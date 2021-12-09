@@ -1,4 +1,5 @@
-
+const int DIMENSION_X = 300;
+const int DIMENSION_Z = 300;
 const float PI = 3.141592;
 
 void trVectorQuestVarSet(string VQVname = "", vector QVv = vector(-1,-1,-1)) {
@@ -73,6 +74,10 @@ the unit's position in the vector.
 */
 void trVectorSetUnitPos(string v = "", string db = "", bool reverse = true) {
 	trVectorQuestVarSet(v, kbGetBlockPosition(""+1*trQuestVarGet(db), reverse));
+}
+
+void trVectorSetUnitPosInt(string v = "", int val = 0, bool reverse = true) {
+	trVectorQuestVarSet(v, kbGetBlockPosition(""+val, reverse));
 }
 
 
