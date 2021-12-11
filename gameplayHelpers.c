@@ -101,7 +101,7 @@ bool collideWithTerrain(int arrow = 0) {
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		collide = true;
-	} else if (terrainIsType("loc", TERRAIN_CHASM, TERRAIN_SUB_CHASM)) {
+	} else if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		collide = true;
@@ -110,6 +110,16 @@ bool collideWithTerrain(int arrow = 0) {
 }
 
 void removeArrow() {
+	for(x=2;<0) {
+		if (yGetVar("arrowsActive", "sfx") > 0) {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("arrowsActive", "sfx"+x), true);
+			trMutateSelected(kbGetProtoUnitID("Rocket"));
+			trUnitDestroy();
+		}
+	}
+	trUnitSelectClear();
+	trUnitSelect(""+1*trQuestVarGet("arrowsActive"), true);
 	yRemoveFromDatabase("arrowsActive");
 	yRemoveUpdateVar("arrowsActive", "destx");
 	yRemoveUpdateVar("arrowsActive", "destz");
@@ -117,6 +127,9 @@ void removeArrow() {
 	yRemoveUpdateVar("arrowsActive", "type");
 	yRemoveUpdateVar("arrowsActive", "damage");
 	yRemoveUpdateVar("arrowsActive", "player");
+	yRemoveUpdateVar("arrowsActive", "sfx1");
+	yRemoveUpdateVar("arrowsActive", "sfx2");
+	yRemoveUpdateVar("arrowsActive", "special");
 }
 
 bool checkArrowDie() {
@@ -124,11 +137,8 @@ bool checkArrowDie() {
 	trQuestVarSet("endx", yGetVar("arrowsActive", "destx"));
 	trQuestVarSet("endz", yGetVar("arrowsActive", "destz"));
 	if ((collideWithTerrain(arrow)) ||
-		zDistanceToVectorSquared("arrowsActive", "end") < 4 ||
+		zDistanceToVectorSquared("arrowsActive", "end") < 9 ||
 		trTimeMS() > yGetVar("arrowsActive", "timeout")) {
-		trUnitSelectClear();
-		trUnitSelect(""+arrow);
-		trUnitChangeProtoUnit("Dust Small");
 		return(true);
 	} else {
 		return(false);
@@ -138,33 +148,154 @@ bool checkArrowDie() {
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
 		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
-		trPlayerGrantResources(1, "Gold", 1*yGetVar("enemies", "bounty"));
+		for(p=1; < ENEMY_PLAYER) {
+			trPlayerGrantResources(p, "Gold", 1*yGetVar("enemies", "bounty"));
+		}
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");
 	yRemoveUpdateVar("enemies", "stunTimeout");
-	yRemoveUpdateVar("enemies", "next");
+	yRemoveUpdateVar("enemies", "stunSFX");
+	yRemoveUpdateVar("enemies", "frostCount");
+	yRemoveUpdateVar("enemies", "shockCount");
 }
 
-void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float dmg = 0) {
+int spyEffect(int unit = 0, int proto = 0) {
+	int x = modularCounterNext("spyFind");
+	trQuestVarSet("spyEye"+x, 0 - proto);
+	trUnitSelectClear();
+	trUnitSelect(""+unit, true);
+	trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+	return(x);
+}
+
+void stunUnit(string db = "", float duration = 0) {
+	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
+		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
+			yAddToDatabase("stunnedUnits", db);
+			ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), "Shockwave stun effect"));
+		}
+		ySetVar(db, "stunTimeout", trTimeMS() + duration);
+	}
+}
+
+int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
+	int sfx = trGetNextUnitScenarioNameNumber();
+	trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+	trUnitSelectClear();
+	trUnitSelect(""+sfx, true);
+	trMutateSelected(kbGetProtoUnitID(proto));
+	trUnitSetAnimationPath(anim);
+	trMutateSelected(kbGetProtoUnitID("Relic"));
+	trImmediateUnitGarrison(""+car);
+	trMutateSelected(kbGetProtoUnitID(proto));
+	return(sfx);
+}
+
+
+void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float dmg = 0, int special = -1) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
+    trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet(from+"x"),0,trQuestVarGet(from+"z"),0,true);
     vectorSetAsTargetVector("target", from, to);
 
-    yAddToDatabase("arrowsActive", "next");
-    yAddUpdateVar("arrowsActive", "damage", dmg);
-    yAddUpdateVar("arrowsActive", "type", type);
-    yAddUpdateVar("arrowsActive", "destx", trQuestVarGet("targetx"));
-    yAddUpdateVar("arrowsActive", "destz", trQuestVarGet("targetz"));
-    yAddUpdateVar("arrowsActive", "player", p);
-    yAddUpdateVar("arrowsActive", "timeout", trTimeMS() + 5000);
-    trUnitSelectClear();
-    trUnitSelect(""+1*trQuestVarGet("next"), true);
-    switch(type)
-    {
-    	case NONE:
-    	{
+    int sfx = 0;
 
-    	}
+    if (type == LIGHT) {
+    	float range = trQuestVarGet("p"+p+"rangeBase") * trQuestVarGet("p"+p+"spellRange");
+    } else {
+    	yAddToDatabase("arrowsActive", "next");
+	    yAddUpdateVar("arrowsActive", "damage", dmg);
+	    yAddUpdateVar("arrowsActive", "type", type);
+	    yAddUpdateVar("arrowsActive", "destx", trQuestVarGet("targetx"));
+	    yAddUpdateVar("arrowsActive", "destz", trQuestVarGet("targetz"));
+	    yAddUpdateVar("arrowsActive", "player", p);
+	    yAddUpdateVar("arrowsActive", "timeout", trTimeMS() + 5000);
+	    yAddUpdateVar("arrowsActive", "special", special);
+	    trUnitSelectClear();
+	    trUnitSelectByQV("next", true);
+	    trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+
+	    switch(type)
+	    {
+	    	case NONE:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Petosuchus Projectile"));
+	    	}
+	    	case FIRE:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Ball of Fire"));
+	    	}
+	    	case ICE:
+	    	{
+	    		sfx = addEffect(1*trQuestVarGet("next"), "Lampades");
+	    		trUnitSelectClear();
+	    		trUnitSelect(""+sfx, true);
+	    		trSetSelectedScale(0,0,0);
+	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
+	    	}
+	    	case THUNDER:
+	    	{
+	    		sfx = addEffect(1*trQuestVarGet("next"), "Arkantos God");
+	    		trUnitSelectClear();
+	    		trUnitSelect(""+sfx, true);
+	    		trSetSelectedScale(0,0,0);
+	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
+	    	}
+	    	case DARK:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Poison SFX"));
+	    	}
+	    }
+
+	    switch(special)
+	    {
+	    	case NONE:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Curse SFX"));
+	    		yAddUpdateVar("arrowsActive", "damage", 3*dmg);
+	    	}
+	    	case FIRE:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Hades Fire"));
+	    		yAddUpdateVar("arrowsActive", "damage", 2*dmg);
+	    	}
+	    	case ICE:
+	    	{
+	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Lampades Bolt"));
+	    	}
+	    }
+
+	    trUnitSelectClear();
+	    trUnitSelectByQV("next", true);
+	    trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+	    trUnitMoveToPoint(trQuestVarGet(to+"x"),0,trQuestVarGet(to+"z"), -1, false);
     }
+}
+
+rule spy_find
+active
+highFrequency
+{
+	if ((trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) == false) {
+		while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
+			int id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
+			if (id >= 0) {
+				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
+					int x = modularCounterNext("spyfound");
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					trMutateSelected(0 - trQuestVarGet("spyEye"+x));
+					trQuestVarSet("spyEye"+x, trQuestVarGet("spysearch"));
+				}
+			}
+			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
+		}
+		trQuestVarSet("spyreset", 1 + trQuestVarGet("spyreset"));
+		if (trQuestVarGet("spyreset") >= 10) {
+			trQuestVarSet("spyfound", trQuestVarGet("spyfind"));
+		}
+	} else {
+		trQuestVarSet("spyreset", 0);
+		trQuestVarSet("spysearch", trGetNextUnitScenarioNameNumber());
+	}
 }

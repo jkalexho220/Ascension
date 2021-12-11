@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c']
+files = ['main.c', 'shared.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

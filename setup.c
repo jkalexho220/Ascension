@@ -14,11 +14,20 @@ runImmediately
 
     trForceNonCinematicModels(true);
     
-    
+    /*
     ambientColor(0,0,0);
     sunColor(0,0,0);
     trLetterBox(true);
     trUIFadeToColor(0,0,0,0,0,true);
+    */
+
+    modularCounterInit("spyFind", 16);
+    modularCounterInit("spyFound", 16);
+
+    /*
+    player 0 omniscience
+    */
+    trTechSetStatus(0, 304, 4);
     
 
     /* Transport Ship max contained */
