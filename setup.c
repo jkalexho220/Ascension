@@ -14,28 +14,29 @@ runImmediately
 
     trForceNonCinematicModels(true);
     
-    /*
+    
     ambientColor(0,0,0);
     sunColor(0,0,0);
     trLetterBox(true);
     trUIFadeToColor(0,0,0,0,0,true);
-    */
+    
 
-    modularCounterInit("spyFind", 16);
-    modularCounterInit("spyFound", 16);
+    modularCounterInit("spyFind", 32);
+    modularCounterInit("spyFound", 32);
 
     /*
     player 0 omniscience
     */
     trTechSetStatus(0, 304, 4);
     
-
     /* Transport Ship max contained */
     trModifyProtounit("Transport Ship Atlantean", 1, 5, -11);
     for(p=1; < ENEMY_PLAYER) {
         /* pop count */
         trModifyProtounit("Vision Revealer", p, 7, 9999);
         trModifyProtounit("Vision Revealer", p, 2, -99);
+
+        trModifyProtounit("Hero Greek Achilles", p, 5, 99)
 
         trModifyProtounit("Vision SFX", p, 0, -9999);
 
@@ -66,6 +67,11 @@ runImmediately
         trForbidProtounit(p, "Hill Fort");
         trForbidProtounit(p, "Tower");
         trForbidProtounit(p, "Longhouse");
+
+        trQuestVarSet("p"+p+"attackSpeed", 1);
+        trQuestVarSet("p"+p+"spellRange", 1);
+        trQuestVarSet("p"+p+"spellDamage", 1);
+        trQuestVarSet("p"+p+"spellDuration", 1);
     }
 
     xsEnableRule("data_load_00");
@@ -92,6 +98,7 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 1) {
+        trSetFogAndBlackmap(false, false);
         /* logo */
         trCameraCut(vector(96,90,98), vector(0,-1,0), vector(0,0,1), vector(1,0,0));
         int posX = 96 - 10;
@@ -130,8 +137,8 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 5) {
-        trSoundPlayFN("market.wav","1",-1,"","");
-        trOverlayText("Battle Gambit", 3.0, -1, -1, -1);
+        trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
+        trOverlayText("Spellslingers", 3.0, -1, -1, -1);
         trUIFadeToColor(0,0,0,1000,3000,true);
         xsEnableRule("Z_cin_02");
         xsDisableSelf();
@@ -150,9 +157,8 @@ highFrequency
         trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
         trQuestVarSet("statue", trGetNextUnitScenarioNameNumber());
         trArmyDispatch("1,0", "Statue of Lightning",1,96,0,96,180,true);
-        trMessageSetText("Host: Delete statue to skip tutorial.",-1);
-        trCounterAddTime("counter", 8, 1, "Tutorial Starting", -1);
-        xsEnableRule("tutorial_00_decide");
+        trMessageSetText("Host: Choose a stage to challenge.",-1);
+        xsEnableRule("gameplay_start");
         xsDisableSelf();
     }
 }

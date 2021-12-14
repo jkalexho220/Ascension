@@ -1,11 +1,12 @@
 /*
-0 = class + basic attack element * 6
-1 = special attack element + primary spell element * 6
-2 = secondary spell element + auxiliary spell element * 6
+0 = attack + special attack element * 6
+1 = Q + W * 6
+2 = E + R * 6
 3 = artifact1
 4 = artifact2
 5 = artifact3
 6 = artifact4
+7 = class + progress
 */
 
 const int SLINGER = 0;
@@ -16,7 +17,7 @@ const int AXEMAN = 3;
 int progress = 0;
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,""+100 * progress / 7,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading:"+100 * progress / 8,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -43,6 +44,7 @@ inactive
 		for(p=1; < ENEMY_PLAYER) {
 			trForbidProtounit(p, "Swordsman Hero");
 		}
+		trLetterBox(false);
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game
@@ -121,8 +123,11 @@ inactive
 						/*
 						Loading elements
 						*/
-						trQuestVarSet("p"+p+"element" + progress, iModulo(6, x));
-						trQuestVarSet("p"+p+"element" + (progress + 1), x / 6);
+						trQuestVarSet("p"+p+"element" + (2 * progress), iModulo(6, x));
+						trQuestVarSet("p"+p+"element" + (2 * progress + 1), x / 6);
+					} else if (progress == 7) {
+						trQuestVarSet("p"+p+"class", iModulo(4, x));
+						trQuestVarSet("p"+p+"progress", x / 4);
 					} else {
 						/*
 						Loading artifacts
@@ -138,14 +143,14 @@ inactive
 		}
 		progress = progress + 1;
 		showLoadProgress();
-		if (progress > 6) {
+		if (progress == 8) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
-		} else {
-			xsEnableRule("data_load_01_load_data");
 		}
+		xsEnableRule("data_load_01_load_data");
 	}
 }
+
 
 rule data_load_03_done
 highFrequency
@@ -167,8 +172,8 @@ inactive
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
 	}
-	trLetterBox(false);
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","");
 	xsDisableSelf();
+	xsEnableRule("Z_cin_00");
 }

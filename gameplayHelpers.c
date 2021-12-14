@@ -59,6 +59,69 @@ string getElementName(int element = 0) {
 	return("NOT AN ELEMENT");
 }
 
+
+void removeArrow() {
+	for(x=2;<0) {
+		if (yGetVar("arrowsActive", "sfx"+x) > 0) {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("arrowsActive", "sfx"+x), true);
+			trMutateSelected(kbGetProtoUnitID("Rocket"));
+			trUnitDestroy();
+		}
+	}
+	trUnitSelectClear();
+	trUnitSelect(""+1*trQuestVarGet("arrowsActive"), true);
+	yRemoveFromDatabase("arrowsActive");
+	yRemoveUpdateVar("arrowsActive", "destx");
+	yRemoveUpdateVar("arrowsActive", "destz");
+	yRemoveUpdateVar("arrowsActive", "timeout");
+	yRemoveUpdateVar("arrowsActive", "element");
+	yRemoveUpdateVar("arrowsActive", "damage");
+	yRemoveUpdateVar("arrowsActive", "player");
+	yRemoveUpdateVar("arrowsActive", "sfx1");
+	yRemoveUpdateVar("arrowsActive", "sfx2");
+	yRemoveUpdateVar("arrowsActive", "special");
+}
+
+void removeEnemy() {
+	if (yGetVar("enemies", "bounty") > 0) {
+		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
+		for(p=1; < ENEMY_PLAYER) {
+			trPlayerGrantResources(p, "Gold", 1*yGetVar("enemies", "bounty"));
+		}
+	}
+	yRemoveFromDatabase("enemies");
+	yRemoveUpdateVar("enemies", "bounty");
+	yRemoveUpdateVar("enemies", "stunTimeout");
+	yRemoveUpdateVar("enemies", "stunSFX");
+	yRemoveUpdateVar("enemies", "poisonTimeout");
+	yRemoveUpdateVar("enemies", "poisonDamage");
+	yRemoveUpdateVar("enemies", "poisonSFX");
+	yRemoveUpdateVar("enemies", "frostCount");
+	yRemoveUpdateVar("enemies", "shockCount");
+	for(x=1; <=5) {
+		yRemoveUpdateVar("enemies", "resist"+x);
+	}	
+}
+
+void removePlayerCharacter() {
+	yRemoveFromDatabase("playerCharacters");
+	yRemoveUpdateVar("playerCharacters", "player");
+	yRemoveUpdateVar("playerCharacters", "specialAttack");
+	yRemoveUpdateVar("playerCharacters", "attacking");
+	yRemoveUpdateVar("playerCharacters", "attackNext");
+}
+
+void removePlayerUnit() {
+	yRemoveFromDatabase("playerUnits");
+	yRemoveUpdateVar("playerUnits", "stunTimeout");
+	yRemoveUpdateVar("playerUnits", "stunSFX");
+	yRemoveUpdateVar("playerUnits", "poisonTimeout");
+	yRemoveUpdateVar("playerUnits", "poisonDamage");
+	yRemoveUpdateVar("playerUnits", "poisonSFX");
+}
+
+
 /*
 Draws a line from 'from' to 'to,' stopping at the edge of the map.
 */
@@ -109,28 +172,6 @@ bool collideWithTerrain(int arrow = 0) {
 	return(collide);
 }
 
-void removeArrow() {
-	for(x=2;<0) {
-		if (yGetVar("arrowsActive", "sfx") > 0) {
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("arrowsActive", "sfx"+x), true);
-			trMutateSelected(kbGetProtoUnitID("Rocket"));
-			trUnitDestroy();
-		}
-	}
-	trUnitSelectClear();
-	trUnitSelect(""+1*trQuestVarGet("arrowsActive"), true);
-	yRemoveFromDatabase("arrowsActive");
-	yRemoveUpdateVar("arrowsActive", "destx");
-	yRemoveUpdateVar("arrowsActive", "destz");
-	yRemoveUpdateVar("arrowsActive", "timeout");
-	yRemoveUpdateVar("arrowsActive", "type");
-	yRemoveUpdateVar("arrowsActive", "damage");
-	yRemoveUpdateVar("arrowsActive", "player");
-	yRemoveUpdateVar("arrowsActive", "sfx1");
-	yRemoveUpdateVar("arrowsActive", "sfx2");
-	yRemoveUpdateVar("arrowsActive", "special");
-}
 
 bool checkArrowDie() {
 	int arrow = trQuestVarGet("arrowsActive");
@@ -143,21 +184,6 @@ bool checkArrowDie() {
 	} else {
 		return(false);
 	}
-}
-
-void removeEnemy() {
-	if (yGetVar("enemies", "bounty") > 0) {
-		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
-		for(p=1; < ENEMY_PLAYER) {
-			trPlayerGrantResources(p, "Gold", 1*yGetVar("enemies", "bounty"));
-		}
-	}
-	yRemoveFromDatabase("enemies");
-	yRemoveUpdateVar("enemies", "bounty");
-	yRemoveUpdateVar("enemies", "stunTimeout");
-	yRemoveUpdateVar("enemies", "stunSFX");
-	yRemoveUpdateVar("enemies", "frostCount");
-	yRemoveUpdateVar("enemies", "shockCount");
 }
 
 int spyEffect(int unit = 0, int proto = 0) {
@@ -173,7 +199,13 @@ void stunUnit(string db = "", float duration = 0) {
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
 			yAddToDatabase("stunnedUnits", db);
-			ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), "Shockwave stun effect"));
+			if (yGetVar(db, "stunSFX") == 0) {
+				ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect")));
+			} else {
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
+				trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
+			}
 		}
 		ySetVar(db, "stunTimeout", trTimeMS() + duration);
 	}
@@ -192,6 +224,14 @@ int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
 	return(sfx);
 }
 
+/*
+Enemies have elemental resistance and weakness
+*/
+void elementalDamage(int p = 0, int element = 0, float dmg = 0, bool spell = false) {
+	dmg = dmg * (1 + trQuestVarGet("p"+p+"element"+element+"bonus")) * (1.0 - yGetVar("enemies", "resist"+element));
+	trDamageUnit(dmg);
+}
+
 
 void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float dmg = 0, int special = -1) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -205,7 +245,7 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
     } else {
     	yAddToDatabase("arrowsActive", "next");
 	    yAddUpdateVar("arrowsActive", "damage", dmg);
-	    yAddUpdateVar("arrowsActive", "type", type);
+	    yAddUpdateVar("arrowsActive", "element", type);
 	    yAddUpdateVar("arrowsActive", "destx", trQuestVarGet("targetx"));
 	    yAddUpdateVar("arrowsActive", "destz", trQuestVarGet("targetz"));
 	    yAddUpdateVar("arrowsActive", "player", p);
