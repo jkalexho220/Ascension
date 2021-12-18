@@ -78,7 +78,8 @@ highFrequency
         } else {
             if (kbUnitGetAnimationActionType(id) == 12) {
                 if (trTimeMS() > yGetVar("playerCharacters", "attackNext")) {
-                    ySetVar("playerCharacters", "attackNext", yGetVar("playerCharacters", "attackNext") + 1000.0 / trQuestVarGet("p"+p+"attackSpeed"));
+                    ySetVar("playerCharacters", "attackNext", 
+                        yGetVar("playerCharacters", "attackNext") + 1000.0 / trQuestVarGet("p"+p+"attackSpeed"));
                     xsSetContextPlayer(p);
                     target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
                     trVectorSetUnitPos("start", "playerCharacters");

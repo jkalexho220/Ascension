@@ -1,3 +1,15 @@
+const int TILE_NOT_FOUND = 0;
+const int TILE_FOUND = 1;
+const int TILE_VISITED = 2;
+
+const int EDGE_NOT_FOUND = 0;
+const int EDGE_NORMAL = 1;
+const int EDGE_CHASM = 2;
+
+const int ROOM_BASIC = 0;
+const int ROOM_STARTER = 1;
+const int ROOM_BOSS = 2;
+
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 
@@ -96,6 +108,7 @@ runImmediately
         trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
         trModifyProtounit("Dwarf", p, 55, 4);
+        trModifyProtounit("Athena", p, 55, 4);
 
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);
@@ -229,16 +242,16 @@ highFrequency
             trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
             trMessageSetText("Host: Choose a stage to challenge.",-1);
 
-            int posX = 96 - trQuestVarGet("p1progress");
+            int posX = 96 - 2 * trQuestVarGet("p1progress");
 
-            for(x=1; <= trQuestVarGet("p1progress")) {
+            for(x=0; <= trQuestVarGet("p1progress")) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                 trArmyDispatch("1,0","Flag Numbered",1,posX,0,100,0,true);
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
                 trUnitSetAnimationPath(""+x+",0,0,0,0,0,0");
                 yAddToDatabase("stageChoices", "next");
-                posX = posX + 2;
+                posX = posX + 4;
             }
 
             xsEnableRule("choose_stage_00");
@@ -267,13 +280,71 @@ highFrequency
     }
 }
 
+void buildRoom(int x = 0, int z = 0, int type = 0) {
+    int room = x + 4 * z;
+    switch(type)
+    {
+        case ROOM_BASIC:
+        {
+            for (i=2; >0) {
+                trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
+                trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
+                trQuestVarSetFromRand("x1", x * 35 + 22, x * 35 + 35, true);
+                trQuestVarSetFromRand("z1", z * 35 + 22, z * 35 + 35, true);
+                int x0 = trQuestVarGet("x0");
+                int x1 = trQuestVarGet("x1");
+                int z0 = trQuestVarGet("z0");
+                int z1 = trQuestVarGet("z1");
+                trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
+                trVectorQuestVarSet("room"+room+"center"+i, xsVectorSet(x0 + x1,0,z0 + z1));
+                trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
+            }
+        }
+    }
+}
+
+int edgeName(int first = 0, int second = 0) {
+    return(16 * xsMin(first, second) + xsMax(first, second));
+}
+
+int getOtherVertex(int edge = 0, int v = 0) {
+    if (edge >= 16 * v) {
+        return(edge - 16 * v);
+    } else {
+        return(edge / 16);
+    }
+}
+
+void buildEdge(int edge = 0, int type = 0) {
+    if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
+        int first = edge / 16;
+        int second = edge - 16 * first;
+        int z0 = first / 4;
+        int x0 = first - 4 * z0;
+        int z1 = second / 4;
+        int x1 = second - 4 * z1;
+        z0 = z0 * 35 + 17;
+        x0 = x0 * 35 + 17;
+        z1 = z1 * 35 + 23;
+        x1 = x1 * 35 + 23;
+        trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+        trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
+        trQuestVarSet("edge"+edge, type);
+    }
+}
+
+
 rule choose_stage_01
 inactive
 highFrequency
 {
     if (trQuestVarGet("stage") > 0) {
+        xsDisableSelf();
+        /*
         trLetterBox(true);
         trUIFadeToColor(0,0,0,0,0,true);
+        */
         trSoundPlayFN("default","1",-1,"Building stage:0","");
         /* minecraft time! */
         switch(1*trQuestVarGet("stage"))
@@ -281,14 +352,96 @@ highFrequency
             case 1:
             {
                 /* desert tomb */
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 2;
 
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 34;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 64;
             }
         }
 
         /* paint entire map cliff and raise it */
         trChangeTerrainHeight(0,0,150,150,10,false);
         trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
+
+        /* build the grid */
+        int x = 0;
+        int z = 0;
+        int n = 0;
+        int total = 0;
+        trQuestVarSet("tile0", TILE_VISITED);
+        trQuestVarSet("tile1", TILE_FOUND);
+        trQuestVarSet("tile4", TILE_FOUND);
+        trQuestVarSet("next", 1);
+        yAddToDatabase("frontier", "next");
+        yAddUpdateVar("frontier", "edge", edgeName(0, 1));
+        trQuestVarSet("next", 4);
+        yAddToDatabase("frontier", "next");
+        yAddUpdateVar("frontier", "edge", edgeName(0, 4));
+        
+        /* build guaranteed path to every room */
+        while(total < 15) {
+            trQuestVarSetFromRand("search", 1, 5, true);
+            yDatabasePointerDefault("frontier");
+            for(j=trQuestVarGet("search"); >0) {
+                yDatabaseNext("frontier");
+            }
+            if (trQuestVarGet("tile"+1*trQuestVarGet("frontier")) < TILE_VISITED) {
+                z = 1*trQuestVarGet("frontier") / 4;
+                x = 1*trQuestVarGet("frontier") - 4 * z;
+                buildEdge(1*yGetVar("frontier", "edge"), EDGE_NORMAL);
+                trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
+                for(a=1; >=0) {
+                    for(b=1; >=0) {
+                        trQuestVarSet("newX", (1 - 2 * b) * a + x);
+                        trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
+                        if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
+                            trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3) {
+                            continue;
+                        }
+                        n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
+                        if (trQuestVarGet("tile"+n) < TILE_VISITED) {
+                            trQuestVarSet("next", n);
+                            yAddToDatabase("frontier", "next");
+                            yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
+                        }
+                    }
+                }
+                total = total + 1;
+            }
+            yRemoveFromDatabase("frontier");
+            yRemoveUpdateVar("frontier", "edge");
+        }
+        /* random bonus paths */
+        for(i=0; <10) {
+            trQuestVarSetFromRand("first", 1, 14);
+            trQuestVarSetFromRand("direction", 0, 3);
+            z = 1*trQuestVarGet("first") / 4;
+            x = 1*trQuestVarGet("first") - z * 4;
+            a = 1*trQuestVarGet("direction") / 2;
+            b = 1*trQuestVarGet("direction") - a * 2;
+            trQuestVarSet("newX", (1 - 2 * b) * a + x);
+            trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
+            if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
+                trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3) {
+                continue;
+            } else {
+                n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
+                buildEdge(edgeName(1*trQuestVarGet("first"), n), EDGE_NORMAL);
+            }
+        }
+
+        for (i=1; < 15) {
+            z = i / 4;
+            x = i - z * 4;
+            buildRoom(x, z, ROOM_BASIC);
+        }
+
         /* paint tiny square at bottom of map for spawning units */
-        trPaintTerrain(0,0,3,3,0,70,false);
+        trPaintTerrain(0,0,3,3,0,70,true);
+        trPaintTerrain(0,0,3,3,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
     }
 }

@@ -4,7 +4,7 @@ rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}
 void main(void) {
 rmSetStatusText("", 0.01);
 
-rmSetMapSize(300, 300);
+rmSetMapSize(290, 290);
 
 rmSetSeaLevel(0);
 rmSetSeaType("greek river");
@@ -19,8 +19,8 @@ rmSetTriggerLoop(false);
 rmSetTriggerRunImmediately(true);
 rmAddTriggerEffect("SetIdleProcessing");
 rmSetTriggerEffectParam("IdleProc",");}}/*");
-code("const int DIMENSION_X = 300;");
-code("const int DIMENSION_Z = 300;");
+code("const int DIMENSION_X = 290;");
+code("const int DIMENSION_Z = 290;");
 code("const float PI = 3.141592;");
 
 code("void trVectorQuestVarSet(string VQVname = \"\", vector QVv = vector(-1,-1,-1)) {");
@@ -346,17 +346,18 @@ code("int yGetDatabaseCount(string db = \"\") {");
 code("return(trQuestVarGet(\"zdatalite\" + db + \"count\"));");
 code("}");
 
-code("int yDatabaseNext(string db = \"\", bool select = false) {");
+code("int yDatabaseNext(string db = \"\", bool select = false, int pointer = 0) {");
 code("for(zdatapointer=0;>1){}");
-code("trQuestVarSet(\"zdatalite\" + db + \"pointer\", trQuestVarGet(\"zdatalite\" + db + \"pointer\")-1);");
-code("if (0 > trQuestVarGet(\"zdatalite\" + db + \"pointer\")) {");
-code("trQuestVarSet(\"zdatalite\" + db + \"pointer\", trQuestVarGet(\"zdatalite\" + db + \"count\")-1);");
+code("trQuestVarSet(\"zdatalite\" + db + \"pointer\"+pointer, trQuestVarGet(\"zdatalite\" + db + \"pointer\"+pointer)-1);");
+code("if (0 > trQuestVarGet(\"zdatalite\" + db + \"pointer\"+pointer)) {");
+code("trQuestVarSet(\"zdatalite\" + db + \"pointer\"+pointer, trQuestVarGet(\"zdatalite\" + db + \"count\")-1);");
 code("}");
-code("if (trQuestVarGet(\"zdatalite\" + db + \"pointer\") >= trQuestVarGet(\"zdatalite\" + db + \"count\")) {");
-code("trQuestVarSet(\"zdatalite\" + db + \"pointer\", trQuestVarGet(\"zdatalite\" + db + \"count\")-1);");
+code("if (trQuestVarGet(\"zdatalite\" + db + \"pointer\"+pointer) >= trQuestVarGet(\"zdatalite\" + db + \"count\")) {");
+code("trQuestVarSet(\"zdatalite\" + db + \"pointer\"+pointer, trQuestVarGet(\"zdatalite\" + db + \"count\")-1);");
 code("}");
-code("zdatapointer = trQuestVarGet(\"zdatalite\" + db + \"pointer\");");
+code("zdatapointer = trQuestVarGet(\"zdatalite\" + db + \"pointer\"+pointer);");
 code("trQuestVarSet(db, trQuestVarGet(\"zdatalite\" + db + \"index\"+zdatapointer));");
+code("trQuestVarSet(\"zdatalite\"+db+\"pointer\", zdatapointer);");
 code("if (select) {");
 code("trUnitSelectClear();");
 code("trUnitSelect(\"\"+1*trQuestVarGet(db), true);");
@@ -386,8 +387,8 @@ code("return(false);");
 code("}");
 
 
-code("void yDatabasePointerDefault(string db = \"\") {");
-code("trQuestVarSet(\"zdatalite\" + db + \"pointer\", 0);");
+code("void yDatabasePointerDefault(string db = \"\", int pointer = 0) {");
+code("trQuestVarSet(\"zdatalite\" + db + \"pointer\"+pointer, 0);");
 code("}");
 
 code("void yRemoveFromDatabase(string db = \"\") {");
@@ -532,8 +533,32 @@ code("}");
 code("}");
 code("return(-1);");
 code("}");
+code("const int TILE_NOT_FOUND = 0;");
+code("const int TILE_FOUND = 1;");
+code("const int TILE_VISITED = 2;");
+
+code("const int EDGE_NOT_FOUND = 0;");
+code("const int EDGE_NORMAL = 1;");
+code("const int EDGE_CHASM = 2;");
+
+code("const int ROOM_BASIC = 0;");
+code("const int ROOM_STARTER = 1;");
+code("const int ROOM_BOSS = 2;");
+
 code("int ENEMY_PLAYER = 0;");
 code("bool Multiplayer = false;");
+
+code("int TERRAIN_CHASM = 5;");
+code("int TERRAIN_SUB_CHASM = 4;");
+
+code("int TERRAIN_WALL = 2;");
+code("int TERRAIN_SUB_WALL = 13;");
+
+code("int TERRAIN_PRIMARY = 0;");
+code("int TERRAIN_SUB_PRIMARY = 1;");
+
+code("int TERRAIN_SECONDARY = 0;");
+code("int TERRAIN_SUB_SECONDARY = 1;");
 
 code("void setupPlayerProto(string proto = \"\", int p = 0, float health = 1000, float range = 12, float speed = 4) {");
 code("trModifyProtounit(proto, p, 27, 9999999999999999999.0);");
@@ -554,6 +579,9 @@ code("trModifyProtounit(proto, p, 11, range);");
 code("trModifyProtounit(proto, p, 1, 9999999999999999999.0);");
 code("trModifyProtounit(proto, p, 1, -9999999999999999999.0);");
 code("trModifyProtounit(proto, p, 1, speed);");
+code("trModifyProtounit(proto, p, 24, -1);");
+code("trModifyProtounit(proto, p, 25, -1);");
+code("trModifyProtounit(proto, p, 26, -1);");
 code("}");
 
 code("rule setup");
@@ -582,6 +610,7 @@ code("trModifyProtounit(\"Vision Revealer\", p, 2, -99);");
 code("trModifyProtounit(\"Hero Greek Achilles\", p, 5, 99);");
 code("trModifyProtounit(\"Vision SFX\", p, 0, -9999);");
 code("trModifyProtounit(\"Dwarf\", p, 55, 4);");
+code("trModifyProtounit(\"Athena\", p, 55, 4);");
 
 code("trPlayerKillAllGodPowers(p);");
 code("trPlayerTechTreeEnabledGodPowers(p, false);");
@@ -702,16 +731,205 @@ code("inactive");
 code("highFrequency");
 code("{");
 code("if (trTime() > cActivationTime + 5) {");
+code("if (trQuestVarGet(\"p1progress\") == 0) {");
+code("trQuestVarSet(\"stage\", 1);");
+code("} else {");
 code("trLetterBox(false);");
 code("trSetLighting(\"default\", 0.1);");
 code("trMusicPlay(\"cinematics\9_in\music.mp3\", \"1\", 0.5);");
 code("trUIFadeToColor(0,0,0,1000,0,false);");
 code("trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));");
-code("trQuestVarSet(\"statue\", trGetNextUnitScenarioNameNumber());");
-code("trArmyDispatch(\"1,0\", \"Statue of Lightning\",1,96,0,96,180,true);");
+code("trQuestVarSet(\"chooser\", trGetNextUnitScenarioNameNumber());");
+code("trArmyDispatch(\"1,0\", \"Athena\",1,96,0,90,0,true);");
 code("trMessageSetText(\"Host: Choose a stage to challenge.\",-1);");
-code("xsEnableRule(\"gameplay_start\");");
+
+code("int posX = 96 - 2 * trQuestVarGet(\"p1progress\");");
+
+code("for(x=0; <= trQuestVarGet(\"p1progress\")) {");
+code("trQuestVarSet(\"next\", trGetNextUnitScenarioNameNumber());");
+code("trArmyDispatch(\"1,0\",\"Flag Numbered\",1,posX,0,100,0,true);");
+code("trUnitSelectClear();");
+code("trUnitSelectByQV(\"next\", true);");
+code("trUnitSetAnimationPath(\"\"+x+\",0,0,0,0,0,0\");");
+code("yAddToDatabase(\"stageChoices\", \"next\");");
+code("posX = posX + 4;");
+code("}");
+
+code("xsEnableRule(\"choose_stage_00\");");
 code("xsDisableSelf();");
+code("}");
+code("xsEnableRule(\"choose_stage_01\");");
+code("}");
+code("}");
+
+code("rule choose_stage_00");
+code("inactive");
+code("highFrequency");
+code("{");
+code("int n = yDatabaseNext(\"stageChoices\");");
+code("if (trCountUnitsInArea(\"\"+n, 1, \"Athena\",3) == 1) {");
+code("trQuestVarSet(\"stage\", yGetPointer(\"stageChoices\") + 1);");
+code("trUnitSelectClear();");
+code("trUnitSelectByQV(\"chooser\", true);");
+code("trUnitChangeProtoUnit(\"Rocket\");");
+code("for(x=yGetDatabaseCount(\"stageChoices\"); >0) {");
+code("yDatabaseNext(\"stageChoices\", true);");
+code("trUnitDestroy();");
+code("}");
+code("yClearDatabase(\"stageChoices\");");
+code("xsDisableSelf();");
+code("}");
+code("}");
+
+code("void buildRoom(int x = 0, int z = 0, int type = 0) {");
+code("switch(type)");
+code("{");
+code("case ROOM_BASIC:");
+code("{");
+code("for (i=2; >0) {");
+code("trQuestVarSetFromRand(\"x0\", x * 35 + 5, x * 35 + 18, true);");
+code("trQuestVarSetFromRand(\"z0\", z * 35 + 5, z * 35 + 18, true);");
+code("trQuestVarSetFromRand(\"x1\", x * 35 + 22, x * 35 + 35, true);");
+code("trQuestVarSetFromRand(\"z1\", z * 35 + 22, z * 35 + 35, true);");
+code("int x0 = trQuestVarGet(\"x0\");");
+code("int x1 = trQuestVarGet(\"x1\");");
+code("int z0 = trQuestVarGet(\"z0\");");
+code("int z1 = trQuestVarGet(\"z1\");");
+code("trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);");
+code("trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);");
+code("}");
+code("}");
+code("}");
+code("}");
+
+code("int edgeName(int first = 0, int second = 0) {");
+code("return(16 * xsMin(first, second) + xsMax(first, second));");
+code("}");
+
+code("int getOtherVertex(int edge = 0, int v = 0) {");
+code("if (edge >= 16 * v) {");
+code("return(edge - 16 * v);");
+code("} else {");
+code("return(edge / 16);");
+code("}");
+code("}");
+
+code("void buildEdge(int edge = 0, int type = 0) {");
+code("if (trQuestVarGet(\"edge\"+edge) == EDGE_NOT_FOUND) {");
+code("int first = edge / 16;");
+code("int second = edge - 16 * first;");
+code("int z0 = first / 4;");
+code("int x0 = first - 4 * z0;");
+code("int z1 = second / 4;");
+code("int x1 = second - 4 * z1;");
+code("z0 = z0 * 35 + 17;");
+code("x0 = x0 * 35 + 17;");
+code("z1 = z1 * 35 + 23;");
+code("x1 = x1 * 35 + 23;");
+code("trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);");
+code("trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);");
+code("trQuestVarSet(\"edge\"+edge, type);");
+code("}");
+code("}");
+
+
+code("rule choose_stage_01");
+code("inactive");
+code("highFrequency");
+code("{");
+code("if (trQuestVarGet(\"stage\") > 0) {");
+code("xsDisableSelf();");
+code("trSoundPlayFN(\"default\",\"1\",-1,\"Building stage:0\",\"\");");
+code("switch(1*trQuestVarGet(\"stage\"))");
+code("{");
+code("case 1:");
+code("{");
+code("TERRAIN_WALL = 2;");
+code("TERRAIN_SUB_WALL = 2;");
+
+code("TERRAIN_PRIMARY = 0;");
+code("TERRAIN_SUB_PRIMARY = 34;");
+
+code("TERRAIN_SECONDARY = 0;");
+code("TERRAIN_SUB_SECONDARY = 64;");
+code("}");
+code("}");
+
+code("trChangeTerrainHeight(0,0,150,150,10,false);");
+code("trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);");
+
+code("int x = 0;");
+code("int z = 0;");
+code("int n = 0;");
+code("int total = 0;");
+code("trQuestVarSet(\"tile0\", TILE_VISITED);");
+code("trQuestVarSet(\"tile1\", TILE_FOUND);");
+code("trQuestVarSet(\"tile4\", TILE_FOUND);");
+code("trQuestVarSet(\"next\", 1);");
+code("yAddToDatabase(\"frontier\", \"next\");");
+code("yAddUpdateVar(\"frontier\", \"edge\", edgeName(0, 1));");
+code("trQuestVarSet(\"next\", 4);");
+code("yAddToDatabase(\"frontier\", \"next\");");
+code("yAddUpdateVar(\"frontier\", \"edge\", edgeName(0, 4));");
+
+code("while(total < 15) {");
+code("trQuestVarSetFromRand(\"search\", 1, 5, true);");
+code("yDatabasePointerDefault(\"frontier\");");
+code("for(j=trQuestVarGet(\"search\"); >0) {");
+code("yDatabaseNext(\"frontier\");");
+code("}");
+code("if (trQuestVarGet(\"tile\"+1*trQuestVarGet(\"frontier\")) < TILE_VISITED) {");
+code("z = 1*trQuestVarGet(\"frontier\") / 4;");
+code("x = 1*trQuestVarGet(\"frontier\") - 4 * z;");
+code("buildEdge(1*yGetVar(\"frontier\", \"edge\"), EDGE_NORMAL);");
+code("trQuestVarSet(\"tile\"+1*trQuestVarGet(\"frontier\"), TILE_VISITED);");
+code("for(a=1; >=0) {");
+code("for(b=1; >=0) {");
+code("trQuestVarSet(\"newX\", (1 - 2 * b) * a + x);");
+code("trQuestVarSet(\"newZ\", (1 - 2 * b) * (1 - a) + z);");
+code("if (trQuestVarGet(\"newX\") < 0 || trQuestVarGet(\"newZ\") < 0 ||");
+code("trQuestVarGet(\"newX\") > 3 || trQuestVarGet(\"newZ\") > 3) {");
+code("continue;");
+code("}");
+code("n = 0 + trQuestVarGet(\"newX\") + 4 * trQuestVarGet(\"newZ\");");
+code("if (trQuestVarGet(\"tile\"+n) < TILE_VISITED) {");
+code("trQuestVarSet(\"next\", n);");
+code("yAddToDatabase(\"frontier\", \"next\");");
+code("yAddUpdateVar(\"frontier\", \"edge\", edgeName(1*trQuestVarGet(\"frontier\"), n));");
+code("}");
+code("}");
+code("}");
+code("total = total + 1;");
+code("}");
+code("yRemoveFromDatabase(\"frontier\");");
+code("yRemoveUpdateVar(\"frontier\", \"edge\");");
+code("}");
+code("for(i=0; <10) {");
+code("trQuestVarSetFromRand(\"first\", 1, 14);");
+code("trQuestVarSetFromRand(\"direction\", 0, 3);");
+code("z = 1*trQuestVarGet(\"first\") / 4;");
+code("x = 1*trQuestVarGet(\"first\") - z * 4;");
+code("a = 1*trQuestVarGet(\"direction\") / 2;");
+code("b = 1*trQuestVarGet(\"direction\") - a * 2;");
+code("trQuestVarSet(\"newX\", (1 - 2 * b) * a + x);");
+code("trQuestVarSet(\"newZ\", (1 - 2 * b) * (1 - a) + z);");
+code("if (trQuestVarGet(\"newX\") < 0 || trQuestVarGet(\"newZ\") < 0 ||");
+code("trQuestVarGet(\"newX\") > 3 || trQuestVarGet(\"newZ\") > 3) {");
+code("continue;");
+code("} else {");
+code("n = 0 + trQuestVarGet(\"newX\") + 4 * trQuestVarGet(\"newZ\");");
+code("buildEdge(edgeName(1*trQuestVarGet(\"first\"), n), EDGE_NORMAL);");
+code("}");
+code("}");
+
+code("for (i=1; < 15) {");
+code("z = i / 4;");
+code("x = i - z * 4;");
+code("buildRoom(x, z, ROOM_BASIC);");
+code("}");
+
+code("trPaintTerrain(0,0,3,3,0,70,true);");
+code("trPaintTerrain(0,0,3,3,TERRAIN_WALL,TERRAIN_SUB_WALL,false);");
 code("}");
 code("}");
 code("const int NONE = 0;");
@@ -728,13 +946,6 @@ code("const int SPECIAL_THUNDER = 9;");
 code("const int SPECIAL_LIGHT = 10;");
 code("const int SPECIAL_DARK = 11;");
 
-code("const int WALL_BRICK = 2;");
-code("const int WALL_WOOD = 3;");
-code("int TERRAIN_CHASM = 5;");
-code("int TERRAIN_SUB_CHASM = 4;");
-
-code("int TERRAIN_WALL = 2;");
-code("int TERRAIN_SUB_WALL = 13;");
 
 
 code("bool terrainIsType(string qv = \"\", int type = 0, int subtype = 0) {");
@@ -931,6 +1142,7 @@ code("}");
 code("if (trTimeMS() + duration > yGetVar(db, \"stunTimeout\")) {");
 code("if (trTimeMS() > yGetVar(db, \"stunTimeout\")) {");
 code("yAddToDatabase(\"stunnedUnits\", db);");
+code("yAddUpdateVar(\"stunnedUnits\", \"proto\", kbGetUnitBaseTypeID(kbGetBlockID(\"\"+1*trQuestVarGet(db), true)));");
 code("if (yGetVar(db, \"stunSFX\") == 0) {");
 code("ySetVar(db, \"stunSFX\", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID(\"Shockwave stun effect\")));");
 code("} else {");
@@ -1145,24 +1357,6 @@ code("trQuestVarSet(\"spysearch\", trGetNextUnitScenarioNameNumber());");
 code("}");
 code("}");
 
-code("rule player_lasers");
-code("active");
-code("highFrequency");
-code("{");
-code("for(x=xsMin(3, yGetDatabaseCount(\"playerLasers\")); >0) {");
-code("yDatabaseNext(\"playerLasers\", true);");
-code("if (trTimeMS() > yGetVar(\"playerLasers\", \"timeout\")) {");
-code("trUnitDestroy();");
-code("yRemoveFromDatabase(\"playerLasers\");");
-code("yRemoveUpdateVar(\"playerLasers\", \"timeout\");");
-code("yRemoveUpdateVar(\"playerLasers\", \"range\");");
-code("} else {");
-code("float width = 3.0 * (yGetVar(\"playerLasers\", \"timeout\") - trTimeMS()) / 500;");
-code("trSetSelectedScale(width, width, yGetVar(\"playerLasers\", \"range\"));");
-code("}");
-code("}");
-code("}");
-
 code("const int SLINGER = 0;");
 code("const int ARCUS = 1;");
 code("const int TURMA = 2;");
@@ -1171,7 +1365,7 @@ code("const int AXEMAN = 3;");
 code("int progress = 0;");
 
 code("void showLoadProgress() {");
-code("trSoundPlayFN(\"default\",\"1\",-1,\"Loading:\"+100 * progress / 9,\"icons\god power reverse time icons 64\");");
+code("trSoundPlayFN(\"default\",\"1\",-1,\"Loading Data:\"+100 * progress / 9,\"icons\god power reverse time icons 64\");");
 code("}");
 
 code("rule data_load_00");
@@ -1285,8 +1479,9 @@ code("showLoadProgress();");
 code("if (progress == 9) {");
 code("xsDisableSelf();");
 code("xsEnableRule(\"data_load_03_done\");");
-code("}");
+code("} else {");
 code("xsEnableRule(\"data_load_01_load_data\");");
+code("}");
 code("}");
 code("}");
 
@@ -1374,6 +1569,10 @@ code("}");
 code("void setupProtounitBounty(string proto = \"\", int bounty = 2) {");
 code("int p = kbGetProtoUnitID(proto);");
 code("trQuestVarSet(\"proto\"+p+\"bounty\", bounty);");
+code("trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);");
+code("trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);");
+code("trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);");
+code("trModifyProtounit(proto, ENEMY_PLAYER, 6, 6);");
 code("}");
 
 code("void setupProtounitResist(string proto = \"\", int element = 0, float resist = 0) {");
@@ -1463,7 +1662,7 @@ code("trArmyDispatch(\"\"+p+\",0\",proto,1,trQuestVarGet(vdb+\"x\"),0,trQuestVar
 code("yAddToDatabase(\"playerCharacters\", \"next\");");
 code("yAddUpdateVar(\"playerCharacters\", \"player\", p);");
 code("yAddUpdateVar(\"playerCharacters\", \"attacking\", 0);");
-
+code("yAddUpdateVar(\"playerCharacters\", \"specialAttack\", trQuestVarGet(\"p\"+p+\"specialAttackCooldown\"));");
 code("yAddToDatabase(\"playerUnits\", \"next\");");
 code("}");
 
@@ -1489,11 +1688,6 @@ code("xsEnableRule(\"gameplay_always\");");
 code("xsEnableRule(\"enemies_always\");");
 code("trQuestVarSet(\"nextProj\", trGetNextUnitScenarioNameNumber());");
 
-code("trVectorQuestVarSet(\"center\", vector(10,0,10));");
-code("spawnPlayer(1, \"center\");");
-code("trQuestVarSet(\"next\", trGetNextUnitScenarioNameNumber());");
-code("yAddToDatabase(\"enemies\", \"next\");");
-code("trArmyDispatch(\"\"+ENEMY_PLAYER+\",0\",\"Militia\",1,20,0,20,0,true);");
 code("}");
 
 code("rule gameplay_always");
@@ -1518,7 +1712,8 @@ code("}");
 code("} else {");
 code("if (kbUnitGetAnimationActionType(id) == 12) {");
 code("if (trTimeMS() > yGetVar(\"playerCharacters\", \"attackNext\")) {");
-code("ySetVar(\"playerCharacters\", \"attackNext\", trTimeMS() + 1000.0 / trQuestVarGet(\"p\"+p+\"attackSpeed\"));");
+code("ySetVar(\"playerCharacters\", \"attackNext\",");
+code("yGetVar(\"playerCharacters\", \"attackNext\") + 1000.0 / trQuestVarGet(\"p\"+p+\"attackSpeed\"));");
 code("xsSetContextPlayer(p);");
 code("target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));");
 code("trVectorSetUnitPos(\"start\", \"playerCharacters\");");
@@ -1611,7 +1806,24 @@ code("}");
 code("}");
 code("}");
 
+code("for(x=yGetDatabaseCount(\"stunnedUnits\"); >0) {");
+code("yDatabaseNext(\"stunnedUnits\", true);");
+code("trMutateSelected(1*yGetVar(\"stunnedUnits\", \"proto\"));");
+code("trUnitOverrideAnimation(2, 0, false, true, -1, 0);");
+code("}");
 
+code("for(x=xsMin(3, yGetDatabaseCount(\"playerLasers\")); >0) {");
+code("yDatabaseNext(\"playerLasers\", true);");
+code("if (trTimeMS() > yGetVar(\"playerLasers\", \"timeout\")) {");
+code("trUnitDestroy();");
+code("yRemoveFromDatabase(\"playerLasers\");");
+code("yRemoveUpdateVar(\"playerLasers\", \"timeout\");");
+code("yRemoveUpdateVar(\"playerLasers\", \"range\");");
+code("} else {");
+code("float width = 3.0 * (yGetVar(\"playerLasers\", \"timeout\") - trTimeMS()) / 500;");
+code("trSetSelectedScale(width, width, yGetVar(\"playerLasers\", \"range\"));");
+code("}");
+code("}");
 
 code("xsSetContextPlayer(old);");
 code("}");

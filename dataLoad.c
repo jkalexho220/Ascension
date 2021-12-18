@@ -147,8 +147,9 @@ inactive
 		if (progress == 9) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
+		} else {
+			xsEnableRule("data_load_01_load_data");
 		}
-		xsEnableRule("data_load_01_load_data");
 	}
 }
 

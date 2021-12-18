@@ -120,7 +120,7 @@ try:
 								print("Missing semicolon")
 								print("Line " + str(ln) + ":\n    " + line)
 							if '{' in templine and not 'else' in templine and not 'if' in templine and not 'for' in templine and not 'while' in templine and ')' in templine and not '{P' in templine:
-								equalCount = templine.count('string', templine.index('(')) + templine.count('int', templine.index('(')) + templine.count('float', templine.index('(')) + templine.count('bool', templine.index('('))
+								equalCount = templine.count('string', templine.index('(')) + templine.count('int ', templine.index('(')) + templine.count('float', templine.index('(')) + templine.count('bool', templine.index('('))
 								if equalCount > templine.count('='):
 									print("Needs equals sign")
 									print("Line " + str(ln) + ":\n    " + line)

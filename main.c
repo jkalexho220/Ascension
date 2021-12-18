@@ -1,6 +1,6 @@
 rmSetStatusText("", 0.01);
 
-rmSetMapSize(300, 300);
+rmSetMapSize(290, 290);
 
 rmSetSeaLevel(0);
 rmSetSeaType("greek river");

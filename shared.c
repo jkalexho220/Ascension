@@ -1,5 +1,5 @@
-const int DIMENSION_X = 300;
-const int DIMENSION_Z = 300;
+const int DIMENSION_X = 290;
+const int DIMENSION_Z = 290;
 const float PI = 3.141592;
 
 void trVectorQuestVarSet(string VQVname = "", vector QVv = vector(-1,-1,-1)) {
