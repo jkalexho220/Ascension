@@ -20,7 +20,7 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
     yAddUpdateVar("playerCharacters", "attacking", 0);
-
+    yAddUpdateVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
     yAddToDatabase("playerUnits", "next");
 }
 
@@ -48,12 +48,12 @@ highFrequency
 
     /*
     TESTING STUFF BELOW THIS LINE
-    */
     trVectorQuestVarSet("center", vector(10,0,10));
     spawnPlayer(1, "center");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
     yAddToDatabase("enemies", "next");
     trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,20,0,20,0,true);
+    */
 }
 
 rule gameplay_always
@@ -78,7 +78,7 @@ highFrequency
         } else {
             if (kbUnitGetAnimationActionType(id) == 12) {
                 if (trTimeMS() > yGetVar("playerCharacters", "attackNext")) {
-                    ySetVar("playerCharacters", "attackNext", trTimeMS() + 1000.0 / trQuestVarGet("p"+p+"attackSpeed"));
+                    ySetVar("playerCharacters", "attackNext", yGetVar("playerCharacters", "attackNext") + 1000.0 / trQuestVarGet("p"+p+"attackSpeed"));
                     xsSetContextPlayer(p);
                     target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
                     trVectorSetUnitPos("start", "playerCharacters");
@@ -161,7 +161,8 @@ highFrequency
                     removeEnemy();
                 } else {
                     if (zDistanceToVectorSquared("enemies", "pos") <= dist) {
-                        arrowHitEnemy(p, id);
+                        arrowHitEnemy(p, id, 1*yGetVar("arrowsActive", "element"), 
+                            yGetVar("arrowsActive", "damage"), 1*yGetVar("arrowsActive", "special"));
                     }
                 }
             }
@@ -176,7 +177,30 @@ highFrequency
         }
     }
 
-    
+    /* 
+    maintain stun
+    */
+    for(x=yGetDatabaseCount("stunnedUnits"); >0) {
+        yDatabaseNext("stunnedUnits", true);
+        trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
+        trUnitOverrideAnimation(2, 0, false, true, -1, 0);
+    }
+
+    /*
+    Player lasers
+    */
+    for(x=xsMin(3, yGetDatabaseCount("playerLasers")); >0) {
+        yDatabaseNext("playerLasers", true);
+        if (trTimeMS() > yGetVar("playerLasers", "timeout")) {
+            trUnitDestroy();
+            yRemoveFromDatabase("playerLasers");
+            yRemoveUpdateVar("playerLasers", "timeout");
+            yRemoveUpdateVar("playerLasers", "range");
+        } else {
+            float width = 3.0 * (yGetVar("playerLasers", "timeout") - trTimeMS()) / 500;
+            trSetSelectedScale(width, width, yGetVar("playerLasers", "range"));
+        }
+    }
 
     xsSetContextPlayer(old);
 }

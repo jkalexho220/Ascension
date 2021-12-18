@@ -12,19 +12,6 @@ const int SPECIAL_THUNDER = 9;
 const int SPECIAL_LIGHT = 10;
 const int SPECIAL_DARK = 11;
 
-const int WALL_BRICK = 2;
-const int WALL_WOOD = 3;
-/*
-Chasm terrain is black
-*/
-int TERRAIN_CHASM = 5;
-int TERRAIN_SUB_CHASM = 4;
-
-/* 
-Wall terrain is blackrock
-*/
-int TERRAIN_WALL = 2;
-int TERRAIN_SUB_WALL = 13;
 
 
 bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
@@ -227,6 +214,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
 			yAddToDatabase("stunnedUnits", db);
+			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
 			if (yGetVar(db, "stunSFX") == 0) {
 				ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect")));
 			} else {
@@ -265,12 +253,17 @@ void elementalDamage(int p = 0, int element = 0, float dmg = 0, bool spell = fal
 }
 
 
-void arrowHitEnemy(int p = 0, int id = 0) {
-	elementalDamage(p, 1*yGetVar("arrowsActive", "element"), yGetVar("arrowsActive", "damage"));
-    if ((yGetVar("arrowsActive", "special") == ICE) && kbUnitGetCurrentHitpoints(id) > 0) {
+void arrowHitEnemy(int p = 0, int id = 0, int element = 0, float damage = 0, int special = 0) {
+	if (special == FIRE) {
+		damage = 2.0 * damage;
+	} else if (special == NONE) {
+		damage = 3.0 * damage;
+	}
+	elementalDamage(p, element, damage);
+    if ((special == ICE) && kbUnitGetCurrentHitpoints(id) > 0) {
         stunUnit("enemies", 1.5, p);
     }
-    if ((yGetVar("arrowsActive", "element") == DARK) && kbUnitGetCurrentHitpoints(id) > 0) {
+    if ((special == DARK) && kbUnitGetCurrentHitpoints(id) > 0) {
         poisonUnit("enemies", 12.0, 12.0, p);
     }
 }
@@ -306,9 +299,24 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
     int sfx = 0;
 
     if (type == LIGHT) {
-    	float range = trQuestVarGet("p"+p+"rangeBase") * trQuestVarGet("p"+p+"spellRange");
+    	float range = trQuestVarGet("p"+p+"attackRange");
+    	trUnitSelectClear();
+    	trUnitSelect(""+1*trQuestVarGet("next"), true);
+    	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+    	trUnitHighlight(1.0, false);
+    	trSetUnitOrientation(zGetUnitVector(to, from), vector(0,1,0), true);
+    	trSetSelectedScale(3, 3, range * 1.25);
+
+    	yAddToDatabase("playerLasers", "next");
+    	yAddUpdateVar("playerLasers", "range", range * 1.25);
+    	yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
     	arrowHit(p);
     	float dist = 0;
+		float hitDist = 4;
+    	if (special == FIRE) {
+    		hitDist = 16;
+    		yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 1000);
+    	}
     	for(x=yGetDatabaseCount("enemies"); >0) {
     		yDatabaseNext("enemies");
     		trVectorSetUnitPos("pos", "enemies");
@@ -317,8 +325,10 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
     			trVectorQuestVarSet("hitbox", zGetUnitVector(from, to, dist));
 	    		trQuestVarSet("hitboxx", trQuestVarGet("hitboxx") + trQuestVarGet(from+"x"));
 	    		trQuestVarSet("hitboxz", trQuestVarGet("hitboxz") + trQuestVarGet(from+"z"));
-	    		if (zDistanceToVectorSquared("enemies", "hitbox") < 4) {
-	    			arrowHitEnemy(p, kbGetBlockID(""+1*trQuestVarGet("enemies"), true));
+	    		if (zDistanceToVectorSquared("enemies", "hitbox") < hitDist) {
+	    			trUnitSelectClear();
+	    			trUnitSelect(""+1*trQuestVarGet("enemies"), true);
+	    			arrowHitEnemy(p, kbGetBlockID(""+1*trQuestVarGet("enemies"), true), LIGHT, dmg, special);
 	    		}
     		}
     	}
@@ -376,12 +386,10 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
 	    	case NONE:
 	    	{
 	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Curse SFX"));
-	    		yAddUpdateVar("arrowsActive", "damage", 3*dmg);
 	    	}
 	    	case FIRE:
 	    	{
 	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Hades Fire"));
-	    		yAddUpdateVar("arrowsActive", "damage", 2*dmg);
 	    	}
 	    	case ICE:
 	    	{

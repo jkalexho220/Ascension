@@ -1,6 +1,10 @@
 void setupProtounitBounty(string proto = "", int bounty = 2) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
+	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
+	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
+	trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);
+	trModifyProtounit(proto, ENEMY_PLAYER, 6, 6);
 }
 
 void setupProtounitResist(string proto = "", int element = 0, float resist = 0) {

@@ -80,7 +80,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trSetCurrentScenarioUserData','trModeEnter', 'exit', 'musicToggleBattleMode', 'trEventSetHandler', 'kbProtoUnitIsUnitType',
 			'uiCopyToClipboard', 'uiPasteFromClipboard', 'trGetTerrainType', 'trGetTerrainSubType', 'trUnitHasLOS', 'trUnitDistanceToPoint',
 			'trShowImageDialog', 'trShowChoiceDialog', 'trGameLoadScenario', 'xsVectorGetX', 'xsVectorGetY', 'xsVectorGetZ', 'kbArmyCreate', 
-			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits'}
+			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
 files = ['main.c', 'shared.c', 'setup.c', 'gameplayHelpers.c', 'dataLoad.c', 'enemies.c', 'gameplay.c']

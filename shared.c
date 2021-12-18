@@ -358,17 +358,18 @@ int yGetDatabaseCount(string db = "") {
 Gets the next unit in the database 'db'. Variables are associated with the
 database index rather than the value.
 */
-int yDatabaseNext(string db = "", bool select = false) {
+int yDatabaseNext(string db = "", bool select = false, int pointer = 0) {
 	for(zdatapointer=0;>1){}
-	trQuestVarSet("zdatalite" + db + "pointer", trQuestVarGet("zdatalite" + db + "pointer")-1);
-	if (0 > trQuestVarGet("zdatalite" + db + "pointer")) {
-		trQuestVarSet("zdatalite" + db + "pointer", trQuestVarGet("zdatalite" + db + "count")-1);
+	trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "pointer"+pointer)-1);
+	if (0 > trQuestVarGet("zdatalite" + db + "pointer"+pointer)) {
+		trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "count")-1);
 	}
-	if (trQuestVarGet("zdatalite" + db + "pointer") >= trQuestVarGet("zdatalite" + db + "count")) {
-		trQuestVarSet("zdatalite" + db + "pointer", trQuestVarGet("zdatalite" + db + "count")-1);
+	if (trQuestVarGet("zdatalite" + db + "pointer"+pointer) >= trQuestVarGet("zdatalite" + db + "count")) {
+		trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "count")-1);
 	}
-	zdatapointer = trQuestVarGet("zdatalite" + db + "pointer");
+	zdatapointer = trQuestVarGet("zdatalite" + db + "pointer"+pointer);
 	trQuestVarSet(db, trQuestVarGet("zdatalite" + db + "index"+zdatapointer));
+	trQuestVarSet("zdatalite"+db+"pointer", zdatapointer);
 	if (select) {
 		trUnitSelectClear();
 		trUnitSelect(""+1*trQuestVarGet(db), true);
@@ -398,8 +399,8 @@ bool yDatabaseContains(string db = "", int index = 0) {
 }
 
 
-void yDatabasePointerDefault(string db = "") {
-	trQuestVarSet("zdatalite" + db + "pointer", 0);
+void yDatabasePointerDefault(string db = "", int pointer = 0) {
+	trQuestVarSet("zdatalite" + db + "pointer"+pointer, 0);
 }
 
 /*

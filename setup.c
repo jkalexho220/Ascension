@@ -1,6 +1,30 @@
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 
+/*
+Chasm terrain is black
+*/
+int TERRAIN_CHASM = 5;
+int TERRAIN_SUB_CHASM = 4;
+
+/* 
+Wall terrain is blackrock
+*/
+int TERRAIN_WALL = 2;
+int TERRAIN_SUB_WALL = 13;
+
+/*
+Floor terrain
+*/
+int TERRAIN_PRIMARY = 0;
+int TERRAIN_SUB_PRIMARY = 1;
+
+/*
+Secondary terrain
+*/
+int TERRAIN_SECONDARY = 0;
+int TERRAIN_SUB_SECONDARY = 1;
+
 void setupPlayerProto(string proto = "", int p = 0, float health = 1000, float range = 12, float speed = 4) {
     /* attack = 0 */
     trModifyProtounit(proto, p, 27, 9999999999999999999.0);
@@ -25,6 +49,10 @@ void setupPlayerProto(string proto = "", int p = 0, float health = 1000, float r
     trModifyProtounit(proto, p, 1, 9999999999999999999.0);
     trModifyProtounit(proto, p, 1, -9999999999999999999.0);
     trModifyProtounit(proto, p, 1, speed); 
+    /* armor */
+    trModifyProtounit(proto, p, 24, -1);
+    trModifyProtounit(proto, p, 25, -1);
+    trModifyProtounit(proto, p, 26, -1);
 }
 
 rule setup
@@ -105,6 +133,7 @@ runImmediately
         trForbidProtounit(p, "Tower");
         trForbidProtounit(p, "Longhouse");
 
+        trQuestVarSet("p"+p+"attackRange", 12);
         trQuestVarSet("p"+p+"attackSpeed", 1);
         trQuestVarSet("p"+p+"spellRange", 1);
         trQuestVarSet("p"+p+"spellDamage", 1);
@@ -188,15 +217,78 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 5) {
-        trLetterBox(false);
-        trSetLighting("default", 0.1);
-        trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
-        trUIFadeToColor(0,0,0,1000,0,false);
-        trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
-        trQuestVarSet("statue", trGetNextUnitScenarioNameNumber());
-        trArmyDispatch("1,0", "Statue of Lightning",1,96,0,96,180,true);
-        trMessageSetText("Host: Choose a stage to challenge.",-1);
-        xsEnableRule("gameplay_start");
+        if (trQuestVarGet("p1progress") == 0) {
+            trQuestVarSet("stage", 1);
+        } else {
+            trLetterBox(false);
+            trSetLighting("default", 0.1);
+            trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
+            trUIFadeToColor(0,0,0,1000,0,false);
+            trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
+            trQuestVarSet("chooser", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
+            trMessageSetText("Host: Choose a stage to challenge.",-1);
+
+            int posX = 96 - trQuestVarGet("p1progress");
+
+            for(x=1; <= trQuestVarGet("p1progress")) {
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Flag Numbered",1,posX,0,100,0,true);
+                trUnitSelectClear();
+                trUnitSelectByQV("next", true);
+                trUnitSetAnimationPath(""+x+",0,0,0,0,0,0");
+                yAddToDatabase("stageChoices", "next");
+                posX = posX + 2;
+            }
+
+            xsEnableRule("choose_stage_00");
+            xsDisableSelf();
+        }
+        xsEnableRule("choose_stage_01");
+    }
+}
+
+rule choose_stage_00
+inactive
+highFrequency
+{
+    int n = yDatabaseNext("stageChoices");
+    if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
+        trQuestVarSet("stage", yGetPointer("stageChoices") + 1);
+        trUnitSelectClear();
+        trUnitSelectByQV("chooser", true);
+        trUnitChangeProtoUnit("Rocket");
+        for(x=yGetDatabaseCount("stageChoices"); >0) {
+            yDatabaseNext("stageChoices", true);
+            trUnitDestroy();
+        }
+        yClearDatabase("stageChoices");
         xsDisableSelf();
+    }
+}
+
+rule choose_stage_01
+inactive
+highFrequency
+{
+    if (trQuestVarGet("stage") > 0) {
+        trLetterBox(true);
+        trUIFadeToColor(0,0,0,0,0,true);
+        trSoundPlayFN("default","1",-1,"Building stage:0","");
+        /* minecraft time! */
+        switch(1*trQuestVarGet("stage"))
+        {
+            case 1:
+            {
+                /* desert tomb */
+
+            }
+        }
+
+        /* paint entire map cliff and raise it */
+        trChangeTerrainHeight(0,0,150,150,10,false);
+        trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
+        /* paint tiny square at bottom of map for spawning units */
+        trPaintTerrain(0,0,3,3,0,70,false);
     }
 }

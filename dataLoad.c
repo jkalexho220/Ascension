@@ -18,7 +18,7 @@ const int AXEMAN = 3;
 int progress = 0;
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading:"+100 * progress / 9,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * progress / 9,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -178,18 +178,22 @@ inactive
 			case NONE:
 			{
 				trQuestVarSet("p"+p+"attack", 60);
+				trModifyProtounit("Wadjet Spit", p, 1, -10);
 			}
 			case FIRE:
 			{
 				trQuestVarSet("p"+p+"attack", 100);
+				trModifyProtounit("Wadjet Spit", p, 1, -10);
 			}
 			case ICE:
 			{
 				trQuestVarSet("p"+p+"attack", 50);
+				trModifyProtounit("Wadjet Spit", p, 1, -15);
 			}
 			case THUNDER:
 			{
 				trQuestVarSet("p"+p+"attack", 20);
+				trModifyProtounit("Wadjet Spit", p, 1, -20);
 			}
 			case LIGHT:
 			{
@@ -198,6 +202,35 @@ inactive
 			case DARK:
 			{
 				trQuestVarSet("p"+p+"attack", 0);
+				trModifyProtounit("Wadjet Spit", p, 1, -10);
+			}
+		}
+
+		switch(1*trQuestVarGet("p"+p+"element1"))
+		{
+			case NONE:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 4);
+			}
+			case FIRE:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 5);
+			}
+			case ICE:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
+			}
+			case THUNDER:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 6);
+			}
+			case LIGHT:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
+			}
+			case DARK:
+			{
+				trQuestVarSet("p"+p+"specialAttackCooldown", 10);
 			}
 		}
 	}
