@@ -95,6 +95,7 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "stunTimeout");
 	yRemoveUpdateVar("enemies", "stunSFX");
 	yRemoveUpdateVar("enemies", "poisonTimeout");
+	yRemoveUpdateVar("enemies", "poisonLast");
 	yRemoveUpdateVar("enemies", "poisonDamage");
 	yRemoveUpdateVar("enemies", "poisonSFX");
 	yRemoveUpdateVar("enemies", "frostCount");
@@ -117,8 +118,10 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "stunTimeout");
 	yRemoveUpdateVar("playerUnits", "stunSFX");
 	yRemoveUpdateVar("playerUnits", "poisonTimeout");
+	yRemoveUpdateVar("playerUnits", "poisonLast");
 	yRemoveUpdateVar("playerUnits", "poisonDamage");
 	yRemoveUpdateVar("playerUnits", "poisonSFX");
+	yRemoveUpdateVar("playerUnits", "decay");
 }
 
 
@@ -195,7 +198,32 @@ int spyEffect(int unit = 0, int proto = 0) {
 	return(x);
 }
 
-void stunUnit(string db = "", float duration = 0) {
+void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
+	if (p > 0) {
+		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+		damage = damage * trQuestVarGet("p"+p+"spellDamage");
+	}
+	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
+		if (trTimeMS() > yGetVar(db, "poisonTimeout")) {
+			if (yGetVar(db, "poisonSFX") == 0) {
+				ySetVar(db, "poisonSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave poison effect")));
+			} else {
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
+				trMutateSelected(kbGetProtoUnitID("Poison SFX"));
+			}
+		}
+		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
+	}
+	if (damage > yGetVar(db, "poisonDamage")) {
+		ySetVar(db, "poisonDamage", damage);
+	}
+}
+
+void stunUnit(string db = "", float duration = 0, int p = 0) {
+	if (p > 0) {
+		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
 			yAddToDatabase("stunnedUnits", db);
@@ -224,12 +252,49 @@ int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
 	return(sfx);
 }
 
+void healUnit(int p = 0, float amt = 0) {
+	trDamageUnit(0.0 - amt);
+}
+
 /*
 Enemies have elemental resistance and weakness
 */
 void elementalDamage(int p = 0, int element = 0, float dmg = 0, bool spell = false) {
 	dmg = dmg * (1 + trQuestVarGet("p"+p+"element"+element+"bonus")) * (1.0 - yGetVar("enemies", "resist"+element));
 	trDamageUnit(dmg);
+}
+
+
+void arrowHitEnemy(int p = 0, int id = 0) {
+	elementalDamage(p, 1*yGetVar("arrowsActive", "element"), yGetVar("arrowsActive", "damage"));
+    if ((yGetVar("arrowsActive", "special") == ICE) && kbUnitGetCurrentHitpoints(id) > 0) {
+        stunUnit("enemies", 1.5, p);
+    }
+    if ((yGetVar("arrowsActive", "element") == DARK) && kbUnitGetCurrentHitpoints(id) > 0) {
+        poisonUnit("enemies", 12.0, 12.0, p);
+    }
+}
+
+void arrowHit(int p = 0) {
+	switch(1*yGetVar("arrowsActive", "element"))
+    {
+        case ICE:
+        {
+            trUnitSelectClear();
+            trUnitSelect(""+1*trQuestVarGet("p"+p+"unit"), true);
+            healUnit(p, 10);
+        }
+        case THUNDER:
+        {
+            for(y=yGetDatabaseCount("playerCharacters"); >0) {
+                yDatabaseNext("playerCharacters");
+                if (yGetVar("playerCharacters", "player") == p) {
+                    ySetVar("playerCharacters", "specialAttack", yGetVar("playerCharacters", "specialAttack") - 1);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 
@@ -242,6 +307,21 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
 
     if (type == LIGHT) {
     	float range = trQuestVarGet("p"+p+"rangeBase") * trQuestVarGet("p"+p+"spellRange");
+    	arrowHit(p);
+    	float dist = 0;
+    	for(x=yGetDatabaseCount("enemies"); >0) {
+    		yDatabaseNext("enemies");
+    		trVectorSetUnitPos("pos", "enemies");
+    		dist = zDistanceBetweenVectors(from, "pos");
+    		if (dist < range) {
+    			trVectorQuestVarSet("hitbox", zGetUnitVector(from, to, dist));
+	    		trQuestVarSet("hitboxx", trQuestVarGet("hitboxx") + trQuestVarGet(from+"x"));
+	    		trQuestVarSet("hitboxz", trQuestVarGet("hitboxz") + trQuestVarGet(from+"z"));
+	    		if (zDistanceToVectorSquared("enemies", "hitbox") < 4) {
+	    			arrowHitEnemy(p, kbGetBlockID(""+1*trQuestVarGet("enemies"), true));
+	    		}
+    		}
+    	}
     } else {
     	yAddToDatabase("arrowsActive", "next");
 	    yAddUpdateVar("arrowsActive", "damage", dmg);
@@ -259,7 +339,11 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
 	    {
 	    	case NONE:
 	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Petosuchus Projectile"));
+	    		sfx = addEffect(1*trQuestVarGet("next"), "Petosuchus Projectile");
+	    		trUnitSelectClear();
+	    		trUnitSelect(""+sfx, true);
+	    		trSetSelectedScale(2,2,2);
+	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
 	    	}
 	    	case FIRE:
 	    	{

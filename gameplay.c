@@ -1,5 +1,5 @@
-void spawnPlayer(int p = 0, string vdb = "") {
-    trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+void spawnPlayerClone(int p = 0, string vdb = "") {
+    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
     string proto = "Slinger";
     switch(1*trQuestVarGet("p"+p+"class"))
     {
@@ -17,9 +17,23 @@ void spawnPlayer(int p = 0, string vdb = "") {
         }
     }
     trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
-    yAddToDatabase("playerCharacters", "p"+p+"unit");
+    yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
     yAddUpdateVar("playerCharacters", "attacking", 0);
+
+    yAddToDatabase("playerUnits", "next");
+}
+
+void spawnPlayer(int p = 0, string vdb = "") {
+    trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+    spawnPlayerClone(p, vdb);
+}
+
+void spawnMinion(int p = 0, string pos = "") {
+    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+    trArmyDispatch(""+p+",0","Minion",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+    yAddToDatabase("playerUnits", "next");
+    yAddUpdateVar("playerUnits", "decay", 8 / trQuestVarGet("p"+p+"spellDuration"));
 }
 
 rule gameplay_start
@@ -29,10 +43,12 @@ highFrequency
     xsDisableSelf();
     trSetFogAndBlackmap(true, true);
     xsEnableRule("gameplay_always");
+    xsEnableRule("enemies_always");
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
-
-
+    /*
+    TESTING STUFF BELOW THIS LINE
+    */
     trVectorQuestVarSet("center", vector(10,0,10));
     spawnPlayer(1, "center");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -50,6 +66,7 @@ highFrequency
     int p = 0;
     float dist = 0;
     float dmg = 0;
+    float angle = 0;
     for (i = 0; < xsMin(yGetDatabaseCount("playerCharacters"), 1 + ENEMY_PLAYER / 3)) {
         id = yDatabaseNext("playerCharacters", true);
         p = yGetVar("playerCharacters", "player");
@@ -74,13 +91,38 @@ highFrequency
                             trQuestVarGet("p"+p+"attack"), 1*trQuestVarGet("p"+p+"element1"));
                         switch(1*trQuestVarGet("p"+p+"element1"))
                         {
+                            case THUNDER:
+                            {
+                                /* shoot five bullets in a cone */
+                                angle = fModulo(6.283185, angleBetweenVectors("start", "end") - 0.39);
+                                for(x=5; >0) {
+                                    angle = fModulo(6.283185, angle + 0.13);
+                                    if (x == 3) {
+                                        continue;
+                                    }
+                                    trVectorSetFromAngle("end", angle);
+                                    trQuestVarSet("endx", trQuestVarGet("endx") + trQuestVarGet("startx"));
+                                    trQuestVarSet("endz", trQuestVarGet("endz") + trQuestVarGet("startz"));
+                                    shootArrow(p, 1*trQuestVarGet("p"+p+"element0"), "start", "end", 
+                                        trQuestVarGet("p"+p+"attack"), 1*trQuestVarGet("p"+p+"element1"));
+                                }
+                            }
                             case LIGHT:
                             {
                                 /* heal all allies */
+                                for(x=yGetDatabaseCount("playerUnits"); >0) {
+                                    id = yDatabaseNext("playerUnits", true);
+                                    if (id == -1 || trUnitAlive() == false) {
+                                        removePlayerUnit();
+                                    } else {
+                                        healUnit(p, trQuestVarGet("p"+p+"attack"));
+                                    }
+                                }
                             }
                             case DARK:
                             {
                                 /* summon zombie minion */
+                                spawnMinion(p, "start");
                             }
                         }
                     } else {
@@ -93,30 +135,7 @@ highFrequency
         }
     }
 
-    /*
-    Projectiles from attacks
-    */
-    xsSetContextPlayer(ENEMY_PLAYER);
-    while(trQuestVarGet("nextProj") < trGetNextUnitScenarioNameNumber()) {
-        id = kbGetBlockID(""+1*trQuestVarGet("nextProj"), true);
-        target = kbGetUnitBaseTypeID(id);
-        if ((target == kbGetProtoUnitID("Sling Stone")) ||
-            (target == kbGetProtoUnitID("Arrow Flaming")) ||
-            (target == kbGetProtoUnitID("Javelin Flaming")) ||
-            (target == kbGetProtoUnitID("Axe"))) {
-            trUnitSelectClear();
-            trUnitSelectByQV("nextProj");
-            if (trUnitIsOwnedBy(ENEMY_PLAYER)) {
-                /*
-                Enemy projectiles.
-                Do something fancy
-                */
-            } else {
-                trUnitDestroy();
-            }
-        }
-        trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
-    }
+    
 
     /*
     Arrows
@@ -132,9 +151,9 @@ highFrequency
             p = yGetVar("arrowsActive", "player");
             trVectorSetUnitPos("pos", "arrowsActive");
             if (yGetVar("arrowsActive", "special") == FIRE) {
-                dist = 25;
+                dist = 36;
             } else {
-                dist = 6.25;
+                dist = 9;
             }
             for(x=yGetDatabaseCount("enemies"); >0) {
                 id = yDatabaseNext("enemies", true);
@@ -142,13 +161,11 @@ highFrequency
                     removeEnemy();
                 } else {
                     if (zDistanceToVectorSquared("enemies", "pos") <= dist) {
-                        elementalDamage(p, 1*yGetVar("arrowsActive", "element"), yGetVar("arrowsActive", "damage"));
-                        if (yGetVar("arrowsActive", "special") == ICE && kbUnitGetCurrentHitpoints(id) > 0) {
-                            stunUnit("enemies", 1.5 * trQuestVarGet("p"+p+"spellDuration"));
-                        }
+                        arrowHitEnemy(p, id);
                     }
                 }
             }
+            arrowHit(p);
             removeArrow();
             if (yGetVar("arrowsActive", "special") == FIRE) {
                 trDamageUnitPercent(100);
@@ -158,6 +175,8 @@ highFrequency
             }
         }
     }
+
+    
 
     xsSetContextPlayer(old);
 }

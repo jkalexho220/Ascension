@@ -2,7 +2,7 @@ import os
 import sys
 
 FILE_1 = None
-FILE_2 = 'Spellslingers.xs'
+FILE_2 = 'Spellcrafters.xs'
 NAME = None
 named = False
 comment = False
@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'setup.c', 'gameplayHelpers.c', 'dataLoad.c', 'enemies.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

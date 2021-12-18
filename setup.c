@@ -1,6 +1,32 @@
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 
+void setupPlayerProto(string proto = "", int p = 0, float health = 1000, float range = 12, float speed = 4) {
+    /* attack = 0 */
+    trModifyProtounit(proto, p, 27, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 27, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 30, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 30, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 31, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 31, -9999999999999999999.0);
+    /* health */
+    trModifyProtounit(proto, p, 0, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 0, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 0, health);
+    /* LOS */
+    trModifyProtounit(proto, p, 2, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 2, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 2, 16);
+    /* range */
+    trModifyProtounit(proto, p, 11, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 11, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 11, range); 
+    /* speed */
+    trModifyProtounit(proto, p, 1, 9999999999999999999.0);
+    trModifyProtounit(proto, p, 1, -9999999999999999999.0);
+    trModifyProtounit(proto, p, 1, speed); 
+}
+
 rule setup
 active
 runImmediately
@@ -14,12 +40,12 @@ runImmediately
 
     trForceNonCinematicModels(true);
     
-    
+    /*
     ambientColor(0,0,0);
     sunColor(0,0,0);
     trLetterBox(true);
     trUIFadeToColor(0,0,0,0,0,true);
-    
+    */
 
     modularCounterInit("spyFind", 32);
     modularCounterInit("spyFound", 32);
@@ -34,17 +60,28 @@ runImmediately
     for(p=1; < ENEMY_PLAYER) {
         /* pop count */
         trModifyProtounit("Vision Revealer", p, 7, 9999);
+        /* LOS */
         trModifyProtounit("Vision Revealer", p, 2, -99);
-
-        trModifyProtounit("Hero Greek Achilles", p, 5, 99)
-
+        /* carry capacity */
+        trModifyProtounit("Hero Greek Achilles", p, 5, 99);
+        /* health */
         trModifyProtounit("Vision SFX", p, 0, -9999);
-
+        /* flying */
         trModifyProtounit("Dwarf", p, 55, 4);
 
         trPlayerKillAllGodPowers(p);
-
         trPlayerTechTreeEnabledGodPowers(p, false);
+
+        trModifyProtounit("Sling Stone", p, 1, -29);
+        trModifyProtounit("Arrow Flaming", p, 1, -29);
+        trModifyProtounit("Javelin Flaming", p, 1, -29);
+        trModifyProtounit("Axe", p, 1, -29);
+
+        setupPlayerProto("Slinger", p, 1000, 12, 4);
+        setupPlayerProto("Archer Atlantean", p, 1000, 22, 4);
+        setupPlayerProto("Javelin Cavalry", p, 1000, 4, 5);
+        setupPlayerProto("Throwing Axeman", p, 1000, 12, 4);
+        setupPlayerProto("Minion", p, 300, 0, 4);
 
         trForbidProtounit(p, "Trident Soldier Hero");
         trForbidProtounit(p, "Archer Atlantean Hero");
@@ -74,6 +111,7 @@ runImmediately
         trQuestVarSet("p"+p+"spellDuration", 1);
     }
 
+    xsEnableRule("setup_enemies");
     xsEnableRule("data_load_00");
     xsDisableSelf();
 }
@@ -138,7 +176,7 @@ highFrequency
 {
     if (trTime() > cActivationTime + 5) {
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-        trOverlayText("Spellslingers", 3.0, -1, -1, -1);
+        trOverlayText("Spellcrafters", 3.0, -1, -1, -1);
         trUIFadeToColor(0,0,0,1000,3000,true);
         xsEnableRule("Z_cin_02");
         xsDisableSelf();

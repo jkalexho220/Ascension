@@ -6,7 +6,8 @@
 4 = artifact2
 5 = artifact3
 6 = artifact4
-7 = class + progress
+7 = artifact5
+8 = class + progress
 */
 
 const int SLINGER = 0;
@@ -17,7 +18,7 @@ const int AXEMAN = 3;
 int progress = 0;
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading:"+100 * progress / 8,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading:"+100 * progress / 9,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -125,7 +126,7 @@ inactive
 						*/
 						trQuestVarSet("p"+p+"element" + (2 * progress), iModulo(6, x));
 						trQuestVarSet("p"+p+"element" + (2 * progress + 1), x / 6);
-					} else if (progress == 7) {
+					} else if (progress == 8) {
 						trQuestVarSet("p"+p+"class", iModulo(4, x));
 						trQuestVarSet("p"+p+"progress", x / 4);
 					} else {
@@ -143,7 +144,7 @@ inactive
 		}
 		progress = progress + 1;
 		showLoadProgress();
-		if (progress == 8) {
+		if (progress == 9) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		}
@@ -171,6 +172,34 @@ inactive
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
+
+		switch(1*trQuestVarGet("p"+p+"element0"))
+		{
+			case NONE:
+			{
+				trQuestVarSet("p"+p+"attack", 60);
+			}
+			case FIRE:
+			{
+				trQuestVarSet("p"+p+"attack", 100);
+			}
+			case ICE:
+			{
+				trQuestVarSet("p"+p+"attack", 50);
+			}
+			case THUNDER:
+			{
+				trQuestVarSet("p"+p+"attack", 20);
+			}
+			case LIGHT:
+			{
+				trQuestVarSet("p"+p+"attack", 50);
+			}
+			case DARK:
+			{
+				trQuestVarSet("p"+p+"attack", 0);
+			}
+		}
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","");
