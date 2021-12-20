@@ -69,6 +69,7 @@ inactive
 	if (swordsmen == total) {
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
+		trQuestVarSet("myGold", trGetScenarioUserData(9));
 		xsDisableSelf();
 	}
 }
@@ -236,7 +237,7 @@ inactive
 		}
 	}
 	trUnblockAllSounds();
-	trSoundPlayFN("favordump.wav","1",-1,"Done!","");
+	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");
 	xsDisableSelf();
 	xsEnableRule("Z_cin_00");
 }

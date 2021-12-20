@@ -27,6 +27,25 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
 void spawnPlayer(int p = 0, string vdb = "") {
     trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
     spawnPlayerClone(p, vdb);
+    if (trCurrentPlayer() == p) {
+        string proto = "Slinger";
+        switch(1*trQuestVarGet("p"+p+"class"))
+        {
+            case 1:
+            {
+                proto = "Archer Atlantean";
+            }
+            case 2:
+            {
+                proto = "Javelin Cavalry";
+            }
+            case 3:
+            {
+                proto = "Throwing Axeman";
+            }
+        }
+        uiFindType(proto);
+    }
 }
 
 void spawnMinion(int p = 0, string pos = "") {
@@ -41,10 +60,17 @@ inactive
 highFrequency
 {
     xsDisableSelf();
+    trSetUnitIdleProcessing(true);
     trSetFogAndBlackmap(true, true);
+    trPlayerResetBlackMapForAllPlayers();
+    trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
     xsEnableRule("enemies_always");
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
+    updateGold();
+    for(p=1; < ENEMY_PLAYER) {
+        spawnPlayer(p, "startPosition");
+    }
 
     /*
     TESTING STUFF BELOW THIS LINE
@@ -148,10 +174,10 @@ highFrequency
         } else if (checkArrowDie()) {
             removeArrow();
             trUnitChangeProtoUnit("Dust Small");
-        } else if (trCountUnitsInArea(""+1*trQuestVarGet("arrowsActive"),ENEMY_PLAYER,"Unit",2.5) > 0) {
+        } else if (trCountUnitsInArea(""+1*trQuestVarGet("arrowsActive"),ENEMY_PLAYER,"Unit",2) > 0) {
             p = yGetVar("arrowsActive", "player");
             trVectorSetUnitPos("pos", "arrowsActive");
-            if (yGetVar("arrowsActive", "special") == FIRE) {
+            if (1*yGetVar("arrowsActive", "special") == FIRE) {
                 dist = 36;
             } else {
                 dist = 9;
@@ -169,7 +195,7 @@ highFrequency
             }
             arrowHit(p);
             removeArrow();
-            if (yGetVar("arrowsActive", "special") == FIRE) {
+            if (dist == 36) {
                 trDamageUnitPercent(100);
                 trUnitChangeProtoUnit("Meteorite");
             } else {
@@ -178,13 +204,26 @@ highFrequency
         }
     }
 
+    if (yGetDatabaseCount("playerUnits") > 0) {
+        id = yDatabaseNext("playerUnits", true);
+        if ((id == -1) || (trUnitAlive() == false)) {
+            removePlayerUnit();
+        } else {
+            stunsAndPoisons("playerUnits");
+        }
+    }
+
     /* 
     maintain stun
     */
     for(x=yGetDatabaseCount("stunnedUnits"); >0) {
-        yDatabaseNext("stunnedUnits", true);
-        trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
-        trUnitOverrideAnimation(2, 0, false, true, -1, 0);
+        id = yDatabaseNext("stunnedUnits", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yRemoveFromDatabase("stunnedUnits");
+        } else {
+            trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
+            trUnitOverrideAnimation(2, 0, false, true, -1, 0);
+        }
     }
 
     /*

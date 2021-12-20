@@ -1,6 +1,9 @@
 void setupProtounitBounty(string proto = "", int bounty = 2) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
+	/*
+	armor and LOS 
+	*/
 	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);
@@ -22,14 +25,18 @@ void activateEnemy(int id = 0) {
     for(i = NONE; <= DARK) {
     	yAddUpdateVar("enemies", "resist"+i, trQuestVarGet("proto"+proto+"resist"+i));
     }
+    yRemoveFromDatabase("enemiesIncoming");
 }
 
 rule setup_enemies
 inactive
 highFrequency
 {
-	setupProtounitBounty("Anubite", 5);
-	setupProtounitResist("Anubite", ICE, -0.5);
+	trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
+	trModifyProtounit("Minion", 1, 8, -99);
+	setupProtounitBounty("Anubite", 6);
+	setupProtounitBounty("Minion", 4);
+	setupProtounitResist("Shade of Hades", LIGHT, -1);
 
 	setupProtounitBounty("Shade of Hades", 5);
 	setupProtounitResist("Shade of Hades", LIGHT, -1);
@@ -78,6 +85,15 @@ highFrequency
             }
         }
         trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
+    }
+
+    if (yGetDatabaseCount("enemies") > 0) {
+    	id = yDatabaseNext("enemies", true);
+	    if ((id == -1) || (trUnitAlive() == false)) {
+	    	removeEnemy();
+	    } else {
+	    	stunsAndPoisons("enemies");
+	    }
     }
 
     xsSetContextPlayer(old);

@@ -1,0 +1,10 @@
+const int CURSED_RANGE = 1;
+const int CURSED_DURATION = 2;
+const int CURSED_POWER = 3;
+const int CURSED_COOLDOWNS = 4;
+const int CURSED_ATTACK_SPEED = 5;
+const int CURSED_SPECIAL_ATTACK = 6;
+const int NOTTUD_BLESSING = 7;
+const int ZENO_PARADOX = 8;
+const int YEEB_STAFF = 9;
+const int ANRAHEIR_WONDERS = 10;

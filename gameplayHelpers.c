@@ -12,12 +12,8 @@ const int SPECIAL_THUNDER = 9;
 const int SPECIAL_LIGHT = 10;
 const int SPECIAL_DARK = 11;
 
-
-
-bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
-	bool isType = trGetTerrainType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == type;
-	isType = trGetTerrainSubType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == subtype;
-	return(isType);
+void updateGold() {
+	trSetCounterDisplay("Gold: " + 1*trQuestVarGet("myGold"));
 }
 
 string getElementColor(int element = 0) {
@@ -48,12 +44,11 @@ string getElementName(int element = 0) {
 
 
 void removeArrow() {
-	for(x=2;<0) {
+	for(x=2;>0) {
 		if (yGetVar("arrowsActive", "sfx"+x) > 0) {
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("arrowsActive", "sfx"+x), true);
-			trMutateSelected(kbGetProtoUnitID("Rocket"));
-			trUnitDestroy();
+			trUnitChangeProtoUnit("Rocket");
 		}
 	}
 	trUnitSelectClear();
@@ -73,14 +68,15 @@ void removeArrow() {
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
 		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
-		for(p=1; < ENEMY_PLAYER) {
-			trPlayerGrantResources(p, "Gold", 1*yGetVar("enemies", "bounty"));
-		}
+		trQuestVarSet("myGold", yGetVar("enemies", "bounty") + trQuestVarGet("myGold"));
+		updateGold();
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");
+	yRemoveUpdateVar("enemies", "stunStatus");
 	yRemoveUpdateVar("enemies", "stunTimeout");
 	yRemoveUpdateVar("enemies", "stunSFX");
+	yRemoveUpdateVar("enemies", "poisonStatus");
 	yRemoveUpdateVar("enemies", "poisonTimeout");
 	yRemoveUpdateVar("enemies", "poisonLast");
 	yRemoveUpdateVar("enemies", "poisonDamage");
@@ -102,8 +98,10 @@ void removePlayerCharacter() {
 
 void removePlayerUnit() {
 	yRemoveFromDatabase("playerUnits");
+	yRemoveUpdateVar("playerUnits", "stunStatus");
 	yRemoveUpdateVar("playerUnits", "stunTimeout");
 	yRemoveUpdateVar("playerUnits", "stunSFX");
+	yRemoveUpdateVar("playerUnits", "poisonStatus");
 	yRemoveUpdateVar("playerUnits", "poisonTimeout");
 	yRemoveUpdateVar("playerUnits", "poisonLast");
 	yRemoveUpdateVar("playerUnits", "poisonDamage");
@@ -191,7 +189,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		damage = damage * trQuestVarGet("p"+p+"spellDamage");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
-		if (trTimeMS() > yGetVar(db, "poisonTimeout")) {
+		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
 				ySetVar(db, "poisonSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave poison effect")));
 			} else {
@@ -199,6 +197,8 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 				trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
 				trMutateSelected(kbGetProtoUnitID("Poison SFX"));
 			}
+			ySetVar(db, "poisonStatus", 1);
+			ySetVar(db, "poisonLast", trTimeMS());
 		}
 		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
 	}
@@ -212,7 +212,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
-		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
+		if (yGetVar(db, "stunStatus") == 0) {
 			yAddToDatabase("stunnedUnits", db);
 			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
 			if (yGetVar(db, "stunSFX") == 0) {
@@ -222,6 +222,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 				trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
 				trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
 			}
+			ySetVar(db, "stunStatus", 1);
 		}
 		ySetVar(db, "stunTimeout", trTimeMS() + duration);
 	}
@@ -305,10 +306,10 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
     	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
     	trUnitHighlight(1.0, false);
     	trSetUnitOrientation(zGetUnitVector(to, from), vector(0,1,0), true);
-    	trSetSelectedScale(3, 3, range * 1.25);
+    	trSetSelectedScale(3, 3, range * 1.3);
 
     	yAddToDatabase("playerLasers", "next");
-    	yAddUpdateVar("playerLasers", "range", range * 1.25);
+    	yAddUpdateVar("playerLasers", "range", range * 1.3);
     	yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
     	arrowHit(p);
     	float dist = 0;
@@ -321,7 +322,7 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
     		yDatabaseNext("enemies");
     		trVectorSetUnitPos("pos", "enemies");
     		dist = zDistanceBetweenVectors(from, "pos");
-    		if (dist < range) {
+    		if (dist < range + 2) {
     			trVectorQuestVarSet("hitbox", zGetUnitVector(from, to, dist));
 	    		trQuestVarSet("hitboxx", trQuestVarGet("hitboxx") + trQuestVarGet(from+"x"));
 	    		trQuestVarSet("hitboxz", trQuestVarGet("hitboxz") + trQuestVarGet(from+"z"));
@@ -344,6 +345,7 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
 	    trUnitSelectClear();
 	    trUnitSelectByQV("next", true);
 	    trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+	    trUnitSetStance("Passive");
 
 	    switch(type)
 	    {
@@ -400,8 +402,37 @@ void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float
 	    trUnitSelectClear();
 	    trUnitSelectByQV("next", true);
 	    trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
-	    trUnitMoveToPoint(trQuestVarGet(to+"x"),0,trQuestVarGet(to+"z"), -1, false);
+	    trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
     }
+}
+
+void stunsAndPoisons(string db = "") {
+	if (yGetVar(db, "poisonStatus") == 1) {
+		if ((yGetVar(db, "poisonSFX") < 0) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
+    		ySetVar(db, "poisonSFX", trQuestVarGet("spyEye"+(0-yGetVar(db, "poisonSFX"))));
+    	}
+    	if (trTimeMS() > yGetVar(db, "poisonTimeout")) {
+    		ySetVar(db, "poisonStatus", 0);
+    		trUnitSelectClear();
+    		trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
+    		trMutateSelected(kbGetProtoUnitID("Rocket"));
+    	} else {
+    		trDamageUnit((trTimeMS() - yGetVar(db, "poisonLast")) * yGetVar(db, "poisonDamage") * 0.001);
+    		ySetVar(db, "poisonLast", trTimeMS());
+    	}
+	}
+	if (yGetVar(db, "stunStatus") == 1) {
+		if ((yGetVar(db, "stunSFX") < 0) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
+    		ySetVar(db, "stunSFX", trQuestVarGet("spyEye"+(0-yGetVar(db, "stunSFX"))));
+    	}
+    	if (trTimeMS() > yGetVar(db, "stunTimeout")) {
+    		ySetVar(db, "stunStatus", 0);
+    		trUnitSelectClear();
+    		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
+    		trMutateSelected(kbGetProtoUnitID("Rocket"));
+    		yRemoveAllCopies("stunnedUnits", 1*trQuestVarGet(db));
+    	}
+	}
 }
 
 rule spy_find

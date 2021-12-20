@@ -234,6 +234,12 @@ vector crossProduct(string a = "", string b = "") {
 	return(ret);
 }
 
+bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
+	bool isType = trGetTerrainType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == type;
+	isType = trGetTerrainSubType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == subtype;
+	return(isType);
+}
+
 /* 
 A shitty binary search algorithm to approximate the intersection of a line with 
 the circle specified by the center vector and radius. Behavior is undefined if start
@@ -431,6 +437,16 @@ void yRemoveUpdateVar(string db = "", string attr = "") {
 	trQuestVarSet("zdatalite" + db + "" + zdataremove + "" + attr, 
 		trQuestVarGet("zdatalite" + db + "" + zdatacount + "" + attr));
 	trQuestVarSet("zdatalite" + db + "" + zdatacount + "" + attr, 0);
+}
+
+void yRemoveAllCopies(string db = "", int val = 0) {
+	int data = 0;
+	for(x=yGetDatabaseCount(db); >0) {
+		data = yDatabaseNext(db, false, 999);
+		if (data == val) {
+			yRemoveFromDatabase(db);
+		}
+	}
 }
 
 void yTransferUpdateVar(string to = "", string from = "", string attr = "") {
