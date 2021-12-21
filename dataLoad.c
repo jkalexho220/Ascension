@@ -121,7 +121,7 @@ inactive
 					if (progress == 0) {
 						trQuestVarSet("p"+p+"progress", x);
 					} else if (progress == 1) {
-						trQuestVarSet("p"+p+"class", x);
+						chooseClass(p, x);
 					} else if (progress == 2) {
 						trPlayerGrantResources(p, "Gold", x);
 					} else if (progress == 3) {
@@ -195,10 +195,15 @@ inactive
 	/*
 	Deploy victory markers to avoid defeats
 	*/
+	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
+		for(c=1; < 10) {
+			proto = trQuestVarGet("class"+c+"proto");
+			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"progress"));
+		}
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");

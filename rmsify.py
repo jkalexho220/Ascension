@@ -66,7 +66,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trDelayedRuleActivation', 'trStringQuestVarGet', 'kbGetBlockID', 'trCurrentPlayer', 'trPlayerGrantResources', 
 			'trPaintTerrain', 'trPlayerResourceCount', 'trCounterAbort', 'return', 'unitTransform', 'trPlayerKillAllGodPowers', 
 			'sunColor', 'trSetCounterDisplay', 'trUnitSelectClear', 'trArmySelect', 'kbGetBlockPosition', 'trPlayerResetBlackMapForAllPlayers',
-			'trQuestVarSetFromRand', 'vector', 'trTechSetStatus', 'trRevealEntireMap', 'trSetObscuredUnits', 
+			'trQuestVarSetFromRand', 'vector', 'trTechSetStatus', 'trRevealEntireMap', 'trSetObscuredUnits', 'trEventFire',
 			'kbUnitGetTargetUnitID', 'ambientColor', 'trUIFadeToColor', 'trClearCounterDisplay', 'trUnitChangeProtoUnit', 
 			'switch', 'trVectorQuestVarGetY', 'trQuestVarCopy', 'trUnitAlive', 'trSetSelectedScale', 'trUnitDoWorkOnUnit', 
 			'kbGetUnitBaseTypeID', 'trImmediateUnitGarrison', 'trStringQuestVarSet', 'trOverlayTextColour', 'trUnitSelectByID', 
@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'inventory.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'inventory.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'moonblade.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

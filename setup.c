@@ -48,7 +48,7 @@ int TERRAIN_SUB_SECONDARY = 1;
 
 void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float range = 12, float speed = 4) {
     for(p=1; <ENEMY_PLAYER) {
-        /* attack = 0 */
+        /* attack */
         trModifyProtounit(proto, p, 27, 9999999999999999999.0);
         trModifyProtounit(proto, p, 27, -9999999999999999999.0);
         trModifyProtounit(proto, p, 27, attack);
@@ -59,6 +59,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 31, -9999999999999999999.0);
         trModifyProtounit(proto, p, 31, attack);
         zInitProtoUnitStat(proto, p, 31, attack);
+        trQuestVarSet("proto"+proto+"attack", attack);
         /* projectiles */
         zInitProtoUnitStat(proto, p, 13, 1);
         /* health */
@@ -66,6 +67,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 0, -9999999999999999999.0);
         trModifyProtounit(proto, p, 0, health);
         zInitProtoUnitStat(proto, p, 0, health);
+        trQuestVarSet("proto"+proto+"health", health);
         /* LOS */
         trModifyProtounit(proto, p, 2, 9999999999999999999.0);
         trModifyProtounit(proto, p, 2, -9999999999999999999.0);
@@ -75,11 +77,13 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 11, -9999999999999999999.0);
         trModifyProtounit(proto, p, 11, range);
         zInitProtoUnitStat(proto, p, 11, range);
+        trQuestVarSet("proto"+proto+"range", range);
         /* speed */
         trModifyProtounit(proto, p, 1, 9999999999999999999.0);
         trModifyProtounit(proto, p, 1, -9999999999999999999.0);
         trModifyProtounit(proto, p, 1, speed);
         zInitProtoUnitStat(proto, p, 1, speed);
+        trQuestVarSet("proto"+proto+"speed", speed);
         /* armor */
         trModifyProtounit(proto, p, 24, -1);
         trModifyProtounit(proto, p, 25, -1);
@@ -90,9 +94,21 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
 void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0, int specialCD = 0) {
     int p = kbGetProtoUnitID(proto);
     trQuestVarSet("class"+class+"proto", p);
+    trQuestVarSet("proto"+p+"class", class);
     trQuestVarSet("class"+class+"firstDelay", firstDelay);
     trQuestVarSet("class"+class+"nextDelay", nextDelay);
     trQuestVarSet("class"+class+"specialCooldown", specialCD);
+}
+
+void chooseClass(int p = 0, int class = 0) {
+    trQuestVarSet("p"+p+"class", class);
+    trEventFire(1000 + 12 * class + 9);
+    int proto = trQuestVarGet("class"+class+"proto");
+    trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
+    trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
+    trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
+    trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
+    trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
 }
 
 rule setup
@@ -108,12 +124,11 @@ runImmediately
 
     trForceNonCinematicModels(true);
     
-    /*
+    
     ambientColor(0,0,0);
     sunColor(0,0,0);
     trLetterBox(true);
     trUIFadeToColor(0,0,0,0,0,true);
-    */
 
     modularCounterInit("spyFind", 32);
     modularCounterInit("spyFound", 32);
@@ -137,7 +152,7 @@ runImmediately
         /* LOS */
         trModifyProtounit("Vision Revealer", p, 2, -99);
         /* carry capacity */
-        trModifyProtounit("Hero Greek Achilles", p, 5, 99);
+        trModifyProtounit("Ajax", p, 5, 99);
         /* health */
         trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
@@ -177,6 +192,7 @@ runImmediately
     }
 
     xsEnableRule("setup_enemies");
+    xsEnableRule("delayed_modify");
     xsEnableRule("data_load_00");
     xsDisableSelf();
 }
@@ -185,15 +201,17 @@ rule delayed_modify
 inactive
 highFrequency
 {
-    if (trTime() > cActivationTime + 3) {
+    if (trTime() > cActivationTime) {
         /* Transport Ship max contained */
-        trModifyProtounit("Transport Ship Atlantean", 1, 5, -11);
+        trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
+        trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
+        trModifyProtounit("Transport Ship Atlantean", 1, 5, 1);
 
         setupPlayerProto("Militia", 100, 10, 0, 4.8);
-        
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 0, 4.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 16, 4.3);
         setupPlayerProto("Royal Guard Hero", 1200, 30, 0, 4.6);
+        xsDisableSelf();
     }
 }
 
@@ -320,6 +338,11 @@ highFrequency
         }
         yClearDatabase("stageChoices");
         xsDisableSelf();
+        trForceNonCinematicModels(true);
+        trLetterBox(true);
+        trUIFadeToColor(0,0,0,1000,0,true);
+        trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
+        trOverlayText("Stage " + 1*trQuestVarGet("stage") + " chosen!", 3.0, -1, -1, -1);
     }
 }
 
@@ -564,12 +587,23 @@ void buildEdge(int edge = 0, int type = 0) {
     }
 }
 
-
 rule choose_stage_01
 inactive
 highFrequency
 {
     if (trQuestVarGet("stage") > 0) {
+        xsEnableRule("choose_stage_02");
+        xsDisableSelf();
+    }
+}
+
+
+rule choose_stage_02
+inactive
+highFrequency
+{
+    if (trTime() > cActivationTime + 1) {
+        xsEnableRule("setup_enemies");
         xsDisableSelf();
         /*
         trLetterBox(true);
@@ -583,6 +617,7 @@ highFrequency
             case 1:
             {
                 /* desert tomb */
+                trOverlayText("Desert Tomb", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 2;
 
@@ -602,7 +637,7 @@ highFrequency
                 trStringQuestVarSet("rockProto2", "Rock Sandstone Big");
                 trStringQuestVarSet("rockProto3", "Statue Pharaoh");
 
-                trQuestVarSet("enemyDensity", 0.04 + 0.01 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.03 * ENEMY_PLAYER);
                 trQuestVarSet("enemyProtoCount", 5);
                 trStringQuestVarSet("enemyProto1", "Minion");
                 trStringQuestVarSet("enemyProto2", "Anubite");
@@ -730,8 +765,6 @@ highFrequency
                 buildRoom(x, z, ROOM_NICK);
                 nick = false;
                 xsEnableRule("nick_00_visit");
-            } else if (trQuestVarGet("chest") == 1) {
-
             } else {
                 buildRoom(x, z, ROOM_BASIC);
             }
@@ -746,5 +779,7 @@ highFrequency
 
         trUnblockAllSounds();
         xsEnableRule("gameplay_start");
+        trLetterBox(false);
+        trUIFadeToColor(0,0,0,1000,0,false);
     }
 }

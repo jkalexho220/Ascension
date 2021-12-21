@@ -1,3 +1,17 @@
+const int ABILITY_READY = 0;
+const int ABILITY_COOLDOWN = 1;
+const int ABILITY_COST = 2;
+
+const int ABILITY_OFF = 0;
+const int ABILITY_ON = 1;
+
+string visionName = "";
+string lureName = "";
+string rainName = "";
+
+bool visionIsUltimate = false;
+bool rainIsUltimate = false;
+bool lureIsUltimate = false;
 
 void removeArrow() {
 	for(x=2;>0) {
@@ -54,6 +68,10 @@ void removePlayerCharacter() {
 	yRemoveUpdateVar("playerCharacters", "attackNext");
 	yRemoveUpdateVar("playerCharacters", "firstDelay");
 	yRemoveUpdateVar("playerCharacters", "nextDelay");
+
+	for(x=1; < 8) {
+		yRemoveUpdateVar("playerCharacters", "data"+x);
+	}
 }
 
 void removePlayerUnit() {
