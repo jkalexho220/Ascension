@@ -15,6 +15,10 @@ const int CHEST_KEY = 1;
 const int CHEST_PADS = 2;
 const int CHEST_ENCOUNTER = 3;
 
+const int MOONBLADE = 1;
+const int SUNBOW = 2;
+const int THUNDERCALLER = 3;
+
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 
@@ -42,34 +46,53 @@ Secondary terrain
 int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
 
-void setupPlayerProto(string proto = "", int p = 0, float health = 1000, float range = 12, float speed = 4) {
-    /* attack = 0 */
-    trModifyProtounit(proto, p, 27, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 27, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 30, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 30, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 31, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 31, -9999999999999999999.0);
-    /* health */
-    trModifyProtounit(proto, p, 0, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 0, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 0, health);
-    /* LOS */
-    trModifyProtounit(proto, p, 2, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 2, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 2, 20);
-    /* range */
-    trModifyProtounit(proto, p, 11, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 11, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 11, range); 
-    /* speed */
-    trModifyProtounit(proto, p, 1, 9999999999999999999.0);
-    trModifyProtounit(proto, p, 1, -9999999999999999999.0);
-    trModifyProtounit(proto, p, 1, speed); 
-    /* armor */
-    trModifyProtounit(proto, p, 24, -1);
-    trModifyProtounit(proto, p, 25, -1);
-    trModifyProtounit(proto, p, 26, -1);
+void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float range = 12, float speed = 4) {
+    for(p=1; <ENEMY_PLAYER) {
+        /* attack = 0 */
+        trModifyProtounit(proto, p, 27, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 27, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 27, attack);
+        zInitProtoUnitStat(proto, p, 27, attack);
+        trModifyProtounit(proto, p, 30, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 30, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 31, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 31, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 31, attack);
+        zInitProtoUnitStat(proto, p, 31, attack);
+        /* projectiles */
+        zInitProtoUnitStat(proto, p, 13, 1);
+        /* health */
+        trModifyProtounit(proto, p, 0, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 0, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 0, health);
+        zInitProtoUnitStat(proto, p, 0, health);
+        /* LOS */
+        trModifyProtounit(proto, p, 2, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 2, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 2, 20);
+        /* range */
+        trModifyProtounit(proto, p, 11, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 11, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 11, range);
+        zInitProtoUnitStat(proto, p, 11, range);
+        /* speed */
+        trModifyProtounit(proto, p, 1, 9999999999999999999.0);
+        trModifyProtounit(proto, p, 1, -9999999999999999999.0);
+        trModifyProtounit(proto, p, 1, speed);
+        zInitProtoUnitStat(proto, p, 1, speed);
+        /* armor */
+        trModifyProtounit(proto, p, 24, -1);
+        trModifyProtounit(proto, p, 25, -1);
+        trModifyProtounit(proto, p, 26, -1);
+    }
+}
+
+void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0, int specialCD = 0) {
+    int p = kbGetProtoUnitID(proto);
+    trQuestVarSet("class"+class+"proto", p);
+    trQuestVarSet("class"+class+"firstDelay", firstDelay);
+    trQuestVarSet("class"+class+"nextDelay", nextDelay);
+    trQuestVarSet("class"+class+"specialCooldown", specialCD);
 }
 
 rule setup
@@ -101,9 +124,13 @@ runImmediately
     trTechSetStatus(0, 304, 4);
     aiSet("NoAI", 0);
     aiSet("NoAI", ENEMY_PLAYER);
-    
-    /* Transport Ship max contained */
-    trModifyProtounit("Transport Ship Atlantean", 1, 5, -11);
+
+    setupClass("Militia", 0, 500, 1000);
+    /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
+    setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
+    setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
+    setupClass("Royal Guard Hero", THUNDERCALLER, 600, 1000, 6);
+
     for(p=1; < ENEMY_PLAYER) {
         /* pop count */
         trModifyProtounit("Vision Revealer", p, 7, 9999);
@@ -119,17 +146,6 @@ runImmediately
 
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);
-
-        trModifyProtounit("Sling Stone", p, 1, -29);
-        trModifyProtounit("Arrow Flaming", p, 1, -29);
-        trModifyProtounit("Javelin Flaming", p, 1, -29);
-        trModifyProtounit("Axe", p, 1, -29);
-
-        setupPlayerProto("Slinger", p, 1000, 12, 4);
-        setupPlayerProto("Archer Atlantean", p, 1000, 22, 4);
-        setupPlayerProto("Javelin Cavalry", p, 1000, 4, 5);
-        setupPlayerProto("Throwing Axeman", p, 1000, 12, 4);
-        setupPlayerProto("Minion", p, 300, 0, 4);
 
         trForbidProtounit(p, "Trident Soldier Hero");
         trForbidProtounit(p, "Archer Atlantean Hero");
@@ -154,7 +170,7 @@ runImmediately
         trForbidProtounit(p, "Longhouse");
 
         trQuestVarSet("p"+p+"attackRange", 12);
-        trQuestVarSet("p"+p+"attackSpeed", 1);
+        trQuestVarSet("p"+p+"projectiles", 1);
         trQuestVarSet("p"+p+"spellRange", 1);
         trQuestVarSet("p"+p+"spellDamage", 1);
         trQuestVarSet("p"+p+"spellDuration", 1);
@@ -163,6 +179,22 @@ runImmediately
     xsEnableRule("setup_enemies");
     xsEnableRule("data_load_00");
     xsDisableSelf();
+}
+
+rule delayed_modify
+inactive
+highFrequency
+{
+    if (trTime() > cActivationTime + 3) {
+        /* Transport Ship max contained */
+        trModifyProtounit("Transport Ship Atlantean", 1, 5, -11);
+
+        setupPlayerProto("Militia", 100, 10, 0, 4.8);
+        
+        setupPlayerProto("Hero Greek Theseus", 1000, 50, 0, 4.3);
+        setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 16, 4.3);
+        setupPlayerProto("Royal Guard Hero", 1200, 30, 0, 4.6);
+    }
 }
 
 rule no_extra_resources
@@ -225,7 +257,7 @@ highFrequency
 {
     if (trTime() > cActivationTime + 5) {
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-        trOverlayText("Spellcrafters", 3.0, -1, -1, -1);
+        trOverlayText("Hero Build Fighters 3", 3.0, -1, -1, -1);
         trUIFadeToColor(0,0,0,1000,3000,true);
         xsEnableRule("Z_cin_02");
         xsDisableSelf();
@@ -237,7 +269,11 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 5) {
-        if (trQuestVarGet("p1progress") == 0) {
+        int minProgress = 10;
+        for (p=1; < ENEMY_PLAYER) {
+            minProgress = xsMin(minProgress, trQuestVarGet("p"+p+"progress"));
+        }
+        if (minProgress == 0) {
             trQuestVarSet("stage", 1);
         } else {
             trLetterBox(false);
@@ -249,9 +285,9 @@ highFrequency
             trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
             trMessageSetText("Host: Choose a stage to challenge.",-1);
 
-            int posX = 96 - 2 * trQuestVarGet("p1progress");
+            int posX = 96 - 2 * minProgress;
 
-            for(x=0; <= trQuestVarGet("p1progress")) {
+            for(x=0; <= minProgress) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                 trArmyDispatch("1,0","Flag Numbered",1,posX,0,100,0,true);
                 trUnitSelectClear();
@@ -380,7 +416,7 @@ void paintColumns(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             if (trQuestVarGet("deploy") < trQuestVarGet("columnDensity")) {
                 trQuestVarSetFromRand("z", z0, z1, true);
                 trPaintTerrain(a-1, 1*trQuestVarGet("z")-1, a+1, 1*trQuestVarGet("z")+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-                trChangeTerrainHeight(a, 1*trQuestVarGet("z"), a+1, 1*trQuestVarGet("z")+1, 10, false);
+                trChangeTerrainHeight(a, 1*trQuestVarGet("z"), a+1, 1*trQuestVarGet("z")+1, 6, false);
             }
         }
         for(b=z0; < z1) {
@@ -388,7 +424,7 @@ void paintColumns(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             if (trQuestVarGet("deploy") < trQuestVarGet("columnDensity")) {
                 trQuestVarSetFromRand("x", x0, x1, true);
                 trPaintTerrain(1*trQuestVarGet("x")-1, b-1, 1*trQuestVarGet("x")+1, b+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-                trChangeTerrainHeight(1*trQuestVarGet("x"), b, 1*trQuestVarGet("x")+1, b+1, 10, false);
+                trChangeTerrainHeight(1*trQuestVarGet("x"), b, 1*trQuestVarGet("x")+1, b+1, 6, false);
             }
         }
     }
@@ -579,7 +615,7 @@ highFrequency
         }
 
         /* paint entire map cliff and raise it */
-        trChangeTerrainHeight(0,0,150,150,10,false);
+        trChangeTerrainHeight(0,0,150,150,6,false);
         trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
 
         /* build the grid */
@@ -587,6 +623,7 @@ highFrequency
         int z = 0;
         int n = 0;
         int total = 0;
+        int backtrack = 5;
         trQuestVarSet("tile0", TILE_VISITED);
         trQuestVarSet("tile1", TILE_FOUND);
         trQuestVarSet("tile4", TILE_FOUND);
@@ -598,8 +635,8 @@ highFrequency
         yAddUpdateVar("frontier", "edge", edgeName(0, 4));
         
         /* build guaranteed path to every room */
-        while(total < 15) {
-            trQuestVarSetFromRand("search", 1, 5, true);
+        for(i=0; < 64) {
+            trQuestVarSetFromRand("search", 1, backtrack, true);
             yDatabasePointerDefault("frontier");
             for(j=trQuestVarGet("search"); >0) {
                 yDatabaseNext("frontier");
@@ -629,6 +666,11 @@ highFrequency
                 }
                 
                 total = total + 1;
+                if (total == 15) {
+                    break;
+                }
+            } else {
+                backtrack = backtrack + 1;
             }
             yRemoveFromDatabase("frontier");
             yRemoveUpdateVar("frontier", "edge");

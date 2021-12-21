@@ -1,59 +1,27 @@
 void spawnPlayerClone(int p = 0, string vdb = "") {
+    int class = trQuestVarGet("p"+p+"class");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    string proto = "Slinger";
-    switch(1*trQuestVarGet("p"+p+"class"))
-    {
-        case 1:
-        {
-            proto = "Archer Atlantean";
-        }
-        case 2:
-        {
-            proto = "Javelin Cavalry";
-        }
-        case 3:
-        {
-            proto = "Throwing Axeman";
-        }
-    }
-    trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+    yAddToDatabase("playerUnits", "next");
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
     yAddUpdateVar("playerCharacters", "attacking", 0);
     yAddUpdateVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
-    yAddToDatabase("playerUnits", "next");
+    yAddUpdateVar("playerCharacters", "firstDelay", trQuestVarGet("class"+class+"firstDelay"));
+    yAddUpdateVar("playerCharacters", "nextDelay", trQuestVarGet("class"+class+"nextDelay"));
+    string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+    trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
 }
 
 void spawnPlayer(int p = 0, string vdb = "") {
     trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
     spawnPlayerClone(p, vdb);
     if (trCurrentPlayer() == p) {
-        string proto = "Slinger";
-        switch(1*trQuestVarGet("p"+p+"class"))
-        {
-            case 1:
-            {
-                proto = "Archer Atlantean";
-            }
-            case 2:
-            {
-                proto = "Javelin Cavalry";
-            }
-            case 3:
-            {
-                proto = "Throwing Axeman";
-            }
-        }
+        int class = trQuestVarGet("p"+p+"class");
+        string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
         uiFindType(proto);
     }
 }
 
-void spawnMinion(int p = 0, string pos = "") {
-    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    trArmyDispatch(""+p+",0","Minion",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
-    yAddToDatabase("playerUnits", "next");
-    yAddUpdateVar("playerUnits", "decay", 8 / trQuestVarGet("p"+p+"spellDuration"));
-}
 
 rule gameplay_start
 inactive
@@ -67,7 +35,6 @@ highFrequency
     xsEnableRule("gameplay_always");
     xsEnableRule("enemies_always");
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
-    updateGold();
     for(p=1; < ENEMY_PLAYER) {
         spawnPlayer(p, "startPosition");
     }
@@ -89,6 +56,7 @@ highFrequency
     int old = xsGetContextPlayer();
     int id = 0;
     int target = 0;
+    int action = 0;
     int p = 0;
     float dist = 0;
     float dmg = 0;
@@ -96,64 +64,26 @@ highFrequency
     for (i = 0; < xsMin(yGetDatabaseCount("playerCharacters"), 1 + ENEMY_PLAYER / 3)) {
         id = yDatabaseNext("playerCharacters", true);
         p = yGetVar("playerCharacters", "player");
+        action = kbUnitGetAnimationActionType(id);
         if (yGetVar("playerCharacters", "attacking") == 0) {
-            if (kbUnitGetAnimationActionType(id) == 12) {
+            if ((action == 12) || (action == 6)) {
                 ySetVar("playerCharacters", "attacking", 1);
-                ySetVar("playerCharacters", "attackNext", trTimeMS() + 500);
+                ySetVar("playerCharacters", "attackNext", trTimeMS() + yGetVar("playerCharacters", "firstDelay"));
             }
         } else {
-            if (kbUnitGetAnimationActionType(id) == 12) {
+            if ((action == 12) || (action == 6)) {
                 if (trTimeMS() > yGetVar("playerCharacters", "attackNext")) {
                     ySetVar("playerCharacters", "attackNext", 
-                        yGetVar("playerCharacters", "attackNext") + 1000.0 / trQuestVarGet("p"+p+"attackSpeed"));
+                        yGetVar("playerCharacters", "attackNext") + yGetVar("playerCharacters", "nextDelay"));
                     xsSetContextPlayer(p);
                     target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
-                    trVectorSetUnitPos("start", "playerCharacters");
-                    trVectorQuestVarSet("end", kbGetBlockPosition(""+target, true));
-
-                    ySetVar("playerCharacters", "specialAttack", yGetVar("playerCharacters", "specialAttack") - 1);
-                    if (yGetVar("playerCharacters", "specialAttack") <= 0) {
-                        ySetVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
-                        shootArrow(p, 1*trQuestVarGet("p"+p+"element0"), "start", "end", 
-                            trQuestVarGet("p"+p+"attack"), 1*trQuestVarGet("p"+p+"element1"));
-                        switch(1*trQuestVarGet("p"+p+"element1"))
-                        {
-                            case THUNDER:
-                            {
-                                /* shoot five bullets in a cone */
-                                angle = fModulo(6.283185, angleBetweenVectors("start", "end") - 0.39);
-                                for(x=5; >0) {
-                                    angle = fModulo(6.283185, angle + 0.13);
-                                    if (x == 3) {
-                                        continue;
-                                    }
-                                    trVectorSetFromAngle("end", angle);
-                                    trQuestVarSet("endx", trQuestVarGet("endx") + trQuestVarGet("startx"));
-                                    trQuestVarSet("endz", trQuestVarGet("endz") + trQuestVarGet("startz"));
-                                    shootArrow(p, 1*trQuestVarGet("p"+p+"element0"), "start", "end", 
-                                        trQuestVarGet("p"+p+"attack"), 1*trQuestVarGet("p"+p+"element1"));
-                                }
-                            }
-                            case LIGHT:
-                            {
-                                /* heal all allies */
-                                for(x=yGetDatabaseCount("playerUnits"); >0) {
-                                    id = yDatabaseNext("playerUnits", true);
-                                    if (id == -1 || trUnitAlive() == false) {
-                                        removePlayerUnit();
-                                    } else {
-                                        healUnit(p, trQuestVarGet("p"+p+"attack"));
-                                    }
-                                }
-                            }
-                            case DARK:
-                            {
-                                /* summon zombie minion */
-                                spawnMinion(p, "start");
-                            }
+                    OnHitEffects(p, 1*trQuestVarGet("playerCharacters"), target);
+                    /* only melee characters have special attacks */
+                    if (action == 6) {
+                        ySetVar("playerCharacters", "specialAttack", yGetVar("playerCharacters", "specialAttack") - 1);
+                        if (yGetVar("playerCharacters", "specialAttack") <= 0) {
+                            ySetVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
                         }
-                    } else {
-                        shootArrow(p, 1*trQuestVarGet("p"+p+"element0"), "start", "end", trQuestVarGet("p"+p+"attack"));
                     }
                 }
             } else {
@@ -162,47 +92,6 @@ highFrequency
         }
     }
 
-    
-
-    /*
-    Arrows
-    */
-    for(i=0; < xsMin(cNumberPlayers, yGetDatabaseCount("arrowsActive"))) {
-        id = yDatabaseNext("arrowsActive", true);
-        if (id == -1) {
-            removeArrow();
-        } else if (checkArrowDie()) {
-            removeArrow();
-            trUnitChangeProtoUnit("Dust Small");
-        } else if (trCountUnitsInArea(""+1*trQuestVarGet("arrowsActive"),ENEMY_PLAYER,"Unit",2) > 0) {
-            p = yGetVar("arrowsActive", "player");
-            trVectorSetUnitPos("pos", "arrowsActive");
-            if (1*yGetVar("arrowsActive", "special") == FIRE) {
-                dist = 36;
-            } else {
-                dist = 9;
-            }
-            for(x=yGetDatabaseCount("enemies"); >0) {
-                id = yDatabaseNext("enemies", true);
-                if (id == -1 || trUnitAlive() == false) {
-                    removeEnemy();
-                } else {
-                    if (zDistanceToVectorSquared("enemies", "pos") <= dist) {
-                        arrowHitEnemy(p, id, 1*yGetVar("arrowsActive", "element"), 
-                            yGetVar("arrowsActive", "damage"), 1*yGetVar("arrowsActive", "special"));
-                    }
-                }
-            }
-            arrowHit(p);
-            removeArrow();
-            if (dist == 36) {
-                trDamageUnitPercent(100);
-                trUnitChangeProtoUnit("Meteorite");
-            } else {
-                trUnitChangeProtoUnit("Lightning Sparks");
-            }
-        }
-    }
 
     if (yGetDatabaseCount("playerUnits") > 0) {
         id = yDatabaseNext("playerUnits", true);

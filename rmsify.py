@@ -2,7 +2,7 @@ import os
 import sys
 
 FILE_1 = None
-FILE_2 = 'Spellcrafters.xs'
+FILE_2 = 'Hero Build Fighters 3.xs'
 NAME = None
 named = False
 comment = False
@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'inventory.c', 'setup.c', 'gameplayHelpers.c', 'dataLoad.c', 'enemies.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'inventory.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

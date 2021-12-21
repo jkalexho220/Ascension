@@ -1,18 +1,16 @@
 void setupProtounitBounty(string proto = "", int bounty = 2) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
-	/*
-	armor and LOS 
-	*/
+	/* armor */
 	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);
+	trModifyProtounit(proto, 1, 24, -1);
+	trModifyProtounit(proto, 1, 25, -1);
+	trModifyProtounit(proto, 1, 26, -1);
+	/* LOS */
 	trModifyProtounit(proto, ENEMY_PLAYER, 6, 6);
-}
-
-void setupProtounitResist(string proto = "", int element = 0, float resist = 0) {
-	int p = kbGetProtoUnitID(proto);
-	trQuestVarSet("proto"+p+"resist"+element, resist);
+	trModifyProtounit(proto, 1, 6, 6);
 }
 
 void activateEnemy(int id = 0) {
@@ -22,9 +20,6 @@ void activateEnemy(int id = 0) {
     yAddToDatabase("enemies", "enemiesIncoming");
     trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
     yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
-    for(i = NONE; <= DARK) {
-    	yAddUpdateVar("enemies", "resist"+i, trQuestVarGet("proto"+proto+"resist"+i));
-    }
     yRemoveFromDatabase("enemiesIncoming");
 }
 
@@ -36,11 +31,6 @@ highFrequency
 	trModifyProtounit("Minion", 1, 8, -99);
 	setupProtounitBounty("Anubite", 6);
 	setupProtounitBounty("Minion", 4);
-	setupProtounitResist("Shade of Hades", LIGHT, -1);
-
-	setupProtounitBounty("Shade of Hades", 5);
-	setupProtounitResist("Shade of Hades", LIGHT, -1);
-	setupProtounitResist("Shade of Hades", DARK, 1);
 	xsDisableSelf();
 }
 

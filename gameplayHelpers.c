@@ -1,47 +1,3 @@
-const int NONE = 0;
-const int FIRE = 1;
-const int ICE = 2;
-const int THUNDER = 3;
-const int LIGHT = 4;
-const int DARK = 5;
-
-const int SPECIAL_NONE = 6;
-const int SPECIAL_FIRE = 7;
-const int SPECIAL_ICE = 8;
-const int SPECIAL_THUNDER = 9;
-const int SPECIAL_LIGHT = 10;
-const int SPECIAL_DARK = 11;
-
-void updateGold() {
-	trSetCounterDisplay("Gold: " + 1*trQuestVarGet("myGold"));
-}
-
-string getElementColor(int element = 0) {
-	switch(element)
-	{
-		case NONE:		{ return(""); }
-		case FIRE:		{ return("<color=0.9,0.2,0>"); }
-		case ICE:		{ return("<color=0.4,0.4,1.0>"); }
-		case LIGHT:		{ return("<color=1,1,0.5>"); }
-		case DARK:		{ return("<color=0.3,0,0.3>"); }
-		case THUNDER:	{ return("<color=0.1,0.9,0.7>"); }
-	}
-	return("NOT AN ELEMENT");
-}
-
-string getElementName(int element = 0) {
-	switch(element)
-	{
-		case NONE:		{ return(""); }
-		case FIRE:		{ return("Fire"); }
-		case ICE:		{ return("Ice"); }
-		case LIGHT:		{ return("Light"); }
-		case DARK:		{ return("Wind"); }
-		case THUNDER:	{ return("Thunder"); }
-	}
-	return("NOT AN ELEMENT");
-}
-
 
 void removeArrow() {
 	for(x=2;>0) {
@@ -68,8 +24,10 @@ void removeArrow() {
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
 		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
-		trQuestVarSet("myGold", yGetVar("enemies", "bounty") + trQuestVarGet("myGold"));
-		updateGold();
+		for(p=1; <ENEMY_PLAYER) {
+			trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
+			trPlayerGrantResources(p, "Favor", yGetVar("enemies", "bounty"));
+		}
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");
@@ -94,6 +52,8 @@ void removePlayerCharacter() {
 	yRemoveUpdateVar("playerCharacters", "specialAttack");
 	yRemoveUpdateVar("playerCharacters", "attacking");
 	yRemoveUpdateVar("playerCharacters", "attackNext");
+	yRemoveUpdateVar("playerCharacters", "firstDelay");
+	yRemoveUpdateVar("playerCharacters", "nextDelay");
 }
 
 void removePlayerUnit() {
@@ -248,162 +208,9 @@ void healUnit(int p = 0, float amt = 0) {
 /*
 Enemies have elemental resistance and weakness
 */
-void elementalDamage(int p = 0, int element = 0, float dmg = 0, bool spell = false) {
-	dmg = dmg * (1 + trQuestVarGet("p"+p+"element"+element+"bonus")) * (1.0 - yGetVar("enemies", "resist"+element));
+float damageEnemy(int p = 0, float dmg = 0, bool spell = false) {
 	trDamageUnit(dmg);
-}
-
-
-void arrowHitEnemy(int p = 0, int id = 0, int element = 0, float damage = 0, int special = 0) {
-	if (special == FIRE) {
-		damage = 2.0 * damage;
-	} else if (special == NONE) {
-		damage = 3.0 * damage;
-	}
-	elementalDamage(p, element, damage);
-    if ((special == ICE) && kbUnitGetCurrentHitpoints(id) > 0) {
-        stunUnit("enemies", 1.5, p);
-    }
-    if ((special == DARK) && kbUnitGetCurrentHitpoints(id) > 0) {
-        poisonUnit("enemies", 12.0, 12.0, p);
-    }
-}
-
-void arrowHit(int p = 0) {
-	switch(1*yGetVar("arrowsActive", "element"))
-    {
-        case ICE:
-        {
-            trUnitSelectClear();
-            trUnitSelect(""+1*trQuestVarGet("p"+p+"unit"), true);
-            healUnit(p, 10);
-        }
-        case THUNDER:
-        {
-            for(y=yGetDatabaseCount("playerCharacters"); >0) {
-                yDatabaseNext("playerCharacters");
-                if (yGetVar("playerCharacters", "player") == p) {
-                    ySetVar("playerCharacters", "specialAttack", yGetVar("playerCharacters", "specialAttack") - 1);
-                    break;
-                }
-            }
-        }
-    }
-}
-
-
-void shootArrow(int p = 0, int type = 0, string from = "", string to = "", float dmg = 0, int special = -1) {
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet(from+"x"),0,trQuestVarGet(from+"z"),0,true);
-    vectorSetAsTargetVector("target", from, to);
-
-    int sfx = 0;
-
-    if (type == LIGHT) {
-    	float range = trQuestVarGet("p"+p+"attackRange");
-    	trUnitSelectClear();
-    	trUnitSelect(""+1*trQuestVarGet("next"), true);
-    	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
-    	trUnitHighlight(1.0, false);
-    	trSetUnitOrientation(zGetUnitVector(to, from), vector(0,1,0), true);
-    	trSetSelectedScale(3, 3, range * 1.3);
-
-    	yAddToDatabase("playerLasers", "next");
-    	yAddUpdateVar("playerLasers", "range", range * 1.3);
-    	yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
-    	arrowHit(p);
-    	float dist = 0;
-		float hitDist = 4;
-    	if (special == FIRE) {
-    		hitDist = 16;
-    		yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 1000);
-    	}
-    	for(x=yGetDatabaseCount("enemies"); >0) {
-    		yDatabaseNext("enemies");
-    		trVectorSetUnitPos("pos", "enemies");
-    		dist = zDistanceBetweenVectors(from, "pos");
-    		if (dist < range + 2) {
-    			trVectorQuestVarSet("hitbox", zGetUnitVector(from, to, dist));
-	    		trQuestVarSet("hitboxx", trQuestVarGet("hitboxx") + trQuestVarGet(from+"x"));
-	    		trQuestVarSet("hitboxz", trQuestVarGet("hitboxz") + trQuestVarGet(from+"z"));
-	    		if (zDistanceToVectorSquared("enemies", "hitbox") < hitDist) {
-	    			trUnitSelectClear();
-	    			trUnitSelect(""+1*trQuestVarGet("enemies"), true);
-	    			arrowHitEnemy(p, kbGetBlockID(""+1*trQuestVarGet("enemies"), true), LIGHT, dmg, special);
-	    		}
-    		}
-    	}
-    } else {
-    	yAddToDatabase("arrowsActive", "next");
-	    yAddUpdateVar("arrowsActive", "damage", dmg);
-	    yAddUpdateVar("arrowsActive", "element", type);
-	    yAddUpdateVar("arrowsActive", "destx", trQuestVarGet("targetx"));
-	    yAddUpdateVar("arrowsActive", "destz", trQuestVarGet("targetz"));
-	    yAddUpdateVar("arrowsActive", "player", p);
-	    yAddUpdateVar("arrowsActive", "timeout", trTimeMS() + 5000);
-	    yAddUpdateVar("arrowsActive", "special", special);
-	    trUnitSelectClear();
-	    trUnitSelectByQV("next", true);
-	    trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
-	    trUnitSetStance("Passive");
-
-	    switch(type)
-	    {
-	    	case NONE:
-	    	{
-	    		sfx = addEffect(1*trQuestVarGet("next"), "Petosuchus Projectile");
-	    		trUnitSelectClear();
-	    		trUnitSelect(""+sfx, true);
-	    		trSetSelectedScale(2,2,2);
-	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
-	    	}
-	    	case FIRE:
-	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Ball of Fire"));
-	    	}
-	    	case ICE:
-	    	{
-	    		sfx = addEffect(1*trQuestVarGet("next"), "Lampades");
-	    		trUnitSelectClear();
-	    		trUnitSelect(""+sfx, true);
-	    		trSetSelectedScale(0,0,0);
-	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
-	    	}
-	    	case THUNDER:
-	    	{
-	    		sfx = addEffect(1*trQuestVarGet("next"), "Arkantos God");
-	    		trUnitSelectClear();
-	    		trUnitSelect(""+sfx, true);
-	    		trSetSelectedScale(0,0,0);
-	    		yAddUpdateVar("arrowsActive", "sfx1", sfx);
-	    	}
-	    	case DARK:
-	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx1", addEffect(1*trQuestVarGet("next"), "Poison SFX"));
-	    	}
-	    }
-
-	    switch(special)
-	    {
-	    	case NONE:
-	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Curse SFX"));
-	    	}
-	    	case FIRE:
-	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Hades Fire"));
-	    	}
-	    	case ICE:
-	    	{
-	    		yAddUpdateVar("arrowsActive", "sfx2", addEffect(1*trQuestVarGet("next"), "Lampades Bolt"));
-	    	}
-	    }
-
-	    trUnitSelectClear();
-	    trUnitSelectByQV("next", true);
-	    trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
-	    trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
-    }
+	return(dmg);
 }
 
 void stunsAndPoisons(string db = "") {
@@ -433,6 +240,11 @@ void stunsAndPoisons(string db = "") {
     		yRemoveAllCopies("stunnedUnits", 1*trQuestVarGet(db));
     	}
 	}
+}
+
+/* values are names */
+void OnHitEffects(int p = 0, int attacker = 0, int target = 0) {
+
 }
 
 rule spy_find

@@ -1,24 +1,16 @@
 /*
-0 = attack + special attack element * 6
-1 = Q + W * 6
-2 = E + R * 6
-3 = artifact1
-4 = artifact2
-5 = artifact3
-6 = artifact4
-7 = artifact5
-8 = class + progress
+0-1 = gold
+2 = gameplay progress
+3 = current class
+4-13 = equipped artifacts
+14-15 = unlocked classes
 */
-
-const int SLINGER = 0;
-const int ARCUS = 1;
-const int TURMA = 2;
-const int AXEMAN = 3;
-
 int progress = 0;
+int savedata = 0;
+int currentdata = 0;
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * progress / 9,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * progress / 16,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -32,11 +24,16 @@ inactive
 		
 		for(p=1; < ENEMY_PLAYER) {
 			trModifyProtounit("Swordsman Hero", p, 6, -100);
-			trModifyProtounit("Swordsman Hero", p, 16, -1000);
-			trModifyProtounit("Swordsman Hero", p, 17, -1000);
-			trModifyProtounit("Swordsman Hero", p, 18, -1000);
-			trModifyProtounit("Swordsman Hero", p, 19, -1000);
-			trArmyDispatch(""+p+",0","Swordsman", 36, posX,0,10,0,true);
+			trModifyProtounit("Swordsman Hero", p, 16, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 17, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 18, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 19, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 16, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 17, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 18, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 19, -9999999999999999999.0);
+			trArmyDispatch(""+p+",0","Swordsman", 32, posX,0,10,0,true);
+			posX = posX + 10;
 		}
 		
 		trBlockAllSounds(true);
@@ -62,14 +59,15 @@ highFrequency
 inactive
 {
 	int swordsmen = 0;
-	int total = 36 * (cNumberPlayers - 2);
+	int total = 32 * (cNumberPlayers - 2);
 	for(p=1; < ENEMY_PLAYER) {
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman");
 	}
 	if (swordsmen == total) {
+		savedata = trGetScenarioUserData(0);
+		currentdata = iModulo(10, savedata);
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
-		trQuestVarSet("myGold", trGetScenarioUserData(9));
 		xsDisableSelf();
 	}
 }
@@ -83,15 +81,12 @@ inactive
 {
 	trLetterBox(false);
 	trBlockAllSounds(true);
-	int c = trGetScenarioUserData(progress);
-	if (c >= 36) {
+	if (currentdata >= 32) {
 		trSoundPlayFN("cantdothat.wav","1",-1,"Invalid code at " + progress + "!","");
 	}
-	c = c + 36 * (trCurrentPlayer() - 1);
-	trChatSend(0, "Class data: " + c);
 	trUnitSelectClear();
-	trUnitSelectByID(c);
-	for(i=36; >0) {
+	trUnitSelectByID(currentdata + 32 * (trCurrentPlayer() - 1));
+	for(i=32; >0) {
 		if (trUnitIsSelected() == false) {
 			uiFindType("Swordsman");
 		} else {
@@ -119,22 +114,24 @@ inactive
 	}
 	if (swordsmen == cNumberPlayers - 2) {
 		for(p=1; < ENEMY_PLAYER) {
-			for(x=0; < 36 * p) {
-				if (kbGetUnitBaseTypeID(x) == kbGetProtoUnitID("Swordsman Hero")) {
-					if (progress <= 2) {
-						/*
-						Loading elements
-						*/
-						trQuestVarSet("p"+p+"element" + (2 * progress), iModulo(6, x));
-						trQuestVarSet("p"+p+"element" + (2 * progress + 1), x / 6);
-					} else if (progress == 8) {
-						trQuestVarSet("p"+p+"class", iModulo(4, x));
-						trQuestVarSet("p"+p+"progress", x / 4);
+			swordsmen = 32 * (p - 1);
+			for(x=0; < 32) {
+				if (kbGetUnitBaseTypeID(x + swordsmen) == kbGetProtoUnitID("Swordsman Hero")) {
+					/* read the data */
+					if (progress == 0) {
+						trQuestVarSet("p"+p+"progress", x);
+					} else if (progress == 1) {
+						trQuestVarSet("p"+p+"class", x);
+					} else if (progress == 2) {
+						trPlayerGrantResources(p, "Gold", x);
+					} else if (progress == 3) {
+						trPlayerGrantResources(p, "Gold", x * 32);
+					} else if (progress < 15) {
+						trQuestVarSet("p"+p+"relic"+(progress - 3), x);
+					} else if (progress == 15) {
+						trQuestVarSet("p"+p+"unlocked", x);
 					} else {
-						/*
-						Loading artifacts
-						*/
-						trQuestVarSet("p"+p+"artifact" + (progress - 2), x);
+						trQuestVarSet("p"+p+"unlocked", trQuestVarGet("p"+p+"unlocked") + 32 * x);
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x);
@@ -145,11 +142,39 @@ inactive
 		}
 		progress = progress + 1;
 		showLoadProgress();
-		if (progress == 9) {
+		if (progress == 16) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
+			/* prepare the next data */
 			xsEnableRule("data_load_01_load_data");
+			switch(progress)
+			{
+				case 1:
+				{
+					currentdata = savedata / 10;
+				}
+				case 2:
+				{
+					savedata = trGetScenarioUserData(1);
+				}
+				case 4:
+				{
+					savedata = trGetScenarioUserData(2);
+				}
+				case 9:
+				{
+					savedata = trGetScenarioUserData(3);
+				}
+				case 14:
+				{
+					savedata = trGetScenarioUserData(4);
+				}
+			}
+			if (progress >=2) {
+				currentdata = iModulo(32, savedata);
+				savedata = savedata / 32;
+			}
 		}
 	}
 }
@@ -174,67 +199,6 @@ inactive
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
-
-		switch(1*trQuestVarGet("p"+p+"element0"))
-		{
-			case NONE:
-			{
-				trQuestVarSet("p"+p+"attack", 60);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
-			case FIRE:
-			{
-				trQuestVarSet("p"+p+"attack", 100);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
-			case ICE:
-			{
-				trQuestVarSet("p"+p+"attack", 50);
-				trModifyProtounit("Wadjet Spit", p, 1, -15);
-			}
-			case THUNDER:
-			{
-				trQuestVarSet("p"+p+"attack", 20);
-				trModifyProtounit("Wadjet Spit", p, 1, -20);
-			}
-			case LIGHT:
-			{
-				trQuestVarSet("p"+p+"attack", 50);
-			}
-			case DARK:
-			{
-				trQuestVarSet("p"+p+"attack", 0);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
-		}
-
-		switch(1*trQuestVarGet("p"+p+"element1"))
-		{
-			case NONE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 4);
-			}
-			case FIRE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 5);
-			}
-			case ICE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
-			}
-			case THUNDER:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 6);
-			}
-			case LIGHT:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
-			}
-			case DARK:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 10);
-			}
-		}
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");
