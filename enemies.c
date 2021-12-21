@@ -27,11 +27,13 @@ rule setup_enemies
 inactive
 highFrequency
 {
-	trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
-	trModifyProtounit("Minion", 1, 8, -99);
-	setupProtounitBounty("Anubite", 6);
-	setupProtounitBounty("Minion", 4);
-	xsDisableSelf();
+	if (trTime() > cActivationTime) {
+		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
+		trModifyProtounit("Minion", 1, 8, -99);
+		setupProtounitBounty("Anubite", 6);
+		setupProtounitBounty("Minion", 4);
+		xsDisableSelf();
+	}
 }
 
 rule enemies_always

@@ -102,13 +102,15 @@ void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDe
 
 void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"class", class);
-    trEventFire(1000 + 12 * class + 9);
+    trEventFire(1000 + 12 * class + p);
     int proto = trQuestVarGet("class"+class+"proto");
     trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
     trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
     trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
+    trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
+    trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+class+"nextDelay"));
 }
 
 rule setup
@@ -147,10 +149,12 @@ runImmediately
     setupClass("Royal Guard Hero", THUNDERCALLER, 600, 1000, 6);
 
     for(p=1; < ENEMY_PLAYER) {
-        /* pop count */
-        trModifyProtounit("Vision Revealer", p, 7, 9999);
-        /* LOS */
-        trModifyProtounit("Vision Revealer", p, 2, -99);
+        trSetCivAndCulture(p, 1, 0);
+        /* LOS and flying */
+        trModifyProtounit("Animal Attractor", p, 2, -99);
+        trModifyProtounit("Animal Attractor", p, 55, 4);
+        trModifyProtounit("Well of Urd", p, 2, -99);
+        trModifyProtounit("Well of Urd", p, 55, 4);
         /* carry capacity */
         trModifyProtounit("Ajax", p, 5, 99);
         /* health */
@@ -189,9 +193,9 @@ runImmediately
         trQuestVarSet("p"+p+"spellRange", 1);
         trQuestVarSet("p"+p+"spellDamage", 1);
         trQuestVarSet("p"+p+"spellDuration", 1);
+        trQuestVarSet("p"+p+"cooldownReduction", 1);
     }
 
-    xsEnableRule("setup_enemies");
     xsEnableRule("delayed_modify");
     xsEnableRule("data_load_00");
     xsDisableSelf();
@@ -211,6 +215,8 @@ highFrequency
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 0, 4.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 16, 4.3);
         setupPlayerProto("Royal Guard Hero", 1200, 30, 0, 4.6);
+
+        xsEnableRule("setup_enemies");
         xsDisableSelf();
     }
 }
@@ -498,6 +504,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
     {
         case ROOM_BASIC:
         {
+            paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
             for (i=2; >0) {
                 trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
                 trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
@@ -517,7 +524,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 paintEyecandy(x0, z0, x1, z1, "sprite");
                 paintEnemies(x0, z0, x1, z1);
             }
-            paintColumns(x0, z0, x1, z1);
             trQuestVarSet("room", room);
             yAddToDatabase("basicRooms", "room");
         }

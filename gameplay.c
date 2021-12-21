@@ -1,13 +1,10 @@
 void spawnPlayerClone(int p = 0, string vdb = "") {
     int class = trQuestVarGet("p"+p+"class");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+    yAddToDatabase("p"+p+"characters", "next");
     yAddToDatabase("playerUnits", "next");
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
-    yAddUpdateVar("playerCharacters", "attacking", 0);
-    yAddUpdateVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
-    yAddUpdateVar("playerCharacters", "firstDelay", trQuestVarGet("class"+class+"firstDelay"));
-    yAddUpdateVar("playerCharacters", "nextDelay", trQuestVarGet("class"+class+"nextDelay"));
     string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
     trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
 }
@@ -23,42 +20,45 @@ void spawnPlayer(int p = 0, string vdb = "") {
 }
 
 void checkGodPowers(int p = 0) {
-    /* vision ability */
-    switch(1*trQuestVarGet("p"+p+"visionCooldownStatus"))
+    /* well ability */
+    switch(1*trQuestVarGet("p"+p+"wellCooldownStatus"))
     {
         case ABILITY_READY:
         {
-            if (trPlayerGetPopulation(p) >= 9999) {
-                yFindLatestReverse("p"+p+"visionObject", "Vision Revealer", p);
+            if (trPlayerUnitCountSpecific(p, "Well of Urd") == 2) {
+                yFindLatestReverse("p"+p+"wellObject", "Well of Urd", p);
+                trVectorSetUnitPos("p"+p+"wellPos", "p"+p+"wellObject");
                 trMutateSelected(kbGetProtoUnitID("Rocket"));
-                trQuestVarSet("p"+p+"visionStatus", ABILITY_ON);
-                trQuestVarSet("p"+p+"visionCooldownStatus", ABILITY_COOLDOWN);
-                trQuestVarSet("p"+p+"visionReadyTime", 
-                    trTimeMS() + 1000 * trQuestVarGet("p"+p+"visionCooldown") * trQuestVarGet("p"+p+"cooldownReduction"));
-                if (trQuestVarGet("p"+p+"visionIsUltimate") == 1) {
-                    trCounterAddTime("vision", 
-                        trQuestVarGet("p"+p+"visionCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, visionName);
+                trUnitDestroy();
+                trQuestVarSet("p"+p+"wellStatus", ABILITY_ON);
+                trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COOLDOWN);
+                trQuestVarSet("p"+p+"wellReadyTime", 
+                    trTimeMS() + 1000 * trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"));
+                if (trCurrentPlayer() == p) {
+                    trCounterAbort("well");
+                    trCounterAddTime("well", 
+                        trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, wellName);
                 }
             }
         }
         case ABILITY_COOLDOWN:
         {
-            if (trTimeMS() > trQuestVarGet("p"+p+"visionReadyTime")) {
-                trQuestVarSet("p"+p+"visionCooldownStatus", ABILITY_COST);
+            if (trTimeMS() > trQuestVarGet("p"+p+"wellReadyTime")) {
+                trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
             }
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"visionCost")) {
-                trQuestVarSet("p"+p+"visionCooldownStatus", ABILITY_READY);
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost")) {
+                trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
-                    trCounterAddTime("vision", -1, -99999, visionName);
-                    if (visionIsUltimate) {
+                    trCounterAddTime("well", -1, -99999, wellName);
+                    if (wellIsUltimate) {
                         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
                     }
                 }
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
-                    trTechGodPower(p, "vision", 1);
+                    trTechGodPower(p, "Well of Urd", 1);
                 }
             }
         }
@@ -74,7 +74,8 @@ void checkGodPowers(int p = 0) {
                 trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COOLDOWN);
                 trQuestVarSet("p"+p+"rainReadyTime", 
                     trTimeMS() + 1000 * trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"));
-                if (trQuestVarGet("p"+p+"rainIsUltimate") == 1) {
+                if (trCurrentPlayer() == p) {
+                    trCounterAbort("rain");
                     trCounterAddTime("rain", 
                         trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, rainName);
                 }
@@ -115,7 +116,8 @@ void checkGodPowers(int p = 0) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COOLDOWN);
                 trQuestVarSet("p"+p+"lureReadyTime", 
                     trTimeMS() + 1000 * trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"));
-                if (trQuestVarGet("p"+p+"lureIsUltimate") == 1) {
+                if (trCurrentPlayer() == p) {
+                    trCounterAbort("lure");
                     trCounterAddTime("lure", 
                         trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, lureName);
                 }
@@ -159,6 +161,9 @@ highFrequency
     xsEnableRule("enemies_always");
     for(p=1; < ENEMY_PLAYER) {
         spawnPlayer(p, "startPosition");
+        trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
+        trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
+        trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COST);
     }
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
@@ -178,39 +183,8 @@ highFrequency
 {
     int old = xsGetContextPlayer();
     int id = 0;
-    int target = 0;
-    int action = 0;
     int p = 0;
-    for (i = 0; < xsMin(yGetDatabaseCount("playerCharacters"), 1 + ENEMY_PLAYER / 3)) {
-        id = yDatabaseNext("playerCharacters", true);
-        p = yGetVar("playerCharacters", "player");
-        action = kbUnitGetAnimationActionType(id);
-        if (yGetVar("playerCharacters", "attacking") == 0) {
-            if ((action == 12) || (action == 6)) {
-                ySetVar("playerCharacters", "attacking", 1);
-                ySetVar("playerCharacters", "attackNext", trTimeMS() + yGetVar("playerCharacters", "firstDelay"));
-            }
-        } else {
-            if ((action == 12) || (action == 6)) {
-                if (trTimeMS() > yGetVar("playerCharacters", "attackNext")) {
-                    ySetVar("playerCharacters", "attackNext", 
-                        yGetVar("playerCharacters", "attackNext") + yGetVar("playerCharacters", "nextDelay"));
-                    xsSetContextPlayer(p);
-                    target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
-                    OnHitEffects(p, 1*trQuestVarGet("playerCharacters"), target);
-                    /* only melee characters have special attacks */
-                    if (action == 6) {
-                        ySetVar("playerCharacters", "specialAttack", yGetVar("playerCharacters", "specialAttack") - 1);
-                        if (yGetVar("playerCharacters", "specialAttack") <= 0) {
-                            ySetVar("playerCharacters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
-                        }
-                    }
-                }
-            } else {
-                ySetVar("playerCharacters", "attacking", 0);
-            }
-        }
-    }
+
 
     /* player units always */
     if (yGetDatabaseCount("playerUnits") > 0) {

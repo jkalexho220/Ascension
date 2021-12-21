@@ -5,11 +5,15 @@ const int ABILITY_COST = 2;
 const int ABILITY_OFF = 0;
 const int ABILITY_ON = 1;
 
-string visionName = "";
+const int ON_HIT_NONE = 0;
+const int ON_HIT_NORMAL = 1;
+const int ON_HIT_SPECIAL = 2;
+
+string wellName = "";
 string lureName = "";
 string rainName = "";
 
-bool visionIsUltimate = false;
+bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
@@ -60,18 +64,11 @@ void removeEnemy() {
 	}	
 }
 
-void removePlayerCharacter() {
-	yRemoveFromDatabase("playerCharacters");
-	yRemoveUpdateVar("playerCharacters", "player");
-	yRemoveUpdateVar("playerCharacters", "specialAttack");
-	yRemoveUpdateVar("playerCharacters", "attacking");
-	yRemoveUpdateVar("playerCharacters", "attackNext");
-	yRemoveUpdateVar("playerCharacters", "firstDelay");
-	yRemoveUpdateVar("playerCharacters", "nextDelay");
-
-	for(x=1; < 8) {
-		yRemoveUpdateVar("playerCharacters", "data"+x);
-	}
+void removePlayerCharacter(int p = 0) {
+	yRemoveFromDatabase("p"+p+"characters");
+	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
+	yRemoveUpdateVar("p"+p+"Characters", "attacking");
+	yRemoveUpdateVar("p"+p+"Characters", "attackNext");
 }
 
 void removePlayerUnit() {
@@ -260,9 +257,34 @@ void stunsAndPoisons(string db = "") {
 	}
 }
 
-/* values are names */
-void OnHitEffects(int p = 0, int attacker = 0, int target = 0) {
-
+int CheckOnHit(int p = 0, int id = 0) {
+    int action = kbUnitGetAnimationActionType(id);
+    int status = ON_HIT_NONE;
+    if (yGetVar("p"+p+"characters", "attacking") == 0) {
+        if ((action == 12) || (action == 6)) {
+            ySetVar("p"+p+"characters", "attacking", 1);
+            ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
+        }
+    } else {
+        if ((action == 12) || (action == 6)) {
+            if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
+            	status = ON_HIT_NORMAL;
+                ySetVar("p"+p+"characters", "attackNext", 
+                    yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"nextDelay"));
+                /* only melee characters have special attacks */
+                if (action == 6) {
+                    ySetVar("p"+p+"characters", "specialAttack", yGetVar("p"+p+"characters", "specialAttack") - 1);
+                    if (yGetVar("p"+p+"characters", "specialAttack") <= 0) {
+                        ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
+                        status = ON_HIT_SPECIAL;
+                    }
+                }
+            }
+        } else {
+            ySetVar("p"+p+"characters", "attacking", 0);
+        }
+    }
+    return(status);
 }
 
 rule spy_find
