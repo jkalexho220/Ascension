@@ -243,7 +243,7 @@ highFrequency
             yRemoveUpdateVar("playerLasers", "timeout");
             yRemoveUpdateVar("playerLasers", "range");
         } else {
-            float width = 3.0 * (yGetVar("playerLasers", "timeout") - trTimeMS()) / 500;
+            float width = 4.0 * (yGetVar("playerLasers", "timeout") - trTimeMS()) / 500;
             trSetSelectedScale(width, width, yGetVar("playerLasers", "range"));
         }
     }

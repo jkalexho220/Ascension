@@ -75,8 +75,6 @@ highFrequency
                 Enemy projectiles.
                 Do something fancy
                 */
-            } else {
-                trUnitDestroy();
             }
         }
         trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));

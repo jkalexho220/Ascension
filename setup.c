@@ -506,7 +506,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
     {
         case ROOM_BASIC:
         {
-            paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
             for (i=2; >0) {
                 trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
                 trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
@@ -526,6 +525,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 paintEyecandy(x0, z0, x1, z1, "sprite");
                 paintEnemies(x0, z0, x1, z1);
             }
+            paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
             trQuestVarSet("room", room);
             yAddToDatabase("basicRooms", "room");
         }

@@ -42,7 +42,7 @@ void moonbladeAlways(int eventID = -1) {
 						}
 					}
 				}
-				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.03;
+				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.01;
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					yDatabaseNext("playerUnits", true);
 					healUnit(p, angle);
@@ -111,7 +111,7 @@ void moonbladeAlways(int eventID = -1) {
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
-		trQuestVarSet("crescentStarted", 1);
+		trQuestVarSet("p"+p+"crescentStarted", 1);
 		trSoundPlayFN("olympustemplesfx.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
 			yDatabaseNext("p"+p+"Characters");
@@ -156,7 +156,7 @@ void moonbladeAlways(int eventID = -1) {
 		}
 	}
 
-	if ((trQuestVarGet("crescentStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
+	if ((trQuestVarGet("p"+p+"crescentStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			if (yGetVar("p"+p+"characters", "crescentSFX") < 0) {
@@ -167,7 +167,7 @@ void moonbladeAlways(int eventID = -1) {
 			trMutateSelected(kbGetProtoUnitID("Outpost"));
 			trSetSelectedScale(0.0,0.0,0.0);
 		}
-		trQuestVarSet("crescentStarted", 0);
+		trQuestVarSet("p"+p+"crescentStarted", 0);
 	}
 
 	if (yGetDatabaseCount("p"+p+"moonbeams") > 0) {
