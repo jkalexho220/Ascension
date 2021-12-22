@@ -32,6 +32,9 @@ highFrequency
 		trModifyProtounit("Minion", 1, 8, -99);
 		setupProtounitBounty("Anubite", 6);
 		setupProtounitBounty("Minion", 4);
+		setupProtounitBounty("Sphinx", 8);
+		setupProtounitBounty("Scarab", 10);
+		setupProtounitBounty("Mummy", 12);
 		xsDisableSelf();
 	}
 }

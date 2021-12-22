@@ -3,6 +3,7 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
     yAddToDatabase("p"+p+"characters", "next");
     yAddToDatabase("playerUnits", "next");
+    yAddUpdateVar("playerUnits", "player", p);
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
     string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
@@ -25,8 +26,8 @@ void checkGodPowers(int p = 0) {
     {
         case ABILITY_READY:
         {
-            if (trPlayerUnitCountSpecific(p, "Well of Urd") == 2) {
-                yFindLatestReverse("p"+p+"wellObject", "Well of Urd", p);
+            if (trPlayerUnitCountSpecific(p, "Tunnel") == 2) {
+                yFindLatest("p"+p+"wellObject", "Tunnel", p);
                 trVectorSetUnitPos("p"+p+"wellPos", "p"+p+"wellObject");
                 trMutateSelected(kbGetProtoUnitID("Rocket"));
                 trUnitDestroy();
@@ -39,6 +40,8 @@ void checkGodPowers(int p = 0) {
                     trCounterAddTime("well", 
                         trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, wellName);
                 }
+            } else {
+                trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber() - 1);
             }
         }
         case ABILITY_COOLDOWN:
@@ -58,7 +61,7 @@ void checkGodPowers(int p = 0) {
                     }
                 }
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
-                    trTechGodPower(p, "Well of Urd", 1);
+                    trTechGodPower(p, "Underworld Passage", 1);
                 }
             }
         }
@@ -147,8 +150,18 @@ void checkGodPowers(int p = 0) {
     }
 }
 
-
 rule gameplay_start
+inactive
+highFrequency
+{
+    xsDisableSelf();
+    trDelayedRuleActivation("gameplay_start_2");
+    for(p=1; < ENEMY_PLAYER) {
+        chooseClass(p, 1*trQuestVarGet("p"+p+"class"));
+    }
+}
+
+rule gameplay_start_2
 inactive
 highFrequency
 {
@@ -164,6 +177,8 @@ highFrequency
         trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
         trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
         trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COST);
+        trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
+        trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
     }
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
@@ -184,7 +199,7 @@ highFrequency
     int old = xsGetContextPlayer();
     int id = 0;
     int p = 0;
-
+    float amt = 0;
 
     /* player units always */
     if (yGetDatabaseCount("playerUnits") > 0) {
@@ -192,6 +207,13 @@ highFrequency
         if ((id == -1) || (trUnitAlive() == false)) {
             removePlayerUnit();
         } else {
+            if (yGetVar("playerUnits", "decay") > 0) {
+                if (trTimeMS() > yGetVar("playerUnits", "decayNext")) {
+                    ySetVar("playerUnits", "decayNext", 1000 + yGetVar("playerUnits", "decayNext"));
+                    trDamageUnitPercent(yGetVar("playerUnits", "decay"));
+                }
+            }
+
             stunsAndPoisons("playerUnits");
         }
     }
@@ -203,6 +225,7 @@ highFrequency
         id = yDatabaseNext("stunnedUnits", true);
         if (id == -1 || trUnitAlive() == false) {
             yRemoveFromDatabase("stunnedUnits");
+            yRemoveUpdateVar("stunnedUnits", "proto");
         } else {
             trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
             trUnitOverrideAnimation(2, 0, false, true, -1, 0);
@@ -229,6 +252,28 @@ highFrequency
     for(p=1; < ENEMY_PLAYER) {
         trEventFire(12*trQuestVarGet("p"+p+"class") + p);
         checkGodPowers(p);
+    }
+
+    /* protection */
+    if (trQuestVarGet("protectionCount") > 0) {
+        for(x=yGetDatabaseCount("playerUnits"); >0) {
+            id = yDatabaseNext("playerUnits", true);
+            trUnitHighlight(0.2, false);
+            xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
+            amt = kbUnitGetCurrentHitpoints(id);
+            if (amt > yGetVar("playerUnits", "currentHealth")) {
+                ySetVar("playerUnits", "currentHealth", amt);
+            } else {
+                trDamageUnit(amt - yGetVar("playerUnits", "currentHealth"));
+            }
+        }
+    }
+
+    /* sounds */
+    if (trQuestVarGet("stunSound") == 1) {
+        trQuestVarSet("stunSound", 0);
+        trQuestVarSetFromRand("sound", 1, 3, true);
+        trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
     }
 
     xsSetContextPlayer(old);

@@ -121,7 +121,7 @@ inactive
 					if (progress == 0) {
 						trQuestVarSet("p"+p+"progress", x);
 					} else if (progress == 1) {
-						chooseClass(p, x);
+						trQuestVarSet("p"+p+"class", x);
 					} else if (progress == 2) {
 						trPlayerGrantResources(p, "Gold", x);
 					} else if (progress == 3) {

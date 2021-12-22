@@ -57,11 +57,6 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "poisonLast");
 	yRemoveUpdateVar("enemies", "poisonDamage");
 	yRemoveUpdateVar("enemies", "poisonSFX");
-	yRemoveUpdateVar("enemies", "frostCount");
-	yRemoveUpdateVar("enemies", "shockCount");
-	for(x=1; <=5) {
-		yRemoveUpdateVar("enemies", "resist"+x);
-	}	
 }
 
 void removePlayerCharacter(int p = 0) {
@@ -73,6 +68,8 @@ void removePlayerCharacter(int p = 0) {
 
 void removePlayerUnit() {
 	yRemoveFromDatabase("playerUnits");
+	yRemoveUpdateVar("playerUnits", "player");
+	yRemoveUpdateVar("playerUnits", "currentHealth");
 	yRemoveUpdateVar("playerUnits", "stunStatus");
 	yRemoveUpdateVar("playerUnits", "stunTimeout");
 	yRemoveUpdateVar("playerUnits", "stunSFX");
@@ -82,6 +79,7 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "poisonDamage");
 	yRemoveUpdateVar("playerUnits", "poisonSFX");
 	yRemoveUpdateVar("playerUnits", "decay");
+	yRemoveUpdateVar("playerUnits", "decayNext");
 }
 
 
@@ -159,6 +157,7 @@ int spyEffect(int unit = 0, int proto = 0) {
 }
 
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
+	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		damage = damage * trQuestVarGet("p"+p+"spellDamage");
@@ -183,6 +182,8 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 }
 
 void stunUnit(string db = "", float duration = 0, int p = 0) {
+	trQuestVarSet("stunSound", 1);
+	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 	}
@@ -223,7 +224,7 @@ void healUnit(int p = 0, float amt = 0) {
 /*
 Enemies have elemental resistance and weakness
 */
-float damageEnemy(int p = 0, float dmg = 0, bool spell = false) {
+float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	trDamageUnit(dmg);
 	return(dmg);
 }
@@ -285,6 +286,10 @@ int CheckOnHit(int p = 0, int id = 0) {
         }
     }
     return(status);
+}
+
+float calculateDecay(int p = 0, float decay = 0) {
+	return(decay / trQuestVarGet("p"+p+"spellDuration"));
 }
 
 rule spy_find

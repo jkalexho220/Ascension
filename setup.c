@@ -46,7 +46,8 @@ Secondary terrain
 int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
 
-void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float range = 12, float speed = 4) {
+void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float speed = 4, float range = 0) {
+    int pNum = kbGetProtoUnitID(proto);
     for(p=1; <ENEMY_PLAYER) {
         /* attack */
         trModifyProtounit(proto, p, 27, 9999999999999999999.0);
@@ -59,7 +60,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 31, -9999999999999999999.0);
         trModifyProtounit(proto, p, 31, attack);
         zInitProtoUnitStat(proto, p, 31, attack);
-        trQuestVarSet("proto"+proto+"attack", attack);
+        trQuestVarSet("proto"+pNum+"attack", attack);
         /* projectiles */
         zInitProtoUnitStat(proto, p, 13, 1);
         /* health */
@@ -67,7 +68,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 0, -9999999999999999999.0);
         trModifyProtounit(proto, p, 0, health);
         zInitProtoUnitStat(proto, p, 0, health);
-        trQuestVarSet("proto"+proto+"health", health);
+        trQuestVarSet("proto"+pNum+"health", health);
         /* LOS */
         trModifyProtounit(proto, p, 2, 9999999999999999999.0);
         trModifyProtounit(proto, p, 2, -9999999999999999999.0);
@@ -77,13 +78,13 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 11, -9999999999999999999.0);
         trModifyProtounit(proto, p, 11, range);
         zInitProtoUnitStat(proto, p, 11, range);
-        trQuestVarSet("proto"+proto+"range", range);
+        trQuestVarSet("proto"+pNum+"range", range);
         /* speed */
         trModifyProtounit(proto, p, 1, 9999999999999999999.0);
         trModifyProtounit(proto, p, 1, -9999999999999999999.0);
         trModifyProtounit(proto, p, 1, speed);
         zInitProtoUnitStat(proto, p, 1, speed);
-        trQuestVarSet("proto"+proto+"speed", speed);
+        trQuestVarSet("proto"+pNum+"speed", speed);
         /* armor */
         trModifyProtounit(proto, p, 24, -1);
         trModifyProtounit(proto, p, 25, -1);
@@ -97,7 +98,7 @@ void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDe
     trQuestVarSet("proto"+p+"class", class);
     trQuestVarSet("class"+class+"firstDelay", firstDelay);
     trQuestVarSet("class"+class+"nextDelay", nextDelay);
-    trQuestVarSet("class"+class+"specialCooldown", specialCD);
+    trQuestVarSet("class"+class+"specialAttackCooldown", specialCD);
 }
 
 void chooseClass(int p = 0, int class = 0) {
@@ -111,6 +112,12 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
     trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
     trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+class+"nextDelay"));
+    trQuestVarSet("p"+p+"specialAttackCooldown", trQuestVarGet("class"+class+"specialAttackCooldown"));
+    trQuestVarSet("p"+p+"projectiles", 1);
+    trQuestVarSet("p"+p+"spellRange", 1);
+    trQuestVarSet("p"+p+"spellDamage", 1);
+    trQuestVarSet("p"+p+"spellDuration", 1);
+    trQuestVarSet("p"+p+"cooldownReduction", 1);
 }
 
 rule setup
@@ -121,6 +128,7 @@ runImmediately
     trSetUnitIdleProcessing(false); 
     
     trSetObscuredUnits(false);
+    configUndef("ErodeBuildingFoundations");
 
     ENEMY_PLAYER = cNumberPlayers - 1;
 
@@ -153,8 +161,8 @@ runImmediately
         /* LOS and flying */
         trModifyProtounit("Animal Attractor", p, 2, -99);
         trModifyProtounit("Animal Attractor", p, 55, 4);
-        trModifyProtounit("Well of Urd", p, 2, -99);
-        trModifyProtounit("Well of Urd", p, 55, 4);
+        trModifyProtounit("Tunnel", p, 2, -99);
+        trModifyProtounit("Tunnel", p, 55, 4);
         /* carry capacity */
         trModifyProtounit("Ajax", p, 5, 99);
         /* health */
@@ -187,13 +195,6 @@ runImmediately
         trForbidProtounit(p, "Hill Fort");
         trForbidProtounit(p, "Tower");
         trForbidProtounit(p, "Longhouse");
-
-        trQuestVarSet("p"+p+"attackRange", 12);
-        trQuestVarSet("p"+p+"projectiles", 1);
-        trQuestVarSet("p"+p+"spellRange", 1);
-        trQuestVarSet("p"+p+"spellDamage", 1);
-        trQuestVarSet("p"+p+"spellDuration", 1);
-        trQuestVarSet("p"+p+"cooldownReduction", 1);
     }
 
     xsEnableRule("delayed_modify");
@@ -211,10 +212,11 @@ highFrequency
         trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
         trModifyProtounit("Transport Ship Atlantean", 1, 5, 1);
 
-        setupPlayerProto("Militia", 100, 10, 0, 4.8);
-        setupPlayerProto("Hero Greek Theseus", 1000, 50, 0, 4.3);
-        setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 16, 4.3);
-        setupPlayerProto("Royal Guard Hero", 1200, 30, 0, 4.6);
+        setupPlayerProto("Militia", 100, 10, 4.8);
+        setupPlayerProto("Wolf", 200, 10, 5);
+        setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3);
+        setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 16);
+        setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
         xsEnableRule("setup_enemies");
         xsDisableSelf();
