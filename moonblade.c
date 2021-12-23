@@ -48,6 +48,9 @@ void moonbladeAlways(int eventID = -1) {
 					healUnit(p, angle);
 				}
 				if (hit == ON_HIT_SPECIAL) {
+					if (trCurrentPlayer() == p) {
+						trSoundPlayFN("mythcreate.wav","1",-1,"","");
+					}
 					trVectorSetUnitPos("pos", "p"+p+"characters");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					yAddToDatabase("playerUnits", "next");
@@ -256,6 +259,8 @@ void chooseMoonblade(int eventID = -1) {
 	trQuestVarSet("p"+p+"lureCost", 0);
 	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
+
+	trSetCivilizationNameOverride(p, "Moonblade | Level " + 1*trQuestVarGet("p"+p+"progress"));
 }
 
 rule moonblade_init

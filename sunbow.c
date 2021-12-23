@@ -62,7 +62,7 @@ void sunbowAlways(int eventID = -1) {
 								if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
 									trUnitSelectClear();
 									trUnitSelectByQV("enemies", true);
-									healUnit(p, amt);
+									damageEnemy(p, amt);
 								}
 							}
 						}
@@ -270,6 +270,8 @@ void chooseSunbow(int eventID = -1) {
 	trQuestVarSet("p"+p+"lureCost", 0);
 	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
+
+	trSetCivilizationNameOverride(p, "Sunbow | Level " + 1*trQuestVarGet("p"+p+"progress"));
 }
 
 rule sunbow_init

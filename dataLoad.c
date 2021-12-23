@@ -195,14 +195,25 @@ inactive
 	/*
 	Deploy victory markers to avoid defeats
 	*/
+	int n = 0;
+	int current = 0;
 	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
+		trQuestVarSet("p"+p+"noob", 1);
+		n = trQuestVarGet("p"+p+"unlocked");
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
-		for(c=1; < 10) {
+		current = xsPow(2, CLASS_COUNT);
+		for(c=CLASS_COUNT; >0) {
 			proto = trQuestVarGet("class"+c+"proto");
 			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"progress"));
+			if (n >= current) {
+				trQuestVarSet("p"+p+"unlocked"+c, 1);
+				trQuestVarSet("p"+p+"noob", 0);
+				n = n - current;
+			}
+			current = current / 2;
 		}
 	}
 	trUnblockAllSounds();

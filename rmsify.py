@@ -54,7 +54,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trGetUnitScenarioNameNumber', 'trUnitIsOwnedBy', 'trCounterAddTime', 'trMutateSelected', 'xsMin', 
 			'trChatSend', 'trUnitIsSelected', 'kbGetProtoUnitName', 'trUnitSetStance', 'trForceNonCinematicModels', 
 			'trLetterBox', 'trUnitDead', 'trUnitPercentDamaged', 'trDamageUnitPercent', 'trCamTrackLoad', 
-			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 
+			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 'trIsGadgetVisible',
 			'trSetUnitOrientation', 'trMessageSetText', 'kbUnitGetAnimationActionType', 'trUnitHighlight', 'trUnitConvert', 
 			'xsVectorSet', 'trVectorQuestVarGetZ', 'map', 'if', 'trSetUnitIdleProcessing', 'configUndef',
 			'trCountUnitsInArea', 'trArmyDispatch', 'trTime', 'xsEnableRule', 'trUnitDestroy', 'trPlayerUnitCountSpecific', 
@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'inventory.c', 'setup.c', 'dataLoad.c', 'gameplayHelpers.c', 'moonblade.c', 'sunbow.c', 'enemies.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'moonblade.c', 'sunbow.c', 'enemies.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:
@@ -127,7 +127,7 @@ try:
 							if 'return' in templine and not '(' in templine:
 								print("Needs parenthesis")
 								print("Line " + str(ln) + ":\n    " + line)
-							if 'for' in templine and '";' in templine:
+							if ('for(' in templine or 'for (' in templine) and '";' in templine:
 								print("Wrong parenthesis")
 								print("Line " + str(ln) + ":\n    " + line)
 							if 'for' in templine and not ';' in templine and not '//':

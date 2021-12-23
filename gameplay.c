@@ -174,9 +174,6 @@ highFrequency
     xsEnableRule("enemies_always");
     for(p=1; < ENEMY_PLAYER) {
         spawnPlayer(p, "startPosition");
-        trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
-        trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
-        trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COST);
         trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
         trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
     }

@@ -17,7 +17,7 @@ const int CHEST_ENCOUNTER = 3;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
-const int THUNDERCALLER = 3;
+const int CLASS_COUNT = 2;
 
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
@@ -48,7 +48,7 @@ int TERRAIN_SUB_SECONDARY = 1;
 
 void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float speed = 4, float range = 0) {
     int pNum = kbGetProtoUnitID(proto);
-    for(p=1; <ENEMY_PLAYER) {
+    for(p=0; <ENEMY_PLAYER) {
         /* attack */
         trModifyProtounit(proto, p, 27, 9999999999999999999.0);
         trModifyProtounit(proto, p, 27, -9999999999999999999.0);
@@ -90,6 +90,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 25, -1);
         trModifyProtounit(proto, p, 26, -1);
     }
+    trModifyProtounit(proto, 0, 2, -20);
 }
 
 void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0, int specialCD = 0) {
@@ -118,6 +119,20 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"spellDamage", 1);
     trQuestVarSet("p"+p+"spellDuration", 1);
     trQuestVarSet("p"+p+"cooldownReduction", 1);
+    trUnitSelectClear();
+    trUnitSelectByQV("p"+p+"unit");
+    if (trUnitAlive()) {
+        trMutateSelected(proto);
+    }
+    trPlayerKillAllGodPowers(p);
+    trCounterAbort("lure");
+    trCounterAbort("well");
+    trCounterAbort("rain");
+    if (class > 0) {
+        trQuestVarSet("p"+p+"wellCooldownStatus", 2);
+        trQuestVarSet("p"+p+"lureCooldownStatus", 2);
+        trQuestVarSet("p"+p+"rainCooldownStatus", 2);
+    }
 }
 
 rule setup
@@ -154,9 +169,9 @@ runImmediately
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
-    setupClass("Royal Guard Hero", THUNDERCALLER, 600, 1000, 6);
 
     for(p=1; < ENEMY_PLAYER) {
+        trPlayerSetDiplomacy(p, 0, "neutral");
         trSetCivAndCulture(p, 1, 0);
         /* LOS and flying */
         trModifyProtounit("Animal Attractor", p, 2, -99);
@@ -300,10 +315,10 @@ highFrequency
             minProgress = xsMin(minProgress, trQuestVarGet("p"+p+"progress"));
         }
         if (minProgress == 0) {
+            trQuestVarSet("newPlayers", 1);
             trQuestVarSet("stage", 1);
         } else {
             trLetterBox(false);
-            trSetLighting("default", 0.1);
             trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
             trUIFadeToColor(0,0,0,1000,0,false);
             trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
@@ -324,8 +339,9 @@ highFrequency
             }
 
             xsEnableRule("choose_stage_00");
-            xsDisableSelf();
         }
+        trSetLighting("default", 0.1);
+        xsDisableSelf();
         xsEnableRule("choose_stage_01");
     }
 }
@@ -534,6 +550,23 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
             trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, 0, false);
             trVectorQuestVarSet("startPosition", xsVectorSet(x*70 + 40,0,z*70+40));
+            if (trQuestVarGet("stage") < 5) {
+                trVectorQuestVarSet("choice1", xsVectorSet(x*70+48,0,z*70+54));
+                trVectorQuestVarSet("choice2", xsVectorSet(x*70+54,0,z*70+48));
+                string choice1 = kbGetProtoUnitName(1*trQuestVarGet("class"+(2*trQuestVarGet("stage")-1)+"proto"));
+                string choice2 = kbGetProtoUnitName(1*trQuestVarGet("class"+(2*trQuestVarGet("stage"))+"proto"));
+                trQuestVarSet("choice1unit", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0", choice1, 1, trQuestVarGet("choice1x"),0,trQuestVarGet("choice1z"),225,true);
+                trQuestVarSet("choice2unit", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0", choice2, 1, trQuestVarGet("choice2x"),0,trQuestVarGet("choice2z"),225,false);
+                trArmySelect("1,0");
+                trUnitConvert(0);
+                yAddToDatabase("stunnedUnits", "choice1unit");
+                yAddUpdateVar("stunnedUnits", "proto", trQuestVarGet("class"+(2*trQuestVarGet("stage")-1)+"proto"));
+                yAddToDatabase("stunnedUnits", "choice2unit");
+                yAddUpdateVar("stunnedUnits", "proto", trQuestVarGet("class"+(2*trQuestVarGet("stage"))+"proto"));
+                xsEnableRule("class_shop_always");
+            }
         }
         case ROOM_BOSS:
         {
@@ -611,14 +644,14 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 1) {
-        xsEnableRule("setup_enemies");
         xsDisableSelf();
-        /*
-        trLetterBox(true);
-        trUIFadeToColor(0,0,0,0,0,true);
-        */
         trBlockAllSounds();
-        trSoundPlayFN("default","1",-1,"Building stage...","");
+        for(i=trQuestVarGet("stage"); >1) {
+            trTechSetStatus(ENEMY_PLAYER, 76, 4);
+            for(j=10; >0) {
+                trTechSetStatus(ENEMY_PLAYER, 78, 4);
+            }
+        }
         /* minecraft time! */
         switch(1*trQuestVarGet("stage"))
         {
@@ -650,7 +683,7 @@ highFrequency
                 trStringQuestVarSet("enemyProto1", "Minion");
                 trStringQuestVarSet("enemyProto2", "Anubite");
                 trStringQuestVarSet("enemyProto3", "Sphinx");
-                trStringQuestVarSet("enemyProto4", "Scarab");
+                trStringQuestVarSet("enemyProto4", "Wadjet");
                 trStringQuestVarSet("enemyProto5", "Mummy");
 
                 trQuestVarSet("columnDensity", 0.05);
@@ -786,8 +819,46 @@ highFrequency
         trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 
         trUnblockAllSounds();
-        xsEnableRule("gameplay_start");
-        trLetterBox(false);
+        if (trQuestVarGet("newPlayers") == 0) {
+            xsEnableRule("gameplay_start");
+            trUIFadeToColor(0,0,0,1000,0,false);
+            trLetterBox(false);
+        } else {
+            xsEnableRule("choose_stage_03");
+            trSoundPlayFN("default","1",-1,
+                "Zenophobia: Looks like we have some new faces today!", "icons\infantry g hoplite icon 64");
+        }
+    }
+}
+
+rule choose_stage_03
+inactive
+highFrequency
+{
+    if (trTime() > cActivationTime + 5) {
+        trSoundPlayFN("default","1",-1,
+            "Zenophobia: I'll let you choose one of the starter characters for free.", "icons\infantry g hoplite icon 64");
+        trUnitSelectClear();
+        trUnitSelectByQV("choice1", true);
+        trUnitSetStance("Passive");
+        trUnitHighlight(15.0, true);
+        trUnitSelectClear();
+        trUnitSelectByQV("choice2", true);
+        trUnitSetStance("Passive");
+        trUnitHighlight(15.0, true);
+        xsEnableRule("choose_stage_04");
+        xsDisableSelf();
+    }
+}
+
+rule choose_stage_04
+inactive
+highFrequency
+{
+    if (trTime() > cActivationTime + 6) {
         trUIFadeToColor(0,0,0,1000,0,false);
+        trLetterBox(false);
+        xsEnableRule("gameplay_start");
+        xsDisableSelf();
     }
 }

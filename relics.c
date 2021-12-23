@@ -1,0 +1,22 @@
+/* regular drop pool */
+const int RELIC_HEALTH = 1;
+const int RELIC_SPEED = 2;
+const int RELIC_ATTACK_RANGE = 3;
+const int RELIC_SPELL_RANGE = 4;
+const int RELIC_SPELL_DURATION = 5;
+const int RELIC_ATTACK_LIFESTEAL = 6;
+const int RELIC_SPELL_LIFESTEAL = 7;
+const int RELIC_ATTACK_DAMAGE = 8;
+const int RELIC_SPELL_POWER = 9;
+const int RELIC_HEAL_BOOST = 10;
+
+/* boss drop pool */
+const int RELIC_POISON_RESISTANCE = 11;
+const int RELIC_STUN_RESISTANCE = 12;
+const int RELIC_SILENCE_RESISTANCE = 13;
+const int RELIC_POISON_KILLER = 14;
+const int RELIC_STUN_KILLER = 15;
+const int RELIC_HALF_KILLER = 16;
+const int RELIC_PROJECTILES = 17;
+const int RELIC_SPECIAL_ATTACK = 18;
+const int RELIC_COOLDOWN_REDUCTION = 19;
