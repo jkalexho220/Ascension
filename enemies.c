@@ -38,10 +38,13 @@ highFrequency
 		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
 		trModifyProtounit("Minion", 1, 8, -99);
 		setupProtounitBounty("Minion", 4);
+        setupProtounitBounty("Golden Lion", 4);
         setupProtounitBounty("Anubite", 6, 0.05);
+        setupProtounitBounty("Terracotta Soldier", 6, 0.05);
 		setupProtounitBounty("Sphinx", 8, 0.1);
-		setupProtounitBounty("Wadjet", 8, 0.1);
-		setupProtounitBounty("Mummy", 16, 1);
+		setupProtounitBounty("Petsuchos", 8, 0.2);
+		setupProtounitBounty("Mummy", 16, 0.5);
+        trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 1000);
 		xsDisableSelf();
 	}
 }
@@ -53,6 +56,9 @@ highFrequency
     int old = xsGetContextPlayer();
     int proto = 0;
     int id = 0;
+    float amt = 0;
+    float angle = 0;
+    string pName = "";
     /*
     Enemies incoming
     */
@@ -99,5 +105,49 @@ highFrequency
 	    }
     }
 
+    /* ambush rooms */
+    if (yGetDatabaseCount("ambushRooms") > 0) {
+        yDatabaseNext("ambushRooms");
+        trQuestVarSet("posX", yGetVar("ambushRooms", "posX"));
+        trQuestVarSet("posZ", yGetVar("ambushRooms", "posZ"));
+        for(p=1; < ENEMY_PLAYER) {
+            if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 100) {
+                pName = trStringQuestVarGet("enemyProto"+1*yGetVar("ambushRooms", "type"));
+                trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
+                angle = 6.283185 / trQuestVarGet("count");
+                amt = 0;
+                trQuestVarSet("angle",0);
+                for(x=trQuestVarGet("count"); >0) {
+                    trQuestVarSetFromRand("dist", 6, 18, true);
+                    trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+                    trVectorScale("dir", trQuestVarGet("dist"));
+                    trQuestVarSet("dirX", trQuestVarGet("posX") + trQuestVarGet("dirX"));
+                    trQuestVarSet("dirZ", trQuestVarGet("posZ") + trQuestVarGet("dirZ"));
+                    amt = fModulo(360.0, trQuestVarGet("angle") * 180.0 / 3.141592 - 180.0);
+                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                    trArmyDispatch("1,0",pName,1,trQuestVarGet("dirX"),0,trQuestVarGet("dirZ"),amt,true);
+                    trUnitSelectClear();
+                    trUnitSelectByQV("next", true);
+                    trUnitConvert(ENEMY_PLAYER);
+                    yAddToDatabase("enemiesIncoming", "next");
+                    trQuestVarSet("angle", trQuestVarGet("angle") + angle);
+                }
+                yDatabasePointerDefault("enemiesIncoming");
+                for(x=trQuestVarGet("count"); >0) {
+                    id = yDatabaseNext("enemiesIncoming", true);
+                    activateEnemy(id);
+                }
+                trSoundPlayFN("attackwarning.wav","1",-1,"","");
+                trSoundPlayFN("wild.wav","1",-1,"","");
+                yRemoveFromDatabase("ambushRooms");
+                yRemoveUpdateVar("ambushRooms", "posX");
+                yRemoveUpdateVar("ambushRooms", "posZ");
+                yRemoveUpdateVar("ambushRooms", "type");
+                break;
+            }
+        }
+    }
+
     xsSetContextPlayer(old);
 }
+

@@ -7,9 +7,10 @@ const int EDGE_NORMAL = 1;
 const int EDGE_CHASM = 2;
 
 const int ROOM_BASIC = 0;
-const int ROOM_STARTER = 1;
-const int ROOM_BOSS = 2;
-const int ROOM_NICK = 3;
+const int ROOM_AMBUSH = 1;
+const int ROOM_STARTER = 10;
+const int ROOM_BOSS = 11;
+const int ROOM_NICK = 12;
 
 const int CHEST_KEY = 1;
 const int CHEST_PADS = 2;
@@ -146,6 +147,7 @@ runImmediately
     configUndef("ErodeBuildingFoundations");
 
     ENEMY_PLAYER = cNumberPlayers - 1;
+    trQuestVarSet("activePlayerCount", ENEMY_PLAYER - 1);
 
     trForceNonCinematicModels(true);
     
@@ -521,32 +523,49 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
     int x1 = 0;
     int z1 = 0;
     trQuestVarSet("room"+room, type);
+    if (type < ROOM_STARTER) {
+        for (i=2; >0) {
+            trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
+            trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
+            trQuestVarSetFromRand("x1", x * 35 + 22, x * 35 + 35, true);
+            trQuestVarSetFromRand("z1", z * 35 + 22, z * 35 + 35, true);
+            x0 = trQuestVarGet("x0");
+            x1 = trQuestVarGet("x1");
+            z0 = trQuestVarGet("z0");
+            z1 = trQuestVarGet("z1");
+            trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
+            trVectorQuestVarSet("room"+room+"top"+i, xsVectorSet(x1,0,z1));
+            trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
+            paintSecondary(x0, z0, x1, z1);
+            paintEyecandy(x0, z0, x1, z1, "tree");
+            paintEyecandy(x0, z0, x1, z1, "rock");
+            paintEyecandy(x0, z0, x1, z1, "sprite");
+        }
+        paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
+    }
     switch(type)
     {
         case ROOM_BASIC:
         {
-            for (i=2; >0) {
-                trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
-                trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
-                trQuestVarSetFromRand("x1", x * 35 + 22, x * 35 + 35, true);
-                trQuestVarSetFromRand("z1", z * 35 + 22, z * 35 + 35, true);
-                x0 = trQuestVarGet("x0");
-                x1 = trQuestVarGet("x1");
-                z0 = trQuestVarGet("z0");
-                z1 = trQuestVarGet("z1");
-                trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
-                trVectorQuestVarSet("room"+room+"center"+i, xsVectorSet(x0 + x1,0,z0 + z1));
-                trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
-                paintSecondary(x0, z0, x1, z1);
-                paintEyecandy(x0, z0, x1, z1, "tree");
-                paintEyecandy(x0, z0, x1, z1, "rock");
-                paintEyecandy(x0, z0, x1, z1, "sprite");
+            for(i = 2; >0) {
+                x0 = trQuestVarGet("room"+room+"bottom"+i+"x");
+                z0 = trQuestVarGet("room"+room+"bottom"+i+"z");
+                x1 = trQuestVarGet("room"+room+"top"+i+"x");
+                z1 = trQuestVarGet("room"+room+"top"+i+"z");
                 paintEnemies(x0, z0, x1, z1);
             }
-            paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
             trQuestVarSet("room", room);
             yAddToDatabase("basicRooms", "room");
+        }
+        case ROOM_AMBUSH:
+        {
+            trQuestVarSet("room", room);
+            yAddToDatabase("ambushRooms", "room");
+            yAddUpdateVar("ambushRooms", "posX", x * 70 + 40);
+            yAddUpdateVar("ambushRooms", "posZ", z * 70 + 40);
+            trQuestVarSetFromRand("type", 1, trQuestVarGet("enemyProtoCount"), true);
+            yAddUpdateVar("ambushRooms", "type", trQuestVarGet("type"));
         }
         case ROOM_STARTER:
         {
@@ -661,33 +680,36 @@ highFrequency
             case 1:
             {
                 /* desert tomb */
-                trOverlayText("Desert Tomb", 3.0, -1, -1, -1);
+                trOverlayText("Temple of the Lion", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 2;
 
                 TERRAIN_PRIMARY = 0;
                 TERRAIN_SUB_PRIMARY = 34;
 
-                TERRAIN_SECONDARY = 0;
-                TERRAIN_SUB_SECONDARY = 17;
+                TERRAIN_SECONDARY = 4;
+                TERRAIN_SUB_SECONDARY = 12;
 
-                trQuestVarSet("treeDensity", 0);
+                trQuestVarSet("treeDensity", 0.03);
+                trStringQuestVarSet("treeProto1", "Statue Lion Left");
+                trStringQuestVarSet("treeProto2", "Statue Lion Right");
+                trStringQuestVarSet("treeProto3", "Statue Nemean Lion");
                 trQuestVarSet("spriteDensity", 0.3);
                 trStringQuestVarSet("spriteProto1", "Rock Sandstone Sprite");
-                trStringQuestVarSet("spriteProto2", "Skeleton");
-                trStringQuestVarSet("spriteProto3", "Cinematic Scorch");
-                trQuestVarSet("rockDensity", 0.1);
+                trStringQuestVarSet("spriteProto2", "Grass");
+                trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
+                trQuestVarSet("rockDensity", 0.13);
                 trStringQuestVarSet("rockProto1", "Rock Sandstone Big");
-                trStringQuestVarSet("rockProto2", "Rock Sandstone Big");
-                trStringQuestVarSet("rockProto3", "Statue Pharaoh");
+                trStringQuestVarSet("rockProto2", "Rock River Sandy");
+                trStringQuestVarSet("rockProto3", "Rock Sandstone Small");
 
-                trQuestVarSet("enemyDensity", 0.03 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
                 trQuestVarSet("enemyProtoCount", 5);
-                trStringQuestVarSet("enemyProto1", "Minion");
+                trStringQuestVarSet("enemyProto1", "Golden Lion");
                 trStringQuestVarSet("enemyProto2", "Anubite");
-                trStringQuestVarSet("enemyProto3", "Sphinx");
-                trStringQuestVarSet("enemyProto4", "Wadjet");
-                trStringQuestVarSet("enemyProto5", "Mummy");
+                trStringQuestVarSet("enemyProto3", "Terracotta Soldier");
+                trStringQuestVarSet("enemyProto4", "Sphinx");
+                trStringQuestVarSet("enemyProto5", "Petsuchos");
 
                 trQuestVarSet("columnDensity", 0.05);
             }
@@ -810,7 +832,12 @@ highFrequency
                 nick = false;
                 xsEnableRule("nick_00_visit");
             } else {
-                buildRoom(x, z, ROOM_BASIC);
+                trQuestVarSetFromRand("roomType", ROOM_BASIC, ROOM_AMBUSH, true);
+                trQuestVarSetFromRand("roomType2", ROOM_BASIC, ROOM_AMBUSH, true);
+                if (trQuestVarGet("roomType2") < trQuestVarGet("roomType")) {
+                    trQuestVarSet("roomType", trQuestVarGet("roomType2"));
+                }
+                buildRoom(x, z, 1*trQuestVarGet("roomType"));
             }
         }
 

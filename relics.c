@@ -22,6 +22,8 @@ const int RELIC_PROJECTILES = 18;
 const int RELIC_SPECIAL_ATTACK = 19;
 const int RELIC_COOLDOWN_REDUCTION = 20;
 
+/* nickonhawk's shop */
+
 const int RELIC_COUNT = 20;
 
 string relicName(int relic = 0) {
@@ -411,16 +413,13 @@ int relicProto(int relic = 0) {
 	return(proto);
 }
 
-int relicRandom(bool basic = true) {
+int relicRandom() {
 	trQuestVarSetFromRand("relicrand1",1,10, true);
 	trQuestVarSetFromRand("relicrand2",1,10, true);
 	float firstDiff = xsAbs(trQuestVarGet("relicrand1") - trQuestVarGet("stage"));
 	float secondDiff = xsAbs(trQuestVarGet("relicrand2") - trQuestVarGet("stage"));
 	if (secondDiff < firstDiff) {
 		trQuestVarSet("relicrand1", trQuestVarGet("relicrand2"));
-	}
-	if (basic == false) {
-		trQuestVarSet("relicrand1", 10 + trQuestVarGet("relicrand1"));
 	}
 	return(1*trQuestVarGet("relicrand1"));
 }

@@ -258,7 +258,13 @@ void stunsAndPoisons(string db = "") {
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
-    		yRemoveAllCopies("stunnedUnits", 1*trQuestVarGet(db));
+    		yDatabasePointerDefault("stunnedUnits");
+    		for(x=yGetDatabaseCount("stunnedUnits"); >0) {
+				if (yDatabaseNext("stunnedUnits") == trQuestVarGet(db)) {
+					yRemoveFromDatabase("stunnedUnits");
+					yRemoveUpdateVar("stunnedUnits", "proto");
+				}
+			}
     	}
 	}
 }

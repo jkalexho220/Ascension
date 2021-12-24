@@ -416,27 +416,27 @@ are associated by index, so we must call yRemoveUpdateVar afterwards for each
 variable associated in this database.
 */
 void yRemoveFromDatabase(string db = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count") - 1;
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
+	int zdatacount = 1*trQuestVarGet("zdatalite" + db + "count") - 1;
+	int zdataremove = 1*trQuestVarGet("zdatalite" + db + "pointer");
 	trQuestVarSet("zdatalite" + db + "index"+zdataremove, 
 		trQuestVarGet("zdatalite" + db + "index"+zdatacount));
 	trQuestVarSet("zdatalite" + db + "count", zdatacount);
 }
 
 void yRemoveUpdateString(string db = "", string attr = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count");
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
+	int zdatacount = 1*trQuestVarGet("zdatalite" + db + "count");
+	int zdataremove = 1*trQuestVarGet("zdatalite" + db + "pointer");
 	trStringQuestVarSet("zdatalite" + db + "" + zdataremove + "" + attr, 
 		trStringQuestVarGet("zdatalite" + db + "" + zdatacount + "" + attr));
 	trStringQuestVarSet("zdatalite" + db + "" + zdatacount + "" + attr, " ");
 }
 
 void yRemoveUpdateVar(string db = "", string attr = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count");
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
-	trQuestVarSet("zdatalite" + db + "" + zdataremove + "" + attr, 
-		trQuestVarGet("zdatalite" + db + "" + zdatacount + "" + attr));
-	trQuestVarSet("zdatalite" + db + "" + zdatacount + "" + attr, 0);
+	int zdatacount = 1*trQuestVarGet("zdatalite" + db + "count");
+	int zdataremove = 1*trQuestVarGet("zdatalite" + db + "pointer");
+	trQuestVarSet("zdatalite" + db + zdataremove + attr, 
+		trQuestVarGet("zdatalite" + db + zdatacount + attr));
+	trQuestVarSet("zdatalite" + db + zdatacount + attr, 0);
 }
 
 void yRemoveAllCopies(string db = "", int val = 0) {

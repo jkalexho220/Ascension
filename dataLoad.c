@@ -90,7 +90,6 @@ inactive
 		if (trUnitIsSelected() == false) {
 			uiFindType("Swordsman");
 		} else {
-			trChatSend(0, "Found!");
 			break;
 		}
 	}

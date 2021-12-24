@@ -303,6 +303,7 @@ highFrequency
                     trUnitChangeProtoUnit("Relic");
                     if (trCurrentPlayer() == p) {
                         trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                        trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
                     yAddToDatabase("freeRelics", "p"+p+"relics");
                     yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
@@ -334,6 +335,7 @@ highFrequency
             trUnitSetAnimationPath("1,0,1,1,0,0,0");
             if (trCurrentPlayer() == p) {
                 trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
+                trSoundPlayFN("researchcomplete.wav","1",-1,"","");
             }
             yAddToDatabase("p"+p+"relics", "freeRelics");
             yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
