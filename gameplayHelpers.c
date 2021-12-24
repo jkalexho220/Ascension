@@ -231,6 +231,13 @@ Enemies have elemental resistance and weakness
 */
 float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	trDamageUnit(dmg);
+	if (spell) {
+		trQuestVarSet("p"+p+"lifestealTotal", 
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal"));
+	} else {
+		trQuestVarSet("p"+p+"lifestealTotal", 
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal"));
+	}
 	return(dmg);
 }
 

@@ -1,22 +1,43 @@
 /*
 0-1 = gold
-2 = gameplay progress
+2 = gameplay loadProgress
 3 = current class
 4-13 = equipped artifacts
 14-15 = unlocked classes
+
+data at 13, 14, 15 is unlocked relic data
 */
-int progress = 0;
+int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
+int unlockedrelics1 = 0;
+int unlockedrelics2 = 0;
+int unlockedrelics3 = 0;
+
+int miscdata6 = 0;
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * progress / 16,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 16,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
 highFrequency
 inactive
 {
+	unlockedrelics1 = trGetScenarioUserData(13);
+	unlockedrelics2 = trGetScenarioUserData(14);
+	unlockedrelics3 = trGetScenarioUserData(15);
+
+	miscdata6 = trGetScenarioUserData(6);
+
+	for(x=1; < 12) {
+		trQuestVarSet("ownedRelics"+x, iModulo(5, unlockedrelics1));
+		unlockedrelics1 = unlockedrelics1 / 5;
+		trQuestVarSet("ownedRelics"+(x+12), iModulo(5, unlockedrelics2));
+		unlockedrelics2 = unlockedrelics2 / 5;
+		trQuestVarSet("ownedRelics"+(x+24), iModulo(5, unlockedrelics3));
+		unlockedrelics3 = unlockedrelics3 / 5;
+	}
 	if (Multiplayer) {
 		trSoundPlayFN("default","1",-1,"Loading:","icons\god power reverse time icons 64");
 
@@ -39,9 +60,7 @@ inactive
 		trBlockAllSounds(true);
 		xsEnableRule("data_load_01_ready");
 	} else {
-		for(p=1; < ENEMY_PLAYER) {
-			trForbidProtounit(p, "Swordsman Hero");
-		}
+		trForbidProtounit(1, "Swordsman Hero");
 		trLetterBox(false);
 	}
 	/*
@@ -82,7 +101,7 @@ inactive
 	trLetterBox(false);
 	trBlockAllSounds(true);
 	if (currentdata >= 32) {
-		trSoundPlayFN("cantdothat.wav","1",-1,"Invalid code at " + progress + "!","");
+		trSoundPlayFN("cantdothat.wav","1",-1,"Invalid code at " + loadProgress + "!","");
 	}
 	trUnitSelectClear();
 	trUnitSelectByID(currentdata + 32 * (trCurrentPlayer() - 1));
@@ -117,17 +136,17 @@ inactive
 			for(x=0; < 32) {
 				if (kbGetUnitBaseTypeID(x + swordsmen) == kbGetProtoUnitID("Swordsman Hero")) {
 					/* read the data */
-					if (progress == 0) {
+					if (loadProgress == 0) {
 						trQuestVarSet("p"+p+"progress", x);
-					} else if (progress == 1) {
+					} else if (loadProgress == 1) {
 						trQuestVarSet("p"+p+"class", x);
-					} else if (progress == 2) {
+					} else if (loadProgress == 2) {
 						trPlayerGrantResources(p, "Gold", x);
-					} else if (progress == 3) {
+					} else if (loadProgress == 3) {
 						trPlayerGrantResources(p, "Gold", x * 32);
-					} else if (progress < 15) {
-						trQuestVarSet("p"+p+"relic"+(progress - 3), x);
-					} else if (progress == 15) {
+					} else if (loadProgress < 15) {
+						trQuestVarSet("p"+p+"relic"+(loadProgress - 3), x);
+					} else if (loadProgress == 15) {
 						trQuestVarSet("p"+p+"unlocked", x);
 					} else {
 						trQuestVarSet("p"+p+"unlocked", trQuestVarGet("p"+p+"unlocked") + 32 * x);
@@ -139,15 +158,15 @@ inactive
 				}
 			}
 		}
-		progress = progress + 1;
+		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (progress == 16) {
+		if (loadProgress == 16) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
 			/* prepare the next data */
 			xsEnableRule("data_load_01_load_data");
-			switch(progress)
+			switch(loadProgress)
 			{
 				case 1:
 				{
@@ -170,7 +189,7 @@ inactive
 					savedata = trGetScenarioUserData(4);
 				}
 			}
-			if (progress >=2) {
+			if (loadProgress >=2) {
 				currentdata = iModulo(32, savedata);
 				savedata = savedata / 32;
 			}

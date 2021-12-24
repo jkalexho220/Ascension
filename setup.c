@@ -8,6 +8,8 @@ const int EDGE_CHASM = 2;
 
 const int ROOM_BASIC = 0;
 const int ROOM_AMBUSH = 1;
+const int ROOM_CHEST_KEY = 2;
+const int ROOM_TRANSPORTER_GUY = 9;
 const int ROOM_STARTER = 10;
 const int ROOM_BOSS = 11;
 const int ROOM_NICK = 12;
@@ -379,6 +381,27 @@ int edgeName(int first = 0, int second = 0) {
     return(16 * xsMin(first, second) + xsMax(first, second));
 }
 
+/*
+input values are grid positions
+*/
+void paintRelicEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
+    /* calculate offset from center. More likely to be farther from center */
+    int x0 = x2 - x1;
+    int z0 = z2 - z1;
+    trQuestVarSetFromRand("x0", 0, x0);
+    trQuestVarSetFromRand("z0", 0, z0);
+    trQuestVarSetFromRand("x1", trQuestVarGet("x0"), x0);
+    trQuestVarSetFromRand("z1", trQuestVarGet("z0"), z0);
+    /* randomly choose 1 or -1 */
+    trQuestVarSetFromRand("negative", 0, 1, true);
+    trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
+    x0 = x1 + x2 + trQuestVarGet("negative") * trQuestVarGet("x1");
+    trQuestVarSetFromRand("negative", 0, 1, true);
+    trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
+    z0 = z1 + z2 + trQuestVarGet("negative") * trQuestVarGet("z1");
+    spawnRelic(x0, z0);
+}
+
 void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
     for(a=x0; < x1) {
         trQuestVarSetFromRand("deploy", 0, 1, false);
@@ -387,14 +410,9 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             trQuestVarSet("posX", a);
             trQuestVarSet("posZ", trQuestVarGet("z"));
             if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-                trQuestVarSetFromRand("type", 1, 1*trQuestVarGet("enemyProtoCount"), true);
-                trQuestVarSetFromRand("type2", 1, 1*trQuestVarGet("enemyProtoCount"), true);
-                if (trQuestVarGet("type2") < trQuestVarGet("type")) {
-                    trQuestVarSet("type", trQuestVarGet("type2"));
-                }
                 trQuestVarSetFromRand("heading", 0, 360, true);
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-                trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("type")),1,
+                trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
                     2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
@@ -410,14 +428,9 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             trQuestVarSet("posX", trQuestVarGet("x"));
             trQuestVarSet("posZ", b);
             if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-                trQuestVarSetFromRand("type", 1, trQuestVarGet("enemyProtoCount"), true);
-                trQuestVarSetFromRand("type2", 1, trQuestVarGet("enemyProtoCount"), true);
-                if (trQuestVarGet("type2") < trQuestVarGet("type")) {
-                    trQuestVarSet("type", trQuestVarGet("type2"));
-                }
                 trQuestVarSetFromRand("heading", 0, 360, true);
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-                trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("type")),1,
+                trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
                     2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
@@ -541,6 +554,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             paintEyecandy(x0, z0, x1, z1, "tree");
             paintEyecandy(x0, z0, x1, z1, "rock");
             paintEyecandy(x0, z0, x1, z1, "sprite");
+
+            /* relic spawn */
+            for(j=randomLow(10) - 7; >0) {
+                paintRelicEdge(x0, z0, x1, z1);
+            }
         }
         paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
     }
@@ -566,11 +584,50 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddUpdateVar("ambushRooms", "posZ", z * 70 + 40);
             trQuestVarSetFromRand("type", 1, trQuestVarGet("enemyProtoCount"), true);
             yAddUpdateVar("ambushRooms", "type", trQuestVarGet("type"));
+            trQuestVarSetFromRand("spawnRelic", 0, 1, false);
+            if (trQuestVarGet("spawnRelic") < 0.5) {
+                spawnRelic(x * 70 + 40, z * 70 + 40);
+            }
+            x0 = trQuestVarGet("room"+room+"bottom1x");
+            z0 = trQuestVarGet("room"+room+"bottom1z");
+            x1 = trQuestVarGet("room"+room+"top1x");
+            z1 = trQuestVarGet("room"+room+"top1z");
+            paintEnemies(x0, z0, x1, z1);
+        }
+        case ROOM_TRANSPORTER_GUY:
+        {
+            x0 = trQuestVarGet("room"+room+"bottom1x");
+            z0 = trQuestVarGet("room"+room+"bottom1z");
+            x1 = trQuestVarGet("room"+room+"top1x");
+            z1 = trQuestVarGet("room"+room+"top1z");
+            trVectorQuestVarSet("center", xsVectorSet(x0 + x1, 0, z0 + z1));
+            trQuestVarSetFromRand("x0", 0, 1, false);
+            trQuestVarSetFromRand("z0", trQuestVarGet("x0"), 1, false);
+            /* set negative to be 1 or -1 */
+            trQuestVarSetFromRand("negative", 0, 1, true);
+            trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
+            x0 = x0 + x1 + (x1 - x0) * trQuestVarGet("x0") * trQuestVarGet("negative");
+            trQuestVarSetFromRand("negative", 0, 1, true);
+            trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
+            z0 = z0 + z1 + (z1 - z0) * trQuestVarGet("z0") * trQuestVarGet("negative");
+            trVectorQuestVarSet("relictransporterguypos", xsVectorSet(x0, 0, z0));
+            trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors("relictransporterguypos", "center"));
+            trQuestVarSet("relicTransporterGuyName", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Villager Atlantean Hero",1,x0,0,z0,trQuestVarGet("heading"), true);
+            trUnitSelectClear();
+            trUnitSelectByQV("relicTransporterGuyName", true);
+            trUnitConvert(0);
+            trArmyDispatch("1,0", "Dwarf",1,x0,0,z0,0,true);
+            trArmySelect("1,0");
+            trUnitChangeProtoUnit("Gaia Forest effect");
+            xsEnableRule("relic_transporter_guy_always");
+            buildRoom(x, z, ROOM_BASIC);
         }
         case ROOM_STARTER:
         {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
             trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, 0, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
             trVectorQuestVarSet("startPosition", xsVectorSet(x*70 + 40,0,z*70+40));
             if (trQuestVarGet("stage") < 5) {
                 trVectorQuestVarSet("choice1", xsVectorSet(x*70+48,0,z*70+54));
@@ -683,9 +740,15 @@ highFrequency
                 trOverlayText("Temple of the Lion", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 2;
-
+                
                 TERRAIN_PRIMARY = 0;
                 TERRAIN_SUB_PRIMARY = 34;
+                
+
+                /*
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 84;
+                */
 
                 TERRAIN_SECONDARY = 4;
                 TERRAIN_SUB_SECONDARY = 12;
@@ -816,6 +879,8 @@ highFrequency
             trQuestVarSet("chestType"+1*trQuestVarGet("swap"), trQuestVarGet("temp"));
         }
 
+        trQuestVarSetFromRand("relicTransporterGuy", 1, 14, true);
+
         for (i=1; < 15) {
             z = i / 4;
             x = i - z * 4;
@@ -827,7 +892,9 @@ highFrequency
             } else {
                 trQuestVarSet("chest", 0);
             }
-            if (nick && (countRoomEntrances(x, z) == 1)) {
+            if (i == trQuestVarGet("relicTransporterGuy")) {
+                buildRoom(x, z, ROOM_TRANSPORTER_GUY);
+            } else if (nick && (countRoomEntrances(x, z) == 1)) {
                 buildRoom(x, z, ROOM_NICK);
                 nick = false;
                 xsEnableRule("nick_00_visit");

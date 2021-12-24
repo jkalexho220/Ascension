@@ -300,13 +300,25 @@ highFrequency
                     relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"relics");
-                    trUnitChangeProtoUnit("Relic");
                     if (trCurrentPlayer() == p) {
-                        trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
                         trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
-                    yAddToDatabase("freeRelics", "p"+p+"relics");
-                    yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                    if (trPlayerResourceCount(p, "Gold") > 10 &&
+                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 64) {
+                        trUnitChangeProtoUnit("Conversion SFX");
+                        if (trCurrentPlayer() == p) {
+                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse!");
+                            trSoundPlayFN("favordump.wav","1",-1,"","");
+                            trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
+                                xsMin(5, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
+                        }
+                        trPlayerGrantResources(p, "Gold", -10);
+                    } else {
+                        trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                        trUnitChangeProtoUnit("Relic");
+                        yAddToDatabase("freeRelics", "p"+p+"relics");
+                        yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                    }
                     yRemoveFromDatabase("p"+p+"relics");
                     yRemoveUpdateVar("p"+p+"relics", "type");
                 }
@@ -358,6 +370,16 @@ highFrequency
         trQuestVarSet("stunSound", 0);  
         trQuestVarSetFromRand("sound", 1, 3, true);
         trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+    }
+
+    /* lifesteal */
+    for(p=1; < ENEMY_PLAYER) {
+        if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
+            trUnitSelectClear();
+            trUnitSelectByQV("p"+p+"unit");
+            trDamageUnit(0.0 - trQuestVarGet("p"+p+"lifestealTotal"));
+            trQuestVarSet("p"+p+"lifestealTotal", 0);
+        }
     }
 
     xsSetContextPlayer(old);

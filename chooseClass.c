@@ -138,7 +138,7 @@ highFrequency
 	trQuestVarSet("choice"+i+"explain", 
 		displayNextTooltip(i + 2 * trQuestVarGet("stage") - 2, 1*trQuestVarGet("choice"+i+"explain")));
 	if (trQuestVarGet("choice"+i+"explain") > 0) {
-		xsEnableRule("class_shop_explain_02");
+		trDelayedRuleActivation("class_shop_explain_02");
 	}
 }
 

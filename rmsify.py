@@ -56,7 +56,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trLetterBox', 'trUnitDead', 'trUnitPercentDamaged', 'trDamageUnitPercent', 'trCamTrackLoad', 'trUnitVisToPlayer',
 			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 'trIsGadgetVisible',
 			'trSetUnitOrientation', 'trMessageSetText', 'kbUnitGetAnimationActionType', 'trUnitHighlight', 'trUnitConvert', 
-			'xsVectorSet', 'trVectorQuestVarGetZ', 'map', 'if', 'trSetUnitIdleProcessing', 'configUndef',
+			'xsVectorSet', 'trVectorQuestVarGetZ', 'map', 'if', 'trSetUnitIdleProcessing', 'configUndef', 'uiMessageBox',
 			'trCountUnitsInArea', 'trArmyDispatch', 'trTime', 'xsEnableRule', 'trUnitDestroy', 'trPlayerUnitCountSpecific', 
 			'xsSetContextPlayer', 'trVectorQuestVarGetX', 'trSetCivAndCulture', 'xsAbs', 'xsAtan', 'trUnitGetIsContained',
 			'trUnitSelect', 'kbUnitGetActionType', 'trSoundPlayFN', 'trUnitTeleport', 'trUnitOverrideAnimation', 
@@ -83,7 +83,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'moonblade.c', 'sunbow.c', 'enemies.c', 'bosses.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 'gameplayHelpers.c', 'traps.c', 'moonblade.c', 'sunbow.c', 'enemies.c', 'bosses.c', 'gameplay.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

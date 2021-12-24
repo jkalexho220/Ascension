@@ -114,112 +114,97 @@ string relicName(int relic = 0) {
 	return(msg);
 }
 
-void relicDescription(int relic = 0) {
+string relicIcon(int relic = 0) {
 	string icon = "icons\infantry g hoplite icon 64";
-	string msg = "WTF That's not a relic!";
 	switch(relic)
 	{
 		case RELIC_HEALTH:
 		{
 			icon = "icons\special g sea turtle icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPEED:
 		{
 			icon = "icons\special g pegasus icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_ATTACK_RANGE:
 		{
 			icon = "icons\cavalry e chariot archer icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPELL_RANGE:
 		{
 			icon = "icons\special e petosuchus icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPELL_DURATION:
 		{
 			icon = "icons\special n frost giant icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_ATTACK_LIFESTEAL:
 		{
 			icon = "icons\special n troll icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPELL_LIFESTEAL:
 		{
 			icon = "icons\special e wadjet icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
 			icon = "icons\siege n ballista icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPELL_POWER:
 		{
 			icon = "icons\special n fire giant icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_HEAL_BOOST:
 		{
 			icon = "icons\special e priest icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
 			icon = "icons\special x behemoth icons 64";
-			msg = relicName(relic);
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
 			icon = "icons\hero g ajax icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
 			icon = "icons\special e sphinx icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_POISON_KILLER:
 		{
 			icon = "icons\special e mummy icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_STUN_KILLER:
 		{
 			icon = "icons\special g medusa icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_HALF_KILLER:
 		{
 			icon = "icons\special g cyclops icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_ULTIMATE_COST:
 		{
 			icon = "icons\special g arkantos icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_PROJECTILES:
 		{
 			icon = "icons\special g manticore icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_SPECIAL_ATTACK:
 		{
 			icon = "icons\special e avenger icon 64";
-			msg = relicName(relic);
 		}
 		case RELIC_COOLDOWN_REDUCTION:
 		{
 			icon = "icons\special x argus icons 64";
-			msg = relicName(relic);
 		}
 	}
+	return(icon);
+}
+
+void relicDescription(int relic = 0) {
+	string icon = relicIcon(relic);
+	string msg = relicName(relic);
 	trShowImageDialog(icon, msg);
 }
 
@@ -413,9 +398,9 @@ int relicProto(int relic = 0) {
 	return(proto);
 }
 
-int relicRandom() {
-	trQuestVarSetFromRand("relicrand1",1,10, true);
-	trQuestVarSetFromRand("relicrand2",1,10, true);
+int randomLow(int maxval = 10) {
+	trQuestVarSetFromRand("relicrand1",1,maxval, true);
+	trQuestVarSetFromRand("relicrand2",1,maxval, true);
 	float firstDiff = xsAbs(trQuestVarGet("relicrand1") - trQuestVarGet("stage"));
 	float secondDiff = xsAbs(trQuestVarGet("relicrand2") - trQuestVarGet("stage"));
 	if (secondDiff < firstDiff) {
@@ -424,7 +409,7 @@ int relicRandom() {
 	return(1*trQuestVarGet("relicrand1"));
 }
 
-void spawnRelic(float x = 0, float z = 0) {
+void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Dwarf",1,x,0,z,0,true);
 	trUnitSelectClear();
@@ -434,5 +419,5 @@ void spawnRelic(float x = 0, float z = 0) {
 	}
 	trUnitChangeProtoUnit("Relic");
 	yAddToDatabase("freeRelics", "next");
-	yAddUpdateVar("freeRelics", "type", relicRandom());
+	yAddUpdateVar("freeRelics", "type", randomLow(maxval));
 }
