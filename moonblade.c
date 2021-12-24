@@ -260,7 +260,7 @@ void chooseMoonblade(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
 
-	trSetCivilizationNameOverride(p, "Moonblade | Level " + 1*trQuestVarGet("p"+p+"progress"));
+	trSetCivilizationNameOverride(p, "Moonblade | " + 1*trQuestVarGet("p"+p+"progress"));
 }
 
 rule moonblade_init

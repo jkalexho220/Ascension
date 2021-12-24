@@ -186,6 +186,9 @@ runImmediately
         trModifyProtounit("Dwarf", p, 55, 4);
         trModifyProtounit("Athena", p, 55, 4);
 
+        trModifyProtounit("Sea Turtle", p, 55, 1);
+        trModifyProtounit("Pegasus", p, 55, 1);
+
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);
 
@@ -382,8 +385,8 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             trQuestVarSet("posX", a);
             trQuestVarSet("posZ", trQuestVarGet("z"));
             if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-                trQuestVarSetFromRand("type", 1, trQuestVarGet("enemyProtoCount"), true);
-                trQuestVarSetFromRand("type2", 1, trQuestVarGet("enemyProtoCount"), true);
+                trQuestVarSetFromRand("type", 1, 1*trQuestVarGet("enemyProtoCount"), true);
+                trQuestVarSetFromRand("type2", 1, 1*trQuestVarGet("enemyProtoCount"), true);
                 if (trQuestVarGet("type2") < trQuestVarGet("type")) {
                     trQuestVarSet("type", trQuestVarGet("type2"));
                 }
@@ -584,13 +587,13 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trUnitConvert(0);
             trUnitChangeProtoUnit("Odysseus");
             trQuestVarSet("nickShop1", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+26,0, 70*z+26,0,true);
+            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+30,0, 70*z+30,0,true);
             trQuestVarSet("nickShop2", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+26,0, 70*z+54,0,true);
+            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+30,0, 70*z+50,0,true);
             trQuestVarSet("nickShop3", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+54,0, 70*z+26,0,true);
+            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+50,0, 70*z+30,0,true);
             trQuestVarSet("nickShop4", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+54,0, 70*z+54,0,true);
+            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+50,0, 70*z+50,0,true);
             for(i=4; >0) {
                 trUnitSelectClear();
                 trUnitSelectByQV("nickShop"+i, true);

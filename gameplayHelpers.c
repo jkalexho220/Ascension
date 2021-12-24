@@ -41,11 +41,13 @@ void removeArrow() {
 
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
-		trChatSend(0, "Collected " + 1*yGetVar("enemies", "bounty") + " <icon=(24)(icons/icon resource gold)>");
 		for(p=1; <ENEMY_PLAYER) {
 			trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
 			trPlayerGrantResources(p, "Favor", yGetVar("enemies", "bounty"));
 		}
+	}
+	if (yGetVar("enemies", "relic") == 1) {
+		spawnRelic(yGetVar("enemies", "posX"), yGetVar("enemies", "posZ"));
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");
@@ -57,6 +59,9 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "poisonLast");
 	yRemoveUpdateVar("enemies", "poisonDamage");
 	yRemoveUpdateVar("enemies", "poisonSFX");
+	yRemoveUpdateVar("enemies", "relic");
+	yRemoveUpdateVar("enemies", "posX");
+	yRemoveUpdateVar("enemies", "posZ");
 }
 
 void removePlayerCharacter(int p = 0) {

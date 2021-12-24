@@ -1,6 +1,7 @@
-void setupProtounitBounty(string proto = "", int bounty = 2) {
+void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance = 0) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
+    trQuestVarSet("proto"+p+"relicChance", relicChance);
 	/* armor */
 	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
@@ -16,10 +17,16 @@ void setupProtounitBounty(string proto = "", int bounty = 2) {
 void activateEnemy(int id = 0) {
     int proto = kbGetUnitBaseTypeID(id);
     int bounty = trQuestVarGet("proto"+proto+"bounty");
+    int relic = 0;
+    trQuestVarSetFromRand("relicChance", 0, 1, false);
+    if (trQuestVarGet("relicChance") < trQuestVarGet("proto"+proto+"relicChance")) {
+        relic = 1;
+    }
 
     yAddToDatabase("enemies", "enemiesIncoming");
     trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
     yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
+    yAddUpdateVar("enemies", "relic", relic);
     yRemoveFromDatabase("enemiesIncoming");
 }
 
@@ -30,11 +37,11 @@ highFrequency
 	if (trTime() > cActivationTime) {
 		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
 		trModifyProtounit("Minion", 1, 8, -99);
-		setupProtounitBounty("Anubite", 6);
 		setupProtounitBounty("Minion", 4);
-		setupProtounitBounty("Sphinx", 8);
-		setupProtounitBounty("Scarab", 10);
-		setupProtounitBounty("Mummy", 12);
+        setupProtounitBounty("Anubite", 6, 0.05);
+		setupProtounitBounty("Sphinx", 8, 0.1);
+		setupProtounitBounty("Wadjet", 8, 0.1);
+		setupProtounitBounty("Mummy", 16, 1);
 		xsDisableSelf();
 	}
 }
@@ -86,6 +93,9 @@ highFrequency
 	    	removeEnemy();
 	    } else {
 	    	stunsAndPoisons("enemies");
+            trVectorSetUnitPos("pos", "enemies");
+            ySetVar("enemies", "posX", trQuestVarGet("posX"));
+            ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
 	    }
     }
 

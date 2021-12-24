@@ -176,6 +176,22 @@ highFrequency
         spawnPlayer(p, "startPosition");
         trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
         trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
+        for(x=10; >0) {
+            if (trQuestVarGet("p"+p+"relic"+x) > 0) {
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
+                yAddToDatabase("p"+p+"relics", "next");
+                yAddUpdateVar("p"+p+"relics", "type", trQuestVarGet("p"+p+"relic"+x));
+                trUnitSelectClear();
+                trUnitSelectByQV("next", true);
+                trMutateSelected(kbGetProtoUnitID("Relic"));
+                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                trMutateSelected(relicProto(1*trQuestVarGet("p"+p+"relic"+x)));
+                trSetSelectedScale(0,0,0);
+                trUnitSetAnimationPath("1,0,1,0,0,0,0");
+                relicEffect(1*trQuestVarGet("p"+p+"relic"+x), p, true);
+            }
+        }
     }
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
@@ -218,6 +234,7 @@ highFrequency
     /* 
     maintain stun
     */
+    yDatabasePointerDefault("stunnedUnits");
     for(x=yGetDatabaseCount("stunnedUnits"); >0) {
         id = yDatabaseNext("stunnedUnits", true);
         if (id == -1 || trUnitAlive() == false) {
@@ -266,9 +283,77 @@ highFrequency
         }
     }
 
+    /* relics dropped */
+    trQuestVarSet("relicPlayer", 1 + trQuestVarGet("relicPlayer"));
+    if (trQuestVarGet("relicPlayer") >= ENEMY_PLAYER) {
+        trQuestVarSet("relicPlayer", 1);
+        p = trQuestVarGet("relicPlayer");
+        trUnitSelectClear();
+        trUnitSelectByQV("p"+p+"unit");
+        if (trUnitAlive()) {
+            trVectorSetUnitPos("pos", "p"+p+"unit");
+            yDatabasePointerDefault("p"+p+"relics");
+            for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+                yDatabaseNext("p"+p+"relics", true);
+                if ((zDistanceToVectorSquared("p"+p+"relics", "pos") > 1) &&
+                    (trUnitGetIsContained("Unit") == false)) {
+                    relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"relics");
+                    trUnitChangeProtoUnit("Relic");
+                    if (trCurrentPlayer() == p) {
+                        trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                    }
+                    yAddToDatabase("freeRelics", "p"+p+"relics");
+                    yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                    yRemoveFromDatabase("p"+p+"relics");
+                    yRemoveUpdateVar("p"+p+"relics", "type");
+                }
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("freeRelics") > 0) {
+        yDatabaseNext("freeRelics", true);
+        if (trUnitGetIsContained("Unit")) {
+            trVectorSetUnitPos("pos", "freeRelics");
+            for(p=1; < ENEMY_PLAYER) {
+                trUnitSelectClear();
+                trUnitSelectByQV("p"+p+"unit");
+                if (trUnitAlive()) {
+                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1) {
+                        break;
+                    }
+                }
+            }
+            relicEffect(1*yGetVar("freeRelics", "type"), p, true);
+            trUnitSelectClear();
+            trUnitSelectByQV("freeRelics", true);
+            trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+            trSetSelectedScale(0,0,0);
+            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+            if (trCurrentPlayer() == p) {
+                trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
+            }
+            yAddToDatabase("p"+p+"relics", "freeRelics");
+            yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
+            yRemoveFromDatabase("freeRelics");
+            yRemoveUpdateVar("freeRelics", "type");
+            yRemoveUpdateVar("freeRelics", "selected");
+            yRemoveUpdateVar("freeRelics", "enemy");
+        } else if (trUnitIsSelected()) {
+            if (yGetVar("freeRelics", "selected") == 0) {
+                ySetVar("freeRelics", "selected", 1);
+                relicDescription(1*yGetVar("freeRelics", "type"));
+            }
+        } else if (yGetVar("freeRelics", "selected") == 1) {
+            ySetVar("freeRelics", "selected", 0);
+        }
+    }
+
     /* sounds */
     if (trQuestVarGet("stunSound") == 1) {
-        trQuestVarSet("stunSound", 0);
+        trQuestVarSet("stunSound", 0);  
         trQuestVarSetFromRand("sound", 1, 3, true);
         trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
     }
