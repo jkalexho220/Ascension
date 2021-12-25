@@ -304,10 +304,10 @@ highFrequency
                         trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
                     if (trPlayerResourceCount(p, "Gold") > 10 &&
-                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 64) {
+                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
                         trUnitChangeProtoUnit("Conversion SFX");
                         if (trCurrentPlayer() == p) {
-                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse!");
+                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
                             trSoundPlayFN("favordump.wav","1",-1,"","");
                             trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
                                 xsMin(5, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));

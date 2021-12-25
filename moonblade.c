@@ -36,7 +36,7 @@ void moonbladeAlways(int eventID = -1) {
 						if (yDatabaseNext("enemies") == target) {
 							trUnitSelectClear();
 							trUnitSelectByQV("enemies", true);
-							damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), true);
+							damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
 							stunUnit("enemies", 1.5, p);
 							break;
 						}

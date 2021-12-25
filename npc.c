@@ -10,7 +10,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Greetings! I am the relic transporter!");
+					uiMessageBox("Greetings! I am the Relic Transporter!");
 				}
 				case 2:
 				{
@@ -27,6 +27,26 @@ int npcDiag(int npc = 0, int dialog = 0) {
 		}
 	}
 	return(dialog);
+}
+
+rule relic_transporter_guy_found
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("relicTransporterGuyName");
+	for(p=1; <ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			xsDisableSelf();
+			xsEnableRule("relic_transporter_guy_always");
+			trArmyDispatch("1,0","Dwarf",1,
+				trQuestVarGet("relicTransporterGuyPosx"),0,trQuestVarGet("relicTransporterGuyPosz"),0,true);
+			trArmySelect("1,0");
+			trUnitChangeProtoUnit("Revealer");
+			trSoundPlayFN("villagercreate.wav","1",-1,"","");
+			break;
+		}
+	}
 }
 
 rule relic_transporter_guy_always

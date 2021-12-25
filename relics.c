@@ -24,6 +24,11 @@ const int RELIC_COOLDOWN_REDUCTION = 20;
 
 /* nickonhawk's shop */
 
+/* key relics */
+const int RELIC_KEY_GREEK = 33;
+const int RELIC_KEY_NORSE = 34;
+const int RELIC_KEY_ATLANTEAN = 35;
+
 const int RELIC_COUNT = 20;
 
 string relicName(int relic = 0) {
@@ -111,6 +116,9 @@ string relicName(int relic = 0) {
 			msg = "Cooldown Reduction x0.1";
 		}
 	}
+	if (relic >= RELIC_KEY_GREEK) {
+		msg = "A key that opens a chest matching this symbol.";
+	}
 	return(msg);
 }
 
@@ -197,6 +205,18 @@ string relicIcon(int relic = 0) {
 		case RELIC_COOLDOWN_REDUCTION:
 		{
 			icon = "icons\special x argus icons 64";
+		}
+		case RELIC_KEY_GREEK:
+		{
+			icon = "ui range indicator greek";
+		}
+		case RELIC_KEY_NORSE:
+		{
+			icon = "ui range indicator norse";
+		}
+		case RELIC_KEY_ATLANTEAN:
+		{
+			icon = "ui range indicator atlantean";
 		}
 	}
 	return(icon);
@@ -308,6 +328,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			trQuestVarSet("p"+p+"cooldownReduction", xsPow(0.9, 1*trQuestVarGet("p"+p+"cooldownReductionCount")));
 		}
 	}
+	if ((relic >= RELIC_KEY_GREEK) && (trCurrentPlayer() == p) && equip) {
+		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
+	}
 }
 
 int relicProto(int relic = 0) {
@@ -394,11 +417,32 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Argus");
 		}
+		case RELIC_KEY_GREEK:
+		{
+			proto = kbGetProtoUnitID("UI Range Indicator Greek SFX");
+		}
+		case RELIC_KEY_NORSE:
+		{
+			proto = kbGetProtoUnitID("UI Range Indicator Norse SFX");
+		}
+		case RELIC_KEY_ATLANTEAN:
+		{
+			proto = kbGetProtoUnitID("UI Range Indicator Atlantean SFX");
+		}
 	}
 	return(proto);
 }
 
 int randomLow(int maxval = 10) {
+	trQuestVarSetFromRand("relicrand1",1,maxval, true);
+	trQuestVarSetFromRand("relicrand2",1,maxval, true);
+	if (trQuestVarGet("relicrand2") < trQuestVarGet("relicrand1")) {
+		trQuestVarSet("relicrand1", trQuestVarGet("relicrand2"));
+	}
+	return(1*trQuestVarGet("relicrand1"));
+}
+
+int randomStageClosest(int maxval = 10) {
 	trQuestVarSetFromRand("relicrand1",1,maxval, true);
 	trQuestVarSetFromRand("relicrand2",1,maxval, true);
 	float firstDiff = xsAbs(trQuestVarGet("relicrand1") - trQuestVarGet("stage"));
@@ -419,5 +463,5 @@ void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
 	}
 	trUnitChangeProtoUnit("Relic");
 	yAddToDatabase("freeRelics", "next");
-	yAddUpdateVar("freeRelics", "type", randomLow(maxval));
+	yAddUpdateVar("freeRelics", "type", randomStageClosest(maxval));
 }
