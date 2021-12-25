@@ -262,7 +262,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddToDatabase("chests", "next");
             yAddUpdateVar("chests", "type", trQuestVarGet("chestType"));
             yAddUpdateVar("chests", "room", room);
-            trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 0, true);
+            trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 315, true);
             trArmySelect("1,0");
             trUnitConvert(0);
             trUnitChangeProtoUnit("Great Box");
@@ -423,7 +423,7 @@ highFrequency
                 /* desert tomb */
                 trOverlayText("Temple of the Lion", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
-                TERRAIN_SUB_WALL = 2;
+                TERRAIN_SUB_WALL = 0;
                 
                 TERRAIN_PRIMARY = 0;
                 TERRAIN_SUB_PRIMARY = 34;
@@ -565,7 +565,7 @@ highFrequency
                     chests = chests - 1;
                 }
             } else {
-                trQuestVarSet("chests", 0);
+                trQuestVarSet("chestRand", 0);
             }
             if (i == trQuestVarGet("relicTransporterGuy")) {
                 buildRoom(x, z, ROOM_TRANSPORTER_GUY);
@@ -604,6 +604,7 @@ highFrequency
             {
                 case CHEST_KEY:
                 {
+                    ySetVar("chests", "keyType", trQuestVarGet("keyType"));
                     paintEnemies(x0, z0, x1, z1);
                     trQuestVarSetFromRand("key", 1, 14, true);
                     for(j=trQuestVarGet("key"); >0) {
@@ -621,6 +622,17 @@ highFrequency
                     trUnitChangeProtoUnit("Relic");
                     yAddToDatabase("freeRelics", "next");
                     yAddUpdateVar("freeRelics", "type", trQuestVarGet("keyType"));
+
+                    trVectorSetUnitPos("pos", "chests");
+                    trQuestVarSet("posX", trQuestVarGet("posX") - 2);
+                    trQuestVarSet("posZ", trQuestVarGet("posZ") - 2);
+                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),45,true);
+                    trUnitSelectClear();
+                    trUnitSelectByQV("next", true);
+                    trUnitConvert(0);
+                    trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
+
                     trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
                 }
                 case CHEST_PADS:

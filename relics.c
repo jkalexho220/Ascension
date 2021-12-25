@@ -117,7 +117,7 @@ string relicName(int relic = 0) {
 		}
 	}
 	if (relic >= RELIC_KEY_GREEK) {
-		msg = "A key that opens a chest matching this symbol.";
+		msg = "A key that opens a chest";
 	}
 	return(msg);
 }

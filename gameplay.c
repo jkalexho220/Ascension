@@ -296,7 +296,8 @@ highFrequency
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
                 if ((zDistanceToVectorSquared("p"+p+"relics", "pos") > 1) &&
-                    (trUnitGetIsContained("Unit") == false)) {
+                    (trUnitGetIsContained("Unit") == false) &&
+                    (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK)) {
                     relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"relics");
