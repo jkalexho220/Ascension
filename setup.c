@@ -15,8 +15,8 @@ const int ROOM_BOSS = 11;
 const int ROOM_NICK = 12;
 
 const int CHEST_KEY = 1;
-const int CHEST_PADS = 2;
-const int CHEST_ENCOUNTER = 3;
+const int CHEST_ENCOUNTER = 2;
+const int CHEST_PADS = 3;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;

@@ -343,8 +343,10 @@ highFrequency
             trUnitSelectClear();
             trUnitSelectByQV("freeRelics", true);
             trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-            trSetSelectedScale(0,0,0);
-            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+            if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                trSetSelectedScale(0,0,0);
+                trUnitSetAnimationPath("1,0,1,1,0,0,0");
+            }
             if (trCurrentPlayer() == p) {
                 trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
                 trSoundPlayFN("researchcomplete.wav","1",-1,"","");

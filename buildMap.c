@@ -29,9 +29,10 @@ int edgeName(int first = 0, int second = 0) {
 }
 
 /*
-input values are grid positions
+input is in grid coordinates
+return value is in vector coordinates
 */
-void paintRelicEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
+vector randomNearEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
     /* calculate offset from center. More likely to be farther from center */
     int x0 = x2 - x1;
     int z0 = z2 - z1;
@@ -46,7 +47,15 @@ void paintRelicEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
     trQuestVarSetFromRand("negative", 0, 1, true);
     trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
     z0 = z1 + z2 + trQuestVarGet("negative") * trQuestVarGet("z1");
-    spawnRelic(x0, z0);
+    return(xsVectorSet(x0, 0, z0));
+}
+
+/*
+input values are grid positions
+*/
+void paintRelicEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
+    vector v0 = randomNearEdge(x1, z1, x2, z2);
+    spawnRelic(xsVectorGetX(v0), xsVectorGetZ(v0));
 }
 
 void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
@@ -240,6 +249,24 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             x1 = trQuestVarGet("room"+room+"top1x");
             z1 = trQuestVarGet("room"+room+"top1z");
             paintEnemies(x0, z0, x1, z1);
+        }
+        case ROOM_CHEST:
+        {
+            /* can't perform pad puzzle with only one player */
+            if (ENEMY_PLAYER == 2) {
+                trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_ENCOUNTER, true);
+            } else {
+                trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_PADS, true);
+            }
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            yAddToDatabase("chests", "next");
+            yAddUpdateVar("chests", "type", trQuestVarGet("chestType"));
+            yAddUpdateVar("chests", "room", room);
+            trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 0, true);
+            trArmySelect("1,0");
+            trUnitConvert(0);
+            trUnitChangeProtoUnit("Great Box");
+            trChatSend(0, "chest spawned!");
         }
         case ROOM_TRANSPORTER_GUY:
         {
@@ -533,12 +560,12 @@ highFrequency
             z = i / 4;
             x = i - z * 4;
             if (chests > 0) {
-                trQuestVarSetFromRand("chest", 1, 7, true);
-                if (trQuestVarGet("chest") == 1) {
+                trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
+                if (trQuestVarGet("chestRand") == 1) {
                     chests = chests - 1;
                 }
             } else {
-                trQuestVarSet("chest", 0);
+                trQuestVarSet("chests", 0);
             }
             if (i == trQuestVarGet("relicTransporterGuy")) {
                 buildRoom(x, z, ROOM_TRANSPORTER_GUY);
@@ -546,6 +573,8 @@ highFrequency
                 buildRoom(x, z, ROOM_NICK);
                 nick = false;
                 xsEnableRule("nick_00_visit");
+            } else if (trQuestVarGet("chestRand") == 1) {
+                buildRoom(x, z, ROOM_CHEST);
             } else {
                 trQuestVarSetFromRand("roomType", ROOM_BASIC, ROOM_AMBUSH, true);
                 trQuestVarSetFromRand("roomType2", ROOM_BASIC, ROOM_AMBUSH, true);
@@ -555,6 +584,108 @@ highFrequency
                 buildRoom(x, z, 1*trQuestVarGet("roomType"));
             }
         }
+    
+        /* finish making chest rooms */
+        int room = 0;
+        int x0 = 0;
+        int z0 = 0;
+        int x1 = 0;
+        int z1 = 0;
+        trQuestVarSet("keyType", RELIC_KEY_GREEK);
+        string pName = "";
+        for(i=yGetDatabaseCount("chests"); >0) {
+            yDatabaseNext("chests");
+            room = yGetVar("chests", "room");
+            x0 = trQuestVarGet("room"+room+"bottom1x");
+            z0 = trQuestVarGet("room"+room+"bottom1z");
+            x1 = trQuestVarGet("room"+room+"top1x");
+            z1 = trQuestVarGet("room"+room+"top1z");
+            switch(1*yGetVar("chests", "type"))
+            {
+                case CHEST_KEY:
+                {
+                    paintEnemies(x0, z0, x1, z1);
+                    trQuestVarSetFromRand("key", 1, 14, true);
+                    for(j=trQuestVarGet("key"); >0) {
+                        room = yDatabaseNext("basicRooms");
+                    }
+                    x0 = trQuestVarGet("room"+room+"bottom1x");
+                    z0 = trQuestVarGet("room"+room+"bottom1z");
+                    x1 = trQuestVarGet("room"+room+"top1x");
+                    z1 = trQuestVarGet("room"+room+"top1z");
+                    trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
+                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                    trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                    trUnitSelectClear();
+                    trUnitSelectByQV("next", true);
+                    trUnitChangeProtoUnit("Relic");
+                    yAddToDatabase("freeRelics", "next");
+                    yAddUpdateVar("freeRelics", "type", trQuestVarGet("keyType"));
+                    trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
+                }
+                case CHEST_PADS:
+                {
+                    paintEnemies(x0, z0, x1, z1);
+                    trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
+                    ySetVar("chests", "pad1", trGetNextUnitScenarioNameNumber());
+                    trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+
+                    x0 = trQuestVarGet("room"+room+"bottom2x");
+                    z0 = trQuestVarGet("room"+room+"bottom2z");
+                    x1 = trQuestVarGet("room"+room+"top2x");
+                    z1 = trQuestVarGet("room"+room+"top2z");
+
+                    paintEnemies(x0, z0, x1, z1);
+                    trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
+                    ySetVar("chests", "pad2", trGetNextUnitScenarioNameNumber());
+                    trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,false);
+                    
+                    trArmySelect("1,0");
+                    trUnitConvert(0);
+                    trUnitChangeProtoUnit("Statue of Automaton Base");
+                }
+                case CHEST_ENCOUNTER:
+                {
+                    ySetVar("chests", "enemiesBegin", trGetNextUnitScenarioNameNumber());
+                    pName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("enemyProtoCount"));
+                    trQuestVarSetFromRand("count", 1, 6, true);
+                    for(j=trQuestVarGet("count"); >0) {
+                        trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
+                        trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
+                        trQuestVarSetFromRand("heading", 1, 360, true);
+                        trQuestVarSet("posX", trQuestVarGet("x0"));
+                        trQuestVarSet("posZ", trQuestVarGet("z0"));
+                        vectorToGrid("pos", "pos");
+                        if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+                            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                            trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
+                            trArmySelect("1,0");
+                            trUnitConvert(ENEMY_PLAYER);
+                        }
+                    }
+                    x0 = trQuestVarGet("room"+room+"bottom2x");
+                    z0 = trQuestVarGet("room"+room+"bottom2z");
+                    x1 = trQuestVarGet("room"+room+"top2x");
+                    z1 = trQuestVarGet("room"+room+"top2z");
+                    trQuestVarSetFromRand("count", 1, 6, true);
+                    for(j=trQuestVarGet("count"); >0) {
+                        trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
+                        trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
+                        trQuestVarSetFromRand("heading", 1, 360, true);
+                        trQuestVarSet("posX", trQuestVarGet("x0"));
+                        trQuestVarSet("posZ", trQuestVarGet("z0"));
+                        vectorToGrid("pos", "pos");
+                        if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+                            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                            trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
+                            trArmySelect("1,0");
+                            trUnitConvert(ENEMY_PLAYER);
+                        }
+                    }
+                    ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());
+                }
+            }
+        }        
 
         /* 
         paint tiny square at bottom of map for spawning units 
