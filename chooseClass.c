@@ -84,14 +84,11 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("choice"+i+"unit");
 		if (trUnitIsSelected()) {
-			if (trQuestVarGet("choice"+i+"selected") == 0) {
-				trQuestVarSet("choice"+i+"selected", 1);
-				trQuestVarSet("pleaseExplain", i);
-				trQuestVarSet("choice"+i+"explain", 0);
-				trDelayedRuleActivation("class_shop_explain_01");
-			}
-		} else if (trQuestVarGet("choice"+i+"selected") == 1) {
-			trQuestVarSet("choice"+i+"selected", 0);
+			trQuestVarSet("choice"+i+"selected", 1);
+			trQuestVarSet("pleaseExplain", i);
+			trQuestVarSet("choice"+i+"explain", 0);
+			trDelayedRuleActivation("class_shop_explain_01");
+			uiClearSelection();
 		}
 		trVectorSetUnitPos("pos", "choice"+i+"unit");
 		for (p=1; < ENEMY_PLAYER) {

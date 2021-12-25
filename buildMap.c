@@ -262,11 +262,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddToDatabase("chests", "next");
             yAddUpdateVar("chests", "type", trQuestVarGet("chestType"));
             yAddUpdateVar("chests", "room", room);
-            trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 315, true);
+            trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 135, true);
             trArmySelect("1,0");
             trUnitConvert(0);
             trUnitChangeProtoUnit("Great Box");
-            trChatSend(0, "chest spawned!");
         }
         case ROOM_TRANSPORTER_GUY:
         {
@@ -561,9 +560,6 @@ highFrequency
             x = i - z * 4;
             if (chests > 0) {
                 trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
-                if (trQuestVarGet("chestRand") == 1) {
-                    chests = chests - 1;
-                }
             } else {
                 trQuestVarSet("chestRand", 0);
             }
@@ -574,6 +570,7 @@ highFrequency
                 nick = false;
                 xsEnableRule("nick_00_visit");
             } else if (trQuestVarGet("chestRand") == 1) {
+                chests = chests - 1;
                 buildRoom(x, z, ROOM_CHEST);
             } else {
                 trQuestVarSetFromRand("roomType", ROOM_BASIC, ROOM_AMBUSH, true);
@@ -622,12 +619,13 @@ highFrequency
                     trUnitChangeProtoUnit("Relic");
                     yAddToDatabase("freeRelics", "next");
                     yAddUpdateVar("freeRelics", "type", trQuestVarGet("keyType"));
+                    ySetVar("chests", "key", trQuestVarGet("next"));
 
                     trVectorSetUnitPos("pos", "chests");
                     trQuestVarSet("posX", trQuestVarGet("posX") - 2);
                     trQuestVarSet("posZ", trQuestVarGet("posZ") - 2);
                     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),45,true);
+                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),225,true);
                     trUnitSelectClear();
                     trUnitSelectByQV("next", true);
                     trUnitConvert(0);
@@ -673,6 +671,7 @@ highFrequency
                             trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
                             trArmySelect("1,0");
                             trUnitConvert(ENEMY_PLAYER);
+                            yAddToDatabase("enemiesIncoming", "next");
                         }
                     }
                     x0 = trQuestVarGet("room"+room+"bottom2x");
@@ -692,6 +691,7 @@ highFrequency
                             trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
                             trArmySelect("1,0");
                             trUnitConvert(ENEMY_PLAYER);
+                            yAddToDatabase("enemiesIncoming", "next");
                         }
                     }
                     ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());

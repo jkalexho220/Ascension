@@ -175,6 +175,9 @@ runImmediately
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
 
     for(p=1; < ENEMY_PLAYER) {
+        trModifyProtounit("UI Range Indicator Greek SFX", p, 55, 1);
+        trModifyProtounit("UI Range Indicator Norse SFX", p, 55, 1);
+        trModifyProtounit("UI Range Indicator Atlantean SFX", p, 55, 1);
         trPlayerSetDiplomacy(p, 0, "neutral");
         trSetCivAndCulture(p, 1, 0);
         /* LOS and flying */

@@ -295,9 +295,7 @@ highFrequency
             yDatabasePointerDefault("p"+p+"relics");
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
-                if ((zDistanceToVectorSquared("p"+p+"relics", "pos") > 1) &&
-                    (trUnitGetIsContained("Unit") == false) &&
-                    (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK)) {
+                if (trUnitGetIsContained("Unit") == false) {
                     relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"relics");
@@ -305,7 +303,8 @@ highFrequency
                         trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
                     if (trPlayerResourceCount(p, "Gold") > 10 &&
-                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
+                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36 &&
+                        (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK)) {
                         trUnitChangeProtoUnit("Conversion SFX");
                         if (trCurrentPlayer() == p) {
                             trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
@@ -320,6 +319,7 @@ highFrequency
                         yAddToDatabase("freeRelics", "p"+p+"relics");
                         yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
                     }
+                
                     yRemoveFromDatabase("p"+p+"relics");
                     yRemoveUpdateVar("p"+p+"relics", "type");
                 }
@@ -356,15 +356,10 @@ highFrequency
             yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
             yRemoveFromDatabase("freeRelics");
             yRemoveUpdateVar("freeRelics", "type");
-            yRemoveUpdateVar("freeRelics", "selected");
             yRemoveUpdateVar("freeRelics", "enemy");
         } else if (trUnitIsSelected()) {
-            if (yGetVar("freeRelics", "selected") == 0) {
-                ySetVar("freeRelics", "selected", 1);
-                relicDescription(1*yGetVar("freeRelics", "type"));
-            }
-        } else if (yGetVar("freeRelics", "selected") == 1) {
-            ySetVar("freeRelics", "selected", 0);
+            uiClearSelection();
+            relicDescription(1*yGetVar("freeRelics", "type"));
         }
     }
 
@@ -384,6 +379,8 @@ highFrequency
             trQuestVarSet("p"+p+"lifestealTotal", 0);
         }
     }
+
+    processChests();
 
     xsSetContextPlayer(old);
 }

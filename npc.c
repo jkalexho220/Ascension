@@ -56,14 +56,11 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("relicTransporterGuyName");
 	if (trUnitIsSelected()) {
-		if (trQuestVarGet("relicTransporterGuySelected") == 0) {
-			trUnitHighlight(5.0, true);
-			trQuestVarSet("relicTransporterGuySelected", 1);
-			xsEnableRule("relic_transporter_guy_explain_01");
-			trQuestVarSet("relicTransporterGuyExplain", 0);
-		}
-	} else if (trQuestVarGet("relicTransporterGuySelected") == 1) {
-		trQuestVarSet("relicTransporterGuySelected", 0);
+		trUnitHighlight(5.0, true);
+		trQuestVarSet("relicTransporterGuySelected", 1);
+		xsEnableRule("relic_transporter_guy_explain_01");
+		trQuestVarSet("relicTransporterGuyExplain", 0);
+		uiClearSelection();
 	}
 }
 
