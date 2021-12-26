@@ -157,6 +157,18 @@ try:
 				first = False
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowashereagain inactive {if(true){xsDisableSelf();//");\n')
+		file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("get_player_names"));\n')
+		file_data_2.write('rmSetTriggerPriority(4);\n')
+		file_data_2.write('rmSetTriggerActive(true);\n')
+		file_data_2.write('rmSetTriggerLoop(false);\n')
+		file_data_2.write('rmSetTriggerRunImmediately(true);\n')
+		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+		file_data_2.write('rmSetTriggerEffectParam("IdleProc","false);/*");\n')
+		file_data_2.write('for(p=1; < cNumberNonGaiaPlayers) {\n')
+		file_data_2.write('code("trStringQuestVarSet(\\"p"+p+"name\\", \\""+rmGetPlayerName(p)+"\\");");\n')
+		file_data_2.write('}\n');
+		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*///");\n')
 		file_data_2.write('rmSetStatusText("", 0.99);')
 		file_data_2.write('}')
 except IOError:

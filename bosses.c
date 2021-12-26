@@ -20,6 +20,6 @@ highFrequency
 
 	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount")) {
 		xsDisableSelf();
-		/*xsEnableRule("");*/
+		xsEnableRule("boss" + 1*trQuestVarGet("stage") + "_cin_00");
 	}
 }
