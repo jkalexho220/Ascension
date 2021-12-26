@@ -14,7 +14,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Drop a relic in front of me and I will teleport it to your warehouse for 10 gold.");
+					uiMessageBox("Drop a relic in front of me and I will teleport it to your warehouse for 25 gold.");
 				}
 				case 3:
 				{

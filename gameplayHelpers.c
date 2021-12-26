@@ -223,6 +223,7 @@ int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
 }
 
 void healUnit(int p = 0, float amt = 0) {
+	amt = amt * trQuestVarGet("p"+p+"healBoost");
 	trDamageUnit(0.0 - amt);
 }
 
@@ -233,12 +234,16 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	trDamageUnit(dmg);
 	if (spell) {
 		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal"));
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal") * dmg);
 	} else {
 		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal"));
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * dmg);
 	}
 	return(dmg);
+}
+
+float damagePlayerUnit(float dmg = 0) {
+	trDamageUnit(dmg);
 }
 
 void stunsAndPoisons(string db = "") {
@@ -298,6 +303,9 @@ int CheckOnHit(int p = 0, int id = 0) {
                         status = ON_HIT_SPECIAL;
                     }
                 }
+                /* lifesteal */
+                trQuestVarSet("p"+p+"lifestealTotal", 
+					trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack"));
             }
         } else {
             ySetVar("p"+p+"characters", "attacking", 0);

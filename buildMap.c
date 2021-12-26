@@ -630,6 +630,7 @@ highFrequency
                     trUnitSelectByQV("next", true);
                     trUnitConvert(0);
                     trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
+                    ySetVar("chests", "indicator", trQuestVarGet("next"));
 
                     trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
                 }

@@ -293,33 +293,34 @@ highFrequency
         if (trUnitAlive()) {
             trVectorSetUnitPos("pos", "p"+p+"unit");
             yDatabasePointerDefault("p"+p+"relics");
+            trChatSend(0, "relic count is " + 1*yGetDatabaseCount("p"+p+"relics"));
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
                 if (trUnitGetIsContained("Unit") == false) {
                     relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
-                    trUnitSelectClear();
-                    trUnitSelectByQV("p"+p+"relics");
-                    if (trCurrentPlayer() == p) {
-                        trSoundPlayFN("backtowork.wav","1",-1,"","");
-                    }
-                    if (trPlayerResourceCount(p, "Gold") > 10 &&
-                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36 &&
-                        (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK)) {
-                        trUnitChangeProtoUnit("Conversion SFX");
+                    if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+                        trUnitSelectClear();
+                        trUnitSelectByQV("p"+p+"relics");
                         if (trCurrentPlayer() == p) {
-                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
-                            trSoundPlayFN("favordump.wav","1",-1,"","");
-                            trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
-                                xsMin(5, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
+                            trSoundPlayFN("backtowork.wav","1",-1,"","");
                         }
-                        trPlayerGrantResources(p, "Gold", -10);
-                    } else {
-                        trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
-                        trUnitChangeProtoUnit("Relic");
-                        yAddToDatabase("freeRelics", "p"+p+"relics");
-                        yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                        if (trPlayerResourceCount(p, "Gold") > 25 &&
+                            zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
+                            trMutateSelected(kbGetProtoUnitID("Conversion SFX"));
+                            if (trCurrentPlayer() == p) {
+                                trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
+                                trSoundPlayFN("favordump.wav","1",-1,"","");
+                                trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
+                                    xsMin(5, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
+                            }
+                            trPlayerGrantResources(p, "Gold", -25);
+                        } else {
+                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                            trUnitChangeProtoUnit("Relic");
+                            yAddToDatabase("freeRelics", "p"+p+"relics");
+                            yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                        }
                     }
-                
                     yRemoveFromDatabase("p"+p+"relics");
                     yRemoveUpdateVar("p"+p+"relics", "type");
                 }
@@ -356,7 +357,6 @@ highFrequency
             yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
             yRemoveFromDatabase("freeRelics");
             yRemoveUpdateVar("freeRelics", "type");
-            yRemoveUpdateVar("freeRelics", "enemy");
         } else if (trUnitIsSelected()) {
             uiClearSelection();
             relicDescription(1*yGetVar("freeRelics", "type"));
@@ -375,7 +375,7 @@ highFrequency
         if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
             trUnitSelectClear();
             trUnitSelectByQV("p"+p+"unit");
-            trDamageUnit(0.0 - trQuestVarGet("p"+p+"lifestealTotal"));
+            healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
             trQuestVarSet("p"+p+"lifestealTotal", 0);
         }
     }
