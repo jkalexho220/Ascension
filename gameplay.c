@@ -20,6 +20,29 @@ void spawnPlayer(int p = 0, string vdb = "") {
     }
 }
 
+void fixAnimations(int p = 0) {
+    /*
+    Prevent hip-thrusting heroes from invisible relic holding
+    */
+    int action = 0;
+    int id = kbGetBlockID(""+1*trQuestVarGet("p"+p+"unit"));
+    if (id > 0) {
+        trUnitSelectClear();
+        trUnitSelectByQV("p"+p+"unit");
+        action = kbUnitGetAnimationActionType(id);
+        if (trQuestVarGet("p"+p+"animation") == action) {
+            if (action == -1) {
+                trUnitOverrideAnimation(-1,0,false,true,-1);
+            }
+        } else {
+            trQuestVarSet("p"+p+"animation", action);
+            if (action == 11) {
+                trUnitSetAnimationPath("0,0,0,0,0,0,0");
+            }
+        }
+    }
+}
+
 void checkGodPowers(int p = 0) {
     /* well ability */
     switch(1*trQuestVarGet("p"+p+"wellCooldownStatus"))
@@ -159,6 +182,7 @@ highFrequency
     for(p=1; < ENEMY_PLAYER) {
         chooseClass(p, 1*trQuestVarGet("p"+p+"class"));
     }
+    trMusicPlayCurrent();
 }
 
 rule gameplay_start_2
@@ -293,7 +317,6 @@ highFrequency
         if (trUnitAlive()) {
             trVectorSetUnitPos("pos", "p"+p+"unit");
             yDatabasePointerDefault("p"+p+"relics");
-            trChatSend(0, "relic count is " + 1*yGetDatabaseCount("p"+p+"relics"));
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
                 if (trUnitGetIsContained("Unit") == false) {
@@ -344,9 +367,9 @@ highFrequency
             relicEffect(1*yGetVar("freeRelics", "type"), p, true);
             trUnitSelectClear();
             trUnitSelectByQV("freeRelics", true);
+            trSetSelectedScale(0,0,0);
             trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
             if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
-                trSetSelectedScale(0,0,0);
                 trUnitSetAnimationPath("1,0,1,1,0,0,0");
             }
             if (trCurrentPlayer() == p) {
@@ -370,14 +393,15 @@ highFrequency
         trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
     }
 
-    /* lifesteal */
     for(p=1; < ENEMY_PLAYER) {
+        /* lifesteal */
         if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
             trUnitSelectClear();
             trUnitSelectByQV("p"+p+"unit");
             healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
             trQuestVarSet("p"+p+"lifestealTotal", 0);
         }
+        fixAnimations(p);
     }
 
     processChests();

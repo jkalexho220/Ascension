@@ -75,6 +75,22 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 	return(next);
 }
 
+string className(int class = 0) {
+	string name = "N/A";
+	switch(class)
+	{
+		case MOONBLADE:
+		{
+			name = "Moonblade";
+		}
+		case SUNBOW:
+		{
+			name = "Sunbow";
+		}
+	}
+	return(name);
+}
+
 rule class_shop_always
 inactive
 highFrequency
@@ -93,30 +109,43 @@ highFrequency
 		trVectorSetUnitPos("pos", "choice"+i+"unit");
 		for (p=1; < ENEMY_PLAYER) {
 			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 5) {
-				if (trQuestVarGet("p"+p+"buy"+i) == 0) {
-					/* attempt to buy the class */
-					trQuestVarSet("p"+p+"buy"+i, 1);
+				if (trQuestVarGet("p"+p+"buy"+i) < 4 &&
+					trTimeMS() > trQuestVarGet("p"+p+"buyNext")) {
+					trQuestVarSet("p"+p+"buy"+i, trQuestVarGet("p"+p+"buy"+i) + 1);
+					trQuestVarSet("p"+p+"buyNext", trTimeMS() + 1000);
 					class = i + 2 * trQuestVarGet("stage") - 2;
-					if (trQuestVarGet("p"+p+"unlocked"+class) == 1) {
-						if (trCurrentPlayer() == p) {
-							trSoundPlayFN("cantdothat.wav","1",-1,"","");
-							trChatSend(0, "You have already unlocked this class!");
+					if (trQuestVarGet("p"+p+"buy"+i) == 4) {
+						/* attempt to buy the class */
+						trQuestVarSet("p"+p+"buy"+i, 5);
+						if (trQuestVarGet("p"+p+"unlocked"+class) == 1) {
+							if (trCurrentPlayer() == p) {
+								trSoundPlayFN("cantdothat.wav","1",-1,"","");
+								trChatSend(0, "You have already unlocked this class!");
+							}
+						} else if (trQuestVarGet("p"+p+"noob") == 1) {
+							trQuestVarSet("p"+p+"noob", 0);
+							trQuestVarSet("p"+p+"unlocked"+class, 1);
+							chooseClass(p, class);
+							if (trCurrentPlayer() == p) {
+								trChatSend(0, "You have purchased the " + className(class) + " class!");
+							}
+							trSoundPlayFN("ui\thunder5.wav","1",-1,"","");
+						} else if (trPlayerResourceCount(p, "Gold") < 500) {
+							if (trCurrentPlayer() == p) {
+								trSoundPlayFN("cantdothat.wav","1",-1,"","");
+								trChatSend(0, "You need 500 gold to unlock this class!");
+							}
+						} else {
+							trQuestVarSet("p"+p+"unlocked"+class, 1);
+							trPlayerGrantResources(p, "Gold", -1000);
+							chooseClass(p, class);
+							if (trCurrentPlayer() == p) {
+								trChatSend(0, "You have purchased the " + className(class) + " class!");
+							}
+							trSoundPlayFN("ui\thunder5.wav","1",-1,"","");
 						}
-					} else if (trQuestVarGet("p"+p+"noob") == 1) {
-						trQuestVarSet("p"+p+"noob", 0);
-						trQuestVarSet("p"+p+"unlocked"+class, 1);
-						chooseClass(p, class);
-						trSoundPlayFN("ui\thunder5.wav","1",-1,"","");
-					} else if (trPlayerResourceCount(p, "Gold") < 500) {
-						if (trCurrentPlayer() == p) {
-							trSoundPlayFN("cantdothat.wav","1",-1,"","");
-							trChatSend(0, "You need 500 gold to unlock this class!");
-						}
-					} else {
-						trQuestVarSet("p"+p+"unlocked"+class, 1);
-						trPlayerGrantResources(p, "Gold", -500);
-						chooseClass(p, class);
-						trSoundPlayFN("ui\thunder5.wav","1",-1,"","");
+					} else if (trCurrentPlayer() == p) {
+						trChatSend(0,"<color=1,1,1>Unlocking "+className(class)+" in "+(4-trQuestVarGet("p"+p+"buy"+i))+"...");
 					}
 				}
 			} else {
@@ -134,9 +163,7 @@ highFrequency
 	int i = trQuestVarGet("pleaseExplain");
 	trQuestVarSet("choice"+i+"explain", 
 		displayNextTooltip(i + 2 * trQuestVarGet("stage") - 2, 1*trQuestVarGet("choice"+i+"explain")));
-	if (trQuestVarGet("choice"+i+"explain") > 0) {
-		trDelayedRuleActivation("class_shop_explain_02");
-	}
+	trDelayedRuleActivation("class_shop_explain_02");
 }
 
 rule class_shop_explain_02
@@ -144,8 +171,12 @@ inactive
 highFrequency
 {
 	int i = trQuestVarGet("pleaseExplain");
-	if ((trQuestVarGet("choice"+i+"explain") > 0) && (trIsGadgetVisible("ShowImageBox") == false)) {
-		trDelayedRuleActivation("class_shop_explain_01");
+	if (trIsGadgetVisible("ShowImageBox") == false) {
+		if (trQuestVarGet("choice"+i+"explain") > 0) {
+			trDelayedRuleActivation("class_shop_explain_01");
+		} else {
+			uiMessageBox("It costs 1000 gold to unlock this class. New players unlock their first class for free.");
+		}
 		xsDisableSelf();
 	}
 }

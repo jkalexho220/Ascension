@@ -322,35 +322,53 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_BOSS:
         {
-            trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x * 35 + 5, z * 35 + 5, x * 35 + 36, z * 35 + 36, 0, false);
+            switch(1*trQuestVarGet("bossRoomShape"))
+            {
+                case ROOM_CIRCLE:
+                {
+                    z0 = 16;
+                    for(a=0; < 16) {
+                        for(b=16; >0) {
+                            if (a*a + z0 * z0 <= 256) {
+                                trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                                trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, false);
+                                break;
+                            } else {
+                                z0 = z0 - 1;
+                            }
+                        }
+                    }
+                }
+                case ROOM_SQUARE:
+                {
+                    trPaintTerrain(x * 35 + 6, z * 35 + 6, x * 35 + 34, z * 35 + 34, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                    trChangeTerrainHeight(x * 35 + 6, z * 35 + 6, x * 35 + 35, z * 35 + 35, 0, false);
+                }
+            }
+            trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
             trVectorQuestVarSet("bossRoomEntrance", xsVectorSet(x * 70 + 10, 0, z * 70 + 10));
             xsEnableRule("enter_boss_room");
         }
         case ROOM_NICK:
         {
-            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, 0, 73, false);
-            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, 0, false);
+            z0 = 12;
+            for(a=0; < 12) {
+                for(b=12; >0) {
+                    if (a*a + z0 * z0 <= 144) {
+                        trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                        trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, false);
+                        break;
+                    } else {
+                        z0 = z0 - 1;
+                    }
+                }
+            }
             trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
             trArmyDispatch("1,0", "Victory Marker", 1, 70*x+40, 0, 70*z+40,225,true);
             trUnitSelectClear();
             trUnitSelectByQV("nickonhawk", true);
             trUnitConvert(0);
             trUnitChangeProtoUnit("Odysseus");
-            trQuestVarSet("nickShop1", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+30,0, 70*z+30,0,true);
-            trQuestVarSet("nickShop2", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+30,0, 70*z+50,0,true);
-            trQuestVarSet("nickShop3", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+50,0, 70*z+30,0,true);
-            trQuestVarSet("nickShop4", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0", "Victory Marker", 1, 70*x+50,0, 70*z+50,0,true);
-            for(i=4; >0) {
-                trUnitSelectClear();
-                trUnitSelectByQV("nickShop"+i, true);
-                trUnitConvert(0);
-                trUnitChangeProtoUnit("Outpost");
-            }
         }
     }
 }
@@ -420,7 +438,7 @@ highFrequency
             case 1:
             {
                 /* desert tomb */
-                trOverlayText("Temple of the Lion", 3.0, -1, -1, -1);
+                trOverlayText("The Lion's Den", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
                 
@@ -439,7 +457,7 @@ highFrequency
                 trQuestVarSet("treeDensity", 0.03);
                 trStringQuestVarSet("treeProto1", "Statue Lion Left");
                 trStringQuestVarSet("treeProto2", "Statue Lion Right");
-                trStringQuestVarSet("treeProto3", "Statue Nemean Lion");
+                trStringQuestVarSet("treeProto3", "Palm");
                 trQuestVarSet("spriteDensity", 0.3);
                 trStringQuestVarSet("spriteProto1", "Rock Sandstone Sprite");
                 trStringQuestVarSet("spriteProto2", "Grass");
@@ -462,7 +480,7 @@ highFrequency
         }
 
         /* paint entire map cliff and raise it */
-        trChangeTerrainHeight(0,0,150,150,6,false);
+        trChangeTerrainHeight(0,0,150,150,5,false);
         trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
 
         /* build the grid */

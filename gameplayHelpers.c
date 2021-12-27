@@ -242,8 +242,13 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	return(dmg);
 }
 
+/*
+protection blocks all damage.
+*/
 float damagePlayerUnit(float dmg = 0) {
-	trDamageUnit(dmg);
+	if (trQuestVarGet("protectionCount") == 0) {
+		trDamageUnit(dmg);
+	}
 }
 
 void stunsAndPoisons(string db = "") {

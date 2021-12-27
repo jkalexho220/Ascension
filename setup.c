@@ -14,6 +14,9 @@ const int ROOM_STARTER = 10;
 const int ROOM_BOSS = 11;
 const int ROOM_NICK = 12;
 
+const int ROOM_CIRCLE = 0;
+const int ROOM_SQUARE = 1;
+
 const int CHEST_KEY = 1;
 const int CHEST_ENCOUNTER = 2;
 const int CHEST_PADS = 3;
@@ -136,6 +139,11 @@ void chooseClass(int p = 0, int class = 0) {
         trQuestVarSet("p"+p+"wellCooldownStatus", 2);
         trQuestVarSet("p"+p+"lureCooldownStatus", 2);
         trQuestVarSet("p"+p+"rainCooldownStatus", 2);
+    }
+
+    for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+        yDatabaseNext("p"+p+"relics");
+        relicEffect(p, 1*yGetVar("p"+p+"relics", "type"), true);
     }
 }
 

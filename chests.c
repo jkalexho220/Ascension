@@ -1,8 +1,7 @@
 const int CHEST_STATE_CLOSED = 0;
 const int CHEST_STATE_UNLOCKED = 1;
-const int CHEST_STATE_OPENING = 2;
-const int CHEST_STATE_REWARDING = 3;
-const int CHEST_STATE_COUNTDOWN = 4;
+const int CHEST_STATE_REWARDING = 2;
+const int CHEST_STATE_COUNTDOWN = 3;
 
 void removeChest() {
 	yRemoveFromDatabase("chests");
@@ -125,39 +124,33 @@ void processChests() {
 		            }
 		        }
 	    	}
-	    	case CHEST_STATE_OPENING:
-	    	{
-	    		if (kbUnitGetAnimationActionType(id) == -1) {
-	    			trQuestVarSetFromRand("rand", 1, 10, true);
-	    			if (trQuestVarGet("rand") == 1) {
-	    				ySetVar("chests", "state", CHEST_STATE_COUNTDOWN);
-	    				trUnitSelectClear();
-	    				trUnitSelectByQV("chests");
-	    				trUnitHighlight(4.0, true);
-	    				trUnitChangeProtoUnit("Phoenix Egg");
-	    				ySetVar("chests", "next", trTimeMS() + 1000);
-	    				ySetVar("chests", "count", 3);
-	    				trSoundPlayFN("attackwarning.wav","1",-1,"","");
-	    				trMessageSetText("The chest was a bomb! Run!",-1);
-	    			} else {
-	    				trQuestVarSetFromRand("rand", 1, trQuestVarGet("rand"), true);
-	    				if (trQuestVarGet("rand") < ENEMY_PLAYER) {
-	    					trQuestVarSet("rand", ENEMY_PLAYER);
-	    				}
-	    				ySetVar("chests", "state", CHEST_STATE_REWARDING);
-	    				ySetVar("chests", "next", trTimeMS());
-	    				ySetVar("chests", "count", trQuestVarGet("rand"));
-	    				trSoundPlayFN("plentybirth.wav","1",-1,"","");
-	    			}
-	    		}
-	    	}
 	    	case CHEST_STATE_UNLOCKED:
 	    	{
 	    		trUnitSelectClear();
 	    		trUnitSelectByQV("chests");
 	    		trUnitSetAnimation("SE_Great_Box_Opening",false,-1);
-	    		ySetVar("chests", "state", CHEST_STATE_OPENING);
 	    		trSoundPlayFN("siegetowerdeath.wav","1",-1,"","");
+	    		trQuestVarSetFromRand("rand", 1, 10, true);
+    			if (trQuestVarGet("rand") == 1) {
+    				ySetVar("chests", "state", CHEST_STATE_COUNTDOWN);
+    				trUnitSelectClear();
+    				trUnitSelectByQV("chests");
+    				trUnitHighlight(4.0, true);
+    				trUnitChangeProtoUnit("Phoenix Egg");
+    				ySetVar("chests", "next", trTimeMS() + 1000);
+    				ySetVar("chests", "count", 3);
+    				trSoundPlayFN("attackwarning.wav","1",-1,"","");
+    				trMessageSetText("The chest was a bomb! Run!",-1);
+    			} else {
+    				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand"), true);
+    				if (trQuestVarGet("rand") < ENEMY_PLAYER) {
+    					trQuestVarSet("rand", ENEMY_PLAYER);
+    				}
+    				ySetVar("chests", "state", CHEST_STATE_REWARDING);
+    				ySetVar("chests", "next", trTimeMS());
+    				ySetVar("chests", "count", trQuestVarGet("rand"));
+    				trSoundPlayFN("plentybirth.wav","1",-1,"","");
+    			}
 	    	}
 	    	case CHEST_STATE_REWARDING:
 	    	{

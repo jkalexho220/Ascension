@@ -62,7 +62,7 @@ void sunbowAlways(int eventID = -1) {
 								if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
 									trUnitSelectClear();
 									trUnitSelectByQV("enemies", true);
-									damageEnemy(p, amt);
+									damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"));
 								}
 							}
 						}
@@ -192,7 +192,7 @@ void sunbowAlways(int eventID = -1) {
 			ySetVar("p"+p+"sunlights", "next", trTimeMS() + 500);
 			trQuestVarSet("centerX", yGetVar("p"+p+"sunlights", "posX"));
 			trQuestVarSet("centerZ", yGetVar("p"+p+"sunlights", "posZ"));
-			amt = xsPow(yGetVar("p"+p+"sunlights", "radius"), 2);
+			amt = yGetVar("p"+p+"sunlights", "radius");
 			posX = yGetVar("p"+p+"sunlights", "power");
 			posX = posX * 0.5;
 
@@ -211,7 +211,7 @@ void sunbowAlways(int eventID = -1) {
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "center") < amt) {
-						damageEnemy(p, posX);
+						damageEnemy(p, posX * trQuestVarGet("p"+p+"healBoost"));
 					}
 				}
 			}
