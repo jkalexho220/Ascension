@@ -69,6 +69,16 @@ void removePlayerCharacter(int p = 0) {
 	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
 	yRemoveUpdateVar("p"+p+"Characters", "attacking");
 	yRemoveUpdateVar("p"+p+"Characters", "attackNext");
+	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+			yDatabaseNext("p"+p+"relics", true);
+			trUnitChangeProtoUnit("Relic");
+			relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+			yAddToDatabase("freeRelics", "p"+p+"relics");
+			yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+		}
+		yClearDatabase("p"+p+"relics");
+	}
 }
 
 void removePlayerUnit() {

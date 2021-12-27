@@ -47,11 +47,6 @@ void thunderRiderAlways(int eventID = -1) {
 		posZ = trQuestVarGet("p"+p+"wellPosz");
 		trSoundPlayFN("lightningstrike3.wav", "1", -1, "","");
 		if (trQuestVarGet("p"+p+"rideLightning") == 0) {
-			/* unload relics */
-			for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-				yDatabaseNext("p"+p+"relics", true);
-				trUnitChangeProtoUnit("Relic");
-			}
 			/* dash */
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				id = yDatabaseNext("p"+p+"characters", true);
@@ -82,6 +77,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
 					trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
+					trMutateSelected(kbGetProtoUnitID("Siege Tower"));
 					trUnitChangeProtoUnit("Dwarf");
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
@@ -95,10 +91,15 @@ void thunderRiderAlways(int eventID = -1) {
 			/* reload relics */
 			for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 				yDatabaseNext("p"+p+"relics", true);
+				trUnitChangeProtoUnit("Relic");
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"relics");
 				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-				trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-				trSetSelectedScale(0,0,0);
-				trUnitSetAnimationPath("1,0,1,1,0,0,0");
+				if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+					trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+					trSetSelectedScale(0,0,0);
+					trUnitSetAnimationPath("1,0,1,1,0,0,0");
+				}
 			}
 		} else {
 			/* ride the lightning direction change */
@@ -108,6 +109,17 @@ void thunderRiderAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trSoundPlayFN("suckup1.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			yDatabaseNext("p"+p+"characters", true);
+			trUnitHighlight(0.5, false);
+			healUnit(p, trQuestVarGet("p"+p+"thunderRiderBonus"));
+			trVectorSetUnitPos("pos", "p"+p+"characters");
+			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+			trArmySelect(""+p+",0");
+			trUnitChangeProtoUnit("Regeneration SFX");
+		}
+		trPlayerGrantResources(p, "favor", 0.1 * trQuestVarGet("p"+p+"thunderRiderBonus"));
+		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
@@ -207,9 +219,9 @@ void chooseThunderRider(int eventID = -1) {
 	}
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("blitzCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("rechargeCooldown"));
+	trQuestVarSet("p"+p+"lureCooldown", 1);
 	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
+	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("rechargeCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
 
 	trSetCivilizationNameOverride(p, "Thunder Rider | " + (1+trQuestVarGet("p"+p+"progress")));
