@@ -97,6 +97,49 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "decayNext");
 }
 
+/*
+called after confirming that the projectile is on WALL terrain.
+*/
+vector getBounceDir(string pos = "", string dir = "") {
+	int xMod = 1;
+	int zMod = 1;
+	if (trQuestVarGet(dir+"x") < 0) {
+		xMod = -1;
+	}
+	if (trQuestVarGet(dir+"z") < 0) {
+		zMod = -1;
+	}
+	vectorToGrid(pos, "loc");
+	vector ret = trVectorQuestVarGet(dir);
+	/* time to bounce! */
+	trQuestVarSet("horizontalX", trQuestVarGet("locX") - xMod);
+	trQuestVarSet("horizontalZ", trQuestVarGet("locZ"));
+	trQuestVarSet("verticalX", trQuestVarGet("locX"));
+	trQuestVarSet("verticalZ", trQuestVarGet("locZ") - zMod);
+	if (terrainIsType("horizontal", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+		ret = xsVectorSetZ(ret, 0.0 - trQuestVarGet(dir+"z"));
+	} else if (terrainIsType("vertical", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+		ret = xsVectorSetX(ret, 0.0 - trQuestVarGet(dir+"x"));
+	} else {
+		/*
+		we collided with a column. time for cool math
+		a = position of the projectile in a unit square
+		b = normalized vector from the contested corner to the projectile position
+		*/
+		vector a = (trVectorQuestVarGet(pos) - (trVectorQuestVarGet("loc") * 2)) / 2;
+		vector b = xsVectorSet((1 - xMod) / 2,0,(1 - zMod) / 2);
+		b = trVectorQuestVarGet(dir) + xsVectorNormalize(b - a);
+		/*
+		sign is different, which means we invert the other axis
+		*/
+		if (xsVectorGetX(b) * trQuestVarGet(dir+"x") < 0) {
+			ret = xsVectorSetZ(ret, 0.0 - xsVectorGetZ(ret));
+		} else {
+			ret = xsVectorSetX(ret, 0.0 - xsVectorGetX(ret));
+		}
+	}
+	return(ret);
+}
 
 /*
 Draws a line from 'from' to 'to,' stopping at the edge of the map.

@@ -2,6 +2,14 @@ void removeThunderRider(int p = 0) {
 	removePlayerCharacter(p);
 	yRemoveUpdateVar("p"+p+"characters", "prevX");
 	yRemoveUpdateVar("p"+p+"characters", "prevZ");
+	yRemoveUpdateVar("p"+p+"characters", "lightning");
+}
+
+void removeLightningBall(int p = 0) {
+	yRemoveFromDatabase("p"+p+"lightningBalls");
+	yRemoveUpdateVar("p"+p+"lightningBalls", "dirX");
+	yRemoveUpdateVar("p"+p+"lightningBalls", "dirZ");
+	yRemoveUpdateVar("p"+p+"lightningBalls", "damage");
 }
 
 void rideLightningOff(int p = 0) {
@@ -124,7 +132,7 @@ void thunderRiderAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trVectorSetUnitPos("pos", "p"+p+"lureObject");
+		trVectorSetUnitPos("end", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
@@ -138,8 +146,19 @@ void thunderRiderAlways(int eventID = -1) {
 			} else {
 				trQuestVarSet("p"+p+"rideLightningNext", 
 					trTimeMS() + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));
-				trSoundPlayFN("flamingweapons.wav","1",-1,"","");
+				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 				trModifyProtounit("Attack Revealer", p, 2, 10);
+				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+					id = yDatabaseNext("p"+p+"characters");
+					if (id == -1 || trUnitAlive() == false) {
+						removeThunderRider(p);
+					} else {
+						trVectorSetUnitPos("start", "p"+p+"characters");
+						trVectorQuestVarSet("dir", xsVectorNormalize(trVectorQuestVarGet("end") - trVectorQuestVarGet("start")));
+						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+						ySetVar("p"+p+"characters", "lightning", trQuestVarGet("next"));
+					}
+				}
 			}
 		} else {
 			if (trCurrentPlayer() == p) {

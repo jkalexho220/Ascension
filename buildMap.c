@@ -728,6 +728,11 @@ highFrequency
         trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 
+        /* DELETE ME */
+        trPaintTerrain(20,0,20,20,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+
+        trPaintTerrain(24,24,24,24,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+
         trUnblockAllSounds();
         if (trQuestVarGet("newPlayers") == 0) {
             xsEnableRule("gameplay_start");
