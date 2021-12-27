@@ -37,7 +37,7 @@ void sunbowAlways(int eventID = -1) {
 					yAddToDatabase("playerLasers", "next");
 					yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
 					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.3);
-					amt = trQuestVarGet("healingRaysPower") * trQuestVarGet("p"+p+"spellDamage");
+					amt = trQuestVarGet("p"+p+"attack");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						yDatabaseNext("playerUnits");
 						dist = zDistanceToVector("playerUnits", "start");
@@ -130,13 +130,14 @@ void sunbowAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"searingStarted", 1);
 		trQuestVarSet("p"+p+"searing", 1 - trQuestVarGet("p"+p+"searing"));
 		if (trQuestVarGet("p"+p+"searing") == 1) {
-			if (trPlayerResourceCount(p, "favor") < trQuestVarGet("searingCost")) {
+			if (trPlayerResourceCount(p, "favor") < 1) {
 				if (trCurrentPlayer() == p) {
 					trSoundPlayFN("cantdothat.wav","1",-1,"","");
 				}
 				trQuestVarSet("p"+p+"searing", 0);
 			} else {
-				trQuestVarSet("p"+p+"searingNext", trTimeMS() + 1000);
+				trQuestVarSet("p"+p+"searingNext", 
+					trTimeMS() + trQuestVarGet("searingDelay") * trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("flamingweapons.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
 					yDatabaseNext("p"+p+"Characters");
@@ -158,9 +159,10 @@ void sunbowAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"searing") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"searingNext")) {
-			trQuestVarSet("p"+p+"searingNext", trTimeMS() + 1000);
-			trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("searingCost"));
-			if (trPlayerResourceCount(p, "favor") < trQuestVarGet("searingCost")) {
+			trQuestVarSet("p"+p+"searingNext", 
+				trQuestVarGet("p"+p+"searingNext") + trQuestVarGet("searingDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+			trPlayerGrantResources(p, "favor", 0 - 1);
+			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"searing", 0);
 				trQuestVarSet("p"+p+"searingStarted", 1);
 				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
@@ -294,4 +296,5 @@ highFrequency
 	trQuestVarSet("healingRaysDuration", 5);
 
 	trQuestVarSet("searingCost", 5);
+	trQuestVarSet("searingDelay", 1000 / trQuestVarGet("searingCost"));
 }

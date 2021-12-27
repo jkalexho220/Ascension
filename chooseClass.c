@@ -87,6 +87,10 @@ string className(int class = 0) {
 		{
 			name = "Sunbow";
 		}
+		case THUNDERRIDER:
+		{
+			name = "Thunder Rider";
+		}
 	}
 	return(name);
 }

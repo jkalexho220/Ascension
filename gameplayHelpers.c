@@ -46,8 +46,8 @@ void removeEnemy() {
 			trPlayerGrantResources(p, "Favor", yGetVar("enemies", "bounty"));
 		}
 	}
-	if (yGetVar("enemies", "relic") == 1) {
-		spawnRelic(yGetVar("enemies", "posX"), yGetVar("enemies", "posZ"));
+	if (yGetVar("enemies", "relic") > 0) {
+		spawnRelicClosest(yGetVar("enemies", "posX"), yGetVar("enemies", "posZ"), 1*yGetVar("enemies", "relic"));
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");

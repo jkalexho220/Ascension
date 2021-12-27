@@ -22,10 +22,9 @@ highFrequency
 	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount")) {
 		xsDisableSelf();
 		xsEnableRule("boss_cin_00");
-		/*
+		
 		trUIFadeToColor(0,0,0,1000,0,true);
 		trLetterBox(true);
-		*/
 	}
 }
 
@@ -33,7 +32,7 @@ rule boss_cin_00
 inactive
 highFrequency
 {
-	if (trTime() > cActivationTime + 2) {
+	if (trTime() > cActivationTime + 1) {
 		xsDisableSelf();
 		trPaintTerrain(trQuestVarGet("bossRoomEntranceX")/2, trQuestVarGet("bossRoomEntranceZ")/2 - 3,
 			trQuestVarGet("bossRoomEntranceX")/2 + 35, trQuestVarGet("bossRoomEntranceZ")/2,
@@ -45,5 +44,45 @@ highFrequency
 			TERRAIN_WALL, TERRAIN_SUB_WALL);
 		trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX")/2 - 3, trQuestVarGet("bossRoomEntranceZ")/2,
 			trQuestVarGet("bossRoomEntranceX")/2, trQuestVarGet("bossRoomEntranceZ")/2 + 35,5,true);
+
+		trQuestVarSet("bossUnit", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0",trStringQuestVarGet("bossProto"),1,
+			trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
+		trUnitSelectClear();
+		trUnitSelectByQV("bossUnit", true);
+		trUnitConvert(0);
+
+		trQuestVarSet("cinTime", trTime());
+		trQuestVarSet("cinStep", 0);
+		
+		xsEnableRule("boss"+1*trQuestVarGet("stage")+"_init");
+	}
+}
+
+rule boss1_init
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 0:
+			{
+				trOverlayText("The King of Beasts", 3.0, -1, -1, -1);
+				trQuestVarSet("cinTime", trTime() + 2);
+			}
+			case 1:
+			{
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsDisableSelf();
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trUnitConvert(ENEMY_PLAYER);
+				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
+				xsEnableRule("boss1_battle");
+			}
+		}
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
 	}
 }

@@ -183,6 +183,7 @@ highFrequency
         chooseClass(p, 1*trQuestVarGet("p"+p+"class"));
     }
     trMusicPlayCurrent();
+    trPlayNextMusicTrack();
 }
 
 rule gameplay_start_2
@@ -351,6 +352,7 @@ highFrequency
         }
     }
 
+    amt = 0;
     if (yGetDatabaseCount("freeRelics") > 0) {
         yDatabaseNext("freeRelics", true);
         if (trUnitGetIsContained("Unit")) {
@@ -360,26 +362,29 @@ highFrequency
                 trUnitSelectByQV("p"+p+"unit");
                 if (trUnitAlive()) {
                     if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1) {
+                        amt = 1;
                         break;
                     }
                 }
             }
-            relicEffect(1*yGetVar("freeRelics", "type"), p, true);
-            trUnitSelectClear();
-            trUnitSelectByQV("freeRelics", true);
-            trSetSelectedScale(0,0,0);
-            trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-            if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
-                trUnitSetAnimationPath("1,0,1,1,0,0,0");
+            if (amt == 1) {
+                relicEffect(1*yGetVar("freeRelics", "type"), p, true);
+                trUnitSelectClear();
+                trUnitSelectByQV("freeRelics", true);
+                trSetSelectedScale(0,0,0);
+                trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+                if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                    trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                }
+                if (trCurrentPlayer() == p) {
+                    trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
+                    trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+                }
+                yAddToDatabase("p"+p+"relics", "freeRelics");
+                yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
+                yRemoveFromDatabase("freeRelics");
+                yRemoveUpdateVar("freeRelics", "type");
             }
-            if (trCurrentPlayer() == p) {
-                trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
-                trSoundPlayFN("researchcomplete.wav","1",-1,"","");
-            }
-            yAddToDatabase("p"+p+"relics", "freeRelics");
-            yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
-            yRemoveFromDatabase("freeRelics");
-            yRemoveUpdateVar("freeRelics", "type");
         } else if (trUnitIsSelected()) {
             uiClearSelection();
             relicDescription(1*yGetVar("freeRelics", "type"));

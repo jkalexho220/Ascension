@@ -1,7 +1,8 @@
-void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance = 0) {
+void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance = 0, int relic = -1) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
     trQuestVarSet("proto"+p+"relicChance", relicChance);
+    trQuestVarSet("proto"+p+"relic", relic);
 	/* armor */
 	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
@@ -20,7 +21,10 @@ void activateEnemy(int id = 0) {
     int relic = 0;
     trQuestVarSetFromRand("relicChance", 0, 1, false);
     if (trQuestVarGet("relicChance") < trQuestVarGet("proto"+proto+"relicChance")) {
-        relic = 1;
+        relic = trQuestVarGet("proto"+proto+"relic");
+        if (relic == -1) {
+            relic = trQuestVarGet("stage");
+        }
     }
 
     yAddToDatabase("enemies", "enemiesIncoming");
@@ -41,8 +45,8 @@ highFrequency
         setupProtounitBounty("Golden Lion", 4);
         setupProtounitBounty("Anubite", 6, 0.05);
         setupProtounitBounty("Terracotta Soldier", 6, 0.05);
-		setupProtounitBounty("Sphinx", 8, 0.1);
-		setupProtounitBounty("Petsuchos", 8, 0.2);
+		setupProtounitBounty("Sphinx", 8, 0.1, RELIC_SPELL_DURATION);
+		setupProtounitBounty("Petsuchos", 8, 0.2, RELIC_ATTACK_RANGE);
 		setupProtounitBounty("Mummy", 16, 0.5);
         trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 1000);
 		xsDisableSelf();

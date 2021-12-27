@@ -12,15 +12,15 @@ const int RELIC_HEAL_BOOST = 10;
 
 /* boss drop pool */
 const int RELIC_POISON_RESISTANCE = 11;
-const int RELIC_STUN_RESISTANCE = 12;
+const int RELIC_ULTIMATE_COST = 12;
 const int RELIC_SILENCE_RESISTANCE = 13;
-const int RELIC_POISON_KILLER = 14;
-const int RELIC_STUN_KILLER = 15;
-const int RELIC_HALF_KILLER = 16;
-const int RELIC_ULTIMATE_COST = 17;
-const int RELIC_PROJECTILES = 18;
-const int RELIC_SPECIAL_ATTACK = 19;
-const int RELIC_COOLDOWN_REDUCTION = 20;
+const int RELIC_PROJECTILES = 14;
+const int RELIC_STUN_RESISTANCE = 15;
+const int RELIC_SPECIAL_ATTACK = 16;
+const int RELIC_POISON_KILLER = 17;
+const int RELIC_COOLDOWN_REDUCTION = 18;
+const int RELIC_STUN_KILLER = 19;
+const int RELIC_HALF_KILLER = 20;
 
 /* nickonhawk's shop */
 
@@ -101,7 +101,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ULTIMATE_COST:
 		{
-			msg = "Ultimate Cost -5. (No effect on toggled ultimates)";
+			msg = "Ultimate Cost -0.1x";
 		}
 		case RELIC_PROJECTILES:
 		{
@@ -311,7 +311,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ULTIMATE_COST:
 		{
-			trQuestVarSet("p"+p+"ultimateCost", trQuestVarGet("p"+p+"ultimateCost") + 5.0 * m);
+			trQuestVarSet("p"+p+"ultimateCost", trQuestVarGet("p"+p+"ultimateCost") - 0.1 * m);
 		}
 		case RELIC_PROJECTILES:
 		{
@@ -453,7 +453,7 @@ int randomStageClosest(int maxval = 10) {
 	return(1*trQuestVarGet("relicrand1"));
 }
 
-void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
+void spawnRelicSpecific(float x = 0, float z = 0, int val = 1) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Dwarf",1,x,0,z,0,true);
 	trUnitSelectClear();
@@ -463,5 +463,16 @@ void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
 	}
 	trUnitChangeProtoUnit("Relic");
 	yAddToDatabase("freeRelics", "next");
-	yAddUpdateVar("freeRelics", "type", randomStageClosest(maxval));
+	yAddUpdateVar("freeRelics", "type", val);
+}
+
+void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
+	spawnRelicSpecific(x, z, randomStageClosest(maxval));
+}
+
+void spawnRelicClosest(float x = 0, float z = 0, int target = 0) {
+	trQuestVarSetFromRand("rand", 0, 10, true);
+	trQuestVarSetFromRand("rand", 
+		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
+	spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
 }

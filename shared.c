@@ -532,6 +532,15 @@ void yClearDatabase(string db = "") {
 	trQuestVarSet(db, 0);
 }
 
+void yVarToVector(string db = "", string v = "") {
+	trQuestVarSet(v+"x", yGetVar(db, v + "x"));
+	trQuestVarSet(v+"z", yGetVar(db, v + "z"));
+}
+
+void ySetVarFromVector(string db = "", string attr = "", string v = "") {
+	ySetVar(db, attr+"x", trQuestVarGet(v+"x"));
+	ySetVar(db, attr+"z", trQuestVarGet(v+"z"));
+}
 
 /* 
 Starting from NextUnitScenarioNameNumber and going backwards until the quest var 'qv',

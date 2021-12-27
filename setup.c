@@ -23,7 +23,8 @@ const int CHEST_PADS = 3;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
-const int CLASS_COUNT = 2;
+const int THUNDERRIDER = 3;
+const int CLASS_COUNT = 3;
 
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
@@ -126,6 +127,7 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"spellDuration", 1);
     trQuestVarSet("p"+p+"cooldownReduction", 1);
     trQuestVarSet("p"+p+"healBoost", 1);
+    trQuestVarSet("p"+p+"ultimateCost", 1);
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
     if (trUnitAlive()) {
@@ -182,6 +184,7 @@ runImmediately
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
+    setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, 3);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
@@ -197,6 +200,7 @@ runImmediately
         trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
         trModifyProtounit("Dwarf", p, 55, 4);
+        trModifyProtounit("Transport Ship Greek", p, 55, 4);
         trModifyProtounit("Athena", p, 55, 4);
 
         trModifyProtounit("Sea Turtle", p, 55, 1);
@@ -243,10 +247,15 @@ highFrequency
         trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
         trModifyProtounit("Transport Ship Atlantean", 1, 5, 1);
 
+        setupPlayerProto("Kronny Flying", 1000, 0, 0);
+
         setupPlayerProto("Militia", 100, 10, 4.8);
         setupPlayerProto("Wolf", 200, 10, 5);
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 16);
+        setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0);
+
+
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
         xsEnableRule("setup_enemies");

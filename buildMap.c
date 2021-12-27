@@ -476,6 +476,9 @@ highFrequency
                 trStringQuestVarSet("enemyProto5", "Petsuchos");
 
                 trQuestVarSet("columnDensity", 0.05);
+
+                trStringQuestVarSet("bossProto", "Nemean Lion");
+                trQuestVarSet("bossScale", 2);
             }
         }
 

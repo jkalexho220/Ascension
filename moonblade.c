@@ -32,6 +32,7 @@ void moonbladeAlways(int eventID = -1) {
 					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lightning Sparks Ground");
+					trPlayerGrantResources(p, "favor", 3);
 					for(x=yGetDatabaseCount("enemies"); >0) {
 						if (yDatabaseNext("enemies") == target) {
 							trUnitSelectClear();
@@ -136,14 +137,15 @@ void moonbladeAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trQuestVarSet("p"+p+"protection", 1 - trQuestVarGet("p"+p+"protection"));
 		if (trQuestVarGet("p"+p+"protection") == 1) {
-			if (trPlayerResourceCount(p, "favor") < trQuestVarGet("protectionCost")) {
+			if (trPlayerResourceCount(p, "favor") < 1) {
 				if (trCurrentPlayer() == p) {
 					trSoundPlayFN("cantdothat.wav","1",-1,"","");
 				}
 				trQuestVarSet("p"+p+"protection", 0);
 			} else {
 				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") + 1);
-				trQuestVarSet("p"+p+"protectionNext", trTimeMS() + 1000);
+				trQuestVarSet("p"+p+"protectionNext", 
+					trTimeMS() + trQuestVarGet("protectionDelay") * trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					id = yDatabaseNext("playerUnits", true);
@@ -227,9 +229,10 @@ void moonbladeAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"protection") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
-			trQuestVarSet("p"+p+"protectionNext", trTimeMS() + 1000);
-			trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("protectionCost"));
-			if (trPlayerResourceCount(p, "favor") < trQuestVarGet("protectionCost")) {
+			trQuestVarSet("p"+p+"protectionNext", 
+				trQuestVarGet("p"+p+"protectionNext") + trQuestVarGet("protectionDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+			trPlayerGrantResources(p, "favor", 0 - 1);
+			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);
 				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);
 				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
@@ -283,4 +286,5 @@ highFrequency
 	trQuestVarSet("crescentDamage", 50);
 
 	trQuestVarSet("protectionCost", 12);
+	trQuestVarSet("protectionDelay", 1000 / 12);
 }
