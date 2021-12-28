@@ -41,7 +41,7 @@ void processChests() {
     	yDatabaseNext("rainingFire", true);
     	if (yGetVar("rainingFire", "morphed") == 0) {
     		ySetVar("rainingFire", "morphed", 1);
-    		trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
+    		trMutateSelected(kbGetProtoUnitID("Meteorite death"));
     	} else {
     		trVectorSetUnitPos("pos", "rainingFire");
     		vectorToGrid("pos", "loc");
@@ -189,7 +189,7 @@ void processChests() {
 	    				trVectorSetUnitPos("pos", "chests");
 	    				trQuestVarSet("heading", 0);
 	    				zSetProtoUnitStat("Kronny Flying", 0, 1, 15);
-	    				for(x=30; >0) {
+	    				for(x=12; >0) {
 	    					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	    					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),trQuestVarGet("heading"),true);
 	    					trUnitSelectClear();
@@ -199,7 +199,7 @@ void processChests() {
 				    		trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 				    		trSetSelectedScale(0,-2.0,0);
 				    		yAddToDatabase("rainingFire", "next");
-				    		trQuestVarSet("heading", trQuestVarGet("heading") + 12);
+				    		trQuestVarSet("heading", trQuestVarGet("heading") + 30);
 	    				}
 	    				yClearDatabase("rainingFireTargets");
 	    				for(x=yGetDatabaseCount("playerUnits"); >0) {

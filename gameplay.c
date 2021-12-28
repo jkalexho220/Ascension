@@ -54,6 +54,9 @@ void checkGodPowers(int p = 0) {
                 trVectorSetUnitPos("p"+p+"wellPos", "p"+p+"wellObject");
                 trMutateSelected(kbGetProtoUnitID("Rocket"));
                 trDamageUnitPercent(100);
+                yFindLatest("p"+p+"wellObject", "Tunnel", p);
+                trMutateSelected(kbGetProtoUnitID("Rocket"));
+                trDamageUnitPercent(100);
                 trQuestVarSet("p"+p+"wellStatus", ABILITY_ON);
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COOLDOWN);
                 trQuestVarSet("p"+p+"wellReadyTime", 

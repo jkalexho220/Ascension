@@ -388,8 +388,13 @@ int yGetUnitAtIndex(string db = "", int index = 0) {
 	return(trQuestVarGet("xdata"+db+"index"+index));
 }
 
-int ySetUnitAtIndex(string db = "", int index = 0, int value = 0) {
+void ySetUnitAtIndex(string db = "", int index = 0, int value = 0) {
 	trQuestVarSet("xdata"+db+"index"+index, value);
+}
+
+void ySetUnit(string db = "", int value = 0) {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	ySetUnitAtIndex(db, index, value);
 }
 
 int yGetPointer(string db = "") {

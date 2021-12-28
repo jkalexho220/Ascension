@@ -35,7 +35,9 @@ void rideLightningOff(int p = 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"characters");
 		trMutateSelected(kbGetProtoUnitID("Dwarf"));
-		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"lightningBalls"));
+		if (kbGetBlockID(""+1*trQuestVarGet("p"+p+"lightningBalls")) >= 0) {
+			trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"lightningBalls"));
+		}
 		trUnitChangeProtoUnit("Dwarf");
 
 		trUnitSelectClear();
@@ -95,7 +97,7 @@ void lightningBallBounce(int p = 0) {
 	trDamageUnitPercent(-100);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-	trSetSelectedScale(0,-5.0,0);
+	trSetSelectedScale(0,-4.5,0);
 	trDamageUnitPercent(100);
 
 	trUnitSelectClear();
@@ -103,7 +105,7 @@ void lightningBallBounce(int p = 0) {
 	trDamageUnitPercent(-100);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-	trSetSelectedScale(0,-5.0,0);
+	trSetSelectedScale(0,-4.5,0);
 	trDamageUnitPercent(100);
 
 	ySetVar("p"+p+"lightningBalls", "yeehaw", 1);
@@ -282,6 +284,13 @@ void thunderRiderAlways(int eventID = -1) {
 			}
 		} else {
 			/* ride the lightning direction change */
+			for(x=yGetDatabaseCount("p"+p+"lightningBalls"); >0) {
+				yDatabaseNext("p"+p+"lightningBalls");
+				trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
+				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
+				ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
+				lightningBallBounce(p);
+			}
 		}
 	}
 
@@ -345,7 +354,7 @@ void thunderRiderAlways(int eventID = -1) {
 						trUnitSelectByQV("next", true);
 						trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 						trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-						trSetSelectedScale(0, -5, 0);
+						trSetSelectedScale(0, -4.5, 0);
 						trDamageUnitPercent(100);
 
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -355,7 +364,7 @@ void thunderRiderAlways(int eventID = -1) {
 						trUnitSelectByQV("next", true);
 						trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 						trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-						trSetSelectedScale(0, -5, 0);
+						trSetSelectedScale(0, -4.5, 0);
 						trDamageUnitPercent(100);
 
 						trUnitSelectClear();
@@ -389,7 +398,32 @@ void thunderRiderAlways(int eventID = -1) {
 			} else {
 				hit = CheckOnHit(p, id);
 				if (hit == ON_HIT_SPECIAL) {
-					
+					yClearDatabase("p"+p+"thunderShockTargets");
+					target = kbUnitGetTargetUnitID(id);
+					for(x=yGetDatabaseCount("enemies"); >0) {
+						id = yDatabaseNext("enemies", true);
+						if (id == -1 || trUnitAlive() == false) {
+							removeEnemy();
+						} else {
+							if (id == target) {
+								yAddToDatabase("p"+p+"thunderShocks", "enemies");
+								yAddUpdateVar("p"+p+"thunderShocks", "damage", trQuestVarGet("p"+p+"attack"));
+								yAddUpdateVar("p"+p+"thunderShocks", "next", trTimeMS() + 100);
+								trVectorSetUnitPos("pos", "enemies");
+								yAddUpdateVar("p"+p+"thunderShocks", "posX", trQuestVarGet("posX"));
+								yAddUpdateVar("p"+p+"thunderShocks", "posZ", trQuestVarGet("posZ"));
+								trUnitHighlight(0.2, false);
+								trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+								trArmySelect(""+p+",0");
+								trUnitChangeProtoUnit("Lightning Sparks");
+							} else {
+								yAddToDatabase("p"+p+"thunderShockTargets", "enemies");
+								yAddUpdateVar("p"+p+"thunderShockTargets", "index", yGetPointer("enemies"));
+							}
+						}
+					}
+					trQuestVarSetFromRand("sound", 1, 4, true);
+					trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				}
 				yVarToVector("p"+p+"characters", "prev");
 				trVectorSetUnitPos("pos", "p"+p+"characters");
@@ -406,6 +440,47 @@ void thunderRiderAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"thunderRiderBonus", xsMax(0, trQuestVarGet("p"+p+"thunderRiderBonus")));
 		trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"thunderRiderBonus"));
 		zSetProtoUnitStat("Hero Greek Atalanta", p, 27, trQuestVarGet("p"+p+"attack"));
+	}
+
+	if (yGetDatabaseCount("p"+p+"thunderShocks") > 0) {
+		yDatabaseNext("p"+p+"thunderShocks");
+		if (trTimeMS() > yGetVar("p"+p+"thunderShocks", "next")) {
+			ySetVar("p"+p+"thunderShocks", "next", 100 + yGetVar("p"+p+"thunderShocks", "next"));
+			yVarToVector("p"+p+"thunderShocks", "pos");
+			dist = 16;
+			trQuestVarSet("temp", -1);
+			for(x=yGetDatabaseCount("p"+p+"thunderShockTargets"); >0) {
+				id = yDatabaseNext("p"+p+"thunderShockTargets", true);
+				if (id == -1 || trUnitAlive() == false) {
+					yRemoveFromDatabase("p"+p+"thunderShockTargets");
+				} else {
+					amt = zDistanceToVectorSquared("p"+p+"thunderShockTargets", "pos");
+					if (amt < dist) {
+						trQuestVarSet("temp", yGetPointer("p"+p+"thunderShockTargets"));
+					}
+				}
+			}
+			if (trQuestVarGet("temp") == -1) {
+				yRemoveFromDatabase("p"+p+"thunderShocks");
+			} else {
+				ySetPointer("p"+p+"thunderShockTargets", 1*trQuestVarGet("temp"));
+				/* this is the new thundershock center */
+				ySetUnit("p"+p+"thunderShocks", trQuestVarGet("p"+p+"thunderShockTargets"));
+				
+				ySetPointer("enemies", 1*yGetVar("p"+p+"thunderShockTargets", "index"));
+				yRemoveFromDatabase("p"+p+"thunderShockTargets");
+
+				trVectorSetUnitPos("pos", "enemies");
+				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect(""+p+",0");
+				trUnitChangeProtoUnit("Lightning Sparks Ground");
+				ySetVarFromVector("p"+p+"thunderShocks", "pos", "pos");
+				trUnitSelectClear();
+				trUnitSelectByQV("enemies");
+				trUnitHighlight(0.2, false);
+				damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"));
+			}
+		}
 	}
 
 	xsSetContextPlayer(old);
@@ -452,6 +527,6 @@ highFrequency
 
 	trQuestVarSet("rideLightningDamage", 100);
 	trQuestVarSet("rideLightningRange", 4);
-	trQuestVarSet("rideLightningCost", 6);
+	trQuestVarSet("rideLightningCost", 8);
 	trQuestVarSet("rideLightningDelay", 1000 / trQuestVarGet("rideLightningCost"));
 }

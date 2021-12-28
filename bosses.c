@@ -56,6 +56,15 @@ highFrequency
 		trQuestVarSet("cinStep", 0);
 		
 		xsEnableRule("boss"+1*trQuestVarGet("stage")+"_init");
+
+		int id = 0;
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			id = yDatabaseNext("enemies", true);
+			if (id >= 0 && trUnitAlive()) {
+				yAddToDatabase("enemiesIncoming", "enemies");
+			}
+		}
+		yClearDatabase("enemies");
 	}
 }
 
