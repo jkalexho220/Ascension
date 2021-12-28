@@ -372,6 +372,10 @@ int yAddToDatabase(string db = "", string val = "") {
 	return(next);
 }
 
+int yGetNewestPointer(string db = "") {
+	return(1*trQuestVarGet("xdata"+db+"newest"));
+}
+
 void yAddUpdateVar(string db = "", string var = "", float val = 0) {
 	ySetVarAtIndex(db, var, val, 1*trQuestVarGet("xdata"+db+"newest"));
 }
@@ -392,9 +396,9 @@ int yGetPointer(string db = "") {
 	return(trQuestVarGet("xdata"+db+"pointer"));
 }
 
-void ySetPointer(string db = "", int val = 0) {
-	trQuestVarSet("xdata"+db+"pointer", val);
-	trQuestVarSet(db, trQuestVarGet("xdata" + db + "index"+val));
+void ySetPointer(string db = "", int index = 0) {
+	trQuestVarSet("xdata"+db+"pointer", index);
+	trQuestVarSet(db, trQuestVarGet("xdata"+db+"index"+index));
 }
 
 void yClearDatabase(string db = "") {

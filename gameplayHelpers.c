@@ -101,6 +101,7 @@ void removePlayerUnit() {
 called after confirming that the projectile is on WALL terrain.
 */
 vector getBounceDir(string pos = "", string dir = "") {
+	bool bounced = false;
 	int xMod = 1;
 	int zMod = 1;
 	if (trQuestVarGet(dir+"x") < 0) {
@@ -118,9 +119,13 @@ vector getBounceDir(string pos = "", string dir = "") {
 	trQuestVarSet("verticalZ", trQuestVarGet("locZ") - zMod);
 	if (terrainIsType("horizontal", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 		ret = xsVectorSetZ(ret, 0.0 - trQuestVarGet(dir+"z"));
-	} else if (terrainIsType("vertical", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+		bounced = true;
+	}
+	if (terrainIsType("vertical", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 		ret = xsVectorSetX(ret, 0.0 - trQuestVarGet(dir+"x"));
-	} else {
+		bounced = true;
+	} 
+	if (bounced == false) {
 		/*
 		we collided with a column. time for cool math
 		a = position of the projectile in a unit square

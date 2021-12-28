@@ -31,6 +31,12 @@ void activateEnemy(int id = 0) {
     trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
     yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
     yAddUpdateVar("enemies", "relic", relic);
+    for(p=1; < ENEMY_PLAYER) {
+        if (trQuestVarGet("p"+p+"rideLightning") == 1) {
+            yAddToDatabase("p"+p+"rideLightningTargets", "enemiesIncoming");
+            yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
+        }
+    }
     yRemoveFromDatabase("enemiesIncoming");
 }
 

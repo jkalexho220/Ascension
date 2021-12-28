@@ -53,7 +53,7 @@ void checkGodPowers(int p = 0) {
                 yFindLatest("p"+p+"wellObject", "Tunnel", p);
                 trVectorSetUnitPos("p"+p+"wellPos", "p"+p+"wellObject");
                 trMutateSelected(kbGetProtoUnitID("Rocket"));
-                trUnitDestroy();
+                trDamageUnitPercent(100);
                 trQuestVarSet("p"+p+"wellStatus", ABILITY_ON);
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COOLDOWN);
                 trQuestVarSet("p"+p+"wellReadyTime", 
@@ -314,7 +314,7 @@ highFrequency
         p = trQuestVarGet("relicPlayer");
         trUnitSelectClear();
         trUnitSelectByQV("p"+p+"unit");
-        if (trUnitAlive()) {
+        if (trUnitAlive() && trQuestVarGet("p"+p+"rideLightning") == 0) {
             trVectorSetUnitPos("pos", "p"+p+"unit");
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
