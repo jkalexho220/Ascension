@@ -241,13 +241,14 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 
 void stunUnit(string db = "", float duration = 0, int p = 0) {
 	trQuestVarSet("stunSound", 1);
+	int index = 0;
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (yGetVar(db, "stunStatus") == 0) {
-			yAddToDatabase("stunnedUnits", db);
+			index = yAddToDatabase("stunnedUnits", db);
 			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
 			if (yGetVar(db, "stunSFX") == 0) {
 				ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect")));
@@ -256,7 +257,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 				trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
 				trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
 			}
-			ySetVar(db, "stunStatus", 1);
+			ySetVar(db, "stunStatus", index);
 		}
 		ySetVar(db, "stunTimeout", trTimeMS() + duration);
 	}
@@ -319,21 +320,17 @@ void stunsAndPoisons(string db = "") {
     		ySetVar(db, "poisonLast", trTimeMS());
     	}
 	}
-	if (yGetVar(db, "stunStatus") == 1) {
+	if (yGetVar(db, "stunStatus") >= 1) {
 		if ((yGetVar(db, "stunSFX") < 0) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
     		ySetVar(db, "stunSFX", trQuestVarGet("spyEye"+(0-yGetVar(db, "stunSFX"))));
     	}
     	if (trTimeMS() > yGetVar(db, "stunTimeout")) {
-    		ySetVar(db, "stunStatus", 0);
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
-    		for(x=yGetDatabaseCount("stunnedUnits"); >0) {
-				if (yDatabaseNext("stunnedUnits") == trQuestVarGet(db)) {
-					yRemoveFromDatabase("stunnedUnits");
-					yRemoveUpdateVar("stunnedUnits", "proto");
-				}
-			}
+    		ySetPointer("stunnedUnits", 1*yGetVar(db, "stunStatus"));
+    		yRemoveFromDatabase("stunnedUnits");
+    		ySetVar(db, "stunStatus", 0);
     	}
 	}
 }
