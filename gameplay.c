@@ -259,7 +259,6 @@ highFrequency
     /* 
     maintain stun
     */
-    yDatabasePointerDefault("stunnedUnits");
     for(x=yGetDatabaseCount("stunnedUnits"); >0) {
         id = yDatabaseNext("stunnedUnits", true);
         if (id == -1 || trUnitAlive() == false) {
@@ -317,7 +316,6 @@ highFrequency
         trUnitSelectByQV("p"+p+"unit");
         if (trUnitAlive()) {
             trVectorSetUnitPos("pos", "p"+p+"unit");
-            yDatabasePointerDefault("p"+p+"relics");
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                 yDatabaseNext("p"+p+"relics", true);
                 if (trUnitGetIsContained("Unit") == false) {

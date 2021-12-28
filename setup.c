@@ -360,6 +360,7 @@ highFrequency
                 trUnitSelectByQV("next", true);
                 trUnitSetAnimationPath(""+x+",0,0,0,0,0,0");
                 yAddToDatabase("stageChoices", "next");
+                yAddUpdateVar("stageChoices", "stage", x + 1);
                 posX = posX + 4;
             }
 

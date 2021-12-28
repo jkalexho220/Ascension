@@ -136,7 +136,6 @@ highFrequency
                     yAddToDatabase("enemiesIncoming", "next");
                     trQuestVarSet("angle", trQuestVarGet("angle") + angle);
                 }
-                yDatabasePointerDefault("enemiesIncoming");
                 for(x=trQuestVarGet("count"); >0) {
                     id = yDatabaseNext("enemiesIncoming", true);
                     activateEnemy(id);

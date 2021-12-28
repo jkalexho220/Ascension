@@ -6,7 +6,7 @@ highFrequency
 {
     int n = yDatabaseNext("stageChoices");
     if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
-        trQuestVarSet("stage", yGetPointer("stageChoices") + 1);
+        trQuestVarSet("stage", yGetVar("stageChoices", "stage"));
         trUnitSelectClear();
         trUnitSelectByQV("chooser", true);
         trUnitChangeProtoUnit("Rocket");
@@ -137,7 +137,7 @@ void paintColumns(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             if (trQuestVarGet("deploy") < trQuestVarGet("columnDensity")) {
                 trQuestVarSetFromRand("z", z0, z1, true);
                 trPaintTerrain(a-1, 1*trQuestVarGet("z")-1, a+1, 1*trQuestVarGet("z")+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-                trChangeTerrainHeight(a, 1*trQuestVarGet("z"), a+1, 1*trQuestVarGet("z")+1, 6, false);
+                trChangeTerrainHeight(a, 1*trQuestVarGet("z"), a+1, 1*trQuestVarGet("z")+1, 5, false);
             }
         }
         for(b=z0; < z1) {
@@ -145,7 +145,7 @@ void paintColumns(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
             if (trQuestVarGet("deploy") < trQuestVarGet("columnDensity")) {
                 trQuestVarSetFromRand("x", x0, x1, true);
                 trPaintTerrain(1*trQuestVarGet("x")-1, b-1, 1*trQuestVarGet("x")+1, b+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-                trChangeTerrainHeight(1*trQuestVarGet("x"), b, 1*trQuestVarGet("x")+1, b+1, 6, false);
+                trChangeTerrainHeight(1*trQuestVarGet("x"), b, 1*trQuestVarGet("x")+1, b+1, 5, false);
             }
         }
     }
@@ -505,9 +505,8 @@ highFrequency
         /* build guaranteed path to every room */
         for(i=0; < 64) {
             trQuestVarSetFromRand("search", 1, backtrack, true);
-            yDatabasePointerDefault("frontier");
             for(j=trQuestVarGet("search"); >0) {
-                yDatabaseNext("frontier");
+                yDatabaseNext("frontier", false, false);
             }
             if (trQuestVarGet("tile"+1*trQuestVarGet("frontier")) < TILE_VISITED) {
                 z = 1*trQuestVarGet("frontier") / 4;
@@ -727,11 +726,6 @@ highFrequency
         */
         trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-
-        /* DELETE ME */
-        trPaintTerrain(20,0,20,20,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-
-        trPaintTerrain(24,24,24,24,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 
         trUnblockAllSounds();
         if (trQuestVarGet("newPlayers") == 0) {
