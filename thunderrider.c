@@ -38,11 +38,7 @@ void rideLightningOff(int p = 0) {
 		if (kbGetBlockID(""+1*trQuestVarGet("p"+p+"lightningBalls")) >= 0) {
 			trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"lightningBalls"));
 		}
-		trUnitChangeProtoUnit("Dwarf");
-
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"characters");
-		trMutateSelected(kbGetProtoUnitID("Hero Greek Atalanta"));
+		trUnitChangeProtoUnit("Hero Greek Atalanta");
 
 		trUnitSelectClear();
 		trUnitSelect(""+1*yGetVar("p"+p+"lightningBalls", "extra"), true);
@@ -186,7 +182,6 @@ void thunderRiderAlways(int eventID = -1) {
 				} else if (trTimeMS() > yGetVar("p"+p+"lightningBalls", "inWallTimeout")) {
 					/* we've been in a wall for too long something's not right */
 					ySetVar("p"+p+"lightningBalls", "inWallTimeout", trTimeMS() + 300);
-					trChatSend(0, "EMERGENCY RETURN!");
 					yVarToVector("p"+p+"lightningBalls", "lastGood");
 					trVectorQuestVarSet("dir", zGetUnitVector("pos", "lastGood"));
 					ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
@@ -259,10 +254,9 @@ void thunderRiderAlways(int eventID = -1) {
 					trUnitSelectByQV("p"+p+"characters");
 					trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 					trMutateSelected(kbGetProtoUnitID("Siege Tower"));
-					trUnitChangeProtoUnit("Dwarf");
+					trUnitChangeProtoUnit("Hero Greek Atalanta");
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
-					trMutateSelected(kbGetProtoUnitID("Hero Greek Atalanta"));
 					trSetUnitOrientation(trVectorQuestVarGet("step"), vector(0,1,0), true);
 					trUnitSelectClear();
 					trUnitSelectByQV("next", true);
@@ -400,23 +394,22 @@ void thunderRiderAlways(int eventID = -1) {
 				if (hit == ON_HIT_SPECIAL) {
 					yClearDatabase("p"+p+"thunderShockTargets");
 					target = kbUnitGetTargetUnitID(id);
+					trQuestVarSet("target", trGetUnitScenarioNameNumber(target));
+					yAddToDatabase("p"+p+"thunderShocks", "target");
+					yAddUpdateVar("p"+p+"thunderShocks", "damage", trQuestVarGet("p"+p+"attack"));
+					yAddUpdateVar("p"+p+"thunderShocks", "next", trTimeMS() + 100);
+					trVectorSetUnitPos("pos", "target");
+					yAddUpdateVar("p"+p+"thunderShocks", "posX", trQuestVarGet("posX"));
+					yAddUpdateVar("p"+p+"thunderShocks", "posZ", trQuestVarGet("posZ"));
+					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+					trArmySelect(""+p+",0");
+					trUnitChangeProtoUnit("Lightning Sparks");
 					for(x=yGetDatabaseCount("enemies"); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else {
-							if (id == target) {
-								yAddToDatabase("p"+p+"thunderShocks", "enemies");
-								yAddUpdateVar("p"+p+"thunderShocks", "damage", trQuestVarGet("p"+p+"attack"));
-								yAddUpdateVar("p"+p+"thunderShocks", "next", trTimeMS() + 100);
-								trVectorSetUnitPos("pos", "enemies");
-								yAddUpdateVar("p"+p+"thunderShocks", "posX", trQuestVarGet("posX"));
-								yAddUpdateVar("p"+p+"thunderShocks", "posZ", trQuestVarGet("posZ"));
-								trUnitHighlight(0.2, false);
-								trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-								trArmySelect(""+p+",0");
-								trUnitChangeProtoUnit("Lightning Sparks");
-							} else {
+							if ((id == target) == false) {
 								yAddToDatabase("p"+p+"thunderShockTargets", "enemies");
 								yAddUpdateVar("p"+p+"thunderShockTargets", "index", yGetPointer("enemies"));
 							}
@@ -478,7 +471,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trUnitSelectClear();
 				trUnitSelectByQV("enemies");
 				trUnitHighlight(0.2, false);
-				damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"));
+				damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"), false);
 			}
 		}
 	}
@@ -506,7 +499,7 @@ void chooseThunderRider(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("rechargeCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
 
-	trSetCivilizationNameOverride(p, "Thunder Rider | " + (1+trQuestVarGet("p"+p+"progress")));
+	trSetCivilizationNameOverride(p, "Thunder Rider | " + (1+trQuestVarGet("p"+p+"level")));
 }
 
 rule thunderRider_init

@@ -353,6 +353,7 @@ highFrequency
         }
     }
 
+    /* free relics */
     amt = 0;
     if (yGetDatabaseCount("freeRelics") > 0) {
         yDatabaseNext("freeRelics", true);
@@ -399,15 +400,58 @@ highFrequency
         trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
     }
 
+    /* misc */
     for(p=1; < ENEMY_PLAYER) {
-        /* lifesteal */
-        if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
+        if (trQuestVarGet("p"+p+"dead") == 0) {
             trUnitSelectClear();
             trUnitSelectByQV("p"+p+"unit");
-            healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
-            trQuestVarSet("p"+p+"lifestealTotal", 0);
+            /* lifesteal */
+            if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
+                healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
+                trQuestVarSet("p"+p+"lifestealTotal", 0);
+            }
+            fixAnimations(p);
+            /* undo silence */
+            if (trQuestVarGet("p"+p+"silenced") == 1 && trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
+                trQuestVarSet("p"+p+"silenced", 0);
+                if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
+                    trTechGodPower(p, "Underworld Passage", 1);
+                }
+                if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
+                    trTechGodPower(p, "Animal magnetism", 1);
+                }
+                if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
+                    trTechGodPower(p, "rain", 1);
+                }
+            }
+        } else if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
+            trUnitSelectClear();
+            trUnitSelectByQV("p"+p+"unit");
+            id = trQuestVarGet("p"+p+"class");
+            id = trQuestVarGet("class"+id+"proto");
+            trUnitChangeProtoUnit("Dwarf");
+            trUnitSelectClear();
+            trUnitSelectByQV("p"+p+"unit");
+            trDamageUnitPercent(-100);
+            trMutateSelected(id);
+            trSoundPlayFN("herorevived.wav","1",-1,"","");
+            trDamageUnitPercent(50);
+            trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+            trQuestVarSet("p"+p+"dead", 0);
+            yAddToDatabase("p"+p+"characters", "p"+p+"unit");
+            for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+                yDatabaseNext("p"+p+"relics", true);
+                trUnitChangeProtoUnit("Relic");
+                trUnitSelectClear();
+                trUnitSelectByQV("p"+p+"relics");
+                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+                    trSetSelectedScale(0,0,0);
+                    trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                }
+            }
         }
-        fixAnimations(p);
     }
 
     processChests();

@@ -273,7 +273,7 @@ void chooseSunbow(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
 
-	trSetCivilizationNameOverride(p, "Sunbow | " + (1+trQuestVarGet("p"+p+"progress")));
+	trSetCivilizationNameOverride(p, "Sunbow | " + (1+trQuestVarGet("p"+p+"level")));
 }
 
 rule sunbow_init

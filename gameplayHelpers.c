@@ -17,6 +17,17 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
+void silencePlayer(int p = 0, float duration = 0) {
+	float timeout = duration * 1000 + trTimeMS();
+	if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
+		trQuestVarSet("p"+p+"silenceTimeout", timeout);
+	}
+	if (trQuestVarGet("p"+p+"silenced") == 0) {
+		trQuestVarSet("p"+p+"silenced", 1);
+		trPlayerKillAllGodPowers(p);
+	}
+}
+
 void removeArrow() {
 	for(x=2;>0) {
 		if (yGetVar("arrowsActive", "sfx"+x) > 0) {
@@ -65,20 +76,24 @@ void removeEnemy() {
 }
 
 void removePlayerCharacter(int p = 0) {
+	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+			yDatabaseNext("p"+p+"relics", true);
+			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+		}
+		trQuestVarSet("p"+p+"dead", 1);
+		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"unit");
+		trUnitOverrideAnimation(6,0,false,false,-1);
+		trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
+		trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
+		silencePlayer(p, 0);
+	}
 	yRemoveFromDatabase("p"+p+"characters");
 	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
 	yRemoveUpdateVar("p"+p+"Characters", "attacking");
 	yRemoveUpdateVar("p"+p+"Characters", "attackNext");
-	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-			yDatabaseNext("p"+p+"relics", true);
-			trUnitChangeProtoUnit("Relic");
-			relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
-			yAddToDatabase("freeRelics", "p"+p+"relics");
-			yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
-		}
-		yClearDatabase("p"+p+"relics");
-	}
 }
 
 void removePlayerUnit() {
@@ -96,6 +111,8 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "decay");
 	yRemoveUpdateVar("playerUnits", "decayNext");
 }
+
+
 
 /*
 called after confirming that the projectile is on WALL terrain.

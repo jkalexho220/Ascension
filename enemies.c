@@ -37,6 +37,15 @@ void activateEnemy(int id = 0) {
             yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
         }
     }
+
+    switch(proto)
+    {
+        case kbGetProtoUnitID("Sphinx"):
+        {
+            
+        }
+    }
+
     yRemoveFromDatabase("enemiesIncoming");
 }
 
@@ -53,8 +62,7 @@ highFrequency
         setupProtounitBounty("Terracotta Soldier", 6, 0.05);
 		setupProtounitBounty("Sphinx", 8, 0.1, RELIC_SPELL_DURATION);
 		setupProtounitBounty("Petsuchos", 8, 0.2, RELIC_ATTACK_RANGE);
-		setupProtounitBounty("Mummy", 16, 0.5);
-        trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 1000);
+		
 		xsDisableSelf();
 	}
 }

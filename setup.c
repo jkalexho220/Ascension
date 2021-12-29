@@ -80,6 +80,7 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
         trModifyProtounit(proto, p, 2, 9999999999999999999.0);
         trModifyProtounit(proto, p, 2, -9999999999999999999.0);
         trModifyProtounit(proto, p, 2, 20);
+        zInitProtoUnitStat(proto, p, 2, 20);
         /* range */
         trModifyProtounit(proto, p, 11, 9999999999999999999.0);
         trModifyProtounit(proto, p, 11, -9999999999999999999.0);
@@ -121,13 +122,17 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
     trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+class+"nextDelay"));
     trQuestVarSet("p"+p+"specialAttackCooldown", trQuestVarGet("class"+class+"specialAttackCooldown"));
+    trQuestVarSet("p"+p+"los", 20);
     trQuestVarSet("p"+p+"projectiles", 1);
     trQuestVarSet("p"+p+"spellRange", 1);
     trQuestVarSet("p"+p+"spellDamage", 1);
     trQuestVarSet("p"+p+"spellDuration", 1);
-    trQuestVarSet("p"+p+"cooldownReduction", 1);
     trQuestVarSet("p"+p+"healBoost", 1);
-    trQuestVarSet("p"+p+"ultimateCost", 1);
+    trQuestVarSet("p"+p+"ultimateCostCount", 1);
+    trQuestVarSet("p"+p+"cooldownReductionCount", 1);
+    trQuestVarSet("p"+p+"stunResistanceCount", 1);
+    trQuestVarSet("p"+p+"poisonResistanceCount", 1);
+    trQuestVarSet("p"+p+"silenceResistanceCount", 1);
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
     if (trUnitAlive()) {
@@ -184,7 +189,7 @@ runImmediately
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
-    setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, 3);
+    setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, 5);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");

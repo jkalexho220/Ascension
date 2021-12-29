@@ -746,7 +746,7 @@ highFrequency
 {
     if (trTime() > cActivationTime + 5) {
         trSoundPlayFN("default","1",-1,
-            "Zenophobia: I'll let you choose one of the starter characters for free.", "icons\infantry g hoplite icon 64");
+            "Zenophobia: I'll let you have the starter characters for free.", "icons\infantry g hoplite icon 64");
         trUnitSelectClear();
         trUnitSelectByQV("choice1", true);
         trUnitSetStance("Passive");

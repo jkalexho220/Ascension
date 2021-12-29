@@ -45,7 +45,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ATTACK_RANGE:
 		{
-			msg = "Attack Range +6";
+			msg = "Attack Range and LOS +5";
 		}
 		case RELIC_SPELL_RANGE:
 		{
@@ -249,8 +249,10 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ATTACK_RANGE:
 		{
-			trQuestVarSet("p"+p+"range", trQuestVarGet("p"+p+"range") + 6.0 * m);
+			trQuestVarSet("p"+p+"range", trQuestVarGet("p"+p+"range") + 5.0 * m);
 			zSetProtoUnitStat(proto, p, 11, trQuestVarGet("p"+p+"range"));
+			trQuestVarSet("p"+p+"los", trQuestVarGet("p"+p+"los") + 5.0 * m);
+			zSetProtoUnitStat(proto, p, 2, trQuestVarGet("p"+p+"los"));
 		}
 		case RELIC_SPELL_RANGE:
 		{
@@ -311,7 +313,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ULTIMATE_COST:
 		{
-			trQuestVarSet("p"+p+"ultimateCost", trQuestVarGet("p"+p+"ultimateCost") - 0.1 * m);
+			trQuestVarSet("p"+p+"ultimateCostCount", trQuestVarGet("p"+p+"ultimateCostCount") + 1.0 * m);
+			trQuestVarSet("p"+p+"ultimateCost", xsPow(0.9, trQuestVarGet("p"+p+"ultimateCostCount")));
 		}
 		case RELIC_PROJECTILES:
 		{
