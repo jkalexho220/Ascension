@@ -24,7 +24,9 @@ const int CHEST_PADS = 3;
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
 const int THUNDERRIDER = 3;
-const int CLASS_COUNT = 3;
+const int FIREKNIGHT = 4;
+const int FROSTKNIGHT = 5;
+const int CLASS_COUNT = 5;
 
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
@@ -176,7 +178,12 @@ runImmediately
     trSetObscuredUnits(false);
     configUndef("ErodeBuildingFoundations");
 
-    ENEMY_PLAYER = cNumberPlayers - 1;
+    if (Multiplayer) {
+        ENEMY_PLAYER = cNumberPlayers - 1;
+    } else {
+        ENEMY_PLAYER = 2;
+    }
+    
     trQuestVarSet("activePlayerCount", ENEMY_PLAYER - 1);
 
     trForceNonCinematicModels(true);
@@ -202,6 +209,8 @@ runImmediately
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, 5);
+    setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, 5);
+    setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, 5);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
@@ -249,8 +258,6 @@ runImmediately
         trForbidProtounit(p, "Longhouse");
     }
 
-    trOverlayText("This map saves your progress", 5.0, -1, -1, -1);
-
     xsEnableRule("delayed_modify");
     xsEnableRule("data_load_00");
     xsDisableSelf();
@@ -273,7 +280,14 @@ highFrequency
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 16);
         setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0);
+        setupPlayerProto("Lancer Hero", 1100, 55, 6.05);
+        setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
 
+        for(p=1; < ENEMY_PLAYER) {
+            trModifyProtounit("Attack Revealer", p, 2, 9999999999999999999.0);
+            trModifyProtounit("Attack Revealer", p, 2, -9999999999999999999.0);
+            zInitProtoUnitStat("Attack Revealer", p, 2, 0);
+        }
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 

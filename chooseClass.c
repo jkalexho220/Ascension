@@ -7,6 +7,9 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		case MOONBLADE:
 		{
 			icon = "icons\hero g theseus icon 64";
+			if (tooltip == 0 && Multiplayer == false) {
+				tooltip = 1;
+			}
 			switch(tooltip)
 			{
 				case 0:
@@ -25,11 +28,17 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power eclipse icon 64";
 					msg = "(Q) Moonbeam: Create a circle that damages enemies. Damage increases for each ally in the circle";
+					if (Multiplayer == false) {
+						next = 6;
+					}
 				}
 				case 4:
 				{
 					icon = "icons\improvement swine array icon 64";
 					msg = "(W) Crescent Strikes: Your next 3 attacks deal bonus damage and stun.";
+					if (Multiplayer == false) {
+						next = 7;
+					}
 				}
 				case 5:
 				{
@@ -37,11 +46,26 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 12 favor per second.";
 					next = 0;
 				}
+				case 6:
+				{
+					icon = "icons\god power eclipse icon 64";
+					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 20 + 10 per ally";
+					next = 4;
+				}
+				case 7:
+				{
+					icon = "icons\improvement swine array icon 64";
+					msg = "Cooldown: 12 | Damage: 50";
+					next = 5;
+				}
 			}
 		}
 		case SUNBOW:
 		{
 			icon = "icons\hero g hyppolyta icon 64";
+			if (tooltip == 0 && Multiplayer == false) {
+				tooltip = 1;
+			}
 			switch(tooltip)
 			{
 				case 0:
@@ -56,17 +80,86 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "(Q) Sunlight: Create a circle that heals allies for several seconds.";
+					if (Multiplayer == false) {
+						next = 5;
+					}
 				}
 				case 3:
 				{
 					icon = "icons\improvement sun ray icon 64";
 					msg = "(W) Healing Rays: For a short duration, your attacks fire rays that heal allies.";
+					if (Multiplayer == false) {
+						next = 6;
+					}
 				}
 				case 4:
 				{
 					icon = "icons\improvement flames of typhon icon";
 					msg = "(E) Searing Light (Toggle): Your heals also deal damage to enemies. Costs 5 favor per second.";
 					next = 0;
+				}
+				case 5:
+				{
+					icon = "icons\god power eclipse icon 64";
+					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Heal: 60";
+					next = 3;
+				}
+				case 6:
+				{
+					icon = "icons\improvement sun ray icon 64";
+					msg = "Cooldown: 12 | Duration: 5 | Heal: 100 | Fire rate scales with projectile count.";
+					next = 4;
+				}
+			}
+		}
+		case THUNDERRIDER:
+		{
+			icon = "icons\hero g atalanta icon 64";
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Passive: You gain bonus attack by continuously moving. This bonus decays by 5 percent each second.";
+				}
+				case 1:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "(Q) Blitz: Teleport towards your cursor, stunning and damaging enemies hit.";
+				}
+				case 2:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "If Ride the Lightning is active, this changes your direction of travel instead.";
+				}
+				case 3:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
+				}
+				case 4:
+				{
+					icon = "icons\improvement heart of the titans icons 64";
+					msg = "(W) Recharge: Consume all your bonus attack and convert it into healing and favor for yourself.";
+				}
+				case 5:
+				{
+					icon = "icons\improvement heart of the titans icons 64";
+					msg = "Cooldown: 22 | Heal: 1x Attack | Favor Regen: 0.1x Attack";
+				}
+				case 6:
+				{
+					icon = "icons\god power implode icons 64";
+					msg = "(E) Ride the Lightning: Become a fast-moving ball of lightning that bounces off walls";
+				}
+				case 7:
+				{
+					icon = "icons\god power implode icons 64";
+					msg = "Damage enemies that you pass through. Damage increases with each bounce.";
+				}
+				case 8:
+				{
+					icon = "icons\god power implode icons 64";
+					msg = "Cost: 8 favor per second | Damage: 100 + 50 per bounce";
 				}
 			}
 		}
@@ -90,6 +183,14 @@ string className(int class = 0) {
 		case THUNDERRIDER:
 		{
 			name = "Thunderwalker";
+		}
+		case FIREKNIGHT:
+		{
+			name = "Fire Knight";
+		}
+		case FROSTKNIGHT:
+		{
+			name = "Frost Knight";
 		}
 	}
 	return(name);
@@ -145,7 +246,7 @@ highFrequency
 	xsDisableSelf();
 	int i = trQuestVarGet("pleaseExplain");
 	trQuestVarSet("choice"+i+"explain", 
-		displayNextTooltip(i + 2 * trQuestVarGet("stage") - 2, 1*trQuestVarGet("choice"+i+"explain")));
+		displayNextTooltip(i, 1*trQuestVarGet("choice"+i+"explain")));
 	trDelayedRuleActivation("class_shop_explain_02");
 }
 

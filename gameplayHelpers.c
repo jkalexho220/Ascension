@@ -78,9 +78,12 @@ void removeArrow() {
 
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
+		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
 		for(p=1; <ENEMY_PLAYER) {
-			trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
-			trPlayerGrantResources(p, "Favor", yGetVar("enemies", "bounty"));
+			if (Multiplayer) {
+				trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
+			}
+			trPlayerGrantResources(p, "Favor", trQuestVarGet("rand"));
 		}
 	}
 	if (yGetVar("enemies", "relic") > 0) {

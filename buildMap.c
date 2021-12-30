@@ -479,7 +479,7 @@ highFrequency
         }
 
         /* paint entire map cliff and raise it */
-        trChangeTerrainHeight(0,0,150,150,5,false);
+        trChangeTerrainHeight(0,0,145,145,5,false);
         trPaintTerrain(0,0,150,150,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
 
         /* build the grid */

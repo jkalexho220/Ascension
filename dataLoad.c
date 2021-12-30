@@ -24,7 +24,9 @@ void saveAllData() {
 	/* current relics */
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics");
-		trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+		}
 	}
 	/* equipped relics */
 	savedata = 0;
@@ -45,12 +47,18 @@ void saveAllData() {
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
 
+	/* gemstones */
+	savedata = 0;
+	for(x=4; >0) {
+		savedata = savedata * 100 + xsMin(100, trQuestVarGet("gemstone"+x));
+	}
+
 	if (Multiplayer == false) {
 		/* class levels */
 		for(y=0; <2) {
 			savedata = 0;
-			for(x=9; >0) {
-				savedata = savedata * 9 + trQuestVarGet("p"+p+"class"+x+"level");
+			for(x=8; >0) {
+				savedata = savedata * 10 + trQuestVarGet("class"+(x+8*y)+"level");
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}
@@ -65,7 +73,9 @@ rule data_load_00
 highFrequency
 inactive
 {
-	/* only the singleplayer needs this info */
+	int proto = 0;
+	/* only the local client needs this info */
+	/* owned relics */
 	for(y=0; < 4) {
 		savedata = trGetScenarioUserData(12 + y);
 		for(x=1; < 9) {
@@ -73,9 +83,14 @@ inactive
 			savedata = savedata / 10;
 		}
 	}
+	/* gemstones */
+	savedata = trGetScenarioUserData(9);
+	for(x=1; <5) {
+		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
+		savedata = savedata / 100;
+	}
 
 	if (Multiplayer) {
-		trSoundPlayFN("default","1",-1,"Loading:","icons\god power reverse time icons 64");
 
 		int posX = 10;
 		
@@ -97,7 +112,43 @@ inactive
 		xsEnableRule("data_load_01_ready");
 	} else {
 		trForbidProtounit(1, "Swordsman Hero");
-		trLetterBox(false);
+
+		/* progress, level, class */
+		savedata = trGetScenarioUserData(0);
+		trQuestVarSet("p1progress", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1level", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1class", savedata);
+
+		/* gold */
+		savedata = trGetScenarioUserData(1);
+		trPlayerGrantResources(1, "Gold", savedata);
+
+		/* equipped relics */
+		for(y=0; <2) {
+			savedata = trGetScenarioUserData(2 + y);
+			for(x=1; <6) {
+				trQuestVarSet("p1relic"+(x+5*y), iModulo(32, savedata));
+				savedata = savedata / 32;
+			}
+		}
+
+		/* class levels */
+		for(y=0; <2) {
+			savedata = trGetScenarioUserData(10 + y);
+			for(x=1; <9) {
+				trQuestVarSet("class"+(x+8*y)+"level", iModulo(10, savedata));
+				savedata = savedata / 10;
+			}
+		}
+
+		for(x=CLASS_COUNT; >0) {
+			proto = trQuestVarGet("class"+x+"proto");
+			trModifyProtounit(kbGetProtoUnitName(proto),1,5,trQuestVarGet("class"+x+"level")-1);
+		}
+
+		xsEnableRule("singleplayer_init");
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game

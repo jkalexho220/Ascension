@@ -187,6 +187,8 @@ highFrequency
     }
     trMusicPlayCurrent();
     trPlayNextMusicTrack();
+    trSetFogAndBlackmap(true, true);
+    trPlayerResetBlackMapForAllPlayers();
 }
 
 rule gameplay_start_2
@@ -195,8 +197,6 @@ highFrequency
 {
     xsDisableSelf();
     trSetUnitIdleProcessing(true);
-    trSetFogAndBlackmap(true, true);
-    trPlayerResetBlackMapForAllPlayers();
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
     xsEnableRule("enemies_always");
@@ -218,8 +218,10 @@ highFrequency
                 trSetSelectedScale(0,0,0);
                 trUnitSetAnimationPath("1,0,1,0,0,0,0");
                 relicEffect(1*trQuestVarGet("p"+p+"relic"+x), p, true);
+                trQuestVarSet("p"+p+"relic"+x, 0);
             }
         }
+        trSetCivilizationNameOverride(p, "Level " + (1+trQuestVarGet("p"+p+"level")));
     }
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
@@ -240,6 +242,7 @@ highFrequency
     int old = xsGetContextPlayer();
     int id = 0;
     int p = 0;
+    int count = 0;
     float amt = 0;
 
     /* player units always */
@@ -361,8 +364,13 @@ highFrequency
     }
 
     /* free relics */
-    amt = 0;
-    if (yGetDatabaseCount("freeRelics") > 0) {
+    if (Multiplayer) {
+        count = 1;
+    } else {
+        count = 30;
+    }
+    for (x=xsMin(count, yGetDatabaseCount("freeRelics")); > 0) {
+        amt = 0;
         yDatabaseNext("freeRelics", true);
         if (trUnitGetIsContained("Unit")) {
             trVectorSetUnitPos("pos", "freeRelics");
@@ -441,6 +449,9 @@ highFrequency
                 }
             }
         } else if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
+            trUnitSelectClear();
+            trUnitSelectByQV("p"+p+"reviveBeam");
+            trUnitChangeProtoUnit("Rocket");
             trUnitSelectClear();
             trUnitSelectByQV("p"+p+"unit");
             id = trQuestVarGet("p"+p+"class");

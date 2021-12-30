@@ -21,7 +21,7 @@ void removeLightningBall(int p = 0) {
 }
 
 void rideLightningOff(int p = 0) {
-	trModifyProtounit("Attack Revealer", p, 2, -16);
+	zSetProtoUnitStat("Attack Revealer", p, 2, 0);
 	int index = 0;
 	for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 		yDatabaseNext("p"+p+"characters");
@@ -322,7 +322,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"rideLightningNext", 
 					trTimeMS() + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
-				trModifyProtounit("Attack Revealer", p, 2, 16);
+				zSetProtoUnitStat("Attack Revealer", p, 2, trQuestVarGet("p"+p+"los"));
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 				trQuestVarSet("p"+p+"rideLightningRange", 
 					trQuestVarGet("rideLightningRange") * trQuestVarGet("p"+p+"spellRange"));
@@ -498,8 +498,6 @@ void chooseThunderRider(int eventID = -1) {
 	trQuestVarSet("p"+p+"lureCost", 0);
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("rechargeCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
-
-	trSetCivilizationNameOverride(p, "Thunderwalker | " + (1+trQuestVarGet("p"+p+"level")));
 }
 
 rule thunderRider_init
@@ -516,7 +514,7 @@ highFrequency
 	trQuestVarSet("blitzRange", 12);
 	trQuestVarSet("blitzDamage", 50);
 
-	trQuestVarSet("rechargeCooldown", 18);
+	trQuestVarSet("rechargeCooldown", 22);
 
 	trQuestVarSet("rideLightningDamage", 100);
 	trQuestVarSet("rideLightningRange", 4);
