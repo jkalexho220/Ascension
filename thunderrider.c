@@ -21,7 +21,7 @@ void removeLightningBall(int p = 0) {
 }
 
 void rideLightningOff(int p = 0) {
-	trModifyProtounit("Attack Revealer", p, 2, -10);
+	trModifyProtounit("Attack Revealer", p, 2, -16);
 	int index = 0;
 	for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 		yDatabaseNext("p"+p+"characters");
@@ -207,7 +207,7 @@ void thunderRiderAlways(int eventID = -1) {
 		}
 		if (trTimeMS() > trQuestVarGet("p"+p+"rideLightningNext")) {
 			trQuestVarSet("p"+p+"rideLightningNext", 
-				trQuestVarGet("p"+p+"rideLightningNext") + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+				trQuestVarGet("p"+p+"rideLightningNext") + trQuestVarGet("rideLightningDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 			trPlayerGrantResources(p, "favor", -1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"rideLightning", 0);
@@ -322,7 +322,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"rideLightningNext", 
 					trTimeMS() + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
-				trModifyProtounit("Attack Revealer", p, 2, 10);
+				trModifyProtounit("Attack Revealer", p, 2, 16);
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 				trQuestVarSet("p"+p+"rideLightningRange", 
 					trQuestVarGet("rideLightningRange") * trQuestVarGet("p"+p+"spellRange"));
@@ -440,7 +440,7 @@ void thunderRiderAlways(int eventID = -1) {
 		if (trTimeMS() > yGetVar("p"+p+"thunderShocks", "next")) {
 			ySetVar("p"+p+"thunderShocks", "next", 100 + yGetVar("p"+p+"thunderShocks", "next"));
 			yVarToVector("p"+p+"thunderShocks", "pos");
-			dist = 16;
+			dist = 25;
 			trQuestVarSet("temp", -1);
 			for(x=yGetDatabaseCount("p"+p+"thunderShockTargets"); >0) {
 				id = yDatabaseNext("p"+p+"thunderShockTargets", true);
@@ -499,7 +499,7 @@ void chooseThunderRider(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("rechargeCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
 
-	trSetCivilizationNameOverride(p, "Thunder Rider | " + (1+trQuestVarGet("p"+p+"level")));
+	trSetCivilizationNameOverride(p, "Thunderwalker | " + (1+trQuestVarGet("p"+p+"level")));
 }
 
 rule thunderRider_init

@@ -12,11 +12,50 @@ data at 13, 14, 15 is unlocked relic data
 int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
-int unlockedrelics1 = 0;
-int unlockedrelics2 = 0;
-int unlockedrelics3 = 0;
-int unlockedrelics4 = 0;
 
+void saveAllData() {
+	int p = trCurrentPlayer();
+	/* slot 0 */
+	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level") + 100 * trQuestVarGet("p"+p+"class");
+	trSetCurrentScenarioUserData(0, savedata);
+	/* gold */
+	savedata = trGetScenarioUserData(1) + trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	trSetCurrentScenarioUserData(1, savedata);
+	/* current relics */
+	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+		yDatabaseNext("p"+p+"relics");
+		trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+	}
+	/* equipped relics */
+	savedata = 0;
+	currentdata = 0;
+	for(x=5; > 0) {
+		savedata = savedata * 32 + trQuestVarGet("p"+p+"relic"+x);
+		currentdata = currentdata * 32 + trQuestVarGet("p"+p+"relic"+(x+5));
+	}
+	trSetCurrentScenarioUserData(2, savedata);
+	trSetCurrentScenarioUserData(3, currentdata);
+
+	/* owned relics */
+	for(y=0; < 4) {
+		savedata = 0;
+		for(x=8; >0) {
+			savedata = savedata * 10 + trQuestVarGet("ownedRelics"+(x+8*y));
+		}
+		trSetCurrentScenarioUserData(12 + y, savedata);
+	}
+
+	if (Multiplayer == false) {
+		/* class levels */
+		for(y=0; <2) {
+			savedata = 0;
+			for(x=9; >0) {
+				savedata = savedata * 9 + trQuestVarGet("p"+p+"class"+x+"level");
+			}
+			trSetCurrentScenarioUserData(10 + y, savedata);
+		}
+	}
+}
 
 void showLoadProgress() {
 	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 15,"icons\god power reverse time icons 64");
@@ -26,22 +65,15 @@ rule data_load_00
 highFrequency
 inactive
 {
-	unlockedrelics1 = trGetScenarioUserData(12);
-	unlockedrelics2 = trGetScenarioUserData(13);
-	unlockedrelics3 = trGetScenarioUserData(14);
-	unlockedrelics4 = trGetScenarioUserData(15);
-
-
-	for(x=1; < 9) {
-		trQuestVarSet("ownedRelics"+x, iModulo(10, unlockedrelics1));
-		unlockedrelics1 = unlockedrelics1 / 10;
-		trQuestVarSet("ownedRelics"+(x+8), iModulo(10, unlockedrelics2));
-		unlockedrelics2 = unlockedrelics2 / 10;
-		trQuestVarSet("ownedRelics"+(x+16), iModulo(10, unlockedrelics3));
-		unlockedrelics3 = unlockedrelics3 / 10;
-		trQuestVarSet("ownedRelics"+(x+24), iModulo(10, unlockedrelics4));
-		unlockedrelics4 = unlockedrelics4 / 10;
+	/* only the singleplayer needs this info */
+	for(y=0; < 4) {
+		savedata = trGetScenarioUserData(12 + y);
+		for(x=1; < 9) {
+			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(10, savedata));
+			savedata = savedata / 10;
+		}
 	}
+
 	if (Multiplayer) {
 		trSoundPlayFN("default","1",-1,"Loading:","icons\god power reverse time icons 64");
 
@@ -152,7 +184,7 @@ inactive
 					} else if (loadProgress == 4) {
 						trPlayerGrantResources(p, "Gold", x * 32);
 					} else if (loadProgress < 15) {
-						trQuestVarSet("p"+p+"relic"+(loadProgress - 3), x);
+						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x);
@@ -226,6 +258,7 @@ inactive
 		if (trQuestVarGet("p"+p+"class") == 0) {
 			trQuestVarSet("p"+p+"noob", 1);
 		}
+		trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");

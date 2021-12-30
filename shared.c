@@ -303,6 +303,11 @@ float yGetVar(string db = "", string var = "") {
 	return(trQuestVarGet("xdata"+db+index+var));
 }
 
+string yGetVarName(string db = "", string var = "") {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	return("xdata"+db+index+var);
+}
+
 float ySetVarAtIndex(string db = "", string var = "", float val = 0, int index = 0) {
 	trQuestVarSet("xdata"+db+index+var, val);
 }

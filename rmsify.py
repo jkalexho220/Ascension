@@ -80,10 +80,13 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trSetCurrentScenarioUserData','trModeEnter', 'exit', 'musicToggleBattleMode', 'trEventSetHandler', 'kbProtoUnitIsUnitType',
 			'uiCopyToClipboard', 'uiPasteFromClipboard', 'trGetTerrainType', 'trGetTerrainSubType', 'trUnitHasLOS', 'trUnitDistanceToPoint',
 			'trShowImageDialog', 'trShowChoiceDialog', 'trGameLoadScenario', 'xsVectorGetX', 'xsVectorGetY', 'xsVectorGetZ', 'kbArmyCreate', 
-			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 'trChangeTerrainHeight'}
+			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 
+			'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 'gameplayHelpers.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 'thunderrider.c', 'enemies.c', 'bosses.c', 'gameplay.c']
+files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 
+		'gameplayHelpers.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 
+		'thunderrider.c', 'enemies.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:

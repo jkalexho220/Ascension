@@ -17,14 +17,40 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
-void silencePlayer(int p = 0, float duration = 0) {
+int spyEffect(int unit = 0, int proto = 0, string qv = "") {
+	int x = modularCounterNext("spyFind");
+	trQuestVarSet("spyEye"+x, 0 - proto);
+	trStringQuestVarSet("spyName"+x, qv);
+	trUnitSelectClear();
+	trUnitSelect(""+unit, true);
+	trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+	return(x);
+}
+
+void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 	float timeout = duration * 1000 + trTimeMS();
 	if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
 		trQuestVarSet("p"+p+"silenceTimeout", timeout);
 	}
 	if (trQuestVarGet("p"+p+"silenced") == 0) {
 		trQuestVarSet("p"+p+"silenced", 1);
+		trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
+		trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
 		trPlayerKillAllGodPowers(p);
+		if (sfx) {
+			if (trQuestVarGet("p"+p+"silenceSFX") > 0) {
+				int id = kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX"));
+				if (id == -1) {
+					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
+				} else {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"silenceSFX");
+					trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
+				}
+			} else {
+				spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
+			}
+		}
 	}
 }
 
@@ -89,6 +115,12 @@ void removePlayerCharacter(int p = 0) {
 		trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
 		trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
 		silencePlayer(p, 0);
+		trQuestVarSet("p"+p+"silenceSFX", 0);
+		trQuestVarSet("p"+p+"reviveBeam", trGetUnitScenarioNameNumber());
+		trVectorSetUnitPos("pos", "p"+p+"unit");
+		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+		trArmySelect(""+p+",0");
+		trUnitChangeProtoUnit("Healing SFX");
 	}
 	yRemoveFromDatabase("p"+p+"characters");
 	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
@@ -227,14 +259,7 @@ bool checkArrowDie() {
 	}
 }
 
-int spyEffect(int unit = 0, int proto = 0) {
-	int x = modularCounterNext("spyFind");
-	trQuestVarSet("spyEye"+x, 0 - proto);
-	trUnitSelectClear();
-	trUnitSelect(""+unit, true);
-	trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
-	return(x);
-}
+
 
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
 	duration = duration * 1000;
@@ -245,7 +270,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
 		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
-				ySetVar(db, "poisonSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave poison effect")));
+				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave poison effect"), yGetVarName(db, "poisonSFX"));
 			} else {
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
@@ -273,7 +298,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 			index = yAddToDatabase("stunnedUnits", db);
 			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
 			if (yGetVar(db, "stunSFX") == 0) {
-				ySetVar(db, "stunSFX", 0 - spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect")));
+				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect"), yGetVarName(db, "stunSFX"));
 			} else {
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
@@ -329,9 +354,6 @@ float damagePlayerUnit(float dmg = 0) {
 
 void stunsAndPoisons(string db = "") {
 	if (yGetVar(db, "poisonStatus") == 1) {
-		if ((yGetVar(db, "poisonSFX") < 0) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
-    		ySetVar(db, "poisonSFX", trQuestVarGet("spyEye"+(0-yGetVar(db, "poisonSFX"))));
-    	}
     	if (trTimeMS() > yGetVar(db, "poisonTimeout")) {
     		ySetVar(db, "poisonStatus", 0);
     		trUnitSelectClear();
@@ -343,9 +365,6 @@ void stunsAndPoisons(string db = "") {
     	}
 	}
 	if (yGetVar(db, "stunStatus") >= 1) {
-		if ((yGetVar(db, "stunSFX") < 0) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
-    		ySetVar(db, "stunSFX", trQuestVarGet("spyEye"+(0-yGetVar(db, "stunSFX"))));
-    	}
     	if (trTimeMS() > yGetVar(db, "stunTimeout")) {
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
@@ -408,6 +427,7 @@ highFrequency
 					trUnitSelectByID(id);
 					trMutateSelected(0 - trQuestVarGet("spyEye"+x));
 					trQuestVarSet("spyEye"+x, trQuestVarGet("spysearch"));
+					trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
 				}
 			}
 			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));

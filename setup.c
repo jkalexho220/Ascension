@@ -128,11 +128,19 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"spellDamage", 1);
     trQuestVarSet("p"+p+"spellDuration", 1);
     trQuestVarSet("p"+p+"healBoost", 1);
-    trQuestVarSet("p"+p+"ultimateCostCount", 1);
-    trQuestVarSet("p"+p+"cooldownReductionCount", 1);
-    trQuestVarSet("p"+p+"stunResistanceCount", 1);
-    trQuestVarSet("p"+p+"poisonResistanceCount", 1);
-    trQuestVarSet("p"+p+"silenceResistanceCount", 1);
+
+    trQuestVarSet("p"+p+"ultimateCost", 1);
+    trQuestVarSet("p"+p+"cooldownReduction", 1);
+    trQuestVarSet("p"+p+"stunResistance", 1);
+    trQuestVarSet("p"+p+"poisonResistance", 1);
+    trQuestVarSet("p"+p+"silenceResistance", 1);
+
+    trQuestVarSet("p"+p+"ultimateCostCount", 0);
+    trQuestVarSet("p"+p+"cooldownReductionCount", 0);
+    trQuestVarSet("p"+p+"stunResistanceCount", 0);
+    trQuestVarSet("p"+p+"poisonResistanceCount", 0);
+    trQuestVarSet("p"+p+"silenceResistanceCount", 0);
+
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
     if (trUnitAlive()) {
@@ -151,6 +159,10 @@ void chooseClass(int p = 0, int class = 0) {
     for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
         yDatabaseNext("p"+p+"relics");
         relicEffect(p, 1*yGetVar("p"+p+"relics", "type"), true);
+    }
+
+    if (Multiplayer == false) {
+        trQuestVarSet("p"+p+"level", trQuestVarGet("p"+p+"class"+class+"level"));
     }
 }
 
@@ -236,6 +248,8 @@ runImmediately
         trForbidProtounit(p, "Tower");
         trForbidProtounit(p, "Longhouse");
     }
+
+    trOverlayText("This map saves your progress", 5.0, -1, -1, -1);
 
     xsEnableRule("delayed_modify");
     xsEnableRule("data_load_00");

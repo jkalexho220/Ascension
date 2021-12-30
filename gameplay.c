@@ -78,7 +78,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost") / trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("well", -1, -99999, wellName);
@@ -118,7 +118,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost") / trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("rain", -1, -99999, rainName);
@@ -160,7 +160,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") / trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("lure", -1, -99999, lureName);
@@ -336,11 +336,18 @@ highFrequency
                                 trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
                                 trSoundPlayFN("favordump.wav","1",-1,"","");
                                 trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
-                                    xsMin(5, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
+                                    xsMin(10, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
                             }
                             trPlayerGrantResources(p, "Gold", -25);
                         } else {
-                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                            if (trCurrentPlayer() == p) {
+                                trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+                                if (zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
+                                    trSoundPlayFN("cantdothat.wav","1",-1,"","");
+                                    trChatSend(0, "Not enough gold to transport relic! You need 25!");
+                                }
+                            }
+                            
                             trUnitChangeProtoUnit("Relic");
                             yAddToDatabase("freeRelics", "p"+p+"relics");
                             yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
@@ -412,16 +419,25 @@ highFrequency
             }
             fixAnimations(p);
             /* undo silence */
-            if (trQuestVarGet("p"+p+"silenced") == 1 && trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
-                trQuestVarSet("p"+p+"silenced", 0);
-                if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
-                    trTechGodPower(p, "Underworld Passage", 1);
-                }
-                if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
-                    trTechGodPower(p, "Animal magnetism", 1);
-                }
-                if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
-                    trTechGodPower(p, "rain", 1);
+            if (trQuestVarGet("p"+p+"silenced") == 1) {
+                if (trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
+                    trQuestVarSet("p"+p+"silenced", 0);
+                    if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
+                        trTechGodPower(p, "Underworld Passage", 1);
+                    }
+                    if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
+                        trTechGodPower(p, "Animal magnetism", 1);
+                    }
+                    if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
+                        trTechGodPower(p, "rain", 1);
+                    }
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"silenceSFX");
+                    trUnitChangeProtoUnit("Cinematic Block");
+                } else if (trQuestVarGet("p"+p+"silenceSFX") == 0) {
+                    if (trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
+                        trQuestVarSet("p"+p+"silenceSFX", trQuestVarGet("spyEye"+1*trQuestVarGet("p"+p+"silenceIndex")));
+                    }
                 }
             }
         } else if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
@@ -457,4 +473,61 @@ highFrequency
     processChests();
 
     xsSetContextPlayer(old);
+
+    /* GAME OVER */
+    if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount")) {
+        xsDisableSelf();
+        xsDisableRule("enemies_always");
+        trSoundPlayFN("lose.wav","1",-1,"","");
+        trUIFadeToColor(0,0,0,1500,0,true);
+        trLetterBox(true);
+        trQuestVarSet("gameOverNext", trTime() + 2);
+        xsEnableRule("game_over");
+    }
+}
+
+rule game_over
+inactive
+highFrequency
+{
+    if (trTime() > trQuestVarGet("gameOverNext")) {
+        trQuestVarSet("gameOverStep", 1 + trQuestVarGet("gameOverStep"));
+        switch(1*trQuestVarGet("gameOverStep"))
+        {
+            case 1:
+            {
+                trSoundPlayFN("default","1",-1,"Zenophobia: Your journey is not over!","icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverNext", trTime() + 4);
+            }
+            case 2:
+            {
+                trSoundPlayFN("default", "1",-1,
+                    "Zenophobia: Your level, gold, and relics have been saved! The next time you play, you will keep them!",
+                    "icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverNext", trTime() + 6);
+            }
+            case 3:
+            {
+                trSoundPlayFN("default", "1",-1,
+                    "Zenophobia: Be sure to also play this map in singleplayer for further customization!",
+                    "icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverNext", trTime() + 6);
+            }
+            case 4:
+            {
+                trQuestVarSet("gameOverNext", trTime() + 2);
+                trUIFadeToColor(0,0,0,1000,0,false);
+                trLetterBox(false);
+                saveAllData();
+            }
+            case 5:
+            {
+                xsDisableSelf();
+                for(p=1; < ENEMY_PLAYER) {
+                    trSetPlayerDefeated(p);
+                }
+                trEndGame();
+            }
+        }
+    }
 }

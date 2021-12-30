@@ -85,23 +85,23 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
-			msg = "You are immune to silences.";
+			msg = "You recover from silences twice as fast.";
 		}
 		case RELIC_POISON_KILLER:
 		{
-			msg = "Deal 0.3x bonus damage to poisoned enemies.";
+			msg = "+0.3x damage to poisoned enemies.";
 		}
 		case RELIC_STUN_KILLER:
 		{
-			msg = "Deal 0.3x bonus damage to stunned enemies.";
+			msg = "+0.3x damage to stunned enemies.";
 		}
 		case RELIC_HALF_KILLER:
 		{
-			msg = "Deal 0.3x bonus damage to enemies below half health.";
+			msg = "+0.3x damage to enemies below half health.";
 		}
 		case RELIC_ULTIMATE_COST:
 		{
-			msg = "Ultimate Cost -0.1x";
+			msg = "Ultimate Cost Reduction x0.1";
 		}
 		case RELIC_PROJECTILES:
 		{

@@ -89,7 +89,7 @@ string className(int class = 0) {
 		}
 		case THUNDERRIDER:
 		{
-			name = "Thunder Rider";
+			name = "Thunderwalker";
 		}
 	}
 	return(name);
@@ -118,7 +118,7 @@ highFrequency
 					trQuestVarGet("p"+p+"noob") == 1) {
 					trQuestVarSet("p"+p+"buy"+i, trQuestVarGet("p"+p+"buy"+i) + 1);
 					trQuestVarSet("p"+p+"buyNext", trTimeMS() + 1000);
-					class = i + 2 * trQuestVarGet("stage") - 2;
+					class = i;
 					if (trQuestVarGet("p"+p+"buy"+i) == 4) {
 						/* attempt to buy the class */
 						trQuestVarSet("p"+p+"buy"+i, 5);

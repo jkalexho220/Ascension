@@ -65,6 +65,8 @@ highFrequency
 			}
 		}
 		yClearDatabase("enemies");
+
+		yAddToDatabase("enemies", "bossUnit");
 	}
 }
 

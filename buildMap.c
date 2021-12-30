@@ -427,7 +427,9 @@ highFrequency
         xsDisableSelf();
         trBlockAllSounds();
         for(i=trQuestVarGet("stage"); >1) {
+            /* monstrous rage */
             trTechSetStatus(ENEMY_PLAYER, 76, 4);
+            /* bacchanalia 10 x stage */
             for(j=10; >0) {
                 trTechSetStatus(ENEMY_PLAYER, 78, 4);
             }
@@ -437,19 +439,13 @@ highFrequency
         {
             case 1:
             {
-                /* desert tomb */
+                /* this had better be good to hook them in */
                 trOverlayText("The Lion's Den", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
                 
                 TERRAIN_PRIMARY = 0;
                 TERRAIN_SUB_PRIMARY = 34;
-                
-
-                /*
-                TERRAIN_PRIMARY = 0;
-                TERRAIN_SUB_PRIMARY = 84;
-                */
 
                 TERRAIN_SECONDARY = 4;
                 TERRAIN_SUB_SECONDARY = 12;

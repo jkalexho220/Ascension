@@ -42,7 +42,9 @@ void activateEnemy(int id = 0) {
     {
         case kbGetProtoUnitID("Sphinx"):
         {
-            
+            yAddToDatabase("Sphinxes", "enemiesIncoming");
+            yAddUpdateVar("Sphinxes", "attacking", 0);
+            yAddUpdateVar("Sphinxes", "nextSpecial", 0);
         }
     }
 
@@ -161,6 +163,24 @@ highFrequency
                 yRemoveUpdateVar("ambushRooms", "posZ");
                 yRemoveUpdateVar("ambushRooms", "type");
                 break;
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("sphinxes") > 0) {
+        id = yDatabaseNext("sphinxes", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yRemoveFromDatabase("sphinxes");
+        } else if (kbUnitGetAnimationActionType(id) == 6) {
+            if (trTimeMS() > yGetVar("sphinxes", "nextSpecial")) {
+                ySetVar("sphinxes", "nextSpecial", trTimeMS() + 10000);
+                trUnitOverrideAnimation(39,0,false,true,-1);
+                trVectorSetUnitPos("pos", "sphinxes");
+                for(p=1; < ENEMY_PLAYER) {
+                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
+                        silencePlayer(p, 5);
+                    }
+                }
             }
         }
     }
