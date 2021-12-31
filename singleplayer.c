@@ -5,8 +5,27 @@ void spSwitchToClass(int class = -1) {
 void spExplainClass(int class = -1) {
 	class = class - 4000;
 	explainClass(class);
-	if (trQuestVarGet("class"+class+"level") == 0) {
-		trDelayedRuleActivation("singleplayer_explain_class");
+}
+
+void spAscendClass(int class = -1) {
+	class = class - 5000;
+	int gemstone = trQuestVarGet("class"+class+"gemstone");
+	if (trPlayerResourceCount(1, "Gold") < trQuestVarGet("goldCost")) {
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+		uiMessageBox("You don't have enough gold! You need " + trQuestVarGet("goldCost"));
+	} else if (trQuestVarGet("gemstone"+gemstone) < trQuestVarGet("gemstoneCost")) {
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+		string noMessage = "You don't have enough gemstones! (";
+		noMessage = noMessage + 1*trQuestVarGet("gemstone"+gemstone)+"/"+1*trQuestVarGet("gemstoneCost")+")";
+		uiMessageBox(noMessage);
+	} else {
+		trPlayerGrantResources(1, "Gold", 0-trQuestVarGet("goldCost"));
+		trQuestVarSet("gemstone"+gemstone, trQuestVarGet("gemstone"+gemstone) - trQuestVarGet("gemstoneCost"));
+		trSoundPlayFN("ageadvance.wav","1",-1,"","");
+		trQuestVarSet("class"+class+"level", 1 + trQuestVarGet("class"+class+"level"));
+		trQuestVarSet("p1level", 1 + trQuestVarGet("p1level"));
+		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "!");
+		trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),1,5,1);
 	}
 }
 
@@ -20,6 +39,9 @@ highFrequency
 	    trUIFadeToColor(0,0,0,1000,0,false);
 		trMusicPlayCurrent();
 	    trPlayNextMusicTrack();
+	    if (trQuestVarGet("p1class") == 0) {
+	    	trQuestVarSet("p1class", MOONBLADE);
+	    }
 	    chooseClass(1, 1*trQuestVarGet("p1class"));
 
 	    trVectorQuestVarSet("startPosition", vector(135,0,135));
@@ -129,6 +151,7 @@ highFrequency
 	    	}
 	    	trEventSetHandler(3000+a, "spSwitchToClass");
 	    	trEventSetHandler(4000+a, "spExplainClass");
+	    	trEventSetHandler(5000+a, "spAscendClass");
 	    }
 
 	    trSetCounterDisplay("To save and exit, enter the Sky Passage.");
@@ -145,8 +168,6 @@ highFrequency
 		trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,2,13,false);
 
-
-
         xsEnableRule("singleplayer_always");
 	}
 }
@@ -155,12 +176,23 @@ rule singleplayer_always
 inactive
 highFrequency
 {
+	int class = 0;
 	trUnitSelectClear();
 	trUnitSelectByQV("p1unit");
 	if (trUnitGetIsContained("Sky Passage")) {
 		xsDisableSelf();
 		xsDisableRule("gameplay_always");
 		trUIFadeToColor(255,255,255,1000,0,true);
+
+		/* free relics go into ownedRelics */
+		for(x=31; >0) {
+			trQuestVarSet("ownedRelics"+x, 0);
+		}
+		for(x=yGetDatabaseCount("freeRelics"); >0) {
+			yDatabaseNext("freeRelics");
+			class = yGetVar("freeRelics", "type");
+			trQuestVarSet("ownedRelics"+class, xsMin(10, 1 + trQuestVarGet("ownedRelics"+class)));
+		}
 		saveAllData();
 		xsEnableRule("singleplayer_end");
 	}
@@ -172,9 +204,30 @@ highFrequency
 			uiClearSelection();
 			if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
 				explainClass(x);
+				if (trQuestVarGet("class"+x+"level") == 0) {
+					trDelayedRuleActivation("singleplayer_explain_class");
+				}
 			} else if (trQuestVarGet("class"+x+"level") > 0) {
 				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+")",
 				"Switch to this class", 3000 + x, "View class details", 4000 + x);
+			}
+		}
+	}
+
+	trUnitSelectClear();
+	trUnitSelectByQV("levelupObelisk");
+	if (trUnitIsSelected()) {
+		uiClearSelection();
+		class = trQuestVarGet("p1class");
+		trQuestVarSet("goldCost", 100 * trQuestVarGet("class"+class+"level"));
+		trQuestVarSet("gemstonesCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
+		string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstonesCost") + " ";
+		yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
+		if (trQuestVarGet("p1level") < 9) {
+			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
+				yesPrompt, 5000+class, "No", -1);
+			for(x=0; <3) {
+				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
 			}
 		}
 	}
@@ -194,7 +247,7 @@ rule singleplayer_explain_class
 inactive
 highFrequency
 {
-	if (trQuestVarGet("explain") == 0) {
+	if (trQuestVarGet("explain") == 0 && trIsGadgetVisible("ShowImageBox") == false) {
 		xsDisableSelf();
 		int class = trQuestVarGet("pleaseExplain");
 		switch(class)
@@ -210,6 +263,14 @@ highFrequency
 			case FROSTKNIGHT:
 			{
 				uiMessageBox("To unlock this class, kill 100 Giants.");
+			}
+			case INVENTOR:
+			{
+				uiMessageBox("To unlock this class, collect 50 relics.");
+			}
+			case ALCHEMIST:
+			{
+				uiMessageBox("To unlock this class, ascend a character to level 10.");
 			}
 		}
 	}

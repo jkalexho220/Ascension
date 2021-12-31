@@ -119,7 +119,7 @@ void removePlayerCharacter(int p = 0) {
 		trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
 		silencePlayer(p, 0);
 		trQuestVarSet("p"+p+"silenceSFX", 0);
-		trQuestVarSet("p"+p+"reviveBeam", trGetUnitScenarioNameNumber());
+		trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
 		trVectorSetUnitPos("pos", "p"+p+"unit");
 		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 		trArmySelect(""+p+",0");

@@ -7,9 +7,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		case MOONBLADE:
 		{
 			icon = "icons\hero g theseus icon 64";
-			if (tooltip == 0 && Multiplayer == false) {
-				tooltip = 1;
-			}
 			switch(tooltip)
 			{
 				case 0:
@@ -63,9 +60,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		case SUNBOW:
 		{
 			icon = "icons\hero g hyppolyta icon 64";
-			if (tooltip == 0 && Multiplayer == false) {
-				tooltip = 1;
-			}
 			switch(tooltip)
 			{
 				case 0:
@@ -174,9 +168,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case FIREKNIGHT:
 		{
-			if (tooltip == 0 && trQuestVarGet("class"+FIREKNIGHT+"level") > 0) {
-				tooltip = 1;
-			}
+			icon = "icons\cavalry x lancer hero icons 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -185,10 +177,104 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: All players have +0.1x spell lifesteal.";
+					msg = "Passive: Gain spell lifesteal equal to your percentage of missing health.";
+				}
+				case 2:
+				{
+					msg = "Special Attack (5 attacks): Deal 80 damage to nearby enemies and yourself.";
+				}
+				case 3:
+				{
+					icon = "icons\special e phoenix icon 64";
+					msg = "(Q) Flaming Impact: Dash to the target location, damaging all enemies hit.";
+				}
+				case 4:
+				{
+					icon = "icons\special e phoenix icon 64";
+					msg = "Cooldown: 12 | Radius: 4 | Damage: 20 per meter";
+				}
+				case 5:
+				{
+					icon = "icons\improvement flames of typhon icon";
+					msg = "(W) Overheat: Set yourself on fire, damaging yourself each second.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement flames of typhon icon";
+					msg = "During this time, reflect all damage you receive onto nearby enemies.";
+				}
+				case 7:
+				{
+					icon = "icons\improvement flames of typhon icon";
+					msg = "Cooldown: 14 | Radius: 4 | Duration: 5 | Damage: 40 per second";
+				}
+				case 8:
+				{
+					icon = "icons\god power firestorm icon 64";
+					msg = "(E) Inferno: Unleash a ring of flames that damages enemies and heals allies for several seconds";
+				}
+				case 9:
+				{
+					icon = "icons\god power firestorm icon 64";
+					msg = "Cost: 60 | Radius: 12 | Duration: 8 | Damage: 120 per second | Heal: 60 per second";
+					next = 0;
 				}
 			}
-			
+		}
+		case FROSTKNIGHT:
+		{
+			icon = "icons\hero g achilles icon 64";
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Frost Knight: A fighter that brings a lot of crowd control.";
+				}
+				case 1:
+				{
+					msg = "Passive: Each time you stun an enemy, deal 10 percent of your max health to them.";
+				}
+				case 2:
+				{
+					msg = "Special Attack (5 attacks): Your attack stuns its target.";
+				}
+				case 3:
+				{
+					icon = "";
+					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage.";
+				}
+				case 4:
+				{
+					icon = "";
+					msg = "If this hits an enemy at full health, stun them.";
+				}
+				case 5:
+				{
+					icon = "";
+					msg = "Cooldown: 5 | Radius: 1.5 | Duration: 6 | Damage: 80";
+				}
+				case 6:
+				{
+					icon = "icons\god power frost icon 64";
+					msg = "(W) Blizzard: For a short duration, you and your summoned allies release frost, dealing damage.";
+				}
+				case 7:
+				{
+					icon = "icons\god power frost icon 64";
+					msg = "Cooldown: 16 | Duration: 6 | Radius: 5 | Damage: 20 per second";
+				}
+				case 8:
+				{
+					icon = "icons\special n frost giant icon 64";
+					msg = "(E) Frost Giant: Summon a Frost Giant familiar to fight for you. It copies your attack and health.";
+				}
+				case 9:
+				{
+					icon = "icons\special n frost giant icon 64";
+					msg = "Cost: 60 | Decay: 3 percent health per second.";
+					next = 0;
+				}
+			}
 		}
 	}
 	trShowImageDialog(icon, msg);

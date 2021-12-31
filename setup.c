@@ -26,7 +26,15 @@ const int SUNBOW = 2;
 const int THUNDERRIDER = 3;
 const int FIREKNIGHT = 4;
 const int FROSTKNIGHT = 5;
+const int INVENTOR = 6;
+const int ALCHEMIST = 7;
+
 const int CLASS_COUNT = 5;
+
+
+const int STARSTONE = 0;
+const int LIFESTONE = 1;
+const int MANASTONE = 2;
 
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
@@ -54,6 +62,26 @@ Secondary terrain
 */
 int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
+
+string gemstoneName(int gem = 0) {
+    string name = "Dust";
+    switch(gem)
+    {
+        case STARSTONE:
+        {
+            name = "Starstone";
+        }
+        case LIFESTONE:
+        {
+            name = "Lifestone";
+        }
+        case MANASTONE:
+        {
+            name = "Manastone";
+        }
+    }
+    return(name);
+}
 
 void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float speed = 4, float range = 0) {
     int pNum = kbGetProtoUnitID(proto);
@@ -103,13 +131,14 @@ void setupPlayerProto(string proto = "", float health = 0, float attack = 0, flo
     trModifyProtounit(proto, 0, 2, -20);
 }
 
-void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0, int specialCD = 0) {
+void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
     int p = kbGetProtoUnitID(proto);
     trQuestVarSet("class"+class+"proto", p);
     trQuestVarSet("proto"+p+"class", class);
     trQuestVarSet("class"+class+"firstDelay", firstDelay);
     trQuestVarSet("class"+class+"nextDelay", nextDelay);
     trQuestVarSet("class"+class+"specialAttackCooldown", specialCD);
+    trQuestVarSet("class"+class+"gemstone", gem);
 }
 
 void chooseClass(int p = 0, int class = 0) {
@@ -216,11 +245,11 @@ runImmediately
 
     setupClass("Militia", 0, 500, 1000);
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
-    setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, 7);
-    setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750);
-    setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, 5);
-    setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, 5);
-    setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, 5);
+    setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
+    setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
+    setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
+    setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, 5, MANASTONE);
+    setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
