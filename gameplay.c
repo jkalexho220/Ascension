@@ -199,7 +199,6 @@ highFrequency
     trSetUnitIdleProcessing(true);
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
-    xsEnableRule("enemies_always");
     for(p=1; < ENEMY_PLAYER) {
         spawnPlayer(p, "startPosition");
         trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
@@ -275,6 +274,8 @@ highFrequency
             trUnitOverrideAnimation(2, 0, false, true, -1, 0);
         }
     }
+
+    enemiesAlways();
 
     /*
     Player lasers
@@ -486,9 +487,8 @@ highFrequency
     xsSetContextPlayer(old);
 
     /* GAME OVER */
-    if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount")) {
+    if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount") && Multiplayer) {
         xsDisableSelf();
-        xsDisableRule("enemies_always");
         trSoundPlayFN("lose.wav","1",-1,"","");
         trUIFadeToColor(0,0,0,1500,0,true);
         trLetterBox(true);

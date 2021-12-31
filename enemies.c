@@ -69,10 +69,7 @@ highFrequency
 	}
 }
 
-rule enemies_always
-inactive
-highFrequency
-{
+void enemiesAlways() {
     int old = xsGetContextPlayer();
     int proto = 0;
     int id = 0;

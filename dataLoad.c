@@ -123,7 +123,7 @@ inactive
 
 		/* gold */
 		savedata = trGetScenarioUserData(1);
-		trPlayerGrantResources(1, "Gold", savedata);
+		trQuestVarSet("p1gold", savedata);
 
 		/* equipped relics */
 		for(y=0; <2) {

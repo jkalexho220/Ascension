@@ -164,7 +164,7 @@ void chooseClass(int p = 0, int class = 0) {
     }
 
     if (Multiplayer == false) {
-        trQuestVarSet("p"+p+"level", trQuestVarGet("p"+p+"class"+class+"level"));
+        trQuestVarSet("p"+p+"level", trQuestVarGet("class"+class+"level"));
     }
 }
 
@@ -306,6 +306,9 @@ highFrequency
             trPlayerGrantResources(p, "Wood", -1000.0);
             trPlayerGrantResources(p, "Gold", -1000.0);
             trPlayerGrantResources(p, "Favor", -1000.0);
+        }
+        if (Multiplayer == false) {
+            trPlayerGrantResources(1, "Gold", trQuestVarGet("p1gold"));
         }
         xsDisableSelf();
     }

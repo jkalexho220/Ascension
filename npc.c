@@ -1,4 +1,5 @@
 int NPC_RELIC_TRANSPORTER = 0;
+int NPC_EXPLAIN_SINGLEPLAYER = 1;
 
 int npcDiag(int npc = 0, int dialog = 0) {
 	dialog = dialog + 1;
@@ -25,8 +26,71 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				dialog = -1;
 			}
 		}
+		case NPC_EXPLAIN_SINGLEPLAYER:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					trCameraCut(vector(90,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+					uiMessageBox("Welcome to the customization area! There are many things you can do here!");
+				}
+				case 2:
+				{
+					trCameraCut(vector(60,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+					uiMessageBox("This is your relic warehouse. This is where all your spare relics are stored.");
+				}
+				case 3:
+				{
+					trCameraCut(vector(90,70.710701,60), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+					uiMessageBox("This is your class selection. Click on a class to see its details or switch to it.");
+				}
+				case 4:
+				{
+					uiMessageBox("Some classes are locked. Each class has a unique unlock condition.");
+				}
+				case 5:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("levelupObelisk");
+					trUnitHighlight(15.0, true);
+					uiMessageBox("This is your Ascension Obelisk. Click on this obelisk to level up your current hero.");
+				}
+				case 6:
+				{
+					uiMessageBox("Level-ups cost gold and gemstones, which are dropped by bosses.");
+				}
+				case 7:
+				{
+					uiMessageBox("Each level-up increases your hero's relic capacity by 1.");
+				}
+				case 8:
+				{
+					uiMessageBox("There are more facilities, but they are locked for now. Play the game some more to unlock them!");
+				}
+				case 9:
+				{
+					trCameraCut(vector(90,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+					uiMessageBox("When you are ready to save your configuration, enter the sky passage in the center.");
+					trUnitSelectClear();
+					trUnitSelectByQV("skypassage");
+					trUnitHighlight(5.0, true);
+				}
+				case 10:
+				{
+					dialog = 0;
+					xsEnableRule("gameplay_start_2");
+				}
+			}
+		}
 	}
 	return(dialog);
+}
+
+void startNPCDialog(int npc = 0) {
+	xsEnableRule("npc_talk_01");
+	trQuestVarSet("currentNPC", npc);
+	trQuestVarSet("currentNPCProgress", 0);
 }
 
 rule relic_transporter_guy_found
@@ -57,31 +121,29 @@ highFrequency
 	trUnitSelectByQV("relicTransporterGuyName");
 	if (trUnitIsSelected()) {
 		trUnitHighlight(5.0, true);
-		trQuestVarSet("relicTransporterGuySelected", 1);
-		xsEnableRule("relic_transporter_guy_explain_01");
-		trQuestVarSet("relicTransporterGuyExplain", 0);
+		startNPCDialog(NPC_RELIC_TRANSPORTER);
 		uiClearSelection();
 	}
 }
 
-rule relic_transporter_guy_explain_01
+rule npc_talk_01
 inactive
 highFrequency
 {
 	xsDisableSelf();
-	trQuestVarSet("relicTransporterGuyExplain", 
-		npcDiag(NPC_RELIC_TRANSPORTER, 1*trQuestVarGet("relicTransporterGuyExplain")));
-	if (trQuestVarGet("relicTransporterGuyExplain") > 0) {
-		trDelayedRuleActivation("relic_transporter_guy_explain_02");
+	trQuestVarSet("currentNPCProgress", 
+		npcDiag(1*trQuestVarGet("currentNPC"), 1*trQuestVarGet("currentNPCProgress")));
+	if (trQuestVarGet("currentNPCProgress") > 0) {
+		trDelayedRuleActivation("npc_talk_02");
 	}
 }
 
-rule relic_transporter_guy_explain_02
+rule npc_talk_02
 inactive
 highFrequency
 {
-	if ((trQuestVarGet("relicTransporterGuyExplain") > 0) && (trIsGadgetVisible("ingame-messagedialog") == false)) {
-		trDelayedRuleActivation("relic_transporter_guy_explain_01");
+	if ((trQuestVarGet("currentNPCProgress") > 0) && (trIsGadgetVisible("ingame-messagedialog") == false)) {
+		trDelayedRuleActivation("npc_talk_01");
 		xsDisableSelf();
 	}
 }
