@@ -158,13 +158,23 @@ void chooseClass(int p = 0, int class = 0) {
         trQuestVarSet("p"+p+"rainCooldownStatus", 2);
     }
 
-    for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-        yDatabaseNext("p"+p+"relics");
-        relicEffect(p, 1*yGetVar("p"+p+"relics", "type"), true);
+    if (Multiplayer == false) {
+        trQuestVarSet("p"+p+"level", trQuestVarGet("class"+class+"level") - 1);
+        trSetCivilizationNameOverride(p, "Level " + (1+trQuestVarGet("p"+p+"level")));
     }
 
-    if (Multiplayer == false) {
-        trQuestVarSet("p"+p+"level", trQuestVarGet("class"+class+"level"));
+    for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+        yDatabaseNext("p"+p+"relics");
+        if (x > trQuestVarGet("p"+p+"level")) {
+            yAddToDatabase("freeRelics", "p"+p+"relics");
+            yAddUpdateVar("freeRelics", "type", 1*yGetVar("p"+p+"relics", "type"));
+            yRemoveFromDatabase("p"+p+"relics");
+            trUnitSelectClear();
+            trUnitSelectByQV("p"+p+"relics");
+            trUnitChangeProtoUnit("Relic");
+        } else {
+            relicEffect(1*yGetVar("p"+p+"relics", "type"), p, true);
+        }
     }
 }
 

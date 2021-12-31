@@ -64,8 +64,18 @@ void rideLightningOff(int p = 0) {
 	yClearDatabase("p"+p+"lightningBalls");
 	yClearDatabase("p"+p+"rideLightningTargets");
 
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"unit");
 	if (trCurrentPlayer() == p) {
-		uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+		trBlockAllSounds();
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			if (trUnitIsSelected() == false) {
+				uiFindType("Hero Greek Atalanta");
+			} else {
+				break;
+			}
+		}
+		trUnblockAllSounds();
 	}
 }
 

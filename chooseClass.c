@@ -100,7 +100,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 5:
 				{
-					icon = "icons\god power eclipse icon 64";
+					icon = "icons\god power restoration icon 64";
 					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Heal: 60";
 					next = 3;
 				}
@@ -119,49 +119,76 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Passive: You gain bonus attack by continuously moving. This bonus decays by 5 percent each second.";
+					msg = "Thunderwalker: A speedy assassin that scales off of speed.";
 				}
 				case 1:
 				{
-					icon = "icons\god power bolt icon 64";
-					msg = "(Q) Blitz: Teleport towards your cursor, stunning and damaging enemies hit.";
+					msg = "Passive: You gain bonus attack by continuously moving. This bonus decays by 5 percent each second.";
 				}
 				case 2:
 				{
-					icon = "icons\god power bolt icon 64";
-					msg = "If Ride the Lightning is active, this changes your direction of travel instead.";
+					msg = "Special Attack (5 attacks): Your attack chains to nearby enemies, damaging all of them.";
 				}
 				case 3:
 				{
 					icon = "icons\god power bolt icon 64";
-					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
+					msg = "(Q) Blitz: Teleport towards your cursor, stunning and damaging enemies hit.";
 				}
 				case 4:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "If Ride the Lightning is active, this changes your direction of travel instead.";
+				}
+				case 5:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
+				}
+				case 6:
 				{
 					icon = "icons\improvement heart of the titans icons 64";
 					msg = "(W) Recharge: Consume all your bonus attack and convert it into healing and favor for yourself.";
 				}
-				case 5:
+				case 7:
 				{
 					icon = "icons\improvement heart of the titans icons 64";
 					msg = "Cooldown: 22 | Heal: 1x Attack | Favor Regen: 0.1x Attack";
 				}
-				case 6:
+				case 8:
 				{
 					icon = "icons\god power implode icons 64";
 					msg = "(E) Ride the Lightning: Become a fast-moving ball of lightning that bounces off walls";
 				}
-				case 7:
+				case 9:
 				{
 					icon = "icons\god power implode icons 64";
 					msg = "Damage enemies that you pass through. Damage increases with each bounce.";
 				}
-				case 8:
+				case 10:
 				{
 					icon = "icons\god power implode icons 64";
 					msg = "Cost: 8 favor per second | Damage: 100 + 50 per bounce";
+					next = 0;
 				}
 			}
+		}
+		case FIREKNIGHT:
+		{
+			if (tooltip == 0 && trQuestVarGet("class"+FIREKNIGHT+"level") > 0) {
+				tooltip = 1;
+			}
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Fire Knight: A diving character that sacrifices health for damage.";
+				}
+				case 1:
+				{
+					msg = "Passive: All players have +0.1x spell lifesteal.";
+				}
+			}
+			
 		}
 	}
 	trShowImageDialog(icon, msg);
@@ -196,6 +223,12 @@ string className(int class = 0) {
 	return(name);
 }
 
+void explainClass(int class = 0) {
+	trQuestVarSet("explain", 0);
+	trQuestVarSet("pleaseExplain", class);
+	xsEnableRule("class_shop_explain_01");
+}
+
 rule class_shop_always
 inactive
 highFrequency
@@ -207,7 +240,7 @@ highFrequency
 		if (trUnitIsSelected()) {
 			trQuestVarSet("choice"+i+"selected", 1);
 			trQuestVarSet("pleaseExplain", i);
-			trQuestVarSet("choice"+i+"explain", 0);
+			trQuestVarSet("explain", 0);
 			trDelayedRuleActivation("class_shop_explain_01");
 			uiClearSelection();
 		}
@@ -245,8 +278,8 @@ highFrequency
 {
 	xsDisableSelf();
 	int i = trQuestVarGet("pleaseExplain");
-	trQuestVarSet("choice"+i+"explain", 
-		displayNextTooltip(i, 1*trQuestVarGet("choice"+i+"explain")));
+	trQuestVarSet("explain", 
+		displayNextTooltip(i, 1*trQuestVarGet("explain")));
 	trDelayedRuleActivation("class_shop_explain_02");
 }
 
@@ -256,7 +289,7 @@ highFrequency
 {
 	int i = trQuestVarGet("pleaseExplain");
 	if (trIsGadgetVisible("ShowImageBox") == false) {
-		if (trQuestVarGet("choice"+i+"explain") > 0) {
+		if (trQuestVarGet("explain") > 0) {
 			trDelayedRuleActivation("class_shop_explain_01");
 		}
 		xsDisableSelf();

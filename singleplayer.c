@@ -1,3 +1,15 @@
+void spSwitchToClass(int class = -1) {
+	chooseClass(1, class - 3000);
+}
+
+void spExplainClass(int class = -1) {
+	class = class - 4000;
+	explainClass(class);
+	if (trQuestVarGet("class"+class+"level") == 0) {
+		trDelayedRuleActivation("singleplayer_explain_class");
+	}
+}
+
 rule singleplayer_init
 inactive
 highFrequency
@@ -102,7 +114,7 @@ highFrequency
 	    x = 138;
 	    z = 98;
 	    for(a=1; <= CLASS_COUNT) {
-	    	trQuestVarSet("class"+a+"unit", trGetUnitScenarioNameNumber());
+	    	trQuestVarSet("class"+a+"unit", trGetNextUnitScenarioNameNumber());
 	    	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
 	    	trArmySelect("1,0");
 	    	trUnitConvert(0);
@@ -115,6 +127,8 @@ highFrequency
 	    		x = 138;
 	    		z = z + 4;
 	    	}
+	    	trEventSetHandler(3000+a, "spSwitchToClass");
+	    	trEventSetHandler(4000+a, "spExplainClass");
 	    }
 
 	    trSetCounterDisplay("To save and exit, enter the Sky Passage.");
@@ -130,6 +144,8 @@ highFrequency
 	    /* paint deployment square at the bottom of the map */
 		trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,2,13,false);
+
+
 
         xsEnableRule("singleplayer_always");
 	}
@@ -148,6 +164,20 @@ highFrequency
 		saveAllData();
 		xsEnableRule("singleplayer_end");
 	}
+
+	for(x=CLASS_COUNT; >0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("class"+x+"unit");
+		if (trUnitIsSelected()) {
+			uiClearSelection();
+			if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
+				explainClass(x);
+			} else if (trQuestVarGet("class"+x+"level") > 0) {
+				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+")",
+				"Switch to this class", 3000 + x, "View class details", 4000 + x);
+			}
+		}
+	}
 }
 
 rule singleplayer_end
@@ -156,5 +186,31 @@ highFrequency
 {
 	if (trTime() > 1 + cActivationTime) {
 		trModeEnter("Pregame");
+	}
+}
+
+
+rule singleplayer_explain_class
+inactive
+highFrequency
+{
+	if (trQuestVarGet("explain") == 0) {
+		xsDisableSelf();
+		int class = trQuestVarGet("pleaseExplain");
+		switch(class)
+		{
+			case THUNDERRIDER:
+			{
+				uiMessageBox("To unlock this class, defeat 5 bosses.");
+			}
+			case FIREKNIGHT:
+			{
+				uiMessageBox("To unlock this class, host this map in multiplayer once.");
+			}
+			case FROSTKNIGHT:
+			{
+				uiMessageBox("To unlock this class, kill 100 Giants.");
+			}
+		}
 	}
 }

@@ -312,6 +312,25 @@ highFrequency
                 trDamageUnit(amt - yGetVar("playerUnits", "currentHealth"));
             }
         }
+        if (trQuestVarGet("protectionWas") == 0) {
+            trQuestVarSet("protectionWas", 1);
+            for(p=1; < ENEMY_PLAYER) {
+                id = trQuestVarGet("p"+p+"class");
+                id = trQuestVarGet("class"+id+"proto");
+                trModifyProtounit(kbGetProtoUnitName(id),p,24,1);
+                trModifyProtounit(kbGetProtoUnitName(id),p,25,1);
+                trModifyProtounit(kbGetProtoUnitName(id),p,26,1);
+            }
+        }
+    } else if (trQuestVarGet("protectionWas") == 1) {
+        trQuestVarSet("protectionWas", 0);
+        for(p=1; < ENEMY_PLAYER) {
+            id = trQuestVarGet("p"+p+"class");
+            id = trQuestVarGet("class"+id+"proto");
+            trModifyProtounit(kbGetProtoUnitName(id),p,24,-1);
+            trModifyProtounit(kbGetProtoUnitName(id),p,25,-1);
+            trModifyProtounit(kbGetProtoUnitName(id),p,26,-1);
+        }
     }
 
     /* relics dropped */

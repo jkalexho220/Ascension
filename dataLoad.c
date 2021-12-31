@@ -42,7 +42,7 @@ void saveAllData() {
 	for(y=0; < 4) {
 		savedata = 0;
 		for(x=8; >0) {
-			savedata = savedata * 10 + trQuestVarGet("ownedRelics"+(x+8*y));
+			savedata = savedata * 11 + trQuestVarGet("ownedRelics"+(x+8*y));
 		}
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
@@ -58,7 +58,7 @@ void saveAllData() {
 		for(y=0; <2) {
 			savedata = 0;
 			for(x=8; >0) {
-				savedata = savedata * 10 + trQuestVarGet("class"+(x+8*y)+"level");
+				savedata = savedata * 11 + trQuestVarGet("class"+(x+8*y)+"level");
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}
@@ -79,8 +79,8 @@ inactive
 	for(y=0; < 4) {
 		savedata = trGetScenarioUserData(12 + y);
 		for(x=1; < 9) {
-			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(10, savedata));
-			savedata = savedata / 10;
+			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
+			savedata = savedata / 11;
 		}
 	}
 	/* gemstones */
@@ -138,7 +138,7 @@ inactive
 		for(y=0; <2) {
 			savedata = trGetScenarioUserData(10 + y);
 			for(x=1; <9) {
-				trQuestVarSet("class"+(x+8*y)+"level", iModulo(10, savedata));
+				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
 				savedata = savedata / 10;
 			}
 		}
