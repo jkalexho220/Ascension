@@ -416,6 +416,59 @@ float calculateDecay(int p = 0, float decay = 0) {
 	return(decay / trQuestVarGet("p"+p+"spellDuration"));
 }
 
+void processGenericProjectiles() {
+	int id = 0;
+	float scale = 0;
+	for(x=1*yGetDatabaseCount("genericProj")/3; >0) {
+		id = yDatabaseNext("genericProj", true);
+		if (id == -1) {
+			yRemoveFromDatabase("genericProj");
+		} else if (yGetVar("genericProj", "yeehaw") == 1) {
+			trMutateSelected(1*yGetVar("genericProj", "proto"));
+			trUnitOverrideAnimation(1*yGetVar("genericProj", "anim"),0,true,true,-1);
+			scale = yGetVar("genericProj", "scale");
+			trSetSelectedScale(scale,scale,scale);
+			ySetVar("genericProj", "yeehaw", 0);
+		} else {
+			trVectorSetUnitPos("pos", "genericProj");
+			if (trQuestVarGet("posY") < 1.0) {
+				yVarToVector("genericProj", "dir");
+				zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar("genericProj", "speed"));
+				trUnitChangeProtoUnit("Kronny Flying");
+				trUnitSelectClear();
+				trUnitSelectByQV("genericProj");
+				trDamageUnitPercent(-100);
+				trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
+				trSetSelectedScale(0,0.0-yGetVar("genericProj", "height"),0);
+				trDamageUnitPercent(100);
+				ySetVar("genericProj", "yeehaw", 1);
+			}
+		}
+	}
+}
+
+int addGenericProjectile(string start="",string dir="",int proto=0,int anim=0,float speed=10,float height=5) {
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int index = yAddToDatabase("genericProj", "next");
+	yAddUpdateVar("genericProj", "proto", proto);
+	yAddUpdateVar("genericProj", "anim", anim);
+	yAddUpdateVar("genericProj", "speed", speed);
+	yAddUpdateVar("genericProj", "height", height);
+	yAddUpdateVar("genericProj", "dirX", trQuestVarGet(dir+"x"));
+	yAddUpdateVar("genericProj", "dirZ", trQuestVarGet(dir+"z"));
+
+	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("next", true);
+	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+	trUnitConvert(0);
+	trSetUnitOrientation(trVectorQuestVarGet(dir), vector(0,1,0), true);
+	trSetSelectedScale(0, 0.0 - height, 0);
+	trDamageUnitPercent(100);
+	return(index);
+}
+
 rule spy_find
 active
 highFrequency

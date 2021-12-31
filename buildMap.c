@@ -475,6 +475,11 @@ highFrequency
 
                 trStringQuestVarSet("bossProto", "Nemean Lion");
                 trQuestVarSet("bossScale", 2);
+
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 1500 * ENEMY_PLAYER);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 4.8);
             }
         }
 

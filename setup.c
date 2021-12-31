@@ -194,7 +194,7 @@ void chooseClass(int p = 0, int class = 0) {
 
     for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
         yDatabaseNext("p"+p+"relics");
-        if (x > trQuestVarGet("p"+p+"level")) {
+        if (x > trQuestVarGet("p"+p+"level")+1) {
             yAddToDatabase("freeRelics", "p"+p+"relics");
             yAddUpdateVar("freeRelics", "type", 1*yGetVar("p"+p+"relics", "type"));
             yRemoveFromDatabase("p"+p+"relics");
@@ -330,6 +330,10 @@ highFrequency
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
+        trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, 9999999999999999999.0);
+        trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, -9999999999999999999.0);
+        zInitProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, 0);
+
         xsEnableRule("setup_enemies");
         xsDisableSelf();
     }
@@ -415,7 +419,6 @@ highFrequency
             minProgress = xsMin(minProgress, trQuestVarGet("p"+p+"progress"));
         }
         if (minProgress == 0) {
-            trQuestVarSet("newPlayers", 1);
             trQuestVarSet("stage", 1);
         } else {
             trLetterBox(false);

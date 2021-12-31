@@ -445,7 +445,9 @@ highFrequency
                 healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
-            fixAnimations(p);
+            if (Multiplayer) {
+                fixAnimations(p);
+            }
             /* undo silence */
             if (trQuestVarGet("p"+p+"silenced") == 1) {
                 if (trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
@@ -545,7 +547,7 @@ highFrequency
             }
             case 4:
             {
-                trQuestVarSet("gameOverNext", trTime() + 2);
+                trQuestVarSet("gameOverNext", trTime() + 1);
                 trUIFadeToColor(0,0,0,1000,0,false);
                 trLetterBox(false);
                 saveAllData();

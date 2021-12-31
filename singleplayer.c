@@ -24,8 +24,9 @@ void spAscendClass(int class = -1) {
 		trSoundPlayFN("ageadvance.wav","1",-1,"","");
 		trQuestVarSet("class"+class+"level", 1 + trQuestVarGet("class"+class+"level"));
 		trQuestVarSet("p1level", 1 + trQuestVarGet("p1level"));
-		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "!");
+		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "! +1 relic slot!");
 		trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),1,5,1);
+		trSetCivilizationNameOverride(1, "Level " + (1+trQuestVarGet("p1level")));
 	}
 }
 
@@ -126,6 +127,7 @@ highFrequency
 	    	xsEnableRule("singleplayer_cin");
 	    	trQuestVarSet("class1level", 1);
 	    	trQuestVarSet("class2level", 1);
+	    	trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
 	    	startNPCDialog(NPC_EXPLAIN_SINGLEPLAYER);
 	    } else {
 	    	xsEnableRule("gameplay_start_2");
@@ -182,7 +184,6 @@ highFrequency
 	if (trUnitGetIsContained("Sky Passage")) {
 		xsDisableSelf();
 		xsDisableRule("gameplay_always");
-		trUIFadeToColor(255,255,255,1000,0,true);
 
 		/* free relics go into ownedRelics */
 		for(x=31; >0) {
@@ -194,7 +195,10 @@ highFrequency
 			trQuestVarSet("ownedRelics"+class, xsMin(10, 1 + trQuestVarGet("ownedRelics"+class)));
 		}
 		saveAllData();
+		
+		trUIFadeToColor(255,255,255,1000,0,true);
 		xsEnableRule("singleplayer_end");
+		
 	}
 
 	for(x=CLASS_COUNT; >0) {
@@ -226,6 +230,7 @@ highFrequency
 		if (trQuestVarGet("p1level") < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
 				yesPrompt, 5000+class, "No", -1);
+			trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
 			for(x=0; <3) {
 				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
 			}

@@ -32,8 +32,8 @@ void saveAllData() {
 	savedata = 0;
 	currentdata = 0;
 	for(x=5; > 0) {
-		savedata = savedata * 32 + trQuestVarGet("p"+p+"relic"+x);
-		currentdata = currentdata * 32 + trQuestVarGet("p"+p+"relic"+(x+5));
+		savedata = savedata * 32 + 1*trQuestVarGet("p"+p+"relic"+x);
+		currentdata = currentdata * 32 + 1*trQuestVarGet("p"+p+"relic"+(x+5));
 	}
 	trSetCurrentScenarioUserData(2, savedata);
 	trSetCurrentScenarioUserData(3, currentdata);
@@ -42,7 +42,7 @@ void saveAllData() {
 	for(y=0; < 4) {
 		savedata = 0;
 		for(x=8; >0) {
-			savedata = savedata * 11 + trQuestVarGet("ownedRelics"+(x+8*y));
+			savedata = savedata * 11 + 1*trQuestVarGet("ownedRelics"+(x+8*y));
 		}
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
@@ -50,7 +50,7 @@ void saveAllData() {
 	/* gemstones */
 	savedata = 0;
 	for(x=4; >0) {
-		savedata = savedata * 100 + xsMin(100, trQuestVarGet("gemstone"+x));
+		savedata = savedata * 100 + 1*xsMin(100, trQuestVarGet("gemstone"+x));
 	}
 
 	if (Multiplayer == false) {
@@ -58,7 +58,7 @@ void saveAllData() {
 		for(y=0; <2) {
 			savedata = 0;
 			for(x=8; >0) {
-				savedata = savedata * 11 + trQuestVarGet("class"+(x+8*y)+"level");
+				savedata = savedata * 11 + 1*trQuestVarGet("class"+(x+8*y)+"level");
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}
@@ -139,7 +139,7 @@ inactive
 			savedata = trGetScenarioUserData(10 + y);
 			for(x=1; <9) {
 				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
-				savedata = savedata / 10;
+				savedata = savedata / 11;
 			}
 		}
 
@@ -175,6 +175,7 @@ inactive
 		savedata = savedata / 10;
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
+		xsEnableRule("data_load_emergency_exit");
 		xsDisableSelf();
 	}
 }
@@ -307,6 +308,7 @@ inactive
 		proto = trQuestVarGet("class"+class+"proto");
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"level"));
 		if (trQuestVarGet("p"+p+"class") == 0) {
+			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
 		trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
@@ -315,4 +317,52 @@ inactive
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");
 	xsDisableSelf();
 	xsEnableRule("Z_cin_00");
+}
+
+rule data_load_emergency_exit
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 8) {
+		xsDisableSelf();
+		if (loadProgress == 0) {
+			int x = 0;
+			for(p=1; < ENEMY_PLAYER) {
+				x = x + trPlayerUnitCountSpecific(p, "Swordsman Hero");
+			}
+			if (x <= 1) {
+				trSoundPlayFN("default","1",-1,
+					"Zenophobia: Hmm, looks like AoM has sent everyone into singleplayer. Returning you to main menu now.",
+					"icons\infantry g hoplite icon 64");
+				if (trCurrentPlayer() == 1) {
+					xsEnableRule("data_load_emergency_exit_01");
+				} else {
+					xsEnableRule("data_load_emergency_exit_02");
+				}
+			}
+		}
+	}	
+}
+
+rule data_load_emergency_exit_01
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 5) {
+		xsDisableSelf();
+		xsEnableRule("data_load_emergency_exit_02");
+		trSoundPlayFN("default","1",-1,
+					"Zenophobia:"+trStringQuestVarGet("p1name")+", make sure all spots are filled and the last player is a CPU.",
+					"icons\infantry g hoplite icon 64");
+	}
+}
+
+rule data_load_emergency_exit_02
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 7) {
+		xsDisableSelf();
+		trModeEnter("Pregame");
+	}
 }

@@ -66,7 +66,11 @@ highFrequency
 		}
 		yClearDatabase("enemies");
 
-		yAddToDatabase("enemies", "bossUnit");
+		trQuestVarSet("bossPointer", yAddToDatabase("enemies", "bossUnit"));
+
+		trModifyProtounit("Revealer", 1, 2, 20);
+		trArmyDispatch("1,0","Revealer",1,trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
+		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
 	}
 }
 
@@ -92,6 +96,7 @@ highFrequency
 				trUnitConvert(ENEMY_PLAYER);
 				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
 				xsEnableRule("boss1_battle");
+				zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER,1,0.01);
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));

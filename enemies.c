@@ -11,8 +11,8 @@ void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance =
 	trModifyProtounit(proto, 1, 25, -1);
 	trModifyProtounit(proto, 1, 26, -1);
 	/* LOS */
-	trModifyProtounit(proto, ENEMY_PLAYER, 6, 6);
-	trModifyProtounit(proto, 1, 6, 6);
+	trModifyProtounit(proto, ENEMY_PLAYER, 6, 10);
+	trModifyProtounit(proto, 1, 6, 10);
 }
 
 void activateEnemy(int id = 0) {
