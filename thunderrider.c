@@ -157,9 +157,10 @@ void thunderRiderAlways(int eventID = -1) {
 				trSetSelectedScale(0,0,0);
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar("p"+p+"lightningBalls", "extra"));
-				trMutateSelected(kbGetProtoUnitID("Vortex Finish linked"));
+				trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
+				trUnitSetAnimationPath("0,1,1,0,0,0,0");
 				trUnitOverrideAnimation(2,0,true,true,-1);
-				trSetSelectedScale(1,1,1);
+				trSetSelectedScale(100,-1,100);
 				ySetVar("p"+p+"lightningBalls", "yeehaw", 0);
 			} else {
 				trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
@@ -295,6 +296,7 @@ void thunderRiderAlways(int eventID = -1) {
 				ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
 				lightningBallBounce(p);
 			}
+			refreshRideLightningTargets(p);
 		}
 	}
 
@@ -527,7 +529,7 @@ highFrequency
 	trQuestVarSet("rechargeCooldown", 22);
 
 	trQuestVarSet("rideLightningDamage", 100);
-	trQuestVarSet("rideLightningRange", 4);
+	trQuestVarSet("rideLightningRange", 5);
 	trQuestVarSet("rideLightningCost", 8);
 	trQuestVarSet("rideLightningDelay", 1000 / trQuestVarGet("rideLightningCost"));
 }

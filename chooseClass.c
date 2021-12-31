@@ -161,7 +161,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\god power implode icons 64";
-					msg = "Cost: 8 favor per second | Damage: 100 + 50 per bounce";
+					msg = "Cost: 8 favor per second | Radius: 5 | Damage: 100 + 50 per bounce";
 					next = 0;
 				}
 			}

@@ -416,7 +416,7 @@ float calculateDecay(int p = 0, float decay = 0) {
 	return(decay / trQuestVarGet("p"+p+"spellDuration"));
 }
 
-void processGenericProjectiles() {
+void processGenericProj() {
 	int id = 0;
 	float scale = 0;
 	for(x=1*yGetDatabaseCount("genericProj")/3; >0) {
@@ -448,15 +448,17 @@ void processGenericProjectiles() {
 	}
 }
 
-int addGenericProjectile(string start="",string dir="",int proto=0,int anim=0,float speed=10,float height=5) {
+int addGenericProj(string start="",string dir="",int proto=0,int anim=0,float speed=10,float height=5,float scale=0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	int index = yAddToDatabase("genericProj", "next");
 	yAddUpdateVar("genericProj", "proto", proto);
 	yAddUpdateVar("genericProj", "anim", anim);
 	yAddUpdateVar("genericProj", "speed", speed);
 	yAddUpdateVar("genericProj", "height", height);
+	yAddUpdateVar("genericProj", "scale", scale);
 	yAddUpdateVar("genericProj", "dirX", trQuestVarGet(dir+"x"));
 	yAddUpdateVar("genericProj", "dirZ", trQuestVarGet(dir+"z"));
+	yAddUpdateVar("genericProj", "yeehaw", 1);
 
 	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
 	trUnitSelectClear();

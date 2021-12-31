@@ -96,7 +96,6 @@ highFrequency
 				trUnitConvert(ENEMY_PLAYER);
 				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
 				xsEnableRule("boss1_battle");
-				zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER,1,0.01);
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
