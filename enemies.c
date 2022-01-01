@@ -60,10 +60,10 @@ highFrequency
 		trModifyProtounit("Minion", 1, 8, -99);
 		setupProtounitBounty("Minion", 4);
         setupProtounitBounty("Golden Lion", 4);
-        setupProtounitBounty("Anubite", 6, 0.05);
-        setupProtounitBounty("Terracotta Soldier", 6, 0.05);
-		setupProtounitBounty("Sphinx", 8, 0.1, RELIC_SPELL_DURATION);
-		setupProtounitBounty("Petsuchos", 8, 0.2, RELIC_ATTACK_RANGE);
+        setupProtounitBounty("Anubite", 6, 0.03);
+        setupProtounitBounty("Terracotta Soldier", 6, 0.03);
+		setupProtounitBounty("Sphinx", 8, 0.05, RELIC_SPELL_DURATION);
+		setupProtounitBounty("Petsuchos", 8, 0.1, RELIC_ATTACK_RANGE);
 		
 		xsDisableSelf();
 	}

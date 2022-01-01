@@ -32,8 +32,8 @@ void saveAllData() {
 	savedata = 0;
 	currentdata = 0;
 	for(x=5; > 0) {
-		savedata = savedata * 32 + 1*trQuestVarGet("p"+p+"relic"+x);
-		currentdata = currentdata * 32 + 1*trQuestVarGet("p"+p+"relic"+(x+5));
+		savedata = savedata * 32 + (1*trQuestVarGet("p"+p+"relic"+x));
+		currentdata = currentdata * 32 + (1*trQuestVarGet("p"+p+"relic"+(x+5)));
 	}
 	trSetCurrentScenarioUserData(2, savedata);
 	trSetCurrentScenarioUserData(3, currentdata);
@@ -42,7 +42,8 @@ void saveAllData() {
 	for(y=0; < 4) {
 		savedata = 0;
 		for(x=8; >0) {
-			savedata = savedata * 11 + 1*trQuestVarGet("ownedRelics"+(x+8*y));
+			currentdata = 1*trQuestVarGet("ownedRelics"+(x+8*y));
+			savedata = savedata * 11 + currentdata;
 		}
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
@@ -50,7 +51,8 @@ void saveAllData() {
 	/* gemstones */
 	savedata = 0;
 	for(x=4; >0) {
-		savedata = savedata * 100 + 1*xsMin(100, trQuestVarGet("gemstone"+x));
+		currentdata = 1*xsMin(100, trQuestVarGet("gemstone"+x));
+		savedata = savedata * 100 + currentdata;
 	}
 
 	if (Multiplayer == false) {
@@ -58,7 +60,8 @@ void saveAllData() {
 		for(y=0; <2) {
 			savedata = 0;
 			for(x=8; >0) {
-				savedata = savedata * 11 + 1*trQuestVarGet("class"+(x+8*y)+"level");
+				currentdata = 1*trQuestVarGet("class"+(x+8*y)+"level");
+				savedata = savedata * 11 + currentdata;
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}

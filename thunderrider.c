@@ -184,7 +184,7 @@ void thunderRiderAlways(int eventID = -1) {
 					ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
 					lightningBallBounce(p);
 				}
-				if (trQuestVarGet("posY") < 0.5 && yGetVar("p"+p+"lightningBalls", "yeehaw") == 0) {
+				if (trQuestVarGet("posY") < (0.5 + worldHeight) && yGetVar("p"+p+"lightningBalls", "yeehaw") == 0) {
 					lightningBallBounce(p);
 				}
 

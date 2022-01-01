@@ -36,6 +36,7 @@ const int STARSTONE = 0;
 const int LIFESTONE = 1;
 const int MANASTONE = 2;
 
+float worldHeight = 0;
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 

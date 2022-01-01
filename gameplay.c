@@ -232,12 +232,12 @@ highFrequency
 
     /*
     TESTING STUFF BELOW THIS LINE
-    trVectorQuestVarSet("center", vector(10,0,10));
-    spawnPlayer(1, "center");
-    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    yAddToDatabase("enemies", "next");
-    trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,20,0,20,0,true);
     */
+    if (Multiplayer) {
+        trUnitSelectClear();
+        trUnitSelectByQV("p1unit");
+        trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
+    }
 }
 
 rule gameplay_always
@@ -506,10 +506,15 @@ highFrequency
                     trUnitSetAnimationPath("1,0,1,1,0,0,0");
                 }
             }
+            if (trCurrentPlayer() == p) {
+                uiFindType(kbGetProtoUnitName(id));
+            }
         }
     }
 
     processChests();
+
+    processGenericProj();
 
     xsSetContextPlayer(old);
 

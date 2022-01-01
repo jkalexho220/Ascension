@@ -212,7 +212,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             paintEyecandy(x0, z0, x1, z1, "sprite");
 
             /* relic spawn */
-            for(j=randomLow(10) - 7; >0) {
+            for(j=randomLow(11) - 8; >0) {
                 paintRelicEdge(x0, z0, x1, z1);
             }
         }
@@ -274,18 +274,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             x1 = trQuestVarGet("room"+room+"top1x");
             z1 = trQuestVarGet("room"+room+"top1z");
             trVectorQuestVarSet("center", xsVectorSet(x0 + x1, 0, z0 + z1));
-            trQuestVarSetFromRand("x0", 0, 1, false);
-            trQuestVarSetFromRand("z0", trQuestVarGet("x0"), 1, false);
-            /* set negative to be 1 or -1 */
-            trQuestVarSetFromRand("negative", 0, 1, true);
-            trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
-            x0 = x0 + x1 + (x1 - x0) * trQuestVarGet("x0") * trQuestVarGet("negative");
-            trQuestVarSetFromRand("negative", 0, 1, true);
-            trQuestVarSet("negative", 1 - 2 * trQuestVarGet("negative"));
-            z0 = z0 + z1 + (z1 - z0) * trQuestVarGet("z0") * trQuestVarGet("negative");
-            trVectorQuestVarSet("relictransporterguypos", xsVectorSet(x0, 0, z0));
+            trVectorQuestVarSet("relictransporterguypos", randomNearEdge(x0, z0, x1, z1));
             trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors("relictransporterguypos", "center"));
             trQuestVarSet("relicTransporterGuyName", trGetNextUnitScenarioNameNumber());
+            x0 = trQuestVarGet("relicTransporterGuyPosx");
+            z0 = trQuestVarGet("relicTransporterGuyPosz");
             trArmyDispatch("1,0","Villager Atlantean Hero",1,x0,0,z0,trQuestVarGet("heading"), true);
             trUnitSelectClear();
             trUnitSelectByQV("relicTransporterGuyName", true);
@@ -478,8 +471,11 @@ highFrequency
 
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 1500 * ENEMY_PLAYER);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 2500 * ENEMY_PLAYER);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 4.8);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 24, -1);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 25, -1);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 26, -1);
             }
         }
 

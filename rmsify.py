@@ -28,6 +28,29 @@ def checkQuestVarSet(templine, ln):
 			elif (x == ')'):
 				depth = depth - 1
 
+def checkQuestVarGet(templine, ln):
+	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').split(' ')
+	findComma = False
+	foundComma = False
+	depth = 0
+	for x in tokens:
+		if (x == 'trQuestVarGet'):
+			findComma = True
+		if findComma:
+			if (depth == 1):
+				if x == ',':
+					foundComma = True
+				elif x == ')':
+					if (foundComma):
+						print("trQuestVarGet instead of trQuestVarSet")
+						print("Line " + str(ln) + ":\n    " + line)
+					else:
+						break
+			if (x == '('):
+				depth = depth + 1
+			elif (x == ')'):
+				depth = depth - 1
+
 def checkUnknownFunctions(templine, ln):
 	tokens = templine.replace('=', ' ').replace(';', ' ').replace('(', ' ( ').replace(')', ' ) ').replace('*', ' ').replace('+', ' ').replace(',', ' ').replace('"', ' " ').replace('-', ' ').replace('/', ' ').replace('<', ' ').replace('>', ' ').split(' ')
 	if (tokens[0] == 'void' or tokens[0] == 'int' or tokens[0] == 'string' or tokens[0] == 'vector' or tokens[0] == 'float' or tokens[0] == 'bool') and tokens[2] == '(':
@@ -108,6 +131,7 @@ try:
 						if (not comment):
 							templine = line.strip()
 							checkQuestVarSet(templine, ln)
+							checkQuestVarGet(templine, ln)
 							if not first:
 								checkUnknownFunctions(templine, ln)
 							if ('//' in templine):

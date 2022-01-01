@@ -33,7 +33,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 1:
 				{
 					trCameraCut(vector(90,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
-					uiMessageBox("Welcome to the customization area! There are many things you can do here!");
+					uiMessageBox("Welcome to the Adventurer's Guild! There are many things you can do here!");
 				}
 				case 2:
 				{
@@ -42,33 +42,37 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trCameraCut(vector(90,70.710701,60), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
-					uiMessageBox("This is your class selection. Click on a class to see its details or switch to it.");
+					uiMessageBox("If you drop a relic here, it will automatically be kept in the warehouse.");
 				}
 				case 4:
 				{
-					uiMessageBox("Some classes are locked. Each class has a unique unlock condition.");
+					trCameraCut(vector(90,70.710701,60), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+					uiMessageBox("This is your class selection. Click on a class to see its details or switch to it.");
 				}
 				case 5:
+				{
+					uiMessageBox("Some classes are locked. Each class has a unique unlock condition.");
+				}
+				case 6:
 				{
 					trUnitSelectClear();
 					trUnitSelectByQV("levelupObelisk");
 					trUnitHighlight(15.0, true);
 					uiMessageBox("This is your Ascension Obelisk. Click on this obelisk to level up your current hero.");
 				}
-				case 6:
+				case 7:
 				{
 					uiMessageBox("Level-ups cost gold and gemstones, which are dropped by bosses.");
 				}
-				case 7:
+				case 8:
 				{
 					uiMessageBox("Each level-up increases your hero's relic capacity by 1.");
 				}
-				case 8:
+				case 9:
 				{
 					uiMessageBox("There are more facilities, but they are locked for now. Play the game some more to unlock them!");
 				}
-				case 9:
+				case 10:
 				{
 					trCameraCut(vector(90,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
 					uiMessageBox("When you are ready to save your configuration, enter the sky passage in the center.");
@@ -76,7 +80,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 					trUnitSelectByQV("skypassage");
 					trUnitHighlight(5.0, true);
 				}
-				case 10:
+				case 11:
 				{
 					dialog = 0;
 					xsEnableRule("gameplay_start_2");
