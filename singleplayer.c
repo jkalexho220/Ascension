@@ -12,10 +12,10 @@ void spAscendClass(int class = -1) {
 	int gemstone = trQuestVarGet("class"+class+"gemstone");
 	if (trPlayerResourceCount(1, "Gold") < trQuestVarGet("goldCost")) {
 		trSoundPlayFN("cantdothat.wav","1",-1,"","");
-		uiMessageBox("You don't have enough gold! You need " + trQuestVarGet("goldCost"));
+		uiMessageBox("You don't have enough gold! You need " + 1*trQuestVarGet("goldCost"));
 	} else if (trQuestVarGet("gemstone"+gemstone) < trQuestVarGet("gemstoneCost")) {
 		trSoundPlayFN("cantdothat.wav","1",-1,"","");
-		string noMessage = "You don't have enough gemstones! (";
+		string noMessage = "You don't have enough " + gemstoneName(gemstone) + "! (";
 		noMessage = noMessage + 1*trQuestVarGet("gemstone"+gemstone)+"/"+1*trQuestVarGet("gemstoneCost")+")";
 		uiMessageBox(noMessage);
 	} else {
@@ -205,7 +205,7 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("class"+x+"unit");
 		if (trUnitIsSelected()) {
-			uiClearSelection();
+			reselectMyself();
 			if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
 				explainClass(x);
 				if (trQuestVarGet("class"+x+"level") == 0) {
@@ -221,11 +221,11 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("levelupObelisk");
 	if (trUnitIsSelected()) {
-		uiClearSelection();
+		reselectMyself();
 		class = trQuestVarGet("p1class");
 		trQuestVarSet("goldCost", 100 * trQuestVarGet("class"+class+"level"));
-		trQuestVarSet("gemstonesCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
-		string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstonesCost") + " ";
+		trQuestVarSet("gemstoneCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
+		string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstoneCost") + " ";
 		yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
 		if (trQuestVarGet("p1level") < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",

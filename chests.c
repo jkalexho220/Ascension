@@ -82,7 +82,7 @@ void processChests() {
 		        	case CHEST_KEY:
 		            {
 		            	if (trUnitIsSelected()) {
-		            		uiClearSelection();
+		            		reselectMyself();
 		                	uiMessageBox("Find a relic with a matching symbol and bring it here to open this chest.");
 		                }
 		                trVectorQuestVarSet("pos", kbGetBlockPosition(""+1*yGetVar("chests", "key")));
@@ -99,14 +99,14 @@ void processChests() {
 		            case CHEST_PADS:
 		            {
 		                if (trUnitIsSelected()) {
-		            		uiClearSelection();
+		            		reselectMyself();
 		                	uiMessageBox("There are two pressure pads in this room. A player must stand on each to open this chest.");
 		                }
 		            }
 		            case CHEST_ENCOUNTER:
 		            {
 		                if (trUnitIsSelected()) {
-		            		uiClearSelection();
+		            		reselectMyself();
 		                	uiMessageBox("You must defeat all the enemies in this room to open this chest.");
 		                }
 		                trQuestVarSet("allDead", 1);

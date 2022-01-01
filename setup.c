@@ -83,6 +83,18 @@ string gemstoneName(int gem = 0) {
     return(name);
 }
 
+void reselectMyself() {
+    uiClearSelection();
+    int p = trCurrentPlayer();
+    int class = trQuestVarGet("p"+p+"class");
+    trackInsert();
+    trackAddWaypoint();
+    trackAddWaypoint();
+    trBlockAllSounds(false);
+    uiFindType(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")));
+    trackPlay(1,999);
+}
+
 void setupPlayerProto(string proto = "", float health = 0, float attack = 0, float speed = 4, float range = 0) {
     int pNum = kbGetProtoUnitID(proto);
     for(p=0; <ENEMY_PLAYER) {

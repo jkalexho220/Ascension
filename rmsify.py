@@ -51,10 +51,10 @@ print("rmsification start!")
 
 functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGPBlocking', 'kbIsPlayerHuman', 'trPlayNextMusicTrack',
 			'trDamageUnitsInArea', 'trCameraCut', 'trUnitSetAnimation', 'trPlayerTechTreeEnabledGodPowers', 'uiLookAtUnitByName',
-			'trGetUnitScenarioNameNumber', 'trUnitIsOwnedBy', 'trCounterAddTime', 'trMutateSelected', 'xsMin', 
-			'trChatSend', 'trUnitIsSelected', 'kbGetProtoUnitName', 'trUnitSetStance', 'trForceNonCinematicModels', 
+			'trGetUnitScenarioNameNumber', 'trUnitIsOwnedBy', 'trCounterAddTime', 'trMutateSelected', 'xsMin', 'trSetSelectedUpVector',
+			'trChatSend', 'trUnitIsSelected', 'kbGetProtoUnitName', 'trUnitSetStance', 'trForceNonCinematicModels', 'trackGotoSelectedWaypoint',
 			'trLetterBox', 'trUnitDead', 'trUnitPercentDamaged', 'trDamageUnitPercent', 'trCamTrackLoad', 'trUnitVisToPlayer',
-			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 'trIsGadgetVisible',
+			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 'trIsGadgetVisible', 'trackRemove',
 			'trSetUnitOrientation', 'trMessageSetText', 'kbUnitGetAnimationActionType', 'trUnitHighlight', 'trUnitConvert', 
 			'xsVectorSet', 'trVectorQuestVarGetZ', 'map', 'if', 'trSetUnitIdleProcessing', 'configUndef', 'uiMessageBox',
 			'trCountUnitsInArea', 'trArmyDispatch', 'trTime', 'xsEnableRule', 'trUnitDestroy', 'trPlayerUnitCountSpecific', 
@@ -170,6 +170,8 @@ try:
 		file_data_2.write('for(p=1; < cNumberNonGaiaPlayers) {\n')
 		file_data_2.write('code("trStringQuestVarSet(\\"p"+p+"name\\", \\""+rmGetPlayerName(p)+"\\");");\n')
 		file_data_2.write('}\n');
+		file_data_2.write('string quote = "\\\\";\n')
+		file_data_2.write('code("map(\\"esc\\", \\"ShowImageBox\\", \\"gadgetUnreal("+quote+"ShowImageBox"+quote+")\\");");\n')
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*///");\n')
 		file_data_2.write('rmSetStatusText("", 0.99);')

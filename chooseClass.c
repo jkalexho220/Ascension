@@ -328,7 +328,7 @@ highFrequency
 			trQuestVarSet("pleaseExplain", i);
 			trQuestVarSet("explain", 0);
 			trDelayedRuleActivation("class_shop_explain_01");
-			uiClearSelection();
+			reselectMyself();
 		}
 		trVectorSetUnitPos("pos", "choice"+i+"unit");
 		for (p=1; < ENEMY_PLAYER) {

@@ -122,7 +122,7 @@ highFrequency
 	if (trUnitIsSelected()) {
 		trUnitHighlight(5.0, true);
 		startNPCDialog(NPC_RELIC_TRANSPORTER);
-		uiClearSelection();
+		reselectMyself();
 	}
 }
 

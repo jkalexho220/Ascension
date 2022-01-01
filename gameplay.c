@@ -1,3 +1,8 @@
+void removeCamTracks(int eventID = -1) {
+    trackRemove();
+    trUnblockAllSounds();
+}
+
 void spawnPlayerClone(int p = 0, string vdb = "") {
     int class = trQuestVarGet("p"+p+"class");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -196,6 +201,7 @@ inactive
 highFrequency
 {
     xsDisableSelf();
+    trEventSetHandler(999, "removeCamTracks");
     trSetUnitIdleProcessing(true);
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
@@ -423,8 +429,8 @@ highFrequency
                 yRemoveUpdateVar("freeRelics", "type");
             }
         } else if (trUnitIsSelected()) {
-            uiClearSelection();
             relicDescription(1*yGetVar("freeRelics", "type"));
+            reselectMyself();
         }
     }
 
