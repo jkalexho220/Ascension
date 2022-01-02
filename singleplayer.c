@@ -40,10 +40,6 @@ highFrequency
 	    trUIFadeToColor(0,0,0,1000,0,false);
 		trMusicPlayCurrent();
 	    trPlayNextMusicTrack();
-	    if (trQuestVarGet("p1class") == 0) {
-	    	trQuestVarSet("p1class", MOONBLADE);
-	    }
-	    chooseClass(1, 1*trQuestVarGet("p1class"));
 
 	    trVectorQuestVarSet("startPosition", vector(135,0,135));
 
@@ -132,6 +128,11 @@ highFrequency
 	    } else {
 	    	xsEnableRule("gameplay_start_2");
 	    }
+
+	    if (trQuestVarGet("p1class") == 0) {
+	    	trQuestVarSet("p1class", MOONBLADE);
+	    }
+	    chooseClass(1, 1*trQuestVarGet("p1class"));
 
 	    /* class selection */
 	    trPaintTerrain(69,49, 75,56, 4,15, false);

@@ -387,12 +387,6 @@ highFrequency
         setupPlayerProto("Lancer Hero", 1100, 55, 6.05);
         setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
 
-        for(p=1; < ENEMY_PLAYER) {
-            trModifyProtounit("Attack Revealer", p, 2, 9999999999999999999.0);
-            trModifyProtounit("Attack Revealer", p, 2, -9999999999999999999.0);
-            zInitProtoUnitStat("Attack Revealer", p, 2, 0);
-        }
-
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
         trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, 9999999999999999999.0);

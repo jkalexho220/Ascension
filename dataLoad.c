@@ -51,9 +51,10 @@ void saveAllData() {
 	/* gemstones */
 	savedata = 0;
 	for(x=3; >=0) {
-		currentdata = 1*xsMin(100, trQuestVarGet("gemstone"+x));
+		currentdata = 1*xsMin(100, 1*trQuestVarGet("gemstone"+x));
 		savedata = savedata * 100 + currentdata;
 	}
+	trSetCurrentScenarioUserData(9, savedata);
 
 	if (Multiplayer == false) {
 		/* class levels */
@@ -176,6 +177,7 @@ inactive
 		savedata = xsMax(0, trGetScenarioUserData(0));
 		currentdata = iModulo(10, savedata);
 		savedata = savedata / 10;
+
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
 		xsEnableRule("data_load_emergency_exit");
@@ -224,7 +226,7 @@ inactive
 	for(p=1; < ENEMY_PLAYER) {
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman Hero");
 	}
-	if (swordsmen == ENEMY_PLAYER - 1) {
+	if (swordsmen == cNumberPlayers - 2) {
 		for(p=1; < ENEMY_PLAYER) {
 			swordsmen = 32 * (p - 1);
 			for(x=0; < 32) {
@@ -244,7 +246,7 @@ inactive
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
 					}
 					trUnitSelectClear();
-					trUnitSelectByID(x);
+					trUnitSelectByID(x + swordsmen);
 					trMutateSelected(kbGetProtoUnitID("Swordsman"));
 					break;
 				}

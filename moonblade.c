@@ -127,8 +127,8 @@ void moonbladeAlways(int eventID = -1) {
 				(kbGetBlockID(""+1*yGetVar("p"+p+"characters", "crescentSFX")) == -1)) {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"characters", true);
-				ySetVar("p"+p+"Characters", "crescentSFX", 
-					0 - spyEffect(1*trQuestVarGet("p"+p+"Characters"), kbGetProtoUnitID("Rocket")));
+				spyEffect(1*trQuestVarGet("p"+p+"Characters"), 
+					kbGetProtoUnitID("Rocket"), yGetVarName("p"+p+"characters", "crescentSFX"));
 			}
 		}
 	}

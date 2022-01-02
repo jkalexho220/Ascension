@@ -145,8 +145,8 @@ void sunbowAlways(int eventID = -1) {
 						(kbGetBlockID(""+1*yGetVar("p"+p+"characters", "searingSFX")) == -1)) {
 						trUnitSelectClear();
 						trUnitSelectByQV("p"+p+"characters", true);
-						ySetVar("p"+p+"Characters", "searingSFX", 
-							0 - spyEffect(1*trQuestVarGet("p"+p+"Characters"), kbGetProtoUnitID("Rocket")));
+						spyEffect(1*trQuestVarGet("p"+p+"Characters"), 
+							kbGetProtoUnitID("Rocket"), yGetVarName("p"+p+"characters", "searingSFX"));
 					}
 				}
 			}

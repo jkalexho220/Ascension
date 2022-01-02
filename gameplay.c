@@ -471,10 +471,6 @@ highFrequency
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"silenceSFX");
                     trUnitChangeProtoUnit("Cinematic Block");
-                } else if (trQuestVarGet("p"+p+"silenceSFX") == 0) {
-                    if (trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
-                        trQuestVarSet("p"+p+"silenceSFX", trQuestVarGet("spyEye"+1*trQuestVarGet("p"+p+"silenceIndex")));
-                    }
                 }
             }
         } else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {

@@ -17,14 +17,14 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
-int spyEffect(int unit = 0, int proto = 0, string qv = "") {
+void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 	int x = modularCounterNext("spyFind");
-	trQuestVarSet("spyEye"+x, 0 - proto);
+	trQuestVarSet("spyEye"+x, proto);
+	trQuestVarSet("spyEye"+x+"unit", unit);
 	trStringQuestVarSet("spyName"+x, qv);
 	trUnitSelectClear();
 	trUnitSelect(""+unit, true);
 	trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
-	return(x);
 }
 
 void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
@@ -487,9 +487,18 @@ highFrequency
 				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
 					int x = modularCounterNext("spyfound");
 					trUnitSelectClear();
+					trUnitSelectByQV("spyEye"+x+"unit");
+					while(trUnitAlive() == false) {
+						if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+							break;
+						}
+						x = modularCounterNext("spyfound");
+						trUnitSelectClear();
+						trUnitSelectByQV("spyEye"+x+"unit");
+					}
+					trUnitSelectClear();
 					trUnitSelectByID(id);
-					trMutateSelected(0 - trQuestVarGet("spyEye"+x));
-					trQuestVarSet("spyEye"+x, trQuestVarGet("spysearch"));
+					trMutateSelected(1*trQuestVarGet("spyEye"+x));
 					trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
 				}
 			}
