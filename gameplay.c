@@ -7,7 +7,7 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
     int class = trQuestVarGet("p"+p+"class");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
     yAddToDatabase("p"+p+"characters", "next");
-    yAddToDatabase("playerUnits", "next");
+    yAddUpdateVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "next"));
     yAddUpdateVar("playerUnits", "player", p);
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
@@ -232,12 +232,13 @@ highFrequency
 
     /*
     TESTING STUFF BELOW THIS LINE
-    */
+    
     if (Multiplayer) {
         trUnitSelectClear();
         trUnitSelectByQV("p1unit");
         trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
     }
+    */
 }
 
 rule gameplay_always
@@ -476,38 +477,69 @@ highFrequency
                     }
                 }
             }
-        } else if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
-            trUnitSelectClear();
-            trUnitSelectByQV("p"+p+"reviveBeam");
-            trUnitChangeProtoUnit("Rocket");
-            trUnitSelectClear();
-            trUnitSelectByQV("p"+p+"unit");
-            id = trQuestVarGet("p"+p+"class");
-            id = trQuestVarGet("class"+id+"proto");
-            trUnitChangeProtoUnit("Dwarf");
-            trUnitSelectClear();
-            trUnitSelectByQV("p"+p+"unit");
-            trDamageUnitPercent(-100);
-            trMutateSelected(id);
-            trSoundPlayFN("herorevived.wav","1",-1,"","");
-            trDamageUnitPercent(50);
-            trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
-            trQuestVarSet("p"+p+"dead", 0);
-            yAddToDatabase("p"+p+"characters", "p"+p+"unit");
-            for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-                yDatabaseNext("p"+p+"relics", true);
-                trUnitChangeProtoUnit("Relic");
-                trUnitSelectClear();
-                trUnitSelectByQV("p"+p+"relics");
-                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-                trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-                if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-                    trSetSelectedScale(0,0,0);
-                    trUnitSetAnimationPath("1,0,1,1,0,0,0");
+        } else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
+            count = 0 - trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20);
+            trQuestVarSet("p"+p+"reviveNext", trTimeMS() + 1000);
+            trVectorSetUnitPos("pos", "p"+p+"unit");
+            trQuestVarSet("playersReviving", 0);
+            for(x=yGetDatabaseCount("playerCharacters"); >0) {
+                id = yDatabaseNext("playerCharacters", true);
+                if (id == -1 || trUnitAlive() == false) {
+                    yRemoveFromDatabase("playerCharacters");
+                } else if (zDistanceToVectorSquared("playerCharacters", "pos") < 100) {
+                    count = count + 1;
+                    trQuestVarSet("playersReviving", 1);
                 }
             }
-            if (trCurrentPlayer() == p) {
-                uiFindType(kbGetProtoUnitName(id));
+            if (Multiplayer == false) {
+                trQuestVarSet("playersReviving", 1);
+                count = 1;
+            }
+            if (trQuestVarGet("playersReviving") == 1) {
+                if (count <= 0) {
+                    trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> can't be revived. Too many enemies nearby!");
+                } else {
+                    trQuestVarSet("p"+p+"dead", xsMax(0, trQuestVarGet("p"+p+"dead") - count));
+                    trChatSend(0, 
+                        "<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + 1*trQuestVarGet("p"+p+"dead"));
+                }
+                if (trQuestVarGet("p"+p+"dead") <= 0) {
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"reviveBeam");
+                    trUnitChangeProtoUnit("Rocket");
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"unit");
+                    id = trQuestVarGet("p"+p+"class");
+                    id = trQuestVarGet("class"+id+"proto");
+                    trUnitChangeProtoUnit("Dwarf");
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"unit");
+                    trDamageUnitPercent(-100);
+                    trMutateSelected(id);
+                    trSoundPlayFN("herorevived.wav","1",-1,"","");
+                    trDamageUnitPercent(50);
+                    trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+                    yAddToDatabase("p"+p+"characters", "p"+p+"unit");
+                    yAddToDatabase("playerCharacters", "p"+p+"unit");
+                    yAddUpdateVar("playerCharacters", "player", p);
+                    yAddToDatabase("playerUnits", "p"+p+"unit");
+                    yAddUpdateVar("playerUnits", "player", p);
+                    for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+                        yDatabaseNext("p"+p+"relics", true);
+                        trUnitChangeProtoUnit("Relic");
+                        trUnitSelectClear();
+                        trUnitSelectByQV("p"+p+"relics");
+                        trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                        trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                        if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+                            trSetSelectedScale(0,0,0);
+                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                        }
+                    }
+                    if (trCurrentPlayer() == p) {
+                        uiFindType(kbGetProtoUnitName(id));
+                    }
+                }
             }
         }
     }
@@ -539,7 +571,8 @@ highFrequency
         {
             case 1:
             {
-                trSoundPlayFN("default","1",-1,"Zenophobia: Your journey is not over!","icons\infantry g hoplite icon 64");
+                trSoundPlayFN("default","1",-1,"Zenophobia: Your journey is not over! This map remembers your progress!",
+                    "icons\infantry g hoplite icon 64");
                 trQuestVarSet("gameOverNext", trTime() + 4);
             }
             case 2:
@@ -567,7 +600,11 @@ highFrequency
             {
                 xsDisableSelf();
                 for(p=1; < ENEMY_PLAYER) {
-                    trSetPlayerDefeated(p);
+                    if (trQuestVarGet("playersWon") == 1) {
+                        trSetPlayerWon(p);
+                    } else {
+                        trSetPlayerDefeated(p);
+                    }
                 }
                 trEndGame();
             }

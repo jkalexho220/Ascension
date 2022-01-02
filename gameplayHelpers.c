@@ -104,13 +104,29 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "posZ");
 }
 
+void removePlayerUnit() {
+	yRemoveFromDatabase("playerUnits");
+	yRemoveUpdateVar("playerUnits", "player");
+	yRemoveUpdateVar("playerUnits", "currentHealth");
+	yRemoveUpdateVar("playerUnits", "stunStatus");
+	yRemoveUpdateVar("playerUnits", "stunTimeout");
+	yRemoveUpdateVar("playerUnits", "stunSFX");
+	yRemoveUpdateVar("playerUnits", "poisonStatus");
+	yRemoveUpdateVar("playerUnits", "poisonTimeout");
+	yRemoveUpdateVar("playerUnits", "poisonLast");
+	yRemoveUpdateVar("playerUnits", "poisonDamage");
+	yRemoveUpdateVar("playerUnits", "poisonSFX");
+	yRemoveUpdateVar("playerUnits", "decay");
+	yRemoveUpdateVar("playerUnits", "decayNext");
+}
+
 void removePlayerCharacter(int p = 0) {
 	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 			yDatabaseNext("p"+p+"relics", true);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 		}
-		trQuestVarSet("p"+p+"dead", 1);
+		trQuestVarSet("p"+p+"dead", 10);
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"unit");
@@ -129,25 +145,8 @@ void removePlayerCharacter(int p = 0) {
 	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
 	yRemoveUpdateVar("p"+p+"Characters", "attacking");
 	yRemoveUpdateVar("p"+p+"Characters", "attackNext");
+	yRemoveUpdateVar("p"+p+"characters", "index");
 }
-
-void removePlayerUnit() {
-	yRemoveFromDatabase("playerUnits");
-	yRemoveUpdateVar("playerUnits", "player");
-	yRemoveUpdateVar("playerUnits", "currentHealth");
-	yRemoveUpdateVar("playerUnits", "stunStatus");
-	yRemoveUpdateVar("playerUnits", "stunTimeout");
-	yRemoveUpdateVar("playerUnits", "stunSFX");
-	yRemoveUpdateVar("playerUnits", "poisonStatus");
-	yRemoveUpdateVar("playerUnits", "poisonTimeout");
-	yRemoveUpdateVar("playerUnits", "poisonLast");
-	yRemoveUpdateVar("playerUnits", "poisonDamage");
-	yRemoveUpdateVar("playerUnits", "poisonSFX");
-	yRemoveUpdateVar("playerUnits", "decay");
-	yRemoveUpdateVar("playerUnits", "decayNext");
-}
-
-
 
 /*
 called after confirming that the projectile is on WALL terrain.
@@ -349,7 +348,7 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 /*
 protection blocks all damage.
 */
-float damagePlayerUnit(float dmg = 0) {
+void damagePlayerUnit(float dmg = 0) {
 	if (trQuestVarGet("protectionCount") == 0) {
 		trDamageUnit(dmg);
 	}

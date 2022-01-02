@@ -168,11 +168,11 @@ string relicIcon(int relic = 0) {
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
-			icon = "icons\special x behemoth icons 64";
+			icon = "icons\god power dryad icons 64";
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
-			icon = "icons\hero g ajax icon 64";
+			icon = "icons\special x behemoth icons 64";
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{

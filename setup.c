@@ -64,6 +64,26 @@ Secondary terrain
 int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
 
+string gemstoneIcon(int gem = 0) {
+    string img = "icons\improvement thurisaz rune icon 64";
+    switch(gem)
+    {
+        case STARSTONE:
+        {
+            img = "icons\improvement focus icons 64";
+        }
+        case LIFESTONE:
+        {
+            img = "icons\god power healing spring icon 64";
+        }
+        case MANASTONE:
+        {
+            img = "icons\improvement thurisaz rune icon 64";
+        }
+    }
+    return(img);
+}
+
 string gemstoneName(int gem = 0) {
     string name = "Dust";
     switch(gem)
@@ -82,6 +102,38 @@ string gemstoneName(int gem = 0) {
         }
     }
     return(name);
+}
+
+string stageName(int stage = 0) {
+    string name = "WTF THAT'S NOT A STAGE";
+    switch(stage)
+    {
+        case 1:
+        {
+            name = "The Lion's Den";
+        }
+        case 2:
+        {
+            name = "Murkwood";
+        }
+    }
+    return(name);
+}
+
+string stageIcon(int stage = 0) {
+    string img = "icons\infantry g hoplite icon 64";
+    switch(stage)
+    {
+        case 1:
+        {
+            img = "ui\ui map watering hole 256x256";
+        }
+        case 2:
+        {
+            img = "ui\ui map deep jungle 256x256";
+        }
+    }
+    return(img);
 }
 
 void reselectMyself() {
@@ -187,7 +239,7 @@ void chooseClass(int p = 0, int class = 0) {
 
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
-    if (trUnitAlive()) {
+    if (trUnitAlive() && trQuestVarGet("p"+p+"unit") > 0) {
         trMutateSelected(proto);
     }
     trPlayerKillAllGodPowers(p);

@@ -26,6 +26,8 @@ void rideLightningOff(int p = 0) {
 		yDatabaseNext("p"+p+"characters");
 		index = yGetVar("p"+p+"characters", "lightningIndex");
 		ySetPointer("p"+p+"lightningBalls", index);
+		trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
+		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lightningBalls", true);
 		trUnitChangeProtoUnit("Transport Ship Greek");
@@ -43,6 +45,8 @@ void rideLightningOff(int p = 0) {
 		trUnitSelectByQV("p"+p+"lightningBalls", true);
 		trDamageUnitPercent(100);
 		trUnitChangeProtoUnit("Implode Sphere Effect");
+		ySetVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "p"+p+"characters"));
+		yAddUpdateVar("playerUnits", "player", p);
 	}
 
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
@@ -340,6 +344,8 @@ void thunderRiderAlways(int eventID = -1) {
 						ySetVar("p"+p+"characters", "lightningIndex", yAddToDatabase("p"+p+"lightningBalls", "next"));
 						yAddUpdateVar("p"+p+"lightningBalls", "dirX", trQuestVarGet("dirX"));
 						yAddUpdateVar("p"+p+"lightningBalls", "dirZ", trQuestVarGet("dirZ"));
+						yAddUpdateVar("p"+p+"lightningBalls", "prevX", trQuestVarGet("startX"));
+						yAddUpdateVar("p"+p+"lightningBalls", "prevZ", trQuestVarGet("startZ"));
 						yAddUpdateVar("p"+p+"lightningBalls", "damage", 
 							trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage"));
 						yAddUpdateVar("p"+p+"lightningBalls", "yeehaw", 1);
@@ -356,6 +362,9 @@ void thunderRiderAlways(int eventID = -1) {
 						trUnitSelectClear();
 						trUnitSelectByQV("p"+p+"characters", true);
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+
+						ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"));
+						removePlayerUnit();
 					}
 				}
 			}

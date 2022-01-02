@@ -446,7 +446,7 @@ highFrequency
                 trQuestVarSet("treeDensity", 0.03);
                 trStringQuestVarSet("treeProto1", "Statue Lion Left");
                 trStringQuestVarSet("treeProto2", "Statue Lion Right");
-                trStringQuestVarSet("treeProto3", "Palm");
+                trStringQuestVarSet("treeProto3", "Savannah Tree");
                 trQuestVarSet("spriteDensity", 0.3);
                 trStringQuestVarSet("spriteProto1", "Rock Sandstone Sprite");
                 trStringQuestVarSet("spriteProto2", "Grass");
@@ -471,7 +471,7 @@ highFrequency
 
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 2500 * ENEMY_PLAYER);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 4.8);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 25, -1);
