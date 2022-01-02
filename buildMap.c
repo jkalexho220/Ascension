@@ -433,7 +433,6 @@ highFrequency
             case 1:
             {
                 /* this had better be good to hook them in */
-                trOverlayText("The Lion's Den", 3.0, -1, -1, -1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
                 
@@ -727,6 +726,7 @@ highFrequency
         trUnblockAllSounds();
         if (trQuestVarGet("newPlayers") == 0) {
             xsEnableRule("gameplay_start");
+            trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
             trUIFadeToColor(0,0,0,1000,0,false);
             trLetterBox(false);
         } else {

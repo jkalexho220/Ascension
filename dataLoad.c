@@ -19,7 +19,7 @@ void saveAllData() {
 	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level") + 100 * trQuestVarGet("p"+p+"class");
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
-	savedata = trGetScenarioUserData(1) + trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	savedata = xsMax(0, trGetScenarioUserData(1)) + trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
@@ -80,14 +80,14 @@ inactive
 	/* only the local client needs this info */
 	/* owned relics */
 	for(y=0; < 4) {
-		savedata = trGetScenarioUserData(12 + y);
+		savedata = xsMax(0, trGetScenarioUserData(12 + y));
 		for(x=1; < 9) {
 			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
 			savedata = savedata / 11;
 		}
 	}
 	/* gemstones */
-	savedata = trGetScenarioUserData(9);
+	savedata = xsMax(0, trGetScenarioUserData(9));
 	for(x=0; <4) {
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
@@ -117,7 +117,7 @@ inactive
 		trForbidProtounit(1, "Swordsman Hero");
 
 		/* progress, level, class */
-		savedata = trGetScenarioUserData(0);
+		savedata = xsMax(0, trGetScenarioUserData(0));
 		trQuestVarSet("p1progress", iModulo(10, savedata));
 		savedata = savedata / 10;
 		trQuestVarSet("p1level", iModulo(10, savedata));
@@ -125,12 +125,12 @@ inactive
 		trQuestVarSet("p1class", savedata);
 
 		/* gold */
-		savedata = trGetScenarioUserData(1);
+		savedata = xsMax(0, trGetScenarioUserData(1));
 		trQuestVarSet("p1gold", savedata);
 
 		/* equipped relics */
 		for(y=0; <2) {
-			savedata = trGetScenarioUserData(2 + y);
+			savedata = xsMax(0, trGetScenarioUserData(2 + y));
 			for(x=1; <6) {
 				trQuestVarSet("p1relic"+(x+5*y), iModulo(32, savedata));
 				savedata = savedata / 32;
@@ -139,7 +139,7 @@ inactive
 
 		/* class levels */
 		for(y=0; <2) {
-			savedata = trGetScenarioUserData(10 + y);
+			savedata = xsMax(0, trGetScenarioUserData(10 + y));
 			for(x=1; <9) {
 				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
 				savedata = savedata / 11;
@@ -173,7 +173,7 @@ inactive
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman");
 	}
 	if (swordsmen == total) {
-		savedata = trGetScenarioUserData(0);
+		savedata = xsMax(0, trGetScenarioUserData(0));
 		currentdata = iModulo(10, savedata);
 		savedata = savedata / 10;
 		xsEnableRule("data_load_01_load_data");
@@ -206,7 +206,9 @@ inactive
 	}
 	uiTransformSelectedUnit("Swordsman Hero");
 	trForceNonCinematicModels(true);
+	
 	trLetterBox(true);
+
 	showLoadProgress();
 	xsDisableSelf();
 }
@@ -222,7 +224,7 @@ inactive
 	for(p=1; < ENEMY_PLAYER) {
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman Hero");
 	}
-	if (swordsmen == cNumberPlayers - 2) {
+	if (swordsmen == ENEMY_PLAYER - 1) {
 		for(p=1; < ENEMY_PLAYER) {
 			swordsmen = 32 * (p - 1);
 			for(x=0; < 32) {
@@ -260,15 +262,15 @@ inactive
 			{
 				case 3:
 				{
-					savedata = trGetScenarioUserData(1);
+					savedata = xsMax(0, trGetScenarioUserData(1));
 				}
 				case 5:
 				{
-					savedata = trGetScenarioUserData(2);
+					savedata = xsMax(0, trGetScenarioUserData(2));
 				}
 				case 10:
 				{
-					savedata = trGetScenarioUserData(3);
+					savedata = xsMax(0, trGetScenarioUserData(3));
 				}
 			}
 			if (loadProgress >=3) {
