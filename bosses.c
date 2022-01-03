@@ -173,6 +173,7 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int x = 0;
+	int action = 0;
 	int id = 0;
 	float angle = 0;
 	bool hit = false;
@@ -217,7 +218,7 @@ highFrequency
 			}
 		}
 		for(x=xsMin(4, yGetDatabaseCount("bossShockwaves")); >0) {
-			yDatabaseNext("bossShockwaves");
+			action = processGenericProj("bossShockwaves");
 			trVectorSetUnitPos("pos", "bossShockwaves");
 			hit = false;
 			for(y=yGetDatabaseCount("bossShockwaveTargets"); >0) {
@@ -238,8 +239,6 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("bossShockwaves", true);
 				trUnitChangeProtoUnit("Dust Small");
-				ySetPointer("genericProj", 1*yGetVar("bossShockwaves", "index"));
-				yRemoveFromDatabase("genericProj");
 				yRemoveFromDatabase("bossShockwaves");
 			}
 		}
@@ -280,8 +279,8 @@ highFrequency
 				ySetPointer("enemies", 1*trQuestVarGet("bossPointer"));
 				removeEnemy();
 				trQuestVarSet("bossSpell", 32);
-				trQuestVarSet("bossSpellTimeout", trTimeMS() + 15000);
-				trQuestVarSet("bossSpellNext", trTimeMS() + 1200);
+				trQuestVarSet("bossSpellTimeout", trTimeMS() + 12000);
+				trQuestVarSet("bossSpellNext", trTimeMS() + 2000);
 				yClearDatabase("bossShockwaveTargets");
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					id = yDatabaseNext("playerUnits", true);
@@ -300,8 +299,7 @@ highFrequency
 					id = kbGetProtoUnitID("Heka Shockwave SFX");
 					trVectorSetFromAngle("dir", trQuestVarGet("bossangle"));
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					yAddToDatabase("bossShockwaves", "next");
-					yAddUpdateVar("bossShockwaves", "index", addGenericProj("bossPos","dir",id,2,15,4));
+					addGenericProj("bossShockwaves","bossPos","dir",id,2,15,4);
 					if (trTimeMS() > trQuestVarGet("bossSpellTimeout")) {
 						trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
 						trQuestVarSetFromRand("bossCooldownTime", 7, 20, true);
@@ -361,8 +359,6 @@ highFrequency
 				yAddUpdateVar("enemies", "bounty", 0);
 				yAddUpdateVar("enemies", "relic", 0);
 				yAddToDatabase("Sphinxes", "next");
-	            yAddUpdateVar("Sphinxes", "attacking", 0);
-	            yAddUpdateVar("Sphinxes", "nextSpecial", 0);
 			}
 			trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
 			trQuestVarSetFromRand("bossCooldownTime", 7, 20, true);
@@ -432,25 +428,9 @@ highFrequency
 						trChatSendSpoofed(ENEMY_PLAYER, "King of Beasts: Bow before me!");
 					}
 				}
-				id = kbGetBlockID(""+1*trQuestVarGet("fakeBoss"));
-				if (id == -1) {
-					trQuestVarSet("noFake", 1);
-					spyEffect(1*trQuestVarGet("bossUnit"),kbGetProtoUnitID("Cinematic Block"),"fakeBoss");
-				} else {
-					trQuestVarSet("noFake", 0);
-					trSetSelectedScale(0,0,0);
-					trMutateSelected(kbGetProtoUnitID("Nemean Lion"));
-					trUnitSelectClear();
-					trUnitSelectByQV("fakeBoss");
-					trUnitChangeProtoUnit("Nemean Lion");
-					trUnitSelectClear();
-					trUnitSelectByQV("fakeBoss");
-					trUnitConvert(ENEMY_PLAYER);
-					trSetSelectedScale(2,2,2);
-				}
+				
 				trMutateSelected(kbGetProtoUnitID("Nemean Lion"));
-				trUnitSetAnimationPath("0,0,0,0,0,0,0");
-				trUnitOverrideAnimation(39,0,false,true,-1);
+				trUnitOverrideAnimation(39,0,false,false,-1);
 				trUnitSetStance("Passive");
 				trQuestVarSet("bossNext", trTimeMS() + 1500);
 				trQuestVarSet("bossSpell", 2);
@@ -464,8 +444,7 @@ highFrequency
 						angle = fModulo(6.283185, angle + 0.2618);
 						trVectorSetFromAngle("dir", angle);
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-						yAddToDatabase("bossShockwaves", "next");
-						yAddUpdateVar("bossShockwaves", "index", addGenericProj("bossPos","dir",id,2,15,4));
+						addGenericProj("bossShockwaves","bossPos","dir",id,2,15,4);
 					}
 					yClearDatabase("bossShockwaveTargets");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
@@ -480,15 +459,6 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 3) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
-					if (trQuestVarGet("noFake") == 0) {
-						trUnitSelectClear();
-						trUnitSelectByQV("fakeBoss");
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-						trUnitSelectClear();
-						trUnitSelectByQV("bossUnit");
-						trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
-					}
-					trUnitSetStance("Aggressive");
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 					trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
 					trQuestVarSetFromRand("bossCooldownTime", 7, 20, true);

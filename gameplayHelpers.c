@@ -9,6 +9,11 @@ const int ON_HIT_NONE = 0;
 const int ON_HIT_NORMAL = 1;
 const int ON_HIT_SPECIAL = 2;
 
+const int PROJ_NONE = 0;
+const int PROJ_GROUND = 1;
+const int PROJ_FALLING = 2;
+const int PROJ_BOUNCE = 3;
+
 string wellName = "";
 string lureName = "";
 string rainName = "";
@@ -118,6 +123,7 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "poisonSFX");
 	yRemoveUpdateVar("playerUnits", "decay");
 	yRemoveUpdateVar("playerUnits", "decayNext");
+	yRemoveUpdateVar("playerUnits", "hero");
 }
 
 void removePlayerCharacter(int p = 0) {
@@ -368,6 +374,7 @@ void stunsAndPoisons(string db = "") {
 	}
 	if (yGetVar(db, "stunStatus") >= 1) {
     	if (trTimeMS() > yGetVar(db, "stunTimeout")) {
+    		trUnitOverrideAnimation(-1,0,false,true,-1);
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
@@ -415,54 +422,59 @@ float calculateDecay(int p = 0, float decay = 0) {
 	return(decay / trQuestVarGet("p"+p+"spellDuration"));
 }
 
-void processGenericProj() {
+int processGenericProj(string db = "") {
 	int id = 0;
+	int action = PROJ_NONE;
 	float scale = 0;
-	if (yGetDatabaseCount("genericProj") > 0) {
-		for(x=1+yGetDatabaseCount("genericProj")/4; >0) {
-			id = yDatabaseNext("genericProj", true);
-			if (id == -1) {
-				yRemoveFromDatabase("genericProj");
-			} else if (yGetVar("genericProj", "yeehaw") == 1) {
-				trMutateSelected(1*yGetVar("genericProj", "proto"));
-				trUnitOverrideAnimation(1*yGetVar("genericProj", "anim"),0,true,true,-1);
-				scale = yGetVar("genericProj", "scale");
-				trSetSelectedScale(scale,scale,scale);
-				ySetVar("genericProj", "yeehaw", 0);
-			} else if (yGetVar("genericProj", "yeehaw") == 2) {
-				/* first time search */
-				ySetVar("genericProj", "yeehaw", 1);
+	if (yGetDatabaseCount(db) > 0) {
+		id = yDatabaseNext(db, true);
+		if (id == -1) {
+			yRemoveFromDatabase(db);
+		} else if (yGetVar(db, "yeehaw") == 1) {
+			trMutateSelected(1*yGetVar(db, "proto"));
+			trUnitOverrideAnimation(1*yGetVar(db, "anim"),0,true,true,-1);
+			scale = yGetVar(db, "scale");
+			trSetSelectedScale(scale,scale,scale);
+			ySetVar(db, "yeehaw", 0);
+			action = PROJ_BOUNCE;
+		} else if (yGetVar(db, "yeehaw") == 2) {
+			/* first time search */
+			ySetVar(db, "yeehaw", 1);
+		} else {
+			trVectorSetUnitPos("pos", db);
+			if (trQuestVarGet("posY") < worldHeight + 0.5) {
+				action = PROJ_GROUND;
+				yVarToVector(db, "dir");
+				zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar(db, "speed"));
+				trUnitChangeProtoUnit("Kronny Flying");
+				trUnitSelectClear();
+				trUnitSelectByQV(db);
+				trDamageUnitPercent(-100);
+				trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
+				trSetSelectedScale(0,0.0-yGetVar(db, "height"),0);
+				trDamageUnitPercent(100);
+				ySetVar(db, "yeehaw", 1);
 			} else {
-				trVectorSetUnitPos("pos", "genericProj");
-				if (trQuestVarGet("posY") < worldHeight + 0.5) {
-					yVarToVector("genericProj", "dir");
-					zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar("genericProj", "speed"));
-					trUnitChangeProtoUnit("Kronny Flying");
-					trUnitSelectClear();
-					trUnitSelectByQV("genericProj");
-					trDamageUnitPercent(-100);
-					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-					trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-					trSetSelectedScale(0,0.0-yGetVar("genericProj", "height"),0);
-					trDamageUnitPercent(100);
-					ySetVar("genericProj", "yeehaw", 1);
-				}
+				action = PROJ_FALLING;
 			}
 		}
 	}
+	return(action);
 }
 
-int addGenericProj(string start="",string dir="",int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0) {
+int addGenericProj(string db = "",string start="",string dir="",
+	int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	int index = yAddToDatabase("genericProj", "next");
-	yAddUpdateVar("genericProj", "proto", proto);
-	yAddUpdateVar("genericProj", "anim", anim);
-	yAddUpdateVar("genericProj", "speed", speed);
-	yAddUpdateVar("genericProj", "height", height);
-	yAddUpdateVar("genericProj", "scale", scale);
-	yAddUpdateVar("genericProj", "dirX", trQuestVarGet(dir+"x"));
-	yAddUpdateVar("genericProj", "dirZ", trQuestVarGet(dir+"z"));
-	yAddUpdateVar("genericProj", "yeehaw", 2);
+	int index = yAddToDatabase(db, "next");
+	yAddUpdateVar(db, "proto", proto);
+	yAddUpdateVar(db, "anim", anim);
+	yAddUpdateVar(db, "speed", speed);
+	yAddUpdateVar(db, "height", height);
+	yAddUpdateVar(db, "scale", scale);
+	yAddUpdateVar(db, "dirX", trQuestVarGet(dir+"x"));
+	yAddUpdateVar(db, "dirZ", trQuestVarGet(dir+"z"));
+	yAddUpdateVar(db, "yeehaw", 2);
 
 	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
 	trUnitSelectClear();

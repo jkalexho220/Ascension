@@ -235,6 +235,8 @@ highFrequency
 			for(x=0; <3) {
 				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
 			}
+		} else {
+			uiMessageBox("You have reached the max level for " + className(class) + "!");
 		}
 	}
 }
@@ -276,7 +278,7 @@ highFrequency
 			}
 			case ALCHEMIST:
 			{
-				uiMessageBox("To unlock this class, ascend a character to level 10.");
+				uiMessageBox("To unlock this class, ascend a character to level 7.");
 			}
 		}
 	}

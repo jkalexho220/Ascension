@@ -43,8 +43,18 @@ void activateEnemy(int id = 0) {
         case kbGetProtoUnitID("Sphinx"):
         {
             yAddToDatabase("Sphinxes", "enemiesIncoming");
-            yAddUpdateVar("Sphinxes", "attacking", 0);
-            yAddUpdateVar("Sphinxes", "nextSpecial", 0);
+        }
+        case kbGetProtoUnitID("Dryad"):
+        {
+            yAddToDatabase("Dryads", "enemiesIncoming");
+        }
+        case kbGetProtoUnitID("Medusa"):
+        {
+            yAddToDatabase("Medusas", "enemiesIncoming");
+        }
+        case kbGetProtoUnitID("Mountain Giant"):
+        {
+            yAddToDatabase("MountainGiants", "enemiesIncoming");
         }
     }
 
@@ -58,12 +68,19 @@ highFrequency
 	if (trTime() > cActivationTime) {
 		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
 		trModifyProtounit("Minion", 1, 8, -99);
-		setupProtounitBounty("Minion", 4);
+		
         setupProtounitBounty("Golden Lion", 4);
         setupProtounitBounty("Anubite", 6, 0.03);
         setupProtounitBounty("Terracotta Soldier", 6, 0.03);
-		setupProtounitBounty("Sphinx", 8, 0.05, RELIC_SPELL_DURATION);
+		setupProtounitBounty("Sphinx", 8, 0.05);
 		setupProtounitBounty("Petsuchos", 8, 0.1, RELIC_ATTACK_RANGE);
+
+        setupProtounitBounty("Minion", 4);
+        setupProtounitBounty("Walking Marsh", 5);
+        setupProtounitBounty("Dryad", 7, 0.03);
+        setupProtounitBounty("Centaur", 6, 0.03);
+        setupProtounitBounty("Medusa", 14, 0.15, RELIC_SPELL_DURATION);
+        setupProtounitBounty("Mountain Giant", 12, 0.1);
 		
 		xsDisableSelf();
 	}
@@ -73,6 +90,7 @@ void enemiesAlways() {
     int old = xsGetContextPlayer();
     int proto = 0;
     int id = 0;
+    int target = 0;
     float amt = 0;
     float angle = 0;
     string pName = "";
@@ -167,16 +185,64 @@ void enemiesAlways() {
     if (yGetDatabaseCount("sphinxes") > 0) {
         id = yDatabaseNext("sphinxes", true);
         if (id == -1 || trUnitAlive() == false) {
+            trUnitOverrideAnimation(-1,0,false,true,-1);
             yRemoveFromDatabase("sphinxes");
-        } else if (kbUnitGetAnimationActionType(id) == 6) {
-            if (trTimeMS() > yGetVar("sphinxes", "nextSpecial")) {
-                ySetVar("sphinxes", "nextSpecial", trTimeMS() + 10000);
-                trUnitOverrideAnimation(39,0,false,true,-1);
-                trVectorSetUnitPos("pos", "sphinxes");
-                for(p=1; < ENEMY_PLAYER) {
-                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
-                        silencePlayer(p, 5);
+            yRemoveUpdateVar("sphinxes", "step");
+        } else if (trTimeMS() > yGetVar("sphinxes", "next")) {
+            switch(1*yGetVar("sphinxes", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 6) {
+                        ySetVar("sphinxes", "next", trTimeMS() + 1600);
+                        ySetVar("sphinxes", "step", 1);
+                        trUnitOverrideAnimation(39,0,false,false,-1);
+                        trVectorSetUnitPos("pos", "sphinxes");
+                        for(p=1; < ENEMY_PLAYER) {
+                            if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
+                                silencePlayer(p, 5);
+                            }
+                        }
                     }
+                }
+                case 1:
+                {
+                    ySetVar("sphinxes", "next", trTimeMS() + 10000);
+                    ySetVar("sphinxes", "step", 0);
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
+                }
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("MountainGiants") > 0) {
+        id = yDatabaseNext("MountainGiants", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trUnitOverrideAnimation(-1,0,false,true,-1);
+            yRemoveFromDatabase("MountainGiants");
+            yRemoveUpdateVar("MountainGiants", "step");
+        } else if (trTimeMS() > yGetVar("MountainGiants", "next")) {
+            switch(1*yGetVar("MountainGiants", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 6) {
+                        target = kbUnitGetTargetUnitID(id);
+                        trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+                        trVectorSetUnitPos("start", "MountainGiants");
+                        trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+                        ySetVarFromVector("MountainGiants", "dir", "dir");
+
+                        ySetVar("MountainGiants", "next", trTimeMS() + 1800);
+                        ySetVar("MountainGiants", "step", 1);
+                        trUnitOverrideAnimation(39,0,false,false,-1);
+                    }
+                }
+                case 1:
+                {
+                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                    trVectorSetUnitPos("pos", "MountainGiants");
+                    yVarToVector("MountainGiants", "dir");
                 }
             }
         }

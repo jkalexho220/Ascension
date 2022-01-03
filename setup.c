@@ -5,10 +5,11 @@ const int TILE_VISITED = 2;
 const int EDGE_NOT_FOUND = 0;
 const int EDGE_NORMAL = 1;
 const int EDGE_BIG = 2;
+const int EDGE_PORTAL = 3;
 
-const int ROOM_BASIC = 0;
-const int ROOM_AMBUSH = 1;
-const int ROOM_CHEST = 2;
+const int ROOM_BASIC = 1;
+const int ROOM_AMBUSH = 2;
+const int ROOM_CHEST = 3;
 const int ROOM_TRANSPORTER_GUY = 9;
 const int ROOM_STARTER = 10;
 const int ROOM_BOSS = 11;
@@ -243,9 +244,11 @@ void chooseClass(int p = 0, int class = 0) {
         trMutateSelected(proto);
     }
     trPlayerKillAllGodPowers(p);
-    trCounterAbort("lure");
-    trCounterAbort("well");
-    trCounterAbort("rain");
+    if (trCurrentPlayer() == p) {
+        trCounterAbort("lure");
+        trCounterAbort("well");
+        trCounterAbort("rain");
+    }
     if (class > 0) {
         trQuestVarSet("p"+p+"wellCooldownStatus", 2);
         trQuestVarSet("p"+p+"lureCooldownStatus", 2);
@@ -318,6 +321,11 @@ runImmediately
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
+        trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");
+        for(x=p+1; < ENEMY_PLAYER) {
+            trPlayerSetDiplomacy(p, x, "ally");
+            trPlayerSetDiplomacy(x, p, "ally");
+        }
         trSetCivAndCulture(p, 1, 0);
         /* LOS and flying */
         trModifyProtounit("Animal Attractor", p, 2, -99);
@@ -392,6 +400,8 @@ highFrequency
         trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, 9999999999999999999.0);
         trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, -9999999999999999999.0);
         zInitProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, 0);
+
+        trModifyProtounit("Sky Passage", 0, 5, 999);
 
         xsEnableRule("setup_enemies");
         xsDisableSelf();

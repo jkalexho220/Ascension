@@ -47,6 +47,7 @@ void rideLightningOff(int p = 0) {
 		trUnitChangeProtoUnit("Implode Sphere Effect");
 		ySetVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "p"+p+"characters"));
 		yAddUpdateVar("playerUnits", "player", p);
+		yAddUpdateVar("playerUnits", "hero", 1);
 	}
 
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {

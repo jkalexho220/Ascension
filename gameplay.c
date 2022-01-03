@@ -9,6 +9,7 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
     yAddToDatabase("p"+p+"characters", "next");
     yAddUpdateVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "next"));
     yAddUpdateVar("playerUnits", "player", p);
+    yAddUpdateVar("playerUnits", "hero", 1);
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
     string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
@@ -278,7 +279,7 @@ highFrequency
             yRemoveUpdateVar("stunnedUnits", "proto");
         } else {
             trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
-            trUnitOverrideAnimation(2, 0, false, true, -1, 0);
+            trUnitOverrideAnimation(2, 0, false, false, -1, 0);
         }
     }
 
@@ -520,6 +521,7 @@ highFrequency
                     yAddUpdateVar("playerCharacters", "player", p);
                     yAddToDatabase("playerUnits", "p"+p+"unit");
                     yAddUpdateVar("playerUnits", "player", p);
+                    yAddUpdateVar("playerUnits", "hero", 1);
                     for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                         yDatabaseNext("p"+p+"relics", true);
                         trUnitChangeProtoUnit("Relic");
@@ -540,9 +542,51 @@ highFrequency
         }
     }
 
-    processChests();
+    /* sky passages */
+    if (yGetDatabaseCount("skyPassages") > 0) {
+        yDatabaseNext("skyPassages");
+        trVectorSetUnitPos("pos", "skyPassages");
+        trQuestVarSet("sound", 0);
+        for(x=yGetDatabaseCount("playerUnits"); >0) {
+            yDatabaseNext("playerUnits");
+            if (zDistanceToVectorSquared("playerUnits", "pos") < 6) {
+                yAddToDatabase("magicalJourney", "playerUnits");
+                if (yGetVar("playerUnits", "hero") == 1) {
+                    if (trCurrentPlayer() == yGetVar("playerUnits", "player")) {
+                        uiLookAtUnitByName(""+1*yGetVar("skyPassages", "exit"));
+                        trQuestVarSet("sound", 1);
+                    }
+                }
+            }
+        }
 
-    processGenericProj();
+        if (yGetDatabaseCount("magicalJourney") > 0) {
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("skyPassages", "exit"));
+            trUnitChangeProtoUnit("Dwarf");
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("skyPassages", "exit"));
+            trMutateSelected(kbGetProtoUnitID("Sky Passage"));
+            for(x=yGetDatabaseCount("magicalJourney"); >0) {
+                yDatabaseNext("magicalJourney", true);
+                trImmediateUnitGarrison(""+1*yGetVar("skyPassages", "exit"));
+            }
+            yClearDatabase("magicalJourney");
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("skyPassages", "exit"));
+            trUnitEjectContained();
+            trUnitChangeProtoUnit("Spy Eye");
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("skyPassages", "exit"));
+            trMutateSelected(kbGetProtoUnitID("Sky Passage"));
+            trSetSelectedScale(0, 0.2, 0);
+        }
+        if (trQuestVarGet("sound") == 1) {
+            trSoundPlayFN("skypassageout.wav","1",-1,"","");
+        }
+    }
+
+    processChests();
 
     xsSetContextPlayer(old);
 
@@ -581,7 +625,7 @@ highFrequency
             case 3:
             {
                 trSoundPlayFN("default", "1",-1,
-                    "Zenophobia: Be sure to also play this map in singleplayer for further customization!",
+                    "Zenophobia: Be sure to also play this map in singleplayer to switch classes, level up, and more!",
                     "icons\infantry g hoplite icon 64");
                 trQuestVarSet("gameOverNext", trTime() + 6);
             }
