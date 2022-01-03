@@ -1,5 +1,5 @@
 void removeSunbow(int p = 0) {
-	removePlayerCharacter(p);
+	removePlayerSpecific(p);
 	yRemoveUpdateVar("p"+p+"characters", "searingSFX");
 }
 

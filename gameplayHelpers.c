@@ -13,6 +13,7 @@ const int PROJ_NONE = 0;
 const int PROJ_GROUND = 1;
 const int PROJ_FALLING = 2;
 const int PROJ_BOUNCE = 3;
+const int PROJ_REMOVE = 4;
 
 string wellName = "";
 string lureName = "";
@@ -126,7 +127,11 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "hero");
 }
 
-void removePlayerCharacter(int p = 0) {
+void removePlayerCharacter() {
+	yRemoveFromDatabase("playerCharacters");
+}
+
+void removePlayerSpecific(int p = 0) {
 	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 			yDatabaseNext("p"+p+"relics", true);
@@ -276,9 +281,10 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		damage = damage * trQuestVarGet("p"+p+"spellDamage");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
+		trQuestVarSet("poisonSound", 1);
 		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
-				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave poison effect"), yGetVarName(db, "poisonSFX"));
+				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Poison SFX"), yGetVarName(db, "poisonSFX"));
 			} else {
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
@@ -300,6 +306,8 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+	} else if (p < 0) {
+		duration = duration * trQuestVarGet("p"+(0-p)+"stunResistance");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (yGetVar(db, "stunStatus") == 0) {
@@ -333,7 +341,9 @@ int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
 
 void healUnit(int p = 0, float amt = 0) {
 	amt = amt * trQuestVarGet("p"+p+"healBoost");
-	trDamageUnit(0.0 - amt);
+	if (yGetVar("playerUnits", "poisonStatus") == 0) {
+		trDamageUnit(0.0 - amt);
+	}
 }
 
 /*
@@ -362,13 +372,14 @@ void damagePlayerUnit(float dmg = 0) {
 
 void stunsAndPoisons(string db = "") {
 	if (yGetVar(db, "poisonStatus") == 1) {
+		float amt = trTimeMS() - yGetVar(db, "poisonLast");
     	if (trTimeMS() > yGetVar(db, "poisonTimeout")) {
     		ySetVar(db, "poisonStatus", 0);
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
-    	} else {
-    		trDamageUnit((trTimeMS() - yGetVar(db, "poisonLast")) * yGetVar(db, "poisonDamage") * 0.001);
+    	} else if (amt > 500) {
+    		trDamageUnit(amt * yGetVar(db, "poisonDamage") * 0.001);
     		ySetVar(db, "poisonLast", trTimeMS());
     	}
 	}
@@ -426,40 +437,40 @@ int processGenericProj(string db = "") {
 	int id = 0;
 	int action = PROJ_NONE;
 	float scale = 0;
-	if (yGetDatabaseCount(db) > 0) {
-		id = yDatabaseNext(db, true);
-		if (id == -1) {
-			yRemoveFromDatabase(db);
-		} else if (yGetVar(db, "yeehaw") == 1) {
-			trMutateSelected(1*yGetVar(db, "proto"));
-			trUnitOverrideAnimation(1*yGetVar(db, "anim"),0,true,true,-1);
-			scale = yGetVar(db, "scale");
-			trSetSelectedScale(scale,scale,scale);
-			ySetVar(db, "yeehaw", 0);
-			action = PROJ_BOUNCE;
-		} else if (yGetVar(db, "yeehaw") == 2) {
-			/* first time search */
+	id = yDatabaseNext(db, true);
+	if (id == -1) {
+		yRemoveFromDatabase(db);
+		action = PROJ_REMOVE;
+	} else if (yGetVar(db, "yeehaw") == 1) {
+		trMutateSelected(1*yGetVar(db, "proto"));
+		trUnitOverrideAnimation(1*yGetVar(db, "anim"),0,true,true,-1);
+		scale = yGetVar(db, "scale");
+		trSetSelectedScale(scale,scale,scale);
+		ySetVar(db, "yeehaw", 0);
+		action = PROJ_BOUNCE;
+	} else if (yGetVar(db, "yeehaw") == 2) {
+		/* first time search */
+		ySetVar(db, "yeehaw", 1);
+	} else {
+		trVectorSetUnitPos("pos", db);
+		if (trQuestVarGet("posY") < worldHeight + 0.5) {
+			action = PROJ_GROUND;
+			yVarToVector(db, "dir");
+			zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar(db, "speed"));
+			trUnitChangeProtoUnit("Kronny Flying");
+			trUnitSelectClear();
+			trUnitSelectByQV(db);
+			trDamageUnitPercent(-100);
+			trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+			trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
+			trSetSelectedScale(0,0.0-yGetVar(db, "height"),0);
+			trDamageUnitPercent(100);
 			ySetVar(db, "yeehaw", 1);
 		} else {
-			trVectorSetUnitPos("pos", db);
-			if (trQuestVarGet("posY") < worldHeight + 0.5) {
-				action = PROJ_GROUND;
-				yVarToVector(db, "dir");
-				zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar(db, "speed"));
-				trUnitChangeProtoUnit("Kronny Flying");
-				trUnitSelectClear();
-				trUnitSelectByQV(db);
-				trDamageUnitPercent(-100);
-				trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-				trSetSelectedScale(0,0.0-yGetVar(db, "height"),0);
-				trDamageUnitPercent(100);
-				ySetVar(db, "yeehaw", 1);
-			} else {
-				action = PROJ_FALLING;
-			}
+			action = PROJ_FALLING;
 		}
 	}
+	
 	return(action);
 }
 

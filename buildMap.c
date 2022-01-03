@@ -21,7 +21,7 @@ highFrequency
         trLetterBox(true);
         trUIFadeToColor(0,0,0,1000,0,true);
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-        trOverlayText("Stage " + 1*trQuestVarGet("stage") + " chosen!", 3.0, -1, -1, -1);
+        trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
     }
 }
 
@@ -211,7 +211,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             z0 = trQuestVarGet("z0");
             z1 = trQuestVarGet("z1");
             trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
+            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
             trVectorQuestVarSet("room"+room+"top"+i, xsVectorSet(x1,0,z1));
             trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
             paintSecondary(x0, z0, x1, z1);
@@ -300,7 +300,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         case ROOM_STARTER:
         {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, 0, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
             paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
             trVectorQuestVarSet("startPosition", xsVectorSet(x*70 + 40,0,z*70+40));
             if (trQuestVarGet("stage") < 5) {
@@ -330,7 +330,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                         for(b=16; >0) {
                             if (a*a + z0 * z0 <= 256) {
                                 trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                                trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, false);
+                                trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
                                 break;
                             } else {
                                 z0 = z0 - 1;
@@ -341,7 +341,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 case ROOM_SQUARE:
                 {
                     trPaintTerrain(x * 35 + 6, z * 35 + 6, x * 35 + 34, z * 35 + 34, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                    trChangeTerrainHeight(x * 35 + 6, z * 35 + 6, x * 35 + 35, z * 35 + 35, 0, false);
+                    trChangeTerrainHeight(x * 35 + 6, z * 35 + 6, x * 35 + 35, z * 35 + 35, worldHeight, false);
                 }
             }
             trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
@@ -355,7 +355,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 for(b=12; >0) {
                     if (a*a + z0 * z0 <= 144) {
                         trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                        trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, false);
+                        trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
                         break;
                     } else {
                         z0 = z0 - 1;
@@ -408,7 +408,7 @@ void buildEdge(int edge = 0, int type = 0) {
             trUnitConvert(0);
             trUnitChangeProtoUnit("Spy Eye");
             trUnitSelectClear();
-            trUnitSelectByQV("next1", true);
+            trUnitSelectByQV("next2", true);
             trMutateSelected(kbGetProtoUnitID("Sky Passage"));
             trSetSelectedScale(0,0.2,0);
             yAddToDatabase("skyPassages", "next1");
@@ -429,7 +429,7 @@ void buildEdge(int edge = 0, int type = 0) {
                 x1 = x1 + trQuestVarGet("rand");
             }
             trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, 0, false);
+            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
             paintSecondary(x0, z0, x1, z1);
         }
         trQuestVarSet("edge"+edge, type);
@@ -533,9 +533,9 @@ highFrequency
                 trStringQuestVarSet("spriteProto1", "Rock Limestone Sprite");
                 trStringQuestVarSet("spriteProto2", "Water Reeds");
                 trStringQuestVarSet("spriteProto3", "Flowers");
-                trQuestVarSet("rockDensity", 0.1);
+                trQuestVarSet("rockDensity", 0.15);
                 trStringQuestVarSet("rockProto1", "Rock Granite Big");
-                trStringQuestVarSet("rockProto2", "Mist");
+                trStringQuestVarSet("rockProto2", "Imperial Examination");
                 trStringQuestVarSet("rockProto3", "Rock Granite Small");
 
                 trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
@@ -655,10 +655,26 @@ highFrequency
                 }
             }
         }
-        
 
         buildRoom(0,0, ROOM_STARTER);
         buildRoom(3,3, ROOM_BOSS);
+
+        /* make portals more visible */
+        for(x=yGetDatabaseCount("skypassages"); >0) {
+            yDatabaseNext("skyPassages");
+            trVectorSetUnitPos("pos", "skyPassages");
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-4,0,trQuestVarGet("posZ"),0,true);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+4,0,trQuestVarGet("posZ"),0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")-4,0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")+4,0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")+3,0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")-3,0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")+3,0,false);
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")-3,0,false);
+            trArmySelect("1,0");
+            trUnitConvert(0);
+            trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+        }
 
         bool nick = false;
         trQuestVarSetFromRand("nick", 0, 20, true);
@@ -827,7 +843,6 @@ highFrequency
         trUnblockAllSounds();
         if (trQuestVarGet("newPlayers") == 0) {
             xsEnableRule("gameplay_start");
-            trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
             trUIFadeToColor(0,0,0,1000,0,false);
             trLetterBox(false);
         } else {

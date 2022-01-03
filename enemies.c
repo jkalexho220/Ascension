@@ -55,6 +55,7 @@ void activateEnemy(int id = 0) {
         case kbGetProtoUnitID("Mountain Giant"):
         {
             yAddToDatabase("MountainGiants", "enemiesIncoming");
+            yAddUpdateVar("MountainGiants", "index", yGetNewestPointer("enemies"));
         }
     }
 
@@ -76,7 +77,7 @@ highFrequency
 		setupProtounitBounty("Petsuchos", 8, 0.1, RELIC_ATTACK_RANGE);
 
         setupProtounitBounty("Minion", 4);
-        setupProtounitBounty("Walking Marsh", 5);
+        setupProtounitBounty("Walking Woods Marsh", 5);
         setupProtounitBounty("Dryad", 7, 0.03);
         setupProtounitBounty("Centaur", 6, 0.03);
         setupProtounitBounty("Medusa", 14, 0.15, RELIC_SPELL_DURATION);
@@ -91,6 +92,7 @@ void enemiesAlways() {
     int proto = 0;
     int id = 0;
     int target = 0;
+    int action = 0;
     float amt = 0;
     float angle = 0;
     string pName = "";
@@ -185,7 +187,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("sphinxes") > 0) {
         id = yDatabaseNext("sphinxes", true);
         if (id == -1 || trUnitAlive() == false) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Sphinx");
             yRemoveFromDatabase("sphinxes");
             yRemoveUpdateVar("sphinxes", "step");
         } else if (trTimeMS() > yGetVar("sphinxes", "next")) {
@@ -218,7 +220,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("MountainGiants") > 0) {
         id = yDatabaseNext("MountainGiants", true);
         if (id == -1 || trUnitAlive() == false) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Mountain Giant");
             yRemoveFromDatabase("MountainGiants");
             yRemoveUpdateVar("MountainGiants", "step");
         } else if (trTimeMS() > yGetVar("MountainGiants", "next")) {
@@ -229,9 +231,7 @@ void enemiesAlways() {
                     if (kbUnitGetAnimationActionType(id) == 6) {
                         target = kbUnitGetTargetUnitID(id);
                         trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-                        trVectorSetUnitPos("start", "MountainGiants");
-                        trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-                        ySetVarFromVector("MountainGiants", "dir", "dir");
+                        ySetVarFromVector("MountainGiants", "end", "end");
 
                         ySetVar("MountainGiants", "next", trTimeMS() + 1800);
                         ySetVar("MountainGiants", "step", 1);
@@ -240,11 +240,139 @@ void enemiesAlways() {
                 }
                 case 1:
                 {
-                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                     trVectorSetUnitPos("pos", "MountainGiants");
-                    yVarToVector("MountainGiants", "dir");
+                    yVarToVector("MountainGiants", "end");
+                    for(x=yGetDatabaseCount("playerUnits"); >0) {
+                        id = yDatabaseNext("playerUnits", true);
+                        if (id == -1 || trUnitAlive() == false) {
+                            removePlayerUnit();
+                        } else if (zDistanceToVectorSquared("playerUnits", "end") < 4) {
+                            damagePlayerUnit(300);
+                            if (yGetVar("playerUnits", "hero") == 1 && trCurrentPlayer() == yGetVar("playerUnits", "player")) {
+                                trCameraShake(0.7, 0.7);
+                            }
+                        }
+                    }
+                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),45,true);
+                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),135,false);
+                    trArmySelect("1,0");
+                    trUnitChangeProtoUnit("Tartarian Gate Flame");
+                    ySetVar("MountainGiants", "step", 2);
+                    ySetVar("MountainGiants", "next", trTimeMS() + 1200);
+                    
+                }
+                case 2:
+                {
+                    ySetVar("MountainGiants", "step", 0);
+                    ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
                 }
             }
+        } else if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("MountainGiants", "index")) > 0 &&
+            yGetVar("MountainGiants", "step") == 1) {
+            ySetVar("MountainGiants", "step", 0);
+            ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+        }
+    }
+
+    for(x=xsMin(4, yGetDatabaseCount("MedusaBalls")); >0) {
+        action = processGenericProj("MedusaBalls");
+        trVectorSetUnitPos("pos", "MedusaBalls");
+        vectorToGrid("pos", "loc");
+        for(y=yGetDatabaseCount("playerUnits"); >0) {
+            id = yDatabaseNext("playerUnits", true);
+            if (id == -1 || trUnitAlive() == false) {
+                removePlayerUnit();
+            } else if (zDistanceToVectorSquared("playerUnits", "pos") < 2.0) {
+                stunUnit("playerUnits", 3.0, 0 - yGetVar("playerUnits", "player"));
+                action = PROJ_REMOVE;
+                break;
+            }
+        }
+        if (action == PROJ_FALLING) {
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("MedusaBalls", "target"));
+            if (trUnitAlive()) {
+                trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("MedusaBalls", "target")));
+                trVectorQuestVarSet("dir", zGetUnitVector("pos", "end"));
+                ySetVarFromVector("MedusaBalls", "dir", "dir");
+            }
+        } else if (action == PROJ_BOUNCE) {
+            ySetVar("MedusaBalls", "bounces", yGetVar("MedusaBalls", "bounces") - 1);
+        } else if (action == PROJ_REMOVE ||
+            terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) ||
+            yGetVar("MedusaBalls", "bounces") <= 0) {
+            trUnitSelectClear();
+            trUnitSelectByQV("MedusaBalls");
+            trUnitChangeProtoUnit("Conversion SFX");
+            yRemoveFromDatabase("MedusaBalls");
+        }
+    }
+
+    if (yGetDatabaseCount("Medusas") >0) {
+        id = yDatabaseNext("Medusas", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit("Medusa");
+            yRemoveFromDatabase("Medusas");
+            yRemoveUpdateVar("Medusas", "step");
+        } else if (trTimeMS() > yGetVar("Medusas", "next")) {
+            switch(1*yGetVar("Medusas", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 12) {
+                        target = kbUnitGetTargetUnitID(id);
+                        ySetVar("Medusas", "target", trGetUnitScenarioNameNumber(target));
+
+                        ySetVar("Medusas", "step", 1);
+                        ySetVar("Medusas", "next", trTimeMS() + 1200);
+                        trUnitOverrideAnimation(40,0,false,false,-1);
+                    }
+                }
+                case 1:
+                {
+                    trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
+                    trVectorSetUnitPos("start", "Medusas");
+                    trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,3,5);
+                    yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
+                    yAddUpdateVar("MedusaBalls", "bounces", 12);
+                    ySetVar("Medusas", "step", 2);
+                    ySetVar("Medusas", "next", trTimeMS() + 800);
+                }
+                case 2:
+                {
+                    ySetVar("Medusas", "step", 0);
+                    ySetVar("Medusas", "next", trTimeMS() + 18000);
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
+                }
+            }
+        } else if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index")) > 0 &&
+            yGetVar("Medusas", "step") == 1) {
+            ySetVar("Medusas", "step", 0);
+            ySetVar("Medusas", "next", trTimeMS() + 18000);
+        }
+    }
+
+    if (yGetDatabaseCount("Dryads") > 0) {
+        id = yDatabaseNext("Dryads", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yVarToVector("Dryads", "pos");
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+            trArmySelect("1,0");
+            trUnitChangeProtoUnit("Lampades Blood");
+            for(x=yGetDatabaseCount("playerUnits"); >0) {
+                id = yDatabaseNext("playerUnits", true);
+                if (id == -1 || trUnitAlive() == false) {
+                    removePlayerUnit();
+                } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
+                    poisonUnit("playerUnits", 12.0, 10.0);
+                }
+            }
+            yRemoveFromDatabase("Dryads");
+        } else {
+            trVectorSetUnitPos("pos", "Dryads");
+            ySetVarFromVector("Dryads", "pos", "pos");
         }
     }
 

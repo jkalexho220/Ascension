@@ -19,6 +19,7 @@ void spawnPlayerClone(int p = 0, string vdb = "") {
 void spawnPlayer(int p = 0, string vdb = "") {
     trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
     spawnPlayerClone(p, vdb);
+    trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
     if (trCurrentPlayer() == p) {
         int class = trQuestVarGet("p"+p+"class");
         string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
@@ -275,6 +276,7 @@ highFrequency
     for(x=yGetDatabaseCount("stunnedUnits"); >0) {
         id = yDatabaseNext("stunnedUnits", true);
         if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("stunnedUnits", "proto")));
             yRemoveFromDatabase("stunnedUnits");
             yRemoveUpdateVar("stunnedUnits", "proto");
         } else {
@@ -443,6 +445,12 @@ highFrequency
         trSoundPlayFN("woodcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
     }
 
+    if (trQuestVarGet("poisonSound") == 1) {
+        trQuestVarSet("poisonSound", 0);
+        trSoundPlayFN("lampadesblood.wav","1",-1,"","");
+        trSoundPlayFN("carnivorabirth.wav","1",-1,"","");
+    }
+
     /* misc */
     for(p=1; < ENEMY_PLAYER) {
         if (trQuestVarGet("p"+p+"dead") == 0) {
@@ -450,7 +458,10 @@ highFrequency
             trUnitSelectByQV("p"+p+"unit");
             /* lifesteal */
             if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
+                count = yGetPointer("playerUnits");
+                ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
                 healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
+                ySetPointer("playerUnits", count);
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
             if (Multiplayer) {
@@ -482,7 +493,7 @@ highFrequency
             for(x=yGetDatabaseCount("playerCharacters"); >0) {
                 id = yDatabaseNext("playerCharacters", true);
                 if (id == -1 || trUnitAlive() == false) {
-                    yRemoveFromDatabase("playerCharacters");
+                    removePlayerCharacter();
                 } else if (zDistanceToVectorSquared("playerCharacters", "pos") < 100) {
                     count = count + 1;
                     trQuestVarSet("playersReviving", 1);
@@ -522,6 +533,7 @@ highFrequency
                     yAddToDatabase("playerUnits", "p"+p+"unit");
                     yAddUpdateVar("playerUnits", "player", p);
                     yAddUpdateVar("playerUnits", "hero", 1);
+                    yAddUpdateVar("p"+p+"characters", "index", yGetNewestPointer("playerUnits"));
                     for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                         yDatabaseNext("p"+p+"relics", true);
                         trUnitChangeProtoUnit("Relic");

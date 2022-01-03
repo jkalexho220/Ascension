@@ -1,5 +1,5 @@
 void removeThunderRider(int p = 0) {
-	removePlayerCharacter(p);
+	removePlayerSpecific(p);
 	yRemoveUpdateVar("p"+p+"characters", "prevX");
 	yRemoveUpdateVar("p"+p+"characters", "prevZ");
 	yRemoveUpdateVar("p"+p+"characters", "lightningIndex");
@@ -48,6 +48,9 @@ void rideLightningOff(int p = 0) {
 		ySetVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "p"+p+"characters"));
 		yAddUpdateVar("playerUnits", "player", p);
 		yAddUpdateVar("playerUnits", "hero", 1);
+		if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+			trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
+		}
 	}
 
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
@@ -301,7 +304,10 @@ void thunderRiderAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitHighlight(0.5, false);
+			target = yGetPointer("playerUnits");
+			ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters"));
 			healUnit(p, trQuestVarGet("p"+p+"thunderRiderBonus"));
+			ySetPointer("playerUnits", target);
 			trVectorSetUnitPos("pos", "p"+p+"characters");
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 			trArmySelect(""+p+",0");

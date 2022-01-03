@@ -507,7 +507,7 @@ highFrequency
 				trQuestVarSet("playersWon", 1);
 				trLetterBox(true);
 				trUIFadeToColor(0,0,0, 2000,0,true);
-				trQuestVarSet("gameOverNext", trTime() + 2);
+				trQuestVarSet("gameOverNext", trTime() + 5);
 				trSoundPlayFN("default","1",-1,
 					"Zenophobia: Boss defeated! Here are the rewards!","icons\infantry g hoplite icon 64");
 			}

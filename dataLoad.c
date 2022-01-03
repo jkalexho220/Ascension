@@ -239,9 +239,9 @@ inactive
 					} else if (loadProgress == 2) {
 						trQuestVarSet("p"+p+"class", x);
 					} else if (loadProgress == 3) {
-						trPlayerGrantResources(p, "Gold", x);
+						trQuestVarSet("p"+p+"gold", x);
 					} else if (loadProgress == 4) {
-						trPlayerGrantResources(p, "Gold", x * 32);
+						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
 					} else if (loadProgress < 15) {
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
 					}
@@ -264,7 +264,7 @@ inactive
 			{
 				case 3:
 				{
-					savedata = xsMax(0, trGetScenarioUserData(1));
+					savedata = xsMin(1000,xsMax(0, trGetScenarioUserData(1)));
 				}
 				case 5:
 				{
@@ -318,7 +318,7 @@ inactive
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
-		trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
+		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");

@@ -1,5 +1,5 @@
 void removeMoonblade(int p = 0) {
-	removePlayerCharacter(p);
+	removePlayerSpecific(p);
 	yRemoveUpdateVar("p"+p+"characters", "crescentCount");
 	yRemoveUpdateVar("p"+p+"characters", "crescentDamage");
 	yRemoveUpdateVar("p"+p+"characters", "crescentTimeout");
