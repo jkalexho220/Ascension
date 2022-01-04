@@ -24,11 +24,12 @@ const int CHEST_PADS = 3;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
-const int THUNDERRIDER = 3;
-const int FIREKNIGHT = 4;
-const int FROSTKNIGHT = 5;
+const int FIREKNIGHT = 3;
+const int FROSTKNIGHT = 4;
+const int THUNDERRIDER = 5;
 const int INVENTOR = 6;
 const int ALCHEMIST = 7;
+const int WINDCUTTER = 8;
 
 const int CLASS_COUNT = 5;
 
@@ -316,7 +317,7 @@ runImmediately
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
-    setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, 5, MANASTONE);
+    setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
 
     for(p=1; < ENEMY_PLAYER) {
@@ -380,11 +381,6 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime) {
-        /* Transport Ship max contained */
-        trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
-        trModifyProtounit("Transport Ship Atlantean", 1, 5, 2147483648.0);
-        trModifyProtounit("Transport Ship Atlantean", 1, 5, 1);
-
         setupPlayerProto("Kronny Flying", 1000, 0, 0);
 
         setupPlayerProto("Militia", 100, 10, 4.8);
@@ -397,11 +393,20 @@ highFrequency
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
-        trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, 9999999999999999999.0);
-        trModifyProtounit("Kronny Flying", ENEMY_PLAYER, 1, -9999999999999999999.0);
-        zInitProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, 0);
 
         trModifyProtounit("Sky Passage", 0, 5, 999);
+
+        for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Wadjet Spit", p, 1, -15);
+            trModifyProtounit("Ajax", p, 5, 999);
+            trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);
+            trModifyProtounit("Ball of Fire Impact", p, 8, -9999999999999999999.0);
+            trModifyProtounit("Ball of Fire Impact", p, 8, 4.0);
+            zInitProtoUnitStat("Ball of Fire Impact", p, 8, 4.0);
+            trModifyProtounit("Kronny Flying", p, 1, 9999999999999999999.0);
+            trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
+            zInitProtoUnitStat("Kronny Flying", p, 1, 0);
+        }
 
         xsEnableRule("setup_enemies");
         xsDisableSelf();

@@ -138,7 +138,7 @@ void sunbowAlways(int eventID = -1) {
 			} else {
 				trQuestVarSet("p"+p+"searingNext", 
 					trTimeMS() + trQuestVarGet("searingDelay") * trQuestVarGet("p"+p+"ultimateCost"));
-				trSoundPlayFN("flamingweapons.wav","1",-1,"","");
+				trSoundPlayFN("forestfirebirth.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
 					yDatabaseNext("p"+p+"Characters");
 					if ((yGetVar("p"+p+"Characters", "searingSFX") == 0) ||

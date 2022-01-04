@@ -85,7 +85,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost") / trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("well", -1, -99999, wellName);
@@ -125,7 +125,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost") / trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("rain", -1, -99999, rainName);
@@ -167,7 +167,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") / trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
                     trCounterAddTime("lure", -1, -99999, lureName);
@@ -222,7 +222,7 @@ highFrequency
                 trMutateSelected(kbGetProtoUnitID("Relic"));
                 trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
                 trMutateSelected(relicProto(1*trQuestVarGet("p"+p+"relic"+x)));
-                trSetSelectedScale(0,0,0);
+                trSetSelectedScale(0,0,-1);
                 trUnitSetAnimationPath("1,0,1,0,0,0,0");
                 relicEffect(1*trQuestVarGet("p"+p+"relic"+x), p, true);
                 trQuestVarSet("p"+p+"relic"+x, 0);
@@ -351,7 +351,7 @@ highFrequency
     p = trQuestVarGet("relicPlayer");
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
-    if (trUnitAlive() && trQuestVarGet("p"+p+"rideLightning") == 0) {
+    if (trUnitAlive() && trQuestVarGet("p"+p+"rideLightning") == 0 && trQuestVarGet("p"+p+"dead") <= 0) {
         trVectorSetUnitPos("pos", "p"+p+"unit");
         for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
             yDatabaseNext("p"+p+"relics", true);
@@ -364,7 +364,7 @@ highFrequency
                         trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
                     if (trPlayerResourceCount(p, "Gold") > 25 &&
-                        zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
+                        zDistanceBetweenVectorsSquared("pos", "relicTransporterGuyPos") < 36) {
                         trMutateSelected(kbGetProtoUnitID("Conversion SFX"));
                         if (trCurrentPlayer() == p) {
                             trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
@@ -418,7 +418,7 @@ highFrequency
                 relicEffect(1*yGetVar("freeRelics", "type"), p, true);
                 trUnitSelectClear();
                 trUnitSelectByQV("freeRelics", true);
-                trSetSelectedScale(0,0,0);
+                trSetSelectedScale(0,0,-1);
                 trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
                 if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
                     trUnitSetAnimationPath("1,0,1,1,0,0,0");
@@ -458,10 +458,7 @@ highFrequency
             trUnitSelectByQV("p"+p+"unit");
             /* lifesteal */
             if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
-                count = yGetPointer("playerUnits");
-                ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
-                healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"));
-                ySetPointer("playerUnits", count);
+                healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
             if (Multiplayer) {
@@ -596,6 +593,10 @@ highFrequency
         if (trQuestVarGet("sound") == 1) {
             trSoundPlayFN("skypassageout.wav","1",-1,"","");
         }
+    }
+
+    for(x=xsMin(5, yGetDatabaseCount("launchedUnits")); >0) {
+        processLaunchedUnit();
     }
 
     processChests();

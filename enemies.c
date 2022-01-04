@@ -247,7 +247,7 @@ void enemiesAlways() {
                         if (id == -1 || trUnitAlive() == false) {
                             removePlayerUnit();
                         } else if (zDistanceToVectorSquared("playerUnits", "end") < 4) {
-                            damagePlayerUnit(300);
+                            damagePlayerUnit(100 + 100 * trQuestVarGet("stage"));
                             if (yGetVar("playerUnits", "hero") == 1 && trCurrentPlayer() == yGetVar("playerUnits", "player")) {
                                 trCameraShake(0.7, 0.7);
                             }
@@ -334,7 +334,7 @@ void enemiesAlways() {
                     trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
                     trVectorSetUnitPos("start", "Medusas");
                     trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,3,5);
+                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,5);
                     yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
                     yAddUpdateVar("MedusaBalls", "bounces", 12);
                     ySetVar("Medusas", "step", 2);

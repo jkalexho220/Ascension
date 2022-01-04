@@ -173,7 +173,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Fire Knight: A diving character that sacrifices health for damage.";
+					msg = "Fire Knight: A character that charges in and sacrifices health for damage.";
 				}
 				case 1:
 				{
@@ -181,17 +181,17 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (5 attacks): Deal 80 damage to nearby enemies and yourself.";
+					msg = "Special Attack (5 attacks): Deal 50 damage to nearby enemies and yourself.";
 				}
 				case 3:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "(Q) Flaming Impact: Dash to the target location, damaging all enemies hit.";
+					msg = "(Q) Flaming Impact: Dash to the target location, damaging enemies and dragging them with you";
 				}
 				case 4:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "Cooldown: 12 | Radius: 4 | Damage: 20 per meter";
+					msg = "Cooldown: 12 | Radius: 4 | Damage: 90";
 				}
 				case 5:
 				{
@@ -216,7 +216,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god power firestorm icon 64";
-					msg = "Cost: 60 | Radius: 12 | Duration: 8 | Damage: 120 per second | Heal: 60 per second";
+					msg = "Cost: 70 | Radius: 12 | Duration: 8 | Damage: 120 per second | Heal: 60 per second";
 					next = 0;
 				}
 			}

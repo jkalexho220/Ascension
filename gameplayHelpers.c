@@ -60,28 +60,6 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 	}
 }
 
-void removeArrow() {
-	for(x=2;>0) {
-		if (yGetVar("arrowsActive", "sfx"+x) > 0) {
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("arrowsActive", "sfx"+x), true);
-			trUnitChangeProtoUnit("Rocket");
-		}
-	}
-	trUnitSelectClear();
-	trUnitSelect(""+1*trQuestVarGet("arrowsActive"), true);
-	yRemoveFromDatabase("arrowsActive");
-	yRemoveUpdateVar("arrowsActive", "destx");
-	yRemoveUpdateVar("arrowsActive", "destz");
-	yRemoveUpdateVar("arrowsActive", "timeout");
-	yRemoveUpdateVar("arrowsActive", "element");
-	yRemoveUpdateVar("arrowsActive", "damage");
-	yRemoveUpdateVar("arrowsActive", "player");
-	yRemoveUpdateVar("arrowsActive", "sfx1");
-	yRemoveUpdateVar("arrowsActive", "sfx2");
-	yRemoveUpdateVar("arrowsActive", "special");
-}
-
 void removeEnemy() {
 	if (yGetVar("enemies", "bounty") > 0) {
 		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
@@ -108,6 +86,7 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "relic");
 	yRemoveUpdateVar("enemies", "posX");
 	yRemoveUpdateVar("enemies", "posZ");
+	yRemoveUpdateVar("enemies", "launched");
 }
 
 void removePlayerUnit() {
@@ -125,6 +104,7 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "decay");
 	yRemoveUpdateVar("playerUnits", "decayNext");
 	yRemoveUpdateVar("playerUnits", "hero");
+	yRemoveUpdateVar("playerUnits", "launched");
 }
 
 void removePlayerCharacter() {
@@ -241,39 +221,6 @@ void vectorSetAsTargetVector(string target = "", string from = "", string to = "
 	}
 }
 
-
-bool collideWithTerrain(int arrow = 0) {
-	bool collide = false;
-	trVectorQuestVarSet("loc", kbGetBlockPosition(""+arrow));
-	vectorToGrid("loc", "loc");
-	if (trCountUnitsInArea(""+arrow,ENEMY_PLAYER,"Phoenix Egg", 1.5) > 0) {
-		trQuestVarSetFromRand("sound", 1, 3, true);
-		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-		collide = true;
-	} else if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-		trQuestVarSetFromRand("sound", 1, 3, true);
-		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-		collide = true;
-	}
-	return(collide);
-}
-
-
-bool checkArrowDie() {
-	int arrow = trQuestVarGet("arrowsActive");
-	trQuestVarSet("endx", yGetVar("arrowsActive", "destx"));
-	trQuestVarSet("endz", yGetVar("arrowsActive", "destz"));
-	if ((collideWithTerrain(arrow)) ||
-		zDistanceToVectorSquared("arrowsActive", "end") < 9 ||
-		trTimeMS() > yGetVar("arrowsActive", "timeout")) {
-		return(true);
-	} else {
-		return(false);
-	}
-}
-
-
-
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
 	duration = duration * 1000;
 	if (p > 0) {
@@ -326,23 +273,110 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 	}
 }
 
-int addEffect(int car = 0, string proto = "", string anim = "0,0,0,0,0,0,0") {
-	int sfx = trGetNextUnitScenarioNameNumber();
-	trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+void processLaunchedUnit() {
+	yDatabaseNext("launchedUnits");
+	yVarToVector("launchedUnits", "dest");
 	trUnitSelectClear();
-	trUnitSelect(""+sfx, true);
-	trMutateSelected(kbGetProtoUnitID(proto));
-	trUnitSetAnimationPath(anim);
-	trMutateSelected(kbGetProtoUnitID("Relic"));
-	trImmediateUnitGarrison(""+car);
-	trMutateSelected(kbGetProtoUnitID(proto));
-	return(sfx);
+	trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
+	if (trUnitAlive() == false ||
+		zDistanceToVectorSquared("launchedUnits", "dest") < 4 ||
+		trTimeMS() > yGetVar("launchedUnits", "timeout")) {
+		if (trUnitAlive()) {
+			string db = "playerUnits";
+			if (yGetVar("launchedUnits", "player") == ENEMY_PLAYER) {
+				db = "enemies";
+			}
+			ySetVarAtIndex(db, "launched", 0, 1*yGetVar("launchedUnits", "index"));
+			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
+			trMutateSelected(1*yGetVar("launchedUnits", "proto"));
+		} else {
+			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
+		}
+		trUnitSelectClear();
+		trUnitSelectByQV("launchedUnits");
+		trUnitChangeProtoUnit("Dust Small");
+		yRemoveFromDatabase("launchedUnits");
+	}
 }
 
-void healUnit(int p = 0, float amt = 0) {
+void launchUnit(string db = "", string dest = "") {
+	if (yGetVar(db, "launched") == 0) {
+		ySetVar(db, "launched", 1);
+		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db)));
+		int owner = ENEMY_PLAYER;
+		trUnitSelectClear();
+		trUnitSelectByQV(db);
+		if (trUnitIsOwnedBy(ENEMY_PLAYER) == false) {
+			owner = yGetVar(db, "player");
+		}
+		trUnitChangeProtoUnit("Transport Ship Greek");
+
+		trVectorSetUnitPos("start", db);
+		trVectorQuestVarSet("dir", zGetUnitVector("start", dest));
+
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		trUnitSelectClear();
+		trUnitSelectByQV("next");
+		trImmediateUnitGarrison(""+1*trQuestVarGet(db));
+		trUnitConvert(owner);
+		trUnitChangeProtoUnit("Dwarf");
+
+		trUnitSelectClear();
+		trUnitSelectByQV("next");
+		trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
+		trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+
+		trUnitSelectClear();
+		trUnitSelectByQV(db);
+		trMutateSelected(type);
+		trUnitOverrideAnimation(24,0,true,true,-1);
+		trMutateSelected(kbGetProtoUnitID("Relic"));
+		trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
+		trMutateSelected(type);
+
+		float dist = zDistanceBetweenVectors("start", dest);
+		for(x=0; < dist / 2) {
+			trQuestVarSet("nextx", trQuestVarGet("startx") + 2.0 * trQuestVarGet("dirx"));
+			trQuestVarSet("nextz", trQuestVarGet("startz") + 2.0 * trQuestVarGet("dirz"));
+			vectorToGrid("next", "loc");
+			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				break;
+			} else {
+				trQuestVarSet("startx", trQuestVarGet("nextx"));
+				trQuestVarSet("startz", trQuestVarGet("nextz"));
+			}
+		}
+
+		trUnitSelectClear();
+		trUnitSelectByQV("next");
+		trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+		trUnitMoveToPoint(trQuestVarGet("startx"),0,trQuestVarGet("startz"),-1,false);
+
+		yAddToDatabase("launchedUnits", "next");
+		yAddUpdateVar("launchedUnits", "unit", trQuestVarGet(db));
+		yAddUpdateVar("launchedUnits", "index", yGetPointer(db));
+		yAddUpdateVar("launchedUnits", "player", owner);
+		yAddUpdateVar("launchedUnits", "proto", type);
+		yAddUpdateVar("launchedUnits", "destX", trQuestVarGet("startx"));
+		yAddUpdateVar("launchedUnits", "destz", trQuestVarGet("startz"));
+		yAddUpdateVar("launchedUnits", "timeout", trTimeMS() + 1100 * dist / 15);
+	}
+}
+
+void healUnit(int p = 0, float amt = 0, int index = -1) {
+	int old = yGetPointer("playerUnits");
+	if (index > 0) {
+		ySetPointer("playerUnits", index);
+	}
 	amt = amt * trQuestVarGet("p"+p+"healBoost");
 	if (yGetVar("playerUnits", "poisonStatus") == 0) {
 		trDamageUnit(0.0 - amt);
+	}
+	if (index > 0) {
+		ySetPointer("playerUnits", old);
 	}
 }
 
@@ -364,9 +398,17 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 /*
 protection blocks all damage.
 */
-void damagePlayerUnit(float dmg = 0) {
+void damagePlayerUnit(float dmg = 0, int index = -1) {
+	int old = 0;
+	if (index > 0) {
+		old = yGetPointer("playerUnits");
+		ySetPointer("playerUnits", index);
+	}
 	if (trQuestVarGet("protectionCount") == 0) {
 		trDamageUnit(dmg);
+	}
+	if (index > 0) {
+		ySetPointer("playerUnits", old);
 	}
 }
 
@@ -380,7 +422,7 @@ void stunsAndPoisons(string db = "") {
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
     	} else if (amt > 500) {
     		trDamageUnit(amt * yGetVar(db, "poisonDamage") * 0.001);
-    		ySetVar(db, "poisonLast", trTimeMS());
+    		ySetVar(db, "poisonLast", yGetVar("poisonLast") + trTimeMS());
     	}
 	}
 	if (yGetVar(db, "stunStatus") >= 1) {

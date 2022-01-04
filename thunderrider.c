@@ -61,7 +61,7 @@ void rideLightningOff(int p = 0) {
 		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
 		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
 		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-			trSetSelectedScale(0,0,0);
+			trSetSelectedScale(0,0,-1);
 			trUnitSetAnimationPath("1,0,1,1,0,0,0");
 		}
 	}
@@ -281,7 +281,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
 				trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
 				if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-					trSetSelectedScale(0,0,0);
+					trSetSelectedScale(0,0,-1);
 					trUnitSetAnimationPath("1,0,1,1,0,0,0");
 				}
 			}
@@ -304,10 +304,7 @@ void thunderRiderAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitHighlight(0.5, false);
-			target = yGetPointer("playerUnits");
-			ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters"));
-			healUnit(p, trQuestVarGet("p"+p+"thunderRiderBonus"));
-			ySetPointer("playerUnits", target);
+			healUnit(p, trQuestVarGet("p"+p+"thunderRiderBonus"), 1*yGetVar("p"+p+"characters", "index"));
 			trVectorSetUnitPos("pos", "p"+p+"characters");
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 			trArmySelect(""+p+",0");
