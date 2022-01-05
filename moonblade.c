@@ -274,8 +274,8 @@ highFrequency
 		trEventSetHandler(1000 + 12 * MOONBLADE + p, "chooseMoonblade");
 	}
 	trQuestVarSet("moonbeamCooldown", 18);
-	trQuestVarSet("moonbeamDamage", 20);
-	trQuestVarSet("moonbeamDamageBoost", 10);
+	trQuestVarSet("moonbeamDamage", 30);
+	trQuestVarSet("moonbeamDamageBoost", 15);
 	trQuestVarSet("moonbeamDuration", 6);
 	trQuestVarSet("moonbeamRadius", 6);
 

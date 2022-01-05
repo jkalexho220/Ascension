@@ -514,6 +514,7 @@ highFrequency
             }
             case 2:
             {
+                trSetLighting("Fimbulwinter", 0.1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 4;
                 

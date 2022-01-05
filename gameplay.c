@@ -612,6 +612,18 @@ highFrequency
         trQuestVarSet("gameOverNext", trTime() + 2);
         xsEnableRule("game_over");
     }
+
+    if (trTime() > trQuestVarGet("noSpecialsNext")) {
+        trQuestVarSet("noSpecialsNext", trTime());
+        for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Frost Giant", p, 9, -999999995);
+            trModifyProtounit("Frost Giant", p, 9, 999999999);
+            trModifyProtounit("Medusa", p, 9, -999999995);
+            trModifyProtounit("Medusa", p, 9, 999999999);
+            trModifyProtounit("Mummy", p, 9, -999999995);
+            trModifyProtounit("Mummy", p, 9, 999999999);
+        }
+    }
 }
 
 rule game_over

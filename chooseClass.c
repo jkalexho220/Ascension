@@ -46,7 +46,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power eclipse icon 64";
-					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 20 + 10 per ally";
+					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 30 + 15 per ally";
 					next = 4;
 				}
 				case 7:
@@ -206,7 +206,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\improvement flames of typhon icon";
-					msg = "Cooldown: 14 | Radius: 4 | Duration: 5 | Damage: 40 per second";
+					msg = "Cooldown: 18 | Radius: 4 | Duration: 5 | Damage: 40 per second";
 				}
 				case 8:
 				{
@@ -228,11 +228,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Frost Knight: A fighter that brings a lot of crowd control.";
+					msg = "Frost Knight: A sturdy fighter that brings a lot of crowd control.";
 				}
 				case 1:
 				{
-					msg = "Passive: Each time you stun an enemy, deal 10 percent of your max health to them.";
+					msg = "Passive: Each time you stun an enemy, restore 5 pecent of your health.";
 				}
 				case 2:
 				{
@@ -251,7 +251,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "";
-					msg = "Cooldown: 5 | Radius: 1.5 | Duration: 6 | Damage: 80";
+					msg = "Cooldown: 4 | Radius: 1.5 | Duration: 6 | Damage: 80";
 				}
 				case 6:
 				{

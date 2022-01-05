@@ -239,6 +239,9 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"poisonResistanceCount", 0);
     trQuestVarSet("p"+p+"silenceResistanceCount", 0);
 
+    trQuestVarSet("p"+p+"stunKiller", 1);
+    trQuestVarSet("p"+p+"poisonKiller", 1);
+
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
     if (trUnitAlive() && trQuestVarGet("p"+p+"unit") > 0) {

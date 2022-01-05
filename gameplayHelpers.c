@@ -247,12 +247,33 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	}
 }
 
+void healUnit(int p = 0, float amt = 0, int index = -1) {
+	int old = yGetPointer("playerUnits");
+	if (index > 0) {
+		ySetPointer("playerUnits", index);
+	}
+	amt = amt * trQuestVarGet("p"+p+"healBoost");
+	if (yGetVar("playerUnits", "poisonStatus") == 0) {
+		trDamageUnit(0.0 - amt);
+	}
+	if (index > 0) {
+		ySetPointer("playerUnits", old);
+	}
+}
+
 void stunUnit(string db = "", float duration = 0, int p = 0) {
 	trQuestVarSet("stunSound", 1);
 	int index = 0;
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+		if (trQuestVarGet("p"+p+"class") == FROSTKNIGHT) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"unit");
+			healUnit(p, 0.05 * trQuestVarGet("p"+p+"health"), 1*trQuestVarGet("p"+p+"index"));
+			trUnitSelectClear();
+			trUnitSelectByQV(db);
+		}
 	} else if (p < 0) {
 		duration = duration * trQuestVarGet("p"+(0-p)+"stunResistance");
 	}
@@ -366,19 +387,6 @@ void launchUnit(string db = "", string dest = "") {
 	}
 }
 
-void healUnit(int p = 0, float amt = 0, int index = -1) {
-	int old = yGetPointer("playerUnits");
-	if (index > 0) {
-		ySetPointer("playerUnits", index);
-	}
-	amt = amt * trQuestVarGet("p"+p+"healBoost");
-	if (yGetVar("playerUnits", "poisonStatus") == 0) {
-		trDamageUnit(0.0 - amt);
-	}
-	if (index > 0) {
-		ySetPointer("playerUnits", old);
-	}
-}
 
 /*
 Enemies have elemental resistance and weakness

@@ -20,7 +20,7 @@ const int RELIC_SPECIAL_ATTACK = 16;
 const int RELIC_POISON_KILLER = 17;
 const int RELIC_COOLDOWN_REDUCTION = 18;
 const int RELIC_STUN_KILLER = 19;
-const int RELIC_HALF_KILLER = 20;
+const int RELIC_ALL = 20;
 
 /* nickonhawk's shop */
 
@@ -95,9 +95,9 @@ string relicName(int relic = 0) {
 		{
 			msg = "+0.3x damage to stunned enemies.";
 		}
-		case RELIC_HALF_KILLER:
+		case RELIC_ALL:
 		{
-			msg = "+0.3x damage to enemies below half health.";
+			msg = "Spell Power, Duration, Range +0.1";
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -186,9 +186,9 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\special g medusa icon 64";
 		}
-		case RELIC_HALF_KILLER:
+		case RELIC_ALL:
 		{
-			icon = "icons\special g cyclops icon 64";
+			icon = "icons\special g chimera icon 64";
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -307,9 +307,11 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"stunKiller", trQuestVarGet("p"+p+"stunKiller") + 0.3 * m);
 		}
-		case RELIC_HALF_KILLER:
+		case RELIC_ALL:
 		{
-			trQuestVarSet("p"+p+"halfKiller", trQuestVarGet("p"+p+"halfKiller") + 0.3 * m);
+			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.1 * m);
+			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.1 * m);
+			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.1 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -400,9 +402,9 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Medusa");
 		}
-		case RELIC_HALF_KILLER:
+		case RELIC_ALL:
 		{
-			proto = kbGetProtoUnitID("Cyclops");
+			proto = kbGetProtoUnitID("Chimera");
 		}
 		case RELIC_ULTIMATE_COST:
 		{

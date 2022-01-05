@@ -376,7 +376,7 @@ highFrequency
 	trQuestVarSet("flamingImpactDamage", 90);
 	trQuestVarSet("flamingImpactRange", 4);
 
-	trQuestVarSet("overheatCooldown", 14);
+	trQuestVarSet("overheatCooldown", 18);
 	trQuestVarSet("overheatDuration", 5);
 	trQuestVarSet("overheatDamage", 40);
 	trQuestVarSet("overheatRadius", 4);
