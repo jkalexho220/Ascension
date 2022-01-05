@@ -219,7 +219,9 @@ void frostknightAlways(int eventID = -1) {
 		trUnitChangeProtoUnit("Frost Giant");
 		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		yAddToDatabase("p"+p+"frostGiants", "p"+p+"lureObject");
-		yAddUpdateVar("p"+p+"frostGiants", "next", trTimeMS());
+		yAddUpdateVar("p"+p+"frostGiants", "decaynext", trTimeMS());
+		yAddUpdateVar("p"+p+"frostGiants", "specialnext", trTimeMS());
+		yAddUpdateVar("p"+p+"frostGiants", "step", 0);
 		yAddUpdateVar("p"+p+"frostGiants", "index", yAddToDatabase("playerUnits", "p"+p+"lureObject"));
 		yAddUpdateVar("playerUnits", "player", p);
 		ySetPointer("p"+p+"frostGiants", yGetNewestPointer("p"+p+"frostGiants"));
@@ -231,9 +233,51 @@ void frostknightAlways(int eventID = -1) {
 		id = yDatabaseNext("p"+p+"frostGiants", true);
 		if (id == -1 || trUnitAlive() == false) {
 			yRemoveFromDatabase("p"+p+"frostGiants");
-		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "next")) {
-			ySetVar("p"+p+"frostGiants", "next", trTimeMS() + 1000);
+		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "decaynext")) {
+			ySetVar("p"+p+"frostGiants", "decaynext", trTimeMS() + 1000);
 			damagePlayerUnit(calculateDecay(p, trQuestVarGet("frostGiantDecay")), 1*yGetVar("p"+p+"frostGiants", "index"));
+		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "specialnext")) {
+			switch(1*yGetVar("p"+p+"frostGiants", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("p"+p+"frostGiants", "target", trGetUnitScenarioNameNumber(target));
+						ySetVar("p"+p+"frostGiants", "step", 1);
+						ySetVar("p"+p+"frostGiants", "specialnext", trTimeMS() + 1400);
+						trUnitOverrideAnimation(40,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					hit = 0;
+					for (x=yGetDatabaseCount("enemies"); >0) {
+						if (yGetVar("p"+p+"frostGiants", "target") == yDatabaseNext("enemies")) {
+							trUnitSelectClear();
+							trUnitSelectByQV("enemies");
+							stunUnit("enemies", 2.0, p);
+							hit = 1;
+							break;
+						}
+					}
+					ySetVar("p"+p+"frostGiants", "step", 2);
+					ySetVar("p"+p+"frostGiants", "specialnext", yGetVar("p"+p+"frostGiants", "specialnext") + 600);
+					if (hit == 0) {
+						ySetVar("p"+p+"frostGiants", "target", -1);
+					}
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					ySetVar("p"+p+"frostGiants", "step", 0);
+					if (yGetVar("p"+p+"frostGiants", "target") == -1) {
+						ySetVar("p"+p+"frostGiants", "specialnext", trTimeMS());
+					} else {
+						ySetVar("p"+p+"frostGiants", "specialnext", trTimeMS() + 15000 * trQuestVarGet("p"+p+"cooldownReduction"));
+					}
+				}
+			}
 		}
 	}
 
@@ -282,5 +326,5 @@ highFrequency
 	trQuestVarSet("blizzardRadius", 4);
 
 	trQuestVarSet("frostGiantDecay", 3);
-	trQuestVarSet("frostGiantCost", 70);
+	trQuestVarSet("frostGiantCost", 60);
 }

@@ -393,6 +393,7 @@ highFrequency
         setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0);
         setupPlayerProto("Lancer Hero", 1100, 55, 6.05);
         setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
+        setupPlayerProto("Frost Giant", 1100, 45, 3.8);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 

@@ -258,7 +258,7 @@ void enemiesAlways() {
                     trArmySelect("1,0");
                     trUnitChangeProtoUnit("Tartarian Gate Flame");
                     ySetVar("MountainGiants", "step", 2);
-                    ySetVar("MountainGiants", "next", trTimeMS() + 1200);
+                    ySetVar("MountainGiants", "next", yGetVar("MountainGiants", "next") + 1200);
                     
                 }
                 case 2:
@@ -338,7 +338,7 @@ void enemiesAlways() {
                     yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
                     yAddUpdateVar("MedusaBalls", "bounces", 12);
                     ySetVar("Medusas", "step", 2);
-                    ySetVar("Medusas", "next", trTimeMS() + 800);
+                    ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
                 }
                 case 2:
                 {
