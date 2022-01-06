@@ -234,6 +234,10 @@ vector crossProduct(string a = "", string b = "") {
 	return(ret);
 }
 
+float dotProduct(string a = "", string b = "") {
+	return(trQuestVarGet(a+"x") * trQuestVarGet(b+"x") + trQuestVarGet(a+"z") * trQuestVarGet(b+"z"));
+}
+
 bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
 	bool isType = trGetTerrainType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == type;
 	isType = trGetTerrainSubType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == subtype;

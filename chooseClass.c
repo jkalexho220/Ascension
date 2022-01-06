@@ -305,6 +305,10 @@ string className(int class = 0) {
 		{
 			name = "Frost Knight";
 		}
+		case STARSEER:
+		{
+			name = "Starseer";
+		}
 	}
 	return(name);
 }

@@ -27,11 +27,13 @@ const int SUNBOW = 2;
 const int FIREKNIGHT = 3;
 const int FROSTKNIGHT = 4;
 const int THUNDERRIDER = 5;
-const int INVENTOR = 6;
+const int STARSEER = 6;
+
 const int ALCHEMIST = 7;
 const int WINDCUTTER = 8;
+const int INVENTOR = 9;
 
-const int CLASS_COUNT = 5;
+const int CLASS_COUNT = 6;
 
 
 const int STARSTONE = 0;
@@ -322,6 +324,7 @@ runImmediately
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
+    setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 6);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
@@ -394,6 +397,7 @@ highFrequency
         setupPlayerProto("Lancer Hero", 1100, 55, 6.05);
         setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
         setupPlayerProto("Frost Giant", 1100, 45, 3.8);
+        setupPlayerProto("Oracle Hero", 1000, 0, 4.0);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 

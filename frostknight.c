@@ -305,6 +305,12 @@ void chooseFrostKnight(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
+void frostknightModify(int eventID = -1) {
+	int p = eventID - 5000 - 12 * FROSTKNIGHT;
+	zSetProtoUnitStat("Frost Giant", p, 0, trQuestVarGet("p"+p+"health"));
+	zSetProtoUnitStat("Frost Giant", p, 27, trQuestVarGet("p"+p+"baseAttack"));
+}
+
 rule frostknight_init
 active
 highFrequency
@@ -313,6 +319,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * FROSTKNIGHT + p, "frostknightAlways");
 		trEventSetHandler(1000 + 12 * FROSTKNIGHT + p, "chooseFrostKnight");
+		trEventSetHandler(5000 + 12 * FROSTKNIGHT + p, "frostknightModify");
 	}
 
 	trQuestVarSet("icicleCooldown", 4);

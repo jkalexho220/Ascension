@@ -264,6 +264,12 @@ void chooseMoonblade(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
+void moonbladeModify(int eventID = -1) {
+	int p = eventID - 5000 - 12 * MOONBLADE;
+	zSetProtoUnitStat("Wolf", p, 0, 0.2 * trQuestVarGet("p"+p+"health"));
+	zSetProtoUnitStat("Wolf", p, 27, 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+}
+
 rule moonblade_init
 active
 highFrequency
@@ -272,6 +278,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * MOONBLADE + p, "moonbladeAlways");
 		trEventSetHandler(1000 + 12 * MOONBLADE + p, "chooseMoonblade");
+		trEventSetHandler(5000 + 12 * MOONBLADE + p, "moonbladeModify");
 	}
 	trQuestVarSet("moonbeamCooldown", 18);
 	trQuestVarSet("moonbeamDamage", 30);

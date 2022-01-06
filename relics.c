@@ -241,8 +241,6 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"health", trQuestVarGet("p"+p+"health") + 300.0 * m);
 			zSetProtoUnitStat(proto, p, 0, trQuestVarGet("p"+p+"health"));
-			zSetProtoUnitStat("Frost Giant", p, 0, trQuestVarGet("p"+p+"health"));
-			zSetProtoUnitStat("Wolf", p, 0, 0.2 * trQuestVarGet("p"+p+"health"));
 		}
 		case RELIC_SPEED:
 		{
@@ -277,8 +275,6 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 12.0 * m);
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
-			zSetProtoUnitStat("Frost Giant", p, 27, trQuestVarGet("p"+p+"baseAttack"));
-			zSetProtoUnitStat("Wolf", p, 27, 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 		}
 		case RELIC_SPELL_POWER:
 		{
@@ -339,6 +335,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
+	} else {
+		/* certain classes have special interactions with stats */
+		trEventFire(5000 + 12 * trQuestVarGet("p"+p+"class") + p);
 	}
 }
 

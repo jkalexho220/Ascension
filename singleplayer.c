@@ -280,6 +280,10 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 7.");
 			}
+			case STARSEER:
+			{
+				uiMessageBox("To unlock this class, complete three quests.");
+			}
 		}
 	}
 }
