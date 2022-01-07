@@ -324,7 +324,7 @@ runImmediately
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
-    setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 6);
+    setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");

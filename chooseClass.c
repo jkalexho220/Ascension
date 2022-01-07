@@ -195,12 +195,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 5:
 				{
-					icon = "icons\improvement flames of typhon icon";
+					icon = "icons\god power chaos icons 64";
 					msg = "(W) Overheat: Set yourself on fire, damaging yourself each second.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement flames of typhon icon";
+					icon = "icons\god power chaos icons 64";
 					msg = "During this time, reflect all damage you receive onto nearby enemies.";
 				}
 				case 7:
@@ -272,6 +272,65 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\special n frost giant icon 64";
 					msg = "Cost: 60 | Decay: 3 percent health per second.";
+					next = 0;
+				}
+			}
+		}
+		case STARSEER:
+		{
+			icon = "icons\infantry x oracle hero icons 64";
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Starseer: A ranged fighter with a unique attack mechanism.";
+				}
+				case 1:
+				{
+					msg = "Passive: Your normal attack deals 0 damage. Instead, 3 stars orbit around you, damaging enemies.";
+				}
+				case 2:
+				{
+					msg = "Damage: 30 | Star speed scales with Projectiles";
+				}
+				case 3:
+				{
+					msg = "Special Attack (3 attacks): Knock your target away from yourself.";
+				}
+				case 4:
+				{
+					icon = "icons\improvement halo of the sun icons 64";
+					msg = "(Q) Solar Flare: Your stars explode, damaging and stunning nearby enemies.";
+				}
+				case 5:
+				{
+					icon = "icons\improvement halo of the sun icons 64";
+					msg = "Cooldown: 15 | Damage: 50 | Radius: 4";
+				}
+				case 6:
+				{
+					icon = "icons\improvement eyes of atlas icons 64";
+					msg = "(W) Realign: Change the radius of your stars to match the distance of your cursor from your hero";
+				}
+				case 7:
+				{
+					icon = "icons\improvement eyes of atlas icons 64";
+					msg = "Cooldown: 5 | Max Range: 15";
+				}
+				case 8:
+				{
+					icon = "icons\improvement celerity icons 64";
+					msg = "(E) The Stars Align: Your stars stop spinning and form a line in the target direction.";
+				}
+				case 9:
+				{
+					icon = "icons\improvement celerity icons 64";
+					msg = "Consume all your favor over several seconds. When you have none left, fire a massive laser.";
+				}
+				case 10:
+				{
+					icon = "icons\improvement celerity icons 64";
+					msg = "Cost: 50-100 | Damage: 30 x favor spent";
 					next = 0;
 				}
 			}

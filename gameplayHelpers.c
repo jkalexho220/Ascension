@@ -228,7 +228,6 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		damage = damage * trQuestVarGet("p"+p+"spellDamage");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
-		trQuestVarSet("poisonSound", 1);
 		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
 				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Poison SFX"), yGetVarName(db, "poisonSFX"));
@@ -239,6 +238,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 			}
 			ySetVar(db, "poisonStatus", 1);
 			ySetVar(db, "poisonLast", trTimeMS());
+			trQuestVarSet("poisonSound", 1);
 		}
 		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
 	}

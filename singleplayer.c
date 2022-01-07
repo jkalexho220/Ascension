@@ -239,6 +239,17 @@ highFrequency
 			uiMessageBox("You have reached the max level for " + className(class) + "!");
 		}
 	}
+
+	if (trQuestVarGet("gaiaDiplo") == 1 && trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
+		trQuestVarSet("gaiaDiplo", 0);
+		trPlayerSetDiplomacy(0, 1, "neutral");
+	}
+
+	if (xsAbs(trQuestVarGet("spyFound") - trQuestVarGet("spyFind")) > 0 &&
+		trQuestVarGet("gaiaDiplo") == 0) {
+		trQuestVarSet("gaiaDiplo", 1);
+		trPlayerSetDiplomacy(0, 1, "Enemy");
+	}
 }
 
 rule singleplayer_end
