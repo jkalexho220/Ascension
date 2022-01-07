@@ -204,7 +204,7 @@ highFrequency
 {
     xsDisableSelf();
     trEventSetHandler(999, "removeCamTracks");
-    trSetUnitIdleProcessing(true);
+    
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
     for(p=1; < ENEMY_PLAYER) {
@@ -232,6 +232,9 @@ highFrequency
     }
     trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 
+    if (Multiplayer) {
+        trSetUnitIdleProcessing(true);
+    }
     /*
     TESTING STUFF BELOW THIS LINE
     

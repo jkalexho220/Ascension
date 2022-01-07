@@ -205,7 +205,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 7:
 				{
-					icon = "icons\improvement flames of typhon icon";
+					icon = "icons\god power chaos icons 64";
 					msg = "Cooldown: 18 | Radius: 4 | Duration: 5 | Damage: 40 per second";
 				}
 				case 8:
@@ -367,6 +367,10 @@ string className(int class = 0) {
 		case STARSEER:
 		{
 			name = "Starseer";
+		}
+		case STORMCUTTER:
+		{
+			name = "Stormcutter";
 		}
 	}
 	return(name);

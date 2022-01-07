@@ -48,9 +48,9 @@ highFrequency
 	    TERRAIN_WALL = 2;
 	    TERRAIN_SUB_WALL = 13;
 
+	    trSetUnitIdleProcessing(false);
 	    trPlayerSetDiplomacy(1, 2, "Enemy");
 	    trPlayerSetDiplomacy(2, 1, "Enemy");
-	    trPlayerSetDiplomacy(0, 1, "Neutral");
 	    trArmyDispatch("1,0","Victory Marker",1,1,0,1,0,true);
 	    trArmyDispatch("2,0","Victory Marker",1,1,0,1,0,true);
 
@@ -238,17 +238,6 @@ highFrequency
 		} else {
 			uiMessageBox("You have reached the max level for " + className(class) + "!");
 		}
-	}
-
-	if (trQuestVarGet("gaiaDiplo") == 1 && trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
-		trQuestVarSet("gaiaDiplo", 0);
-		trPlayerSetDiplomacy(0, 1, "neutral");
-	}
-
-	if (xsAbs(trQuestVarGet("spyFound") - trQuestVarGet("spyFind")) > 0 &&
-		trQuestVarGet("gaiaDiplo") == 0) {
-		trQuestVarSet("gaiaDiplo", 1);
-		trPlayerSetDiplomacy(0, 1, "Enemy");
 	}
 }
 

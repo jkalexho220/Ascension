@@ -314,6 +314,11 @@ void processLaunchedUnit() {
 			trMutateSelected(1*yGetVar("launchedUnits", "proto"));
 		} else {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
+			if (yGetVar("launchedUnits", "unit") == trQuestVarGet("bossUnit")) {
+				trUnitSelectClear();
+				trUnitSelectByQV("launchedUnits");
+				trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+			}
 		}
 		trUnitSelectClear();
 		trUnitSelectByQV("launchedUnits");
@@ -357,6 +362,9 @@ void launchUnit(string db = "", string dest = "") {
 		trMutateSelected(kbGetProtoUnitID("Relic"));
 		trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 		trMutateSelected(type);
+		if (trQuestVarGet(db) == trQuestVarGet("bossUnit")) {
+			trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+		}
 
 		float dist = zDistanceBetweenVectors("start", dest);
 		for(x=0; < dist / 2) {

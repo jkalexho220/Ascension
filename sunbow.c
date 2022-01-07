@@ -62,7 +62,7 @@ void sunbowAlways(int eventID = -1) {
 								if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
 									trUnitSelectClear();
 									trUnitSelectByQV("enemies", true);
-									damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"));
+									damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"), false);
 								}
 							}
 						}
@@ -116,7 +116,7 @@ void sunbowAlways(int eventID = -1) {
 			trTimeMS() + 1000 * trQuestVarGet("healingRaysDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trSoundPlayFN("skypassagein.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+SUNBOW+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+SUNBOW+"nextDelay") * 4.0 / (3.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 
 	if ((trQuestVarGet("p"+p+"healingRays") == 1) && (trTimeMS() > trQuestVarGet("p"+p+"healingRaysTimeout"))) {
@@ -173,9 +173,6 @@ void sunbowAlways(int eventID = -1) {
 	if ((trQuestVarGet("p"+p+"searingStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
-			if (yGetVar("p"+p+"characters", "searingSFX") < 0) {
-				ySetVar("p"+p+"characters", "searingSFX", trQuestVarGet("spyEye"+(0-yGetVar("p"+p+"characters", "searingSFX"))));
-			}
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("p"+p+"characters", "searingSFX"), true);
 			if (trQuestVarGet("p"+p+"searing") == 1) {

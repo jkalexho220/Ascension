@@ -79,7 +79,7 @@ void starseerAlways(int eventID = -1) {
 				current = yGetVar("p"+p+"characters", "angle");
 				for(x=1; <=3) {
 					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "star"+x));
-					if (id == -1) {
+					if (id == -1 || yGetVar("p"+p+"characters", "star"+x) == 0) {
 						if (trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
 							spyEffect(1*trQuestVarGet("p"+p+"characters"),
 								kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "star"+x));

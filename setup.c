@@ -28,12 +28,12 @@ const int FIREKNIGHT = 3;
 const int FROSTKNIGHT = 4;
 const int THUNDERRIDER = 5;
 const int STARSEER = 6;
+const int STORMCUTTER = 7;
 
-const int ALCHEMIST = 7;
-const int WINDCUTTER = 8;
+const int ALCHEMIST = 8;
 const int INVENTOR = 9;
 
-const int CLASS_COUNT = 6;
+const int CLASS_COUNT = 7;
 
 
 const int STARSTONE = 0;
@@ -325,6 +325,7 @@ runImmediately
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
+    setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, LIFESTONE);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
@@ -398,6 +399,7 @@ highFrequency
         setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
         setupPlayerProto("Frost Giant", 1100, 45, 3.8);
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0);
+        setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 20);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -415,6 +417,11 @@ highFrequency
             trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
         }
+
+        trModifyProtounit("Bolt Strike", 0, 27, -10000);
+        trModifyProtounit("Bolt Strike", 0, 28, -10000);
+        trModifyProtounit("Bolt Strike", 0, 29, -10000);
+        zInitProtoUnitStat("Bolt Strike", 0, 27, 0);
 
         xsEnableRule("setup_enemies");
         xsDisableSelf();
