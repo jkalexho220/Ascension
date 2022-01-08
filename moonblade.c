@@ -27,7 +27,7 @@ void moonbladeAlways(int eventID = -1) {
 				if (yGetVar("p"+p+"characters", "crescentCount") > 0) {
 					ySetVar("p"+p+"characters", "crescentCount", yGetVar("p"+p+"characters", "crescentCount") - 1);
 					ySetVar("p"+p+"characters", "crescentTimeout", trTimeMS() + 5000);
-					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					target = trGetUnitScenarioNameNumber(1*yGetVar("p"+p+"characters", "attackTarget"));
 					trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
 					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 					trArmySelect("1,0");

@@ -26,14 +26,15 @@ const int MOONBLADE = 1;
 const int SUNBOW = 2;
 const int FIREKNIGHT = 3;
 const int FROSTKNIGHT = 4;
-const int THUNDERRIDER = 5;
-const int STARSEER = 6;
-const int STORMCUTTER = 7;
 
+const int STORMCUTTER = 5;
+const int STARSEER = 6;
+const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
+
 const int INVENTOR = 9;
 
-const int CLASS_COUNT = 7;
+const int CLASS_COUNT = 16;
 
 
 const int STARSTONE = 0;
@@ -326,6 +327,7 @@ runImmediately
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, LIFESTONE);
+    setupClass("Pharaoh", ALCHEMIST, 550, 1200, LIFESTONE);
 
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
@@ -400,6 +402,7 @@ highFrequency
         setupPlayerProto("Frost Giant", 1100, 45, 3.8);
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0);
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 20);
+        setupPlayerProto("Pharaoh", 1000, 50, 4.0, 12);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -407,6 +410,7 @@ highFrequency
         trModifyProtounit("Sky Passage", 0, 5, 999);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Wadjet Spit", p, 1, -15);
             trModifyProtounit("Ajax", p, 5, 999);
             trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);
@@ -491,7 +495,7 @@ highFrequency
 {
     if (trTime() > cActivationTime + 5) {
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-        trOverlayText("The Seekers Project", 3.0, -1, -1, -1);
+        trOverlayText("Ascension", 3.0, -1, -1, -1);
         trUIFadeToColor(0,0,0,1000,3000,true);
         xsEnableRule("Z_cin_02");
         xsDisableSelf();

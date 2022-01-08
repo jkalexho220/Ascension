@@ -21,7 +21,7 @@ void frostknightAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
-				target = kbUnitGetTargetUnitID(id);
+				target = yGetVar("p"+p+"characters", "attackTarget");
 				for(x=yGetDatabaseCount("enemies"); >0) {
 					if (target == yDatabaseNext("enemies", true)) {
 						stunUnit("enemies", 1.5, p);
@@ -219,11 +219,12 @@ void frostknightAlways(int eventID = -1) {
 		trUnitChangeProtoUnit("Frost Giant");
 		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		yAddToDatabase("p"+p+"frostGiants", "p"+p+"lureObject");
-		yAddUpdateVar("p"+p+"frostGiants", "decaynext", trTimeMS());
 		yAddUpdateVar("p"+p+"frostGiants", "specialnext", trTimeMS());
 		yAddUpdateVar("p"+p+"frostGiants", "step", 0);
 		yAddUpdateVar("p"+p+"frostGiants", "index", yAddToDatabase("playerUnits", "p"+p+"lureObject"));
 		yAddUpdateVar("playerUnits", "player", p);
+		yAddUpdateVar("playerUnits", "decay", calculateDecay(p, trQuestVarGet("frostGiantDecay")));
+		yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 		ySetPointer("p"+p+"frostGiants", yGetNewestPointer("p"+p+"frostGiants"));
 		spyEffect(1*trQuestVarGet("p"+p+"lureObject"),
 			kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"frostGiants", "blizzardSFX"));
@@ -233,9 +234,6 @@ void frostknightAlways(int eventID = -1) {
 		id = yDatabaseNext("p"+p+"frostGiants", true);
 		if (id == -1 || trUnitAlive() == false) {
 			yRemoveFromDatabase("p"+p+"frostGiants");
-		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "decaynext")) {
-			ySetVar("p"+p+"frostGiants", "decaynext", trTimeMS() + 1000);
-			damagePlayerUnit(calculateDecay(p, trQuestVarGet("frostGiantDecay")), 1*yGetVar("p"+p+"frostGiants", "index"));
 		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "specialnext")) {
 			switch(1*yGetVar("p"+p+"frostGiants", "step"))
 			{

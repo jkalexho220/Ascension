@@ -33,7 +33,7 @@ void starseerAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
-				target = kbUnitGetTargetUnitID(id);
+				target = yGetVar("p"+p+"characters", "attackTarget");
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				for(x=yGetDatabaseCount("enemies"); >0) {
 					id = yDatabaseNext("enemies", true);

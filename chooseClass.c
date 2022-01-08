@@ -2,6 +2,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 	string icon = "";
 	string msg = "";
 	int next = tooltip + 1;
+	if (class > 16) {
+		next = 0;
+		int revealed = ((class - 16) / 4) * 2;
+		icon = "icons\building outpost icon 64";
+		msg = "This class will be revealed when you clear Stage " + revealed;
+	}
 	switch(class)
 	{
 		case MOONBLADE:
@@ -20,6 +26,9 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 2:
 				{
 					msg = "Special Attack (7 attacks): Summon a wolf companion that fights for you.";
+					if (Multiplayer == false) {
+						next = 8;
+					}
 				}
 				case 3:
 				{
@@ -54,6 +63,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					icon = "icons\improvement swine array icon 64";
 					msg = "Cooldown: 12 | Damage: 50";
 					next = 5;
+				}
+				case 8:
+				{
+					msg = "It has a fifth of your attack and health. Decay: 5 percent health per second";
+					next = 3;
 				}
 			}
 		}
@@ -334,6 +348,56 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					next = 0;
 				}
 			}
+		}
+		case STORMCUTTER:
+		{
+			icon = "icons\archer x arcus hero icons 64";
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Stormcutter: An archer who commands the power of storms.";
+				}
+				case 1:
+				{
+					msg = "Passive: You deal more damage the further your target is. 10 percent for every 5 meters.";
+				}
+				case 2:
+				{
+					icon = "icons\god power lightning icon 64";
+					msg = "(Q) Rain of Lightning: Your attacks call lightning to strike your foes, dealing damage in an area";
+				}
+				case 3:
+				{
+					icon = "icons\god power lightning icon 64";
+					msg = "Cooldown: 12 | Duration: 4 | Damage: 2 x Attack x Spell Power | Fire rate scales with projectiles";
+				}
+				case 4:
+				{
+					icon = "icons\god power shifting sand icon 64";
+					msg = "(W) Disengage: Stun nearby enemies and then teleport a short distance towards your cursor.";
+				}
+				case 5:
+				{
+					icon = "icons\god power shifting sand icon 64";
+					msg = "Cooldown: 8 | Radius: 4 | Range: 12";
+				}
+				case 6:
+				{
+					icon = "icons\god power tornado icon 64";
+					msg = "(E) Whirlwind: Create a storm that instantly pulls in nearby enemies.";
+				}
+				case 7:
+				{
+					icon = "icons\god power tornado icon 64";
+					msg = "Cost: 70 | Range: 18";
+					next = 0;
+				}
+			}
+		}
+		case ALCHEMIST:
+		{
+			icon = "icons\special e pharaoh icon 64";
 		}
 	}
 	trShowImageDialog(icon, msg);

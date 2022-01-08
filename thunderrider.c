@@ -398,7 +398,7 @@ void thunderRiderAlways(int eventID = -1) {
 				hit = CheckOnHit(p, id);
 				if (hit == ON_HIT_SPECIAL) {
 					yClearDatabase("p"+p+"thunderShockTargets");
-					target = kbUnitGetTargetUnitID(id);
+					target = yGetVar("p"+p+"characters", "attackTarget");
 					trQuestVarSet("target", trGetUnitScenarioNameNumber(target));
 					yAddToDatabase("p"+p+"thunderShocks", "target");
 					yAddUpdateVar("p"+p+"thunderShocks", "damage", trQuestVarGet("p"+p+"attack"));

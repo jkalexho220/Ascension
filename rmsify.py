@@ -2,7 +2,7 @@ import os
 import sys
 
 FILE_1 = None
-FILE_2 = 'Seekers MMORPG.xs'
+FILE_2 = 'Ascension MMORPG.xs'
 NAME = None
 named = False
 comment = False
@@ -108,7 +108,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 unknowns = {''}
 ln = 1
 files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 
-		'gameplayHelpers.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c' ,
+		'gameplayHelpers.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c' , 'alchemist.c',
 		'thunderrider.c', 'fireknight.c', 'frostknight.c', 'starseer.c', 'enemies.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
 first = True
 try:

@@ -23,7 +23,7 @@ void sunbowAlways(int eventID = -1) {
 			if (hit == ON_HIT_NORMAL) {
 				if (trQuestVarGet("p"+p+"healingRays") == 1) {
 					trPlayerGrantResources(p, "favor", 1);
-					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					target = trGetUnitScenarioNameNumber(1*yGetVar("p"+p+"characters", "attackTarget"));
 					trVectorQuestVarSet("end", kbGetBlockPosition(""+target));
 					trVectorSetUnitPos("start", "p"+p+"characters");
 					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));

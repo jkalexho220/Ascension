@@ -3,29 +3,6 @@ void removeCamTracks(int eventID = -1) {
     trUnblockAllSounds();
 }
 
-void spawnPlayerClone(int p = 0, string vdb = "") {
-    int class = trQuestVarGet("p"+p+"class");
-    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-    yAddToDatabase("p"+p+"characters", "next");
-    yAddUpdateVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "next"));
-    yAddUpdateVar("playerUnits", "player", p);
-    yAddUpdateVar("playerUnits", "hero", 1);
-    yAddToDatabase("playerCharacters", "next");
-    yAddUpdateVar("playerCharacters", "player", p);
-    string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
-    trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
-}
-
-void spawnPlayer(int p = 0, string vdb = "") {
-    trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
-    spawnPlayerClone(p, vdb);
-    trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
-    if (trCurrentPlayer() == p) {
-        int class = trQuestVarGet("p"+p+"class");
-        string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
-        uiFindType(proto);
-    }
-}
 
 void fixAnimations(int p = 0) {
     /*

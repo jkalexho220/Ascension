@@ -143,7 +143,11 @@ highFrequency
 	    	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
 	    	trArmySelect("1,0");
 	    	trUnitConvert(0);
-	    	trMutateSelected(1*trQuestVarGet("class"+a+"proto"));
+	    	if (a <= 4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2))) {
+	    		trMutateSelected(1*trQuestVarGet("class"+a+"proto"));
+	    	} else {
+	    		trUnitChangeProtoUnit("Atlantis Wall Connector");
+	    	}
 	    	if (trQuestVarGet("class"+a+"level") == 0) {
 	    		trPaintTerrain(x/2,z/2,x/2,z/2,2,12,false);
 	    	}
@@ -207,7 +211,9 @@ highFrequency
 		trUnitSelectByQV("class"+x+"unit");
 		if (trUnitIsSelected()) {
 			reselectMyself();
-			if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
+			if (x > 4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2))) {
+				explainClass(x + 16);
+			} else if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
 				explainClass(x);
 				if (trQuestVarGet("class"+x+"level") == 0) {
 					trDelayedRuleActivation("singleplayer_explain_class");
@@ -262,7 +268,7 @@ highFrequency
 		{
 			case THUNDERRIDER:
 			{
-				uiMessageBox("To unlock this class, defeat 5 bosses.");
+				uiMessageBox("To unlock this class, kill 50 Giants. Current: " + 1*trQuestVarGet("giantKills"));
 			}
 			case FIREKNIGHT:
 			{
@@ -270,19 +276,23 @@ highFrequency
 			}
 			case FROSTKNIGHT:
 			{
-				uiMessageBox("To unlock this class, kill 100 Giants.");
+				uiMessageBox("To unlock this class, defeat 5 bosses. Current: " + 1*trQuestVarGet("bossKills"));
 			}
 			case INVENTOR:
 			{
-				uiMessageBox("To unlock this class, collect 50 relics.");
+				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
 			case ALCHEMIST:
 			{
-				uiMessageBox("To unlock this class, ascend a character to level 7.");
+				uiMessageBox("To unlock this class, ascend a character to level 5.");
 			}
 			case STARSEER:
 			{
-				uiMessageBox("To unlock this class, complete three quests.");
+				uiMessageBox("To unlock this class, complete three quests. Current: " + 1*trQuestVarGet("questCount"));
+			}
+			case STORMCUTTER:
+			{
+				uiMessageBox("To unlock this class, clear stage 2.");
 			}
 		}
 	}

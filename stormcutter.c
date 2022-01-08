@@ -19,7 +19,7 @@ void stormcutterAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_NORMAL) {
-				target = kbUnitGetTargetUnitID(id);
+				target = yGetVar("p"+p+"characters", "attackTarget");
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
 				dist = zDistanceBetweenVectors("pos", "target");

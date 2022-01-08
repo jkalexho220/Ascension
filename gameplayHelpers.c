@@ -6,8 +6,9 @@ const int ABILITY_OFF = 0;
 const int ABILITY_ON = 1;
 
 const int ON_HIT_NONE = 0;
-const int ON_HIT_NORMAL = 1;
-const int ON_HIT_SPECIAL = 2;
+const int ON_HIT_ATTACKING = 1;
+const int ON_HIT_NORMAL = 2;
+const int ON_HIT_SPECIAL = 3;
 
 const int PROJ_NONE = 0;
 const int PROJ_GROUND = 1;
@@ -459,6 +460,7 @@ int CheckOnHit(int p = 0, int id = 0) {
     int status = ON_HIT_NONE;
     if (yGetVar("p"+p+"characters", "attacking") == 0) {
         if ((action == 12) || (action == 6)) {
+        	ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
             ySetVar("p"+p+"characters", "attacking", 1);
             ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
         }
@@ -479,6 +481,13 @@ int CheckOnHit(int p = 0, int id = 0) {
                 /* lifesteal */
                 trQuestVarSet("p"+p+"lifestealTotal", 
 					trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack"));
+            } else {
+            	int target = kbUnitGetTargetUnitID(id);
+            	if (xsAbs(yGetVar("p"+p+"characters", "attackTarget") - target) > 0) {
+            		ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
+            		ySetVar("p"+p+"characters", "attackTarget", target);
+            	}
+            	status = ON_HIT_ATTACKING;
             }
         } else {
             ySetVar("p"+p+"characters", "attacking", 0);
@@ -555,6 +564,31 @@ int addGenericProj(string db = "",string start="",string dir="",
 	trSetSelectedScale(0, 0.0 - height, 0);
 	trDamageUnitPercent(100);
 	return(index);
+}
+
+
+void spawnPlayerClone(int p = 0, string vdb = "") {
+    int class = trQuestVarGet("p"+p+"class");
+    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+    yAddToDatabase("p"+p+"characters", "next");
+    yAddUpdateVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "next"));
+    yAddUpdateVar("playerUnits", "player", p);
+    yAddUpdateVar("playerUnits", "hero", 1);
+    yAddToDatabase("playerCharacters", "next");
+    yAddUpdateVar("playerCharacters", "player", p);
+    string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+    trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+}
+
+void spawnPlayer(int p = 0, string vdb = "") {
+    trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+    spawnPlayerClone(p, vdb);
+    trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
+    if (trCurrentPlayer() == p) {
+        int class = trQuestVarGet("p"+p+"class");
+        string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+        uiFindType(proto);
+    }
 }
 
 rule spy_find
