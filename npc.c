@@ -33,7 +33,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 1:
 				{
 					trCameraCut(vector(90,70.710701,90), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
-					uiMessageBox("Welcome to the Adventurer's Guild! There are many things you can do here!");
+					uiMessageBox("Welcome to the Seeker's Guild! There are many things you can do here!");
 				}
 				case 2:
 				{

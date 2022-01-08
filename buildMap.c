@@ -458,7 +458,7 @@ highFrequency
             /* monstrous rage */
             trTechSetStatus(ENEMY_PLAYER, 76, 4);
             /* bacchanalia 10 x stage */
-            for(j=10; >0) {
+            for(j=8; >0) {
                 trTechSetStatus(ENEMY_PLAYER, 78, 4);
             }
         }

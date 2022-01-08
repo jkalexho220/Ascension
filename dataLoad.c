@@ -359,7 +359,7 @@ inactive
 		xsDisableSelf();
 		xsEnableRule("data_load_emergency_exit_02");
 		trSoundPlayFN("default","1",-1,
-					"Zenophobia:"+trStringQuestVarGet("p1name")+", make sure all spots are filled and the last player is a CPU.",
+					"Zenophobia:Host, make sure all spots are filled and the last player is a CPU.",
 					"icons\infantry g hoplite icon 64");
 	}
 }

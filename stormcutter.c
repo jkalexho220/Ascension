@@ -27,11 +27,12 @@ void stormcutterAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"stormbonus")));
 				zSetProtoUnitStat("Archer Atlantean Hero", p, 31, trQuestVarGet("p"+p+"attack"));
 				if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
+					trPlayerGrantResources(p, "favor", 1);
 					trUnitSelectClear();
 					trUnitSelectByID(target);
 					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 					dist = xsPow(trQuestVarGet("rainOfLightningRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
+					amt = 2.0 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
 					for(x=yGetDatabaseCount("enemies"); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
@@ -48,15 +49,100 @@ void stormcutterAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
-		
+		dist = trQuestVarGet("disengageRadius") * trQuestVarGet("p"+p+"spellRange");
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			id = yDatabaseNext("enemies", true);
+			if (id == -1 || trUnitAlive() == false) {
+				removeEnemy();
+			} else if (trCountUnitsInArea(""+1*trQuestVarGet("enemies"),p,"Archer Atlantean Hero", dist) >0) {
+				stunUnit("enemies", 2.0, p);
+				trPlayerGrantResources(p, "favor", 1);
+			}
+		}
+		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			id = yDatabaseNext("p"+p+"characters", true);
+			if (id == -1 || trUnitAlive() == false) {
+				removeStormcutter(p);
+			} else {
+				trVectorSetUnitPos("pos", "p"+p+"characters");
+				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect(""+p+",0");
+				trUnitChangeProtoUnit("Dust Large");
+				target = 1 + xsMin(trQuestVarGet("disengageRange") * trQuestVarGet("p"+p+"spellRange"), 
+					zDistanceBetweenVectors("pos", "p"+p+"wellPos")) / 2;
+				trVectorQuestVarSet("step", zGetUnitVector("pos", "p"+p+"wellPos"));
+				for(i=target; >0) {
+					trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("stepx"));
+					trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("stepz"));
+					vectorToGrid("pos", "loc");
+					if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+						break;
+					}
+				}
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+p+",0", "Transport Ship Greek", 1, trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"characters");
+				trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
+				trMutateSelected(kbGetProtoUnitID("Siege Tower"));
+				trUnitChangeProtoUnit("Archer Atlantean Hero");
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"characters");
+				trSetUnitOrientation(trVectorQuestVarGet("step"), vector(0,1,0), true);
+				trMutateSelected(kbGetProtoUnitID("Archer Atlantean Hero"));
+				trUnitSelectClear();
+				trUnitSelectByQV("next", true);
+				trUnitChangeProtoUnit("Lightning Sparks");
+			}
+		}
+		/* reload relics */
+		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+			yDatabaseNext("p"+p+"relics", true);
+			trUnitChangeProtoUnit("Relic");
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"relics");
+			trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+			trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+			if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+				trSetSelectedScale(0,0,-1);
+				trUnitSetAnimationPath("1,0,1,1,0,0,0");
+			}
+		}
 	}
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("whirlwindCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
+		trVectorSetUnitPos("center", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
-		trUnitDestroy();
-		
+		trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
+		trUnitSetAnimationPath("0,1,1,1,0,0,0");
+		yAddToDatabase("p"+p+"whirlwindObjects", "p"+p+"lureObject");
+		yAddUpdateVar("p"+p+"whirlwindObjects", "timeout", trTimeMS() + 1000 * trQuestVarGet("p"+p+"spellRange"));
+		dist = xsPow(trQuestVarGet("whirlwindRange") * trQuestVarGet("p"+p+"spellRange"), 2);
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			id = yDatabaseNext("enemies", true);
+			if (id == -1 || trUnitAlive() == false) {
+				removeEnemy();
+			} else if (zDistanceToVectorSquared("enemies", "center") < dist) {
+				launchUnit("enemies", "center");
+			}
+		}
+	}
+
+	if (yGetDatabaseCount("p"+p+"whirlwindObjects") > 0) {
+		yDatabaseNext("p"+p+"whirlwindObjects", true);
+		amt = yGetVar("p"+p+"whirlwindObjects", "timeout") - trTimeMS();
+		if (amt > 0) {
+			amt = amt / 1000;
+			trSetSelectedScale(amt, amt, amt);
+		} else {
+			trUnitDestroy();
+			yRemoveFromDatabase("p"+p+"whirlwindObjects");
+		}
 	}
 
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
@@ -100,7 +186,7 @@ void chooseStormcutter(int eventID = -1) {
 	}
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("disengageCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("whirlwindCooldown"));
+	trQuestVarSet("p"+p+"lureCooldown", 1);
 	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("whirlwindCost"));
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("rainOfLightningCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);

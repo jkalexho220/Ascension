@@ -71,7 +71,7 @@ void checkGodPowers(int p = 0) {
                 if (trCurrentPlayer() == p) {
                     trCounterAbort("well");
                     trCounterAddTime("well", 
-                        trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, wellName);
+                        trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
                 }
             } else {
                 trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber() - 1);
@@ -113,7 +113,7 @@ void checkGodPowers(int p = 0) {
                 if (trCurrentPlayer() == p) {
                     trCounterAbort("rain");
                     trCounterAddTime("rain", 
-                        trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, rainName);
+                        trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, rainName);
                 }
             }
         }
@@ -155,7 +155,7 @@ void checkGodPowers(int p = 0) {
                 if (trCurrentPlayer() == p) {
                     trCounterAbort("lure");
                     trCounterAddTime("lure", 
-                        trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 1, lureName);
+                        trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, lureName);
                 }
             }
         }
