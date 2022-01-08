@@ -572,6 +572,7 @@ highFrequency
         int n = 0;
         int total = 0;
         int backtrack = 5;
+        bool edgeIsPortal = false;
         trQuestVarSet("tile0", TILE_VISITED);
         trQuestVarSet("tile1", TILE_FOUND);
         trQuestVarSet("tile4", TILE_FOUND);
@@ -594,6 +595,7 @@ highFrequency
                 z = 1*trQuestVarGet("frontier") / 4;
                 x = 1*trQuestVarGet("frontier") - 4 * z;
                 buildEdge(1*yGetVar("frontier", "edge"), 1*yGetVar("frontier", "type"));
+                edgeIsPortal = (yGetVar("frontier", "type") == EDGE_PORTAL);
                 trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
                 if (trQuestVarGet("frontier") < 15) {
                     for(a=1; >=0) {
@@ -613,7 +615,7 @@ highFrequency
                             }
                         }
                     }
-                    if (trQuestVarGet("mapType") == MAP_PORTALS) {
+                    if ((trQuestVarGet("mapType") == MAP_PORTALS) && (edgeIsPortal == false)) {
                         trQuestVarSetFromRand("rand", 1, 14, true);
                         n = trQuestVarGet("rand");
                         if (trQuestVarGet("tile"+n) < TILE_VISITED) {

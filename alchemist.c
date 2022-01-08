@@ -211,6 +211,7 @@ void alchemistAlways(int eventID = -1) {
 			yAddUpdateVar("p"+p+"duplicates", "decay", 0);
 			yAddUpdateVar("p"+p+"duplicates", "decayNext", trTime());
 			trSoundPlayFN("changeunit.wav","1",-1,"","");
+			trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
 			if (trCurrentPlayer() == 1*yGetVar("playerCharacters", "player")) {
 				trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has summoned a copy of you!");
 			}
@@ -234,7 +235,7 @@ void alchemistAlways(int eventID = -1) {
 				}
 				case POTION_STUN:
 				{
-					trSetCounterDisplay("Potion: STUN");
+					trSetCounterDisplay("Potion: FREEZE");
 					trSoundPlayFN("icestereo.wav","1",-1,"","");
 				}
 				case POTION_HEAL:

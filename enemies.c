@@ -220,6 +220,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("MountainGiants") > 0) {
         id = yDatabaseNext("MountainGiants", true);
         if (id == -1 || trUnitAlive() == false) {
+            trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
             trUnitChangeProtoUnit("Mountain Giant");
             yRemoveFromDatabase("MountainGiants");
             yRemoveUpdateVar("MountainGiants", "step");

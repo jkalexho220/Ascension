@@ -566,6 +566,7 @@ highFrequency
 				trQuestVarSet("gameOverStep", 1);
 				xsDisableSelf();
 				xsEnableRule("game_over");
+				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));
 			}
 		}
 		gadgetUnreal("ShowImageBox-CloseButton");

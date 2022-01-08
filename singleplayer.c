@@ -27,6 +27,83 @@ void spAscendClass(int class = -1) {
 		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "! +1 relic slot!");
 		trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),1,5,1);
 		trSetCivilizationNameOverride(1, "Level " + (1+trQuestVarGet("p1level")));
+		if (trQuestVarGet("class"+class+"level") == 5) {
+			if (trQuestVarGet("class"+ALCHEMIST+"level") == 0) {
+				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
+				trQuestVarSet("newClass"+1*trQuestVarGet("newClassese"), ALCHEMIST);
+				xsEnableRule("singleplayer_unlocks");
+				trVectorSetUnitPos("pos", "class"+ALCHEMIST+"unit");
+				vectorToGrid("pos", "loc");
+				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+			}
+		}
+	}
+}
+
+void classNewUnlock(int class = 0) {
+	bool unlocked = false;
+	if (trQuestVarGet("class"+class+"level") == 0) {
+		switch(class)
+		{
+			case FIREKNIGHT:
+			{
+				if (trQuestVarGet("playerHasHosted") == 1) {
+					unlocked = true;
+				}
+			}
+			case FROSTKNIGHT:
+			{
+				if (trQuestVarGet("bossKills") >= 5) {
+					unlocked = true;
+				}
+			}
+			case STORMCUTTER:
+			{
+				unlocked = true;
+			}
+			case STARSEER:
+			{
+				if (trQuestVarGet("questCount") >= 3) {
+					unlocked = true;
+				}
+			}
+			case INVENTOR:
+			{
+				trQuestVarSet("relicCount", yGetDatabaseCount("p1relics") + yGetDatabaseCount("freeRelics"));
+				if (trQuestVarGet("relicCount") >= 100) {
+					unlocked = true;
+				}
+			}
+			case THUNDERRIDER:
+			{
+				if (trQuestVarGet("giantKills") >= 50) {
+					unlocked = true;
+				}
+			}
+		}
+	}
+	if (unlocked) {
+		trQuestVarSet("class"+class+"level", 1);
+		trQuestVarSet("newClasses", 1 + trQuestVarGet("newClasses"));
+		trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), class);
+	}
+}
+
+rule singleplayer_unlocks
+inactive
+highFrequency
+{
+	if ((trIsGadgetVisible("ShowImageBox") == false) &&
+		(trIsGadgetVisible("ingame-messagedialog") == false)) {
+		xsDisableSelf();
+		if (trQuestVarGet("newClasses") > 0) {
+			trQuestVarSetFromRand("sound", 1, 5, true);
+			int class = trQuestVarGet("newClass"+1*trQuestVarGet("newClasses"));
+			trShowImageDialog(classIcon(class), "New class unlocked! " + className(class));
+			trSoundPlayFN("ui\thunder"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			trDelayedRuleActivation("singleplayer_unlocks");
+			trQuestVarSet("newClasses", trQuestVarGet("newClasses") - 1);
+		}
 	}
 }
 
@@ -35,6 +112,7 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 2) {
+		int proto = 0;
 		xsDisableSelf();
 		trLetterBox(false);
 	    trUIFadeToColor(0,0,0,1000,0,false);
@@ -127,6 +205,10 @@ highFrequency
 	    	startNPCDialog(NPC_EXPLAIN_SINGLEPLAYER);
 	    } else {
 	    	xsEnableRule("gameplay_start_2");
+	    	xsEnableRule("singleplayer_unlocks");
+	    	for(a=4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2)); >2) {
+	    		classNewUnlock(a);
+	    	}
 	    }
 
 	    if (trQuestVarGet("p1class") == 0) {
@@ -139,6 +221,8 @@ highFrequency
 	    x = 138;
 	    z = 98;
 	    for(a=1; <= CLASS_COUNT) {
+			proto = trQuestVarGet("class"+a+"proto");
+			trModifyProtounit(kbGetProtoUnitName(proto),1,5,trQuestVarGet("class"+a+"level")-1);
 	    	trQuestVarSet("class"+a+"unit", trGetNextUnitScenarioNameNumber());
 	    	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
 	    	trArmySelect("1,0");

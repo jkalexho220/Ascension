@@ -495,7 +495,7 @@ highFrequency
 {
     if (trTime() > cActivationTime + 5) {
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-        trOverlayText("Ascension", 3.0, -1, -1, -1);
+        trOverlayText("Ascension MMORPG", 3.0, -1, -1, -1);
         trUIFadeToColor(0,0,0,1000,3000,true);
         xsEnableRule("Z_cin_02");
         xsDisableSelf();

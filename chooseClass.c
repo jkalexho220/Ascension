@@ -1,10 +1,50 @@
+string classIcon(int class = 0) {
+	string icon = "icons\infantry g hoplite icon 64";
+	switch(class)
+	{
+		case MOONBLADE:
+		{
+			icon = "icons\hero g theseus icon 64";
+		}
+		case SUNBOW:
+		{
+			icon = "icons\hero g hyppolyta icon 64";
+		}
+		case THUNDERRIDER:
+		{
+			icon = "icons\hero g atalanta icon 64";
+		}
+		case FIREKNIGHT:
+		{
+			icon = "icons\cavalry x lancer hero icons 64";
+		}
+		case FROSTKNIGHT:
+		{
+			icon = "icons\hero g achilles icon 64";
+		}
+		case STARSEER:
+		{
+			icon = "icons\infantry x oracle hero icons 64";
+		}
+		case STORMCUTTER:
+		{
+			icon = "icons\archer x arcus hero icons 64";
+		}
+		case ALCHEMIST:
+		{
+			icon = "icons\special e pharaoh icon 64";
+		}
+	}
+	return(icon);
+}
+
 int displayNextTooltip(int class = 0, int tooltip = 0) {
-	string icon = "";
+	string icon = classIcon(class);
 	string msg = "";
 	int next = tooltip + 1;
 	if (class > 16) {
 		next = 0;
-		int revealed = ((class - 16) / 4) * 2;
+		int revealed = ((class - 17) / 4) * 2;
 		icon = "icons\building outpost icon 64";
 		msg = "This class will be revealed when you clear Stage " + revealed;
 	}
@@ -12,7 +52,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 	{
 		case MOONBLADE:
 		{
-			icon = "icons\hero g theseus icon 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -73,7 +112,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case SUNBOW:
 		{
-			icon = "icons\hero g hyppolyta icon 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -122,7 +160,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case THUNDERRIDER:
 		{
-			icon = "icons\hero g atalanta icon 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -182,7 +219,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case FIREKNIGHT:
 		{
-			icon = "icons\cavalry x lancer hero icons 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -237,7 +273,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case FROSTKNIGHT:
 		{
-			icon = "icons\hero g achilles icon 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -292,7 +327,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case STARSEER:
 		{
-			icon = "icons\infantry x oracle hero icons 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -351,7 +385,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case STORMCUTTER:
 		{
-			icon = "icons\archer x arcus hero icons 64";
 			switch(tooltip)
 			{
 				case 0:
@@ -397,7 +430,58 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 		}
 		case ALCHEMIST:
 		{
-			icon = "icons\special e pharaoh icon 64";
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Alchemist: A versatile support with the right tool for every situation.";
+				}
+				case 1:
+				{
+					msg = "Passive: Every third attack, you throw a potion with a special effect.";
+				}
+				case 2:
+				{
+					icon = "icons\god power frost icon 64";
+					msg = "Freeze: The potion stuns your target. Additional projectiles will stun nearby enemies.";
+				}
+				case 3:
+				{
+					icon = "icons\god power pestilence icon 64";
+					msg = "Poison: The potion spills poison on the ground, poisoning enemies in an area.";
+				}
+				case 4:
+				{
+					icon = "icons\god power restoration icon 64";
+					msg = "Heal: All allies restore 5 percent of their health";
+				}
+				case 5:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "Cooldown: 12 | Heal: 200";
+				}
+				case 7:
+				{
+					icon = "icons\improvement salt amphora icon 64";
+					msg = "(W) Swap Potion: Swap the type of potion you throw, cycling between the three options.";
+				}
+				case 8:
+				{
+					icon = "icons\god power call to arms icon";
+					msg = "(E) Duplicate: Summon a perfect copy of an allied hero. It also casts spells with them.";
+				}
+				case 9:
+				{
+					icon = "icons\god power call to arms icon";
+					msg = "Cost: 50 | Decay: 1 + 1 per second";
+					next = 0;
+				}
+			}
 		}
 	}
 	trShowImageDialog(icon, msg);
@@ -436,9 +520,15 @@ string className(int class = 0) {
 		{
 			name = "Stormcutter";
 		}
+		case ALCHEMIST:
+		{
+			name = "Alchemist";
+		}
+		
 	}
 	return(name);
 }
+
 
 void explainClass(int class = 0) {
 	trQuestVarSet("explain", 0);

@@ -67,6 +67,18 @@ void saveAllData() {
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}
 	}
+
+	/* class unlock progress */
+	savedata = 0;
+	currentdata = xsMin(10, trQuestVarGet("questCount"));
+	savedata = savedata * 11 + currentdata;
+	currentdata = xsMin(100, trQuestVarGet("giantKills"));
+	savedata = savedata * 101 + currentdata;
+	currentdata = xsMin(5, trQuestVarGet("bossKills"));
+	savedata = savedata * 6 + currentdata;
+	currentdata = trQuestVarGet("playerHasHosted");
+	savedata = savedata * 2 + trQuestVarGet("playerHasHosted");
+	trSetCurrentScenarioUserData(8, savedata);
 }
 
 void showLoadProgress() {
@@ -92,6 +104,20 @@ inactive
 	for(x=0; <4) {
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
+	}
+	/* class unlock progress */
+	savedata = xsMax(0, trGetScenarioUserData(8));
+	trQuestVarSet("playerHasHosted", iModulo(2, savedata));
+	savedata = savedata / 2;
+	trQuestVarSet("bossKills", iModulo(6, savedata));
+	savedata = savedata / 6;
+	trQuestVarSet("giantKills", iModulo(101, savedata));
+	savedata = savedata / 100;
+	trQuestVarSet("questCount", iModulo(11, savedata));
+	savedata = savedata / 11;
+
+	if (trCurrentPlayer() == 1) {
+		trQuestVarSet("playerHasHosted", 1);
 	}
 
 	if (Multiplayer) {
@@ -145,11 +171,6 @@ inactive
 				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
 				savedata = savedata / 11;
 			}
-		}
-
-		for(x=CLASS_COUNT; >0) {
-			proto = trQuestVarGet("class"+x+"proto");
-			trModifyProtounit(kbGetProtoUnitName(proto),1,5,trQuestVarGet("class"+x+"level")-1);
 		}
 
 		xsEnableRule("singleplayer_init");

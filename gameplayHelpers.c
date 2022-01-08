@@ -313,13 +313,19 @@ void processLaunchedUnit() {
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
 			trMutateSelected(1*yGetVar("launchedUnits", "proto"));
-		} else {
-			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
 			if (yGetVar("launchedUnits", "unit") == trQuestVarGet("bossUnit")) {
 				trUnitSelectClear();
 				trUnitSelectByQV("launchedUnits");
 				trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
 			}
+			if (yGetVar("launchedUnits", "stun") == 1) {
+				int index = yGetPointer(db);
+				ySetPointer(db, 1*yGetVar("launchedUnits", "index"));
+				stunUnit(db, 1.5);
+				ySetPointer(db, index);
+			}
+		} else {
+			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
 		}
 		trUnitSelectClear();
 		trUnitSelectByQV("launchedUnits");
@@ -329,6 +335,7 @@ void processLaunchedUnit() {
 }
 
 void launchUnit(string db = "", string dest = "") {
+	int hitWall = 0;
 	if (yGetVar(db, "launched") == 0) {
 		ySetVar(db, "launched", 1);
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db)));
@@ -373,6 +380,7 @@ void launchUnit(string db = "", string dest = "") {
 			trQuestVarSet("nextz", trQuestVarGet("startz") + 2.0 * trQuestVarGet("dirz"));
 			vectorToGrid("next", "loc");
 			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				hitWall = 1;
 				break;
 			} else {
 				trQuestVarSet("startx", trQuestVarGet("nextx"));
@@ -393,6 +401,7 @@ void launchUnit(string db = "", string dest = "") {
 		yAddUpdateVar("launchedUnits", "destX", trQuestVarGet("startx"));
 		yAddUpdateVar("launchedUnits", "destz", trQuestVarGet("startz"));
 		yAddUpdateVar("launchedUnits", "timeout", trTimeMS() + 1100 * dist / 15);
+		yAddUpdateVar("launchedUnits", "stun", hitWall);
 	}
 }
 
