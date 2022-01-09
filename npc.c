@@ -1,5 +1,15 @@
-int NPC_RELIC_TRANSPORTER = 0;
-int NPC_EXPLAIN_SINGLEPLAYER = 1;
+const int NPC_RELIC_TRANSPORTER = 0;
+const int NPC_EXPLAIN_SINGLEPLAYER = 1;
+const int NPC_ZENO_FIRST_QUIZ = 2;
+const int NPC_ZENO_NEXT_QUIZ = 3;
+const int NPC_ZENO_NEXT_QUESTION = 4;
+const int NPC_ZENO_QUIZ_END = 5;
+
+void startNPCDialog(int npc = 0) {
+	xsEnableRule("npc_talk_01");
+	trQuestVarSet("currentNPC", npc);
+	trQuestVarSet("currentNPCProgress", 0);
+}
 
 int npcDiag(int npc = 0, int dialog = 0) {
 	dialog = dialog + 1;
@@ -87,15 +97,77 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+		/*
+		case NPC_ZENO_FIRST_QUIZ:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey! It's me, Zenophobia! I've got a fun little quiz for you!");
+				}
+				case 2:
+				{
+					int gem = 1*trQuestVarGet("zenoReward");
+					uiMessageBox("For each question you answer correctly, I'll give you a "+gemstoneName(gem)+"! Ready?");
+					dialog = 0;
+					startNPCDialog(NPC_ZENO_NEXT_QUESTION);
+				}
+			}
+		}
+		case NPC_ZENO_NEXT_QUIZ:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey I'm back! Ready for another quiz?");
+				}
+				case 2:
+				{
+					int gem = 1*trQuestVarGet("zenoReward");
+					uiMessageBox("This time I'll give you a "+gemstoneName(gem)+" for each correct answer. Ready?");
+					dialog = 0;
+					startNPCDialog(NPC_ZENO_NEXT_QUESTION);
+				}
+			}
+		}
+		case NPC_ZENO_NEXT_QUESTION:
+		{
+			if (dialog > trQuestVarGet("explainations"+1*trQuestVarGet("currentQuestion"))) {
+				dialog = 0;
+				trShowChoiceDialog(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")),
+					trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"first"), 6001,
+					trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"second"), 6002);
+			} else {
+				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
+			}
+		}
+		case NPC_ZENO_QUIZ_END:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain1"));
+				}
+				case 2:
+				{
+					dialog = 0;
+					uiMessageBox("That's all for today! I'll be back after you clear another floor!");
+					trUnitSelectClear();
+					trUnitSelectByQV("zenoUnit");
+					trUnitChangeProtoUnit("Arkantos God Out");
+					trSoundPlayFN("arkantosleave.wav","1",-1,"","");
+				}
+			}
+		}
+		*/
 	}
 	return(dialog);
 }
 
-void startNPCDialog(int npc = 0) {
-	xsEnableRule("npc_talk_01");
-	trQuestVarSet("currentNPC", npc);
-	trQuestVarSet("currentNPCProgress", 0);
-}
+
 
 rule relic_transporter_guy_found
 inactive

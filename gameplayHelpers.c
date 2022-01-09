@@ -88,6 +88,8 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "posX");
 	yRemoveUpdateVar("enemies", "posZ");
 	yRemoveUpdateVar("enemies", "launched");
+	yRemoveUpdateVar("enemies", "magicResist");
+	yRemoveUpdateVar("enemies", "physicalResist");
 }
 
 void removePlayerUnit() {
@@ -410,6 +412,11 @@ void launchUnit(string db = "", string dest = "") {
 Enemies have elemental resistance and weakness
 */
 float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
+	if (spell) {
+		dmg = dmg - dmg * yGetVar("enemies", "magicResist");
+	} else {
+		dmg = dmg - dmg * yGetVar("enemies", "physicalResist");
+	}
 	trDamageUnit(dmg);
 	if (spell) {
 		trQuestVarSet("p"+p+"lifestealTotal", 

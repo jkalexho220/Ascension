@@ -110,7 +110,7 @@ string gemstoneName(int gem = 0) {
 }
 
 string stageName(int stage = 0) {
-    string name = "WTF THAT'S NOT A STAGE";
+    string name = "(This stage has not been made yet)";
     switch(stage)
     {
         case 1:
@@ -120,6 +120,10 @@ string stageName(int stage = 0) {
         case 2:
         {
             name = "Murkwood";
+        }
+        case 3:
+        {
+            name = "Frozen Canyon";
         }
     }
     return(name);
@@ -136,6 +140,10 @@ string stageIcon(int stage = 0) {
         case 2:
         {
             img = "ui\ui map deep jungle 256x256";
+        }
+        case 3:
+        {
+            img = "ui\ui map jotunheim 256x256";
         }
     }
     return(img);
@@ -391,6 +399,12 @@ highFrequency
 {
     if (trTime() > cActivationTime) {
         setupPlayerProto("Kronny Flying", 1000, 0, 0);
+
+        /* i gotta look good */
+        trTechSetStatus(0, 7, 4);
+        trTechSetStatus(0, 476, 4);
+        trTechSetStatus(ENEMY_PLAYER, 7, 4);
+        trTechSetStatus(ENEMY_PLAYER, 476, 4);
 
         setupPlayerProto("Militia", 100, 10, 4.8);
         setupPlayerProto("Wolf", 200, 10, 5);

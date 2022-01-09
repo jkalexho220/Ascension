@@ -195,6 +195,17 @@ highFrequency
 			{
 				trOverlayText("The Wraithwood", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
+				float angle = 0;
+				for(x=7; >0) {
+					trVectorSetFromAngle("dir", angle);
+					angle = angle + 0.897597;
+					trQuestVarSet("dirX", trQuestVarGet("dirX") * 15.0 + trQuestVarGet("bossRoomCenterX"));
+					trQuestVarSet("dirZ", trQuestVarGet("dirZ") * 15.0 + trQuestVarGet("bossRoomCenterZ"));
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("dirX"),0,trQuestVarGet("dirZ"),0,true);
+					trArmySelect("1,0");
+					trUnitConvert(0);
+					trUnitChangeProtoUnit("Imperial Examination");
+				}
 			}
 			case 1:
 			{
@@ -213,7 +224,13 @@ highFrequency
 				yRemoveFromDatabase("enemies");
 				trQuestVarSet("bossHealth", 100);
 				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100", -1);
-				trModifyProtounit("Earth Dragon Hole", ENEMY_PLAYER, 8, 1);
+
+				trModifyProtounit("Shade XP", ENEMY_PLAYER, 0, 6391);
+				trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -2.8);
+				trModifyProtounit("Shade XP", ENEMY_PLAYER, 27, 656);
+				trModifyProtounit("Shade XP", ENEMY_PLAYER, 28, 566);
+				trModifyProtounit("Shade XP", ENEMY_PLAYER, 29, 656);
+				
 				xsEnableRule("boss2_battle");
 				trQuestVarSet("bossSpell", 41);
 				trQuestVarSet("boss", 1);
@@ -364,7 +381,7 @@ highFrequency
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
 						trMutateSelected(kbGetProtoUnitID("Pine Dead"));
-						trSetSelectedScale(0.7,dist/1000,0.7);
+						trSetSelectedScale(0.9,dist/750,0.9);
 						trSetSelectedUpVector(2.5*trQuestVarGet("dirx"),0,2.5*trQuestVarGet("dirz"));
 
 						trUnitSelectClear();
@@ -381,7 +398,7 @@ highFrequency
 					{
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
-						if (dist > 400) {
+						if (dist > 300) {
 							trSetSelectedScale(1,0.4,1);
 							ySetVar("treeStabs", "step", 2);
 							ySetVar("treeStabs", "next", trTimeMS() + 2000);
@@ -407,7 +424,7 @@ highFrequency
 								}
 							}
 						} else {
-							trSetSelectedScale(1,dist/1000,1);
+							trSetSelectedScale(1,dist/750,1);
 						}
 					}
 					case 2:
@@ -431,18 +448,19 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 				trQuestVarSet("bossSpell", 0);
-				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
 			}
 		} else if (trQuestVarGet("bossSpell") > 40) {
 			if (trQuestVarGet("bossSpell") == 41) {
 				trQuestVarSet("bossHealth", trQuestVarGet("bossHealth") - 10);
+				if (trQuestVarGet("bossHealth") > 0) {
+					trSoundPlayFN("walkingwoodsbirth.wav","1",-1,"","");
+					trQuestVarSet("bossSpell", 42);
+					trQuestVarSet("bossNext", trTimeMS());
+					trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, 12, true);
+					trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, trQuestVarGet("bossCount"), true);
+				}
 				trCounterAbort("bosshealth");
 				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth"), -1);
-				trSoundPlayFN("walkingwoodsbirth.wav","1",-1,"","");
-				trQuestVarSet("bossSpell", 42);
-				trQuestVarSet("bossNext", trTimeMS());
-				trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, 12, true);
-				trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, trQuestVarGet("bossCount"), true);
 			} else if (trQuestVarGet("bossSpell") == 42) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
 					trQuestVarSet("bossNext", trTimeMS() + 500);
@@ -462,11 +480,35 @@ highFrequency
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 30) {
-			
+			if (trQuestVarGet("bossSpell") == 31) {
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trSoundPlayFN("underworldpassage.wav","1",-1,"","");
+				trSetLighting("night", 1.0);
+				trOverlayText("Wraith Unleashed", 3.0, -1, -1, -1);
+				trQuestVarSet("bossSpell", 32);
+				trQuestVarSet("bossNext", trTimeMS() + 1500);
+			} else if (trQuestVarGet("bossSpell") == 32) {
+				if (trTimeMS() > trQuestVarGet("bossSpell")) {
+					trQuestVarSet("bossWraith", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("bossRoomCenterX")-5,0,trQuestVarGet("bossRoomCenterZ")-5,225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("bossWraith", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trUnitChangeProtoUnit("Shade XP");
+					trUnitSelectClear();
+					trUnitSelectByQV("bossWraith", true);
+					trSetSelectedScale(2,2,2);
+					yAddToDatabase("enemies", "bossWraith");
+					trSetLighting("Fimbulwinter", 3.0);
+					trQuestVarSet("bossUltimate", 1);
+					bossCooldown(6, 15);
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
 				trCameraShake(0.5,0.25);
-				trSoundPlayFN("underminebirth.wav","1",-1,"","");
+				trSoundPlayFN("xpack\xcinematics\7_in\bigoltitan.wav","1",-1,"","");
 				trQuestVarSet("bossSpell", 22);
 				trQuestVarSet("bossNext", trTimeMS());
 				trQuestVarSet("bossCount", ENEMY_PLAYER - 1);
@@ -480,7 +522,7 @@ highFrequency
 					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 					if (trQuestVarGet("bossCount") == 0) {
 						trQuestVarSet("bossSpell", 23);
-						trQuestVarSet("bossCount", 35);
+						trQuestVarSet("bossCount", 32);
 						trQuestVarSet("bossRadius", 6);
 						trQuestVarSetFromRand("bossAngle", 0, 3.14, false);
 						trQuestVarSet("bossNext", trTimeMS() + 2000);
@@ -563,7 +605,8 @@ highFrequency
 			if (trCountUnitsInArea(""+1*trQuestVarGet("bosSUnit"),ENEMY_PLAYER,"Walking Woods Marsh", 40) == 0) {
 				trQuestVarSet("bossSpell", 41);
 			} else {
-				trQuestVarSetFromRand("bossSpell", 0, xsMin(3, 1 * (trUnitPercentDamaged() * 0.05)), true);
+				action = 100.0 - trQuestVarGet("bossHealth");
+				trQuestVarSetFromRand("bossSpell", 0, xsMin(3, action / 20), true);
 				trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
 				if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
 					trQuestVarSetFromRand("bossSpell", 0, 2, true);

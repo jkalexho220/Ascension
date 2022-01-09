@@ -40,6 +40,28 @@ void spAscendClass(int class = -1) {
 	}
 }
 
+
+void answerQuestion(int eventID = -1) {
+	int answer = eventID - 6000;
+	int question = trQuestVarGet("currentQuestion");
+	string result = "Incorrect! ";
+	if (answer == trQuestVarGet("question"+question+"answer")) {
+		result = "Correct! ";
+		trQuestVarSet("gemstone"+1*trQuestVarGet("zenoReward"), 1 + trQuestVarGet("gemstone"+1*trQuestVarGet("zenoReward")));
+		trSoundPlayFN("favordump.wav","1",-1,"","");
+	} else {
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+	}
+	question = question + 1;
+	trQuestVarSet("currentQuestion", question);
+	trStringQuestVarSet("question"+question+"explain1", result + trStringQuestVarGet("question"+question+"explain1"));
+	if (trQuestVarGet("currentQuestion") <= trQuestVarGet("zenoQuestions")) {
+		startNPCDialog(NPC_ZENO_NEXT_QUESTION);
+	} else {
+		startNPCDialog(NPC_ZENO_QUIZ_END);
+	}
+}
+
 void classNewUnlock(int class = 0) {
 	bool unlocked = false;
 	if (trQuestVarGet("class"+class+"level") == 0) {
@@ -206,8 +228,18 @@ highFrequency
 	    } else {
 	    	xsEnableRule("gameplay_start_2");
 	    	xsEnableRule("singleplayer_unlocks");
+	    	trEventSetHandler(6001, "answerQuestion");
+	    	trEventSetHandler(6002, "answerQuestion");
 	    	for(a=4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2)); >2) {
 	    		classNewUnlock(a);
+	    	}
+	    	if (trQuestVarGet("p1progress") > trQuestVarGet("zenoQuiz")) {
+	    		trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
+	    		trArmyDispatch("1,0", "Hoplite", 1, 135, 0, 145, 225, 0, false);
+	    		trUnitSelectClear();
+	    		trUnitSelectByQV("zenoUnit", true);
+	    		trUnitConvert(0);
+	    		xsEnableRule("zeno_quiz_start");
 	    	}
 	    }
 
@@ -243,6 +275,13 @@ highFrequency
 	    	trEventSetHandler(3000+a, "spSwitchToClass");
 	    	trEventSetHandler(4000+a, "spExplainClass");
 	    	trEventSetHandler(5000+a, "spAscendClass");
+	    }
+
+	    /* monsterpedia */
+	    if (trQuestVarGet("p1progress") >= 3) {
+	    	/*
+	    	MONSERPEDIA
+	    	*/
 	    }
 
 	    trSetCounterDisplay("To save and exit, enter the Sky Passage.");
@@ -378,6 +417,28 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, clear stage 2.");
 			}
+		}
+	}
+}
+
+
+rule zeno_quiz_start
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("zenoUnit", true);
+	if (trUnitIsSelected()) {
+		xsDisableSelf();
+		reselectMyself();
+		trQuestVarSet("currentQuestion", 1);
+		if (trQuestVarGet("zenoQuiz") == 0) {
+			startNPCDialog(NPC_ZENO_FIRST_QUIZ);
+			trQuestVarSet("zenoReward", STARSTONE);
+			trQuestVarSet("zenoQuestions", 3);
+		} else {
+			startNPCDialog(NPC_ZENO_NEXT_QUIZ);
+
 		}
 	}
 }

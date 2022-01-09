@@ -233,7 +233,9 @@ void frostknightAlways(int eventID = -1) {
 	if(yGetDatabaseCount("p"+p+"frostGiants") >0) {
 		id = yDatabaseNext("p"+p+"frostGiants", true);
 		if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit("Frost Giant");
 			yRemoveFromDatabase("p"+p+"frostGiants");
+			yRemoveUpdateVar("p"+p+"frostGiants", "step");
 		} else if (trTimeMS() > yGetVar("p"+p+"frostGiants", "specialnext")) {
 			switch(1*yGetVar("p"+p+"frostGiants", "step"))
 			{

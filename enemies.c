@@ -56,11 +56,26 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Medusa"):
         {
             yAddToDatabase("Medusas", db);
+            yAddUpdateVar("Medusa", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Mountain Giant"):
         {
             yAddToDatabase("MountainGiants", db);
             yAddUpdateVar("MountainGiants", "index", yGetNewestPointer("enemies"));
+        }
+        case kbGetProtoUnitID("Frost Giant"):
+        {
+            yAddToDatabase("FrostGiants", db);
+            yAddUpdateVar("FrostGiants", "index", yGetNewestPointer("enemies"));
+        }
+        case kbGetProtoUnitID("Valkyrie"):
+        {
+            yAddUpdateVar("enemies", "magicResist", 1);
+            spyEffect(1*trQuestVarGet("enemies"), kbGetProtoUnitID("Vortex Finish Linked"), "fake");
+        }
+        case kbGetProtoUnitID("Ballista"):
+        {
+            yAddToDatabase("ballistas", db);
         }
     }
 }
@@ -85,6 +100,11 @@ highFrequency
         setupProtounitBounty("Centaur", 6, 0.03);
         setupProtounitBounty("Medusa", 14, 0.15, RELIC_SPELL_DURATION);
         setupProtounitBounty("Mountain Giant", 12, 0.1);
+
+        /* ballista projectiles */
+        trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
+        trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
+        trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
 		
 		xsDisableSelf();
 	}
@@ -120,17 +140,80 @@ void enemiesAlways() {
     while(trQuestVarGet("nextProj") < trGetNextUnitScenarioNameNumber()) {
         id = kbGetBlockID(""+1*trQuestVarGet("nextProj"), true);
         proto = kbGetUnitBaseTypeID(id);
-        if ((proto == kbGetProtoUnitID("Sling Stone")) ||
-            (proto == kbGetProtoUnitID("Arrow Flaming")) ||
-            (proto == kbGetProtoUnitID("Javelin Flaming")) ||
-            (proto == kbGetProtoUnitID("Axe"))) {
+        if (proto == kbGetProtoUnitID("Ballista Shot")) {
             trUnitSelectClear();
             trUnitSelectByQV("nextProj");
             if (trUnitIsOwnedBy(ENEMY_PLAYER)) {
-                /*
-                Enemy projectiles.
-                Do something fancy
-                */
+                trVectorSetUnitPos("pos", "nextProj");
+                trQuestVarSet("closest", 0);
+                trQuestVarSet("closestName", 0);
+                trQuestVarSet("closestDistance", 25);
+                for (x=yGetDatabaseCount("ballistas"); >0) {
+                    id = yDatabaseNext("ballistas", true);
+                    if (trUnitAlive() == false) {
+                        yRemoveFromDatabase("ballistas");
+                    } else if (kbUnitGetAnimationActionType(id) == 12) {
+                        trQuestVarSet("currentDistance", zDistanceToVectorSquared("ballistas", "pos"));
+                        if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
+                            trQuestVarCopy("closestDistance", "currentDistance");
+                            trQuestVarSet("closest", id);
+                            trQuestVarCopy("closestName", "ballistas");
+                        }
+                    }
+                }
+                trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
+                trVectorSetUnitPos("start", "closestName");
+                trVectorSetUnitPos("end", "target");
+                vectorSetAsTargetVector("target", "start", "end");
+
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trUnitConvert(ENEMY_PLAYER);
+                trUnitChangeProtoUnit("Transport Ship Greek");
+
+                trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,10", "Dwarf", 1, 0,0,0,0,true);
+                trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,10", "Dwarf", 1, 0,0,0,0,false);
+                trArmySelect("1,10");
+                trUnitConvert(ENEMY_PLAYER);
+                trImmediateUnitGarrison(""+1*trQuestVarGet("ballistaShot"));
+                trUnitChangeProtoUnit("Dwarf");
+
+                yAddToDatabase("ballistaShots", "next2");
+                yAddUpdateVar("ballistaShots", "destx", trQuestVarGet("targetx"));
+                yAddUpdateVar("ballistaShots", "destz", trQuestVarGet("targetz"));
+                yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
+                yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("ballistaShot"));
+                yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 10000);
+
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("next1"), true);
+                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trUnitChangeProtoUnit("Relic");
+
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("next2"), true);
+                trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("next1"), true);
+                trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+
+                trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+                trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("next2"), true);
+                trMutateSelected(kbGetProtoUnitID("Priest Projectile"));
+                trSetSelectedScale(0,50,0);
+                trSetUnitOrientation(zGetUnitVector("start", "end"), xsVectorSet(0,1,0), true);
+                trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
+                trUnitSelectClear();
+                trUnitSelect(""+1*trQuestVarGet("next1"), true);
+                trUnitConvert(0);
             }
         }
         trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
@@ -271,10 +354,13 @@ void enemiesAlways() {
                     trUnitOverrideAnimation(-1,0,false,true,-1);
                 }
             }
-        } else if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("MountainGiants", "index")) > 0 &&
-            yGetVar("MountainGiants", "step") == 1) {
-            ySetVar("MountainGiants", "step", 0);
-            ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("MountainGiants", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("MountainGiants", "index"));
+            if (action > 0 && yGetVar("MountainGiants", "step") == 1) {
+                ySetVar("MountainGiants", "step", 0);
+                ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+            }
         }
     }
 
@@ -337,9 +423,9 @@ void enemiesAlways() {
                     trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
                     trVectorSetUnitPos("start", "Medusas");
                     trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,5);
+                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,5,5);
                     yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
-                    yAddUpdateVar("MedusaBalls", "bounces", 12);
+                    yAddUpdateVar("MedusaBalls", "bounces", 10);
                     ySetVar("Medusas", "step", 2);
                     ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
                 }
@@ -350,10 +436,13 @@ void enemiesAlways() {
                     trUnitOverrideAnimation(-1,0,false,true,-1);
                 }
             }
-        } else if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index")) > 0 &&
-            yGetVar("Medusas", "step") == 1) {
-            ySetVar("Medusas", "step", 0);
-            ySetVar("Medusas", "next", trTimeMS() + 18000);
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Medusas", "index"));
+            if (action > 0 && yGetVar("Medusas", "step") == 1) {
+                ySetVar("Medusas", "step", 0);
+                ySetVar("Medusas", "next", trTimeMS() + 18000);
+            }
         }
     }
 
@@ -376,6 +465,72 @@ void enemiesAlways() {
         } else {
             trVectorSetUnitPos("pos", "Dryads");
             ySetVarFromVector("Dryads", "pos", "pos");
+        }
+    }
+
+    if(yGetDatabaseCount("frostGiants") >0) {
+        id = yDatabaseNext("frostGiants", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
+            trUnitChangeProtoUnit("Frost Giant");
+            yRemoveFromDatabase("frostGiants");
+            yRemoveUpdateVar("frostGiants", "step");
+        } else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
+            switch(1*yGetVar("frostGiants", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 6) {
+                        target = kbUnitGetTargetUnitID(id);
+                        ySetVar("frostGiants", "target", trGetUnitScenarioNameNumber(target));
+                        ySetVar("frostGiants", "step", 1);
+                        ySetVar("frostGiants", "specialnext", trTimeMS() + 1400);
+                        trUnitOverrideAnimation(40,0,false,false,-1);
+                    }
+                }
+                case 1:
+                {
+                    action = 0;
+                    for (x=yGetDatabaseCount("playerUnits"); >0) {
+                        if (yGetVar("frostGiants", "target") == yDatabaseNext("playerUnits")) {
+                            trUnitSelectClear();
+                            trUnitSelectByQV("playerUnits");
+                            stunUnit("playerUnits", 3.0);
+                            action = 1;
+                            break;
+                        }
+                    }
+                    ySetVar("frostGiants", "step", 2);
+                    ySetVar("frostGiants", "specialnext", yGetVar("frostGiants", "specialnext") + 600);
+                    if (action == 0) {
+                        ySetVar("frostGiants", "target", -1);
+                    }
+                }
+                case 2:
+                {
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
+                    ySetVar("frostGiants", "step", 0);
+                    if (yGetVar("frostGiants", "target") == -1) {
+                        ySetVar("frostGiants", "specialnext", trTimeMS());
+                    } else {
+                        ySetVar("frostGiants", "specialnext", trTimeMS() + 15000);
+                    }
+                }
+            }
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("frostGiants", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("frostGiants", "index"));
+            if (action > 0 && yGetVar("frostGiants", "step") == 1) {
+                ySetVar("frostGiants", "step", 0);
+                ySetVar("frostGiants", "next", trTimeMS() + 18000);
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("ballistas") > 0) {
+        id = yDatabaseNext("ballistas", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yRemoveFromDatabase("ballistas");
         }
     }
 

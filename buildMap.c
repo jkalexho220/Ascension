@@ -469,6 +469,7 @@ highFrequency
             case 1:
             {
                 trQuestVarSet("bossRoomSize", 16);
+                trQuestVarSet("extraEdges", 10);
                 /* this had better be good to hook them in */
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
@@ -563,6 +564,47 @@ highFrequency
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
             }
+            case 3:
+            {
+                trQuestVarSet("bossRoomSize", 14);
+                trQuestVarSet("extraEdges", 0);
+                /* this had better be good to hook them in */
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 3;
+                
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 41;
+
+                TERRAIN_SECONDARY = 5;
+                TERRAIN_SUB_SECONDARY = 0;
+
+                trQuestVarSet("mapType", MAP_STANDARD);
+                trQuestVarSet("treeDensity", 0.05);
+                trStringQuestVarSet("treeProto1", "Pine Snow");
+                trStringQuestVarSet("treeProto2", "Pine Snow");
+                trStringQuestVarSet("treeProto3", "Snow Drift Archery");
+                trQuestVarSet("spriteDensity", 0.22);
+                trStringQuestVarSet("spriteProto1", "Rock Granite Sprite");
+                trStringQuestVarSet("spriteProto2", "Ice Block");
+                trStringQuestVarSet("spriteProto3", "Rock Granite Small");
+                trQuestVarSet("rockDensity", 0.15);
+                trStringQuestVarSet("rockProto1", "Rock Granite Big");
+                trStringQuestVarSet("rockProto2", "Rock River Icy");
+                trStringQuestVarSet("rockProto3", "Rock River Icy");
+
+                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
+                trQuestVarSet("enemyProtoCount", 5);
+                trStringQuestVarSet("enemyProto1", "Fenris Wolf");
+                trStringQuestVarSet("enemyProto2", "Valkyrie");
+                trStringQuestVarSet("enemyProto3", "Ballista");
+                trStringQuestVarSet("enemyProto4", "Frost Giant");
+                trStringQuestVarSet("enemyProto5", "Mountain Giant");
+
+                trQuestVarSet("columnDensity", 0.05);
+
+                trStringQuestVarSet("bossProto", "King Folstag");
+                trQuestVarSet("bossScale", 2);
+            }
         }
 
         /* paint entire map cliff and raise it */
@@ -642,7 +684,7 @@ highFrequency
         }
         if (trQuestVarGet("mapType") == MAP_STANDARD) {
             /* random bonus paths */
-            for(i=0; <10) {
+            for(i=0; <trQuestVarGet("extraEdges")) {
                 trQuestVarSetFromRand("first", 1, 14);
                 trQuestVarSetFromRand("direction", 0, 3);
                 z = 1*trQuestVarGet("first") / 4;

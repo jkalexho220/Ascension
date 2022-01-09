@@ -115,6 +115,8 @@ inactive
 	savedata = savedata / 100;
 	trQuestVarSet("questCount", iModulo(11, savedata));
 	savedata = savedata / 11;
+	trQuestVarSet("zenoQuiz", iModulo(10, savedata));
+	savedata = savedata / 10;
 
 	if (trCurrentPlayer() == 1) {
 		trQuestVarSet("playerHasHosted", 1);
