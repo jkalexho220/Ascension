@@ -340,15 +340,18 @@ int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
 
 void yRemoveFromDatabase(string db = "") {
 	int index = trQuestVarGet("xdata"+db+"pointer");
-	/* connect next with prev */
-	ySetVarAtIndex(db, "xNextBlock", yGetVar(db, "xNextBlock"), 1*yGetVar(db, "xPrevBlock"));
-	ySetVarAtIndex(db, "xPrevBlock", yGetVar(db, "xPrevBlock"), 1*yGetVar(db, "xNextBlock"));
-	
-	ySetVar(db, "xNextBlock", trQuestVarGet("xdata"+db+"nextFree"));
-	trQuestVarSet("xdata"+db+"nextFree", index);
+	if (yGetVar(db, "xActive") == 1) {
+		/* connect next with prev */
+		ySetVarAtIndex(db, "xNextBlock", yGetVar(db, "xNextBlock"), 1*yGetVar(db, "xPrevBlock"));
+		ySetVarAtIndex(db, "xPrevBlock", yGetVar(db, "xPrevBlock"), 1*yGetVar(db, "xNextBlock"));
+		
+		ySetVar(db, "xNextBlock", trQuestVarGet("xdata"+db+"nextFree"));
+		ySetVar(db, "xActive", 0);
+		trQuestVarSet("xdata"+db+"nextFree", index);
 
-	trQuestVarSet("xdata"+db+"pointer", yGetVar(db, "xPrevBlock"));
-	trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") - 1);
+		trQuestVarSet("xdata"+db+"pointer", yGetVar(db, "xPrevBlock"));
+		trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") - 1);
+	}
 }
 
 void yRemoveUpdateVar(string db = "", string attr = "") {
@@ -365,6 +368,7 @@ int yAddToDatabase(string db = "", string val = "") {
 		trQuestVarSet("xdata"+db+"nextFree", yGetVarAtIndex(db, "xNextBlock", next));
 	}
 	trQuestVarSet("xdata"+db+"index"+next, trQuestVarGet(val));
+	ySetVarAtIndex(db, "xActive", 1, next);
 	if (trQuestVarGet("xdata"+db+"count") == 0) {
 		ySetVarAtIndex(db, "xNextBlock", next, next);
 		ySetVarAtIndex(db, "xPrevBlock", next, next);

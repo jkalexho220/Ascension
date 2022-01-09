@@ -30,6 +30,7 @@ void spAscendClass(int class = -1) {
 		if (trQuestVarGet("class"+class+"level") == 5) {
 			if (trQuestVarGet("class"+ALCHEMIST+"level") == 0) {
 				trQuestVarSet("class"+ALCHEMIST+"level", 1);
+				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+ALCHEMIST+"proto")),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), ALCHEMIST);
 				xsEnableRule("singleplayer_unlocks");

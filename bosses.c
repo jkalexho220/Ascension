@@ -27,7 +27,7 @@ highFrequency
 		}
 	}
 
-	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount")) {
+	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount")) {
 		xsDisableSelf();
 		xsEnableRule("boss_cin_00");
 		
@@ -935,6 +935,7 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("bossUnit");
 					trMutateSelected(kbGetProtoUnitID("Nemean Lion"));
+					trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
 					bossCooldown(7, 20);
 				}
 			}

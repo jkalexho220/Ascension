@@ -417,7 +417,7 @@ void enemiesAlways() {
             if (id == -1 || trUnitAlive() == false) {
                 removePlayerUnit();
             } else if (zDistanceToVectorSquared("playerUnits", "pos") < 2.0) {
-                stunUnit("playerUnits", 3.0, 0 - yGetVar("playerUnits", "player"));
+                stunUnit("playerUnits", 3.0);
                 action = PROJ_REMOVE;
                 break;
             }

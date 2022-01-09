@@ -427,6 +427,7 @@ highFrequency
 
         for(p=ENEMY_PLAYER; >0) {
             trModifyProtounit("Pharaoh", p, 15, -999);
+            trModifyProtounit("Pharaoh", p, 14, -999);
             trModifyProtounit("Wadjet Spit", p, 1, -15);
             trModifyProtounit("Ajax", p, 5, 999);
             trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);

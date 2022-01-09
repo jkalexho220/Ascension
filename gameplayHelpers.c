@@ -35,7 +35,7 @@ void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 }
 
 void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
-	float timeout = duration * 1000 + trTimeMS();
+	float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
 	if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
 		trQuestVarSet("p"+p+"silenceTimeout", timeout);
 	}
@@ -116,6 +116,7 @@ void removePlayerCharacter() {
 
 void removePlayerSpecific(int p = 0) {
 	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+		trVectorSetUnitPos("dead"+p+"pos", "p"+p+"unit");
 		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 			yDatabaseNext("p"+p+"relics", true);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
@@ -229,6 +230,9 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		damage = damage * trQuestVarGet("p"+p+"spellDamage");
+	} else {
+		p = yGetVar(db, "player");
+		duration = duration * trQuestVarGet("p"+p+"poisonResistance");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
 		if (yGetVar(db, "poisonStatus") == 0) {
@@ -277,8 +281,9 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 			trUnitSelectClear();
 			trUnitSelectByQV(db);
 		}
-	} else if (p < 0) {
-		duration = duration * trQuestVarGet("p"+(0-p)+"stunResistance");
+	} else {
+		p = yGetVar(db, "player");
+		duration = duration * trQuestVarGet("p"+p+"stunResistance");
 	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (yGetVar(db, "stunStatus") == 0) {

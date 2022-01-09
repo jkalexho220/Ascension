@@ -25,7 +25,7 @@ void rideLightningOff(int p = 0) {
 	for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 		yDatabaseNext("p"+p+"characters");
 		index = yGetVar("p"+p+"characters", "lightningIndex");
-		ySetPointer("p"+p+"lightningBalls", index);
+		index = ySetPointer("p"+p+"lightningBalls", index);
 		trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
 		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trUnitSelectClear();
@@ -51,6 +51,7 @@ void rideLightningOff(int p = 0) {
 		if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 			trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
 		}
+		ySetPointer("p"+p+"lightningBalls", index);
 	}
 
 	equipRelicsAgain(p);
@@ -195,10 +196,11 @@ void thunderRiderAlways(int eventID = -1) {
 						if (trUnitVisToPlayer()) {
 							trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 						}
-						ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"));
+						id = ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"));
 						trUnitHighlight(0.5, false);
 						damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
 						yRemoveFromDatabase("p"+p+"rideLightningTargets");
+						ySetPointer("enemies", id);
 					}
 				}
 			}

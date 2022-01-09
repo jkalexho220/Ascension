@@ -146,7 +146,7 @@ void alchemistAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
-		dist = 81;
+		dist = 2500;
 		hit = -1;
 		for(x=yGetDatabaseCount("playerUnits"); >0) {
 			id = yDatabaseNext("playerUnits", true);
@@ -184,6 +184,7 @@ void alchemistAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
@@ -192,9 +193,9 @@ void alchemistAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("playerCharacters"); >0) {
 			id = yDatabaseNext("playerCharacters", true);
 			if (id == -1 || trUnitAlive() == false) {
-				removePlayerUnit();
+				removePlayerCharacter();
 			} else {
-				amt = zDistanceToVectorSquared("playerCharacters", "p"+p+"wellPos");
+				amt = zDistanceToVectorSquared("playerCharacters", "pos");
 				if (amt < dist) {
 					dist = amt;
 					hit = yGetPointer("playerCharacters");
@@ -215,6 +216,8 @@ void alchemistAlways(int eventID = -1) {
 			if (trCurrentPlayer() == 1*yGetVar("playerCharacters", "player")) {
 				trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has summoned a copy of you!");
 			}
+		} else if (trCurrentPlayer() == p) {
+			trSoundPlayFN("cantdothat.wav","1",-1,"","");
 		}
 	}
 

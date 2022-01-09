@@ -463,15 +463,22 @@ highFrequency
                 }
             }
         } else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
-            count = 0 - trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20);
+            count = 0;
+            for(x=yGetDatabaseCount("enemies"); >0) {
+                id = yDatabaseNext("enemies", true);
+                if (id == -1 || trUnitAlive() == false) {
+                    removeEnemy();
+                } else if (zDistanceToVectorSquared("enemies", "dead"+p+"pos") < 225) {
+                    count = count - 1;
+                }
+            }
             trQuestVarSet("p"+p+"reviveNext", trTimeMS() + 1000);
-            trVectorSetUnitPos("pos", "p"+p+"unit");
             trQuestVarSet("playersReviving", 0);
             for(x=yGetDatabaseCount("playerCharacters"); >0) {
                 id = yDatabaseNext("playerCharacters", true);
                 if (id == -1 || trUnitAlive() == false) {
                     removePlayerCharacter();
-                } else if (zDistanceToVectorSquared("playerCharacters", "pos") < 100) {
+                } else if (zDistanceToVectorSquared("playerCharacters", "dead"+p+"pos") < 100) {
                     count = count + 1;
                     trQuestVarSet("playersReviving", 1);
                 }
@@ -494,35 +501,14 @@ highFrequency
                     trUnitChangeProtoUnit("Rocket");
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"unit");
-                    id = trQuestVarGet("p"+p+"class");
-                    id = trQuestVarGet("class"+id+"proto");
-                    trUnitChangeProtoUnit("Dwarf");
+                    trUnitDestroy();
+                    spawnPlayer(p, "dead"+p+"pos");
+                    trSoundPlayFN("herorevived.wav","1",-1,"","");
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"unit");
-                    trDamageUnitPercent(-100);
-                    trMutateSelected(id);
-                    trSoundPlayFN("herorevived.wav","1",-1,"","");
                     trDamageUnitPercent(50);
                     trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
-                    yAddToDatabase("p"+p+"characters", "p"+p+"unit");
-                    yAddToDatabase("playerCharacters", "p"+p+"unit");
-                    yAddUpdateVar("playerCharacters", "player", p);
-                    yAddToDatabase("playerUnits", "p"+p+"unit");
-                    yAddUpdateVar("playerUnits", "player", p);
-                    yAddUpdateVar("playerUnits", "hero", 1);
-                    yAddUpdateVar("p"+p+"characters", "index", yGetNewestPointer("playerUnits"));
-                    for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-                        yDatabaseNext("p"+p+"relics", true);
-                        trUnitChangeProtoUnit("Relic");
-                        trUnitSelectClear();
-                        trUnitSelectByQV("p"+p+"relics");
-                        trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-                        trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-                        if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-                            trSetSelectedScale(0,0,0);
-                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
-                        }
-                    }
+                    equipRelicsAgain(p);
                     if (trCurrentPlayer() == p) {
                         uiFindType(kbGetProtoUnitName(id));
                     }
