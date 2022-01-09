@@ -70,6 +70,8 @@ void saveAllData() {
 
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
+	savedata = savedata * 10 + currentdata;
 	currentdata = xsMin(10, trQuestVarGet("questCount"));
 	savedata = savedata * 11 + currentdata;
 	currentdata = xsMin(100, trQuestVarGet("giantKills"));

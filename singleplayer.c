@@ -42,10 +42,12 @@ void spAscendClass(int class = -1) {
 
 
 void answerQuestion(int eventID = -1) {
+	
 	int answer = eventID - 6000;
 	int question = trQuestVarGet("currentQuestion");
 	string result = "Incorrect! ";
-	if (answer == trQuestVarGet("question"+question+"answer")) {
+	
+	if (answer == 1*trQuestVarGet("question"+question+"answer")) {
 		result = "Correct! ";
 		trQuestVarSet("gemstone"+1*trQuestVarGet("zenoReward"), 1 + trQuestVarGet("gemstone"+1*trQuestVarGet("zenoReward")));
 		trSoundPlayFN("favordump.wav","1",-1,"","");
@@ -59,6 +61,7 @@ void answerQuestion(int eventID = -1) {
 		startNPCDialog(NPC_ZENO_NEXT_QUESTION);
 	} else {
 		startNPCDialog(NPC_ZENO_QUIZ_END);
+		trQuestVarSet("zenoQuiz", 1 + trQuestVarGet("zenoQuiz"));
 	}
 }
 
@@ -235,7 +238,7 @@ highFrequency
 	    	}
 	    	if (trQuestVarGet("p1progress") > trQuestVarGet("zenoQuiz")) {
 	    		trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
-	    		trArmyDispatch("1,0", "Hoplite", 1, 135, 0, 145, 225, 0, false);
+	    		trArmyDispatch("1,0", "Hoplite", 1, 130, 0, 160, 225, false);
 	    		trUnitSelectClear();
 	    		trUnitSelectByQV("zenoUnit", true);
 	    		trUnitConvert(0);
@@ -421,6 +424,24 @@ highFrequency
 	}
 }
 
+void setupQuestion(string question = "", string first = "", string second = "", int answer = 1) {
+	int count = 1 + trQuestVarGet("zenoQuestions");
+	trQuestVarSet("zenoQuestions", count);
+	trStringQuestVarSet("question"+count, question);
+	trStringQuestVarSet("question"+count+"first", first);
+	trStringQuestVarSet("question"+count+"second", second);
+	trQuestVarSet("question"+count+"answer", answer);
+}
+
+void setupExplain(string explain = "", int question = -1) {
+	if (question < 0) {
+		question = 1 + trQuestVarGet("zenoQuestions");
+	}
+	int count = 1 + trQuestVarGet("question"+question+"explainations");
+	trQuestVarSet("question"+question+"explainations", count);
+	trStringQuestVarSet("question"+question+"explain"+count, explain);
+}
+
 
 rule zeno_quiz_start
 inactive
@@ -432,13 +453,52 @@ highFrequency
 		xsDisableSelf();
 		reselectMyself();
 		trQuestVarSet("currentQuestion", 1);
-		if (trQuestVarGet("zenoQuiz") == 0) {
-			startNPCDialog(NPC_ZENO_FIRST_QUIZ);
-			trQuestVarSet("zenoReward", STARSTONE);
-			trQuestVarSet("zenoQuestions", 3);
-		} else {
-			startNPCDialog(NPC_ZENO_NEXT_QUIZ);
-
+		for(x=trQuestVarGet("zenoQuestions"); >0) {
+			trQuestVarSet("question"+x+"explainations", 0);
 		}
+		trQuestVarSet("zenoQuestions", 0);
+
+		if (trQuestVarGet("zenoQuiz") == 0) {
+			trQuestVarSet("zenoReward", STARSTONE);
+
+			setupExplain("Hey it's me, Zenophobia! I've got a fun little quiz for you!");
+			setupExplain("For each question you answer correctly, I'll give you a Starstone! Ready?");
+			setupQuestion("You cannot cast spells when stunned.", "True", "False", 2);
+			setupExplain("You can still cast spells when stunned.");
+
+			setupQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
+			setupExplain("Enemies cannot cast spells when stunned. In fact, you can interrupt an enemy's spell with a stun!");
+
+				
+			setupQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
+				"Reduces the duration of stuns on you by a percentage", 2);
+			setupExplain("Stun Resistance will reduce the duration of stuns on you. It stacks multiplicatively.");
+
+
+		} else {
+			int gem = 0;
+			switch(1*trQuestVarGet("zenoQuiz"))
+			{
+				case 1:
+				{
+					gem = MANASTONE;
+					setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
+					setupExplain("Only your ultimate costs favor! The other spells are free!");
+					setupExplain("In fact, your basic spells generate favor when they hit enemies.");
+
+					setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
+					setupQuestion("If I have 5 cooldown reduction relics, how long are my cooldowns?",
+						"0.5x as long", "0.59x as long", 2);
+					setupExplain("Cooldown reduction stacks multiplicatively, not additively.");
+
+					setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
+					setupExplain("Spell Power affects both your spell damage and healing.");
+				}
+			}
+			trQuestVarSet("zenoReward", gem);
+			setupExplain("Hey it's me again! Here comes another quiz!", 1);
+			setupExplain("This time, I'll give you a "+gemstoneName(gem)+" for each correct answer!", 1);
+		}
+		startNPCDialog(NPC_ZENO_NEXT_QUESTION);
 	}
 }
