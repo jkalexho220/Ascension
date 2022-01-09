@@ -523,11 +523,8 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 5) {
-        int minProgress = 10;
-        for (p=1; < ENEMY_PLAYER) {
-            minProgress = xsMin(minProgress, trQuestVarGet("p"+p+"progress"));
-        }
-        if (minProgress == 0) {
+        
+        if (trQuestVarGet("p1progress") == 0) {
             trQuestVarSet("stage", 1);
         } else {
             trLetterBox(false);
@@ -536,11 +533,11 @@ highFrequency
             trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
             trQuestVarSet("chooser", trGetNextUnitScenarioNameNumber());
             trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
-            trMessageSetText("Host: Choose a stage to challenge.",-1);
+            trMessageSetText("Host: Choose a floor to challenge.",-1);
 
-            int posX = 96 - 2 * minProgress;
+            int posX = 96 - 2 * trQuestVarGet("p1progress");
 
-            for(x=0; <= minProgress) {
+            for(x=0; <= trQuestVarGet("p1progress")) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                 trArmyDispatch("1,0","Flag Numbered",1,posX,0,100,0,true);
                 trUnitSelectClear();

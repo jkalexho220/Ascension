@@ -410,9 +410,11 @@ int yGetPointer(string db = "") {
 	return(trQuestVarGet("xdata"+db+"pointer"));
 }
 
-void ySetPointer(string db = "", int index = 0) {
+int ySetPointer(string db = "", int index = 0) {
+	int safe = trQuestVarGet("xdata"+db+"pointer");
 	trQuestVarSet("xdata"+db+"pointer", index);
 	trQuestVarSet(db, trQuestVarGet("xdata"+db+"index"+index));
+	return(safe);
 }
 
 void yClearDatabase(string db = "") {

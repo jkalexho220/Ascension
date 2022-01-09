@@ -126,6 +126,7 @@ highFrequency
 			trUnitDestroy();
 			spawnPlayer(p, "bossRoomPlayers");
 			equipRelicsAgain(p);
+			trChatSend(p, "database size is now " + yGetDatabaseCount("p"+p+"characters"));
 		}
 
 		int id = 0;

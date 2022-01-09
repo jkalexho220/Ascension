@@ -23,7 +23,7 @@ void moonbladeAlways(int eventID = -1) {
 			removeMoonblade(p);
 		} else {
 			hit = CheckOnHit(p, id);
-			if (hit > ON_HIT_NONE) {
+			if (hit > ON_HIT_ATTACKING) {
 				if (yGetVar("p"+p+"characters", "crescentCount") > 0) {
 					ySetVar("p"+p+"characters", "crescentCount", yGetVar("p"+p+"characters", "crescentCount") - 1);
 					ySetVar("p"+p+"characters", "crescentTimeout", trTimeMS() + 5000);

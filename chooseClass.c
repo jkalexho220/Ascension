@@ -172,44 +172,48 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (5 attacks): Your attack chains to nearby enemies, damaging all of them.";
+					msg = "Bonus: 0.1 x Attack for every meter traveled.";
 				}
 				case 3:
 				{
-					icon = "icons\god power bolt icon 64";
-					msg = "(Q) Blitz: Teleport towards your cursor, stunning and damaging enemies hit.";
+					msg = "Special Attack (5 attacks): Your attack chains to nearby enemies, damaging all of them.";
 				}
 				case 4:
 				{
 					icon = "icons\god power bolt icon 64";
-					msg = "If Ride the Lightning is active, this changes your direction of travel instead.";
+					msg = "(Q) Blitz: Teleport towards your cursor, stunning and damaging enemies hit.";
 				}
 				case 5:
 				{
 					icon = "icons\god power bolt icon 64";
-					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
+					msg = "If Ride the Lightning is active, this changes your direction of travel instead.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement heart of the titans icons 64";
-					msg = "(W) Recharge: Consume all your bonus attack and convert it into healing and favor for yourself.";
+					icon = "icons\god power bolt icon 64";
+					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
 				}
 				case 7:
 				{
 					icon = "icons\improvement heart of the titans icons 64";
-					msg = "Cooldown: 22 | Heal: 1x Attack | Favor Regen: 0.1x Attack";
+					msg = "(W) Recharge: Consume all your bonus attack and convert it into healing and favor for yourself.";
 				}
 				case 8:
 				{
-					icon = "icons\god power implode icons 64";
-					msg = "(E) Ride the Lightning: Become a fast-moving ball of lightning that bounces off walls";
+					icon = "icons\improvement heart of the titans icons 64";
+					msg = "Cooldown: 22 | Heal: 1x Attack | Favor Regen: 0.1x Attack";
 				}
 				case 9:
 				{
 					icon = "icons\god power implode icons 64";
-					msg = "Damage enemies that you pass through. Damage increases with each bounce.";
+					msg = "(E) Ride the Lightning: Become a fast-moving ball of lightning that bounces off walls";
 				}
 				case 10:
+				{
+					icon = "icons\god power implode icons 64";
+					msg = "Damage enemies that you pass through. Damage increases with each bounce.";
+				}
+				case 11:
 				{
 					icon = "icons\god power implode icons 64";
 					msg = "Cost: 8 favor per second | Radius: 5 | Damage: 100 + 50 per bounce";

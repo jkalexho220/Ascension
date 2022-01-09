@@ -29,20 +29,25 @@ void spAscendClass(int class = -1) {
 		trSetCivilizationNameOverride(1, "Level " + (1+trQuestVarGet("p1level")));
 		if (trQuestVarGet("class"+class+"level") == 5) {
 			if (trQuestVarGet("class"+ALCHEMIST+"level") == 0) {
+				trQuestVarSet("class"+ALCHEMIST+"level", 1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
-				trQuestVarSet("newClass"+1*trQuestVarGet("newClassese"), ALCHEMIST);
+				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), ALCHEMIST);
 				xsEnableRule("singleplayer_unlocks");
 				trVectorSetUnitPos("pos", "class"+ALCHEMIST+"unit");
 				vectorToGrid("pos", "loc");
 				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
 			}
 		}
+		trChatHistoryClear();
+		trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
+		for(x=0; <3) {
+			trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
+		}
 	}
 }
 
 
 void answerQuestion(int eventID = -1) {
-	
 	int answer = eventID - 6000;
 	int question = trQuestVarGet("currentQuestion");
 	string result = "Incorrect! ";
@@ -363,6 +368,7 @@ highFrequency
 		if (trQuestVarGet("p1level") < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
 				yesPrompt, 5000+class, "No", -1);
+			trChatHistoryClear();
 			trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
 			for(x=0; <3) {
 				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
@@ -487,12 +493,12 @@ highFrequency
 					setupExplain("In fact, your basic spells generate favor when they hit enemies.");
 
 					setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
-					setupQuestion("If I have 5 cooldown reduction relics, how long are my cooldowns?",
-						"0.5x as long", "0.59x as long", 2);
-					setupExplain("Cooldown reduction stacks multiplicatively, not additively.");
+					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
+						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
+					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 
 					setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
-					setupExplain("Spell Power affects both your spell damage and healing.");
+					setupExplain("Spell Power affects the healing and damage of your spells.");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

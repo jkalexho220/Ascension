@@ -555,14 +555,6 @@ highFrequency
 
                 trStringQuestVarSet("bossProto", "Tamarisk Tree");
                 trQuestVarSet("bossScale", 1.5);
-
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 1, 4.8);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
             }
             case 3:
             {
@@ -579,11 +571,11 @@ highFrequency
                 TERRAIN_SUB_SECONDARY = 0;
 
                 trQuestVarSet("mapType", MAP_STANDARD);
-                trQuestVarSet("treeDensity", 0.05);
+                trQuestVarSet("treeDensity", 0.1);
                 trStringQuestVarSet("treeProto1", "Pine Snow");
                 trStringQuestVarSet("treeProto2", "Pine Snow");
                 trStringQuestVarSet("treeProto3", "Snow Drift Archery");
-                trQuestVarSet("spriteDensity", 0.22);
+                trQuestVarSet("spriteDensity", 0.25);
                 trStringQuestVarSet("spriteProto1", "Rock Granite Sprite");
                 trStringQuestVarSet("spriteProto2", "Ice Block");
                 trStringQuestVarSet("spriteProto3", "Rock Granite Small");
@@ -597,13 +589,21 @@ highFrequency
                 trStringQuestVarSet("enemyProto1", "Fenris Wolf");
                 trStringQuestVarSet("enemyProto2", "Valkyrie");
                 trStringQuestVarSet("enemyProto3", "Ballista");
-                trStringQuestVarSet("enemyProto4", "Frost Giant");
-                trStringQuestVarSet("enemyProto5", "Mountain Giant");
+                trStringQuestVarSet("enemyProto4", "Mountain Giant");
+                trStringQuestVarSet("enemyProto5", "Frost Giant");
 
                 trQuestVarSet("columnDensity", 0.05);
 
                 trStringQuestVarSet("bossProto", "King Folstag");
-                trQuestVarSet("bossScale", 2);
+                trQuestVarSet("bossScale", 1.5);
+
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 2.15);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
             }
         }
 

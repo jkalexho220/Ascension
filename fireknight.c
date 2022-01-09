@@ -38,7 +38,7 @@ void fireknightAlways(int eventID = -1) {
 		trVectorSetUnitPos("pos", "p"+p+"fireCharges");
 		yVarToVector("p"+p+"fireCharges", "dest");
 		if (zDistanceBetweenVectorsSquared("pos", "dest") < 4 || trTimeMS() > yGetVar("p"+p+"fireCharges", "timeout")) {
-			ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"));
+			hit = ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"));
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"characters");
 			trUnitChangeProtoUnit("Lancer Hero");
@@ -47,18 +47,7 @@ void fireknightAlways(int eventID = -1) {
 			trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
 
 			if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-				for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-					yDatabaseNext("p"+p+"relics", true);
-					trUnitChangeProtoUnit("Relic");
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"relics");
-					trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-					trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-					if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-						trSetSelectedScale(0,0,-1);
-						trUnitSetAnimationPath("1,0,1,1,0,0,0");
-					}
-				}
+				equipRelicsAgain(p);
 			}
 
 			zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
@@ -90,6 +79,7 @@ void fireknightAlways(int eventID = -1) {
 				}
 			}
 			trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
+			ySetPointer("p"+p+"characters", hit);
 		} else {
 			dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 			for(x=yGetDatabaseCount("enemies"); >0) {

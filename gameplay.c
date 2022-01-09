@@ -181,12 +181,6 @@ highFrequency
 {
     xsDisableSelf();
     trEventSetHandler(999, "removeCamTracks");
-
-    /* DELETE ME */
-    if (Multiplayer) {
-        trQuestVarSet("startPositionX", trQuestVarGet("bossRoomCenterX") - 10);
-        trQuestVarSet("startPositionZ", trQuestVarGet("bossRoomCenterZ") - 10);
-    }
     
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
@@ -394,7 +388,7 @@ highFrequency
                 trUnitSelectClear();
                 trUnitSelectByQV("p"+p+"unit");
                 if (trUnitAlive()) {
-                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1) {
+                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1.5) {
                         amt = 1;
                         break;
                     }

@@ -71,7 +71,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Valkyrie"):
         {
             yAddUpdateVar("enemies", "magicResist", 1);
-            spyEffect(1*trQuestVarGet("enemies"), kbGetProtoUnitID("Vortex Finish Linked"), "fake");
+            spyEffect(1*trQuestVarGet("enemiesIncoming"), kbGetProtoUnitID("UI Range Indicator Norse SFX"), "fake");
         }
         case kbGetProtoUnitID("Ballista"):
         {
@@ -101,13 +101,42 @@ highFrequency
         setupProtounitBounty("Medusa", 14, 0.15, RELIC_SPELL_DURATION);
         setupProtounitBounty("Mountain Giant", 12, 0.1);
 
+        setupProtounitBounty("Fenris Wolf", 5, 0.03);
+        setupProtounitBounty("Valkyrie", 7, 0.05);
+        setupProtounitBounty("Ballista", 6, 0.03);
+        setupProtounitBounty("Frost Giant", 12, 0.1);
+
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
         trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
+        trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
         trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
+        trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
 		
 		xsDisableSelf();
 	}
+}
+
+void ballistaShotPop() {
+    int id = 0;
+    for(x=yGetDatabaseCount("playerUnits"); >0) {
+        id = yDatabaseNext("playerUnits", true);
+        if (id == -1 || trUnitAlive() == false) {
+            removePlayerUnit();
+        } else if (zDistanceToVectorSquared("playerUnits", "pos") < 4) {
+            damagePlayerUnit(200);
+        }
+    }
+    trUnitSelectClear();
+    trUnitSelect(""+1*yGetVar("ballistaShots", "next1"), true);
+    trUnitSelect(""+1*yGetVar("ballistaShots", "next2"), true);
+    trUnitDestroy();
+    trUnitSelectClear();
+    trUnitSelectByQV("ballistaShots", true);
+    trDamageUnitPercent(100);
+    trUnitChangeProtoUnit("Meteorite");
+    trSoundPlayFN("fireball launch.wav","1",-1,"","");
+    yRemoveFromDatabase("ballistaShots");
 }
 
 void enemiesAlways() {
@@ -133,6 +162,23 @@ void enemiesAlways() {
         }
     }
 
+    for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
+        yDatabaseNext("ballistaShots", true);
+        trVectorSetUnitPos("pos", "ballistaShots");
+        vectorToGrid("pos", "loc");
+        if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > yGetVar("ballistaShots", "timeout")) {
+            ballistaShotPop();
+        } else {
+            action = 0;
+            for(p=1; < ENEMY_PLAYER) {
+                action = action + trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),p,"Unit",2.5);
+            }
+            if (action > 0) {
+                ballistaShotPop();
+            }
+        }
+    }
+
     /*
     Projectiles from attacks
     */
@@ -142,7 +188,7 @@ void enemiesAlways() {
         proto = kbGetUnitBaseTypeID(id);
         if (proto == kbGetProtoUnitID("Ballista Shot")) {
             trUnitSelectClear();
-            trUnitSelectByQV("nextProj");
+            trUnitSelectByQV("nextProj", true);
             if (trUnitIsOwnedBy(ENEMY_PLAYER)) {
                 trVectorSetUnitPos("pos", "nextProj");
                 trQuestVarSet("closest", 0);
@@ -167,29 +213,27 @@ void enemiesAlways() {
                 vectorSetAsTargetVector("target", "start", "end");
 
                 trUnitSelectClear();
-                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trUnitSelectByQV("nextProj", true);
                 trUnitConvert(ENEMY_PLAYER);
                 trUnitChangeProtoUnit("Transport Ship Greek");
 
                 trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
-                trArmyDispatch("1,10", "Dwarf", 1, 0,0,0,0,true);
+                trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,true);
                 trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
-                trArmyDispatch("1,10", "Dwarf", 1, 0,0,0,0,false);
-                trArmySelect("1,10");
+                trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,false);
+                trArmySelect("1,0");
                 trUnitConvert(ENEMY_PLAYER);
-                trImmediateUnitGarrison(""+1*trQuestVarGet("ballistaShot"));
+                trImmediateUnitGarrison(""+1*trQuestVarGet("nextProj"));
                 trUnitChangeProtoUnit("Dwarf");
 
                 yAddToDatabase("ballistaShots", "next2");
-                yAddUpdateVar("ballistaShots", "destx", trQuestVarGet("targetx"));
-                yAddUpdateVar("ballistaShots", "destz", trQuestVarGet("targetz"));
                 yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
-                yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("ballistaShot"));
+                yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
                 yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 10000);
 
                 trUnitSelectClear();
                 trUnitSelect(""+1*trQuestVarGet("next1"), true);
-                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trUnitSelect(""+1*trQuestVarGet("nextProj"), true);
                 trUnitChangeProtoUnit("Relic");
 
                 trUnitSelectClear();
@@ -202,7 +246,7 @@ void enemiesAlways() {
 
                 trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
                 trUnitSelectClear();
-                trUnitSelect(""+1*trQuestVarGet("ballistaShot"), true);
+                trUnitSelectByQV("nextProj", true);
                 trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
                 trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
                 trUnitSelectClear();

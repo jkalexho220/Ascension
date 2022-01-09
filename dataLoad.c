@@ -120,7 +120,7 @@ inactive
 	trQuestVarSet("zenoQuiz", iModulo(10, savedata));
 	savedata = savedata / 10;
 
-	if (trCurrentPlayer() == 1) {
+	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);
 	}
 

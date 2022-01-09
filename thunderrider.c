@@ -443,7 +443,7 @@ void thunderRiderAlways(int eventID = -1) {
 				/* this is the new thundershock center */
 				ySetUnit("p"+p+"thunderShocks", trQuestVarGet("p"+p+"thunderShockTargets"));
 				
-				ySetPointer("enemies", 1*yGetVar("p"+p+"thunderShockTargets", "index"));
+				hit = ySetPointer("enemies", 1*yGetVar("p"+p+"thunderShockTargets", "index"));
 				yRemoveFromDatabase("p"+p+"thunderShockTargets");
 
 				trVectorSetUnitPos("pos", "enemies");
@@ -455,6 +455,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trUnitSelectByQV("enemies");
 				trUnitHighlight(0.2, false);
 				damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"), false);
+				ySetPointer("enemies", hit);
 			}
 		}
 	}
