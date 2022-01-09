@@ -322,8 +322,7 @@ highFrequency
 					trDamageUnitPercent(100);
 				}
 				yRemoveFromDatabase("bossRoots");
-			} else if (trTimeMS() > yGetVar("bossRoots", "next")) {
-				ySetVar("bossRoots", "next", trTimeMS() + 500);
+			} else {
 				yVarToVector("bossRoots", "pos");
 				action = 0;
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
@@ -333,20 +332,20 @@ highFrequency
 					} else {
 						dist = zDistanceToVectorSquared("playerUnits", "pos");
 						if (dist > 16 && dist < 36) {
-							if (trQuestVarGet("stunSound") == 1) {
-								trQuestVarSet("stunSound", 2);
-							}
-							if (yGetVar("playerUnits", "stunStatus") == 0) {
-								trQuestVarSet("stunSound", 2);
-							}
+							hit = (trQuestVarGet("stunSound") == 1 || yGetVar("playerUnits", "stunStatus") == 0);
 							stunUnit("playerUnits", 1.5);
-							trQuestVarSet("stunSound", trQuestVarGet("stunSound") - 1);
-							damagePlayerUnit(10);
-							action = 1;
+							if (hit == false) {
+								trQuestVarSet("stunSound", 0);
+							}
+							if (trTimeMS() > yGetVar("bossRoots", "next")) {
+								damagePlayerUnit(10);
+								action = 1;
+							}
 						}
 					}
 				}
 				if (action == 1) {
+					ySetVar("bossRoots", "next", trTimeMS() + 500);
 					trQuestVarSetFromRand("sound", 1, 4, true);
 					trSoundPlayFN("arrowonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				}
@@ -365,8 +364,8 @@ highFrequency
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
 						trMutateSelected(kbGetProtoUnitID("Pine Dead"));
-						trSetSelectedScale(0.5,dist/1000,0.5);
-						trSetSelectedUpVector(2.0*trQuestVarGet("dirx"),0,2.0*trQuestVarGet("dirz"));
+						trSetSelectedScale(0.7,dist/1000,0.7);
+						trSetSelectedUpVector(2.5*trQuestVarGet("dirx"),0,2.5*trQuestVarGet("dirz"));
 
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("treeStabs","sfx"),true);
@@ -382,8 +381,8 @@ highFrequency
 					{
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
-						if (dist > 300) {
-							trSetSelectedScale(1,0.3,1);
+						if (dist > 400) {
+							trSetSelectedScale(1,0.4,1);
 							ySetVar("treeStabs", "step", 2);
 							ySetVar("treeStabs", "next", trTimeMS() + 2000);
 							trVectorSetUnitPos("pos", "treeStabs");
@@ -415,7 +414,7 @@ highFrequency
 					{
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs", true);
-						trSetSelectedScale(1, (1000.0 - dist) / 3333, 1);
+						trSetSelectedScale(1, (1000.0 - dist) / 2500, 1);
 						if (dist > 1000) {
 							trUnitSelectClear();
 							trUnitSelectByQV("treeStabs", true);
