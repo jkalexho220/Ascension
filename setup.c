@@ -409,6 +409,8 @@ highFrequency
 
         trModifyProtounit("Sky Passage", 0, 5, 999);
 
+        trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
+
         for(p=ENEMY_PLAYER; >0) {
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Wadjet Spit", p, 1, -15);

@@ -325,10 +325,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             {
                 case ROOM_CIRCLE:
                 {
-                    z0 = 16;
-                    for(a=0; < 16) {
-                        for(b=16; >0) {
-                            if (a*a + z0 * z0 <= 256) {
+                    int size = trQuestVarGet("bossRoomSize");
+                    z0 = size;
+                    for(a=0; < size) {
+                        for(b=size; >0) {
+                            if (a*a + z0 * z0 <= size * size) {
                                 trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
                                 trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
                                 break;
@@ -340,8 +341,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 }
                 case ROOM_SQUARE:
                 {
-                    trPaintTerrain(x * 35 + 6, z * 35 + 6, x * 35 + 34, z * 35 + 34, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                    trChangeTerrainHeight(x * 35 + 6, z * 35 + 6, x * 35 + 35, z * 35 + 35, worldHeight, false);
+                    trPaintTerrain(x*35+20-size,z*35+20-size,x*35+34,z*35+20+size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                    trChangeTerrainHeight(x*35+20-size,z*35+20-size,x*35+21+size,z*35+20+size, worldHeight, false);
                 }
             }
             trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
@@ -467,6 +468,7 @@ highFrequency
         {
             case 1:
             {
+                trQuestVarSet("bossRoomSize", 16);
                 /* this had better be good to hook them in */
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
@@ -514,6 +516,7 @@ highFrequency
             }
             case 2:
             {
+                trQuestVarSet("bossRoomSize", 12);
                 trSetLighting("Fimbulwinter", 0.1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 4;
@@ -549,8 +552,8 @@ highFrequency
 
                 trQuestVarSet("columnDensity", 0);
 
-                trStringQuestVarSet("bossProto", "Chimera");
-                trQuestVarSet("bossScale", 2);
+                trStringQuestVarSet("bossProto", "Tamarisk Tree");
+                trQuestVarSet("bossScale", 1.5);
 
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);

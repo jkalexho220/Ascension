@@ -53,18 +53,7 @@ void rideLightningOff(int p = 0) {
 		}
 	}
 
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics", true);
-		trUnitChangeProtoUnit("Relic");
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"relics");
-		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-			trSetSelectedScale(0,0,-1);
-			trUnitSetAnimationPath("1,0,1,1,0,0,0");
-		}
-	}
+	equipRelicsAgain(p);
 	yClearDatabase("p"+p+"lightningBalls");
 	yClearDatabase("p"+p+"rideLightningTargets");
 
@@ -273,18 +262,7 @@ void thunderRiderAlways(int eventID = -1) {
 				}
 			}
 			/* reload relics */
-			for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-				yDatabaseNext("p"+p+"relics", true);
-				trUnitChangeProtoUnit("Relic");
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"relics");
-				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-				trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-				if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-					trSetSelectedScale(0,0,-1);
-					trUnitSetAnimationPath("1,0,1,1,0,0,0");
-				}
-			}
+			equipRelicsAgain(p);
 		} else {
 			/* ride the lightning direction change */
 			for(x=yGetDatabaseCount("p"+p+"lightningBalls"); >0) {

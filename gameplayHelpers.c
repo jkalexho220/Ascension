@@ -315,7 +315,7 @@ void processLaunchedUnit() {
 			trMutateSelected(1*yGetVar("launchedUnits", "proto"));
 			if (yGetVar("launchedUnits", "unit") == trQuestVarGet("bossUnit")) {
 				trUnitSelectClear();
-				trUnitSelectByQV("launchedUnits");
+				trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
 				trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
 			}
 			if (yGetVar("launchedUnits", "stun") == 1) {
@@ -598,6 +598,21 @@ void spawnPlayer(int p = 0, string vdb = "") {
         string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
         uiFindType(proto);
     }
+}
+
+void equipRelicsAgain(int p = 0) {
+	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+		yDatabaseNext("p"+p+"relics", true);
+		trUnitChangeProtoUnit("Relic");
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"relics");
+		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+			trSetSelectedScale(0,0,-1);
+			trUnitSetAnimationPath("1,0,1,1,0,0,0");
+		}
+	}
 }
 
 rule spy_find

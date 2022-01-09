@@ -453,7 +453,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\god power restoration icon 64";
-					msg = "Heal: All allies restore 5 percent of their health";
+					msg = "Heal: When the potion is thrown, all allies restore 5 percent of their health";
 				}
 				case 5:
 				{

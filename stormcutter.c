@@ -97,18 +97,7 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 		/* reload relics */
-		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-			yDatabaseNext("p"+p+"relics", true);
-			trUnitChangeProtoUnit("Relic");
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"relics");
-			trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-			trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-			if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-				trSetSelectedScale(0,0,-1);
-				trUnitSetAnimationPath("1,0,1,1,0,0,0");
-			}
-		}
+		equipRelicsAgain(p);
 	}
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {

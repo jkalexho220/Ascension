@@ -19,7 +19,11 @@ def checkQuestVarSet(templine, ln):
 		if findComma:
 			if (depth == 1):
 				if x == ',':
-					foundComma = True
+					if not foundComma:
+						foundComma = True
+					else:
+						print("trQuestVarSet instead of trQuestVarSetFromRand")
+						print("Line " + str(ln) + ":\n    " + line)
 				elif x == ')' and not foundComma:
 					print("trQuestVarSet instead of trQuestVarGet")
 					print("Line " + str(ln) + ":\n    " + line)

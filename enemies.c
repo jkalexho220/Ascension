@@ -15,25 +15,30 @@ void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance =
 	trModifyProtounit(proto, 1, 6, 10);
 }
 
-void activateEnemy(int id = 0) {
+void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
+    int id = kbGetBlockID(""+1*trQuestVarGet(db));
     int proto = kbGetUnitBaseTypeID(id);
-    int bounty = trQuestVarGet("proto"+proto+"bounty");
-    int relic = 0;
-    trQuestVarSetFromRand("relicChance", 0, 1, false);
-    if (trQuestVarGet("relicChance") < trQuestVarGet("proto"+proto+"relicChance")) {
-        relic = trQuestVarGet("proto"+proto+"relic");
-        if (relic == -1) {
-            relic = trQuestVarGet("stage");
+    if (bounty < 0) {
+        bounty = trQuestVarGet("proto"+proto+"bounty");
+    }
+    if (relic < 0) {
+        trQuestVarSetFromRand("relicChance", 0, 1, false);
+        if (trQuestVarGet("relicChance") < trQuestVarGet("proto"+proto+"relicChance")) {
+            relic = trQuestVarGet("proto"+proto+"relic");
+            if (relic == -1) {
+                relic = trQuestVarGet("stage");
+            }
         }
     }
+    
 
-    yAddToDatabase("enemies", "enemiesIncoming");
+    yAddToDatabase("enemies", db);
     trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
     yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
     yAddUpdateVar("enemies", "relic", relic);
     for(p=1; < ENEMY_PLAYER) {
         if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-            yAddToDatabase("p"+p+"rideLightningTargets", "enemiesIncoming");
+            yAddToDatabase("p"+p+"rideLightningTargets", db);
             yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
         }
     }
@@ -42,24 +47,22 @@ void activateEnemy(int id = 0) {
     {
         case kbGetProtoUnitID("Sphinx"):
         {
-            yAddToDatabase("Sphinxes", "enemiesIncoming");
+            yAddToDatabase("Sphinxes", db);
         }
         case kbGetProtoUnitID("Dryad"):
         {
-            yAddToDatabase("Dryads", "enemiesIncoming");
+            yAddToDatabase("Dryads", db);
         }
         case kbGetProtoUnitID("Medusa"):
         {
-            yAddToDatabase("Medusas", "enemiesIncoming");
+            yAddToDatabase("Medusas", db);
         }
         case kbGetProtoUnitID("Mountain Giant"):
         {
-            yAddToDatabase("MountainGiants", "enemiesIncoming");
+            yAddToDatabase("MountainGiants", db);
             yAddUpdateVar("MountainGiants", "index", yGetNewestPointer("enemies"));
         }
     }
-
-    yRemoveFromDatabase("enemiesIncoming");
 }
 
 rule setup_enemies
@@ -99,11 +102,14 @@ void enemiesAlways() {
     /*
     Enemies incoming
     */
-    id = yDatabaseNext("enemiesIncoming", true);
-    for(p=1; < ENEMY_PLAYER) {
-        if (trUnitHasLOS(p)) {
-            activateEnemy(id);
-            break;
+    if (yGetDatabaseCount("enemiesIncoming") > 0) {
+        yDatabaseNext("enemiesIncoming", true);
+        for(p=1; < ENEMY_PLAYER) {
+            if (trUnitHasLOS(p)) {
+                activateEnemy("enemiesIncoming");
+                yRemoveFromDatabase("enemiesIncoming");
+                break;
+            }
         }
     }
 
@@ -166,12 +172,8 @@ void enemiesAlways() {
                     trUnitSelectClear();
                     trUnitSelectByQV("next", true);
                     trUnitConvert(ENEMY_PLAYER);
-                    yAddToDatabase("enemiesIncoming", "next");
+                    activateEnemy("next");
                     trQuestVarSet("angle", trQuestVarGet("angle") + angle);
-                }
-                for(x=trQuestVarGet("count"); >0) {
-                    id = yDatabaseNext("enemiesIncoming", true);
-                    activateEnemy(id);
                 }
                 trSoundPlayFN("attackwarning.wav","1",-1,"","");
                 trSoundPlayFN("wild.wav","1",-1,"","");

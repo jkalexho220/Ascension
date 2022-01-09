@@ -155,7 +155,6 @@ void processChests() {
 	    	case CHEST_STATE_REWARDING:
 	    	{
 	    		if (trTimeMS() > yGetVar("chests", "next")) {
-	    			ySetVar("chests", "count", yGetVar("chests", "count") - 1);
 	    			if (yGetVar("chests", "count") == 0) {
 	    				removeChest();
 	    			} else {
@@ -173,6 +172,7 @@ void processChests() {
 			    		trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 			    		trSetSelectedScale(0,-3,0);
 			    		yAddToDatabase("rainingRelics", "next");
+			    		ySetVar("chests", "count", yGetVar("chests", "count") - 1);
 	    			}
 	    		}
 	    	}
