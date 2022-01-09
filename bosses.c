@@ -119,6 +119,7 @@ highFrequency
 		trQuestVarSet("bossRoomPlayersX", trQuestVarGet("bossRoomCenterX") - 12);
 		trQuestVarSet("bossRoomPlayersZ", trQuestVarGet("bossRoomCenterZ") - 12);
 
+		yClearDatabase("playerCharacters");
 		for(p=1; < ENEMY_PLAYER) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"unit");
@@ -203,9 +204,16 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("bossUnit", true);
 				trUnitConvert(ENEMY_PLAYER);
+				trUnitChangeProtoUnit("Spy Eye");
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
 				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
 				ySetPointer("enemies", 1*trQuestVarGet("bossPointer"));
 				yRemoveFromDatabase("enemies");
+				trQuestVarSet("bossHealth", 100);
+				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100", -1);
+				trModifyProtounit("Earth Dragon Hole", ENEMY_PLAYER, 8, 1);
 				xsEnableRule("boss2_battle");
 				trQuestVarSet("bossSpell", 41);
 				trQuestVarSet("boss", 1);
@@ -223,22 +231,24 @@ void treeStab(string db = "") {
 	trVectorQuestVarSet("dir", zGetUnitVector("bossRoomCenter", db));
 	trQuestVarSet("startx", trQuestVarGet(db+"x") - trQuestVarGet("dirx") * 4.0);
 	trQuestVarSet("startz", trQuestVarGet(db+"z") - trQuestVarGet("dirz") * 4.0);
-	trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
-	trArmySelect("1,0");
-	trUnitChangeProtoUnit("Dust Small");
+	trUnitSelectClear();
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
-	trQuestVarSet("sfx", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,false);
+	trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
 	trArmySelect("1,0");
 	trUnitChangeProtoUnit("Cinematic Block");
+	trUnitSelectClear();
+	trUnitSelect(""+(1+trQuestVarGet("next")), true);
+	trMutateSelected(kbGetProtoUnitID("Tartarian Gate Flame"));
+	trUnitSetAnimationPath("0,1,1,0,0,0,0");
+	trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+	trSetSelectedScale(0.8,1.0,0.5);
 	trQuestVarSet("treeStabSound",1);
 	yAddToDatabase("treeStabs", "next");
 	yAddUpdateVar("treeStabs", "dirx", trQuestVarGet("dirx"));
 	yAddUpdateVar("treeStabs", "dirz", trQuestVarGet("dirz"));
 	yAddUpdateVar("treeStabs", "step", 0);
 	yAddUpdateVar("treeStabs", "next", trTimeMS() + 2000);
-	yAddUpdateVar("treeStabs", "sfx", trQuestVarGet("sfx"));
+	yAddUpdateVar("treeStabs", "sfx", trQuestVarGet("next") + 1);
 }
 
 rule boss2_battle
@@ -255,7 +265,7 @@ highFrequency
 	float angle = 0;
 	float dist = 0;
 	bool hit = false;
-	if (trUnitPercentDamaged() < 100) {
+	if (trQuestVarGet("bossHealth") > 0) {
 		if (yGetDatabaseCount("bossRainingTrees") > 0) {
 			action = processGenericProj("bossRainingTrees");
 			if (action == PROJ_GROUND) {
@@ -265,7 +275,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("bossRainingTrees");
 				trDamageUnitPercent(-100);
-				activateEnemy("bossRainingTrees",0,0);
+				activateEnemy("bossRainingTrees",-1,0);
 				yRemoveFromDatabase("bossRainingTrees");
 			}
 		}
@@ -281,7 +291,9 @@ highFrequency
 				trSoundPlayFN("recreation.wav","1",-1,"","");
 				trUnitSelectClear();
 				trUnitSelectByQV("bossUnit");
-				trDamageUnitPercent(-5);
+				trQuestVarSet("bossHealth", xsMin(100, trQuestVarGet("bossHealth") + 5));
+				trCounterAbort("bosshealth");
+				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth"), -1);
 				trUnitHighlight(0.2,false);
 			} else {
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
@@ -289,6 +301,7 @@ highFrequency
 					if (id == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 4) {
+						healUnit(1*yGetVar("playerUnits","player"), 100);
 						trUnitSelectClear();
 						trUnitSelectByQV("bossHeals");
 						trUnitChangeProtoUnit("Hero Death");
@@ -319,7 +332,7 @@ highFrequency
 						removePlayerUnit();
 					} else {
 						dist = zDistanceToVectorSquared("playerUnits", "pos");
-						if (dist > 20 && dist < 36) {
+						if (dist > 16 && dist < 36) {
 							if (trQuestVarGet("stunSound") == 1) {
 								trQuestVarSet("stunSound", 2);
 							}
@@ -340,7 +353,7 @@ highFrequency
 			}
 		}
 
-		for(y=xsMin(5, yGetDatabaseCount("treeStabs")); >0) {
+		for(y=xsMin(9, yGetDatabaseCount("treeStabs")); >0) {
 			yDatabaseNext("treeStabs");
 			dist = trTimeMS() - yGetVar("treeStabs", "next");
 			if (dist > 0) {
@@ -352,14 +365,16 @@ highFrequency
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
 						trMutateSelected(kbGetProtoUnitID("Pine Dead"));
-						trSetSelectedScale(1,dist/300,1);
-						trSetSelectedUpVector(trQuestVarGet("dirx"),0.25,trQuestVarGet("dirz"));
+						trSetSelectedScale(0.5,dist/1000,0.5);
+						trSetSelectedUpVector(2.0*trQuestVarGet("dirx"),0,2.0*trQuestVarGet("dirz"));
 
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("treeStabs","sfx"),true);
 						trUnitChangeProtoUnit("Tartarian Gate flame");
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("treeStabs","sfx"),true);
+						trSetSelectedScale(0.8,1.0,0.5);
+						trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 						trUnitSetAnimationPath("0,1,1,0,0,0,0");
 						ySetVar("treeStabs", "step", 1);
 					}
@@ -368,7 +383,7 @@ highFrequency
 						trUnitSelectClear();
 						trUnitSelectByQV("treeStabs",true);
 						if (dist > 300) {
-							trSetSelectedScale(1,1,1);
+							trSetSelectedScale(1,0.3,1);
 							ySetVar("treeStabs", "step", 2);
 							ySetVar("treeStabs", "next", trTimeMS() + 2000);
 							trVectorSetUnitPos("pos", "treeStabs");
@@ -379,10 +394,13 @@ highFrequency
 									removePlayerUnit();
 								} else {
 									dist = zDistanceToVector("playerUnits", "pos");
-									if (dist < 10) {
+									if (dist < 6) {
 										trQuestVarSet("hitboxX", trQuestVarGet("posX") + dist * trQuestVarGet("dirX"));
 										trQuestVarSet("hitboxZ", trQuestVarGet("posZ") + dist * trQuestVarGet("dirZ"));
-										if (zDistanceToVectorSquared("playerUnits", "hitbox") < 2) {
+										if (zDistanceToVectorSquared("playerUnits", "hitbox") < 3) {
+											if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+trCurrentPlayer()+"unit")) {
+												trCameraShake(0.3, 0.8);
+											}
 											damagePlayerUnit(300);
 											trQuestVarSet("treeHitSound", 1);
 										}
@@ -390,12 +408,14 @@ highFrequency
 								}
 							}
 						} else {
-							trSetSelectedScale(1,dist/300,1);
+							trSetSelectedScale(1,dist/1000,1);
 						}
 					}
 					case 2:
 					{
-						trSetSelectedScale(1, (1000.0 - dist) / 1000, 1);
+						trUnitSelectClear();
+						trUnitSelectByQV("treeStabs", true);
+						trSetSelectedScale(1, (1000.0 - dist) / 3333, 1);
 						if (dist > 1000) {
 							trUnitSelectClear();
 							trUnitSelectByQV("treeStabs", true);
@@ -416,8 +436,9 @@ highFrequency
 			}
 		} else if (trQuestVarGet("bossSpell") > 40) {
 			if (trQuestVarGet("bossSpell") == 41) {
-				trDamageUnitPercent(10);
-				trCameraShake(1.0,0.25);
+				trQuestVarSet("bossHealth", trQuestVarGet("bossHealth") - 10);
+				trCounterAbort("bosshealth");
+				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth"), -1);
 				trSoundPlayFN("walkingwoodsbirth.wav","1",-1,"","");
 				trQuestVarSet("bossSpell", 42);
 				trQuestVarSet("bossNext", trTimeMS());
@@ -445,13 +466,51 @@ highFrequency
 			
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
-				trMessageSetText("If the white lights reach the Wraithwood, it will heal! Touch them to destroy them!",-1);
-				trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
-				trQuestVarSet("bossCount", 9);
+				trCameraShake(0.5,0.25);
+				trSoundPlayFN("underminebirth.wav","1",-1,"","");
 				trQuestVarSet("bossSpell", 22);
 				trQuestVarSet("bossNext", trTimeMS());
-				trQuestVarSetFromRand("bossAngle", 0, 3.141592, false);
+				trQuestVarSet("bossCount", ENEMY_PLAYER - 1);
 			} else if (trQuestVarGet("bossSpell") == 22) {
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trQuestVarSet("bossNext", trTimeMS() + 1000);
+					if (trQuestVarGet("p"+1*trQuestVarGet("bossCount")+"dead") == 0) {
+						trVectorSetUnitPos("pos", "p"+1*trQuestVarGet("bossCount")+"unit");
+						treeStab("pos");
+					}
+					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
+					if (trQuestVarGet("bossCount") == 0) {
+						trQuestVarSet("bossSpell", 23);
+						trQuestVarSet("bossCount", 35);
+						trQuestVarSet("bossRadius", 6);
+						trQuestVarSetFromRand("bossAngle", 0, 3.14, false);
+						trQuestVarSet("bossNext", trTimeMS() + 2000);
+					}
+				}
+			} else if (trQuestVarGet("bossSpell") == 23) {
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 200);
+					trQuestVarSet("bossAngle", fModulo(6.283185, trQuestVarGet("bossAngle") + 2.45));
+					trQuestVarSet("bossRadius", trQuestVarGet("bossRadius") + 0.5);
+					trVectorSetFromAngle("dir", trQuestVarGet("bossAngle"));
+					trQuestVarSet("startx", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("dirX") * trQuestVarGet("bossRadius"));
+					trQuestVarSet("startz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("dirZ") * trQuestVarGet("bossRadius"));
+					treeStab("start");
+					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
+					if (trQuestVarGet("bossCount") == 0) {
+						bossCooldown(10, 15);
+					}
+				}
+			}
+		} else if (trQuestVarGet("bossSpell") > 10) {
+			if (trQuestVarGet("bossSpell") == 11) {
+				trMessageSetText("If the white lights reach the Wraithwood, it will heal! Touch them to destroy them!",-1);
+				trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
+				trQuestVarSet("bossCount", 3 + ENEMY_PLAYER / 2);
+				trQuestVarSet("bossSpell", 12);
+				trQuestVarSet("bossNext", trTimeMS());
+				trQuestVarSetFromRand("bossAngle", 0, 3.141592, false);
+			} else if (trQuestVarGet("bossSpell") == 12) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
 					trQuestVarSetFromRand("sound",1,3, true);
 					trSoundPlayFN("gaiasparkle"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
@@ -467,43 +526,7 @@ highFrequency
 
 					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 					if (trQuestVarGet("bossCount") == 0) {
-						bossCooldown(7, 12);
-					}
-				}
-			}
-		} else if (trQuestVarGet("bossSpell") > 10) {
-			if (trQuestVarGet("bossSpell") == 11) {
-				trSoundPlayFN("mummyselect.wav","1",-1,"","");
-				trQuestVarSet("bossSpell", 12);
-				trQuestVarSet("bossNext", trTimeMS());
-				trQuestVarSet("bossCount", ENEMY_PLAYER - 1);
-			} else if (trQuestVarGet("bossSpell") == 12) {
-				if (trTimeMS() > trQuestVarGet("bossNext")) {
-					trQuestVarSet("bossNext", trTimeMS() + 1000);
-					if (trQuestVarGet("p"+1*trQuestVarGet("bossCount")+"dead") == 0) {
-						trVectorSetUnitPos("pos", "p"+p+"unit");
-						treeStab("pos");
-					}
-					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
-					if (trQuestVarGet("bossCount") == 0) {
-						trQuestVarSet("bossSpell", 13);
-						trQuestVarSet("bossCount", 36);
-						trQuestVarSet("bossRadius", 6);
-						trQuestVarSetFromRand("bossAngle", 0, 3.14, false);
-						trQuestVarSet("bossNext", trTimeMS() + 2000);
-					}
-				}
-			} else if (trQuestVarGet("bossSpell") == 13) {
-				if (trTimeMS() > trQuestVarGet("bossNext")) {
-					trQuestVarSet("bossAngle", fModulo(6.283185, trQuestVarGet("bossAngle") + 2.45));
-					trQuestVarSet("bossRadius", trQuestVarGet("bossRadius") + 0.3);
-					trVectorSetFromAngle("dir", trQuestVarGet("bossAngle"));
-					trQuestVarSet("startx", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("dirX") * trQuestVarGet("bossRadius"));
-					trQuestVarSet("startz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("dirZ") * trQuestVarGet("bossRadius"));
-					treeStab("start");
-					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
-					if (trQuestVarGet("bossCount") == 0) {
-						bossCooldown(7, 12);
+						bossCooldown(10, 15);
 					}
 				}
 			}
@@ -522,7 +545,7 @@ highFrequency
 						trVectorSetFromAngle("dir", angle);
 						angle = angle + 0.392699;
 						trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-						trUnitConvert(ENEMY_PLAYER);
+						trUnitConvert(0);
 						trUnitChangeProtoUnit("Uproot 4x4");
 					}
 					yAddToDatabase("bossRoots", "next");
@@ -533,7 +556,8 @@ highFrequency
 					trSoundPlayFN("hesperidesselect.wav","1",-1,"","");
 					bossCooldown(3, 12);
 				} else {
-					trQuestVarSet("bossSpell", 11);
+					trQuestVarSetFromRand("bossSpell", 1, 2, true);
+					trQuestVarSet("bossSpell", 10 * trQuestVarGet("bossSpell") + 1);
 				}
 			}
 		} else {
