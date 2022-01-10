@@ -111,8 +111,8 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 
-		'gameplayHelpers.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c' , 'alchemist.c',
+files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 'gameplayHelpers.c',
+		'walls.c', 'chests.c',  'traps.c', 'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c' , 'alchemist.c',
 		'thunderrider.c', 'fireknight.c', 'frostknight.c', 'starseer.c', 'enemies.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
 first = True
 try:
@@ -144,7 +144,7 @@ try:
 							if (len(templine) > 120):
 								print("Line length greater than 120! Length is " + str(len(templine)))
 								print("Line " + str(ln) + ":\n    " + line)
-							if ('if ' in templine or 'if(' in templine) and ('yGetVar' in templine or 'trQuestVarGet' in templine) and not ('=' in templine or '>' in templine or '<' in templine or 'ySetContains' in templine or 'trUnitIsOwnedBy' in templine or 'cWatchActive' in templine or 'yDatabaseContains' in templine or 'HasKeyword' in templine or 'trCheckGPActive' in templine):
+							if ('if ' in templine or 'if(' in templine) and not 'ySetPointer' in templine and ('yGetVar' in templine or 'trQuestVarGet' in templine) and not ('=' in templine or '>' in templine or '<' in templine or 'ySetContains' in templine or 'trUnitIsOwnedBy' in templine or 'cWatchActive' in templine or 'yDatabaseContains' in templine or 'HasKeyword' in templine or 'trCheckGPActive' in templine):
 								print("Missing equality statement")
 								print("Line " + str(ln) + ":\n    " + line)
 							if not (templine[-1] == ';' or '//' in templine or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch('):

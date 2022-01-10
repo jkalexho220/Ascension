@@ -566,6 +566,7 @@ highFrequency
     }
 
     processChests();
+    processWalls();
 
     xsSetContextPlayer(old);
 

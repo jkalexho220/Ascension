@@ -28,6 +28,8 @@ const int RELIC_ALL = 20;
 const int RELIC_KEY_GREEK = 33;
 const int RELIC_KEY_NORSE = 34;
 const int RELIC_KEY_ATLANTEAN = 35;
+const int RELIC_KEY_CHINA = 36;
+const int RELIC_KEY_EGYPT = 37;
 
 const int RELIC_COUNT = 20;
 
@@ -117,7 +119,7 @@ string relicName(int relic = 0) {
 		}
 	}
 	if (relic >= RELIC_KEY_GREEK) {
-		msg = "A key that opens a chest";
+		msg = "A key that opens something";
 	}
 	return(msg);
 }
@@ -217,6 +219,14 @@ string relicIcon(int relic = 0) {
 		case RELIC_KEY_ATLANTEAN:
 		{
 			icon = "ui range indicator atlantean";
+		}
+		case RELIC_KEY_CHINA:
+		{
+			icon = "ui range indicator chinese";
+		}
+		case RELIC_KEY_EGYPT:
+		{
+			icon = "ui range indicator egypt";
 		}
 	}
 	return(icon);
@@ -436,6 +446,14 @@ int relicProto(int relic = 0) {
 		case RELIC_KEY_ATLANTEAN:
 		{
 			proto = kbGetProtoUnitID("UI Range Indicator Atlantean SFX");
+		}
+		case RELIC_KEY_CHINA:
+		{
+			proto = kbGetProtoUnitID("UI Range Indicator Chinese SFX");
+		}
+		case RELIC_KEY_EGYPT:
+		{
+			proto = kbGetProtoUnitID("UI Range Indicator Egypt SFX");
 		}
 	}
 	return(proto);

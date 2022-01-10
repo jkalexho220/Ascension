@@ -88,23 +88,23 @@ highFrequency
 		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
 		trModifyProtounit("Minion", 1, 8, -99);
 		
-        setupProtounitBounty("Golden Lion", 4);
-        setupProtounitBounty("Anubite", 6, 0.03);
-        setupProtounitBounty("Terracotta Soldier", 6, 0.03);
-		setupProtounitBounty("Sphinx", 8, 0.05);
-		setupProtounitBounty("Petsuchos", 8, 0.1, RELIC_ATTACK_RANGE);
+        setupProtounitBounty("Golden Lion", 3);
+        setupProtounitBounty("Anubite", 4, 0.03);
+        setupProtounitBounty("Terracotta Soldier", 4, 0.03);
+		setupProtounitBounty("Sphinx", 5, 0.05);
+		setupProtounitBounty("Petsuchos", 6, 0.1, RELIC_ATTACK_RANGE);
 
-        setupProtounitBounty("Minion", 4);
-        setupProtounitBounty("Walking Woods Marsh", 5);
-        setupProtounitBounty("Dryad", 7, 0.03);
-        setupProtounitBounty("Centaur", 6, 0.03);
-        setupProtounitBounty("Medusa", 14, 0.15, RELIC_SPELL_DURATION);
-        setupProtounitBounty("Mountain Giant", 12, 0.1);
+        setupProtounitBounty("Minion", 2);
+        setupProtounitBounty("Walking Woods Marsh", 3);
+        setupProtounitBounty("Dryad", 4, 0.03);
+        setupProtounitBounty("Centaur", 4, 0.03);
+        setupProtounitBounty("Medusa", 8, 0.15, RELIC_SPELL_DURATION);
+        setupProtounitBounty("Mountain Giant", 10, 0.1);
 
-        setupProtounitBounty("Fenris Wolf", 5, 0.03);
-        setupProtounitBounty("Valkyrie", 7, 0.05);
-        setupProtounitBounty("Ballista", 6, 0.03);
-        setupProtounitBounty("Frost Giant", 12, 0.1);
+        setupProtounitBounty("Fenris Wolf", 4, 0.03);
+        setupProtounitBounty("Valkyrie", 5, 0.05);
+        setupProtounitBounty("Ballista", 4, 0.03);
+        setupProtounitBounty("Frost Giant", 10, 0.1);
 
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);

@@ -6,6 +6,7 @@ const int EDGE_NOT_FOUND = 0;
 const int EDGE_NORMAL = 1;
 const int EDGE_BIG = 2;
 const int EDGE_PORTAL = 3;
+const int EDGE_WALL = 4;
 
 const int ROOM_BASIC = 1;
 const int ROOM_AMBUSH = 2;
@@ -42,6 +43,7 @@ const int LIFESTONE = 1;
 const int MANASTONE = 2;
 
 float worldHeight = 0;
+float wallHeight = 5;
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 
@@ -99,7 +101,7 @@ string gemstoneName(int gem = 0) {
         }
         case LIFESTONE:
         {
-            name = "Lifestone";
+            name = "Soulstone";
         }
         case MANASTONE:
         {

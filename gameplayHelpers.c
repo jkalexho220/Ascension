@@ -25,13 +25,15 @@ bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
 void spyEffect(int unit = 0, int proto = 0, string qv = "") {
-	int x = modularCounterNext("spyFind");
-	trQuestVarSet("spyEye"+x, proto);
-	trQuestVarSet("spyEye"+x+"unit", unit);
-	trStringQuestVarSet("spyName"+x, qv);
 	trUnitSelectClear();
 	trUnitSelect(""+unit, true);
-	trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+	if (trUnitAlive()) {
+		int x = modularCounterNext("spyFind");
+		trQuestVarSet("spyEye"+x, proto);
+		trQuestVarSet("spyEye"+x+"unit", unit);
+		trStringQuestVarSet("spyName"+x, qv);
+		trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+	}
 }
 
 void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
@@ -632,26 +634,32 @@ rule spy_find
 active
 highFrequency
 {
-	if ((trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) == false) {
+	if (xsAbs(trQuestVarGet("spyfound") - trQuestVarGet("spyfind")) > 0) {
 		while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
 			int id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
 			if (id >= 0) {
 				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
 					int x = modularCounterNext("spyfound");
-					trUnitSelectClear();
-					trUnitSelectByQV("spyEye"+x+"unit");
-					while(trUnitAlive() == false) {
-						if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+					trVectorSetUnitPos("spos", "spysearch");
+					while(true) {
+						trUnitSelectClear();
+						trUnitSelectByQV("spyEye"+x+"unit");
+						if (trUnitAlive() == false) {
+							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+						} else if (zDistanceToVectorSquared("spyEye"+x+"unit", "spos") > 0.7) {
+							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+						} else {
+							trUnitSelectClear();
+							trUnitSelectByID(id);
+							trMutateSelected(1*trQuestVarGet("spyEye"+x));
+							trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
+							break;
+						}
+						if (trQuestVarGet("spyFound") - trQuestVarGet("spyFind") == 0) {
 							break;
 						}
 						x = modularCounterNext("spyfound");
-						trUnitSelectClear();
-						trUnitSelectByQV("spyEye"+x+"unit");
 					}
-					trUnitSelectClear();
-					trUnitSelectByID(id);
-					trMutateSelected(1*trQuestVarGet("spyEye"+x));
-					trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
 				}
 			}
 			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
@@ -662,6 +670,6 @@ highFrequency
 		}
 	} else {
 		trQuestVarSet("spyreset", 0);
-		trQuestVarSet("spysearch", trGetNextUnitScenarioNameNumber());
+		trQuestVarSet("spysearch", trGetNextUnitScenarioNameNumber() - 1);
 	}
 }
