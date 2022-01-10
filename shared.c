@@ -326,6 +326,12 @@ int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
 	if (reverse) {
 		index = yGetVar(db, "xPrevBlock");
 	}
+	if (yGetVar(db, "xActive") == 0) {
+		if (trCurrentPlayer() == 1) {
+			trSoundPlayFN("attackwarning.wav","1",-1,"","");
+			trChatSend(0, "<color=1,0,0>"+db+" is pointing to something wrong!");
+		}
+	}
 	trQuestVarSet("xdata"+db+"pointer", index);
 	int u = trQuestVarGet("xdata"+db+"index"+index);
 	trQuestVarSet(db, u);
@@ -414,10 +420,12 @@ int yGetPointer(string db = "") {
 	return(trQuestVarGet("xdata"+db+"pointer"));
 }
 
-int ySetPointer(string db = "", int index = 0) {
-	int safe = trQuestVarGet("xdata"+db+"pointer");
-	trQuestVarSet("xdata"+db+"pointer", index);
-	trQuestVarSet(db, trQuestVarGet("xdata"+db+"index"+index));
+bool ySetPointer(string db = "", int index = 0) {
+	bool safe = (yGetVarAtIndex(db, "xActive", index) == 1);
+	if (safe) {
+		trQuestVarSet("xdata"+db+"pointer", index);
+		trQuestVarSet(db, trQuestVarGet("xdata"+db+"index"+index));
+	}
 	return(safe);
 }
 

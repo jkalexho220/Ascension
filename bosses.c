@@ -27,7 +27,8 @@ highFrequency
 		}
 	}
 
-	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount")) {
+	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount") &&
+		trQuestVarGet("playersInBossRoom") > 0) {
 		xsDisableSelf();
 		xsEnableRule("boss_cin_00");
 		
@@ -126,7 +127,6 @@ highFrequency
 			trUnitDestroy();
 			spawnPlayer(p, "bossRoomPlayers");
 			equipRelicsAgain(p);
-			trChatSend(p, "database size is now " + yGetDatabaseCount("p"+p+"characters"));
 		}
 
 		int id = 0;
@@ -707,8 +707,9 @@ highFrequency
 					yRemoveFromDatabase("bossShockwaveTargets");
 				} else if (zDistanceToVectorSquared("bossShockwaveTargets", "pos") < 9) {
 					hit = true;
-					ySetPointer("playerUnits", 1*yGetVar("bossShockwaveTargets", "index"));
-					damagePlayerUnit(200);
+					if (ySetPointer("playerUnits", 1*yGetVar("bossShockwaveTargets", "index"))) {
+						damagePlayerUnit(200);
+					}
 					if (trQuestVarGet("bossSpell") < 30 || trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 						yRemoveFromDatabase("bossShockwaveTargets");
 					}
@@ -756,8 +757,9 @@ highFrequency
 					trUnitChangeProtoUnit("Tornado");
 					trUnitConvert(ENEMY_PLAYER);
 				}
-				ySetPointer("enemies", 1*trQuestVarGet("bossPointer"));
-				removeEnemy();
+				if (ySetPointer("enemies", 1*trQuestVarGet("bossPointer"))) {
+					removeEnemy();
+				}
 				trQuestVarSet("bossSpell", 32);
 				trQuestVarSet("bossSpellTimeout", trTimeMS() + 12000);
 				trQuestVarSet("bossSpellNext", trTimeMS() + 2000);

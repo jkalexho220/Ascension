@@ -38,48 +38,48 @@ void fireknightAlways(int eventID = -1) {
 		trVectorSetUnitPos("pos", "p"+p+"fireCharges");
 		yVarToVector("p"+p+"fireCharges", "dest");
 		if (zDistanceBetweenVectorsSquared("pos", "dest") < 4 || trTimeMS() > yGetVar("p"+p+"fireCharges", "timeout")) {
-			hit = ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"));
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"characters");
-			trUnitChangeProtoUnit("Lancer Hero");
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"characters");
-			trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
+			if (ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"))) {
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"characters");
+				trUnitChangeProtoUnit("Lancer Hero");
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"characters");
+				trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
 
-			if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-				equipRelicsAgain(p);
-			}
-
-			zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("p"+p+"fireCharges", "sfx"), true);
-			trUnitChangeProtoUnit("Kronny Flying");
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("p"+p+"fireCharges", "sfx"), true);
-			trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-			trSetSelectedScale(0,-5.0,0);
-			trDamageUnitPercent(100);
-			trQuestVarSet("next", yGetVar("p"+p+"fireCharges", "sfx"));
-			yAddToDatabase("p"+p+"fireHarpies", "next");
-
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"fireCharges");
-			trDamageUnitPercent(100);
-			trUnitChangeProtoUnit("Meteorite");
-			yRemoveFromDatabase("p"+p+"fireCharges");
-			amt = trQuestVarGet("flamingImpactDamage") * trQuestVarGet("p"+p+"spellDamage");
-			dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange") * 2, 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
-				id = yDatabaseNext("enemies", true);
-				if (id == -1 || trUnitAlive() == false) {
-					removeEnemy();
-				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-					damageEnemy(p, amt, true);
-					trPlayerGrantResources(p, "favor", 2);
+				if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+					equipRelicsAgain(p);
 				}
+
+				zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("p"+p+"fireCharges", "sfx"), true);
+				trUnitChangeProtoUnit("Kronny Flying");
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("p"+p+"fireCharges", "sfx"), true);
+				trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+				trSetSelectedScale(0,-5.0,0);
+				trDamageUnitPercent(100);
+				trQuestVarSet("next", yGetVar("p"+p+"fireCharges", "sfx"));
+				yAddToDatabase("p"+p+"fireHarpies", "next");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"fireCharges");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Meteorite");
+				yRemoveFromDatabase("p"+p+"fireCharges");
+				amt = trQuestVarGet("flamingImpactDamage") * trQuestVarGet("p"+p+"spellDamage");
+				dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange") * 2, 2);
+				for(x=yGetDatabaseCount("enemies"); >0) {
+					id = yDatabaseNext("enemies", true);
+					if (id == -1 || trUnitAlive() == false) {
+						removeEnemy();
+					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+						damageEnemy(p, amt, true);
+						trPlayerGrantResources(p, "favor", 2);
+					}
+				}
+				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
 			}
-			trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
-			ySetPointer("p"+p+"characters", hit);
 		} else {
 			dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 			for(x=yGetDatabaseCount("enemies"); >0) {

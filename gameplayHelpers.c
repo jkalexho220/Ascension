@@ -256,14 +256,14 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 
 void healUnit(int p = 0, float amt = 0, int index = -1) {
 	int old = yGetPointer("playerUnits");
-	if (index > 0) {
-		ySetPointer("playerUnits", index);
+	if (index < 0) {
+		index = old;
 	}
-	amt = amt * trQuestVarGet("p"+p+"healBoost");
-	if (yGetVar("playerUnits", "poisonStatus") == 0) {
-		trDamageUnit(0.0 - amt);
-	}
-	if (index > 0) {
+	if (ySetPointer("playerUnits", index)) {
+		amt = amt * trQuestVarGet("p"+p+"healBoost");
+		if (yGetVar("playerUnits", "poisonStatus") == 0) {
+			trDamageUnit(0.0 - amt);
+		}
 		ySetPointer("playerUnits", old);
 	}
 }
@@ -327,9 +327,10 @@ void processLaunchedUnit() {
 			}
 			if (yGetVar("launchedUnits", "stun") == 1) {
 				int index = yGetPointer(db);
-				ySetPointer(db, 1*yGetVar("launchedUnits", "index"));
-				stunUnit(db, 1.5);
-				ySetPointer(db, index);
+				if (ySetPointer(db, 1*yGetVar("launchedUnits", "index"))) {
+					stunUnit(db, 1.5);
+					ySetPointer(db, index);
+				}
 			}
 		} else {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("launchedUnits", "proto")));
@@ -437,15 +438,14 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 protection blocks all damage.
 */
 void damagePlayerUnit(float dmg = 0, int index = -1) {
-	int old = 0;
-	if (index > 0) {
-		old = yGetPointer("playerUnits");
-		ySetPointer("playerUnits", index);
+	int old = yGetPointer("playerUnits");
+	if (index < 0) {
+		index = old;
 	}
-	if (trQuestVarGet("protectionCount") == 0) {
-		trDamageUnit(dmg);
-	}
-	if (index > 0) {
+	if (ySetPointer("playerUnits", index)) {
+		if (trQuestVarGet("protectionCount") == 0) {
+			trDamageUnit(dmg);
+		}
 		ySetPointer("playerUnits", old);
 	}
 }
@@ -469,9 +469,9 @@ void stunsAndPoisons(string db = "") {
     		trUnitSelectClear();
     		trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
     		trMutateSelected(kbGetProtoUnitID("Rocket"));
-    		int old = ySetPointer("stunnedUnits", 1*yGetVar(db, "stunStatus"));
-    		yRemoveFromDatabase("stunnedUnits");
-    		ySetPointer("stunnedUnits", old);
+    		if (ySetPointer("stunnedUnits", 1*yGetVar(db, "stunStatus"))) {
+    			yRemoveFromDatabase("stunnedUnits");
+    		}
     		ySetVar(db, "stunStatus", 0);
     	}
 	}

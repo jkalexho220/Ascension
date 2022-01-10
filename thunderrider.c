@@ -25,7 +25,7 @@ void rideLightningOff(int p = 0) {
 	for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 		yDatabaseNext("p"+p+"characters");
 		index = yGetVar("p"+p+"characters", "lightningIndex");
-		index = ySetPointer("p"+p+"lightningBalls", index);
+		ySetPointer("p"+p+"lightningBalls", index);
 		trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
 		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trUnitSelectClear();
@@ -51,7 +51,6 @@ void rideLightningOff(int p = 0) {
 		if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 			trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
 		}
-		ySetPointer("p"+p+"lightningBalls", index);
 	}
 
 	equipRelicsAgain(p);
@@ -196,11 +195,11 @@ void thunderRiderAlways(int eventID = -1) {
 						if (trUnitVisToPlayer()) {
 							trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 						}
-						id = ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"));
-						trUnitHighlight(0.5, false);
-						damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
+						if (ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"))) {
+							trUnitHighlight(0.5, false);
+							damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
+						}
 						yRemoveFromDatabase("p"+p+"rideLightningTargets");
-						ySetPointer("enemies", id);
 					}
 				}
 			}
@@ -347,8 +346,9 @@ void thunderRiderAlways(int eventID = -1) {
 						trUnitSelectByQV("p"+p+"characters", true);
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 
-						ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"));
-						removePlayerUnit();
+						if (ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"))) {
+							removePlayerUnit();
+						}
 					}
 				}
 			}
@@ -445,19 +445,18 @@ void thunderRiderAlways(int eventID = -1) {
 				/* this is the new thundershock center */
 				ySetUnit("p"+p+"thunderShocks", trQuestVarGet("p"+p+"thunderShockTargets"));
 				
-				hit = ySetPointer("enemies", 1*yGetVar("p"+p+"thunderShockTargets", "index"));
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"thunderShockTargets", "index"))) {
+					trUnitSelectClear();
+					trUnitSelectByQV("enemies");
+					trUnitHighlight(0.2, false);
+					damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"), false);
+					trVectorSetUnitPos("pos", "enemies");
+				}
 				yRemoveFromDatabase("p"+p+"thunderShockTargets");
-
-				trVectorSetUnitPos("pos", "enemies");
 				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 				trArmySelect(""+p+",0");
 				trUnitChangeProtoUnit("Lightning Sparks Ground");
 				ySetVarFromVector("p"+p+"thunderShocks", "pos", "pos");
-				trUnitSelectClear();
-				trUnitSelectByQV("enemies");
-				trUnitHighlight(0.2, false);
-				damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"), false);
-				ySetPointer("enemies", hit);
 			}
 		}
 	}
