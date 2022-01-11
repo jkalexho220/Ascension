@@ -39,7 +39,7 @@ const int CLASS_COUNT = 16;
 
 
 const int STARSTONE = 0;
-const int LIFESTONE = 1;
+const int SOULSTONE = 1;
 const int MANASTONE = 2;
 
 float worldHeight = 0;
@@ -72,20 +72,20 @@ int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
 
 string gemstoneIcon(int gem = 0) {
-    string img = "icons\improvement thurisaz rune icon 64";
+    string img = "icons\improvement hands of the pharaoh icons 64";
     switch(gem)
     {
         case STARSTONE:
         {
             img = "icons\improvement focus icons 64";
         }
-        case LIFESTONE:
+        case SOULSTONE:
         {
             img = "icons\god power healing spring icon 64";
         }
         case MANASTONE:
         {
-            img = "icons\improvement thurisaz rune icon 64";
+            img = "icons\improvement hands of the pharaoh icons 64";
         }
     }
     return(img);
@@ -99,7 +99,7 @@ string gemstoneName(int gem = 0) {
         {
             name = "Starstone";
         }
-        case LIFESTONE:
+        case SOULSTONE:
         {
             name = "Soulstone";
         }
@@ -336,9 +336,13 @@ runImmediately
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
-    setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, LIFESTONE);
-    setupClass("Pharaoh", ALCHEMIST, 550, 1200, LIFESTONE);
+    setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, SOULSTONE);
+    setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
 
+    trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
+    trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
+    trQuestVarSet("p0stunResistance", 1);
+    trQuestVarSet("p0poisonResistance", 1);
     for(p=1; < ENEMY_PLAYER) {
         trPlayerSetDiplomacy(p, 0, "neutral");
         trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");
@@ -388,6 +392,8 @@ runImmediately
         trForbidProtounit(p, "Hill Fort");
         trForbidProtounit(p, "Tower");
         trForbidProtounit(p, "Longhouse");
+        trForbidProtounit(p, "Manor");
+        trForbidProtounit(p, "Guild");
     }
 
     xsEnableRule("delayed_modify");
@@ -422,12 +428,14 @@ highFrequency
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
+        setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
 
         trModifyProtounit("Sky Passage", 0, 5, 999);
 
         trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Pharaoh", p, 14, -999);
             trModifyProtounit("Wadjet Spit", p, 1, -15);

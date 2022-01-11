@@ -116,7 +116,7 @@ void sunbowAlways(int eventID = -1) {
 			trTimeMS() + 1000 * trQuestVarGet("healingRaysDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trSoundPlayFN("skypassagein.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+SUNBOW+"nextDelay") * 4.0 / (3.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+SUNBOW+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 
 	if ((trQuestVarGet("p"+p+"healingRays") == 1) && (trTimeMS() > trQuestVarGet("p"+p+"healingRaysTimeout"))) {
@@ -271,6 +271,14 @@ void chooseSunbow(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
+void modifySunbow(int eventID = -1) {
+	int p = eventID - 5000 - 12 * SUNBOW;
+	if (trQuestVarGet("p"+p+"healingRays") == 1) {
+		trQuestVarSet("p"+p+"nextDelay", 
+			trQuestVarGet("class"+SUNBOW+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+	}
+}
+
 rule sunbow_init
 active
 highFrequency
@@ -279,6 +287,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * SUNBOW + p, "sunbowAlways");
 		trEventSetHandler(1000 + 12 * SUNBOW + p, "chooseSunbow");
+		trEventSetHandler(5000 + 12 * SUNBOW + p, "modifySunbow");
 	}
 
 	trQuestVarSet("sunlightCooldown", 18);

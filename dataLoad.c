@@ -15,11 +15,20 @@ int currentdata = 0;
 
 void saveAllData() {
 	int p = trCurrentPlayer();
+	int relic = 0;
+	/* relic transporter guy */
+	for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
+		yDatabaseNext("p"+p+"warehouse");
+		relic = yGetVar("p"+p+"warehouse", "type");
+		trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
+	}
 	/* slot 0 */
-	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level") + 100 * trQuestVarGet("p"+p+"class");
+	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
+	savedata = savedata + 100 * trQuestVarGet("p"+p+"transporterLevel") + 1000 * trQuestVarGet("p"+p+"class");
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
-	savedata = xsMax(0, trGetScenarioUserData(1)) + trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	savedata = trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	savedata = savedata + trGetScenarioUserData(1);
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
@@ -84,7 +93,7 @@ void saveAllData() {
 }
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 15,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 16,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -95,26 +104,35 @@ inactive
 	/* only the local client needs this info */
 	/* owned relics */
 	for(y=0; < 4) {
-		savedata = xsMax(0, trGetScenarioUserData(12 + y));
+		savedata = trGetScenarioUserData(12 + y);
+		if (savedata < 0) {
+			savedata = 0;
+		}
 		for(x=1; < 9) {
 			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
 			savedata = savedata / 11;
 		}
 	}
 	/* gemstones */
-	savedata = xsMax(0, trGetScenarioUserData(9));
+	savedata = trGetScenarioUserData(9);
+	if (savedata < 0) {
+		savedata = 0;
+	}
 	for(x=0; <4) {
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
 	}
 	/* class unlock progress */
-	savedata = xsMax(0, trGetScenarioUserData(8));
+	savedata = trGetScenarioUserData(8);
+	if (savedata < 0) {
+		savedata = 0;
+	}
 	trQuestVarSet("playerHasHosted", iModulo(2, savedata));
 	savedata = savedata / 2;
 	trQuestVarSet("bossKills", iModulo(6, savedata));
 	savedata = savedata / 6;
 	trQuestVarSet("giantKills", iModulo(101, savedata));
-	savedata = savedata / 100;
+	savedata = savedata / 101;
 	trQuestVarSet("questCount", iModulo(11, savedata));
 	savedata = savedata / 11;
 	trQuestVarSet("zenoQuiz", iModulo(10, savedata));
@@ -148,20 +166,31 @@ inactive
 		trForbidProtounit(1, "Swordsman Hero");
 
 		/* progress, level, class */
-		savedata = xsMax(0, trGetScenarioUserData(0));
+		savedata = trGetScenarioUserData(0);
+		if (savedata < 0) {
+			savedata = 0;
+		}
 		trQuestVarSet("p1progress", iModulo(10, savedata));
 		savedata = savedata / 10;
 		trQuestVarSet("p1level", iModulo(10, savedata));
 		savedata = savedata / 10;
-		trQuestVarSet("p1class", savedata);
+		trQuestVarSet("p1transporterLevel", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1class", iModulo(100, savedata));
 
 		/* gold */
-		savedata = xsMax(0, trGetScenarioUserData(1));
+		savedata = trGetScenarioUserData(1);
+		if (savedata < 0) {
+			savedata = 0;
+		}
 		trQuestVarSet("p1gold", savedata);
 
 		/* equipped relics */
 		for(y=0; <2) {
-			savedata = xsMax(0, trGetScenarioUserData(2 + y));
+			savedata = trGetScenarioUserData(2 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
 			for(x=1; <6) {
 				trQuestVarSet("p1relic"+(x+5*y), iModulo(32, savedata));
 				savedata = savedata / 32;
@@ -170,7 +199,10 @@ inactive
 
 		/* class levels */
 		for(y=0; <2) {
-			savedata = xsMax(0, trGetScenarioUserData(10 + y));
+			savedata = trGetScenarioUserData(10 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
 			for(x=1; <9) {
 				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
 				savedata = savedata / 11;
@@ -199,7 +231,10 @@ inactive
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman");
 	}
 	if (swordsmen == total) {
-		savedata = xsMax(0, trGetScenarioUserData(0));
+		savedata = trGetScenarioUserData(0);
+		if (savedata < 0) {
+			savedata = 0;
+		}
 		currentdata = iModulo(10, savedata);
 		savedata = savedata / 10;
 
@@ -262,12 +297,14 @@ inactive
 					} else if (loadProgress == 1) {
 						trQuestVarSet("p"+p+"level", x);
 					} else if (loadProgress == 2) {
-						trQuestVarSet("p"+p+"class", x);
+						trQuestVarSet("p"+p+"transporterLevel", x);
 					} else if (loadProgress == 3) {
-						trQuestVarSet("p"+p+"gold", x);
+						trQuestVarSet("p"+p+"class", x);
 					} else if (loadProgress == 4) {
+						trQuestVarSet("p"+p+"gold", x);
+					} else if (loadProgress == 5) {
 						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
-					} else if (loadProgress < 15) {
+					} else if (loadProgress < 16) {
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
 					}
 					trUnitSelectClear();
@@ -279,7 +316,7 @@ inactive
 		}
 		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (loadProgress == 15) {
+		if (loadProgress == 16) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
@@ -287,24 +324,33 @@ inactive
 			xsEnableRule("data_load_01_load_data");
 			switch(loadProgress)
 			{
-				case 3:
+				case 4:
 				{
-					savedata = xsMin(1000,xsMax(0, trGetScenarioUserData(1)));
+					savedata = trGetScenarioUserData(1);
+					if (savedata < 0) {
+						savedata = 0;
+					} else if (savedata > 1000) {
+						savedata = 1000;
+					}
 				}
-				case 5:
+				case 6:
 				{
-					savedata = xsMax(0, trGetScenarioUserData(2));
+					savedata = trGetScenarioUserData(2);
+					if (savedata < 0) {
+						savedata = 0;
+					}
 				}
-				case 10:
+				case 11:
 				{
-					savedata = xsMax(0, trGetScenarioUserData(3));
+					savedata = trGetScenarioUserData(3);
+					if (savedata < 0) {
+						savedata = 0;
+					}
 				}
 			}
 			if (loadProgress >=3) {
 				currentdata = iModulo(32, savedata);
 				savedata = savedata / 32;
-			} else if (loadProgress == 2) {
-				currentdata = savedata;
 			} else {
 				currentdata = iModulo(10, savedata);
 				savedata = savedata / 10;
@@ -333,6 +379,7 @@ inactive
 	int class = 0;
 	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
+		trModifyProtounit("Villager Atlantean Hero", p, 5, trQuestVarGet("p"+p+"transporterLevel"));
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);

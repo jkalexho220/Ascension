@@ -185,6 +185,8 @@ void modifyStormcutter(int eventID = -1) {
 	int p = eventID - 5000 - 12 * STORMCUTTER;
 	if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
 		zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
+		trQuestVarSet("p"+p+"nextDelay", 
+			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 }
 

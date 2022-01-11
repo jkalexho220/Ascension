@@ -20,8 +20,11 @@ void fixAnimations(int p = 0) {
             }
         } else {
             trQuestVarSet("p"+p+"animation", action);
-            if (action == 11) {
+            if ((action == 11) && xsAbs(trQuestVarGet("p"+p+"action") - 12) > 0) {
                 trUnitSetAnimationPath("0,0,0,0,0,0,0");
+            } else if (action == -1) {
+                xsSetContextPlayer(p);
+                trQuestVarSet("p"+p+"action", kbUnitGetActionType(id));
             }
         }
     }
@@ -336,40 +339,68 @@ highFrequency
         for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
             yDatabaseNext("p"+p+"relics", true);
             if (trUnitGetIsContained("Unit") == false) {
-                relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                 if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"relics");
                     if (trCurrentPlayer() == p) {
                         trSoundPlayFN("backtowork.wav","1",-1,"","");
                     }
-                    if (trPlayerResourceCount(p, "Gold") > 25 &&
-                        zDistanceBetweenVectorsSquared("pos", "relicTransporterGuyPos") < 36) {
-                        trMutateSelected(kbGetProtoUnitID("Conversion SFX"));
-                        if (trCurrentPlayer() == p) {
-                            trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " added to your warehouse");
-                            trSoundPlayFN("favordump.wav","1",-1,"","");
-                            trQuestVarSet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"), 
-                                xsMin(10, 1 + trQuestVarGet("ownedRelics"+1*yGetVar("p"+p+"relics", "type"))));
+                    if (zDistanceBetweenVectorsSquared("pos", "relicTransporterGuyPos") < 36) {
+                        trUnitChangeProtoUnit("Relic");
+                        trUnitSelectClear();
+                        trUnitSelectByQV("p"+p+"relics", true);
+                        trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                        trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                        trSetSelectedScale(0,0,-1);
+                        trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                        if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
+                            if (trPlayerResourceCount(p, "gold") >= 100) {
+                                trQuestVarSet("p"+p+"transporterPurchased", 1);
+                                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                                yAddToDatabase("playerUnits", "next");
+                                yAddUpdateVar("playerUnits", "player", p);
+                                trArmyDispatch(""+p+",0","Villager Atlantean Hero",1,
+                                    trQuestVarGet("posx"),0,trQuestVarGet("posz"),180,true);
+                                if (trCurrentPlayer() == p) {
+                                    trChatSend(0, "A Relic Transporter has been hired!");
+                                    trSoundPlayFN("favordump.wav","1",-1,"","");
+                                    trSoundPlayFN("villagercreate.wav","1",-1,"","");
+                                }
+                            } else if (trCurrentPlayer() == p) {
+                                trChatSend(0, "You don't have enough gold! You need 100!");
+                                trSoundPlayFN("cantdothat.wav","1",-1,"","");
+                            }
                         }
-                        trPlayerGrantResources(p, "Gold", -25);
                     } else {
                         if (trCurrentPlayer() == p) {
                             trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
-                            if (zDistanceToVectorSquared("p"+p+"relics", "relicTransporterGuyPos") < 36) {
-                                trSoundPlayFN("cantdothat.wav","1",-1,"","");
-                                trChatSend(0, "Not enough gold to transport relic! You need 25!");
-                            }
                         }
-                        
+                        relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                         trUnitChangeProtoUnit("Relic");
                         yAddToDatabase("freeRelics", "p"+p+"relics");
                         yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                        yRemoveFromDatabase("p"+p+"relics");
+                        yRemoveUpdateVar("p"+p+"relics", "type");
                     }
+                } else {
+                    /* RELIC_KEY_GREEK */
+                    yRemoveFromDatabase("p"+p+"relics");
+                    yRemoveUpdateVar("p"+p+"relics", "type");
                 }
-                yRemoveFromDatabase("p"+p+"relics");
-                yRemoveUpdateVar("p"+p+"relics", "type");
             }
+        }
+    }
+
+    if (yGetDatabaseCount("p"+p+"warehouse") > 0) {
+        yDatabaseNext("p"+p+"warehouse", true);
+        if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
+            if (yGetVar("p"+p+"warehouse", "type") < RELIC_KEY_GREEK ||
+                trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") > 0) {
+                trUnitChangeProtoUnit("Relic");
+                yAddToDatabase("freeRelics", "p"+p+"warehouse");
+                yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
+            }
+            yRemoveFromDatabase("p"+p+"warehouse");
         }
     }
 
@@ -383,34 +414,51 @@ highFrequency
         amt = 0;
         yDatabaseNext("freeRelics", true);
         if (trUnitGetIsContained("Unit")) {
-            trVectorSetUnitPos("pos", "freeRelics");
-            for(p=1; < ENEMY_PLAYER) {
-                trUnitSelectClear();
-                trUnitSelectByQV("p"+p+"unit");
-                if (trUnitAlive()) {
-                    if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1.5) {
-                        amt = 1;
+            if (trUnitGetIsContained("Villager Atlantean Hero")) {
+                for(p=1; < ENEMY_PLAYER) {
+                    if (trUnitIsOwnedBy(p)) {
+                        trSetSelectedScale(0,0,-1);
+                        trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+                        if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                        }
+                        yAddToDatabase("p"+p+"warehouse", "freeRelics");
+                        yAddUpdateVar("p"+p+"warehouse", "type", yGetVar("freeRelics", "type"));
+                        yRemoveFromDatabase("freeRelics");
+                        yRemoveUpdateVar("freeRelics", "type");
                         break;
                     }
                 }
-            }
-            if (amt == 1) {
-                relicEffect(1*yGetVar("freeRelics", "type"), p, true);
-                trUnitSelectClear();
-                trUnitSelectByQV("freeRelics", true);
-                trSetSelectedScale(0,0,-1);
-                trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-                if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
-                    trUnitSetAnimationPath("1,0,1,1,0,0,0");
+            } else {
+                trVectorSetUnitPos("pos", "freeRelics");
+                for(p=1; < ENEMY_PLAYER) {
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"unit");
+                    if (trUnitAlive()) {
+                        if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1.5) {
+                            amt = 1;
+                            break;
+                        }
+                    }
                 }
-                if (trCurrentPlayer() == p) {
-                    trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
-                    trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+                if (amt == 1) {
+                    relicEffect(1*yGetVar("freeRelics", "type"), p, true);
+                    trUnitSelectClear();
+                    trUnitSelectByQV("freeRelics", true);
+                    trSetSelectedScale(0,0,-1);
+                    trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+                    if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                        trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                    }
+                    if (trCurrentPlayer() == p) {
+                        trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
+                        trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+                    }
+                    yAddToDatabase("p"+p+"relics", "freeRelics");
+                    yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
+                    yRemoveFromDatabase("freeRelics");
+                    yRemoveUpdateVar("freeRelics", "type");
                 }
-                yAddToDatabase("p"+p+"relics", "freeRelics");
-                yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
-                yRemoveFromDatabase("freeRelics");
-                yRemoveUpdateVar("freeRelics", "type");
             }
         } else if (trUnitIsSelected()) {
             relicDescription(1*yGetVar("freeRelics", "type"));

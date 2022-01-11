@@ -470,18 +470,17 @@ highFrequency
 
 			setupExplain("Hey it's me, Zenophobia! I've got a fun little quiz for you!");
 			setupExplain("For each question you answer correctly, I'll give you a Starstone! Ready?");
-			setupQuestion("You cannot cast spells when stunned.", "True", "False", 2);
-			setupExplain("You can still cast spells when stunned.");
+			setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
+			setupExplain("Only your ultimate costs favor! The other spells are free!");
+			setupExplain("In fact, your basic spells generate favor when they hit enemies.");
 
-			setupQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
-			setupExplain("Enemies cannot cast spells when stunned. In fact, you can interrupt an enemy's spell with a stun!");
+			setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
+			setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
+				"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
+			setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 
-				
-			setupQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
-				"Reduces the duration of stuns on you by a percentage", 2);
-			setupExplain("Stun Resistance will reduce the duration of stuns on you. It stacks multiplicatively.");
-
-
+			setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
+			setupExplain("Spell Power affects the healing and damage of your spells.");
 		} else {
 			int gem = 0;
 			switch(1*trQuestVarGet("zenoQuiz"))
@@ -489,17 +488,55 @@ highFrequency
 				case 1:
 				{
 					gem = MANASTONE;
-					setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
-					setupExplain("Only your ultimate costs favor! The other spells are free!");
-					setupExplain("In fact, your basic spells generate favor when they hit enemies.");
+					
+					setupQuestion("You cannot cast spells when stunned.", "True", "False", 2);
+					setupExplain("You can still cast spells when stunned.");
 
-					setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
-					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
-						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
-					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
+					setupQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
+					setupExplain("Enemies cannot cast spells when stunned. In fact, you can interrupt an enemy's spell with a stun!");
+						
+					setupQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
+						"Reduces the duration of stuns on you by a percentage", 2);
+					setupExplain("Stun Resistance will reduce the duration of stuns on you. It stacks multiplicatively.");
+				}
+				case 2:
+				{
+					gem = SOULSTONE;
+					setupQuestion("Being poisoned prevents you from healing.", "True", "False", 1);
+					setupExplain("In addition to dealing damage over time, the poison status effect prevents you from healing.");
 
-					setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
-					setupExplain("Spell Power affects the healing and damage of your spells.");
+					setupQuestion("Spell Duration affects the duration of Stuns and Poisons that you inflict on enemies.",
+						"True", "False", 1);
+					setupExplain("Spell Duration does increase the duration of your Stuns and Poisons.");
+
+					setupQuestion("Spell Power affects the damage of Poisons that you inflict on enemies.",
+						"True", "False", 1);
+					setupExplain("Your poison damage is increased by Spell Power.");
+				}
+				case 3:
+				{
+					gem = MANASTONE;
+					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
+					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
+
+					setupQuestion("All players must be present to start the boss battle.","True","False",2);
+					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
+				}
+				case 4:
+				{
+					gem = SOULSTONE;
+					setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
+						"The poison damage adds up.","Only the strongest poison deals damage.",2);
+					setupQuestion("Only the strongest poison deals damage. Poison damage does not stack.");
+
+					setupQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
+					setupExplain("Some abilities will launch enemies. Launching an enemy into a wall will stun them!");
+				}
+				case 5:
+				{
+					gem = STARSTONE;
+					setupQuestion("Ultimate Cost Reduction does not work on toggled Ultimates","True","False",2);
+					setupExplain("Ultimate Cost Reduction will decrease the favor drain of toggled Ultimates.");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

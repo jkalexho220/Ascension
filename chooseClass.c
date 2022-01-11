@@ -172,7 +172,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Bonus: 0.1 x Attack for every meter traveled.";
+					msg = "Bonus: 0.1 x Attack for every meter traveled | Decay doubles when standing still";
 				}
 				case 3:
 				{
@@ -231,7 +231,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Gain spell lifesteal equal to your percentage of missing health.";
+					msg = "Passive: Gain Spell Lifesteal equal to your percentage of missing health.";
 				}
 				case 2:
 				{
@@ -293,17 +293,17 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					icon = "";
+					icon = "icons\improvement bite of the shark icons 64";
 					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage.";
 				}
 				case 4:
 				{
-					icon = "";
+					icon = "icons\improvement bite of the shark icons 64";
 					msg = "If this hits an enemy at full health, stun them.";
 				}
 				case 5:
 				{
-					icon = "";
+					icon = "icons\improvement bite of the shark icons 64";
 					msg = "Cooldown: 4 | Radius: 1.5 | Duration: 6 | Damage: 80";
 				}
 				case 6:
@@ -417,7 +417,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\god power shifting sand icon 64";
-					msg = "Cooldown: 8 | Radius: 4 | Range: 12";
+					msg = "Cooldown: 8 | Stun Radius: 4 | Teleport Range: 12";
 				}
 				case 6:
 				{
@@ -456,33 +456,38 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					icon = "icons\god power restoration icon 64";
-					msg = "Heal: When the potion is thrown, all allies restore 5 percent of their health";
+					icon = "icons\god power pestilence icon 64";
+					msg = "Damage: 12 | Duration: 12";
 				}
 				case 5:
 				{
-					icon = "icons\improvement temple of healing icon 64";
-					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
+					icon = "icons\god power restoration icon 64";
+					msg = "Heal: When the potion is thrown, all allies restore 5 percent of their health";
 				}
 				case 6:
 				{
 					icon = "icons\improvement temple of healing icon 64";
-					msg = "Cooldown: 12 | Heal: 200";
+					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
 				}
 				case 7:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "Cooldown: 12 | Heal: 200";
+				}
+				case 8:
 				{
 					icon = "icons\improvement salt amphora icon 64";
 					msg = "(W) Swap Potion: Swap the type of potion you throw, cycling between the three options.";
 				}
-				case 8:
+				case 9:
 				{
 					icon = "icons\god power call to arms icon";
 					msg = "(E) Duplicate: Summon a perfect copy of an allied hero. It also casts spells with them.";
 				}
-				case 9:
+				case 10:
 				{
 					icon = "icons\god power call to arms icon";
-					msg = "Cost: 50 | Decay: 1 + 1 per second";
+					msg = "Cost: 50 | Decay: 1 + 1 per second (percent max health)";
 					next = 0;
 				}
 			}

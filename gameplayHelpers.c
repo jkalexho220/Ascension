@@ -330,7 +330,7 @@ void processLaunchedUnit() {
 			if (yGetVar("launchedUnits", "stun") == 1) {
 				int index = yGetPointer(db);
 				if (ySetPointer(db, 1*yGetVar("launchedUnits", "index"))) {
-					stunUnit(db, 1.5);
+					stunUnit(db, 3.0);
 					ySetPointer(db, index);
 				}
 			}

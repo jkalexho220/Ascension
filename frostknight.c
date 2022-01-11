@@ -226,8 +226,13 @@ void frostknightAlways(int eventID = -1) {
 		yAddUpdateVar("playerUnits", "decay", calculateDecay(p, trQuestVarGet("frostGiantDecay")));
 		yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 		ySetPointer("p"+p+"frostGiants", yGetNewestPointer("p"+p+"frostGiants"));
-		spyEffect(1*trQuestVarGet("p"+p+"lureObject"),
-			kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"frostGiants", "blizzardSFX"));
+		if (trQuestVarGet("p"+p+"blizzard") == 0) {
+			spyEffect(1*trQuestVarGet("p"+p+"lureObject"),
+				kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"frostGiants", "blizzardSFX"));
+		} else {
+			spyEffect(1*trQuestVarGet("p"+p+"lureObject"),
+				kbGetProtoUnitID("Frost Drift"),yGetVarName("p"+p+"frostGiants", "blizzardSFX"));
+		}
 	}
 
 	if(yGetDatabaseCount("p"+p+"frostGiants") >0) {

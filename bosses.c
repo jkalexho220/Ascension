@@ -86,6 +86,16 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
 		xsDisableSelf();
+		int id = 0;
+		for(x=yGetDatabaseCount("playerUnits"); >0) {
+			id = yDatabaseNext("playerUnits", true);
+			if (id == -1 || trUnitAlive() == false) {
+				removePlayerUnit();
+			} else if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Villager Atlantean Hero")) {
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				removePlayerUnit();
+			}
+		}
 		trQuestVarSet("bossRelicCount", randomLow(2));
 		trQuestVarSet("normalRelicCount", 3 - trQuestVarGet("bossRelicCount"));
 		trQuestVarSet("gameOverStep", 0);
@@ -129,7 +139,6 @@ highFrequency
 			equipRelicsAgain(p);
 		}
 
-		int id = 0;
 		for(x=yGetDatabaseCount("enemies"); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id >= 0 && trUnitAlive()) {
@@ -224,7 +233,7 @@ highFrequency
 				ySetPointer("enemies", 1*trQuestVarGet("bossPointer"));
 				yRemoveFromDatabase("enemies");
 				trQuestVarSet("bossHealth", 100);
-				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100", -1);
+				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100</color>", -1);
 
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 0, 6391);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -2.8);
@@ -594,86 +603,6 @@ highFrequency
 	xsSetContextPlayer(old);
 }
 
-rule boss_ded
-inactive
-highFrequency
-{
-	if (trTime() > trQuestVarGet("gameOverNext")) {
-		int relic = 0;
-		trQuestVarSet("gameOverStep", 1 + trQuestVarGet("gameOverStep"));
-		switch(1*trQuestVarGet("gameOverStep"))
-		{
-			case 1:
-			{
-				trQuestVarSet("playersWon", 1);
-				trLetterBox(true);
-				trUIFadeToColor(0,0,0, 2000,0,true);
-				trQuestVarSet("gameOverNext", trTime() + 5);
-				trSoundPlayFN("default","1",-1,
-					"Zenophobia: Boss defeated! Here are the rewards!","icons\infantry g hoplite icon 64");
-			}
-			case 2:
-			{
-				trQuestVarSet("gameOverNext", trTime() + 3);
-				int gem = trQuestVarGet("bossGem");
-				trShowImageDialog(gemstoneIcon(gem), gemstoneName(gem) + " x" + 1*trQuestVarGet("bossGemCount"));
-				trQuestVarSet("gemstone"+gem, trQuestVarGet("bossGemCount") + trQuestVarGet("gemstone"+gem));
-				trSoundPlayFN("favordump.wav","1",-1,"","");
-			}
-			case 3:
-			{
-				trQuestVarSet("gameOverNext", trTime() + 3);
-				relic = randomStageClosest();
-				trShowImageDialog(relicIcon(relic), "Relic: " + relicName(relic));
-				trQuestVarSet("normalRelicCount", trQuestVarGet("normalRelicCount") - 1);
-				if (trQuestVarGet("normalRelicCount") > 0) {
-					trQuestVarSet("gameOverStep", 2);
-				}
-				trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
-				trSoundPlayFN("favordump.wav","1",-1,"","");
-			}
-			case 4:
-			{
-				trQuestVarSet("gameOverNext", trTime() + 3);
-				relic = randomStageClosest() + 10;
-				trShowImageDialog(relicIcon(relic), "Relic: " + relicName(relic));
-				trQuestVarSet("bossRelicCount", trQuestVarGet("bossRelicCount") - 1);
-				if (trQuestVarGet("bossRelicCount") > 0) {
-					trQuestVarSet("gameOverStep", 3);
-				}
-				trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
-				trSoundPlayFN("favordump.wav","1",-1,"","");
-			}
-			case 5:
-			{
-				if (trQuestVarGet("stage") < 10) {
-					int p = trCurrentPlayer();
-					if (trQuestVarGet("stage") == trQuestVarGet("p"+p+"progress")+1) {
-						trQuestVarSet("p"+p+"progress", trQuestVarGet("p"+p+"progress")+1);
-					}
-					int stage = 1 + trQuestVarGet("stage");
-					trShowImageDialog(stageIcon(stage), "Unlocked stage " + stage + ": " + stageName(stage) + "!");
-					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trQuestVarSet("gameOverNext", trTime() + 5);
-				}
-			}
-			case 6:
-			{
-				gadgetUnreal("ShowImageBox");
-				trQuestVarSet("gameOverNext", trTime() + 8);
-				trSoundPlayFN("default.wav","1",-1,
-					"Zenophobia: Rewards have been sent to your warehouse. You can access them by playing this map in singleplayer.",
-					"icons\infantry g hoplite icon 64");
-				trQuestVarSet("gameOverStep", 1);
-				xsDisableSelf();
-				xsEnableRule("game_over");
-				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));
-			}
-		}
-		gadgetUnreal("ShowImageBox-CloseButton");
-	}
-}
-
 
 rule boss2_battle
 inactive
@@ -717,7 +646,8 @@ highFrequency
 				trUnitSelectByQV("bossUnit");
 				trQuestVarSet("bossHealth", xsMin(100, trQuestVarGet("bossHealth") + 5));
 				trCounterAbort("bosshealth");
-				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth"), -1);
+				trCounterAddTime("bosshealth",-1,-9999,
+					"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth")+"</color>", -1);
 				trUnitHighlight(0.2,false);
 			} else {
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
@@ -867,7 +797,8 @@ highFrequency
 					trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, trQuestVarGet("bossCount"), true);
 				}
 				trCounterAbort("bosshealth");
-				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth"), -1);
+				trCounterAddTime("bosshealth",-1,-9999,
+					"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth")+"</color>", -1);
 			} else if (trQuestVarGet("bossSpell") == 42) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
 					trQuestVarSet("bossNext", trTimeMS() + 500);
@@ -1048,4 +979,85 @@ highFrequency
 		xsDisableRule("gameplay_always");
 	}
 	xsSetContextPlayer(old);
+}
+
+
+rule boss_ded
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("gameOverNext")) {
+		int relic = 0;
+		trQuestVarSet("gameOverStep", 1 + trQuestVarGet("gameOverStep"));
+		switch(1*trQuestVarGet("gameOverStep"))
+		{
+			case 1:
+			{
+				trQuestVarSet("playersWon", 1);
+				trLetterBox(true);
+				trUIFadeToColor(0,0,0, 2000,0,true);
+				trQuestVarSet("gameOverNext", trTime() + 5);
+				trSoundPlayFN("default","1",-1,
+					"Zenophobia: Boss defeated! Here are the rewards!","icons\infantry g hoplite icon 64");
+			}
+			case 2:
+			{
+				trQuestVarSet("gameOverNext", trTime() + 3);
+				int gem = trQuestVarGet("bossGem");
+				trShowImageDialog(gemstoneIcon(gem), gemstoneName(gem) + " x" + 1*trQuestVarGet("bossGemCount"));
+				trQuestVarSet("gemstone"+gem, trQuestVarGet("bossGemCount") + trQuestVarGet("gemstone"+gem));
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+			}
+			case 3:
+			{
+				trQuestVarSet("gameOverNext", trTime() + 3);
+				relic = randomStageClosest();
+				trShowImageDialog(relicIcon(relic), "Relic: " + relicName(relic));
+				trQuestVarSet("normalRelicCount", trQuestVarGet("normalRelicCount") - 1);
+				if (trQuestVarGet("normalRelicCount") > 0) {
+					trQuestVarSet("gameOverStep", 2);
+				}
+				trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+			}
+			case 4:
+			{
+				trQuestVarSet("gameOverNext", trTime() + 3);
+				relic = randomStageClosest() + 10;
+				trShowImageDialog(relicIcon(relic), "Relic: " + relicName(relic));
+				trQuestVarSet("bossRelicCount", trQuestVarGet("bossRelicCount") - 1);
+				if (trQuestVarGet("bossRelicCount") > 0) {
+					trQuestVarSet("gameOverStep", 3);
+				}
+				trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+			}
+			case 5:
+			{
+				if (trQuestVarGet("stage") < 10) {
+					int p = trCurrentPlayer();
+					if (trQuestVarGet("stage") == trQuestVarGet("p"+p+"progress")+1) {
+						trQuestVarSet("p"+p+"progress", trQuestVarGet("p"+p+"progress")+1);
+					}
+					int stage = 1 + trQuestVarGet("stage");
+					trShowImageDialog(stageIcon(stage), "Unlocked stage " + stage + ": " + stageName(stage) + "!");
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trQuestVarSet("gameOverNext", trTime() + 5);
+				}
+			}
+			case 6:
+			{
+				gadgetUnreal("ShowImageBox");
+				trQuestVarSet("gameOverNext", trTime() + 8);
+				trSoundPlayFN("default.wav","1",-1,
+					"Zenophobia: Rewards have been sent to your warehouse. You can access them by playing this map in singleplayer.",
+					"icons\infantry g hoplite icon 64");
+				trQuestVarSet("gameOverStep", 1);
+				xsDisableSelf();
+				xsEnableRule("game_over");
+				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));
+			}
+		}
+		gadgetUnreal("ShowImageBox-CloseButton");
+	}
 }

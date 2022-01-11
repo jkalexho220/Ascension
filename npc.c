@@ -1,7 +1,10 @@
 const int NPC_RELIC_TRANSPORTER = 0;
-const int NPC_EXPLAIN_SINGLEPLAYER = 1;
-const int NPC_ZENO_NEXT_QUESTION = 2;
-const int NPC_ZENO_QUIZ_END = 3;
+const int NPC_RELIC_TRANSPORTER_WTF = 1;
+
+const int NPC_EXPLAIN_SINGLEPLAYER = 2;
+
+const int NPC_ZENO_NEXT_QUESTION = 3;
+const int NPC_ZENO_QUIZ_END = 4;
 
 void startNPCDialog(int npc = 0) {
 	xsEnableRule("npc_talk_01");
@@ -20,20 +23,31 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Greetings! I am the Relic Transporter!");
+					uiMessageBox("Relic Carrying Company, at your service! You can hire me for just 100 gold!");
 				}
 				case 2:
 				{
-					uiMessageBox("Drop a relic in front of me and I will teleport it to your warehouse for 25 gold.");
+					uiMessageBox("I can carry up to "+(3+trQuestVarGet("p"+trCurrentPlayer()+"transporterLevel"))+" relics.");
 				}
 				case 3:
 				{
+					uiMessageBox("When you clear this floor, any relics I carry will be sent to your warehouse.");
+				}
+				case 4:
+				{
 					uiMessageBox("You can visit your warehouse by playing this map in singleplayer.");
 				}
+				case 5:
+				{
+					uiMessageBox("To hire me, simply drop a relic next to me. I will charge you 100 gold. (The relic will be re-equipped)");
+					dialog = -1;
+				}
 			}
-			if (dialog == 4) {
-				dialog = -1;
-			}
+		}
+		case NPC_RELIC_TRANSPORTER_WTF:
+		{
+			dialog = -1;
+			uiMessageBox("You want to hire another? What happened to the last guy?!");
 		}
 		case NPC_EXPLAIN_SINGLEPLAYER:
 		{
@@ -155,7 +169,12 @@ highFrequency
 	trUnitSelectByQV("relicTransporterGuyName");
 	if (trUnitIsSelected()) {
 		trUnitHighlight(5.0, true);
-		startNPCDialog(NPC_RELIC_TRANSPORTER);
+		int p = trCurrentPlayer();
+		if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
+			startNPCDialog(NPC_RELIC_TRANSPORTER);
+		} else {
+			startNPCDialog(NPC_RELIC_TRANSPORTER_WTF);
+		}
 		reselectMyself();
 	}
 }

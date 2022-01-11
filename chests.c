@@ -25,7 +25,7 @@ void processChests() {
     		trUnitSetAnimationPath("0,0,0,0,0,0,0");
     	} else {
     		trVectorSetUnitPos("pos", "rainingRelics");
-    		if (trQuestVarGet("posY") <= 0) {
+    		if (trQuestVarGet("posY") <= worldHeight + 0.3) {
     			trUnitChangeProtoUnit("Relic");
     			trUnitSelectClear();
     			trUnitSelectByQV("rainingRelics", true);
@@ -176,6 +176,7 @@ void processChests() {
 	    			if (yGetVar("chests", "count") == 0) {
 	    				removeChest();
 	    			} else {
+	    				trSoundPlayFN("tributereceived.wav","1",-1,"","");
 	    				ySetVar("chests", "next", trTimeMS() + 500);
 	    				trVectorSetUnitPos("pos", "chests");
 			    		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());

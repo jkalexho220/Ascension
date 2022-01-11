@@ -315,7 +315,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
             paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
             trVectorQuestVarSet("startPosition", xsVectorSet(x*70 + 40,0,z*70+40));
-            if (trQuestVarGet("stage") < 5) {
+            if (trQuestVarGet("newPlayers") > 0) {
                 trVectorQuestVarSet("choice1", xsVectorSet(x*70+48,0,z*70+54));
                 trVectorQuestVarSet("choice2", xsVectorSet(x*70+54,0,z*70+48));
                 trQuestVarSet("choice1unit", trGetNextUnitScenarioNameNumber());
