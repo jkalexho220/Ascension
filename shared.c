@@ -234,6 +234,10 @@ vector crossProduct(string a = "", string b = "") {
 	return(ret);
 }
 
+float dotProduct(string a = "", string b = "") {
+	return(trQuestVarGet(a+"x") * trQuestVarGet(b+"x") + trQuestVarGet(a+"z") * trQuestVarGet(b+"z"));
+}
+
 bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
 	bool isType = trGetTerrainType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == type;
 	isType = trGetTerrainSubType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == subtype;
@@ -293,245 +297,155 @@ int peekModularCounterNext(string name = "") {
 	return(0 + trQuestVarGet("counter" + name + "fake"));
 }
 
-/* 
-Initializes a database of units given a starting value and length. 
-Units are selected using trUnitSelectByID, which is O(1), as opposed
-to trUnitSelect, which is O(n).
-Variables are associated with the unit value rather than the index in
-the database.
-This database is meant to be static. No adding or removing is supported.
-This allows faster access of units and variables and less memory consumed.
-*/
-void zBankInit(string name = "", int start = 0, int length = 0) {
-	trQuestVarSet("z"+name+"start", start);
-	trQuestVarSet("z"+name+"end", start + length);
-	trQuestVarSet("z"+name+"pointer", start);
-	trQuestVarSet(name, start);
+
+float yGetVarAtIndex(string db = "", string var = "", int index = 0) {
+	return(trQuestVarGet("xdata"+db+index+var));
 }
 
-/* Gets the next unit in the bank. */
-int zBankNext(string name = "", bool select = false) {
-	trQuestVarSet("z"+name+"pointer", trQuestVarGet("z"+name+"pointer") + 1);
-	if (trQuestVarGet("z"+name+"pointer") >= trQuestVarGet("z"+name+"end")) {
-		trQuestVarSet("z"+name+"pointer", trQuestVarGet("z"+name+"start"));
+float yGetVar(string db = "", string var = "") {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	return(trQuestVarGet("xdata"+db+index+var));
+}
+
+string yGetVarName(string db = "", string var = "") {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	return("xdata"+db+index+var);
+}
+
+float ySetVarAtIndex(string db = "", string var = "", float val = 0, int index = 0) {
+	trQuestVarSet("xdata"+db+index+var, val);
+}
+
+float ySetVar(string db = "", string var = "", float val = 0) {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	ySetVarAtIndex(db, var, val, index);
+}
+
+int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
+	int index = yGetVar(db, "xNextBlock");
+	if (reverse) {
+		index = yGetVar(db, "xPrevBlock");
 	}
-	trQuestVarSet(name, trQuestVarGet("z"+name+"pointer"));
-	if (select) {
-		trUnitSelectClear();
-		trUnitSelectByID(1*trQuestVarGet(name));
-	}
-	return(1*trQuestVarGet(name));
-}
-
-/* Sets the variable of the currently selected bank item */
-void zSetVar(string name = "", string var = "", float val = 0) {
-	int index = trQuestVarGet(name);
-	trQuestVarSet("z"+name+"i"+index+"v"+var, val);
-}
-
-/* Sets the variable of the bank item specified by index */
-void zSetVarByIndex(string name = "", string var = "", int index = 0, float val = 0) {
-	trQuestVarSet("z"+name+"i"+index+"v"+var, val);
-}
-
-/* Gets the variable of the currently selected bank item */
-float zGetVar(string name = "", string var = "") {
-	int index = trQuestVarGet(name);
-	return(trQuestVarGet("z"+name+"i"+index+"v"+var));
-}
-
-/* Gets the variable of the bank item given by index */
-float zGetVarByIndex(string name = "", string var = "", int index = 0) {
-	return(trQuestVarGet("z"+name+"i"+index+"v"+var));	
-}
-
-int zGetBankCount(string name = "") {
-	return(trQuestVarGet("z"+name+"end") - trQuestVarGet("z"+name+"start"));
-}
-
-/* Adds a unit specified by the quest var 'from' to the database 'to' */
-void yAddToDatabase(string to = "", string from = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + to + "count");
-   	trQuestVarSet("zdatalite" + to + "index"+zdatacount, trQuestVarGet(from));
-   	trQuestVarSet("zdatalite" + to + "count", zdatacount+1);
-}
-
-int yGetDatabaseCount(string db = "") {
-	return(trQuestVarGet("zdatalite" + db + "count"));
-}
-
-/*
-Gets the next unit in the database 'db'. Variables are associated with the
-database index rather than the value.
-*/
-int yDatabaseNext(string db = "", bool select = false, int pointer = 0) {
-	for(zdatapointer=0;>1){}
-	trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "pointer"+pointer)-1);
-	if (0 > trQuestVarGet("zdatalite" + db + "pointer"+pointer)) {
-		trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "count")-1);
-	}
-	if (trQuestVarGet("zdatalite" + db + "pointer"+pointer) >= trQuestVarGet("zdatalite" + db + "count")) {
-		trQuestVarSet("zdatalite" + db + "pointer"+pointer, trQuestVarGet("zdatalite" + db + "count")-1);
-	}
-	zdatapointer = trQuestVarGet("zdatalite" + db + "pointer"+pointer);
-	trQuestVarSet(db, trQuestVarGet("zdatalite" + db + "index"+zdatapointer));
-	trQuestVarSet("zdatalite"+db+"pointer", zdatapointer);
-	if (select) {
-		trUnitSelectClear();
-		trUnitSelect(""+1*trQuestVarGet(db), true);
-		return(kbGetBlockID(""+1*trQuestVarGet(db), true));
-	}
-	return(trQuestVarGet(db));
-}
-
-void yDatabaseSelectAll(string db = "") {
-	trUnitSelectClear();
-	for(zdatapointer=0; <yGetDatabaseCount(db)) {
-		trUnitSelect(""+1*trQuestVarGet("zdatalite"+db+"index"+zdatapointer), true);
-	}
-}
-
-bool yDatabaseContains(string db = "", int index = 0) {
-	for (x=yGetDatabaseCount(db) - 1; >=0) {
-		if (xsRound(trQuestVarGet("zdatalite" + db + "index" + x)) == index) {
-			trQuestVarSet("zdatalite" + db + "pointer", x);
-			trQuestVarSet(db, index);
-			trUnitSelectClear();
-			trUnitSelect(""+index, true);
-			return(true);
+	if (yGetVar(db, "xActive") == 0) {
+		if (trCurrentPlayer() == 1) {
+			trSoundPlayFN("attackwarning.wav","1",-1,"","");
+			trChatSend(0, "<color=1,0,0>"+db+" is pointing to something wrong!");
 		}
 	}
-	return(false);
+	trQuestVarSet("xdata"+db+"pointer", index);
+	int u = trQuestVarGet("xdata"+db+"index"+index);
+	trQuestVarSet(db, u);
+	if (select) {
+		trUnitSelectClear();
+		trUnitSelect(""+u, true);
+		return(kbGetBlockID(""+u, true));
+	} else {
+		return(trQuestVarGet(db));
+	}
 }
 
-
-void yDatabasePointerDefault(string db = "", int pointer = 0) {
-	trQuestVarSet("zdatalite" + db + "pointer"+pointer, 0);
-}
-
-/*
-When something is removed from the database, we simply swap it with
-the last item in the array and decrease count by 1. However, the variables
-are associated by index, so we must call yRemoveUpdateVar afterwards for each
-variable associated in this database.
-*/
 void yRemoveFromDatabase(string db = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count") - 1;
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
-	trQuestVarSet("zdatalite" + db + "index"+zdataremove, 
-		trQuestVarGet("zdatalite" + db + "index"+zdatacount));
-	trQuestVarSet("zdatalite" + db + "count", zdatacount);
-}
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	if (yGetVar(db, "xActive") == 1) {
+		/* connect next with prev */
+		ySetVarAtIndex(db, "xNextBlock", yGetVar(db, "xNextBlock"), 1*yGetVar(db, "xPrevBlock"));
+		ySetVarAtIndex(db, "xPrevBlock", yGetVar(db, "xPrevBlock"), 1*yGetVar(db, "xNextBlock"));
+		
+		ySetVar(db, "xNextBlock", trQuestVarGet("xdata"+db+"nextFree"));
+		ySetVar(db, "xActive", 0);
+		trQuestVarSet("xdata"+db+"nextFree", index);
 
-void yRemoveUpdateString(string db = "", string attr = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count");
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
-	trStringQuestVarSet("zdatalite" + db + "" + zdataremove + "" + attr, 
-		trStringQuestVarGet("zdatalite" + db + "" + zdatacount + "" + attr));
-	trStringQuestVarSet("zdatalite" + db + "" + zdatacount + "" + attr, " ");
+		trQuestVarSet("xdata"+db+"pointer", yGetVar(db, "xPrevBlock"));
+		trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") - 1);
+	}
 }
 
 void yRemoveUpdateVar(string db = "", string attr = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count");
-	int zdataremove = trQuestVarGet("zdatalite" + db + "pointer");
-	trQuestVarSet("zdatalite" + db + "" + zdataremove + "" + attr, 
-		trQuestVarGet("zdatalite" + db + "" + zdatacount + "" + attr));
-	trQuestVarSet("zdatalite" + db + "" + zdatacount + "" + attr, 0);
+	int index = trQuestVarGet("xdata"+db+"nextFree");
+	ySetVarAtIndex(db, attr, 0, index);
 }
 
-void yRemoveAllCopies(string db = "", int val = 0) {
-	int data = 0;
-	for(x=yGetDatabaseCount(db); >0) {
-		data = yDatabaseNext(db, false, 999);
-		if (data == val) {
-			yRemoveFromDatabase(db);
-		}
+int yAddToDatabase(string db = "", string val = "") {
+	int next = trQuestVarGet("xdata"+db+"nextFree");
+	if (next == 0) {
+		next = 1 + trQuestVarGet("xdata"+db+"total");
+		trQuestVarSet("xdata"+db+"total", next);
+	} else {
+		trQuestVarSet("xdata"+db+"nextFree", yGetVarAtIndex(db, "xNextBlock", next));
 	}
+	trQuestVarSet("xdata"+db+"index"+next, trQuestVarGet(val));
+	ySetVarAtIndex(db, "xActive", 1, next);
+	if (trQuestVarGet("xdata"+db+"count") == 0) {
+		ySetVarAtIndex(db, "xNextBlock", next, next);
+		ySetVarAtIndex(db, "xPrevBlock", next, next);
+		trQuestVarSet("xdata"+db+"pointer", next);
+	} else {
+		int index = trQuestVarGet("xdata"+db+"pointer");
+		ySetVarAtIndex(db, "xNextBlock", yGetVarAtIndex(db, "xNextBlock", index), next);
+		ySetVarAtIndex(db, "xPrevBlock", index, next);
+		ySetVarAtIndex(db, "xNextBlock", next, index);
+		ySetVarAtIndex(db, "xPrevBlock", next, 1*yGetVarAtIndex(db, "xNextBlock", next));
+	}
+	trQuestVarSet("xdata"+db+"newest", next);
+	trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") + 1);
+	return(next);
 }
 
-void yTransferUpdateVar(string to = "", string from = "", string attr = "") {
-	int zdatato = trQuestVarGet("zdatalite" + to + "count") - 1;
-	int zdatafrom = trQuestVarGet("zdatalite" + from + "pointer");
-	trQuestVarSet("zdatalite" + to + ""  + zdatato + "" + attr, 
-		trQuestVarGet("zdatalite" + from + ""  + zdatafrom + "" + attr));
+int yGetNewestPointer(string db = "") {
+	return(1*trQuestVarGet("xdata"+db+"newest"));
 }
 
-void yTransferUpdateString(string to = "", string from = "", string attr = "") {
-	int zdatato = trQuestVarGet("zdatalite" + to + "count") - 1;
-	int zdatafrom = trQuestVarGet("zdatalite" + from + "pointer");
-	trStringQuestVarSet("zdatalite" + to + ""  + zdatato + "" + attr, 
-		trStringQuestVarGet("zdatalite" + from + ""  + zdatafrom + "" + attr));
+void yAddUpdateVar(string db = "", string var = "", float val = 0) {
+	ySetVarAtIndex(db, var, val, 1*trQuestVarGet("xdata"+db+"newest"));
 }
 
-void yAddUpdateString(string db = "", string attr = "", string value = "") {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count") - 1;
-	trStringQuestVarSet("zdatalite" + db + zdatacount + attr, value);
-}
-
-void yAddUpdateVar(string db = "", string attr = "", float value = 0.0) {
-	int zdatacount = trQuestVarGet("zdatalite" + db + "count") - 1;
-	trQuestVarSet("zdatalite" + db + zdatacount + attr, value);
-}
-
-string yGetString(string db = "", string attr = "") {
-	int zdatapointer = trQuestVarGet("zdatalite" + db + "pointer");
-	return(trStringQuestVarGet("zdatalite" + db + zdatapointer + attr));
-}
-
-float yGetVar(string db = "", string attr = "") {
-	int zdatapointer = trQuestVarGet("zdatalite" + db + "pointer");
-	return(trQuestVarGet("zdatalite" + db + "" + zdatapointer + "" + attr));
-}
-
-string yGetStringByIndex(string db = "", string attr = "", int index = 0) {
-	return(trStringQuestVarGet("zdatalite" + db + "" + index + "" + attr));
-}
-
-float yGetVarByIndex(string db = "", string attr = "", int index = 0) {
-	return(trQuestVarGet("zdatalite" + db + "" + index + "" + attr));
-}
-
-void ySetString(string db = "", string attr = "", string value = "") {
-	int zdatapointer = trQuestVarGet("zdatalite" + db + "pointer");
-	trStringQuestVarSet("zdatalite" + db + "" + zdatapointer + "" + attr, value);
-}
-
-void ySetVar(string db = "", string attr = "", float value = 0.0) {
-	int zdatapointer = trQuestVarGet("zdatalite" + db + "pointer");
-	trQuestVarSet("zdatalite" + db + "" + zdatapointer + "" + attr, value);
-}
-
-void ySetStringByIndex(string db = "", string attr = "", int index = 0, string value = "") {
-	trStringQuestVarSet("zdatalite" + db + "" + index + "" + attr, value);
-}
-
-void ySetVarByIndex(string db = "", string attr = "", int index = 0, float value = 0.0) {
-	trQuestVarSet("zdatalite" + db + "" + index + "" + attr, value);
+int yGetDatabaseCount(string db = "") {
+	return(1*trQuestVarGet("xdata"+db+"count"));
 }
 
 int yGetUnitAtIndex(string db = "", int index = 0) {
-	return(trQuestVarGet("zdatalite"+db+"index"+index));
+	return(trQuestVarGet("xdata"+db+"index"+index));
 }
 
-int ySetUnitAtIndex(string db = "", int index = 0, int value = 0) {
-	trQuestVarSet("zdatalite"+db+"index"+index, value);
+void ySetUnitAtIndex(string db = "", int index = 0, int value = 0) {
+	trQuestVarSet("xdata"+db+"index"+index, value);
+}
+
+void ySetUnit(string db = "", int value = 0) {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	ySetUnitAtIndex(db, index, value);
 }
 
 int yGetPointer(string db = "") {
-	return(trQuestVarGet("zdatalite"+db+"pointer"));
+	return(trQuestVarGet("xdata"+db+"pointer"));
 }
 
-void ySetPointer(string db = "", int val = 0) {
-	trQuestVarSet("zdatalite"+db+"pointer", val);
-	trQuestVarSet(db, trQuestVarGet("zdatalite" + db + "index"+val));
+bool ySetPointer(string db = "", int index = 0) {
+	bool safe = (yGetVarAtIndex(db, "xActive", index) == 1);
+	if (safe) {
+		trQuestVarSet("xdata"+db+"pointer", index);
+		trQuestVarSet(db, trQuestVarGet("xdata"+db+"index"+index));
+	}
+	return(safe);
 }
 
 void yClearDatabase(string db = "") {
-	trQuestVarSet("zdatalite" + db + "count", 0);
-	trQuestVarSet("zdatalite" + db + "pointer", 0);
-	trQuestVarSet(db, 0);
+	int index = trQuestVarGet("xdata"+db+"nextFree");
+	trQuestVarSet("xdata"+db+"nextFree", yGetVar(db, "xNextBlock"));
+	ySetVar(db, "xNextBlock", index);
+	trQuestVarSet("xdata"+db+"count", 0);
+	trQuestVarSet("xdata"+db+"pointer", 0);
 }
 
+void yVarToVector(string db = "", string v = "") {
+	trQuestVarSet(v+"x", yGetVar(db, v + "x"));
+	trQuestVarSet(v+"z", yGetVar(db, v + "z"));
+}
+
+void ySetVarFromVector(string db = "", string attr = "", string v = "") {
+	ySetVar(db, attr+"x", trQuestVarGet(v+"x"));
+	ySetVar(db, attr+"z", trQuestVarGet(v+"z"));
+}
 
 /* 
 Starting from NextUnitScenarioNameNumber and going backwards until the quest var 'qv',

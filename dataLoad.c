@@ -1,51 +1,215 @@
 /*
-0 = attack + special attack element * 6
-1 = Q + W * 6
-2 = E + R * 6
-3 = artifact1
-4 = artifact2
-5 = artifact3
-6 = artifact4
-7 = artifact5
-8 = class + progress
+progress
+0 = stage progress
+1 = current class level
+2 = current class
+3-4 = gold
+5-14 = equipped artifacts
+15-16 = unlocked classes
+
+data at 13, 14, 15 is unlocked relic data
 */
+int loadProgress = 0;
+int savedata = 0;
+int currentdata = 0;
 
-const int SLINGER = 0;
-const int ARCUS = 1;
-const int TURMA = 2;
-const int AXEMAN = 3;
+void saveAllData() {
+	int p = trCurrentPlayer();
+	int relic = 0;
+	/* relic transporter guy */
+	for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
+		yDatabaseNext("p"+p+"warehouse");
+		relic = yGetVar("p"+p+"warehouse", "type");
+		trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
+	}
+	/* slot 0 */
+	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
+	savedata = savedata + 100 * trQuestVarGet("p"+p+"transporterLevel") + 1000 * trQuestVarGet("p"+p+"class");
+	trSetCurrentScenarioUserData(0, savedata);
+	/* gold */
+	savedata = trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	savedata = savedata + trGetScenarioUserData(1);
+	trSetCurrentScenarioUserData(1, savedata);
+	/* current relics */
+	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+		yDatabaseNext("p"+p+"relics");
+		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+		}
+	}
+	/* equipped relics */
+	savedata = 0;
+	currentdata = 0;
+	for(x=5; > 0) {
+		savedata = savedata * 32 + (1*trQuestVarGet("p"+p+"relic"+x));
+		currentdata = currentdata * 32 + (1*trQuestVarGet("p"+p+"relic"+(x+5)));
+	}
+	trSetCurrentScenarioUserData(2, savedata);
+	trSetCurrentScenarioUserData(3, currentdata);
 
-int progress = 0;
+	/* owned relics */
+	for(y=0; < 4) {
+		savedata = 0;
+		for(x=8; >0) {
+			currentdata = 1*xsMin(10, 1*trQuestVarGet("ownedRelics"+(x+8*y)));
+			savedata = savedata * 11 + currentdata;
+		}
+		trSetCurrentScenarioUserData(12 + y, savedata);
+	}
+
+	/* gemstones */
+	savedata = 0;
+	for(x=3; >=0) {
+		currentdata = 1*xsMin(100, 1*trQuestVarGet("gemstone"+x));
+		savedata = savedata * 100 + currentdata;
+	}
+	trSetCurrentScenarioUserData(9, savedata);
+
+	if (Multiplayer == false) {
+		/* class levels */
+		for(y=0; <2) {
+			savedata = 0;
+			for(x=8; >0) {
+				currentdata = 1*xsMin(10, 1*trQuestVarGet("class"+(x+8*y)+"level"));
+				savedata = savedata * 11 + currentdata;
+			}
+			trSetCurrentScenarioUserData(10 + y, savedata);
+		}
+	}
+
+	/* class unlock progress */
+	savedata = 0;
+	currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
+	savedata = savedata * 10 + currentdata;
+	currentdata = xsMin(10, trQuestVarGet("questCount"));
+	savedata = savedata * 11 + currentdata;
+	currentdata = xsMin(100, trQuestVarGet("giantKills"));
+	savedata = savedata * 101 + currentdata;
+	currentdata = xsMin(5, trQuestVarGet("bossKills"));
+	savedata = savedata * 6 + currentdata;
+	currentdata = trQuestVarGet("playerHasHosted");
+	savedata = savedata * 2 + trQuestVarGet("playerHasHosted");
+	trSetCurrentScenarioUserData(8, savedata);
+}
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * progress / 9,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 16,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
 highFrequency
 inactive
 {
+	int proto = 0;
+	/* only the local client needs this info */
+	/* owned relics */
+	for(y=0; < 4) {
+		savedata = trGetScenarioUserData(12 + y);
+		if (savedata < 0) {
+			savedata = 0;
+		}
+		for(x=1; < 9) {
+			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
+			savedata = savedata / 11;
+		}
+	}
+	/* gemstones */
+	savedata = trGetScenarioUserData(9);
+	if (savedata < 0) {
+		savedata = 0;
+	}
+	for(x=0; <4) {
+		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
+		savedata = savedata / 100;
+	}
+	/* class unlock progress */
+	savedata = trGetScenarioUserData(8);
+	if (savedata < 0) {
+		savedata = 0;
+	}
+	trQuestVarSet("playerHasHosted", iModulo(2, savedata));
+	savedata = savedata / 2;
+	trQuestVarSet("bossKills", iModulo(6, savedata));
+	savedata = savedata / 6;
+	trQuestVarSet("giantKills", iModulo(101, savedata));
+	savedata = savedata / 101;
+	trQuestVarSet("questCount", iModulo(11, savedata));
+	savedata = savedata / 11;
+	trQuestVarSet("zenoQuiz", iModulo(10, savedata));
+	savedata = savedata / 10;
+
+	if ((trCurrentPlayer() == 1) && Multiplayer) {
+		trQuestVarSet("playerHasHosted", 1);
+	}
+
 	if (Multiplayer) {
-		trSoundPlayFN("default","1",-1,"Loading:","icons\god power reverse time icons 64");
 
 		int posX = 10;
 		
 		for(p=1; < ENEMY_PLAYER) {
 			trModifyProtounit("Swordsman Hero", p, 6, -100);
-			trModifyProtounit("Swordsman Hero", p, 16, -1000);
-			trModifyProtounit("Swordsman Hero", p, 17, -1000);
-			trModifyProtounit("Swordsman Hero", p, 18, -1000);
-			trModifyProtounit("Swordsman Hero", p, 19, -1000);
-			trArmyDispatch(""+p+",0","Swordsman", 36, posX,0,10,0,true);
+			trModifyProtounit("Swordsman Hero", p, 16, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 17, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 18, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 19, 9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 16, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 17, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 18, -9999999999999999999.0);
+			trModifyProtounit("Swordsman Hero", p, 19, -9999999999999999999.0);
+			trArmyDispatch(""+p+",0","Swordsman", 32, posX,0,10,0,true);
+			posX = posX + 10;
 		}
 		
 		trBlockAllSounds(true);
 		xsEnableRule("data_load_01_ready");
 	} else {
-		for(p=1; < ENEMY_PLAYER) {
-			trForbidProtounit(p, "Swordsman Hero");
+		trForbidProtounit(1, "Swordsman Hero");
+
+		/* progress, level, class */
+		savedata = trGetScenarioUserData(0);
+		if (savedata < 0) {
+			savedata = 0;
 		}
-		trLetterBox(false);
+		trQuestVarSet("p1progress", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1level", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1transporterLevel", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1class", iModulo(100, savedata));
+
+		/* gold */
+		savedata = trGetScenarioUserData(1);
+		if (savedata < 0) {
+			savedata = 0;
+		}
+		trQuestVarSet("p1gold", savedata);
+
+		/* equipped relics */
+		for(y=0; <2) {
+			savedata = trGetScenarioUserData(2 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
+			for(x=1; <6) {
+				trQuestVarSet("p1relic"+(x+5*y), iModulo(32, savedata));
+				savedata = savedata / 32;
+			}
+		}
+
+		/* class levels */
+		for(y=0; <2) {
+			savedata = trGetScenarioUserData(10 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
+			for(x=1; <9) {
+				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
+				savedata = savedata / 11;
+			}
+		}
+
+		xsEnableRule("singleplayer_init");
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game
@@ -62,14 +226,21 @@ highFrequency
 inactive
 {
 	int swordsmen = 0;
-	int total = 36 * (cNumberPlayers - 2);
+	int total = 32 * (cNumberPlayers - 2);
 	for(p=1; < ENEMY_PLAYER) {
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman");
 	}
 	if (swordsmen == total) {
+		savedata = trGetScenarioUserData(0);
+		if (savedata < 0) {
+			savedata = 0;
+		}
+		currentdata = iModulo(10, savedata);
+		savedata = savedata / 10;
+
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
-		trQuestVarSet("myGold", trGetScenarioUserData(9));
+		xsEnableRule("data_load_emergency_exit");
 		xsDisableSelf();
 	}
 }
@@ -83,25 +254,23 @@ inactive
 {
 	trLetterBox(false);
 	trBlockAllSounds(true);
-	int c = trGetScenarioUserData(progress);
-	if (c >= 36) {
-		trSoundPlayFN("cantdothat.wav","1",-1,"Invalid code at " + progress + "!","");
+	if (currentdata >= 32) {
+		trSoundPlayFN("cantdothat.wav","1",-1,"Invalid code at " + loadProgress + "!","");
 	}
-	c = c + 36 * (trCurrentPlayer() - 1);
-	trChatSend(0, "Class data: " + c);
 	trUnitSelectClear();
-	trUnitSelectByID(c);
-	for(i=36; >0) {
+	trUnitSelectByID(currentdata + 32 * (trCurrentPlayer() - 1));
+	for(i=32; >0) {
 		if (trUnitIsSelected() == false) {
 			uiFindType("Swordsman");
 		} else {
-			trChatSend(0, "Found!");
 			break;
 		}
 	}
 	uiTransformSelectedUnit("Swordsman Hero");
 	trForceNonCinematicModels(true);
+	
 	trLetterBox(true);
+
 	showLoadProgress();
 	xsDisableSelf();
 }
@@ -119,37 +288,73 @@ inactive
 	}
 	if (swordsmen == cNumberPlayers - 2) {
 		for(p=1; < ENEMY_PLAYER) {
-			for(x=0; < 36 * p) {
-				if (kbGetUnitBaseTypeID(x) == kbGetProtoUnitID("Swordsman Hero")) {
-					if (progress <= 2) {
-						/*
-						Loading elements
-						*/
-						trQuestVarSet("p"+p+"element" + (2 * progress), iModulo(6, x));
-						trQuestVarSet("p"+p+"element" + (2 * progress + 1), x / 6);
-					} else if (progress == 8) {
-						trQuestVarSet("p"+p+"class", iModulo(4, x));
-						trQuestVarSet("p"+p+"progress", x / 4);
-					} else {
-						/*
-						Loading artifacts
-						*/
-						trQuestVarSet("p"+p+"artifact" + (progress - 2), x);
+			swordsmen = 32 * (p - 1);
+			for(x=0; < 32) {
+				if (kbGetUnitBaseTypeID(x + swordsmen) == kbGetProtoUnitID("Swordsman Hero")) {
+					/* read the data */
+					if (loadProgress == 0) {
+						trQuestVarSet("p"+p+"progress", x);
+					} else if (loadProgress == 1) {
+						trQuestVarSet("p"+p+"level", x);
+					} else if (loadProgress == 2) {
+						trQuestVarSet("p"+p+"transporterLevel", x);
+					} else if (loadProgress == 3) {
+						trQuestVarSet("p"+p+"class", x);
+					} else if (loadProgress == 4) {
+						trQuestVarSet("p"+p+"gold", x);
+					} else if (loadProgress == 5) {
+						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
+					} else if (loadProgress < 16) {
+						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
 					}
 					trUnitSelectClear();
-					trUnitSelectByID(x);
+					trUnitSelectByID(x + swordsmen);
 					trMutateSelected(kbGetProtoUnitID("Swordsman"));
 					break;
 				}
 			}
 		}
-		progress = progress + 1;
+		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (progress == 9) {
+		if (loadProgress == 16) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
+			/* prepare the next data */
 			xsEnableRule("data_load_01_load_data");
+			switch(loadProgress)
+			{
+				case 4:
+				{
+					savedata = trGetScenarioUserData(1);
+					if (savedata < 0) {
+						savedata = 0;
+					} else if (savedata > 1000) {
+						savedata = 1000;
+					}
+				}
+				case 6:
+				{
+					savedata = trGetScenarioUserData(2);
+					if (savedata < 0) {
+						savedata = 0;
+					}
+				}
+				case 11:
+				{
+					savedata = trGetScenarioUserData(3);
+					if (savedata < 0) {
+						savedata = 0;
+					}
+				}
+			}
+			if (loadProgress >=3) {
+				currentdata = iModulo(32, savedata);
+				savedata = savedata / 32;
+			} else {
+				currentdata = iModulo(10, savedata);
+				savedata = savedata / 10;
+			}
 		}
 	}
 }
@@ -169,75 +374,74 @@ inactive
 	}
 	/*
 	Deploy victory markers to avoid defeats
+	modify class hold capacity
 	*/
+	int class = 0;
+	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
+		trModifyProtounit("Villager Atlantean Hero", p, 5, trQuestVarGet("p"+p+"transporterLevel"));
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
-
-		switch(1*trQuestVarGet("p"+p+"element0"))
-		{
-			case NONE:
-			{
-				trQuestVarSet("p"+p+"attack", 60);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
-			case FIRE:
-			{
-				trQuestVarSet("p"+p+"attack", 100);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
-			case ICE:
-			{
-				trQuestVarSet("p"+p+"attack", 50);
-				trModifyProtounit("Wadjet Spit", p, 1, -15);
-			}
-			case THUNDER:
-			{
-				trQuestVarSet("p"+p+"attack", 20);
-				trModifyProtounit("Wadjet Spit", p, 1, -20);
-			}
-			case LIGHT:
-			{
-				trQuestVarSet("p"+p+"attack", 50);
-			}
-			case DARK:
-			{
-				trQuestVarSet("p"+p+"attack", 0);
-				trModifyProtounit("Wadjet Spit", p, 1, -10);
-			}
+		class = trQuestVarGet("p"+p+"class");
+		proto = trQuestVarGet("class"+class+"proto");
+		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"level"));
+		if (trQuestVarGet("p"+p+"class") == 0) {
+			trQuestVarSet("newPlayers", 1);
+			trQuestVarSet("p"+p+"noob", 1);
 		}
-
-		switch(1*trQuestVarGet("p"+p+"element1"))
-		{
-			case NONE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 4);
-			}
-			case FIRE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 5);
-			}
-			case ICE:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
-			}
-			case THUNDER:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 6);
-			}
-			case LIGHT:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 8);
-			}
-			case DARK:
-			{
-				trQuestVarSet("p"+p+"specialAttackCooldown", 10);
-			}
-		}
+		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");
 	xsDisableSelf();
 	xsEnableRule("Z_cin_00");
+}
+
+rule data_load_emergency_exit
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 8) {
+		xsDisableSelf();
+		if (loadProgress == 0) {
+			int x = 0;
+			for(p=1; < ENEMY_PLAYER) {
+				x = x + trPlayerUnitCountSpecific(p, "Swordsman Hero");
+			}
+			if (x <= 1) {
+				trSoundPlayFN("default","1",-1,
+					"Zenophobia: Hmm, looks like AoM has sent everyone into singleplayer. Returning you to main menu now.",
+					"icons\infantry g hoplite icon 64");
+				if (trCurrentPlayer() == 1) {
+					xsEnableRule("data_load_emergency_exit_01");
+				} else {
+					xsEnableRule("data_load_emergency_exit_02");
+				}
+			}
+		}
+	}	
+}
+
+rule data_load_emergency_exit_01
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 5) {
+		xsDisableSelf();
+		xsEnableRule("data_load_emergency_exit_02");
+		trSoundPlayFN("default","1",-1,
+					"Zenophobia:Host, make sure all spots are filled and the last player is a CPU.",
+					"icons\infantry g hoplite icon 64");
+	}
+}
+
+rule data_load_emergency_exit_02
+highFrequency
+inactive
+{
+	if (trTime() > cActivationTime + 7) {
+		xsDisableSelf();
+		trModeEnter("Pregame");
+	}
 }
