@@ -425,6 +425,9 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	} else {
 		dmg = dmg - dmg * yGetVar("enemies", "physicalResist");
 	}
+	if (yGetVar("enemies", "poisonStatus") == 1) {
+		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
+	}
 	trDamageUnit(dmg);
 	if (spell) {
 		trQuestVarSet("p"+p+"lifestealTotal", 
@@ -487,6 +490,7 @@ int CheckOnHit(int p = 0, int id = 0) {
         	ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
             ySetVar("p"+p+"characters", "attacking", 1);
             ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
+            ySetVar("p"+p+"characters", "attackTargetIndex", 0);
         }
     } else {
         if ((action == 12) || (action == 6)) {
@@ -502,6 +506,16 @@ int CheckOnHit(int p = 0, int id = 0) {
                         status = ON_HIT_SPECIAL;
                     }
                 }
+                /* get the target */
+                if (yGetVar("p"+p+"characters", "attackTargetIndex") == 0) {
+                	for(x=yGetDatabaseCount("enemies"); >0) {
+                		yDatabaseNext("enemies");
+                		if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
+                			ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
+                			break;
+                		}
+                	}
+                }
                 /* lifesteal */
                 trQuestVarSet("p"+p+"lifestealTotal", 
 					trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack"));
@@ -510,6 +524,7 @@ int CheckOnHit(int p = 0, int id = 0) {
             	if (xsAbs(yGetVar("p"+p+"characters", "attackTarget") - target) > 0) {
             		ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
             		ySetVar("p"+p+"characters", "attackTarget", target);
+            		ySetVar("p"+p+"characters", "attackTargetIndex", 0);
             	}
             	status = ON_HIT_ATTACKING;
             }

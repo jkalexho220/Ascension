@@ -107,7 +107,7 @@ void classNewUnlock(int class = 0) {
 			}
 			case THUNDERRIDER:
 			{
-				if (trQuestVarGet("giantKills") >= 50) {
+				if (trQuestVarGet("giantKills") >= 100) {
 					unlocked = true;
 				}
 			}
@@ -401,7 +401,7 @@ highFrequency
 		{
 			case THUNDERRIDER:
 			{
-				uiMessageBox("To unlock this class, kill 50 Giants. Current: " + 1*trQuestVarGet("giantKills"));
+				uiMessageBox("To unlock this class, kill 100 Giants. Current: " + 1*trQuestVarGet("giantKills"));
 			}
 			case FIREKNIGHT:
 			{
@@ -470,14 +470,12 @@ highFrequency
 
 			setupExplain("Hey it's me, Zenophobia! I've got a fun little quiz for you!");
 			setupExplain("For each question you answer correctly, I'll give you a Starstone! Ready?");
+			setupQuestion("What buttons do you press to cast a spell?", "Q, W, and E", "Click on the god power", 1);
+			setupExplain("In this game, you can cast your spells by casting Q, W, and E on your keyboard.");
+
 			setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
 			setupExplain("Only your ultimate costs favor! The other spells are free!");
 			setupExplain("In fact, your basic spells generate favor when they hit enemies.");
-
-			setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
-			setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
-				"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
-			setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 
 			setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
 			setupExplain("Spell Power affects the healing and damage of your spells.");
@@ -516,8 +514,10 @@ highFrequency
 				case 3:
 				{
 					gem = MANASTONE;
-					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
-					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
+					setupExplain("First Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
+					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
+						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
+					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 
 					setupQuestion("All players must be present to start the boss battle.","True","False",2);
 					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
@@ -537,6 +537,9 @@ highFrequency
 					gem = STARSTONE;
 					setupQuestion("Ultimate Cost Reduction does not work on toggled Ultimates","True","False",2);
 					setupExplain("Ultimate Cost Reduction will decrease the favor drain of toggled Ultimates.");
+
+					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
+					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

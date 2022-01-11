@@ -100,7 +100,7 @@ void alchemistAlways(int eventID = -1) {
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (zDistanceToVectorSquared("enemies", "pos") < 16) {
-							poisonUnit("enemies", 12,12, p);
+							poisonUnit("enemies", 12,12 * trQuestVarGet("p"+p+"projectiles"), p);
 						}
 					}
 				}

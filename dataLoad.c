@@ -2,10 +2,10 @@
 progress
 0 = stage progress
 1 = current class level
-2 = current class
-3-4 = gold
-5-14 = equipped artifacts
-15-16 = unlocked classes
+2 = transporter level
+3 = current class
+4-5 = gold
+6-15 = equipped artifacts
 
 data at 13, 14, 15 is unlocked relic data
 */
@@ -20,7 +20,9 @@ void saveAllData() {
 	for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
 		yDatabaseNext("p"+p+"warehouse");
 		relic = yGetVar("p"+p+"warehouse", "type");
-		trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
+		if (relic < RELIC_KEY_GREEK) {
+			trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
+		}
 	}
 	/* slot 0 */
 	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");

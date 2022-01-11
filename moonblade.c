@@ -33,14 +33,9 @@ void moonbladeAlways(int eventID = -1) {
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lightning Sparks Ground");
 					trPlayerGrantResources(p, "favor", 3);
-					for(x=yGetDatabaseCount("enemies"); >0) {
-						if (yDatabaseNext("enemies") == target) {
-							trUnitSelectClear();
-							trUnitSelectByQV("enemies", true);
-							damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
-							stunUnit("enemies", 2.0, p);
-							break;
-						}
+					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+						stunUnit("enemies", 2.0, p);
+						damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
 					}
 				}
 				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.01;

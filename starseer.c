@@ -33,21 +33,14 @@ void starseerAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
-				target = yGetVar("p"+p+"characters", "attackTarget");
 				trVectorSetUnitPos("pos", "p"+p+"characters");
-				for(x=yGetDatabaseCount("enemies"); >0) {
-					id = yDatabaseNext("enemies", true);
-					if (id == -1 || trUnitAlive() == false) {
-						removeEnemy();
-					} else if (id == target) {
-						trVectorSetUnitPos("dir", "enemies");
-						trVectorQuestVarSet("dest", zGetUnitVector("pos", "dir", 15.0 * trQuestVarGet("p"+p+"spellRange")));
-						trQuestVarSet("destx", trQuestVarGet("destx") + trQuestVarGet("posx"));
-						trQuestVarSet("destZ", trQuestVarGet("destZ") + trQuestVarGet("posZ"));
-						launchUnit("enemies", "dest");
-						trSoundPlayFN("shockwave.wav","1",-1,"","");
-						break;
-					}
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					trVectorSetUnitPos("dir", "enemies");
+					trVectorQuestVarSet("dest", zGetUnitVector("pos", "dir", 15.0 * trQuestVarGet("p"+p+"spellRange")));
+					trQuestVarSet("destx", trQuestVarGet("destx") + trQuestVarGet("posx"));
+					trQuestVarSet("destZ", trQuestVarGet("destZ") + trQuestVarGet("posZ"));
+					launchUnit("enemies", "dest");
+					trSoundPlayFN("shockwave.wav","1",-1,"","");
 				}
 			}
 			

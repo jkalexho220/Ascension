@@ -14,7 +14,7 @@ const int ROOM_CHEST = 3;
 const int ROOM_TRANSPORTER_GUY = 9;
 const int ROOM_STARTER = 10;
 const int ROOM_BOSS = 11;
-const int ROOM_NICK = 12;
+const int ROOM_NOTTUD = 12;
 
 const int ROOM_CIRCLE = 0;
 const int ROOM_SQUARE = 1;

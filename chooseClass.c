@@ -457,7 +457,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\god power pestilence icon 64";
-					msg = "Damage: 12 | Duration: 12";
+					msg = "Duration: 12 | Damage: 12 x Projectiles";
 				}
 				case 5:
 				{

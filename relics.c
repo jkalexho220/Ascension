@@ -22,7 +22,17 @@ const int RELIC_COOLDOWN_REDUCTION = 18;
 const int RELIC_STUN_KILLER = 19;
 const int RELIC_ALL = 20;
 
-/* nickonhawk's shop */
+/* nottud's shop */
+const int RELIC_WEIGHTED_BLOWS = 21;
+const int RELIC_YEEBAAGOOON = 22;
+const int RELIC_ZENOPHOBIA = 23;
+const int RELIC_NICKONHAWK = 24;
+const int RELIC_NOTTUD = 25;
+const int RELIC_CURSED_RANGE = 26;
+const int RELIC_CURSED_DURATION = 27;
+const int RELIC_CURSED_POWER = 28;
+const int RELIC_CURSED_COOLDOWNS = 29;
+const int RELIC_ON_ATTACK = 30;
 
 /* key relics */
 const int RELIC_KEY_GREEK = 33;
@@ -91,11 +101,11 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_POISON_KILLER:
 		{
-			msg = "+0.3x damage to poisoned enemies.";
+			msg = "+0.5x damage to poisoned enemies.";
 		}
 		case RELIC_STUN_KILLER:
 		{
-			msg = "+0.3x damage to stunned enemies.";
+			msg = "+0.5x damage to stunned enemies.";
 		}
 		case RELIC_ALL:
 		{
@@ -311,11 +321,11 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_POISON_KILLER:
 		{
-			trQuestVarSet("p"+p+"poisonKiller", trQuestVarGet("p"+p+"poisonKiller") + 0.3 * m);
+			trQuestVarSet("p"+p+"poisonKiller", trQuestVarGet("p"+p+"poisonKiller") + 0.5 * m);
 		}
 		case RELIC_STUN_KILLER:
 		{
-			trQuestVarSet("p"+p+"stunKiller", trQuestVarGet("p"+p+"stunKiller") + 0.3 * m);
+			trQuestVarSet("p"+p+"stunKiller", trQuestVarGet("p"+p+"stunKiller") + 0.5 * m);
 		}
 		case RELIC_ALL:
 		{

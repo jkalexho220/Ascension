@@ -272,7 +272,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_PADS, true);
             }
             if (trQuestVarGet("chestType") == CHEST_KEY) {
-                if (trQuestVarGet("keyType") == RELIC_KEY_GREEK) {
+                if (trQuestVarGet("keyType") < RELIC_KEY_GREEK) {
                     trQuestVarSet("chestType", CHEST_ENCOUNTER);
                 } else {
                     trQuestVarSet("keyType", trQuestVarGet("keyType") - 1);
@@ -361,7 +361,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trVectorQuestVarSet("bossRoomEntrance", xsVectorSet(x * 70 + 10, 0, z * 70 + 10));
             xsEnableRule("enter_boss_room");
         }
-        case ROOM_NICK:
+        case ROOM_NOTTUD:
         {
             z0 = 12;
             for(a=0; < 12) {
@@ -375,12 +375,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                     }
                 }
             }
-            trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
+            trQuestVarSet("nottud", trGetNextUnitScenarioNameNumber());
             trArmyDispatch("1,0", "Victory Marker", 1, 70*x+40, 0, 70*z+40,225,true);
             trUnitSelectClear();
-            trUnitSelectByQV("nickonhawk", true);
+            trUnitSelectByQV("nottud", true);
             trUnitConvert(0);
-            trUnitChangeProtoUnit("Odysseus");
+            trUnitChangeProtoUnit("Minotaur");
+            yAddToDatabase("stunnedUnits", "nottud");
+            xsEnableRule("nottud_always");
         }
     }
 }
@@ -827,7 +829,7 @@ highFrequency
                 if (i == trQuestVarGet("relicTransporterGuy")) {
                     buildRoom(x, z, ROOM_TRANSPORTER_GUY);
                 } else if (nick && (countRoomEntrances(x, z) == 1)) {
-                    buildRoom(x, z, ROOM_NICK);
+                    buildRoom(x, z, ROOM_NOTTUD);
                     nick = false;
                     xsEnableRule("nick_00_visit");
                 } else if (trQuestVarGet("chestRand") == 1) {
@@ -851,6 +853,7 @@ highFrequency
         int x1 = 0;
         int z1 = 0;
         string pName = "";
+        trQuestVarSet("keyType", RELIC_KEY_GREEK);
         for(i=yGetDatabaseCount("chests"); >0) {
             yDatabaseNext("chests");
             room = yGetVar("chests", "room");

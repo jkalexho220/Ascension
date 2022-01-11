@@ -384,6 +384,7 @@ highFrequency
                     }
                 } else {
                     /* RELIC_KEY_GREEK */
+                    trSoundPlayFN("storehouse.wav","1",-1,"","");
                     yRemoveFromDatabase("p"+p+"relics");
                     yRemoveUpdateVar("p"+p+"relics", "type");
                 }
@@ -395,10 +396,12 @@ highFrequency
         yDatabaseNext("p"+p+"warehouse", true);
         if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
             if (yGetVar("p"+p+"warehouse", "type") < RELIC_KEY_GREEK ||
-                trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") > 0) {
+                trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
                 trUnitChangeProtoUnit("Relic");
                 yAddToDatabase("freeRelics", "p"+p+"warehouse");
                 yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
+            } else {
+                trSoundPlayFN("storehouse.wav","1",-1,"","");
             }
             yRemoveFromDatabase("p"+p+"warehouse");
         }

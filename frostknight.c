@@ -21,11 +21,8 @@ void frostknightAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
-				target = yGetVar("p"+p+"characters", "attackTarget");
-				for(x=yGetDatabaseCount("enemies"); >0) {
-					if (target == yDatabaseNext("enemies", true)) {
-						stunUnit("enemies", 1.5, p);
-					}
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					stunUnit("enemies", 1.5, p);
 				}
 			}
 		}

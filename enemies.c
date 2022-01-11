@@ -71,7 +71,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Valkyrie"):
         {
             yAddUpdateVar("enemies", "magicResist", 1);
-            spyEffect(1*trQuestVarGet("enemiesIncoming"), kbGetProtoUnitID("UI Range Indicator Norse SFX"), "fake");
+            spyEffect(1*trQuestVarGet("enemiesIncoming"), kbGetProtoUnitID("Vortex Finish Linked"), "fake");
         }
         case kbGetProtoUnitID("Ballista"):
         {
@@ -123,7 +123,7 @@ void ballistaShotPop() {
         id = yDatabaseNext("playerUnits", true);
         if (id == -1 || trUnitAlive() == false) {
             removePlayerUnit();
-        } else if (zDistanceToVectorSquared("playerUnits", "pos") < 4) {
+        } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
             damagePlayerUnit(200);
         }
     }
@@ -210,7 +210,7 @@ void enemiesAlways() {
                 trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
                 trVectorSetUnitPos("start", "closestName");
                 trVectorSetUnitPos("end", "target");
-                vectorSetAsTargetVector("target", "start", "end");
+                vectorSetAsTargetVector("target", "start", "end", 100.0);
 
                 trUnitSelectClear();
                 trUnitSelectByQV("nextProj", true);
@@ -229,7 +229,7 @@ void enemiesAlways() {
                 yAddToDatabase("ballistaShots", "next2");
                 yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
                 yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
-                yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 10000);
+                yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 5000);
 
                 trUnitSelectClear();
                 trUnitSelect(""+1*trQuestVarGet("next1"), true);
