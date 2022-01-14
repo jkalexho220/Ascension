@@ -435,9 +435,12 @@ highFrequency
 
         trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
 
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, 1);
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, 1);
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, -1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, -1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, -1);
+        trModifyProtounit("Monument 2", 0, 24, -1);
+        trModifyProtounit("Monument 2", 0, 25, -1);
+        trModifyProtounit("Monument 2", 0, 26, -1);
 
         for(p=ENEMY_PLAYER; >0) {
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);

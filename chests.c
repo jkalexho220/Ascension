@@ -15,8 +15,55 @@ void removeChest() {
 	yRemoveUpdateVar("chests", "indicator");
 }
 
+void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate = false) {
+	int old = yGetPointer("statuesIn"+room);
+	if (index > 0) {
+		ySetPointer("statuesIn"+room, index);
+	}
+	ySetVar("statuesIn"+room, "angle", fModulo(6.283185, 1.570796 + yGetVar("statuesIn"+room, "angle")));
+	ySetVar("statuesIn"+room, "position", 1 + yGetVar("statuesIn"+room, "position"));
+	if (yGetVar("statuesIn"+room, "position") >= 4) {
+		ySetVar("statuesIn"+room, "position", 0);
+	}
+	trUnitSelectClear();
+	trUnitSelectByQV("statuesIn"+room);
+	trDamageUnitPercent(-100);
+	if (immediate) {
+		trVectorSetFromAngle("dir", yGetVar("statuesIn"+room, "angle"));
+		trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+		if (yGetVar("statuesIn"+room, "position") == 0) {
+			trQuestVarSet("correctStatuesIn"+room, 1 + trQuestVarGet("correctStatuesIn"+room));
+		} else if (yGetVar("statuesIn"+room, "position") == 1) {
+			trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("correctStatuesIn"+room) - 1);
+		}
+	} else {
+		trUnitConvert(0);
+		ySetVar("statuesIn"+room, "state", 1);
+		if (trTimeMS() < yGetVar("statuesIn"+room, "timeout")) {
+			ySetVar("statuesIn"+room, "timeout", 1000 + yGetVar("statuesIn"+room, "timeout"));
+		} else {
+			ySetVar("statuesIn"+room, "timeout", trTimeMS() + 1000);
+		}
+	}
+
+	if (first) {
+		for(x=yGetVar("statuesIn"+room, "connections"); >0) {
+			turnStatue(room, 1*yGetVar("statuesIn"+room, "connection"+x), false, immediate);
+		}
+		if (immediate == false) {
+			trSoundPlayFN("trojangateopen.wav","1",-1,"","");
+		}
+	}
+
+	if (index > 0) {
+		ySetPointer("statuesIn"+room, old);
+	}
+}
+
 void processChests() {
 	int id = 0;
+	int room = 0;
+	float angle = 0;
 	for(x=yGetDatabaseCount("rainingRelics"); > 0) {
     	yDatabaseNext("rainingRelics", true);
     	if (yGetVar("rainingRelics", "morphed") == 0) {
@@ -100,9 +147,47 @@ void processChests() {
 		            {
 		                if (trUnitIsSelected()) {
 		            		reselectMyself();
-		                	uiMessageBox("Make all the statues face the same way to open this chest.");
+		                	uiMessageBox("Make all the statues face the chest to open it.");
 		                }
-		                
+		                room = yGetVar("chests", "room");
+		                for(x=yGetDatabaseCount("statuesIn"+room); >0) {
+		                	yDatabaseNext("statuesIn"+room, true);
+		                	switch(1*yGetVar("statuesIn"+room, "state"))
+		                	{
+		                		case 0:
+		                		{
+		                			/* waiting */
+		                			if (trUnitPercentDamaged() > 0) {
+		                				turnStatue(room,0,true,false);
+		                			}
+		                		}
+		                		case 1:
+		                		{
+		                			/* turning */
+		                			angle = 0.001 * (yGetVar("statuesIn"+room, "timeout") - trTimeMS());
+		                			if (angle < 0) {
+		                				angle = yGetVar("statuesIn"+room, "angle");
+		                				ySetVar("statuesIn"+room, "state", 0);
+		                				trUnitConvert(ENEMY_PLAYER);
+		                				trDamageUnitPercent(-100);
+		                				if ((yGetVar("statuesIn"+room, "position") == 0) && yGetVar("statuesIn"+room, "previous") > 0) {
+		                					trQuestVarSet("correctStatuesIn"+room, 1 + trQuestVarGet("correctStatuesIn"+room));
+		                				}
+		                				if ((yGetVar("statuesIn"+room, "position") > 0) && yGetVar("statuesIn"+room, "previous") == 0) {
+		                					trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("correctStatuesIn"+room) - 1);
+		                				}
+		                				ySetVar("statuesIn"+room, "previous", yGetVar("statuesIn"+room, "position"));
+		                			} else {
+		                				angle = fModulo(6.283185, yGetVar("statuesIn"+room, "angle") - angle * 1.570796);
+		                			}
+		                			trVectorSetFromAngle("dir", angle);
+		                			trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+		                		}
+		                	}
+		                }
+		                if (trQuestVarGet("correctStatuesIn"+room) == yGetDatabaseCount("statuesIn"+room)) {
+		                	ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
+		                }
 		            }
 		            case CHEST_ENCOUNTER:
 		            {

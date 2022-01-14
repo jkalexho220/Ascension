@@ -276,6 +276,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         case ROOM_CHEST:
         {
             trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_STATUES, true);
+            /* DELETE ME */
             trQuestVarSet("chestType", CHEST_STATUES);
             if (trQuestVarGet("chestType") < CHEST_STATUES) {
                 buildRoom(x, z, ROOM_BASIC);
@@ -590,20 +591,17 @@ void buildEdge(int edge = 0, int type = 0) {
 }
 
 void connectStatues(int index1 = 0, int index2 = 0, int room = 0) {
-    trChatSend(0, "connecting statues " + index1 + " and " + index2);
     ySetPointer("statuesIn"+room, index1);
     ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
     ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index2);
     trQuestVarSet("pos1X", yGetVar("statuesIn"+room, "posX"));
     trQuestVarSet("pos1Z", yGetVar("statuesIn"+room, "posZ"));
-    trChatSend(0, "pos1 is " + trVectorQuestVarGet("pos1"));
 
     ySetPointer("statuesIn"+room, index2);
     ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
     ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index1);
     trQuestVarSet("pos2X", yGetVar("statuesIn"+room, "posX"));
     trQuestVarSet("pos2Z", yGetVar("statuesIn"+room, "posZ"));
-    trChatSend(0, "pos2 is " + trVectorQuestVarGet("pos2"));
 
     trVectorQuestVarSet("dir", zGetUnitVector("pos1", "pos2"));
     trQuestVarSet("temp", trQuestVarGet("dirX"));
@@ -621,8 +619,6 @@ void connectStatues(int index1 = 0, int index2 = 0, int room = 0) {
     trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
     trUnitTeleport(x,0,z);
     trMutateSelected(kbGetProtoUnitID("undermine ground decal long"));
-    trChatSend(0, "distance is " + dist);
-    trChatSend(0, "dir is " + trVectorQuestVarGet("dir"));
 }
 
 rule choose_stage_01
@@ -1052,16 +1048,15 @@ highFrequency
                 }
                 case CHEST_STATUES:
                 {
-                    paintEnemies(x0, z0, x1, z1);
                     trVectorSetUnitPos("pos", "chests");
                     trQuestVarSetFromRand("rand", 4, 7, true);
                     trQuestVarSet("angle", 0.785398);
                     trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
                     for(x=0; < trQuestVarGet("rand")) {
                         trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-                        trQuestVarSet("statueX", trQuestVarGet("posX") + 10.0 * trQuestVarGet("dirX"));
-                        trQuestVarSet("statueZ", trQuestVarGet("posZ") + 10.0 * trQuestVarGet("dirZ"));
-                        trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
+                        trQuestVarSet("statueX", trQuestVarGet("posX") - 10.0 * trQuestVarGet("dirX"));
+                        trQuestVarSet("statueZ", trQuestVarGet("posZ") - 10.0 * trQuestVarGet("dirZ"));
+                        
 
                         trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                         trArmyDispatch("1,0","Dwarf",1,1,0,1,180,true);
@@ -1070,18 +1065,20 @@ highFrequency
                         trUnitConvert(ENEMY_PLAYER);
                         trUnitTeleport(trQuestVarGet("statueX"),0,trQuestVarGet("statueZ"));
                         trMutateSelected(kbGetProtoUnitID("Monument 2"));
-                        trQuestVarSet("dirX", 0.0 - trQuestVarGet("dirX"));
-                        trQuestVarSet("dirZ", 0.0 - trQuestVarGet("dirZ"));
                         trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+
                         trQuestVarSet("index", yAddToDatabase("statuesIn"+room, "next"));
-                        yAddUpdateVar("statuesIn"+room, "angle", fModulo(6.283185, trQuestVarGet("angle") - 3.141592));
+                        yAddUpdateVar("statuesIn"+room, "angle", trQuestVarGet("angle"));
                         yAddUpdateVar("statuesIn"+room, "posX", trQuestVarGet("statueX"));
                         yAddUpdateVar("statuesIn"+room, "posZ", trQuestVarGet("statueZ"));
                         yAddToDatabase("statuesReady", "index");
+
                         trQuestVarSetFromRand("jump", 1, 2, true);
                         for (y=trQuestVarGet("jump"); >0) {
                             yDatabaseNext("statuesReady");
                         }
+
+                        trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
                     }
 
                     for(x=trQuestVarGet("rand"); >0) {
@@ -1093,6 +1090,11 @@ highFrequency
                         }
                         connectStatues(yGetUnitAtIndex("statuesReady", 1*trQuestVarGet("start")), 1*trQuestVarGet("statuesReady"), room);
                         ySetPointer("statuesReady", 1*trQuestVarGet("start"));
+                    }
+                    trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("rand"));
+                    for(x=trQuestVarGet("rand"); >1) {
+                        yDatabaseNext("statuesIn"+room);
+                        turnStatue(room, 0, true, true);
                     }
                     yClearDatabase("statuesReady");
                 }
