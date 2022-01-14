@@ -404,7 +404,7 @@ int yGetDatabaseCount(string db = "") {
 }
 
 int yGetUnitAtIndex(string db = "", int index = 0) {
-	return(trQuestVarGet("xdata"+db+"index"+index));
+	return(1*trQuestVarGet("xdata"+db+"index"+index));
 }
 
 void ySetUnitAtIndex(string db = "", int index = 0, int value = 0) {

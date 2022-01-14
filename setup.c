@@ -11,17 +11,18 @@ const int EDGE_WALL = 4;
 const int ROOM_BASIC = 1;
 const int ROOM_AMBUSH = 2;
 const int ROOM_CHEST = 3;
-const int ROOM_TRANSPORTER_GUY = 9;
-const int ROOM_STARTER = 10;
-const int ROOM_BOSS = 11;
-const int ROOM_NOTTUD = 12;
+const int ROOM_TRANSPORTER_GUY = 4;
+const int ROOM_VILLAGE = 10;
+const int ROOM_STARTER = 20;
+const int ROOM_BOSS = 21;
+const int ROOM_NOTTUD = 22;
 
 const int ROOM_CIRCLE = 0;
 const int ROOM_SQUARE = 1;
 
 const int CHEST_KEY = 1;
 const int CHEST_ENCOUNTER = 2;
-const int CHEST_PADS = 3;
+const int CHEST_STATUES = 3;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
@@ -433,6 +434,10 @@ highFrequency
         trModifyProtounit("Sky Passage", 0, 5, 999);
 
         trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
+
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, 1);
 
         for(p=ENEMY_PLAYER; >0) {
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);

@@ -27,17 +27,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("I can carry up to "+(3+trQuestVarGet("p"+trCurrentPlayer()+"transporterLevel"))+" relics.");
+					uiMessageBox("I can carry up to 3 relics. After you clear this floor, I will send them to your warehouse.");
 				}
-				case 3:
-				{
-					uiMessageBox("When you clear this floor, any relics I carry will be sent to your warehouse.");
-				}
-				case 4:
+				case 33:
 				{
 					uiMessageBox("You can visit your warehouse by playing this map in singleplayer.");
 				}
-				case 5:
+				case 4:
 				{
 					uiMessageBox("To hire me, simply drop a relic next to me. I will charge you 100 gold. (The relic will be re-equipped)");
 					dialog = -1;

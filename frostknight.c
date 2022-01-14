@@ -128,7 +128,7 @@ void frostknightAlways(int eventID = -1) {
 		trMutateSelected(kbGetProtoUnitID("Ice Block"));
 		trUnitSetAnimationPath("0,0,0,0,0,0,0");
 		trSetSelectedScale(trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"),
-			6,trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
+			3,trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
 		trUnitHighlight(trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration"), false);
 
 		trSoundPlayFN("piercemetal3.wav", "1", -1, "", "");

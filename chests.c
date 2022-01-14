@@ -96,30 +96,13 @@ void processChests() {
 		                	trUnitChangeProtoUnit("Rocket");
 		                }
 		            }
-		            case CHEST_PADS:
+		            case CHEST_STATUES:
 		            {
 		                if (trUnitIsSelected()) {
 		            		reselectMyself();
-		                	uiMessageBox("There are two pressure pads in this room. A player must stand on each to open this chest.");
+		                	uiMessageBox("Make all the statues face the same way to open this chest.");
 		                }
-		                trQuestVarSet("pad1", 0);
-		                trQuestVarSet("pad2", 0);
-		                trVectorQuestVarSet("pos1", kbGetBlockPosition(""+1*yGetVar("chests", "pad1")));
-		                trVectorQuestVarSet("pos2", kbGetBlockPosition(""+1*yGetVar("chests", "pad2")));
-		                for(x=yGetDatabaseCount("playerUnits"); >0) {
-		                	id = yDatabaseNext("playeRUnits", true);
-		                	if (id == -1 || trUnitAlive() == false) {
-		                		removeChest();
-		                	} else if (zDistanceToVectorSquared("playerUnits", "pad1") < 0.7) {
-		                		trQuestVarSet("pad1", 1);
-		                	} else if (zDistanceToVectorSquared("playerUnits", "pad2") < 0.7) {
-		                		trQuestVarSet("pad2", 1);
-		                	}
-		                	if (trQuestVarGet("pad1") * trQuestVarGet("pad2") == 1) {
-		                		ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
-		                		break;
-		                	}
-		                }
+		                
 		            }
 		            case CHEST_ENCOUNTER:
 		            {

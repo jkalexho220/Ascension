@@ -244,10 +244,43 @@ highFrequency
 				xsEnableRule("boss2_battle");
 				trQuestVarSet("bossSpell", 41);
 				trQuestVarSet("boss", 1);
-				trQuestVarSet("bossGem", MANASTONE);
+				trQuestVarSet("bossGem", SOULSTONE);
 				trQuestVarSetFromRand("bossGemCount", 1, 2, true);
 				xsEnableRule("boss_music");
 				trMessageSetText("Defeat the spawned enemies to damage the Wraithwood!", -1);
+			}
+		}
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+	}
+}
+
+rule boss3_init
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 0:
+			{
+				trOverlayText("King of Ice", 3.0, -1, -1, -1);
+				trQuestVarSet("cinTime", trTime() + 2);
+				trRenderSnow(0.2);
+			}
+			case 1:
+			{
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsDisableSelf();
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trUnitConvert(ENEMY_PLAYER);
+				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
+				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Cinematic Block"), "auroraSFX");
+				xsEnableRule("boss3_battle");
+				trQuestVarSet("bossGem", MANASTONE);
+				trQuestVarSetFromRand("bossGemCount", 1, 2, true);
+				xsEnableRule("boss_music");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -981,6 +1014,113 @@ highFrequency
 	xsSetContextPlayer(old);
 }
 
+rule boss3_battle
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("bossUnit");
+	int old = xsGetContextPlayer();
+	int p = 0;
+	int x = 0;
+	int action = 0;
+	int id = 0;
+	float angle = 0;
+	bool hit = false;
+	if (trUnitAlive() == true) {
+		
+		
+		trUnitSelectClear();
+		trUnitSelectByQV("bossUnit");
+		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
+			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+				trQuestVarSet("bossSpell", 0);
+				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+			} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
+				trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
+				trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
+			}
+		} else if (trQuestVarGet("bossSpell") > 30) {
+			
+		} else if (trQuestVarGet("bossSpell") > 20) {
+			
+		} else if (trQuestVarGet("bossSpell") > 10) {
+			if (trQuestVarGet("bossSpell") == 11) {
+				
+			}
+		} else if (trQuestVarGet("bossSpell") > 0) {
+			trQuestVarSet("iceKingArmor", 1 - trQuestVarGet("iceKingArmor"));
+			if (trQuestVarGet("iceKingArmor") == 1) {
+				trSoundPlayFN("icemono.wav","1",-1,"","");
+				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, 1);
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, 1);
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, 1);
+				ySetVarAtIndex("enemies", "physicalResist", 1, 1*trQuestVarGet("bossPointer"));
+				ySetVarAtIndex("enemies", "magicResist", 0, 1*trQuestVarGet("bossPointer"));
+				trQuestVarSetFromRand("rand", 1, 3, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "King of Ice: Your blades won't reach me!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "King of Ice: Ice Armor!");
+				}
+				trMessageSetText("The King of Ice is now resistant to attacks but vulnerable to spells.",-1);
+				if (kbGetBlockID(""+1*trQuestVarGet("auroraSFX")) > 0) {
+					trUnitSelectClear();
+					trUnitSelectByQV("auroraSFX");
+					trUnitChangeProtoUnit("Cinematic Block");
+				}
+			} else {
+				trSoundPlayFN("sphinxteleportin.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
+				ySetVarAtIndex("enemies", "physicalResist", 0, 1*trQuestVarGet("bossPointer"));
+				ySetVarAtIndex("enemies", "magicResist", 1, 1*trQuestVarGet("bossPointer"));
+				trQuestVarSetFromRand("rand", 1, 3, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "King of Ice: Your magic is meaningless!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "King of Ice: Aurora Armor!");
+				}
+				trMessageSetText("The King of Ice is now resistant to spells but vulnerable to attacks.",-1);
+				if (kbGetBlockID(""+1*trQuestVarGet("auroraSFX")) > 0) {
+					trUnitSelectClear();
+					trUnitSelectByQV("auroraSFX");
+					trUnitChangeProtoUnit("Vortex Finish Linked");
+				} else {
+					spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Vortex Finish Linked"), "auroraSFX");
+				}
+			}
+			bossCooldown(10, 15);
+		} else if (yGetVarAtIndex("enemies", "stunStatus", 1*trQuestVarGet("bossPointer")) == 0) {
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, 1 * (trUnitPercentDamaged() * 0.05)), true);
+			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
+			if (trQuestVarGet("bossSpell") == 11 && trQuestVarGet("bossMeteorCount") == 3) {
+				trQuestVarSet("bossSpell", 1);
+			}
+			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
+				trQuestVarSetFromRand("bossSpell", 0, 2, true);
+				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+			}
+		}
+	} else {
+		xsDisableSelf();
+		trMusicStop();
+		trQuestVarSet("boss", 0);
+		trSetLighting("default", 1.0);
+		trSoundPlayFN("win.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			yDatabaseNext("enemies", true);
+			trDamageUnitPercent(100);
+		}
+		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
+		xsEnableRule("boss_ded");
+		xsDisableRule("gameplay_always");
+	}
+	xsSetContextPlayer(old);
+}
 
 rule boss_ded
 inactive

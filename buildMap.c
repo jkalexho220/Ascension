@@ -1,6 +1,15 @@
 const int MAP_STANDARD = 0;
 const int MAP_PORTALS = 1;
 
+void deployEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
+    int n = trGetNextUnitScenarioNameNumber();
+    trArmyDispatch("1,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
+    trUnitSelectClear();
+    trUnitSelect(""+n, true);
+    trUnitConvert(0);
+    trUnitChangeProtoUnit(proto);
+}
+
 rule choose_stage_00
 inactive
 highFrequency
@@ -195,12 +204,13 @@ void paintSecondary(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 
 void buildRoom(int x = 0, int z = 0, int type = 0) {
     int room = x + 4 * z;
+    int size = 0;
     int x0 = 0;
     int z0 = 0;
     int x1 = 0;
     int z1 = 0;
     trQuestVarSet("room"+room, type);
-    if (type < ROOM_STARTER) {
+    if (type < ROOM_CHEST) {
         for (i=2; >0) {
             trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
             trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
@@ -265,12 +275,27 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_CHEST:
         {
-            /* can't perform pad puzzle with only one player */
-            if (ENEMY_PLAYER == 2) {
-                trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_ENCOUNTER, true);
+            trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_STATUES, true);
+            trQuestVarSet("chestType", CHEST_STATUES);
+            if (trQuestVarGet("chestType") < CHEST_STATUES) {
+                buildRoom(x, z, ROOM_BASIC);
+                trQuestVarSet("room"+room, ROOM_CHEST);
             } else {
-                trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_PADS, true);
+                size = 12;
+                z0 = size;
+                for(a=0; < size) {
+                    for(b=size; >0) {
+                        if (a*a + z0 * z0 <= size * size) {
+                            trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                            trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
+                            break;
+                        } else {
+                            z0 = z0 - 1;
+                        }
+                    }
+                }
             }
+
             if (trQuestVarGet("chestType") == CHEST_KEY) {
                 if (trQuestVarGet("keyType") < RELIC_KEY_GREEK) {
                     trQuestVarSet("chestType", CHEST_ENCOUNTER);
@@ -309,6 +334,57 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             xsEnableRule("relic_transporter_guy_found");
             buildRoom(x, z, ROOM_BASIC);
         }
+        case ROOM_VILLAGE + 1:
+        {
+            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+            paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
+
+            trQuestVarSet("villageX", 70 * x + 20);
+            trQuestVarSet("villageZ", 70 * z + 20);
+
+            deployEyecandy("Savannah Tree",15,37,0);
+            deployEyecandy("Savannah Tree",11,33,50);
+            deployEyecandy("Savannah Tree",5,21,90);
+            deployEyecandy("Savannah Tree",29,31,47);
+            deployEyecandy("Savannah Tree",33,29,127);
+
+            deployEyecandy("House",7,29,180);
+            deployEyecandy("House",9,15,0);
+
+            deployEyecandy("Granary",7,33,0);
+            deployEyecandy("Dock",9,13,0);
+            deployEyecandy("Tower",33,15,270);
+            deployEyecandy("Counter Building",23,29,180);
+
+            deployEyecandy("Fence Wood",19,15,180);
+            deployEyecandy("Fence Wood",19,11,180);
+            deployEyecandy("Fence Wood",21,9,270);
+            deployEyecandy("Fence Wood",25,17,270);
+            deployEyecandy("Fence Wood",27,15,180);
+            deployEyecandy("Fence Wood",27,11,180);
+        }
+        case ROOM_VILLAGE + 2:
+        {
+            size = 12;
+            z0 = size;
+            for(a=0; < size) {
+                for(b=size; >0) {
+                    if (a*a + z0 * z0 <= size * size) {
+                        trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                        trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
+                        break;
+                    } else {
+                        z0 = z0 - 1;
+                    }
+                }
+            }
+        }
+        case ROOM_VILLAGE + 3:
+        {
+
+        }
         case ROOM_STARTER:
         {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
@@ -337,7 +413,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             {
                 case ROOM_CIRCLE:
                 {
-                    int size = trQuestVarGet("bossRoomSize");
+                    size = trQuestVarGet("bossRoomSize");
                     z0 = size;
                     for(a=0; < size) {
                         for(b=size; >0) {
@@ -363,10 +439,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_NOTTUD:
         {
-            z0 = 12;
-            for(a=0; < 12) {
-                for(b=12; >0) {
-                    if (a*a + z0 * z0 <= 144) {
+            z0 = 10;
+            for(a=0; < 10) {
+                for(b=8; >0) {
+                    if (a*a + z0 * z0 <= 100) {
                         trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
                         trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
                         break;
@@ -382,6 +458,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trUnitConvert(0);
             trUnitChangeProtoUnit("Minotaur");
             yAddToDatabase("stunnedUnits", "nottud");
+            yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Minotaur"));
             xsEnableRule("nottud_always");
         }
     }
@@ -404,8 +481,12 @@ void buildEdge(int edge = 0, int type = 0) {
     int x1 = second - 4 * z1;
     if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
         if (type == EDGE_PORTAL) {
-            buildRoom(x0, z0, ROOM_BASIC);
-            buildRoom(x1, z1, ROOM_BASIC);
+            if (xsAbs(x0 + 4 * z0 - trQuestVarGet("village")) > 0) {
+                buildRoom(x0, z0, ROOM_BASIC);
+            }
+            if (xsAbs(x1 + 4 * z1 - trQuestVarGet("village")) > 0) {
+                buildRoom(x1, z1, ROOM_BASIC);
+            }
             trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
             trArmyDispatch("1,0","Dwarf",1,x0*70+40,0,z0*70+40,0,true);
             trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
@@ -508,6 +589,42 @@ void buildEdge(int edge = 0, int type = 0) {
     }
 }
 
+void connectStatues(int index1 = 0, int index2 = 0, int room = 0) {
+    trChatSend(0, "connecting statues " + index1 + " and " + index2);
+    ySetPointer("statuesIn"+room, index1);
+    ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
+    ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index2);
+    trQuestVarSet("pos1X", yGetVar("statuesIn"+room, "posX"));
+    trQuestVarSet("pos1Z", yGetVar("statuesIn"+room, "posZ"));
+    trChatSend(0, "pos1 is " + trVectorQuestVarGet("pos1"));
+
+    ySetPointer("statuesIn"+room, index2);
+    ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
+    ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index1);
+    trQuestVarSet("pos2X", yGetVar("statuesIn"+room, "posX"));
+    trQuestVarSet("pos2Z", yGetVar("statuesIn"+room, "posZ"));
+    trChatSend(0, "pos2 is " + trVectorQuestVarGet("pos2"));
+
+    trVectorQuestVarSet("dir", zGetUnitVector("pos1", "pos2"));
+    trQuestVarSet("temp", trQuestVarGet("dirX"));
+    trQuestVarSet("dirX", 0.0 - trQuestVarGet("dirZ"));
+    trQuestVarSet("dirZ", trQuestVarGet("temp"));
+
+    float dist = zDistanceBetweenVectors("pos1", "pos2");
+    float x = 0.5 * (trQuestVarGet("pos1x") + trQuestVarGet("pos2x"));
+    float z = 0.5 * (trQuestVarGet("pos1z") + trQuestVarGet("pos2z"));
+
+    trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+    trArmySelect("1,0");
+    trUnitConvert(0);
+    trSetSelectedScale(dist / 9.0, 1, 0.3);
+    trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+    trUnitTeleport(x,0,z);
+    trMutateSelected(kbGetProtoUnitID("undermine ground decal long"));
+    trChatSend(0, "distance is " + dist);
+    trChatSend(0, "dir is " + trVectorQuestVarGet("dir"));
+}
+
 rule choose_stage_01
 inactive
 highFrequency
@@ -539,8 +656,9 @@ highFrequency
         {
             case 1:
             {
+                trSetCivAndCulture(0, 3, 1);
                 trQuestVarSet("bossRoomSize", 16);
-                trQuestVarSet("extraEdges", 10);
+                trQuestVarSet("extraEdges", 9);
                 /* this had better be good to hook them in */
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 0;
@@ -588,6 +706,7 @@ highFrequency
             }
             case 2:
             {
+                trSetCivAndCulture(0, 8, 2);
                 trQuestVarSet("bossRoomSize", 12);
                 trSetLighting("Fimbulwinter", 0.1);
                 TERRAIN_WALL = 2;
@@ -629,6 +748,7 @@ highFrequency
             }
             case 3:
             {
+                trSetCivAndCulture(0, 7, 2);
                 trQuestVarSet("bossRoomSize", 14);
                 trQuestVarSet("extraEdges", 0);
                 trQuestVarSet("wallEdges", 4);
@@ -669,12 +789,12 @@ highFrequency
                 trQuestVarSet("columnDensity", 0.05);
 
                 trStringQuestVarSet("bossProto", "King Folstag");
-                trQuestVarSet("bossScale", 1.5);
+                trQuestVarSet("bossScale", 1.25);
 
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 2.15);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 1.075);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
@@ -697,14 +817,32 @@ highFrequency
         trQuestVarSet("tile0", TILE_VISITED);
         trQuestVarSet("tile1", TILE_FOUND);
         trQuestVarSet("tile4", TILE_FOUND);
-        trQuestVarSet("next", 1);
-        yAddToDatabase("frontier", "next");
-        yAddUpdateVar("frontier", "edge", edgeName(0, 1));
-        yAddUpdateVar("frontier", "type", EDGE_NORMAL);
-        trQuestVarSet("next", 4);
-        yAddToDatabase("frontier", "next");
-        yAddUpdateVar("frontier", "edge", edgeName(0, 4));
-        yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+
+        trQuestVarSetFromRand("village", 1, 14, true);
+        if (trQuestVarGet("mapType") == MAP_PORTALS) {
+            total = 1;
+            trQuestVarSet("tile"+1*trQuestVarGet("village"), TILE_VISITED);
+            trQuestVarSetFromRand("villageEntrance", 1, 13, true);
+            trQuestVarSet("villageEntrance", trQuestVarGet("village") + trQuestVarGet("villageEntrance"));
+            if (trQuestVarGet("villageEntrance") > 14) {
+                trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 14);
+            }
+            buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
+        }
+
+        if (trQuestVarGet("tile1") == TILE_FOUND) {
+            trQuestVarSet("next", 1);
+            yAddToDatabase("frontier", "next");
+            yAddUpdateVar("frontier", "edge", edgeName(0, 1));
+            yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+        }
+
+        if (trQuestVarGet("tile4") == TILE_FOUND) {
+            trQuestVarSet("next", 4);
+            yAddToDatabase("frontier", "next");
+            yAddUpdateVar("frontier", "edge", edgeName(0, 4));
+            yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+        }
         
         /* build guaranteed path to every room */
         for(i=0; < 64) {
@@ -721,7 +859,8 @@ highFrequency
                 if (trQuestVarGet("frontier") < 15) {
                     yAddToDatabase("visited", "frontier");
                 }
-                if (trQuestVarGet("frontier") < 15) {
+                /* only add more edges if the room is not the boss room or the village room */
+                if (trQuestVarGet("frontier") < 15 && xsAbs(trQuestVarGet("frontier") - trQuestVarGet("village")) > 0) {
                     for(a=1; >=0) {
                         for(b=1; >=0) {
                             trQuestVarSet("newX", (1 - 2 * b) * a + x);
@@ -748,7 +887,7 @@ highFrequency
                     if ((trQuestVarGet("mapType") == MAP_PORTALS) && (edgeIsPortal == false)) {
                         trQuestVarSetFromRand("rand", 1, 14, true);
                         n = trQuestVarGet("rand");
-                        if (trQuestVarGet("tile"+n) < TILE_VISITED) {
+                        if (trQuestVarGet("tile"+n) < TILE_VISITED && xsAbs(n - trQuestVarGet("villageEntrance")) > 0) {
                             yAddToDatabase("frontier", "rand");
                             yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
                             yAddUpdateVar("frontier", "type", EDGE_PORTAL);
@@ -767,6 +906,7 @@ highFrequency
             yRemoveUpdateVar("frontier", "edge");
             yRemoveUpdateVar("frontier", "type");
         }
+
         if (trQuestVarGet("mapType") == MAP_STANDARD) {
             /* random bonus paths */
             for(i=0; <trQuestVarGet("extraEdges")) {
@@ -784,7 +924,10 @@ highFrequency
                     continue;
                 } else {
                     n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
-                    buildEdge(edgeName(1*trQuestVarGet("first"), n), EDGE_BIG);
+                    if (xsAbs(trQuestVarGet("first") - trQuestVarGet("village")) * xsAbs(n - trQuestVarGet("village")) > 0) {
+                        /* Don't build an edge to the village */
+                        buildEdge(edgeName(1*trQuestVarGet("first"), n), EDGE_BIG);
+                    }
                 }
             }
         }
@@ -809,13 +952,18 @@ highFrequency
             trUnitChangeProtoUnit("Garrison Flag Sky Passage");
         }
 
-        bool nick = false;
+        bool nottudSpawn = false;
         trQuestVarSetFromRand("nick", 0, 20, true);
         if (trQuestVarGet("nick") < trQuestVarGet("stage")) {
-            nick = true;
+            nottudSpawn = true;
         }
 
-        trQuestVarSetFromRand("relicTransporterGuy", 1, 14, true);
+
+        trQuestVarSetFromRand("relicTransporterGuy", 1, 13, true);
+        trQuestVarSet("relicTransporterGuy", trQuestVarGet("village") + trQuestVarGet("relicTransporterGuy"));
+        if (trQuestVarGet("relicTransporterGuy") > 14) {
+            trQuestVarSet("relicTransporterGuy", trQuestVarGet("relicTransporterGuy") - 14);
+        }
 
         for (i=1; < 15) {
             z = i / 4;
@@ -823,14 +971,18 @@ highFrequency
             if (trQuestVarGet("room"+i) == 0) {
                 if (chests > 0) {
                     trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
+                    /* DELETE ME */
+                    trQuestVarSet("chestRand", 1);
                 } else {
                     trQuestVarSet("chestRand", 0);
                 }
                 if (i == trQuestVarGet("relicTransporterGuy")) {
                     buildRoom(x, z, ROOM_TRANSPORTER_GUY);
-                } else if (nick && (countRoomEntrances(x, z) == 1)) {
+                } else if (i == 1*trQuestVarGet("village")) {
+                    buildRoom(x, z, ROOM_VILLAGE + trQuestVarGet("stage"));
+                } else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
                     buildRoom(x, z, ROOM_NOTTUD);
-                    nick = false;
+                    nottudSpawn = false;
                     xsEnableRule("nick_00_visit");
                 } else if (trQuestVarGet("chestRand") == 1) {
                     chests = chests - 1;
@@ -898,30 +1050,51 @@ highFrequency
 
                     trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
                 }
-                case CHEST_PADS:
+                case CHEST_STATUES:
                 {
                     paintEnemies(x0, z0, x1, z1);
-                    trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
-                    ySetVar("chests", "pad1", trGetNextUnitScenarioNameNumber());
-                    trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                    trVectorSetUnitPos("pos", "chests");
+                    trQuestVarSetFromRand("rand", 4, 7, true);
+                    trQuestVarSet("angle", 0.785398);
+                    trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
+                    for(x=0; < trQuestVarGet("rand")) {
+                        trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+                        trQuestVarSet("statueX", trQuestVarGet("posX") + 10.0 * trQuestVarGet("dirX"));
+                        trQuestVarSet("statueZ", trQuestVarGet("posZ") + 10.0 * trQuestVarGet("dirZ"));
+                        trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
 
-                    trArmySelect("1,0");
-                    trUnitConvert(0);
-                    trUnitChangeProtoUnit("Statue of Automaton Base");
+                        trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                        trArmyDispatch("1,0","Dwarf",1,1,0,1,180,true);
+                        trUnitSelectClear();
+                        trUnitSelectByQV("next", true);
+                        trUnitConvert(ENEMY_PLAYER);
+                        trUnitTeleport(trQuestVarGet("statueX"),0,trQuestVarGet("statueZ"));
+                        trMutateSelected(kbGetProtoUnitID("Monument 2"));
+                        trQuestVarSet("dirX", 0.0 - trQuestVarGet("dirX"));
+                        trQuestVarSet("dirZ", 0.0 - trQuestVarGet("dirZ"));
+                        trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+                        trQuestVarSet("index", yAddToDatabase("statuesIn"+room, "next"));
+                        yAddUpdateVar("statuesIn"+room, "angle", fModulo(6.283185, trQuestVarGet("angle") - 3.141592));
+                        yAddUpdateVar("statuesIn"+room, "posX", trQuestVarGet("statueX"));
+                        yAddUpdateVar("statuesIn"+room, "posZ", trQuestVarGet("statueZ"));
+                        yAddToDatabase("statuesReady", "index");
+                        trQuestVarSetFromRand("jump", 1, 2, true);
+                        for (y=trQuestVarGet("jump"); >0) {
+                            yDatabaseNext("statuesReady");
+                        }
+                    }
 
-                    x0 = trQuestVarGet("room"+room+"bottom2x");
-                    z0 = trQuestVarGet("room"+room+"bottom2z");
-                    x1 = trQuestVarGet("room"+room+"top2x");
-                    z1 = trQuestVarGet("room"+room+"top2z");
-
-                    paintEnemies(x0, z0, x1, z1);
-                    trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
-                    ySetVar("chests", "pad2", trGetNextUnitScenarioNameNumber());
-                    trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-                    
-                    trArmySelect("1,0");
-                    trUnitConvert(0);
-                    trUnitChangeProtoUnit("Statue of Automaton Base");
+                    for(x=trQuestVarGet("rand"); >0) {
+                        yDatabaseNext("statuesReady");
+                        trQuestVarSet("start", yGetPointer("statuesReady"));
+                        trQuestVarSetFromRand("jump", 1, (trQuestVarGet("rand") - 1) / 2, true);
+                        for(y=trQuestVarGet("jump"); >0) {
+                            yDatabaseNext("statuesReady");
+                        }
+                        connectStatues(yGetUnitAtIndex("statuesReady", 1*trQuestVarGet("start")), 1*trQuestVarGet("statuesReady"), room);
+                        ySetPointer("statuesReady", 1*trQuestVarGet("start"));
+                    }
+                    yClearDatabase("statuesReady");
                 }
                 case CHEST_ENCOUNTER:
                 {

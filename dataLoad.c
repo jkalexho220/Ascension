@@ -381,7 +381,6 @@ inactive
 	int class = 0;
 	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
-		trModifyProtounit("Villager Atlantean Hero", p, 5, trQuestVarGet("p"+p+"transporterLevel"));
 		trForbidProtounit(p, "Swordsman Hero");
 		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
