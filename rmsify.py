@@ -87,7 +87,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trCountUnitsInArea', 'trArmyDispatch', 'trTime', 'xsEnableRule', 'trUnitDestroy', 'trPlayerUnitCountSpecific', 
 			'xsSetContextPlayer', 'trVectorQuestVarGetX', 'trSetCivAndCulture', 'xsAbs', 'xsAtan', 'trUnitGetIsContained',
 			'trUnitSelect', 'kbUnitGetActionType', 'trSoundPlayFN', 'trUnitTeleport', 'trUnitOverrideAnimation', 'xsVectorNormalize', 'xsVectorSetZ', 'xsVectorSetX',
-			'trCameraShake', 'trCamTrackPlay', 'kbGetProtoUnitID', 'trDamageUnit', 'trGetStatValue', 'xsDisableRule', 
+			'trCameraShake', 'trCamTrackPlay', 'kbGetProtoUnitID', 'trDamageUnit', 'trGetStatValue', 'xsDisableRule', 'trRenderSnow',
 			'xsSqrt', 'trSetLighting', 'for', 'trVectorQuestVarSet', 'trTechInvokeGodPower', 'aiSet', 'trCheckGPActive', 
 			'trGetNextUnitScenarioNameNumber', 'trMusicPlay', 'xsSin', 'trPlayerGetPopulation', 'trUnitMoveToUnit', 'trPlayerModifyLOS',
 			'trDelayedRuleActivation', 'trStringQuestVarGet', 'kbGetBlockID', 'trCurrentPlayer', 'trPlayerGrantResources', 

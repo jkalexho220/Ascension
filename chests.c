@@ -24,6 +24,9 @@ void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate 
 	ySetVar("statuesIn"+room, "position", 1 + yGetVar("statuesIn"+room, "position"));
 	if (yGetVar("statuesIn"+room, "position") >= 4) {
 		ySetVar("statuesIn"+room, "position", 0);
+		trQuestVarSet("correctStatuesIn"+room, 1 + trQuestVarGet("correctStatuesIn"+room));
+	} else if (yGetVar("statuesIn"+room, "position") == 1) {
+		trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("correctStatuesIn"+room) - 1);
 	}
 	trUnitSelectClear();
 	trUnitSelectByQV("statuesIn"+room);
@@ -31,13 +34,9 @@ void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate 
 	if (immediate) {
 		trVectorSetFromAngle("dir", yGetVar("statuesIn"+room, "angle"));
 		trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-		if (yGetVar("statuesIn"+room, "position") == 0) {
-			trQuestVarSet("correctStatuesIn"+room, 1 + trQuestVarGet("correctStatuesIn"+room));
-		} else if (yGetVar("statuesIn"+room, "position") == 1) {
-			trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("correctStatuesIn"+room) - 1);
-		}
 	} else {
 		trUnitConvert(0);
+		trQuestVarSet("movingStatuesIn"+room, 1 + trQuestVarGet("movingStatuesIn"+room));
 		ySetVar("statuesIn"+room, "state", 1);
 		if (trTimeMS() < yGetVar("statuesIn"+room, "timeout")) {
 			ySetVar("statuesIn"+room, "timeout", 1000 + yGetVar("statuesIn"+room, "timeout"));
@@ -170,13 +169,7 @@ void processChests() {
 		                				ySetVar("statuesIn"+room, "state", 0);
 		                				trUnitConvert(ENEMY_PLAYER);
 		                				trDamageUnitPercent(-100);
-		                				if ((yGetVar("statuesIn"+room, "position") == 0) && yGetVar("statuesIn"+room, "previous") > 0) {
-		                					trQuestVarSet("correctStatuesIn"+room, 1 + trQuestVarGet("correctStatuesIn"+room));
-		                				}
-		                				if ((yGetVar("statuesIn"+room, "position") > 0) && yGetVar("statuesIn"+room, "previous") == 0) {
-		                					trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("correctStatuesIn"+room) - 1);
-		                				}
-		                				ySetVar("statuesIn"+room, "previous", yGetVar("statuesIn"+room, "position"));
+		                				trQuestVarSet("movingStatuesIn"+room, trQuestVarGet("movingStatuesIn"+room) - 1);
 		                			} else {
 		                				angle = fModulo(6.283185, yGetVar("statuesIn"+room, "angle") - angle * 1.570796);
 		                			}
@@ -185,8 +178,10 @@ void processChests() {
 		                		}
 		                	}
 		                }
-		                if (trQuestVarGet("correctStatuesIn"+room) == yGetDatabaseCount("statuesIn"+room)) {
+		                if ((trQuestVarGet("correctStatuesIn"+room) == yGetDatabaseCount("statuesIn"+room)) &&
+		                	trQuestVarGet("movingStatuesIn"+room) == 0) {
 		                	ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
+		                	trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 		                }
 		            }
 		            case CHEST_ENCOUNTER:
@@ -228,7 +223,7 @@ void processChests() {
     				trSoundPlayFN("attackwarning.wav","1",-1,"","");
     				trMessageSetText("The chest was a bomb! Run!",-1);
     			} else {
-    				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand"), true);
+    				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand") + trQuestVarGet("correctStatuesIn"+room), true);
     				if (trQuestVarGet("rand") < ENEMY_PLAYER) {
     					trQuestVarSet("rand", ENEMY_PLAYER);
     				}

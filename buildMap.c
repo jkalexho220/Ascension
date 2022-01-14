@@ -276,8 +276,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         case ROOM_CHEST:
         {
             trQuestVarSetFromRand("chestType", CHEST_KEY, CHEST_STATUES, true);
-            /* DELETE ME */
-            trQuestVarSet("chestType", CHEST_STATUES);
             if (trQuestVarGet("chestType") < CHEST_STATUES) {
                 buildRoom(x, z, ROOM_BASIC);
                 trQuestVarSet("room"+room, ROOM_CHEST);
@@ -967,8 +965,6 @@ highFrequency
             if (trQuestVarGet("room"+i) == 0) {
                 if (chests > 0) {
                     trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
-                    /* DELETE ME */
-                    trQuestVarSet("chestRand", 1);
                 } else {
                     trQuestVarSet("chestRand", 0);
                 }
