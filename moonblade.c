@@ -35,6 +35,8 @@ void moonbladeAlways(int eventID = -1) {
 					trPlayerGrantResources(p, "favor", 3);
 					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 						stunUnit("enemies", 2.0, p);
+						trUnitSelectClear();
+						trUnitSelectByQV("enemies");
 						damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
 					}
 				}
@@ -217,7 +219,8 @@ void moonbladeAlways(int eventID = -1) {
 	if (yGetDatabaseCount("p"+p+"wolves") > 0) {
 		yDatabaseNext("p"+p+"wolves", true);
 		if (trUnitAlive() == false) {
-			trUnitChangeProtoUnit("Conversion SFX");
+			yAddToDatabase("decayingWolves", "p"+p+"wolves");
+			yAddUpdateVar("decayingWolves", "timeout", 3000 + trTimeMS());
 			yRemoveFromDatabase("p"+p+"wolves");
 		}
 	}

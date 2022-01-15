@@ -1,6 +1,7 @@
 void removeFireKnight(int p = 0) {
 	removePlayerSpecific(p);
 	yRemoveUpdateVar("p"+p+"characters", "phoenix");
+	yRemoveUpdateVar("p"+p+"characters", "charging");
 }
 
 void fireknightAlways(int eventID = -1) {
@@ -39,6 +40,7 @@ void fireknightAlways(int eventID = -1) {
 		yVarToVector("p"+p+"fireCharges", "dest");
 		if (zDistanceBetweenVectorsSquared("pos", "dest") < 4 || trTimeMS() > yGetVar("p"+p+"fireCharges", "timeout")) {
 			if (ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"))) {
+				ySetVar("p"+p+"characters", "charging", 0);
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"characters");
 				trUnitChangeProtoUnit("Lancer Hero");
@@ -104,7 +106,8 @@ void fireknightAlways(int eventID = -1) {
 			id = yDatabaseNext("p"+p+"characters", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeFireKnight();
-			} else {
+			} else if (yGetVar("p"+p+"characters", "charging") == 0) {
+				ySetVar("p"+p+"characters", "charging", 1);
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
@@ -163,7 +166,7 @@ void fireknightAlways(int eventID = -1) {
 
 				yAddToDatabase("p"+p+"fireCharges", "next");
 				yAddUpdateVar("p"+p+"fireCharges", "index", yGetPointer("p"+p+"characters"));
-				yAddUpdateVar("p"+p+"fireCharges", "timeout", trTimeMS() + 1100 * dist / 15);
+				yAddUpdateVar("p"+p+"fireCharges", "timeout", trTimeMS() + 2000 * trQuestVarGet("p"+p+"spellDuration"));
 				yAddUpdateVar("p"+p+"fireCharges", "sfx", trQuestVarGet("sfx"));
 				yAddUpdateVar("p"+p+"fireCharges", "destX", trQuestVarGet("posx"));
 				yAddUpdateVar("p"+p+"fireCharges", "destZ", trQuestVarGet("posz"));

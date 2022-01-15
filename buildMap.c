@@ -1,7 +1,7 @@
 const int MAP_STANDARD = 0;
 const int MAP_PORTALS = 1;
 
-void deployEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
+void deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
     int n = trGetNextUnitScenarioNameNumber();
     trArmyDispatch("1,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
     trUnitSelectClear();
@@ -343,26 +343,37 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trQuestVarSet("villageX", 70 * x + 20);
             trQuestVarSet("villageZ", 70 * z + 20);
 
-            deployEyecandy("Savannah Tree",15,37,0);
-            deployEyecandy("Savannah Tree",11,33,50);
-            deployEyecandy("Savannah Tree",5,21,90);
-            deployEyecandy("Savannah Tree",29,31,47);
-            deployEyecandy("Savannah Tree",33,29,127);
+            deployTownEyecandy("Savannah Tree",15,37,0);
+            deployTownEyecandy("Savannah Tree",11,33,50);
+            deployTownEyecandy("Savannah Tree",5,21,90);
+            deployTownEyecandy("Savannah Tree",29,31,47);
+            deployTownEyecandy("Savannah Tree",33,29,127);
 
-            deployEyecandy("House",7,29,180);
-            deployEyecandy("House",9,15,0);
+            deployTownEyecandy("House",7,29,180);
+            deployTownEyecandy("House",9,15,0);
 
-            deployEyecandy("Granary",7,33,0);
-            deployEyecandy("Dock",9,13,0);
-            deployEyecandy("Tower",33,15,270);
-            deployEyecandy("Counter Building",23,29,180);
+            deployTownEyecandy("Granary",7,33,0);
+            deployTownEyecandy("Dock",9,13,0);
+            deployTownEyecandy("Tower",33,15,270);
+            deployTownEyecandy("Counter Building",23,29,180);
 
-            deployEyecandy("Fence Wood",19,15,180);
-            deployEyecandy("Fence Wood",19,11,180);
-            deployEyecandy("Fence Wood",21,9,270);
-            deployEyecandy("Fence Wood",25,17,270);
-            deployEyecandy("Fence Wood",27,15,180);
-            deployEyecandy("Fence Wood",27,11,180);
+            deployTownEyecandy("Fence Wood",19,15,180);
+            deployTownEyecandy("Fence Wood",19,11,180);
+            deployTownEyecandy("Fence Wood",21,9,270);
+            deployTownEyecandy("Fence Wood",25,17,270);
+            deployTownEyecandy("Fence Wood",27,15,180);
+            deployTownEyecandy("Fence Wood",27,11,180);
+
+            trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Villager Chinese",23,19,315);
+            trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Maceman",19,25,225);
+            yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
+            yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Maceman"));
+            trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Villager Egyptian",11,27,180);
         }
         case ROOM_VILLAGE + 2:
         {
@@ -971,7 +982,21 @@ highFrequency
                 if (i == trQuestVarGet("relicTransporterGuy")) {
                     buildRoom(x, z, ROOM_TRANSPORTER_GUY);
                 } else if (i == 1*trQuestVarGet("village")) {
+                    xsEnableRule("town_always");
                     buildRoom(x, z, ROOM_VILLAGE + trQuestVarGet("stage"));
+                    /* quest givers */
+                    for(x=3; >0) {
+                        if (trQuestVarGet("localQuest") == x) {
+                            trVectorSetUnitPos("pos", "guy"+x);
+                            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                            trArmySelect("1,0");
+                            trUnitChangeProtoUnit("Healing SFX");
+                            trQuestVarSet("questGuy", trQuestVarGet("guy"+x));
+                        } else {
+                            yAddToDatabase("npcTalk", "guy"+x);
+                            yAddUpdateVar("npcTalk", "dialog", 10 * x + trQuestVarGet("stage"));
+                        }
+                    }
                 } else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
                     buildRoom(x, z, ROOM_NOTTUD);
                     nottudSpawn = false;

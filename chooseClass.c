@@ -245,7 +245,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "Cooldown: 12 | Radius: 4 | Damage: 90";
+					msg = "Cooldown: 12 | Radius: 4 | Duration: 2 | Damage: 90";
 				}
 				case 5:
 				{

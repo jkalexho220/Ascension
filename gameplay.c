@@ -616,6 +616,15 @@ highFrequency
         processLaunchedUnit();
     }
 
+    if (yGetDatabaseCount("decayingWolves") > 0) {
+        yDatabaseNext("decayingWolves");
+        if (trTimeMS() > yGetVar("decayingWolves", "timeout")) {
+            trUnitSelectClear();
+            trUnitSelectByQV("decayingWolves", true);
+            trUnitChangeProtoUnit("Dust Small");
+        }
+    }
+
     processChests();
     processWalls();
 

@@ -19,11 +19,11 @@ const int RELIC_STUN_RESISTANCE = 15;
 const int RELIC_SPECIAL_ATTACK = 16;
 const int RELIC_POISON_KILLER = 17;
 const int RELIC_COOLDOWN_REDUCTION = 18;
-const int RELIC_STUN_KILLER = 19;
+const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
 /* nottud's shop */
-const int RELIC_WEIGHTED_BLOWS = 21;
+const int RELIC_SOMETHING = 21;
 const int RELIC_YEEBAAGOOON = 22;
 const int RELIC_ZENOPHOBIA = 23;
 const int RELIC_NICKONHAWK = 24;
@@ -103,9 +103,9 @@ string relicName(int relic = 0) {
 		{
 			msg = "+0.5x damage to poisoned enemies.";
 		}
-		case RELIC_STUN_KILLER:
+		case RELIC_WEIGHTED_BLOWS:
 		{
-			msg = "+0.5x damage to stunned enemies.";
+			msg = "Your stuns deal damage equal to 10 percent of your health.";
 		}
 		case RELIC_ALL:
 		{
@@ -194,7 +194,7 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\special e mummy icon 64";
 		}
-		case RELIC_STUN_KILLER:
+		case RELIC_WEIGHTED_BLOWS:
 		{
 			icon = "icons\special g medusa icon 64";
 		}
@@ -323,9 +323,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"poisonKiller", trQuestVarGet("p"+p+"poisonKiller") + 0.5 * m);
 		}
-		case RELIC_STUN_KILLER:
+		case RELIC_WEIGHTED_BLOWS:
 		{
-			trQuestVarSet("p"+p+"stunKiller", trQuestVarGet("p"+p+"stunKiller") + 0.5 * m);
+			trQuestVarSet("p"+p+"stunDamage", trQuestVarGet("p"+p+"stunDamage") + 0.1 * m);
 		}
 		case RELIC_ALL:
 		{
@@ -421,7 +421,7 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Mummy");
 		}
-		case RELIC_STUN_KILLER:
+		case RELIC_WEIGHTED_BLOWS:
 		{
 			proto = kbGetProtoUnitID("Medusa");
 		}

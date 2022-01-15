@@ -6,6 +6,15 @@ const int NPC_EXPLAIN_SINGLEPLAYER = 2;
 const int NPC_ZENO_NEXT_QUESTION = 3;
 const int NPC_ZENO_QUIZ_END = 4;
 
+
+const int FETCH_NPC = 10;
+const int BOUNTY_NPC = 20;
+const int SHOP_NPC = 30;
+
+const int FETCH_GUY = 1;
+const int BOUNTY_GUY = 2;
+const int SHOP_GUY = 3;
+
 void startNPCDialog(int npc = 0) {
 	xsEnableRule("npc_talk_01");
 	trQuestVarSet("currentNPC", npc);
@@ -131,6 +140,60 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
 			}
 		}
+
+		case FETCH_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Good day! Welcome to Foothill Camp!");
+				}
+				case 2:
+				{
+					uiMessageBox("They call us Foothill Camp because we're at the first floor of the Tower!");
+				}
+				case 3:
+				{
+					uiMessageBox("Oh these pigs? They're not for sale. Don't touch them.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Welcome, adventurers! Are you here for some training?");
+				}
+				case 2:
+				{
+					uiMessageBox("I don't have any bounties for you today though! Check again later!");
+				}
+			}
+		}
+
+		case SHOP_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("They say there are ten floors in this tower, but no one knows what's at the top.");
+				}
+				case 2:
+				{
+					uiMessageBox("No adventurer has made it up there and came back down to tell the tale.");
+				}
+				case 3:
+				{
+					uiMessageBox("Maybe they've been abducted by aliens!");
+				}
+			}
+		}
 	}
 	return(dialog);
 }
@@ -194,5 +257,44 @@ highFrequency
 	if ((trQuestVarGet("currentNPCProgress") > 0) && (trIsGadgetVisible("ingame-messagedialog") == false)) {
 		trDelayedRuleActivation("npc_talk_01");
 		xsDisableSelf();
+	}
+}
+
+rule town_always
+inactive
+highFrequency
+{
+	int x = 0;
+	int z = 0;
+	if (trQuestVarGet("townFound") == 0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("guy1");
+		for(p=1; < ENEMY_PLAYER) {
+			if (trUnitHasLOS(p)) {
+				trQuestVarSet("townFound", 1);
+				break;
+			}
+		}
+		if (trQuestVarGet("townFound") == 1) {
+			x = trQuestVarGet("village");
+			z = x / 4;
+			x = trQuestVarGet("village") - 4 * z;
+			zSetProtoUnitStat("Revealer", 1, 2, 32);
+			trArmyDispatch("1,0","Revealer",1,2*x,0,2*z,225,true);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			trSoundPlayFN("settlement.wav","1",-1,"","");
+		}
+	} else {
+		yDatabaseNext("npcTalk", true);
+		if (trUnitIsSelected()) {
+			startNPCDialog(1*yGetVar("npcTalk", "dialog"));
+			reselectMyself();
+		}
+		trUnitSelectClear();
+		trUnitSelectByQV("questGuy");
+		if (false) {
+			uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+		}
 	}
 }

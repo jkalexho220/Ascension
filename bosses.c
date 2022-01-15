@@ -150,8 +150,10 @@ highFrequency
 
 		trQuestVarSet("bossPointer", yAddToDatabase("enemies", "bossUnit"));
 
-		trModifyProtounit("Revealer", 1, 2, 20);
+		zSetProtoUnitStat("Revealer", 1, 2, 32);
 		trArmyDispatch("1,0","Revealer",1,trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
+		trArmySelect("1,0");
+		trUnitConvert(0);
 		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
 	}
 }

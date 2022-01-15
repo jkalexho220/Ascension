@@ -245,13 +245,13 @@ void processChests() {
 			    		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 			    		trQuestVarSetFromRand("heading",1,360,true);
 			    		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),trQuestVarGet("heading"),true);
-			    		trQuestVarSetFromRand("speed", 0, 4);
+			    		trQuestVarSetFromRand("speed", 2, 10);
 			    		zSetProtoUnitStat("Kronny Flying", 0, 1, trQuestVarGet("speed"));
 			    		trUnitSelectClear();
 			    		trUnitSelectByQV("next", true);
 			    		trUnitConvert(0);
-			    		trDamageUnitPercent(100);
 			    		trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+			    		trDamageUnitPercent(100);
 			    		trSetSelectedScale(0,-3,0);
 			    		yAddToDatabase("rainingRelics", "next");
 			    		ySetVar("chests", "count", yGetVar("chests", "count") - 1);

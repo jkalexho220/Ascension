@@ -253,7 +253,7 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"poisonResistanceCount", 0);
     trQuestVarSet("p"+p+"silenceResistanceCount", 0);
 
-    trQuestVarSet("p"+p+"stunKiller", 1);
+    trQuestVarSet("p"+p+"stunDamage", 0);
     trQuestVarSet("p"+p+"poisonKiller", 1);
 
     trUnitSelectClear();
@@ -407,6 +407,7 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime) {
+        zInitProtoUnitStat("Revealer", 1, 2, 12);
         setupPlayerProto("Kronny Flying", 1000, 0, 0);
 
         /* i gotta look good */
@@ -456,6 +457,10 @@ highFrequency
             trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
         }
+
+        trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);
+        trModifyProtounit("Kronny Flying", 0, 1, -9999999999999999999.0);
+        zInitProtoUnitStat("Kronny Flying", 0, 1, 0);
 
         trModifyProtounit("Bolt Strike", 0, 27, -10000);
         trModifyProtounit("Bolt Strike", 0, 28, -10000);

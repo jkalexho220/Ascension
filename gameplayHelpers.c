@@ -270,6 +270,29 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 	}
 }
 
+/*
+Enemies have elemental resistance and weakness
+*/
+float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
+	if (spell) {
+		dmg = dmg - dmg * yGetVar("enemies", "magicResist");
+	} else {
+		dmg = dmg - dmg * yGetVar("enemies", "physicalResist");
+	}
+	if (yGetVar("enemies", "poisonStatus") == 1) {
+		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
+	}
+	trDamageUnit(dmg);
+	if (spell) {
+		trQuestVarSet("p"+p+"lifestealTotal", 
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal") * dmg);
+	} else {
+		trQuestVarSet("p"+p+"lifestealTotal", 
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * dmg);
+	}
+	return(dmg);
+}
+
 void stunUnit(string db = "", float duration = 0, int p = 0) {
 	trQuestVarSet("stunSound", 1);
 	int index = 0;
@@ -282,6 +305,9 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 			healUnit(p, 0.05 * trQuestVarGet("p"+p+"health"), 1*trQuestVarGet("p"+p+"index"));
 			trUnitSelectClear();
 			trUnitSelectByQV(db);
+		}
+		if (trQuestVarGet("p"+p+"stunDamage") > 0) {
+			damageEnemy(p, trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"stunDamage"), true);
 		}
 	} else {
 		p = yGetVar(db, "player");
@@ -413,30 +439,6 @@ void launchUnit(string db = "", string dest = "") {
 		yAddUpdateVar("launchedUnits", "timeout", trTimeMS() + 1100 * dist / 15);
 		yAddUpdateVar("launchedUnits", "stun", hitWall);
 	}
-}
-
-
-/*
-Enemies have elemental resistance and weakness
-*/
-float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
-	if (spell) {
-		dmg = dmg - dmg * yGetVar("enemies", "magicResist");
-	} else {
-		dmg = dmg - dmg * yGetVar("enemies", "physicalResist");
-	}
-	if (yGetVar("enemies", "poisonStatus") == 1) {
-		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
-	}
-	trDamageUnit(dmg);
-	if (spell) {
-		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal") * dmg);
-	} else {
-		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * dmg);
-	}
-	return(dmg);
 }
 
 /*

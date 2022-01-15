@@ -108,7 +108,6 @@ void stormcutterAlways(int eventID = -1) {
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
-		trUnitSetAnimationPath("0,1,1,1,0,0,0");
 		yAddToDatabase("p"+p+"whirlwindObjects", "p"+p+"lureObject");
 		yAddUpdateVar("p"+p+"whirlwindObjects", "timeout", trTimeMS() + 1000 * trQuestVarGet("p"+p+"spellRange"));
 		dist = xsPow(trQuestVarGet("whirlwindRange") * trQuestVarGet("p"+p+"spellRange"), 2);
@@ -126,7 +125,7 @@ void stormcutterAlways(int eventID = -1) {
 		yDatabaseNext("p"+p+"whirlwindObjects", true);
 		amt = yGetVar("p"+p+"whirlwindObjects", "timeout") - trTimeMS();
 		if (amt > 0) {
-			amt = amt / 1000;
+			amt = amt * 0.001;
 			trSetSelectedScale(amt, amt, amt);
 		} else {
 			trUnitDestroy();
