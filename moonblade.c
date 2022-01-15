@@ -140,7 +140,7 @@ void moonbladeAlways(int eventID = -1) {
 				}
 				trQuestVarSet("p"+p+"protection", 0);
 			} else {
-				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") + 1);
+				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
 				trQuestVarSet("p"+p+"protectionNext", 
 					trTimeMS() + trQuestVarGet("protectionDelay") * trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");

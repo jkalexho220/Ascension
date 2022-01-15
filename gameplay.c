@@ -217,13 +217,14 @@ highFrequency
     }
     /*
     TESTING STUFF BELOW THIS LINE
+    */
     
     if (Multiplayer) {
         trUnitSelectClear();
         trUnitSelectByQV("p1unit");
         trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
     }
-    */
+    
 }
 
 rule gameplay_always
@@ -263,8 +264,11 @@ highFrequency
             yRemoveFromDatabase("stunnedUnits");
             yRemoveUpdateVar("stunnedUnits", "proto");
         } else {
-            trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
-            trUnitOverrideAnimation(2, 0, false, false, -1, 0);
+            if (xsAbs(trQuestVarGet("stunnedUnits") - trQuestVarGet("bossUnit")) > 0 ||
+                trQuestVarGet("bossAnim") == 0) {
+                trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
+                trUnitOverrideAnimation(2, 0, false, false, -1, 0);
+            }
         }
     }
 
@@ -334,7 +338,7 @@ highFrequency
     p = trQuestVarGet("relicPlayer");
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
-    if (trUnitAlive() && trQuestVarGet("p"+p+"rideLightning") == 0 && trQuestVarGet("p"+p+"dead") <= 0) {
+    if (trUnitAlive() && trQuestVarGet("p"+p+"launched") == 0 && trQuestVarGet("p"+p+"dead") <= 0) {
         trVectorSetUnitPos("pos", "p"+p+"unit");
         for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
             yDatabaseNext("p"+p+"relics", true);
@@ -622,6 +626,7 @@ highFrequency
             trUnitSelectClear();
             trUnitSelectByQV("decayingWolves", true);
             trUnitChangeProtoUnit("Dust Small");
+            yRemoveFromDatabase("decayingWolves");
         }
     }
 

@@ -80,6 +80,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
     }
 }
 
+
 rule setup_enemies
 inactive
 highFrequency
@@ -467,7 +468,7 @@ void enemiesAlways() {
                     trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
                     trVectorSetUnitPos("start", "Medusas");
                     trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,5,5);
+                    addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
                     yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
                     yAddUpdateVar("MedusaBalls", "bounces", 10);
                     ySetVar("Medusas", "step", 2);

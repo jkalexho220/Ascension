@@ -145,6 +145,22 @@ void removePlayerSpecific(int p = 0) {
 	yRemoveUpdateVar("p"+p+"characters", "index");
 }
 
+void equipRelicsAgain(int p = 0) {
+	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+		yDatabaseNext("p"+p+"relics", true);
+		trUnitChangeProtoUnit("Relic");
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"relics");
+		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+			trSetSelectedScale(0,0,-1);
+			trUnitSetAnimationPath("1,0,1,1,0,0,0");
+		}
+	}
+}
+
+
 /*
 called after confirming that the projectile is on WALL terrain.
 */
@@ -293,6 +309,23 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	return(dmg);
 }
 
+
+void growFrostGiantsIncoming(string pos = "") {
+    for(x=yGetDatabaseCount("frostGiantsIncoming"); >0) {
+        yDatabaseNext("frostGiantsIncoming");
+        if (zDistanceToVectorSquared("frostGiantsIncoming", pos) < 100) {
+            trUnitSelectClear();
+            trUnitSelectByQV("frostGiantsIncoming", true);
+            trUnitHighlight(0.5, false);
+            if (yGetVar("frostGiantsIncoming", "targetSize") < 10) {
+                trQuestVarSet("frostGiantIncomingSound", 1);
+                ySetVar("frostGiantsIncoming", "targetSize", 2 + yGetVar("frostGiantsIncoming", "targetSize"));
+                ySetVar("frostGiantsIncoming", "targetTime", xsMax(trTimeMS(), yGetVar("frostGiantsIncoming", "targetTime")) + 1000);
+            }
+        }
+    }
+}
+
 void stunUnit(string db = "", float duration = 0, int p = 0) {
 	trQuestVarSet("stunSound", 1);
 	int index = 0;
@@ -315,6 +348,10 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 	}
 	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 		if (yGetVar(db, "stunStatus") == 0) {
+			if (trQuestVarGet("boss") == 3) {
+				trVectorSetUnitPos("stunpos", db);
+				growFrostGiantsIncoming("stunpos");
+			}
 			index = yAddToDatabase("stunnedUnits", db);
 			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
 			if (yGetVar(db, "stunSFX") == 0) {
@@ -340,7 +377,8 @@ void processLaunchedUnit() {
 		trTimeMS() > yGetVar("launchedUnits", "timeout")) {
 		if (trUnitAlive()) {
 			string db = "playerUnits";
-			if (yGetVar("launchedUnits", "player") == ENEMY_PLAYER) {
+			int p = yGetVar("launchedUnits", "player");
+			if (p == ENEMY_PLAYER) {
 				db = "enemies";
 			}
 			ySetVarAtIndex(db, "launched", 0, 1*yGetVar("launchedUnits", "index"));
@@ -348,6 +386,10 @@ void processLaunchedUnit() {
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
 			trMutateSelected(1*yGetVar("launchedUnits", "proto"));
+			if ((p < ENEMY_PLAYER) && (yGetVar("launchedUnits", "unit") == trQuestVarGet("p"+p+"unit"))) {
+				equipRelicsAgain(p);
+				trQuestVarSet("p"+p+"launched", 0);
+			}
 			if (yGetVar("launchedUnits", "unit") == trQuestVarGet("bossUnit")) {
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar("launchedUnits", "unit"));
@@ -375,11 +417,11 @@ void launchUnit(string db = "", string dest = "") {
 	if (yGetVar(db, "launched") == 0) {
 		ySetVar(db, "launched", 1);
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db)));
-		int owner = ENEMY_PLAYER;
+		int p = ENEMY_PLAYER;
 		trUnitSelectClear();
 		trUnitSelectByQV(db);
 		if (trUnitIsOwnedBy(ENEMY_PLAYER) == false) {
-			owner = yGetVar(db, "player");
+			p = yGetVar(db, "player");
 		}
 		trUnitChangeProtoUnit("Transport Ship Greek");
 
@@ -391,7 +433,7 @@ void launchUnit(string db = "", string dest = "") {
 		trUnitSelectClear();
 		trUnitSelectByQV("next");
 		trImmediateUnitGarrison(""+1*trQuestVarGet(db));
-		trUnitConvert(owner);
+		trUnitConvert(p);
 		trUnitChangeProtoUnit("Dwarf");
 
 		trUnitSelectClear();
@@ -432,12 +474,20 @@ void launchUnit(string db = "", string dest = "") {
 		yAddToDatabase("launchedUnits", "next");
 		yAddUpdateVar("launchedUnits", "unit", trQuestVarGet(db));
 		yAddUpdateVar("launchedUnits", "index", yGetPointer(db));
-		yAddUpdateVar("launchedUnits", "player", owner);
+		yAddUpdateVar("launchedUnits", "player", p);
 		yAddUpdateVar("launchedUnits", "proto", type);
 		yAddUpdateVar("launchedUnits", "destX", trQuestVarGet("startx"));
 		yAddUpdateVar("launchedUnits", "destz", trQuestVarGet("startz"));
 		yAddUpdateVar("launchedUnits", "timeout", trTimeMS() + 1100 * dist / 15);
 		yAddUpdateVar("launchedUnits", "stun", hitWall);
+
+		if ((p < ENEMY_PLAYER) && (trQuestVarGet(db) == trQuestVarGet("p"+p+"unit"))) {
+			trQuestVarSet("p"+p+"launched", 1);
+			for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+				yDatabaseNext("p"+p+"relics", true);
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			}
+		}
 	}
 }
 
@@ -632,38 +682,28 @@ void spawnPlayer(int p = 0, string vdb = "") {
     }
 }
 
-void equipRelicsAgain(int p = 0) {
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics", true);
-		trUnitChangeProtoUnit("Relic");
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"relics");
-		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
-			trSetSelectedScale(0,0,-1);
-			trUnitSetAnimationPath("1,0,1,1,0,0,0");
-		}
-	}
-}
-
 rule spy_find
 active
 highFrequency
 {
-	if (xsAbs(trQuestVarGet("spyfound") - trQuestVarGet("spyfind")) > 0) {
+	int loopCount = trQuestVarGet("spyfind") - trQuestVarGet("spyfound");
+	int x = 0;
+	if (loopCount < 0) {
+		loopCount = loopCount + 32;
+	}
+	if (loopCount > 0) {
 		while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
 			int id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
 			if (id >= 0) {
 				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
-					int x = modularCounterNext("spyfound");
 					trVectorSetUnitPos("spos", "spysearch");
-					while(true) {
+					for(i=0; < loopCount) {
+						x = modularCounterNext("spyfound");
 						trUnitSelectClear();
 						trUnitSelectByQV("spyEye"+x+"unit");
 						if (trUnitAlive() == false) {
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
-						} else if (zDistanceToVectorSquared("spyEye"+x+"unit", "spos") > 0.7) {
+						} else if (zDistanceToVectorSquared("spyEye"+x+"unit", "spos") > 1) {
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
 						} else {
 							trUnitSelectClear();
@@ -672,11 +712,8 @@ highFrequency
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
 							break;
 						}
-						if (trQuestVarGet("spyFound") - trQuestVarGet("spyFind") == 0) {
-							break;
-						}
-						x = modularCounterNext("spyfound");
 					}
+					loopCount = loopCount - i;
 				}
 			}
 			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));

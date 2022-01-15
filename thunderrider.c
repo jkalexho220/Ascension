@@ -210,6 +210,7 @@ void thunderRiderAlways(int eventID = -1) {
 			trPlayerGrantResources(p, "favor", -1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"rideLightning", 0);
+				trQuestVarSet("p"+p+"launched", 0);
 				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
 				rideLightningOff(p);
 			}
@@ -307,6 +308,7 @@ void thunderRiderAlways(int eventID = -1) {
 				}
 				trQuestVarSet("p"+p+"rideLightning", 0);
 			} else {
+				trQuestVarSet("p"+p+"launched", 1);
 				refreshRideLightningTargets(p);
 				trQuestVarSet("p"+p+"rideLightningNext", 
 					trTimeMS() + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));

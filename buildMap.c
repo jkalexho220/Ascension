@@ -374,6 +374,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Maceman"));
             trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Villager Egyptian",11,27,180);
+
+            if (trQuestVarGet("localQuest") > 1) {
+                trQuestVarSet("pigStart", trGetNextUnitScenarioNameNumber());
+                deployTownEyecandy("Pig",21,15,120);
+                deployTownEyecandy("Pig",25,13,56);
+                deployTownEyecandy("Pig",21,11,222);
+                trQuestVarSet("pigEnd", trGetNextUnitScenarioNameNumber());
+            }
         }
         case ROOM_VILLAGE + 2:
         {
@@ -428,7 +436,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                     for(a=0; < size) {
                         for(b=size; >0) {
                             if (a*a + z0 * z0 <= size * size) {
-                                trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                                if (trQuestVarGet("stage") == 3) {
+                                    trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 5, 0, false);
+                                } else {
+                                    trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                                }
                                 trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
                                 break;
                             } else {
