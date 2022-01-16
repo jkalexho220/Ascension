@@ -77,7 +77,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			msg = "Attack +12";
+			msg = "Attack +15";
 		}
 		case RELIC_SPELL_POWER:
 		{
@@ -292,7 +292,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 12.0 * m);
+			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 15.0 * m);
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
 		}

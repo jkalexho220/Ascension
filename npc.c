@@ -172,6 +172,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("I don't have any bounties for you today though! Check again later!");
+					dialog = 0;
 				}
 			}
 		}
@@ -191,6 +192,127 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					uiMessageBox("Maybe they've been abducted by aliens!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case FETCH_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Why did I come to this tower? I should've never listened to those bastards!");
+				}
+				case 2:
+				{
+					uiMessageBox("What's so great about the Tower of Ascension anyway? It's not like anyone makes it to the top!");
+				}
+				case 3:
+				{
+					uiMessageBox("You should leave too! Before you're killed!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Who am I? Who are you?");
+				}
+				case 2:
+				{
+					uiMessageBox("Timmy! Don't run that way! No!");
+				}
+				case 3:
+				{
+					uiMessageBox("Wait, who's Timmy?");
+					dialog = 0;
+				}
+			}
+		}
+
+		case SHOP_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("We're lost souls. As long as that Wraithwood stands, we're trapped here.");
+				}
+				case 2:
+				{
+					uiMessageBox("But I'm hoping an adventurer will come by and sell me a Resurrection Stone.");
+				}
+				case 3:
+				{
+					uiMessageBox("Hey, do you have a Resurrection Stone? I'll buy it for 9000 gold.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case FETCH_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I never knew there could be native peoples living in this tower.");
+				}
+				case 2:
+				{
+					uiMessageBox("Turns out there are dwarves living on this floor.");
+				}
+				case 3:
+				{
+					uiMessageBox("Have you checked out that dwarf's wares yet? He sells some impressive stuff!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("These damn dwarves charge such high prices!");
+				}
+				case 2:
+				{
+					uiMessageBox("Where am I supposed to find a Frosted Bone to repair this axe?");
+				}
+				case 3:
+				{
+					uiMessageBox("Do they expect me to take down a Frost Giant with my bare fists?!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case SHOP_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Welcome, travelers! Come and rest a while. The ascent up this tower can be quite arduous.");
+				}
+				case 2:
+				{
+					uiMessageBox("I'm forging something at the moment, but if you come back later, there might be something for sale.");
+				}
+				case 3:
+				{
+					uiMessageBox("Us dwarves pride ourselves on our craftsmanship. Quality guaranteed!");
+					dialog = 0;
 				}
 			}
 		}
@@ -279,8 +401,10 @@ highFrequency
 			x = trQuestVarGet("village");
 			z = x / 4;
 			x = trQuestVarGet("village") - 4 * z;
+			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
 			zSetProtoUnitStat("Revealer", 1, 2, 32);
-			trArmyDispatch("1,0","Revealer",1,2*x,0,2*z,225,true);
+			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Revealer",1,70*x+40,0,70*z+40,225,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
 			trSoundPlayFN("settlement.wav","1",-1,"","");
@@ -295,6 +419,19 @@ highFrequency
 		trUnitSelectByQV("questGuy");
 		if (false) {
 			uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+		}
+
+		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
+			trQuestVarSet("townHealNext", trTime());
+			for(p=1; < ENEMY_PLAYER) {
+				if (zDistanceToVectorSquared("p"+p+"unit", "townCenter") < 400) {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"unit");
+					if (trUnitAlive()) {
+						trDamageUnitPercent(-1);
+					}
+				}
+			}
 		}
 	}
 }

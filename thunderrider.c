@@ -349,6 +349,17 @@ void thunderRiderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 
 						if (ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"))) {
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("playerUnits", "stunSFX"));
+							trUnitDestroy();
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("playerUnits", "poisonSFX"));
+							trUnitDestroy();
+							if (yGetVar("playerUnits", "stunStatus") > 0) {
+								if (ySetPointer("stunnedUnits", 1*yGetVar("playerUnits", "stunStatus"))) {
+					    			yRemoveFromDatabase("stunnedUnits");
+					    		}
+							}
 							removePlayerUnit();
 						}
 					}

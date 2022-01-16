@@ -217,14 +217,14 @@ highFrequency
     }
     /*
     TESTING STUFF BELOW THIS LINE
-    */
+    
     
     if (Multiplayer) {
         trUnitSelectClear();
         trUnitSelectByQV("p1unit");
         trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
     }
-    
+    */
 }
 
 rule gameplay_always

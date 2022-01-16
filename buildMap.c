@@ -398,10 +398,78 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                     }
                 }
             }
+            trQuestVarSet("villageX", 70 * x + 16);
+            trQuestVarSet("villageZ", 70 * z + 16);
+
+            trQuestVarSet("start", trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Marsh Tree",25,41,250);
+            deployTownEyecandy("Marsh Tree",23,41,75);
+            deployTownEyecandy("Marsh Tree",17,39,321);
+            deployTownEyecandy("Marsh Tree",13,37,266);
+            deployTownEyecandy("Marsh Tree",5,29,240);
+            deployTownEyecandy("Marsh Tree",5,21,80);
+            deployTownEyecandy("Marsh Tree",9,15,44);
+            deployTownEyecandy("Marsh Tree",9,11,280);
+            deployTownEyecandy("Marsh Tree",13,5,140);
+            deployTownEyecandy("Marsh Tree",19,7,275);
+            deployTownEyecandy("Marsh Tree",25,7,121);
+            deployTownEyecandy("Marsh Tree",29,7,100);
+            deployTownEyecandy("Marsh Tree",37,11,155);
+            deployTownEyecandy("Marsh Tree",37,17,44);
+            deployTownEyecandy("Marsh Tree",39,17,145);
+            deployTownEyecandy("Marsh Tree",39,25,131);
+            deployTownEyecandy("Marsh Tree",39,31,178);
+            deployTownEyecandy("Marsh Tree",29,37,33);
+            for(a=trQuestVarGet("start"); < trGetNextUnitScenarioNameNumber()) {
+                trUnitSelectClear();
+                trUnitSelect(""+a, true);
+                trSetSelectedScale(2,2,2);
+            }
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Runestone", 35,35,225);
+            trUnitSelectClear();
+            trUnitSelectByQV("next", true);
+            trSetSelectedScale(2.5,2.5,2.5);
+            deployTownEyecandy("Shrine",15,31,90);
+            deployTownEyecandy("Shrine",17,11,0);
+            deployTownEyecandy("Shrine",35,15,270);
+
+            trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Shade",25,35,180);
+            trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Shade",37,27,270);
+            trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Shade",21,19,30);
         }
         case ROOM_VILLAGE + 3:
         {
+            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+            paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
 
+            trQuestVarSet("villageX", 70 * x + 20);
+            trQuestVarSet("villageZ", 70 * z + 20);
+
+            deployTownEyecandy("Dwarf Foundry",29,29,180);
+            deployTownEyecandy("Dwarven Forge", 11, 29,180);
+            deployTownEyecandy("Armory",27,9,270);
+            deployTownEyecandy("Dwarven Forge",11,11,0);
+
+            trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Throwing Axeman",21,9,270);
+            trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Ulfsark",15,23,135);
+            trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Dwarf",25,25,225);
+            yAddToDatabase("stunnedUnits", "guy"+FETCH_GUY);
+            yAddUpdateVar("stunnedUnits","proto", kbGetProtoUnitID("Throwing Axeman"));
+            yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
+            yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Ulfsark"));
         }
         case ROOM_STARTER:
         {
@@ -1127,7 +1195,10 @@ highFrequency
                     trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("rand"));
                     for(x=trQuestVarGet("rand"); >1) {
                         yDatabaseNext("statuesIn"+room);
-                        turnStatue(room, 0, true, true);
+                        trQuestVarSetFromRand("amt",1,3,true);
+                        for(y=trQuestVarGet("amt"); >0) {
+                            turnStatue(room, 0, true, true);
+                        }
                     }
                     yClearDatabase("statuesReady");
                 }

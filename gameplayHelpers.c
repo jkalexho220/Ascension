@@ -317,7 +317,7 @@ void growFrostGiantsIncoming(string pos = "") {
             trUnitSelectClear();
             trUnitSelectByQV("frostGiantsIncoming", true);
             trUnitHighlight(0.5, false);
-            if (yGetVar("frostGiantsIncoming", "targetSize") < 10) {
+            if (yGetVar("frostGiantsIncoming", "targetSize") < 5) {
                 trQuestVarSet("frostGiantIncomingSound", 1);
                 ySetVar("frostGiantsIncoming", "targetSize", 2 + yGetVar("frostGiantsIncoming", "targetSize"));
                 ySetVar("frostGiantsIncoming", "targetTime", xsMax(trTimeMS(), yGetVar("frostGiantsIncoming", "targetTime")) + 1000);

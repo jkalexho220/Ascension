@@ -1095,9 +1095,9 @@ highFrequency
 			yDatabaseNext("frostGiantsIncoming", true);
 			amt = yGetVar("frostGiantsIncoming", "targetTime") - trTimeMS();
 			if (amt > 0) {
-				amt = yGetVar("frostGiantsIncoming", "targetSize") - amt * 0.002;
+				amt = yGetVar("frostGiantsIncoming", "targetSize") - amt * 0.001;
 				trSetSelectedScale(amt * 0.5, amt, amt * 0.5);
-			} else if (yGetVar("frostGiantsIncoming", "targetSize") >= 10) {
+			} else if (yGetVar("frostGiantsIncoming", "targetSize") >= 5) {
 				trUnitChangeProtoUnit("Frost Giant");
 				trUnitSelectClear();
 				trUnitSelectByQV("frostGiantsIncoming");
