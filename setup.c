@@ -10,8 +10,8 @@ const int EDGE_WALL = 4;
 
 const int ROOM_BASIC = 1;
 const int ROOM_AMBUSH = 2;
-const int ROOM_CHEST = 3;
 const int ROOM_TRANSPORTER_GUY = 4;
+const int ROOM_CHEST = 5;
 const int ROOM_VILLAGE = 10;
 const int ROOM_STARTER = 20;
 const int ROOM_BOSS = 21;

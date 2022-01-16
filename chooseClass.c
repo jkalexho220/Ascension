@@ -88,7 +88,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 12 favor per second.";
+					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 15 favor per second.";
 					next = 0;
 				}
 				case 6:
@@ -100,7 +100,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\improvement swine array icon 64";
-					msg = "Cooldown: 12 | Damage: 50";
+					msg = "Cooldown: 12 | Damage: 50 | Lose one stack every 5 seconds if not used";
 					next = 5;
 				}
 				case 8:

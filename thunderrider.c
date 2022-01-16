@@ -71,6 +71,7 @@ void rideLightningOff(int p = 0) {
 		uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
 		trUnblockAllSounds();
 	}
+	trQuestVarSet("p"+p+"launched", 0);
 }
 
 void refreshRideLightningTargets(int p = 0) {
@@ -318,7 +319,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"rideLightningRange", 
 					trQuestVarGet("rideLightningRange") * trQuestVarGet("p"+p+"spellRange"));
 				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-					id = yDatabaseNext("p"+p+"characters");
+					id = yDatabaseNext("p"+p+"characters", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeThunderRider(p);
 					} else {

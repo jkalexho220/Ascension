@@ -331,7 +331,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trArmySelect("1,0");
             trUnitChangeProtoUnit("Gaia Forest effect");
             xsEnableRule("relic_transporter_guy_found");
-            buildRoom(x, z, ROOM_BASIC);
         }
         case ROOM_VILLAGE + 1:
         {
@@ -912,6 +911,7 @@ highFrequency
             if (trQuestVarGet("villageEntrance") > 14) {
                 trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 14);
             }
+            trChatSend(0, "Village entrance is " + 1*trQuestVarGet("villageEntrance"));
             buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
         }
 
@@ -941,7 +941,7 @@ highFrequency
                 buildEdge(1*yGetVar("frontier", "edge"), 1*yGetVar("frontier", "type"));
                 edgeIsPortal = (yGetVar("frontier", "type") == EDGE_PORTAL);
                 trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
-                if (trQuestVarGet("frontier") < 15) {
+                if (trQuestVarGet("frontier") < 15 && xsAbs(trQuestVarGet("frontier") - trQuestVarGet("village")) > 0) {
                     yAddToDatabase("visited", "frontier");
                 }
                 /* only add more edges if the room is not the boss room or the village room */
@@ -972,7 +972,9 @@ highFrequency
                     if ((trQuestVarGet("mapType") == MAP_PORTALS) && (edgeIsPortal == false)) {
                         trQuestVarSetFromRand("rand", 1, 14, true);
                         n = trQuestVarGet("rand");
-                        if (trQuestVarGet("tile"+n) < TILE_VISITED && xsAbs(n - trQuestVarGet("villageEntrance")) > 0) {
+                        if (trQuestVarGet("tile"+n) < TILE_VISITED && 
+                            xsAbs(n - trQuestVarGet("villageEntrance")) > 0 &&
+                            xsAbs(trQuestVarGet("villageEntrance") - trQuestVarGet("frontier")) > 0) {
                             yAddToDatabase("frontier", "rand");
                             yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
                             yAddUpdateVar("frontier", "type", EDGE_PORTAL);
@@ -1059,7 +1061,7 @@ highFrequency
                 } else {
                     trQuestVarSet("chestRand", 0);
                 }
-                if (i == trQuestVarGet("relicTransporterGuy")) {
+                if (i == 1*trQuestVarGet("relicTransporterGuy")) {
                     buildRoom(x, z, ROOM_TRANSPORTER_GUY);
                 } else if (i == 1*trQuestVarGet("village")) {
                     xsEnableRule("town_always");

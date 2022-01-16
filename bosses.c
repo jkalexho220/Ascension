@@ -96,6 +96,7 @@ highFrequency
 				removePlayerUnit();
 			}
 		}
+		trQuestVarSet("deadPlayerCount", 0);
 		trQuestVarSet("bossRelicCount", randomLow(2));
 		trQuestVarSet("normalRelicCount", 3 - trQuestVarGet("bossRelicCount"));
 		trQuestVarSet("gameOverStep", 0);
@@ -137,6 +138,7 @@ highFrequency
 			trUnitDestroy();
 			spawnPlayer(p, "bossRoomPlayers");
 			equipRelicsAgain(p);
+			trQuestVarSet("p"+p+"silenceTimeout", 0);
 		}
 
 		for(x=yGetDatabaseCount("enemies"); >0) {
@@ -1151,13 +1153,13 @@ highFrequency
 						} else {
 							trVectorSetUnitPos("target", "playerCharacters");
 							trVectorQuestVarSet("dir", zGetUnitVector("pos", "target"));
-							addGenericProj("MedusaBalls","pos","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
+							addGenericProj("MedusaBalls","pos","dir",kbGetProtoUnitID("Lampades"),37,4,4.7);
 		                    yAddUpdateVar("MedusaBalls", "target", trQuestVarGet("playerCharacters"));
 		                    yAddUpdateVar("MedusaBalls", "bounces", 10);
 						}
 					}
 					if (trTimeMS() > trQuestVarGet("bossTimeout")) {
-						bossCooldown(8, 15);
+						bossCooldown(12, 18);
 						trQuestVarSet("bossUltimate", 3);
 						trSetLighting("default",1.0);
 						trUnitSelectClear();

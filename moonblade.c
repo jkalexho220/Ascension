@@ -288,6 +288,6 @@ highFrequency
 	trQuestVarSet("crescentCount", 3);
 	trQuestVarSet("crescentDamage", 50);
 
-	trQuestVarSet("protectionCost", 12);
+	trQuestVarSet("protectionCost", 15);
 	trQuestVarSet("protectionDelay", 1000 / 12);
 }
