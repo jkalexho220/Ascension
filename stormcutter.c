@@ -139,7 +139,7 @@ void stormcutterAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"rainOfLightningTimeout", 
 			trTimeMS() + 1000 * trQuestVarGet("rainOfLightningDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 		zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
 		trQuestVarSet("p"+p+"arrowNext", trGetNextUnitScenarioNameNumber() - 1);
 	}
@@ -185,7 +185,7 @@ void modifyStormcutter(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
 		zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 }
 

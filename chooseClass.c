@@ -34,6 +34,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\special e pharaoh icon 64";
 		}
+		case SPELLSTEALER:
+		{
+			icon = "icons\infantry x murmillo hero icons 64";
+		}
 	}
 	return(icon);
 }
@@ -66,13 +70,13 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					msg = "Special Attack (7 attacks): Summon a wolf companion that fights for you.";
 					if (Multiplayer == false) {
-						next = 8;
+						next = 9;
 					}
 				}
 				case 3:
 				{
 					icon = "icons\god power eclipse icon 64";
-					msg = "(Q) Moonbeam: Create a circle that damages enemies. Damage increases for each ally in the circle";
+					msg = "(Q) Moonbeam: Create a circle that damages and silences enemies in it.";
 					if (Multiplayer == false) {
 						next = 6;
 					}
@@ -82,7 +86,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					icon = "icons\improvement swine array icon 64";
 					msg = "(W) Crescent Strikes: Your next 3 attacks deal bonus damage and stun.";
 					if (Multiplayer == false) {
-						next = 7;
+						next = 8;
 					}
 				}
 				case 5:
@@ -94,16 +98,21 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power eclipse icon 64";
+					msg = "Damage increases for each ally in the circle.";
+				}
+				case 7:
+				{
+					icon = "icons\god power eclipse icon 64";
 					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 30 + 15 per ally";
 					next = 4;
 				}
-				case 7:
+				case 8:
 				{
 					icon = "icons\improvement swine array icon 64";
 					msg = "Cooldown: 12 | Damage: 50 | Lose one stack every 5 seconds if not used";
 					next = 5;
 				}
-				case 8:
+				case 9:
 				{
 					msg = "It has a fifth of your attack and health. Decay: 5 percent health per second";
 					next = 3;
@@ -164,7 +173,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Thunderwalker: A speedy assassin that scales off of speed.";
+					msg = "Thunderstepper: A speedy assassin that scales off of speed.";
 				}
 				case 1:
 				{
@@ -294,12 +303,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 3:
 				{
 					icon = "icons\improvement bite of the shark icons 64";
-					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage.";
+					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage in a small area.";
 				}
 				case 4:
 				{
 					icon = "icons\improvement bite of the shark icons 64";
-					msg = "If this hits an enemy at full health, stun them.";
+					msg = "If this hits only one enemy, stun them.";
 				}
 				case 5:
 				{
@@ -457,7 +466,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\god power pestilence icon 64";
-					msg = "Duration: 12 | Damage: 12 x Projectiles";
+					msg = "Radius: 4 | Duration: 12 | Damage: 12 x Projectiles";
 				}
 				case 5:
 				{
@@ -502,52 +511,69 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Every third attack, you throw a potion with a special effect.";
+					msg = "Passive: When you attack an enemy, gain 8 bonus attack for each status effect on them.";
 				}
 				case 2:
 				{
-					icon = "icons\god power frost icon 64";
-					msg = "Freeze: The potion stuns your target. Additional projectiles will stun nearby enemies.";
+					msg = "Bonus decays by 8 percent each second.";
 				}
 				case 3:
 				{
-					icon = "icons\god power pestilence icon 64";
-					msg = "Poison: The potion spills poison on the ground, poisoning enemies in an area.";
+					msg = "Special Attack (6 attacks): Poison your target and nearby enemies.";
 				}
 				case 4:
 				{
-					icon = "icons\god power pestilence icon 64";
-					msg = "Duration: 12 | Damage: 12 x Projectiles";
+					msg = "Radius: 6 | Duration: 12 | Damage: 12";
 				}
 				case 5:
 				{
-					icon = "icons\god power restoration icon 64";
-					msg = "Heal: When the potion is thrown, all allies restore 5 percent of their health";
+					icon = "icons\god power barrage icon";
+					msg = "(Q) Spellblades: Throw daggers in a cone that damage enemies.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement temple of healing icon 64";
-					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
+					icon = "icons\god power barrage icon";
+					msg = "Cooldown: 9 | Damage: 0.5 x Attack x Spell Power | Knives: 5 + 2 x Projectiles";
 				}
 				case 7:
 				{
-					icon = "icons\improvement temple of healing icon 64";
-					msg = "Cooldown: 12 | Heal: 200";
+					icon = "icons\god major leto icons 64";
+					msg = "(W) Negation Cloak: For a short duration, you absorb status effects and spell damage that hits you.";
 				}
 				case 8:
 				{
-					icon = "icons\improvement salt amphora icon 64";
-					msg = "(W) Swap Potion: Swap the type of potion you throw, cycling between the three options.";
+					icon = "icons\god major leto icons 64";
+					msg = "Convert all spell damage absorbed into bonus attack for yourself.";
 				}
 				case 9:
 				{
-					icon = "icons\god power call to arms icon";
-					msg = "(E) Duplicate: Summon a perfect copy of an allied hero. It also casts spells with them.";
+					icon = "icons\god major leto icons 64";
+					msg = "When this spell ends, your next spell will apply all the status effects absorbed.";
 				}
 				case 10:
 				{
-					icon = "icons\god power call to arms icon";
-					msg = "Cost: 50 | Decay: 1 + 1 per second (percent max health)";
+					icon = "icons\god major leto icons 64";
+					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.1x Damage absorbed";
+				}
+				case 11:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Applies your passive and attack lifesteal";
+				}
+				case 12:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "If the target is affected by a status effect, also attack nearby enemies with the same status";
+				}
+				case 13:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "If this hits only one enemy, it only costs 10 favor.";
+				}
+				case 14:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "Cost: 30 | Radius: 15 | Damage: Attack x Spell Power";
 					next = 0;
 				}
 			}
@@ -571,7 +597,7 @@ string className(int class = 0) {
 		}
 		case THUNDERRIDER:
 		{
-			name = "Thunderwalker";
+			name = "Thunderstepper";
 		}
 		case FIREKNIGHT:
 		{

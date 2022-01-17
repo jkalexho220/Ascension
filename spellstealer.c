@@ -204,7 +204,7 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 
-	for(y=xsMin(3, yGetDatabaseCount("p"+p+"spellblades")); >0) {
+	for(y=xsMin(2, yGetDatabaseCount("p"+p+"spellblades")); >0) {
 		hit = 0;
 		yDatabaseNext("p"+p+"spellblades");
 		yVarToVector("p"+p+"spellblades", "prev");

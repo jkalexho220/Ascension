@@ -84,8 +84,13 @@ void silenceEnemy(int p = 0, float duration = 9.0) {
 	if (trTimeMS() + duration > yGetVar("enemies", "silenceTimeout")) {
 		ySetVar("enemies", "silenceTimeout", trTimeMS() + duration);
 	}
+	if (trQuestVarGet("enemies") == trQuestVarGet("bossUnit")) {
+		if (trTimeMS() + duration > trQuestVarGet("bossCooldownTime")) {
+			/* take the average */
+			trQuestVarSet("bossCooldownTime", 0.5 * (trQuestVarGet("bossCooldownTime") + trTimeMS() + duration));
+		}
+	}
 	if (yGetVar("enemies", "silenceStatus") == 0) {
-		trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
 		ySetVar("enemies", "silenceStatus", 1);
 		if (kbGetBlockID(""+1*yGetVar("enemies", "silenceSFX")) == -1) {
 			spyEffect(1*trQuestVarGet("enemies"), 

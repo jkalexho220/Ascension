@@ -194,6 +194,7 @@ void moonbladeAlways(int eventID = -1) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "center") < angle) {
 					damageEnemy(p, posX);
+					silenceEnemy(p, 1.0);
 				}
 			}
 			if (trTimeMS() > yGetVar("p"+p+"moonbeams", "timeout")) {

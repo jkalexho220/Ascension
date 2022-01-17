@@ -116,7 +116,7 @@ void sunbowAlways(int eventID = -1) {
 			trTimeMS() + 1000 * trQuestVarGet("healingRaysDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trSoundPlayFN("skypassagein.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+SUNBOW+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+SUNBOW+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 
 	if ((trQuestVarGet("p"+p+"healingRays") == 1) && (trTimeMS() > trQuestVarGet("p"+p+"healingRaysTimeout"))) {
@@ -275,7 +275,7 @@ void modifySunbow(int eventID = -1) {
 	int p = eventID - 5000 - 12 * SUNBOW;
 	if (trQuestVarGet("p"+p+"healingRays") == 1) {
 		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+SUNBOW+"nextDelay") * 3.0 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+			trQuestVarGet("class"+SUNBOW+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 }
 

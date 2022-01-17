@@ -136,17 +136,21 @@ void frostknightAlways(int eventID = -1) {
 		trSoundPlayFN("icemono.wav", "1", -1, "", "");
 
 		dist = xsPow(trQuestVarGet("p"+p+"spellRange") * trQuestVarGet("icicleRadius"), 2);
+		hit = 0;
 		for(x=yGetDatabaseCount("enemies"); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else if (zDistanceToVectorSquared("enemies", "p"+p+"wellPos") < dist) {
-				if (trUnitPercentDamaged() == 0) {
-					stunUnit("enemies", 1.5, p);
-				}
+				target = yGetPointer("enemies");
+				hit = hit + 1;
 				trPlayerGrantResources(p, "favor", 1);
 				damageEnemy(p, trQuestVarGet("icicleDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
 			}
+		}
+		if (hit == 1) {
+			ySetPointer("enemies", target);
+			stunUnit("enemies", 1.5, p);
 		}
 	}
 

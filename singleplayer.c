@@ -413,7 +413,7 @@ highFrequency
 			}
 			case INVENTOR:
 			{
-				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
+				uiMessageBox("To unlock this class, IDK");
 			}
 			case ALCHEMIST:
 			{
@@ -426,6 +426,10 @@ highFrequency
 			case STORMCUTTER:
 			{
 				uiMessageBox("To unlock this class, clear stage 2.");
+			}
+			case SPELLSTEALER:
+			{
+				uiMessageBox("To unlock this class, open ten chests. Current: " + 1*trQuestVarGet("chestCount"));
 			}
 		}
 	}
@@ -519,12 +523,20 @@ highFrequency
 						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
 					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 
-					setupQuestion("All players must be present to start the boss battle.","True","False",2);
-					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
+					setupQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
+						"True", "False", 1);
+					setupExplain("But not only will Silence stop an enemy's special attacks, their passive abilities are disabled!");
+					setupExplain("For example, silencing a Dryad will prevent them from bleeding poison on death!");
+
+					setupQuestion("Inflicting Silence on a boss will prevent if from casting spells.", "True", "False", 2);
+					setupExplain("Silences will only extend the duration of a boss's cooldowns.");
 				}
 				case 4:
 				{
 					gem = SOULSTONE;
+					setupQuestion("All players must be present to start the boss battle.","True","False",2);
+					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
+
 					setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
 						"The poison damage adds up.","Only the strongest poison deals damage.",2);
 					setupQuestion("Only the strongest poison deals damage. Poison damage does not stack.");

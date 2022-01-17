@@ -81,6 +81,8 @@ void saveAllData() {
 
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = xsMin(10, trQuestVarGet("chestCount"));
+	savedata = savedata * 11 + currentdata;
 	currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
 	savedata = savedata * 10 + currentdata;
 	currentdata = xsMin(10, trQuestVarGet("questCount"));
@@ -139,6 +141,8 @@ inactive
 	savedata = savedata / 11;
 	trQuestVarSet("zenoQuiz", iModulo(10, savedata));
 	savedata = savedata / 10;
+	trQuestVarSet("chestCount", iModulo(11, savedata));
+	savedata = savedata / 11;
 
 	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);

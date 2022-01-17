@@ -207,6 +207,7 @@ void processChests() {
 	    	}
 	    	case CHEST_STATE_UNLOCKED:
 	    	{
+	    		trQuestVarSet("chestCount", 1 + trQuestVarGet("chestCount"));
 	    		trUnitSelectClear();
 	    		trUnitSelectByQV("chests");
 	    		trUnitSetAnimation("SE_Great_Box_Opening",false,-1);

@@ -72,6 +72,8 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Valkyrie"):
         {
             yAddUpdateVar("enemies", "magicResist", 1);
+            yAddToDatabase("Valkyries", "enemiesIncoming");
+            yAddUpdateVar("Valkyries", "index", yGetNewestPointer("enemies"));
             spyEffect(1*trQuestVarGet("enemiesIncoming"), kbGetProtoUnitID("Vortex Finish Linked"), "fake");
         }
         case kbGetProtoUnitID("Ballista"):
@@ -498,25 +500,41 @@ void enemiesAlways() {
         }
     }
 
+    if (yGetDatabaseCount("Valkyries") > 0) {
+        id = yDatabaseNext("Valkryies", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yRemoveFromDatabase("Valkyries");
+        } else {
+            id = yGetPointer("enemies");
+            if (ySetPointer("enemies", 1*yGetVar("Valkyries", "index"))) {
+                ySetVar("enemies", "magicResist", 1 - yGetVar("enemies", "silenceStatus"));
+                ySetPointer("enemies", id);
+            }
+        }
+    }
+
     if (yGetDatabaseCount("Dryads") > 0) {
         id = yDatabaseNext("Dryads", true);
         if (id == -1 || trUnitAlive() == false) {
-            yVarToVector("Dryads", "pos");
-            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-            trArmySelect("1,0");
-            trUnitChangeProtoUnit("Lampades Blood");
-            for(x=yGetDatabaseCount("playerUnits"); >0) {
-                id = yDatabaseNext("playerUnits", true);
-                if (id == -1 || trUnitAlive() == false) {
-                    removePlayerUnit();
-                } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-                    poisonUnit("playerUnits", 12.0, 10.0);
+            if (yGetVar("Dryads", "silenceStatus") == 0) {
+                yVarToVector("Dryads", "pos");
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                trArmySelect("1,0");
+                trUnitChangeProtoUnit("Lampades Blood");
+                for(x=yGetDatabaseCount("playerUnits"); >0) {
+                    id = yDatabaseNext("playerUnits", true);
+                    if (id == -1 || trUnitAlive() == false) {
+                        removePlayerUnit();
+                    } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
+                        poisonUnit("playerUnits", 12.0, 10.0);
+                    }
                 }
+                yRemoveFromDatabase("Dryads");
             }
-            yRemoveFromDatabase("Dryads");
         } else {
             trVectorSetUnitPos("pos", "Dryads");
             ySetVarFromVector("Dryads", "pos", "pos");
+            ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")));
         }
     }
 
