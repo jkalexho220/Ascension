@@ -125,7 +125,7 @@ float fModulo(float mod = 0, float val = 0) {
 }
 
 bool getBit(int bit = 0, int val = 0) {
-	val = val / xsPow(2, bit - 1);
+	val = val / xsPow(2, bit);
 	return((iModulo(2, val) == 1));
 }
 

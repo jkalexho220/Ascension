@@ -402,8 +402,10 @@ highFrequency
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
-				trQuestVarSet("bossSpell", 0);
-				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+				if (yGetVarAtIndex("enemies", "silenceStatus", 1*trQuestVarGet("bossPointer")) == 0) {
+					trQuestVarSet("bossSpell", 0);
+					trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+				}
 			} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
 				trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
 				trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
@@ -1119,8 +1121,10 @@ highFrequency
 		
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
-				trQuestVarSet("bossSpell", 0);
-				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+				if (yGetVarAtIndex("enemies", "silenceStatus", 1*trQuestVarGet("bossPointer")) == 0) {
+					trQuestVarSet("bossSpell", 0);
+					trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+				}
 			} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
 				trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
 				trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);

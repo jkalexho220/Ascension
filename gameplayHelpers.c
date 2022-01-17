@@ -45,9 +45,12 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
 		if (getBit(STATUS_SILENCE, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_SILENCE));
+			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+			trPlayerGrantResources(p, "favor", 5);
+			if (trCurrentPlayer() == p) {
+				trChatSend(0, "<color=1,1,1>Silence absorbed! Your next spell will inflict Silence!</color>");
+			}
 		}
-		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
 	} else {
 		float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
 		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
@@ -72,6 +75,27 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
 				}
 			}
+		}
+	}
+}
+
+void silenceEnemy(int p = 0, float duration = 9.0) {
+	duration = 1000 * duration * trQuestVarGet("p"+p+"spellDuration");
+	if (trTimeMS() + duration > yGetVar("enemies", "silenceTimeout")) {
+		ySetVar("enemies", "silenceTimeout", trTimeMS() + duration);
+	}
+	if (yGetVar("enemies", "silenceStatus") == 0) {
+		trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
+		ySetVar("enemies", "silenceStatus", 1);
+		if (kbGetBlockID(""+1*yGetVar("enemies", "silenceSFX")) == -1) {
+			spyEffect(1*trQuestVarGet("enemies"), 
+				kbGetProtoUnitID("UI Range Indicator Egypt SFX"), yGetVarName("enemies", "silenceSFX"));
+		} else {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("enemies", "silenceSFX"), true);
+			trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
+			trUnitSelectClear();
+			trUnitSelectByQV("enemies");
 		}
 	}
 }
@@ -105,6 +129,9 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "launched");
 	yRemoveUpdateVar("enemies", "magicResist");
 	yRemoveUpdateVar("enemies", "physicalResist");
+	yRemoveUpdateVar("enemies", "silenceStatus");
+	yRemoveUpdateVar("enemies", "silenceTimeout");
+	yRemoveUpdateVar("enemies", "silenceSFX");
 }
 
 void removePlayerUnit() {
@@ -269,9 +296,12 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
 		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
+			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+			trPlayerGrantResources(p, "favor", 5);
+			if (trCurrentPlayer() == p) {
+				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
+			}
 		}
-		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
 	} else if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
 		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
@@ -286,9 +316,9 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 			trQuestVarSet("poisonSound", 1);
 		}
 		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
-	}
-	if (damage > yGetVar(db, "poisonDamage")) {
-		ySetVar(db, "poisonDamage", damage);
+		if (damage > yGetVar(db, "poisonDamage")) {
+			ySetVar(db, "poisonDamage", damage);
+		}
 	}
 }
 
@@ -347,7 +377,6 @@ void growFrostGiantsIncoming(string pos = "") {
 }
 
 void stunUnit(string db = "", float duration = 0, int p = 0) {
-	trQuestVarSet("stunSound", 1);
 	int index = 0;
 	bool targetPlayers = (p == 0);
 	duration = duration * 1000;
@@ -357,9 +386,9 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"unit");
 			healUnit(p, 0.05 * trQuestVarGet("p"+p+"health"), 1*trQuestVarGet("p"+p+"index"));
-			trUnitSelectClear();
-			trUnitSelectByQV(db);
 		}
+		trUnitSelectClear();
+		trUnitSelectByQV(db);
 		if (trQuestVarGet("p"+p+"stunDamage") > 0) {
 			damageEnemy(p, trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"stunDamage"), true);
 		}
@@ -370,10 +399,14 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
 		if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
+			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+			trPlayerGrantResources(p, "favor", 5);
+			if (trCurrentPlayer() == p) {
+				trChatSend(0, "<color=1,1,1>Stun absorbed! Your next spell will inflict Stun!</color>");
+			}
 		}
-		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
 	} else {
+		trQuestVarSet("stunSound", 1);
 		if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 			if (yGetVar(db, "stunStatus") == 0) {
 				if (trQuestVarGet("boss") == 3) {
@@ -533,7 +566,7 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 		if (trQuestVarGet("protectionCount") == 0) {
 			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
 				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * dmg);
-				trPlayerGrantResources(p, "favor", 0.0 - trQuestVarGet("negationCloakCostDamage")*trQuestVarGet("p"+p+"ultimateCost"));
+				trPlayerGrantResources(p, "favor", 1);
 			} else {
 				trDamageUnit(dmg);
 			}
@@ -566,6 +599,14 @@ void stunsAndPoisons(string db = "") {
     		}
     		ySetVar(db, "stunStatus", 0);
     	}
+	}
+	if (yGetVar(db, "silenceStatus") == 1) {
+		if (trTimeMS() > yGetVar(db, "silenceTimeout")) {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar(db, "silenceSFX"));
+			trMutateSelected(kbGetProtoUnitID("Rocket"));
+			ySetVar(db, "silenceStatus", 0);
+		}
 	}
 }
 

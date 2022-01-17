@@ -38,7 +38,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				{
 					uiMessageBox("I can carry up to 3 relics. After you clear this floor, I will send them to your warehouse.");
 				}
-				case 33:
+				case 3:
 				{
 					uiMessageBox("You can visit your warehouse by playing this map in singleplayer.");
 				}

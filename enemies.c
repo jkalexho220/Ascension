@@ -48,6 +48,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Sphinx"):
         {
             yAddToDatabase("Sphinxes", db);
+            yAddUpdateVar("Sphinxes", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Dryad"):
         {
@@ -320,6 +321,8 @@ void enemiesAlways() {
             trUnitChangeProtoUnit("Sphinx");
             yRemoveFromDatabase("sphinxes");
             yRemoveUpdateVar("sphinxes", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("sphinxes", "index")) == 1) {
+            ySetVar("sphinxes", "step", 1);
         } else if (trTimeMS() > yGetVar("sphinxes", "next")) {
             switch(1*yGetVar("sphinxes", "step"))
             {
@@ -354,6 +357,8 @@ void enemiesAlways() {
             trUnitChangeProtoUnit("Mountain Giant");
             yRemoveFromDatabase("MountainGiants");
             yRemoveUpdateVar("MountainGiants", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("MountainGiants", "index")) == 1) {
+            ySetVar("MountainGiants", "step", 2);
         } else if (trTimeMS() > yGetVar("MountainGiants", "next")) {
             switch(1*yGetVar("MountainGiants", "step"))
             {
@@ -449,6 +454,8 @@ void enemiesAlways() {
             trUnitChangeProtoUnit("Medusa");
             yRemoveFromDatabase("Medusas");
             yRemoveUpdateVar("Medusas", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
+            ySetVar("Medusas", "step", 2);
         } else if (trTimeMS() > yGetVar("Medusas", "next")) {
             switch(1*yGetVar("Medusas", "step"))
             {
@@ -520,6 +527,8 @@ void enemiesAlways() {
             trUnitChangeProtoUnit("Frost Giant");
             yRemoveFromDatabase("frostGiants");
             yRemoveUpdateVar("frostGiants", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
+            ySetVar("frostGiants", "step", 2);
         } else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
             switch(1*yGetVar("frostGiants", "step"))
             {

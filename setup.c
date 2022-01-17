@@ -340,7 +340,7 @@ runImmediately
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, SOULSTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
-    setupClass("Swordsman Hero", SPELLSTEALER, 500, 1000, SOULSTONE, 6);
+    setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, SOULSTONE, 6);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);

@@ -492,6 +492,66 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case SPELLSTEALER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Spellstealer: An assassin who reflects status effects onto enemies.";
+				}
+				case 1:
+				{
+					msg = "Passive: Every third attack, you throw a potion with a special effect.";
+				}
+				case 2:
+				{
+					icon = "icons\god power frost icon 64";
+					msg = "Freeze: The potion stuns your target. Additional projectiles will stun nearby enemies.";
+				}
+				case 3:
+				{
+					icon = "icons\god power pestilence icon 64";
+					msg = "Poison: The potion spills poison on the ground, poisoning enemies in an area.";
+				}
+				case 4:
+				{
+					icon = "icons\god power pestilence icon 64";
+					msg = "Duration: 12 | Damage: 12 x Projectiles";
+				}
+				case 5:
+				{
+					icon = "icons\god power restoration icon 64";
+					msg = "Heal: When the potion is thrown, all allies restore 5 percent of their health";
+				}
+				case 6:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
+				}
+				case 7:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "Cooldown: 12 | Heal: 200";
+				}
+				case 8:
+				{
+					icon = "icons\improvement salt amphora icon 64";
+					msg = "(W) Swap Potion: Swap the type of potion you throw, cycling between the three options.";
+				}
+				case 9:
+				{
+					icon = "icons\god power call to arms icon";
+					msg = "(E) Duplicate: Summon a perfect copy of an allied hero. It also casts spells with them.";
+				}
+				case 10:
+				{
+					icon = "icons\god power call to arms icon";
+					msg = "Cost: 50 | Decay: 1 + 1 per second (percent max health)";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);
