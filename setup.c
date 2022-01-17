@@ -34,7 +34,8 @@ const int STARSEER = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
-const int INVENTOR = 9;
+const int SPELLSTEALER = 9;
+const int INVENTOR = 10;
 
 const int CLASS_COUNT = 16;
 
@@ -339,6 +340,7 @@ runImmediately
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, SOULSTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
+    setupClass("Swordsman Hero", SPELLSTEALER, 500, 1000, SOULSTONE, 6);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -427,6 +429,7 @@ highFrequency
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0);
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 20);
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 12);
+        setupPlayerProto("Swordsman Hero", 1000, 50, 4.8);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -444,6 +447,9 @@ highFrequency
         trModifyProtounit("Monument 2", 0, 26, -1);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Revealer to Player", p, 2, 9999999999999999999.0);
+            trModifyProtounit("Revealer to Player", p, 2, -9999999999999999999.0);
+            trModifyProtounit("Revealer to Player", p, 2, 20);
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Pharaoh", p, 14, -999);

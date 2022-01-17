@@ -273,6 +273,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			zSetProtoUnitStat(proto, p, 11, trQuestVarGet("p"+p+"range"));
 			trQuestVarSet("p"+p+"los", trQuestVarGet("p"+p+"los") + 5.0 * m);
 			zSetProtoUnitStat(proto, p, 2, trQuestVarGet("p"+p+"los"));
+			zSetProtoUnitStat("Revealer to Player", p, 2, trQuestVarGet("p"+p+"los"));
 		}
 		case RELIC_SPELL_RANGE:
 		{
@@ -293,6 +294,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_ATTACK_DAMAGE:
 		{
 			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 15.0 * m);
+			trQuestVarSet("p"+p+"Attack", trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
 		}

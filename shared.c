@@ -124,6 +124,10 @@ float fModulo(float mod = 0, float val = 0) {
 	return(0.0 + val - mod * c);
 }
 
+bool getBit(int bit = 0, int val = 0) {
+	val = val / xsPow(2, bit - 1);
+	return((iModulo(2, val) == 1));
+}
 
 void zUnitHeading(float a = 0) {
 	trSetUnitOrientation(xsVectorSet(xsSin(a),0,xsCos(a)), xsVectorSet(0,1,0), true);

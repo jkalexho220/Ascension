@@ -533,7 +533,10 @@ string className(int class = 0) {
 		{
 			name = "Alchemist";
 		}
-		
+		case SPELLSTEALER:
+		{
+			name = "Spellstealer";
+		}
 	}
 	return(name);
 }

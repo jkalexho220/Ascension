@@ -16,6 +16,11 @@ const int PROJ_FALLING = 2;
 const int PROJ_BOUNCE = 3;
 const int PROJ_REMOVE = 4;
 
+const int STATUS_NONE = 0;
+const int STATUS_STUN = 1;
+const int STATUS_POISON = 2;
+const int STATUS_SILENCE = 3;
+
 string wellName = "";
 string lureName = "";
 string rainName = "";
@@ -37,27 +42,35 @@ void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 }
 
 void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
-	float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
-	if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
-		trQuestVarSet("p"+p+"silenceTimeout", timeout);
-	}
-	if (trQuestVarGet("p"+p+"silenced") == 0) {
-		trQuestVarSet("p"+p+"silenced", 1);
-		trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
-		trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
-		trPlayerKillAllGodPowers(p);
-		if (sfx) {
-			if (trQuestVarGet("p"+p+"silenceSFX") > 0) {
-				int id = kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX"));
-				if (id == -1) {
-					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
+	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
+		if (getBit(STATUS_SILENCE, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_SILENCE));
+		}
+		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
+	} else {
+		float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
+		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
+			trQuestVarSet("p"+p+"silenceTimeout", timeout);
+		}
+		if (trQuestVarGet("p"+p+"silenced") == 0) {
+			trQuestVarSet("p"+p+"silenced", 1);
+			trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
+			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
+			trPlayerKillAllGodPowers(p);
+			if (sfx) {
+				if (trQuestVarGet("p"+p+"silenceSFX") > 0) {
+					int id = kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX"));
+					if (id == -1) {
+						spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
+					} else {
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"silenceSFX");
+						trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
+					}
 				} else {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"silenceSFX");
-					trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
+					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
 				}
-			} else {
-				spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
 			}
 		}
 	}
@@ -214,9 +227,9 @@ vector getBounceDir(string pos = "", string dir = "") {
 Draws a line from 'from' to 'to,' stopping at the edge of the map.
 */
 void vectorSetAsTargetVector(string target = "", string from = "", string to = "", float dist = 40.0) {
-	trVectorQuestVarSet("dir", zGetUnitVector(from, to, dist));
-	trQuestVarSet(target+"x", trQuestVarGet("dirx") + trQuestVarGet(from+"x"));
-	trQuestVarSet(target+"z", trQuestVarGet("dirz") + trQuestVarGet(from+"z"));
+	trVectorQuestVarSet("dirrr", zGetUnitVector(from, to, dist));
+	trQuestVarSet(target+"x", trQuestVarGet("dirrrx") + trQuestVarGet(from+"x"));
+	trQuestVarSet(target+"z", trQuestVarGet("dirrrz") + trQuestVarGet(from+"z"));
 
 	/*
 	No out-of-bounds allowed
@@ -244,6 +257,7 @@ void vectorSetAsTargetVector(string target = "", string from = "", string to = "
 }
 
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
+	bool targetPlayers = (p == 0);
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
@@ -252,7 +266,13 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"poisonResistance");
 	}
-	if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
+	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
+		}
+		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
+	} else if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
 		if (yGetVar(db, "poisonStatus") == 0) {
 			if (yGetVar(db, "poisonSFX") == 0) {
 				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Poison SFX"), yGetVarName(db, "poisonSFX"));
@@ -329,6 +349,7 @@ void growFrostGiantsIncoming(string pos = "") {
 void stunUnit(string db = "", float duration = 0, int p = 0) {
 	trQuestVarSet("stunSound", 1);
 	int index = 0;
+	bool targetPlayers = (p == 0);
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
@@ -346,24 +367,32 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"stunResistance");
 	}
-	if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
-		if (yGetVar(db, "stunStatus") == 0) {
-			if (trQuestVarGet("boss") == 3) {
-				trVectorSetUnitPos("stunpos", db);
-				growFrostGiantsIncoming("stunpos");
-			}
-			index = yAddToDatabase("stunnedUnits", db);
-			yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
-			if (yGetVar(db, "stunSFX") == 0) {
-				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect"), yGetVarName(db, "stunSFX"));
-			} else {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
-				trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
-			}
-			ySetVar(db, "stunStatus", index);
+	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+		if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+			trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
 		}
-		ySetVar(db, "stunTimeout", trTimeMS() + duration);
+		trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("negationCloakCostStatus") * trQuestVarGet("p"+p+"ultimateCost"));
+	} else {
+		if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
+			if (yGetVar(db, "stunStatus") == 0) {
+				if (trQuestVarGet("boss") == 3) {
+					trVectorSetUnitPos("stunpos", db);
+					growFrostGiantsIncoming("stunpos");
+				}
+				index = yAddToDatabase("stunnedUnits", db);
+				yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
+				if (yGetVar(db, "stunSFX") == 0) {
+					spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect"), yGetVarName(db, "stunSFX"));
+				} else {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
+					trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
+				}
+				ySetVar(db, "stunStatus", index);
+			}
+			ySetVar(db, "stunTimeout", trTimeMS() + duration);
+		}
 	}
 }
 
@@ -500,8 +529,14 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 		index = old;
 	}
 	if (ySetPointer("playerUnits", index)) {
+		int p = yGetVar("playerUnits", "player");
 		if (trQuestVarGet("protectionCount") == 0) {
-			trDamageUnit(dmg);
+			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
+				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * dmg);
+				trPlayerGrantResources(p, "favor", 0.0 - trQuestVarGet("negationCloakCostDamage")*trQuestVarGet("p"+p+"ultimateCost"));
+			} else {
+				trDamageUnit(dmg);
+			}
 		}
 		ySetPointer("playerUnits", old);
 	}
