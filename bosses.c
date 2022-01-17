@@ -4,6 +4,22 @@ void bossCooldown(int minVal = 0, int maxVal = 0) {
 	trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
 	trQuestVarSetFromRand("bossCooldownTime", minVal, maxVal, true);
 	trQuestVarSet("bossCooldownTime", trTimeMS() + 1000 * trQuestVarGet("bossCooldownTime"));
+	trQuestVarSet("bossOriginalCooldownTime", trQuestVarGet("bossCooldownTime"));
+}
+
+void processBossCooldown() {
+	float diff = trTimeMS() - trQuestVarGet("bossCooldownLastCheck");
+	trQuestVarSet("bossCooldownLastCheck", trTimeMS());
+	if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+		trQuestVarSet("bossSpell", 0);
+		trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+	} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
+		trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
+		trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
+	} else if (trTimeMS() > trQuestVarGet("bossOriginalCooldownTime")) {
+		diff = 0.0001 * diff * (trQuestVarGet("bossCooldownTime") - trQuestVarGet("bossOriginalCooldownTime"));
+		trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - diff);
+	}
 }
 
 rule enter_boss_room
@@ -401,13 +417,7 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
-				trQuestVarSet("bossSpell", 0);
-				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
-			} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
-				trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
-				trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
-			}
+			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			if (trQuestVarGet("bossSpell") == 31) {
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
@@ -1118,13 +1128,7 @@ highFrequency
 		trUnitSelectByQV("bossUnit");
 		
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
-				trQuestVarSet("bossSpell", 0);
-				trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
-			} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
-				trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
-				trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
-			}
+			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			if (trQuestVarGet("bossSpell") == 31) {
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");

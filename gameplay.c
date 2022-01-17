@@ -203,7 +203,7 @@ highFrequency
                 trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
                 trMutateSelected(relicProto(1*trQuestVarGet("p"+p+"relic"+x)));
                 trSetSelectedScale(0,0,-1);
-                trUnitSetAnimationPath("1,0,1,0,0,0,0");
+                trUnitSetAnimationPath("1,0,1,1,0,0,0");
                 relicEffect(1*trQuestVarGet("p"+p+"relic"+x), p, true);
                 trQuestVarSet("p"+p+"relic"+x, 0);
             }
@@ -359,6 +359,7 @@ highFrequency
                         trUnitSetAnimationPath("1,0,1,1,0,0,0");
                         if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
                             if (trPlayerResourceCount(p, "gold") >= 100) {
+                                trPlayerGrantResources(p, "gold", -100);
                                 trQuestVarSet("p"+p+"transporterPurchased", 1);
                                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                                 yAddToDatabase("playerUnits", "next");

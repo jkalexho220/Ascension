@@ -86,8 +86,7 @@ void silenceEnemy(int p = 0, float duration = 9.0) {
 	}
 	if (trQuestVarGet("enemies") == trQuestVarGet("bossUnit")) {
 		if (trTimeMS() + duration > trQuestVarGet("bossCooldownTime")) {
-			/* take the average */
-			trQuestVarSet("bossCooldownTime", 0.5 * (trQuestVarGet("bossCooldownTime") + trTimeMS() + duration));
+			trQuestVarSet("bossCooldownTime", trTimeMS() + duration);
 		}
 	}
 	if (yGetVar("enemies", "silenceStatus") == 0) {
@@ -618,6 +617,8 @@ void stunsAndPoisons(string db = "") {
 int CheckOnHit(int p = 0, int id = 0) {
     int action = kbUnitGetAnimationActionType(id);
     int status = ON_HIT_NONE;
+    int class = trQuestVarGet("p"+p+"class");
+    float amt = 0;
     if (yGetVar("p"+p+"characters", "attacking") == 0) {
         if ((action == 12) || (action == 6)) {
         	ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
@@ -645,13 +646,20 @@ int CheckOnHit(int p = 0, int id = 0) {
                 		yDatabaseNext("enemies");
                 		if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
                 			ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
+                			trQuestVarSet("p"+p+"poisonKillerActive", yGetVar("enemies", "poisonStatus"));
                 			break;
                 		}
                 	}
+                } else {
+                	trQuestVarSet("p"+p+"poisonKillerActive", 
+                		yGetVarAtIndex("enemies", "poisonStatus", 1*yGetVar("p"+p+"characters", "attackTargetIndex")));
                 }
                 /* lifesteal */
-                trQuestVarSet("p"+p+"lifestealTotal", 
-					trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack"));
+                amt = trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack");
+                if (trQuestVarGet("p"+p+"poisonKillerActive") == 1) {
+                	amt = amt * (1.0 + trQuestVarGet("p"+p+"poisonKiller"));
+                }
+                trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
             } else {
             	int target = kbUnitGetTargetUnitID(id);
             	if (xsAbs(yGetVar("p"+p+"characters", "attackTarget") - target) > 0) {
@@ -663,9 +671,18 @@ int CheckOnHit(int p = 0, int id = 0) {
             }
         } else {
             ySetVar("p"+p+"characters", "attacking", 0);
+            trQuestVarSet("p"+p+"poisonKillerActive", 0);
         }
     }
     return(status);
+}
+
+/* call this at the end of each class's function */
+void poisonKillerBonus(int p = 0) {
+	int class = trQuestVarGet("p"+p+"class");
+	float amt = trQuestVarGet("p"+p+"poisonKiller")*trQuestVarGet("p"+p+"attack")*trQuestVarGet("p"+p+"poisonKillerActive");
+	zSetProtoUnitStat(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),p,27,amt+trQuestVarGet("p"+p+"attack"));
+	zSetProtoUnitStat(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),p,31,amt+trQuestVarGet("p"+p+"attack"));
 }
 
 float calculateDecay(int p = 0, float decay = 0) {

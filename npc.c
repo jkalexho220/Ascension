@@ -402,7 +402,6 @@ highFrequency
 			z = x / 4;
 			x = trQuestVarGet("village") - 4 * z;
 			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
-			zSetProtoUnitStat("Revealer", 1, 2, 32);
 			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Revealer",1,70*x+40,0,70*z+40,225,true);
 			trArmySelect("1,0");

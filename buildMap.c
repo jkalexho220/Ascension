@@ -877,7 +877,7 @@ highFrequency
 
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 1.075);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
@@ -969,15 +969,21 @@ highFrequency
                             }
                         }
                     }
-                    if ((trQuestVarGet("mapType") == MAP_PORTALS) && (edgeIsPortal == false)) {
-                        trQuestVarSetFromRand("rand", 1, 14, true);
-                        n = trQuestVarGet("rand");
-                        if (trQuestVarGet("tile"+n) < TILE_VISITED && 
-                            xsAbs(n - trQuestVarGet("villageEntrance")) > 0 &&
-                            xsAbs(trQuestVarGet("villageEntrance") - trQuestVarGet("frontier")) > 0) {
-                            yAddToDatabase("frontier", "rand");
-                            yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
-                            yAddUpdateVar("frontier", "type", EDGE_PORTAL);
+                    if (edgeIsPortal == false) {
+                        if ((trQuestVarGet("relictransporterguy") == 0) &&
+                            xsAbs(trQuestVarGet("frontier") - trQuestVarGet("villageEntrance")) > 0) {
+                            trQuestVarSet("relicTransporterGuy", trQuestVarGet("frontier"));
+                        } else if (trQuestVarGet("mapType") == MAP_PORTALS) {
+                            trQuestVarSetFromRand("rand", 1, 14, true);
+                            n = trQuestVarGet("rand");
+                            if (trQuestVarGet("tile"+n) < TILE_VISITED && 
+                                xsAbs(n - trQuestVarGet("villageEntrance")) > 0 &&
+                                xsAbs(n - trQuestVarGet("relicTransporterGuy")) > 0 &&
+                                xsAbs(trQuestVarGet("villageEntrance") - trQuestVarGet("frontier")) > 0) {
+                                yAddToDatabase("frontier", "rand");
+                                yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
+                                yAddUpdateVar("frontier", "type", EDGE_PORTAL);
+                            }
                         }
                     }
                 }
@@ -1043,13 +1049,6 @@ highFrequency
         trQuestVarSetFromRand("nick", 0, 20, true);
         if (trQuestVarGet("nick") < trQuestVarGet("stage")) {
             nottudSpawn = true;
-        }
-
-
-        trQuestVarSetFromRand("relicTransporterGuy", 1, 13, true);
-        trQuestVarSet("relicTransporterGuy", trQuestVarGet("village") + trQuestVarGet("relicTransporterGuy"));
-        if (trQuestVarGet("relicTransporterGuy") > 14) {
-            trQuestVarSet("relicTransporterGuy", trQuestVarGet("relicTransporterGuy") - 14);
         }
 
         for (i=1; < 15) {

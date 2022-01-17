@@ -238,7 +238,7 @@ void moonbladeAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }
 
@@ -280,8 +280,8 @@ highFrequency
 		trEventSetHandler(5000 + 12 * MOONBLADE + p, "moonbladeModify");
 	}
 	trQuestVarSet("moonbeamCooldown", 18);
-	trQuestVarSet("moonbeamDamage", 30);
-	trQuestVarSet("moonbeamDamageBoost", 15);
+	trQuestVarSet("moonbeamDamage", 20);
+	trQuestVarSet("moonbeamDamageBoost", 10);
 	trQuestVarSet("moonbeamDuration", 6);
 	trQuestVarSet("moonbeamRadius", 6);
 

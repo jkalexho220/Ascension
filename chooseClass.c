@@ -38,6 +38,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\infantry x murmillo hero icons 64";
 		}
+		case COMMANDO:
+		{
+			icon = "icons\infantry x maceman hero";
+		}
 	}
 	return(icon);
 }
@@ -76,7 +80,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 3:
 				{
 					icon = "icons\god power eclipse icon 64";
-					msg = "(Q) Moonbeam: Create a circle that damages and silences enemies in it.";
+					msg = "(Q) Moonbeam: Create a circle that damages and silences enemies in it for several seconds.";
 					if (Multiplayer == false) {
 						next = 6;
 					}
@@ -103,7 +107,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power eclipse icon 64";
-					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 30 + 15 per ally";
+					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 20 + 10 per ally";
 					next = 4;
 				}
 				case 8:
@@ -622,6 +626,10 @@ string className(int class = 0) {
 		case SPELLSTEALER:
 		{
 			name = "Spellstealer";
+		}
+		case COMMANDO:
+		{
+			name = "Commando";
 		}
 	}
 	return(name);

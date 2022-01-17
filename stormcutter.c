@@ -156,6 +156,7 @@ void stormcutterAlways(int eventID = -1) {
 		}
 	}
 
+	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }
 

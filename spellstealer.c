@@ -92,7 +92,7 @@ void spellstealerAlways(int eventID = -1) {
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				id = yDatabaseNext("p"+p+"characters", true);
 				if (id == -1 || trUnitAlive() == false) {
-					removeSpellstealer();
+					removeSpellstealer(p);
 				} else {
 					trMutateSelected(kbGetProtoUnitID("Revealer to Player"));
 				}
@@ -188,7 +188,7 @@ void spellstealerAlways(int eventID = -1) {
 					yDatabaseNext("p"+p+"characters", true);
 					trMutateSelected(kbGetProtoUnitID("Dwarf"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
-					trUnitChangeProtoUnit("Dwarf");
+					trUnitChangeProtoUnit("Swordsman Hero");
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
 					trMutateSelected(kbGetProtoUnitID("Swordsman Hero"));
@@ -278,7 +278,7 @@ void spellstealerAlways(int eventID = -1) {
 		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
 			if (id == -1 || trUnitAlive() == false) {
-				removeSpellstealer();
+				removeSpellstealer(p);
 			} else {
 				trVectorSetUnitPos("start", "p"+p+"characters");
 				hit = trQuestVarGet("spellbladesCount") + 2 * trQuestVarGet("p"+p+"projectiles");
@@ -323,7 +323,7 @@ void spellstealerAlways(int eventID = -1) {
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				id = yDatabaseNext("p"+p+"characters", true);
 				if (id == -1 || trUnitAlive() == false) {
-					removeSpellstealer();
+					removeSpellstealer(p);
 				} else {
 					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "cloakSFX")) == -1) {
 						spyEffect(1*trQuestVarGet("p"+p+"characters"), 
@@ -341,7 +341,7 @@ void spellstealerAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"negationCloak", 0);
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				if ((yDatabaseNext("p"+p+"characters", true) == -1) || (trUnitAlive() == false)) {
-					removeSpellstealer();
+					removeSpellstealer(p);
 				} else {
 					trUnitSelectClear();
 					trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
@@ -351,8 +351,7 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 
-	zSetProtoUnitStat("Swordsman Hero", p, 27, trQuestVarGet("p"+p+"attack"));
-
+	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }
 
@@ -388,7 +387,6 @@ active
 highFrequency
 {
 	xsDisableSelf();
-	trQuestVarSet("starAngularVelocity", 6.283185 / 4.0);
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * SPELLSTEALER + p, "spellstealerAlways");
 		trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");

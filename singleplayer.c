@@ -525,10 +525,11 @@ highFrequency
 
 					setupQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
 						"True", "False", 1);
-					setupExplain("But not only will Silence stop an enemy's special attacks, their passive abilities are disabled!");
+					setupExplain("Not only will Silence prevent an enemy's special attacks, their passive abilities are disabled!");
 					setupExplain("For example, silencing a Dryad will prevent them from bleeding poison on death!");
+					setupExplain("However, Silences do not interrupt a special attack that is already being cast.");
 
-					setupQuestion("Inflicting Silence on a boss will prevent if from casting spells.", "True", "False", 2);
+					setupQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
 					setupExplain("Silences will only extend the duration of a boss's cooldowns.");
 				}
 				case 4:

@@ -501,7 +501,7 @@ void enemiesAlways() {
     }
 
     if (yGetDatabaseCount("Valkyries") > 0) {
-        id = yDatabaseNext("Valkryies", true);
+        id = yDatabaseNext("Valkyries", true);
         if (id == -1 || trUnitAlive() == false) {
             yRemoveFromDatabase("Valkyries");
         } else {

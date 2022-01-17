@@ -219,6 +219,19 @@ float angleBetweenVectors(string from = "", string to = "") {
   	return(a);
 }
 
+float angleOfVector(string dir = "") {
+	float a = trQuestVarGet(dir+"X") / trQuestVarGet(dir+"Z");
+	a = xsAtan(a);
+	if (0.0 > trVectorQuestVarGetZ(dir)) {
+	    if (0.0 > trVectorQuestVarGetX(dir)) {
+			a = a - PI;
+	    } else {
+			a = a + PI;
+	    }
+  	}
+  	return(a);
+}
+
 vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
 	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
 	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
@@ -399,6 +412,10 @@ int yAddToDatabase(string db = "", string val = "") {
 	trQuestVarSet("xdata"+db+"newest", next);
 	trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") + 1);
 	return(next);
+}
+
+string yGetNewestName(string db = "") {
+	return("xdata"+db+"index"+1*trQuestVarGet("xdata"+db+"newest"));
 }
 
 int yGetNewestPointer(string db = "") {

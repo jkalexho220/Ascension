@@ -35,7 +35,9 @@ const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
 const int SPELLSTEALER = 9;
-const int INVENTOR = 10;
+const int COMMANDO = 10;
+const int GARDENER = 11;
+const int INVENTOR = 13;
 
 const int CLASS_COUNT = 16;
 
@@ -230,6 +232,7 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
     trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
+    trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
     trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
     trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
@@ -255,7 +258,7 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"silenceResistanceCount", 0);
 
     trQuestVarSet("p"+p+"stunDamage", 0);
-    trQuestVarSet("p"+p+"poisonKiller", 1);
+    trQuestVarSet("p"+p+"poisonKiller", 0);
 
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
@@ -304,6 +307,8 @@ runImmediately
     trSetObscuredUnits(false);
     configUndef("ErodeBuildingFoundations");
 
+    trVectorQuestVarSet("zeroVector", vector(0,0,0));
+
     if (Multiplayer) {
         ENEMY_PLAYER = cNumberPlayers - 1;
     } else {
@@ -341,6 +346,7 @@ runImmediately
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, SOULSTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
     setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, SOULSTONE, 6);
+    setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -370,6 +376,7 @@ runImmediately
 
         trModifyProtounit("Sea Turtle", p, 55, 1);
         trModifyProtounit("Pegasus", p, 55, 1);
+        trModifyProtounit("Flying Medic", p, 55, 1);
 
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);
@@ -430,6 +437,7 @@ highFrequency
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 20);
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 12);
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8);
+        setupPlayerProto("Maceman Hero", 1200, 45, 4.8);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -447,9 +455,6 @@ highFrequency
         trModifyProtounit("Monument 2", 0, 26, -1);
 
         for(p=ENEMY_PLAYER; >0) {
-            trModifyProtounit("Revealer to Player", p, 2, 9999999999999999999.0);
-            trModifyProtounit("Revealer to Player", p, 2, -9999999999999999999.0);
-            trModifyProtounit("Revealer to Player", p, 2, 20);
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Pharaoh", p, 14, -999);
@@ -462,6 +467,7 @@ highFrequency
             trModifyProtounit("Kronny Flying", p, 1, 9999999999999999999.0);
             trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
+            zInitProtoUnitStat("Meteorite",p,1,100);
         }
 
         trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);

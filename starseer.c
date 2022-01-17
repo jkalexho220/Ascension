@@ -223,6 +223,7 @@ void starseerAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Lampades Bolt");
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
+				zSetProtoUnitStat("Meteorite",p,1,100.0);
 				trMutateSelected(kbGetProtoUnitID("Meteorite"));
 				trUnitOverrideAnimation(6,0,true,false,-1);
 				trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"));

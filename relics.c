@@ -23,16 +23,16 @@ const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
 /* nottud's shop */
-const int RELIC_SOMETHING = 21;
-const int RELIC_YEEBAAGOOON = 22;
-const int RELIC_ZENOPHOBIA = 23;
+const int RELIC_POISON_DAMAGE_STACKS = 21;
+const int RELIC_FAVOR_FROM_ATTACKS = 22;
+const int RELIC_YEEBAAGOOON = 23;
 const int RELIC_NICKONHAWK = 24;
 const int RELIC_NOTTUD = 25;
 const int RELIC_CURSED_RANGE = 26;
 const int RELIC_CURSED_DURATION = 27;
 const int RELIC_CURSED_POWER = 28;
 const int RELIC_CURSED_COOLDOWNS = 29;
-const int RELIC_ON_ATTACK = 30;
+const int RELIC_ZENOPHOBIA = 30;
 
 /* key relics */
 const int RELIC_KEY_GREEK = 33;
@@ -85,7 +85,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			msg = "Healing Effects +0.3x";
+			msg = "Healing Effects +0.4x";
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
@@ -176,7 +176,7 @@ string relicIcon(int relic = 0) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			icon = "icons\special e priest icon 64";
+			icon = "icons\special x flying medic icons 64";
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
@@ -304,7 +304,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			trQuestVarSet("p"+p+"healBoost", trQuestVarGet("p"+p+"healBoost") + 0.3 * m);
+			trQuestVarSet("p"+p+"healBoost", trQuestVarGet("p"+p+"healBoost") + 0.4 * m);
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
@@ -405,7 +405,7 @@ int relicProto(int relic = 0) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			proto = kbGetProtoUnitID("Priest");
+			proto = kbGetProtoUnitID("Flying Medic");
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
