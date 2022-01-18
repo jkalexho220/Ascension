@@ -496,6 +496,10 @@ highFrequency
             /* lifesteal */
             if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
                 healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
+                /* TIER 3 SUB  OMG */
+                if (trQuestVarGet("p"+p+"simp") > 0) {
+                    healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+1*trQuestVarGet("p"+p+"simp")+"index"));
+                }
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
             if (Multiplayer) {

@@ -27,17 +27,20 @@ const int CHEST_STATUES = 3;
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
 const int FIREKNIGHT = 3;
-const int FROSTKNIGHT = 4;
+const int THRONESHIELD = 4;
 
 const int STORMCUTTER = 5;
-const int STARSEER = 6;
+const int FROSTKNIGHT = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
 const int SPELLSTEALER = 9;
 const int COMMANDO = 10;
 const int GARDENER = 11;
+const int SAVIOR = 12;
+
 const int INVENTOR = 13;
+const int STARSEER = 14;
 
 const int CLASS_COUNT = 16;
 
@@ -343,10 +346,12 @@ runImmediately
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
-    setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, SOULSTONE);
+    setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
     setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, SOULSTONE, 6);
     setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
+    setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
+    setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -440,6 +445,7 @@ highFrequency
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 12);
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8);
         setupPlayerProto("Maceman Hero", 1200, 45, 4.8);
+        setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 

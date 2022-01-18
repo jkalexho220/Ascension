@@ -181,6 +181,15 @@ void removePlayerSpecific(int p = 0) {
 		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 		trArmySelect(""+p+",0");
 		trUnitChangeProtoUnit("Healing SFX");
+		/* NOOOO MY QUEEEEN */
+		if (trQuestVarGet("p"+p+"simp") > 0) {
+			int simp = trQuestVarGet("p"+p+"simp");
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+simp+"tether");
+			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			trQuestVarSet("p"+simp+"queen", 0);
+			trQuestVarSet("p"+p+"simp", 0);
+		}
 	}
 	yRemoveFromDatabase("p"+p+"characters");
 	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
@@ -569,7 +578,7 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 		int p = yGetVar("playerUnits", "player");
 		if (trQuestVarGet("protectionCount") == 0) {
 			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
-				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * dmg);
+				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * dmg);
 				trPlayerGrantResources(p, "favor", 1);
 			} else {
 				trDamageUnit(dmg);
@@ -618,6 +627,7 @@ int CheckOnHit(int p = 0, int id = 0) {
     int action = kbUnitGetAnimationActionType(id);
     int status = ON_HIT_NONE;
     int class = trQuestVarGet("p"+p+"class");
+    int simp = 0;
     float amt = 0;
     if (yGetVar("p"+p+"characters", "attacking") == 0) {
         if ((action == 12) || (action == 6)) {
@@ -639,6 +649,14 @@ int CheckOnHit(int p = 0, int id = 0) {
                         ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
                         status = ON_HIT_SPECIAL;
                     }
+                }
+                /* simp benefits */
+                if (trQuestVarGet("p"+p+"simp") > 0) {
+                	simp = trQuestVarGet("p"+p+"simp");
+                	for(x=yGetDatabaseCount("p"+simp+"characters"); >0) {
+                		yDatabaseNext("p"+simp+"characters");
+                		ySetVar("p"+simp+"characters", "specialAttack", yGetVar("p"+simp+"characters", "specialAttack") - 1);
+                	}
                 }
                 /* get the target */
                 if (yGetVar("p"+p+"characters", "attackTargetIndex") == 0) {

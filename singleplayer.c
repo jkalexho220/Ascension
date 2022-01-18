@@ -98,7 +98,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case INVENTOR:
+			case COMMANDO:
 			{
 				trQuestVarSet("relicCount", yGetDatabaseCount("p1relics") + yGetDatabaseCount("freeRelics"));
 				if (trQuestVarGet("relicCount") >= 100) {
@@ -430,6 +430,10 @@ highFrequency
 			case SPELLSTEALER:
 			{
 				uiMessageBox("To unlock this class, open ten chests. Current: " + 1*trQuestVarGet("chestCount"));
+			}
+			case COMMANDO:
+			{
+				uiMessageBox("To unlock this class, collect 50 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
 		}
 	}

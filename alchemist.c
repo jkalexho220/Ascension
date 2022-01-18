@@ -146,7 +146,7 @@ void alchemistAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
-		dist = 2500;
+		dist = 100;
 		hit = -1;
 		for(x=yGetDatabaseCount("playerUnits"); >0) {
 			id = yDatabaseNext("playerUnits", true);
@@ -179,6 +179,13 @@ void alchemistAlways(int eventID = -1) {
 			} else {
 				trUnitChangeProtoUnit("Hero Birth");
 			}
+		} else {
+			if (trCurrentPlayer() == p) {
+				trCounterAbort("well");
+				trSoundPlayFN("cantdothat.wav","1",-1,"","");
+				trChatSend(0, "You must target an ally!");
+			}
+			trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
 		}
 	}
 
@@ -279,7 +286,9 @@ void chooseAlchemist(int eventID = -1) {
 		map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
 		lureName = "(E) Duplicate";
 		lureIsUltimate = true;
+		trSetCounterDisplay("Potion: FREEZE");
 	}
+	trQuestVarSet("p"+p+"potion", POTION_STUN);
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("elixirCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
 	trQuestVarSet("p"+p+"lureCooldown", 1);

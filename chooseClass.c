@@ -552,12 +552,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "When this spell ends, your next spell will apply all the status effects absorbed.";
+					msg = "When this spell ends, your next spell will apply all the absorbed status effects.";
 				}
 				case 10:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.1x Damage absorbed";
+					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.2x Damage absorbed";
 				}
 				case 11:
 				{
@@ -579,6 +579,68 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					icon = "icons\improvement greatest of fifty icon 64";
 					msg = "Cost: 30 | Radius: 15 | Damage: Attack x Spell Power";
 					next = 0;
+				}
+			}
+		}
+		case COMMANDO:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Commando: A mid-ranged fighter that wields an arsenal of explosive weaponry.";
+				}
+				case 1:
+				{
+					msg = "Passive: Each time you attack, restore 3 favor.";
+				}
+				case 2:
+				{
+					msg = "Special Attack (5 attacks): Fire your shotgun, dealing damage in a cone.";
+				}
+				case 3:
+				{
+					msg = "Damage per pellet: 0.75 x Attack | Pellets: 4 + Projectiles";
+				}
+				case 4:
+				{
+					icon = "icons\improvement electrum bullets icon 64";
+					msg = "(Q) Shrapnel Shot: Fire an explosive at your cursor.";
+				}
+				case 5:
+				{
+					icon = "icons\improvement electrum bullets icon 64";
+					msg = "If it hits a wall, it explodes and releases a cone of shrapnel, dealing damage.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement electrum bullets icon 64";
+					msg = "Damage per pellet: 0.75 x Attack | Pellets: 7 + 2 x Projectiles";
+				}
+				case 7:
+				{
+					icon = "sfx a implode lighting flair";
+					msg = "(W) Echo Bomb: Attach a bomb to an enemy that records all the damage it takes for several seconds";
+				}
+				case 8:
+				{
+					icon = "sfx a implode lighting flair";
+					msg = "When the bomb explodes, deal all the stored damage in a large radius.";
+				}
+				case 9:
+				{
+					icon = "sfx a implode lighting flair";
+					msg = "Cooldown: 24 | Duration: 6 | Radius: 12";
+				}
+				case 10:
+				{
+					icon = "icons\siege x fire siphon icons 64";
+					msg = "(E) Flamethrower: Activate your flamethrower, continuously spewing flames in front of you.";
+				}
+				case 11:
+				{
+					icon = "icons\siege x fire siphon icons 64";
+					msg = "Cost: 7 per second | Range: 8 | Damage: 2 x Attack x Spell Power";
 				}
 			}
 		}
@@ -630,6 +692,10 @@ string className(int class = 0) {
 		case COMMANDO:
 		{
 			name = "Commando";
+		}
+		case THRONESHIELD:
+		{
+			name = "Throne Shield";
 		}
 	}
 	return(name);

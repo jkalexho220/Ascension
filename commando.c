@@ -9,7 +9,7 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	amt = fModulo(6.283185, amt - 0.5 * dist);
 	dist = dist / (count - 1);
 	yAddToDatabase("p"+p+"shotgunHitboxes","next");
-	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", trQuestVarGet("p"+p+"attack") * count);
+	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.75 * trQuestVarGet("p"+p+"attack") * count);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startx", trQuestVarGet(start+"x"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startz", trQuestVarGet(start+"Z"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle1", amt);
@@ -46,9 +46,6 @@ void commandoAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int stunned = 0;
-	int poisoned = 0;
-	int silenced = 0;
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
@@ -103,6 +100,12 @@ void commandoAlways(int eventID = -1) {
 		trQuestVarSet("angleDiff", dotProduct("dir1", "dir2"));
 		/* projectiles move at 30 units per second */
 		dist = (trTimeMS() - yGetVar("p"+p+"shotgunHitboxes", "startTime")) * 0.03;
+		/* at close range, enemies are hit no matter what */
+		if (dist < 4.0) {
+			trQuestVarSet("dir2X", 0.0 - trQuestVarGet("dir1X"));
+			trQuestVarSet("dir2Z", 0.0 - trQuestVarGet("dir1Z"));
+			trQuestVarSet("angleDiff", -1);
+		}
 		trQuestVarSet("curDist", dist);
 		amt = yGetVar("p"+p+"shotgunHitboxes", "damage");
 		trQuestVarSet("outer", dist * dist);
@@ -197,7 +200,7 @@ void commandoAlways(int eventID = -1) {
 					}
 					if (trQuestVarGet("p"+p+"flamethrowerActive") == 1) {
 						dist = trQuestVarGet("flamethrowerRange") * trQuestVarGet("p"+p+"spellRange");
-						amt = 2.4 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
+						amt = 1.5 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
 						for(x=yGetDatabaseCount("enemies"); >0) {
 							id = yDatabaseNext("enemies", true);
 							if (id == -1 || trUnitAlive() == false) {
@@ -489,10 +492,7 @@ highFrequency
 		trEventSetHandler(1000 + 12 * COMMANDO + p, "chooseCommando");
 	}
 
-	trQuestVarSet("shotgunCount", 4);
-
 	trQuestVarSet("shrapnelCooldown", 10);
-	trQuestVarSet("shrapnelCount", 8);
 
 	trQuestVarSet("echoBombCooldown", 24);
 	trQuestVarSet("echoBombDuration", 6);
@@ -500,7 +500,7 @@ highFrequency
 
 	/* hits every 0.75 seconds for 120 damage */
 	trQuestVarSet("flamethrowerDamage", 90);
-	trQuestVarSet("flamethrowerCost", 8);
+	trQuestVarSet("flamethrowerCost", 7);
 	trQuestVarSet("flamethrowerDelay", 1000 / trQuestVarGet("flamethrowerCost"));
-	trQuestVarSet("flamethrowerRange", 7);
+	trQuestVarSet("flamethrowerRange", 8);
 }
