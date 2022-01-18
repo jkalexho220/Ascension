@@ -235,6 +235,7 @@ highFrequency
     int old = xsGetContextPlayer();
     int id = 0;
     int p = 0;
+    int simp = 0;
     int count = 0;
     float amt = 0;
 
@@ -496,9 +497,14 @@ highFrequency
             /* lifesteal */
             if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
                 healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
-                /* TIER 3 SUB  OMG */
+                /* simp benefits */
                 if (trQuestVarGet("p"+p+"simp") > 0) {
-                    healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+1*trQuestVarGet("p"+p+"simp")+"index"));
+                    simp = trQuestVarGet("p"+p+"simp");
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+simp+"unit");
+                    healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+simp+"index"));
+                    trUnitSelectClear();
+                    trUnitSelectByQV("p"+p+"unit");
                 }
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }

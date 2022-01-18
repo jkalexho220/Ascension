@@ -42,6 +42,18 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\infantry x maceman hero";
 		}
+		case THRONESHIELD:
+		{
+			icon = "icons\infantry x protector hero icons 64";
+		}
+		case SAVIOR:
+		{
+			icon = "icons\hero g bellerophon icon 64";
+		}
+		case GARDENER:
+		{
+			icon = "icons\hero g chiron icon 64";
+		}
 	}
 	return(icon);
 }
@@ -644,6 +656,66 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case THRONESHIELD:
+		{
+			case 0:
+			{
+				msg = "Throne Shield: A frontline fighter that tanks damage for allies.";
+			}
+			case 1:
+			{
+				msg = "Passive: When you take damage, reduce it by 2 percent for every 100 health you have.";
+			}
+			case 2:
+			{
+				msg = "Special Attack (10 attacks): Stun your target and heal all allies for 5 percent of your health.";
+			}
+			case 3:
+			{
+				icon = "icons\god power ragnarok icon 64";
+				msg = "(Q) Knight's Vow: Choose an allied player to be your partner.";
+			}
+			case 4:
+			{
+				icon = "icons\god power ragnarok icon 64";
+				msg = "When they take damage, you take half of it instead. Their lifesteal will heal you as well.";
+			}
+			case 5:
+			{
+				icon = "icons\god power ragnarok icon 64";
+				msg = "Also, their attacks will advance your special attack cooldown as well.";
+			}
+			case 6:
+			{
+				icon = "icons\god power ragnarok icon 64";
+				msg = "Cooldown: 10 | Cannot target another Throne Shield or a player that already has a Vow.";
+			}
+			case 7:
+			{
+				icon = "icons\god power thunder clap icons 64";
+				msg = "(W) Justice: Stun nearby enemies that are attacking your allies instead of you.";
+			}
+			case 8:
+			{
+				icon = "icons\god power thunder clap icons 64";
+				msg = "Cooldown: 10 | Radius: 8";
+			}
+			case 9:
+			{
+				icon = "icons\god power valor icons 64";
+				msg = "(E) Shield of Light: Absorb all the damage you receive for a short duration.";
+			}
+			case 10:
+			{
+				icon = "icons\god power valor icons 64";
+				msg = "Then, your next attack will fire an enormous laser that deals all the absorbed damage."
+			}
+			case 11:
+			{
+				icon = "icons\god power valor icons 64";
+				msg = "Cost: 60 | Duration: 10";
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);
@@ -696,6 +768,14 @@ string className(int class = 0) {
 		case THRONESHIELD:
 		{
 			name = "Throne Shield";
+		}
+		case SAVIOR:
+		{
+			name = "Savior";
+		}
+		case GARDENER:
+		{
+			name = "Gardener";
 		}
 	}
 	return(name);

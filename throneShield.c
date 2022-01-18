@@ -329,6 +329,7 @@ void throneShieldAlways(int eventID = -1) {
 						trUnitSelectByQV("p"+p+"characters");
 						trSetSelectedScale(1,1,1);
 					} else if (hit == ON_HIT_SPECIAL) {
+						trPlayerGrantResources(p, "favor", 3);
 						stunUnit("enemies", 2.0, p);
 						amt = 0.05 * trQuestVarGet("p"+p+"health");
 						for(x=yGetDatabaseCount("playerCharacters"); >0) {
@@ -392,7 +393,7 @@ highFrequency
 	trQuestVarSet("justiceCooldown", 10);
 	trQuestVarSet("justiceRadius", 8);
 
-	trQuestVarSet("shieldOfLightCost", 50);
+	trQuestVarSet("shieldOfLightCost", 60);
 	trQuestVarSet("shieldOfLightDuration", 10);
 	trQuestVarSet("shieldOfLightWidth", 3);
 }

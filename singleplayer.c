@@ -82,7 +82,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case FROSTKNIGHT:
+			case THRONESHIELD:
 			{
 				if (trQuestVarGet("bossKills") >= 5) {
 					unlocked = true;
@@ -92,7 +92,7 @@ void classNewUnlock(int class = 0) {
 			{
 				unlocked = true;
 			}
-			case STARSEER:
+			case FROSTKNIGHT:
 			{
 				if (trQuestVarGet("questCount") >= 3) {
 					unlocked = true;
@@ -102,6 +102,12 @@ void classNewUnlock(int class = 0) {
 			{
 				trQuestVarSet("relicCount", yGetDatabaseCount("p1relics") + yGetDatabaseCount("freeRelics"));
 				if (trQuestVarGet("relicCount") >= 100) {
+					unlocked = true;
+				}
+			}
+			case SPELLSTEALER:
+			{
+				if (trQuestVarGet("chestCount") == 10) {
 					unlocked = true;
 				}
 			}
@@ -407,7 +413,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, host this map in multiplayer once.");
 			}
-			case FROSTKNIGHT:
+			case THRONESHIELD:
 			{
 				uiMessageBox("To unlock this class, defeat 5 bosses. Current: " + 1*trQuestVarGet("bossKills"));
 			}
@@ -419,7 +425,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 5.");
 			}
-			case STARSEER:
+			case FROSTKNIGHT:
 			{
 				uiMessageBox("To unlock this class, complete three quests. Current: " + 1*trQuestVarGet("questCount"));
 			}
