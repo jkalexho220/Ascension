@@ -417,6 +417,8 @@ highFrequency
 {
     if (trTime() > cActivationTime) {
         zInitProtoUnitStat("Revealer", 1, 2, 12);
+        zInitProtoUnitStat("Revealer to Player", 1, 2, 12);
+        zSetProtoUnitStat("Revealer to Player", 1, 2, 32);
         setupPlayerProto("Kronny Flying", 1000, 0, 0);
 
         /* i gotta look good */

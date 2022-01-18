@@ -150,6 +150,7 @@ void checkGodPowers(int p = 0) {
             if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_READY);
                 if (trCurrentPlayer() == p) {
+                    trCounterAbort("lure");
                     trCounterAddTime("lure", -1, -99999, lureName);
                     if (lureIsUltimate) {
                         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");

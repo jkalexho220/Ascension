@@ -403,7 +403,7 @@ highFrequency
 			x = trQuestVarGet("village") - 4 * z;
 			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
 			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Revealer",1,70*x+40,0,70*z+40,225,true);
+			trArmyDispatch("1,0","Revealer to Player",1,70*x+40,0,70*z+40,225,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
 			trSoundPlayFN("settlement.wav","1",-1,"","");

@@ -9,7 +9,7 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	amt = fModulo(6.283185, amt - 0.5 * dist);
 	dist = dist / (count - 1);
 	yAddToDatabase("p"+p+"shotgunHitboxes","next");
-	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.5 * trQuestVarGet("p"+p+"attack") * count);
+	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", trQuestVarGet("p"+p+"attack") * count);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startx", trQuestVarGet(start+"x"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startz", trQuestVarGet(start+"Z"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle1", amt);
@@ -21,6 +21,24 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle2", amt);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "dist", 0);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startTime", trTimeMS());
+}
+
+void flamethrowersOff(int p = 0) {
+	for (x=yGetDatabaseCount("p"+p+"characters"); >0) {
+		if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+			removeCommando(p);
+		} else {
+			for(y=3; >0) {
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("p"+p+"characters", "chimera"+y));
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			}
+		}
+	}
+	if (trCurrentPlayer() == p) {
+		trSoundPlayFN("godpoewrfailed.wav","1",-1,"","");
+	}
+	trQuestVarSet("p"+p+"flamethrowerActive", 0);
 }
 
 void commandoAlways(int eventID = -1) {
@@ -109,7 +127,7 @@ void commandoAlways(int eventID = -1) {
 							current = xsSqrt(current);
 							dist = xsMax(current, dist);
 							/* the farther they are, the lower the damage */
-							damageEnemy(p, (30.0 - current) / current * amt, true);
+							damageEnemy(p, (30.0 - current) / 30.0 * amt, true);
 							target = 1;
 							trPlayerGrantResources(p, "favor", 1);
 						}
@@ -121,10 +139,9 @@ void commandoAlways(int eventID = -1) {
 		if (trTimeMS() > yGetVar("p"+p+"shotgunHitboxes", "startTime") + 1000) {
 			yRemoveFromDatabase("p"+p+"shotgunHitboxes");
 		} else if (target == 1) {
-			ySetVar("p"+p+"shotgunHitboxes", "dist", dist);
+			ySetVar("p"+p+"shotgunHitboxes", "dist", dist + 0.1);
 			trQuestVarSetFromRand("sound", 1,4,true);
 			trSoundPlayFN("arrowonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-			ySetVar("p"+p+"shotgunHitboxes", "dist", dist);
 		} else if (trQuestVarGet("curDist") > yGetVar("p"+p+"shotgunHitboxes", "dist") + 2.0) {
 			ySetVar("p"+p+"shotgunHitboxes", "dist", trQuestVarGet("curDist"));
 		}
@@ -136,16 +153,67 @@ void commandoAlways(int eventID = -1) {
 			removeCommando(p);
 		} else {
 			hit = CheckOnHit(p, id);
-			if (hit >= ON_HIT_NORMAL) {
-				trPlayerGrantResources(p, "favor", 3);
-				if (hit == ON_HIT_SPECIAL) {
-					trVectorSetUnitPos("start", "p"+p+"characters");
-					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-						trSoundPlayFN("titanfall.wav","1",-1,"","");
-						trSoundPlayFN("implode start.wav","1",-1,"","");
-						trVectorSetUnitPos("end", "enemies");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-						shootShotgun(p, "start", "dir", 3 + trQuestVarGet("p"+p+"projectiles"));
+			trVectorSetUnitPos("start", "p"+p+"characters");
+			if (hit >= ON_HIT_ATTACKING) {
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					trVectorSetUnitPos("end", "enemies");
+					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+					ySetVarFromVector("p"+p+"characters", "dir", "dir");
+					if (hit >= ON_HIT_NORMAL) {
+						trPlayerGrantResources(p, "favor", 3);
+						if (hit == ON_HIT_SPECIAL) {
+							trSoundPlayFN("titanfall.wav","1",-1,"","");
+							trSoundPlayFN("implode start.wav","1",-1,"","");
+							shootShotgun(p, "start", "dir", 3 + trQuestVarGet("p"+p+"projectiles"));
+						}
+					}
+				}
+			} else {
+				yVarToVector("p"+p+"characters", "prev");
+				if (zDistanceBetweenVectorsSquared("start", "prev") > 0) {
+					trVectorQuestVarSet("dir", zGetUnitVector("prev", "start"));
+					ySetVarFromVector("p"+p+"characters", "dir", "dir");
+					ySetVarFromVector("p"+p+"characters", "prev", "start");
+				}
+			}
+			
+			if (trQuestVarGet("p"+p+"flamethrower") == 1) {
+				if (trTimeMS() > yGetVar("p"+p+"characters", "flamethrowerNext")) {
+					ySetVar("p"+p+"characters", "flamethrowerNext", trTimeMS() + 750);
+					yVarToVector("p"+p+"characters", "dir");
+					target = 1 + yGetVar("p"+p+"characters", "flamethrowerStep");
+					if (target <= 3) {
+						ySetVar("p"+p+"characters", "flamethrowerStep", target);
+						if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "chimera"+target)) >= 0) {
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("p"+p+"characters", "chimera"+target), true);
+							trSetSelectedScale(0,1,0);
+							trMutateSelected(kbGetProtoUnitID("Chimera"));
+							trUnitOverrideAnimation(19,0,true,false,-1);
+						} else {
+							spyEffect(1*trQuestVarGet("p"+p+"characters"),
+								kbGetBlockID("Cinematic Block"),yGetVarName("p"+p+"characters", "chimera"+target));
+						}
+					}
+					if (trQuestVarGet("p"+p+"flamethrowerActive") == 1) {
+						dist = trQuestVarGet("flamethrowerRange") * trQuestVarGet("p"+p+"spellRange");
+						amt = 2.4 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
+						for(x=yGetDatabaseCount("enemies"); >0) {
+							id = yDatabaseNext("enemies", true);
+							if (id == -1 || trUnitAlive() == false) {
+								removeEnemy();
+							} else {
+								current = zDistanceToVector("enemies", "start");
+								if (current < dist + 3.0) {
+									trQuestVarSet("hitboxX", trQuestVarGet("startx") + current * trQuestVarGet("dirX"));
+									trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + current * trQuestVarGet("dirZ"));
+									current = 0.3 * current + 1.0;
+									if (zDistanceToVector("enemies", "hitbox") < current) {
+										damageEnemy(p, amt);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -208,6 +276,88 @@ void commandoAlways(int eventID = -1) {
 			}
 		}
 	}
+
+	if (yGetDatabaseCount("p"+p+"fireharpies") > 0) {
+		for (x=yGetDatabaseCount("p"+p+"fireharpies"); >0) {
+			yDatabaseNext("p"+p+"fireharpies", true);
+			trMutateSelected(kbGetProtoUnitID("Harpy"));
+			trUnitOverrideAnimation(1,0,false,false,-1);
+		}
+		yClearDatabase("p"+p+"fireharpies");
+	}
+
+	if (yGetDatabaseCount("p"+p+"echoBombs") > 0) {
+		yDatabaseNext("p"+p+"echoBombs");
+		hit = 0;
+		if (trQuestVarGet("p"+p+"echoBombs") > 0) {
+			target = 1*yGetVar("p"+p+"echoBombs", "unit");
+			trUnitSelectClear();
+			trUnitSelect(""+target);
+			if (trUnitAlive() == false) {
+				hit = 1;
+				amt = yGetVar("p"+p+"echoBombs", "health");
+			} else {
+				trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
+				ySetVarFromVector("p"+p+"echoBombs", "pos", "pos");
+				xsSetContextPlayer(ENEMY_PLAYER);
+				amt = kbUnitGetCurrentHitpoints(kbGetBlockID(""+target));
+				if (trTimeMS() > yGetVar("p"+p+"echoBombs", "timeout")) {
+					amt = yGetVar("p"+p+"echoBombs", "health") - amt;
+					hit = 1;
+				} else if (amt < yGetVar("p"+p+"echoBombs", "currenthealth")) {
+					ySetVar("p"+p+"echoBombs", "size", 
+						yGetVar("p"+p+"echoBombs", "size") + 0.002 * (yGetVar("p"+p+"echoBombs", "currenthealth") - amt));
+					ySetVar("p"+p+"echoBombs", "currenthealth", amt);
+					amt = xsSqrt(yGetVar("p"+p+"echoBombs", "size"));
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"echoBombs", true);
+					trSetSelectedScale(amt, amt, amt);
+					trUnitHighlight(0.2, false);
+				}
+				xsSetContextPlayer(p);
+			}
+			if (hit == 1) {
+				yVarToVector("p"+p+"echoBombs", "pos");
+				amt = amt * trQuestVarGet("p"+p+"spellDamage");
+				dist = xsPow(trQuestVarGet("echoBombRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+				for(x=yGetDatabaseCount("enemies"); >0) {
+					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+						removeEnemy();
+					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+						damageEnemy(p, amt);
+					}
+				}
+
+				if (amt < 1000) {
+					trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+				} else {
+					trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
+					trCameraShake(0.5, 0.3);
+				}
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"echoBombs", true);
+				trUnitDestroy();
+
+				zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				yAddToDatabase("p"+p+"fireHarpies", "next");
+				trUnitSelectClear();
+				trUnitSelect(""+1*trQuestVarGet("next"), true);
+				trUnitChangeProtoUnit("Kronny Flying");
+				trUnitSelectClear();
+				trUnitSelect(""+1*trQuestVarGet("next"), true);
+				trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+				trSetSelectedScale(0,-5.0,0);
+				trDamageUnitPercent(100);
+
+				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect(""+p+",0");
+				trUnitChangeProtoUnit("Meteor Impact Ground");
+				yRemoveFromDatabase("p"+p+"echoBombs");
+			}
+		}
+	}
 	
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
@@ -217,12 +367,90 @@ void commandoAlways(int eventID = -1) {
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trMutateSelected(kbGetProtoUnitID("Rocket"));
 		trUnitDestroy();
-		
+		dist = xsPow(12, 2);
+		target = 0;
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			id = yDatabaseNext("enemies", true);
+			if (id == -1 || trUnitAlive() == false) {
+				removeEnemy();
+			} else {
+				current = zDistanceToVectorSquared("enemies", "pos");
+				if (current < dist) {
+					hit = id;
+					target = yGetPointer("enemies");
+					dist = current;
+				}
+			}
+		}
+		if (target > 0 && ySetPointer("enemies", target)) {
+			trVectorSetUnitPos("pos", "enemies");
+			trQuestVarSet("next", -1);
+			yAddToDatabase("p"+p+"echoBombs", "next");
+			yAddUpdateVar("p"+p+"echoBombs", "unit", trQuestVarGet("enemies"));
+			spyEffect(1*trQuestVarGet("enemies"),kbGetProtoUnitID("Phoenix Egg"),yGetNewestName("p"+p+"echoBombs"));
+			xsSetContextPlayer(ENEMY_PLAYER);
+			amt = kbUnitGetCurrentHitpoints(hit);
+			yAddUpdateVar("p"+p+"echoBombs", "health", amt);
+			yAddUpdateVar("p"+p+"echoBombs", "currenthealth", amt);
+			yAddUpdateVar("p"+p+"echoBombs", "size", 1.0);
+			yAddUpdateVar("p"+p+"echoBombs", "posx", trQuestVarGet("posx"));
+			yAddUpdateVar("p"+p+"echoBombs", "posz", trQuestVarGet("posz"));
+			yAddUpdateVar("p"+p+"echoBombs", "timeout", 
+				trTimeMS() + 1000 * trQuestVarGet("echoBombDuration") * trQuestVarGet("p"+p+"spellDuration"));
+			xsSetContextPlayer(p);
+			trSoundPlayFN("siegeselect.wav", "1", -1, "","");
+			trSoundPlayFN("gatherpoint.wav","1",-1,"","");
+		} else {
+			if (trCurrentPlayer() == p) {
+				trSoundPlayFN("cantdothat.wav","1",-1,"","");
+				trChatSend(0, "You must target an enemy with this ability!");
+			}
+			trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
+		}
+	}
+
+	if (trQuestVarGet("p"+p+"flamethrower") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"flamethrowerNext")) {
+			trQuestVarSet("p"+p+"flamethrowerActive", 1);
+			trQuestVarSet("p"+p+"flamethrowerNext", 
+				trQuestVarGet("p"+p+"flamethrowerNext") + trQuestVarGet("flamethrowerDelay") / trQuestVarGet("p"+p+"ultimateCost"));
+			trPlayerGrantResources(p, "favor", -1);
+			if (trPlayerResourceCount(p, "favor") == 0) {
+				trQuestVarSet("p"+p+"flamethrower", 0);
+				flamethrowersOff(p);
+			}
+		}
 	}
 
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
-		
+		trQuestVarSet("p"+p+"flamethrower", 1 - trQuestVarGet("p"+p+"flamethrower"));
+		if (trQuestVarGet("p"+p+"flamethrower") == 0) {
+			flamethrowersOff(p);
+		} else if (trPlayerResourceCount(p, "favor") == 0) {
+			trQuestVarSet("p"+p+"flamethrower", 0);
+			if (trCurrentPlayer() == p) {
+				trSoundPlayFN("cantdothat.wav","1",-1,"","");
+				trChatSend(0, "Not enough favor to activate Flamethrower!");
+			}
+		} else {
+			trSoundPlayFN("storehouse.wav","1",-1,"","");
+			trQuestVarSet("p"+p+"flamethrowerNext", trTimeMS() + 850);
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+					removeCommando(p);
+				} else {
+					ySetVar("p"+p+"characters", "flamethrowerNext", trTimeMS() + 100);
+					ySetVar("p"+p+"characters", "flamethrowerStep", 0);
+					for(y=3; >0) {
+						if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "chimera"+y)) == -1) {
+							spyEffect(1*trQuestVarGet("p"+p+"characters"), 
+								kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "chimera"+y));
+						}
+					}
+				}
+			}
+		}
 	}
 
 
@@ -248,7 +476,7 @@ void chooseCommando(int eventID = -1) {
 	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("echoBombCooldown"));
 	trQuestVarSet("p"+p+"lureCost", 0);
 	trQuestVarSet("p"+p+"rainCooldown", 2);
-	trQuestVarSet("p"+p+"rainCost", 1);
+	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
 rule commando_init
@@ -270,6 +498,8 @@ highFrequency
 	trQuestVarSet("echoBombDuration", 6);
 	trQuestVarSet("echoBombRadius", 12);
 
+	/* hits every 0.75 seconds for 120 damage */
+	trQuestVarSet("flamethrowerDamage", 90);
 	trQuestVarSet("flamethrowerCost", 8);
 	trQuestVarSet("flamethrowerDelay", 1000 / trQuestVarGet("flamethrowerCost"));
 	trQuestVarSet("flamethrowerRange", 7);
