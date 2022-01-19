@@ -6,9 +6,10 @@ const int ABILITY_OFF = 0;
 const int ABILITY_ON = 1;
 
 const int ON_HIT_NONE = 0;
-const int ON_HIT_ATTACKING = 1;
-const int ON_HIT_NORMAL = 2;
-const int ON_HIT_SPECIAL = 3;
+const int ON_HIT_JUMP = 1;
+const int ON_HIT_ATTACKING = 2;
+const int ON_HIT_NORMAL = 3;
+const int ON_HIT_SPECIAL = 4;
 
 const int PROJ_NONE = 0;
 const int PROJ_GROUND = 1;
@@ -629,7 +630,9 @@ int CheckOnHit(int p = 0, int id = 0) {
     int class = trQuestVarGet("p"+p+"class");
     int simp = 0;
     float amt = 0;
-    if (yGetVar("p"+p+"characters", "attacking") == 0) {
+    if (action == 32) {
+    	action = ON_HIT_JUMP;
+    } else if (yGetVar("p"+p+"characters", "attacking") == 0) {
         if ((action == 12) || (action == 6)) {
         	ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
             ySetVar("p"+p+"characters", "attacking", 1);

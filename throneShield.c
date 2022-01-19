@@ -7,6 +7,7 @@ void removeThroneShield(int p = 0) {
 			trUnitSelectByQV("p"+queen+"tether");
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 		}
+		trQuestVarSet("p"+queen+"simp", 0);
 		trQuestVarSet("p"+p+"queen", 0);
 	}
 	yRemoveUpdateVar("p"+p+"characters", "shieldSFX");
@@ -123,7 +124,7 @@ void throneShieldAlways(int eventID = -1) {
 			}
 			if (kbGetBlockID(""+1*trQuestVarGet("p"+target+"tether")) == -1) {
 				spyEffect(1*trQuestVarGet("p"+target+"unit"),kbGetProtoUnitID("Vortex Finish Linked"),"p"+target+"tether");
-				trQuestVarSet("p"+p+"tetherReady", 0);
+				trQuestVarSet("p"+target+"tetherReady", 0);
 			} else if (trQuestVarGet("p"+target+"tetherReady") == 0) {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+target+"tether", true);
@@ -142,7 +143,7 @@ void throneShieldAlways(int eventID = -1) {
 		xsSetContextPlayer(target);
 		amt = kbUnitGetCurrentHitpoints(kbGetBlockID(""+1*trQuestVarGet("p"+target+"unit")));
 		dist = 0.5 * (trQuestVarGet("p"+target+"currentHitpoints") - amt);
-		if (dist > 0) {
+		if (dist > 0 && trQuestVarGet("p"+target+"currentHitpoints") > 1.0) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+target+"unit");
 			trDamageUnit(0.0 - dist);
@@ -232,7 +233,7 @@ void throneShieldAlways(int eventID = -1) {
 				id = yDatabaseNext("justice", true);
 				if (zDistanceToVectorSquared("justice", "pos") < dist) {
 					hit = kbUnitGetTargetUnitID(id);
-					if ((hit == target) || (hit < 0)) {
+					if (hit == target) {
 						continue;
 					} else {
 						if (ySetPointer("enemies", 1*yGetVar("justice", "index"))) {
@@ -245,7 +246,7 @@ void throneShieldAlways(int eventID = -1) {
 			}
 			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 			trArmySelect("1,0");
-			trUnitChangeProtoUnit("Tremor");
+			trUnitChangeProtoUnit("Olympus Temple SFX");
 		}
 		trSoundPlayFN("ageadvance.wav","1",-1,"","");
 	}
@@ -266,6 +267,8 @@ void throneShieldAlways(int eventID = -1) {
 					current = 1.0 + xsSqrt(yGetVar("p"+p+"characters", "absorbed")) * 0.02;
 					trSetSelectedScale(current,current,current);
 					trUnitHighlight(0.2, false);
+				} else if (yGetVar("p"+p+"characters", "currentHitpoints") <= 1) {
+					dist = 0;
 				} else {
 					dist = dist * trQuestVarGet("p"+p+"damageReduction");
 				}
@@ -367,7 +370,7 @@ void chooseThroneShield(int eventID = -1) {
 	trQuestVarSet("p"+p+"damageReduction", 0.02 * trQuestVarGet("p"+p+"health") / 100);
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("vowCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", 1);
+	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("shieldOfLightCooldown"));
 	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("shieldOfLightCost"));
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("justiceCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
@@ -395,6 +398,7 @@ highFrequency
 	trQuestVarSet("justiceRadius", 8);
 
 	trQuestVarSet("shieldOfLightCost", 60);
+	trQuestVarSet("shieldOfLightCooldown", 20);
 	trQuestVarSet("shieldOfLightDuration", 10);
 	trQuestVarSet("shieldOfLightWidth", 3);
 }

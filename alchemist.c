@@ -162,10 +162,11 @@ void alchemistAlways(int eventID = -1) {
 		}
 		if (hit > 0) {
 			ySetPointer("playerUnits", hit);
+			target = yGetVar("playerUnits", "player");
 			ySetVar("playerUnits", "poisonTimeout", 0);
 			ySetVar("playerUnits", "stunTimeout", 0);
-			if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+1*yGetVar("playerUnits", "player")+"unit")) {
-				trQuestVarSet("p"+1*yGetVar("playerUnits", "player")+"silencedTimeout", 0);
+			if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+target+"unit")) {
+				trQuestVarSet("p"+target+"silenceTimeout", 0);
 			}
 			trSoundPlayFN("recreation.wav","1",-1,"","");
 			trUnitSelectClear();

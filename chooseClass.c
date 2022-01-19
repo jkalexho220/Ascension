@@ -685,7 +685,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\god power ragnarok icon 64";
-					msg = "Also, their attacks will advance your special attack cooldown as well.";
+					msg = "Also, their attacks will advance your special attack cooldown too.";
 				}
 				case 6:
 				{
@@ -695,7 +695,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power thunder clap icons 64";
-					msg = "(W) Justice: Stun nearby enemies that are attacking your allies instead of you.";
+					msg = "(W) Justice: Stun nearby enemies that are not attacking you.";
 				}
 				case 8:
 				{
@@ -715,7 +715,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Cost: 60 | Duration: 10";
+					msg = "Cost: 60 | Duration: 10 | Absorbed damage is calculated before your passive reduction";
 					next = 0;
 				}
 			}
