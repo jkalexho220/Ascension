@@ -720,6 +720,68 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case SAVIOR:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Savior: A high-mobility fighter that heals allies and grants them favor.";
+				}
+				case 1:
+				{
+					msg = "Passive: You can jump towards distant foes. When you land, stun your target.";
+				}
+				case 2:
+				{
+					msg = "Special Attack (3 attacks): Your spear pierces your target and hits enemies in a line.";
+				}
+				case 3:
+				{
+					msg = "Range: 10 | Apply on-hit effects to each enemy hit";
+				}
+				case 4:
+				{
+					icon = "icons\improvement heroic renewal icons 64";
+					msg = "(Q) Guardian Angel: Teleport next to an ally and heal them. Heal increases with distance traveled"
+				}
+				case 5:
+				{
+					icon = "icons\improvement heroic renewal icons 64";
+					msg = "You can target an area near yourself to teleport a short distance."
+				}
+				case 6:
+				{
+					icon = "icons\improvement heroic renewal icons 64";
+					msg = "Cooldown: 8 | Heal: 50 + 5 x distance traveled";
+				}
+				case 7:
+				{
+					icon = "icons\god power cease fire icon 64";
+					msg = "(W) Unity: Create an aura at your cursor. You have 0.25x bonus attack for each ally in the aura."
+				}
+				case 8:
+				{
+					icon = "icons\god power cease fire icon 64";
+					msg = "Each time you attack, heal allies in the aura and grant them 1 favor.";
+				}
+				case 9:
+				{
+					icon = "icons\god power cease fire icon 64";
+					msg = "Cooldown: 20 | Duration: 8 | Radius: 10 | Heal: 0.5x Attack";
+				}
+				case 10:
+				{
+					icon = "icons\god power restoration icon 64";
+					msg = "(E) Intervention: Revive all dead allies. If you die while this is ready, it auto-activates.";
+				}
+				case 11:
+				{
+					icon = "icons\god power restoration icon 64";
+					msg = "Cost: 100 | Cooldown: 10";
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);

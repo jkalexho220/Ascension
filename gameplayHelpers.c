@@ -52,7 +52,7 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 				trChatSend(0, "<color=1,1,1>Silence absorbed! Your next spell will inflict Silence!</color>");
 			}
 		}
-	} else if (trQuestVarGet("p"+p+"unityCount") == 0) {
+	} else {
 		float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
 		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
 			trQuestVarSet("p"+p+"silenceTimeout", timeout);
