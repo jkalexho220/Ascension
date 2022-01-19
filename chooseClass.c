@@ -695,12 +695,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power thunder clap icons 64";
-					msg = "(W) Justice: Stun nearby enemies that are not attacking you.";
+					msg = "(W) Justice: Stun nearby enemies that are not attacking you. Silence the ones that are.";
 				}
 				case 8:
 				{
 					icon = "icons\god power thunder clap icons 64";
-					msg = "Cooldown: 10 | Radius: 8";
+					msg = "Cooldown: 10 | Radius: 8 | Stun Duration: 2 | Silence Duration: 6";
 				}
 				case 9:
 				{

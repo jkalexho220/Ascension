@@ -41,6 +41,12 @@ void trVectorQuestVarEcho(string VQVname = "") {
 	trChatSend(0, ""+VQVname+": "+trVectorQuestVarGet(VQVname));
 }
 
+void vectorRotate90Deg(string qv = "") {
+	float x = trQuestVarGet(qv+"x");
+	trQuestVarSet(qv+"x", 0.0 - trQuestVarGet(qv+"z"));
+	trQuestVarSet(qv+"z", x);
+}
+
 void trStringQuestVarSet(string name = "", string value = "") {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(0);

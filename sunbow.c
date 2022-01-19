@@ -39,30 +39,35 @@ void sunbowAlways(int eventID = -1) {
 					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.3);
 					amt = trQuestVarGet("p"+p+"attack");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
-						yDatabaseNext("playerUnits");
-						dist = zDistanceToVector("playerUnits", "start");
-						if (dist < trQuestVarGet("p"+p+"range") + 3) {
-							trQuestVarSet("hitboxX", trQuestVarGet("startX") + dist * trQuestVarGet("dirx"));
-							trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + dist * trQuestVarGet("dirz"));
-							if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9) {
-								trUnitSelectClear();
-								trUnitSelectByQV("playerUnits", true);
-								healUnit(p, amt);
-							}
-						}
-						
-					}
-					if (trQuestVarGet("p"+p+"searing") == 1) {
-						for(x=yGetDatabaseCount("enemies"); >0) {
-							yDatabaseNext("enemies");
-							dist = zDistanceToVector("enemies", "start");
+						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+							removePlayerUnit();
+						} else {
+							dist = zDistanceToVector("playerUnits", "start");
 							if (dist < trQuestVarGet("p"+p+"range") + 3) {
 								trQuestVarSet("hitboxX", trQuestVarGet("startX") + dist * trQuestVarGet("dirx"));
 								trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + dist * trQuestVarGet("dirz"));
-								if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
+								if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9) {
 									trUnitSelectClear();
-									trUnitSelectByQV("enemies", true);
-									damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"), false);
+									trUnitSelectByQV("playerUnits", true);
+									healUnit(p, amt);
+								}
+							}
+						}
+					}
+					if (trQuestVarGet("p"+p+"searing") == 1) {
+						for(x=yGetDatabaseCount("enemies"); >0) {
+							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+								removeEnemy();
+							} else {
+								dist = zDistanceToVector("enemies", "start");
+								if (dist < trQuestVarGet("p"+p+"range") + 3) {
+									trQuestVarSet("hitboxX", trQuestVarGet("startX") + dist * trQuestVarGet("dirx"));
+									trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + dist * trQuestVarGet("dirz"));
+									if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
+										trUnitSelectClear();
+										trUnitSelectByQV("enemies", true);
+										damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"), false);
+									}
 								}
 							}
 						}

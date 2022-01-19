@@ -234,7 +234,7 @@ void throneShieldAlways(int eventID = -1) {
 				if (zDistanceToVectorSquared("justice", "pos") < dist) {
 					hit = kbUnitGetTargetUnitID(id);
 					if (hit == target) {
-						continue;
+						silenceEnemy(p, 6.0);
 					} else {
 						if (ySetPointer("enemies", 1*yGetVar("justice", "index"))) {
 							stunUnit("enemies", 2.0, p);

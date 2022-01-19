@@ -509,7 +509,9 @@ highFrequency
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
             if (Multiplayer) {
-                fixAnimations(p);
+                if (xsAbs(SAVIOR - trQuestVarGet("p"+p+"class")) > 0) {
+                    fixAnimations(p);
+                }
             }
             /* undo silence */
             if (trQuestVarGet("p"+p+"silenced") == 1) {
@@ -563,22 +565,7 @@ highFrequency
                         "<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + 1*trQuestVarGet("p"+p+"dead"));
                 }
                 if (trQuestVarGet("p"+p+"dead") <= 0) {
-                    trUnitSelectClear();
-                    trUnitSelectByQV("p"+p+"reviveBeam");
-                    trUnitChangeProtoUnit("Rocket");
-                    trUnitSelectClear();
-                    trUnitSelectByQV("p"+p+"unit");
-                    trUnitDestroy();
-                    spawnPlayer(p, "dead"+p+"pos");
-                    trSoundPlayFN("herorevived.wav","1",-1,"","");
-                    trUnitSelectClear();
-                    trUnitSelectByQV("p"+p+"unit");
-                    trDamageUnitPercent(50);
-                    trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
-                    equipRelicsAgain(p);
-                    if (trCurrentPlayer() == p) {
-                        uiFindType(kbGetProtoUnitName(id));
-                    }
+                    revivePlayer(p);
                 }
             }
         }

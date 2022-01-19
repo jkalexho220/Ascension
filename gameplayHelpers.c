@@ -52,7 +52,7 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 				trChatSend(0, "<color=1,1,1>Silence absorbed! Your next spell will inflict Silence!</color>");
 			}
 		}
-	} else {
+	} else if (trQuestVarGet("p"+p+"unityCount") == 0) {
 		float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
 		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
 			trQuestVarSet("p"+p+"silenceTimeout", timeout);
@@ -154,6 +154,7 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "decay");
 	yRemoveUpdateVar("playerUnits", "decayNext");
 	yRemoveUpdateVar("playerUnits", "hero");
+	yRemoveUpdateVar("playerUnits", "unity");
 	yRemoveUpdateVar("playerUnits", "launched");
 }
 
@@ -631,7 +632,7 @@ int CheckOnHit(int p = 0, int id = 0) {
     int simp = 0;
     float amt = 0;
     if (action == 32) {
-    	action = ON_HIT_JUMP;
+    	status = ON_HIT_JUMP;
     } else if (yGetVar("p"+p+"characters", "attacking") == 0) {
         if ((action == 12) || (action == 6)) {
         	ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
@@ -801,6 +802,25 @@ void spawnPlayer(int p = 0, string vdb = "") {
     }
 }
 
+void revivePlayer(int p = 0) {
+	trUnitSelectClear();
+    trUnitSelectByQV("p"+p+"reviveBeam");
+    trUnitChangeProtoUnit("Rocket");
+    trUnitSelectClear();
+    trUnitSelectByQV("p"+p+"unit");
+    trUnitDestroy();
+    spawnPlayer(p, "dead"+p+"pos");
+    trSoundPlayFN("herorevived.wav","1",-1,"","");
+    trUnitSelectClear();
+    trUnitSelectByQV("p"+p+"unit");
+    trDamageUnitPercent(50);
+    trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+    equipRelicsAgain(p);
+    if (trCurrentPlayer() == p) {
+        uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+    }
+}
+
 rule spy_find
 active
 highFrequency
@@ -822,8 +842,10 @@ highFrequency
 						trUnitSelectByQV("spyEye"+x+"unit");
 						if (trUnitAlive() == false) {
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+							debugLog("spyUnit " + x + " is already dead!");
 						} else if (zDistanceToVectorSquared("spyEye"+x+"unit", "spos") > 1) {
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+							debugLog("spyUnit " + x + " too far!");
 						} else {
 							trUnitSelectClear();
 							trUnitSelectByID(id);

@@ -372,6 +372,7 @@ runImmediately
         trModifyProtounit("Tunnel", p, 55, 4);
         /* carry capacity */
         trModifyProtounit("Ajax", p, 5, 99);
+        trModifyProtounit("Transport Ship Greek", p, 5, 99);
         /* health */
         trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
@@ -446,6 +447,7 @@ highFrequency
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8);
         setupPlayerProto("Maceman Hero", 1200, 45, 4.8);
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9);
+        setupPlayerProto("Hero Greek Bellerophon", 1100, 40, 6.0);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -463,6 +465,7 @@ highFrequency
         trModifyProtounit("Monument 2", 0, 26, -1);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Spy Eye", p, 2, -99);
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Pharaoh", p, 14, -999);
