@@ -218,30 +218,22 @@ void throneShieldAlways(int eventID = -1) {
 		xsSetContextPlayer(ENEMY_PLAYER);
 		yClearDatabase("justice");
 		dist = trQuestVarGet("justiceRadius") * trQuestVarGet("p"+p+"spellRange");
-		for(x=yGetDatabaseCount("enemies"); >0) {
-			yDatabaseNext("enemies");
-			if (trCountUnitsInArea(""+1*trQuestVarGet("enemies"),p,"Trident Soldier Hero",dist) >0) {
-				yAddToDatabase("justice", "enemies");
-				yAddUpdateVar("justice", "index", yGetPointer("enemies"));
-			}
-		}
 		dist = dist * dist;
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			target = yDatabaseNext("p"+p+"characters", true);
 			trVectorSetUnitPos("pos", "p"+p+"characters");
-			for(y=yGetDatabaseCount("justice"); >0) {
-				id = yDatabaseNext("justice", true);
-				if (zDistanceToVectorSquared("justice", "pos") < dist) {
+			for(y=yGetDatabaseCount("enemies"); >0) {
+				id = yDatabaseNext("enemies", true);
+				if (id == -1 || trUnitAlive() == false) {
+					removeEnemy();
+				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 					hit = kbUnitGetTargetUnitID(id);
 					if (hit == target) {
 						silenceEnemy(p, 6.0);
 					} else {
-						if (ySetPointer("enemies", 1*yGetVar("justice", "index"))) {
-							stunUnit("enemies", 2.0, p);
-							trPlayerGrantResources(p, "favor", 1);
-						}
-						yRemoveFromDatabase("justice");
+						stunUnit("enemies", 2.0, p);
 					}
+					trPlayerGrantResources(p, "favor", 1);
 				}
 			}
 			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
