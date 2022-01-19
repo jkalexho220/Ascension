@@ -231,7 +231,8 @@ void throneShieldAlways(int eventID = -1) {
 			for(y=yGetDatabaseCount("justice"); >0) {
 				id = yDatabaseNext("justice", true);
 				if (zDistanceToVectorSquared("justice", "pos") < dist) {
-					if (kbUnitGetTargetUnitID(id) == target) {
+					hit = kbUnitGetTargetUnitID(id);
+					if ((hit == target) || (hit < 0)) {
 						continue;
 					} else {
 						if (ySetPointer("enemies", 1*yGetVar("justice", "index"))) {
