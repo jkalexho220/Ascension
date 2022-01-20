@@ -57,7 +57,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Medusa"):
         {
             yAddToDatabase("Medusas", db);
-            yAddUpdateVar("Medusa", "index", yGetNewestPointer("enemies"));
+            yAddUpdateVar("Medusas", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Mountain Giant"):
         {

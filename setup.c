@@ -34,9 +34,9 @@ const int FROSTKNIGHT = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
-const int SAVIOR = 9;
-const int COMMANDO = 10;
-const int GARDENER = 11;
+const int GARDENER = 9;
+const int SAVIOR = 10;
+const int COMMANDO = 11;
 const int SPELLSTEALER = 12;
 
 const int INVENTOR = 13;

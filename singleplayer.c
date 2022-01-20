@@ -39,6 +39,18 @@ void spAscendClass(int class = -1) {
 				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
 			}
 		}
+		if (trQuestVarGet("class"+class+"level") == 8) {
+			if (trQuestVarGet("class"+SAVIOR+"level") == 0) {
+				trQuestVarSet("class"+SAVIOR+"level", 1);
+				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+SAVIOR+"proto")),1,5,1);
+				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
+				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), SAVIOR);
+				xsEnableRule("singleplayer_unlocks");
+				trVectorSetUnitPos("pos", "class"+SAVIOR+"unit");
+				vectorToGrid("pos", "loc");
+				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+			}
+		}
 		trChatHistoryClear();
 		trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
 		for(x=0; <3) {
@@ -440,6 +452,10 @@ highFrequency
 			case COMMANDO:
 			{
 				uiMessageBox("To unlock this class, collect 50 relics. Current: " + 1*trQuestVarGet("relicCount"));
+			}
+			case SAVIOR:
+			{
+				uiMessageBox("To unlock this class, ascend a character to level 8");
 			}
 		}
 	}

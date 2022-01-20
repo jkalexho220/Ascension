@@ -743,12 +743,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\improvement heroic renewal icons 64";
-					msg = "(Q) Guardian Angel: Teleport next to an ally and heal them. Heal increases with distance traveled"
+					msg = "(Q) Guardian Angel: Teleport next to an ally and heal them. Heal increases with distance traveled";
 				}
 				case 5:
 				{
 					icon = "icons\improvement heroic renewal icons 64";
-					msg = "You can target an area near yourself to teleport a short distance."
+					msg = "You can target an area near yourself to teleport a short distance.";
 				}
 				case 6:
 				{
@@ -758,7 +758,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "(W) Unity: Create an aura at your cursor. You have 0.25x bonus attack for each ally in the aura."
+					msg = "(W) Unity: Create an aura at your cursor. You have 0.25x bonus attack for each ally in the aura.";
 				}
 				case 8:
 				{
@@ -779,6 +779,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "Cost: 100 | Cooldown: 10";
+					next = 0;
 				}
 			}
 		}
