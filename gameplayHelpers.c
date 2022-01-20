@@ -137,6 +137,7 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "silenceStatus");
 	yRemoveUpdateVar("enemies", "silenceTimeout");
 	yRemoveUpdateVar("enemies", "silenceSFX");
+	yRemoveUpdateVar("enemies", "bomb");
 }
 
 void removePlayerUnit() {
@@ -391,7 +392,7 @@ void growFrostGiantsIncoming(string pos = "") {
     }
 }
 
-void stunUnit(string db = "", float duration = 0, int p = 0) {
+void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
 	bool targetPlayers = (p == 0);
 	duration = duration * 1000;
@@ -421,9 +422,9 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 			}
 		}
 	} else {
-		trQuestVarSet("stunSound", 1);
 		if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
 			if (yGetVar(db, "stunStatus") == 0) {
+				trQuestVarSet("stunSound", 1);
 				if (trQuestVarGet("boss") == 3) {
 					trVectorSetUnitPos("stunpos", db);
 					growFrostGiantsIncoming("stunpos");
@@ -438,6 +439,8 @@ void stunUnit(string db = "", float duration = 0, int p = 0) {
 					trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
 				}
 				ySetVar(db, "stunStatus", index);
+			} else if (sound) {
+				trQuestVarSet("stunSound", 1);
 			}
 			ySetVar(db, "stunTimeout", trTimeMS() + duration);
 		}
@@ -835,7 +838,6 @@ highFrequency
 			int id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
 			if (id >= 0) {
 				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
-					trVectorSetUnitPos("spos", "spysearch");
 					for(i=0; < loopCount) {
 						x = modularCounterNext("spyfound");
 						trUnitSelectClear();
@@ -843,18 +845,15 @@ highFrequency
 						if (trUnitAlive() == false) {
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
 							debugLog("spyUnit " + x + " is already dead!");
-						} else if (zDistanceToVectorSquared("spyEye"+x+"unit", "spos") > 1) {
-							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
-							debugLog("spyUnit " + x + " too far!");
 						} else {
 							trUnitSelectClear();
 							trUnitSelectByID(id);
 							trMutateSelected(1*trQuestVarGet("spyEye"+x));
 							trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
+							loopCount = loopCount - i;
 							break;
 						}
 					}
-					loopCount = loopCount - i;
 				}
 			}
 			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));

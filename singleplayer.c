@@ -27,7 +27,7 @@ void spAscendClass(int class = -1) {
 		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "! +1 relic slot!");
 		trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),1,5,1);
 		trSetCivilizationNameOverride(1, "Level " + (1+trQuestVarGet("p1level")));
-		if (trQuestVarGet("class"+class+"level") == 5) {
+		if (trQuestVarGet("class"+class+"level") >= 5) {
 			if (trQuestVarGet("class"+ALCHEMIST+"level") == 0) {
 				trQuestVarSet("class"+ALCHEMIST+"level", 1);
 				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+ALCHEMIST+"proto")),1,5,1);
@@ -39,7 +39,7 @@ void spAscendClass(int class = -1) {
 				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
 			}
 		}
-		if (trQuestVarGet("class"+class+"level") == 8) {
+		if (trQuestVarGet("class"+class+"level") >= 7) {
 			if (trQuestVarGet("class"+SAVIOR+"level") == 0) {
 				trQuestVarSet("class"+SAVIOR+"level", 1);
 				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+SAVIOR+"proto")),1,5,1);
@@ -101,6 +101,10 @@ void classNewUnlock(int class = 0) {
 				}
 			}
 			case STORMCUTTER:
+			{
+				unlocked = true;
+			}
+			case GARDENER:
 			{
 				unlocked = true;
 			}
@@ -429,10 +433,6 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, defeat 5 bosses. Current: " + 1*trQuestVarGet("bossKills"));
 			}
-			case INVENTOR:
-			{
-				uiMessageBox("To unlock this class, IDK");
-			}
 			case ALCHEMIST:
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 5.");
@@ -455,7 +455,7 @@ highFrequency
 			}
 			case SAVIOR:
 			{
-				uiMessageBox("To unlock this class, ascend a character to level 8");
+				uiMessageBox("To unlock this class, ascend a character to level 7");
 			}
 		}
 	}

@@ -352,6 +352,7 @@ runImmediately
     setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
     setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
     setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
+    setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -448,6 +449,9 @@ highFrequency
         setupPlayerProto("Maceman Hero", 1200, 45, 4.8);
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9);
         setupPlayerProto("Hero Greek Bellerophon", 1100, 40, 6.0);
+        setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 16);
+        setupPlayerProto("Audrey", 1000, 50, 0);
+        setupPlayerProto("Walking Berry Bush", 500, 25, 0);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -463,6 +467,8 @@ highFrequency
         trModifyProtounit("Monument 2", 0, 24, -1);
         trModifyProtounit("Monument 2", 0, 25, -1);
         trModifyProtounit("Monument 2", 0, 26, -1);
+
+        trModifyProtounit("Uproot 2x2", 0, 8, -99);
 
         for(p=ENEMY_PLAYER; >0) {
             trModifyProtounit("Spy Eye", p, 2, -99);

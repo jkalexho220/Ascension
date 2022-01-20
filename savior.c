@@ -255,7 +255,7 @@ void saviorAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 						trUnitHighlight(1.0, false);
 						trSetUnitOrientation(xsVectorSet(0.0 - trQuestVarGet("dirx"),0, 0.0 - trQuestVarGet("dirz")), vector(0,1,0), true);
-						dist = 10.0 * trQuestVarGet("p"+p+"spellRange");
+						dist = 10.0 + trQuestVarGet("p"+p+"attackRange");
 						yAddToDatabase("playerLasers", "next");
 						yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
 						yAddUpdateVar("playerLasers", "range", dist);

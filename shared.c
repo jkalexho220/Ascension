@@ -4,7 +4,7 @@ const float PI = 3.141592;
 
 void debugLog(string msg = "") {
 	if (trCurrentPlayer() == 1) {
-		trChatSend(0, msg);
+		trChatSend(0, "<color=1,0,0>" + msg);
 	}
 }
 
@@ -242,7 +242,10 @@ vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
 	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
 	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
 	float dist = xsSqrt(xdiff * xdiff + zdiff * zdiff);
-	vector ret = xsVectorSet(xdiff / dist * mod, 0, zdiff / dist * mod);
+	vector ret = vector(1,0,0);
+	if (dist > 0) {
+		ret = xsVectorSet(xdiff / dist * mod, 0, zdiff / dist * mod);
+	}
 	return(ret);
 }
 

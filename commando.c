@@ -9,7 +9,7 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	amt = fModulo(6.283185, amt - 0.5 * dist);
 	dist = dist / (count - 1);
 	yAddToDatabase("p"+p+"shotgunHitboxes","next");
-	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.75 * trQuestVarGet("p"+p+"attack") * count);
+	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.5 * trQuestVarGet("p"+p+"attack") * count);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startx", trQuestVarGet(start+"x"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startz", trQuestVarGet(start+"Z"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle1", amt);
@@ -307,6 +307,9 @@ void commandoAlways(int eventID = -1) {
 				if (trTimeMS() > yGetVar("p"+p+"echoBombs", "timeout")) {
 					amt = yGetVar("p"+p+"echoBombs", "health") - amt;
 					hit = 1;
+					if (ySetPointer("enemies", 1*yGetVar("p"+p+"echoBombs", "index"))) {
+						ySetVar("enemies", "bomb", 0);
+					}
 				} else if (amt < yGetVar("p"+p+"echoBombs", "currenthealth")) {
 					ySetVar("p"+p+"echoBombs", "size", 
 						yGetVar("p"+p+"echoBombs", "size") + 0.002 * (yGetVar("p"+p+"echoBombs", "currenthealth") - amt));
@@ -385,7 +388,7 @@ void commandoAlways(int eventID = -1) {
 				}
 			}
 		}
-		if (target > 0 && ySetPointer("enemies", target)) {
+		if (target > 0 && ySetPointer("enemies", target) && yGetVar("enemies", "bomb") == 0) {
 			trVectorSetUnitPos("pos", "enemies");
 			trQuestVarSet("next", -1);
 			yAddToDatabase("p"+p+"echoBombs", "next");
@@ -398,6 +401,7 @@ void commandoAlways(int eventID = -1) {
 			yAddUpdateVar("p"+p+"echoBombs", "size", 1.0);
 			yAddUpdateVar("p"+p+"echoBombs", "posx", trQuestVarGet("posx"));
 			yAddUpdateVar("p"+p+"echoBombs", "posz", trQuestVarGet("posz"));
+			yAddUpdateVar("p"+p+"echoBombs", "index", target);
 			yAddUpdateVar("p"+p+"echoBombs", "timeout", 
 				trTimeMS() + 1000 * trQuestVarGet("echoBombDuration") * trQuestVarGet("p"+p+"spellDuration"));
 			xsSetContextPlayer(p);
@@ -406,7 +410,11 @@ void commandoAlways(int eventID = -1) {
 		} else {
 			if (trCurrentPlayer() == p) {
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
-				trChatSend(0, "You must target an enemy with this ability!");
+				if (target > 0) {
+					trChatSend(0, "An enemy can only have one Echo Bomb on it at a time!");
+				} else {
+					trChatSend(0, "You must target an enemy with this ability!");
+				}
 			}
 			trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
 		}
@@ -494,7 +502,7 @@ highFrequency
 
 	trQuestVarSet("shrapnelCooldown", 10);
 
-	trQuestVarSet("echoBombCooldown", 24);
+	trQuestVarSet("echoBombCooldown", 20);
 	trQuestVarSet("echoBombDuration", 6);
 	trQuestVarSet("echoBombRadius", 12);
 

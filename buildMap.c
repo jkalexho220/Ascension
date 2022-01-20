@@ -911,7 +911,7 @@ highFrequency
             if (trQuestVarGet("villageEntrance") > 14) {
                 trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 14);
             }
-            trChatSend(0, "Village entrance is " + 1*trQuestVarGet("villageEntrance"));
+            debugLog("Village entrance is " + 1*trQuestVarGet("villageEntrance"));
             buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
         }
 

@@ -612,7 +612,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					msg = "Damage per pellet: 0.75 x Attack | Pellets: 4 + Projectiles";
+					msg = "Damage per pellet: 0.5 x Attack | Pellets: 4 + Projectiles";
 				}
 				case 4:
 				{
@@ -627,7 +627,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement electrum bullets icon 64";
-					msg = "Damage per pellet: 0.75 x Attack | Pellets: 7 + 2 x Projectiles";
+					msg = "Damage per pellet: 0.5 x Attack | Pellets: 7 + 2 x Projectiles";
 				}
 				case 7:
 				{
@@ -642,7 +642,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Cooldown: 24 | Duration: 6 | Radius: 12";
+					msg = "Cooldown: 20 | Duration: 6 | Radius: 12 | An enemy can only have one Echo Bomb at a time";
 				}
 				case 10:
 				{
