@@ -20,7 +20,7 @@ void fixAnimations(int p = 0) {
             }
         } else {
             trQuestVarSet("p"+p+"animation", action);
-            if ((action == 11) && xsAbs(trQuestVarGet("p"+p+"action") - 12) > 0) {
+            if ((action == 11) && trQuestVarGet("p"+p+"action") != 12) {
                 trUnitSetAnimationPath("0,0,0,0,0,0,0");
             } else if (action == -1) {
                 xsSetContextPlayer(p);
@@ -266,7 +266,7 @@ highFrequency
             yRemoveFromDatabase("stunnedUnits");
             yRemoveUpdateVar("stunnedUnits", "proto");
         } else {
-            if (xsAbs(trQuestVarGet("stunnedUnits") - trQuestVarGet("bossUnit")) > 0 ||
+            if (trQuestVarGet("stunnedUnits") != trQuestVarGet("bossUnit") ||
                 trQuestVarGet("bossAnim") == 0) {
                 trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
                 trUnitOverrideAnimation(2, 0, false, false, -1, 0);
@@ -509,7 +509,7 @@ highFrequency
                 trQuestVarSet("p"+p+"lifestealTotal", 0);
             }
             if (Multiplayer) {
-                if (xsAbs(SAVIOR - trQuestVarGet("p"+p+"class")) > 0) {
+                if (SAVIOR != trQuestVarGet("p"+p+"class")) {
                     fixAnimations(p);
                 }
             }

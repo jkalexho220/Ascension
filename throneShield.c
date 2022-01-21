@@ -391,6 +391,6 @@ highFrequency
 
 	trQuestVarSet("shieldOfLightCost", 60);
 	trQuestVarSet("shieldOfLightCooldown", 20);
-	trQuestVarSet("shieldOfLightDuration", 10);
+	trQuestVarSet("shieldOfLightDuration", 6);
 	trQuestVarSet("shieldOfLightWidth", 3);
 }

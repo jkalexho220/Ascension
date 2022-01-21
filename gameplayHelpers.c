@@ -687,7 +687,7 @@ int CheckOnHit(int p = 0, int id = 0) {
                 trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
             } else {
             	int target = kbUnitGetTargetUnitID(id);
-            	if (xsAbs(yGetVar("p"+p+"characters", "attackTarget") - target) > 0) {
+            	if (yGetVar("p"+p+"characters", "attackTarget") != target) {
             		ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
             		ySetVar("p"+p+"characters", "attackTarget", target);
             		ySetVar("p"+p+"characters", "attackTargetIndex", 0);
@@ -828,42 +828,35 @@ rule spy_find
 active
 highFrequency
 {
-	int loopCount = trQuestVarGet("spyfind") - trQuestVarGet("spyfound");
 	int x = 0;
-	if (loopCount < 0) {
-		loopCount = loopCount + 32;
-	}
-	if (loopCount > 0) {
-		while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
-			int id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
-			if (id >= 0) {
-				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
-					for(i=0; < loopCount) {
-						x = modularCounterNext("spyfound");
-						trUnitSelectClear();
-						trUnitSelectByQV("spyEye"+x+"unit");
-						if (trUnitAlive() == false) {
-							trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
-							debugLog("spyUnit " + x + " is already dead!");
-						} else {
-							trUnitSelectClear();
-							trUnitSelectByID(id);
-							trMutateSelected(1*trQuestVarGet("spyEye"+x));
-							trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
-							loopCount = loopCount - i;
-							break;
-						}
-					}
-				}
+	int id = 0;
+	while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
+		id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
+		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
+			x = modularCounterNext("spyfound");
+			trUnitSelectClear();
+			trUnitSelectByQV("spyEye"+x+"unit");
+			if (trUnitAlive() == false) {
+				trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+			} else {
+				trUnitSelectClear();
+				trUnitSelectByID(id);
+				trMutateSelected(1*trQuestVarGet("spyEye"+x));
+				trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
 			}
-			trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
 		}
+		trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
+	}
+	if (trQuestVarGet("spyfind") != trQuestVarGet("spyfound")) {
 		trQuestVarSet("spyreset", 1 + trQuestVarGet("spyreset"));
-		if (trQuestVarGet("spyreset") >= 10) {
-			trQuestVarSet("spyfound", trQuestVarGet("spyfind"));
+		if (trQuestVarGet("spyreset") >= 3) {
+			while (trQuestVarGet("spyfind") != trQuestVarGet("spyfound")) {
+				x = modularCounterNext("spyFound");
+				trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+			}
+			debugLog("resetting spyfound");
 		}
 	} else {
 		trQuestVarSet("spyreset", 0);
-		trQuestVarSet("spysearch", trGetNextUnitScenarioNameNumber() - 1);
 	}
 }

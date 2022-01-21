@@ -111,7 +111,7 @@ void spellstealerAlways(int eventID = -1) {
 
 			for(x=yGetDatabaseCount("p"+p+"bladeDanceTargets"); >0) {
 				yDatabaseNext("p"+p+"bladeDanceTargets");
-				if (xsAbs(target - yGetPointer("p"+p+"bladeDanceTargets")) > 0) {
+				if (target != yGetPointer("p"+p+"bladeDanceTargets")) {
 					id = yGetVar("p"+p+"bladeDanceTargets", "index");
 					hit = yGetVarAtIndex("enemies", "stunStatus", id) * stunned;
 					hit = hit + yGetVarAtIndex("enemies", "poisonStatus", id) * poisoned;

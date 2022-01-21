@@ -40,7 +40,7 @@ string classIcon(int class = 0) {
 		}
 		case COMMANDO:
 		{
-			icon = "icons\infantry x maceman hero";
+			icon = "icons\infantry x maceman hero icons 64";
 		}
 		case THRONESHIELD:
 		{
@@ -653,6 +653,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\siege x fire siphon icons 64";
 					msg = "Cost: 7 per second | Range: 8 | Damage: 2 x Attack x Spell Power";
+					next = 0;
 				}
 			}
 		}
@@ -715,7 +716,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Cost: 60 | Duration: 10 | Absorbed damage is calculated before your passive reduction";
+					msg = "Cost: 60 | Duration: 6 | Absorbed damage is calculated before your passive reduction";
 					next = 0;
 				}
 			}
@@ -779,6 +780,70 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "Cost: 100 | Cooldown: 10";
+					next = 0;
+				}
+			}
+		}
+		case GARDENER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Gardener: A supportive archer that grows various plants to assist allies.";
+				}
+				case 1:
+				{
+					msg = "Passive: Your arrows drop seeds. A damaged player can consume a seed to restore health.";
+				}
+				case 2:
+				{
+					msg = "Heal: 30 | Duration: 15";
+				}
+				case 3:
+				{
+					icon = "icons\god power audrey icons 64";
+					msg = "(Q) Bloodbloom: Summon a carnivorous plant with your stats at the target location.";
+				}
+				case 4:
+				{
+					icon = "icons\god power audrey icons 64";
+					msg = "Its attacks will poison enemies and leave behind seeds.";
+				}
+				case 5:
+				{
+					icon = "icons\god power audrey icons 64";
+					msg = "Cooldown: 15 | Decay: 8 percent per second";
+				}
+				case 6:
+				{
+					icon = "icons\god power uproot icon";
+					msg = "(W) Stranglethorns: Cause seeds near your cursor to sprout into grasping roots that stun enemies.";
+				}
+				case 7:
+				{
+					icon = "icons\god power uproot icon";
+					msg = "Cooldown: 12 | Range: 6 | Thorn Radius: 3 | Duration: 3 | Damage: 20 per second";
+				}
+				case 8:
+				{
+					icon = "icons\world berry bush icon 64";
+					msg = "(E) Nature's Bounty: For a short duration, you plant Bery Bushes instead of seeds.";
+				}
+				case 9:
+				{
+					icon = "icons\world berry bush icon 64";
+					msg = "Berry Bushes restore 4x health. Casting Stranglethorns on Berry Bushes will bring them to life.";
+				}
+				case 10:
+				{
+					icon = "icons\world berry bush icon 64";
+					msg = "Walking Berry Bushes have half your attack and health.";
+				}
+				case 11:
+				{
+					icon = "icons\world berry bush icon 64";
+					msg = "Cost: 60 | Duration: 12 | Heal: 120 | Decay: 4 percent per second";
 					next = 0;
 				}
 			}

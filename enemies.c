@@ -53,6 +53,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Dryad"):
         {
             yAddToDatabase("Dryads", db);
+            yAddUpdateVar("dryads", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Medusa"):
         {
@@ -516,7 +517,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("Dryads") > 0) {
         id = yDatabaseNext("Dryads", true);
         if (id == -1 || trUnitAlive() == false) {
-            if (yGetVar("Dryads", "silenceStatus") == 0) {
+            if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")) == 0) {
                 yVarToVector("Dryads", "pos");
                 trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
                 trArmySelect("1,0");
@@ -529,8 +530,8 @@ void enemiesAlways() {
                         poisonUnit("playerUnits", 12.0, 10.0);
                     }
                 }
-                yRemoveFromDatabase("Dryads");
             }
+            yRemoveFromDatabase("Dryads");
         } else {
             trVectorSetUnitPos("pos", "Dryads");
             ySetVarFromVector("Dryads", "pos", "pos");

@@ -23,14 +23,16 @@ const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
 /* nottud's shop */
-const int RELIC_POISON_DAMAGE_STACKS = 21;
-const int RELIC_FAVOR_FROM_ATTACKS = 22;
-const int RELIC_YEEBAAGOOON = 23;
-const int RELIC_NICKONHAWK = 24;
-const int RELIC_NOTTUD = 25;
-const int RELIC_CURSED_RANGE = 26;
-const int RELIC_CURSED_DURATION = 27;
-const int RELIC_CURSED_POWER = 28;
+const int RELIC_CURSED_RANGE = 21;
+const int RELIC_CURSED_DURATION = 22;
+const int RELIC_CURSED_POWER = 23;
+const int RELIC_FAVOR_FROM_ATTACKS = 24;
+const int RELIC_POISON_DAMAGE_STACKS = 25;
+
+const int RELIC_YEEBAAGOOON = 26;
+const int RELIC_NICKONHAWK = 27;
+const int RELIC_NOTTUD = 28;
+
 const int RELIC_CURSED_COOLDOWNS = 29;
 const int RELIC_ZENOPHOBIA = 30;
 
@@ -126,6 +128,26 @@ string relicName(int relic = 0) {
 		case RELIC_COOLDOWN_REDUCTION:
 		{
 			msg = "Cooldown Reduction x0.1";
+		}
+		case RELIC_CURSED_RANGE:
+		{
+			msg = "Spell Range +0.5 | Spell Power -0.5";
+		}
+		case RELIC_CURSED_DURATION:
+		{
+			msg = "Spell Duration +0.5 | Spell Range -0.5";
+		}
+		case RELIC_CURSED_POWER:
+		{
+			msg = "Spell Power +0.5 | Spell Duration -0.5";
+		}
+		case RELIC_FAVOR_FROM_ATTACKS:
+		{
+			msg = "When your Special Attack triggers, gain 1 favor.";
+		}
+		case RELIC_POISON_DAMAGE_STACKS:
+		{
+			msg = "When you poison an enemy that is already poisoned, increase the poison damage by 6";
 		}
 	}
 	if (relic >= RELIC_KEY_GREEK) {

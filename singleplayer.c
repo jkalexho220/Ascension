@@ -110,14 +110,14 @@ void classNewUnlock(int class = 0) {
 			}
 			case FROSTKNIGHT:
 			{
-				if (trQuestVarGet("questCount") >= 3) {
+				if (trQuestVarGet("chestCount") >= 5) {
 					unlocked = true;
 				}
 			}
 			case COMMANDO:
 			{
 				trQuestVarSet("relicCount", yGetDatabaseCount("p1relics") + yGetDatabaseCount("freeRelics"));
-				if (trQuestVarGet("relicCount") >= 100) {
+				if (trQuestVarGet("relicCount") >= 50) {
 					unlocked = true;
 				}
 			}
@@ -146,17 +146,25 @@ rule singleplayer_unlocks
 inactive
 highFrequency
 {
+	xsDisableSelf();
+	if (trQuestVarGet("newClasses") > 0) {
+		trQuestVarSetFromRand("sound", 1, 5, true);
+		int class = trQuestVarGet("newClass"+1*trQuestVarGet("newClasses"));
+		trShowImageDialog(classIcon(class), "New class unlocked! " + className(class));
+		trSoundPlayFN("ui\thunder"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		trDelayedRuleActivation("singleplayer_unlocks_2");
+		trQuestVarSet("newClasses", trQuestVarGet("newClasses") - 1);
+	}
+}
+
+rule singleplayer_unlocks_2
+inactive
+highFrequency
+{
 	if ((trIsGadgetVisible("ShowImageBox") == false) &&
 		(trIsGadgetVisible("ingame-messagedialog") == false)) {
+		trDelayedRuleActivation("singleplayer_unlocks");
 		xsDisableSelf();
-		if (trQuestVarGet("newClasses") > 0) {
-			trQuestVarSetFromRand("sound", 1, 5, true);
-			int class = trQuestVarGet("newClass"+1*trQuestVarGet("newClasses"));
-			trShowImageDialog(classIcon(class), "New class unlocked! " + className(class));
-			trSoundPlayFN("ui\thunder"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-			trDelayedRuleActivation("singleplayer_unlocks");
-			trQuestVarSet("newClasses", trQuestVarGet("newClasses") - 1);
-		}
 	}
 }
 
@@ -439,7 +447,7 @@ highFrequency
 			}
 			case FROSTKNIGHT:
 			{
-				uiMessageBox("To unlock this class, complete three quests. Current: " + 1*trQuestVarGet("questCount"));
+				uiMessageBox("To unlock this class, open five chests. Current: " + 1*trQuestVarGet("chestCount"));
 			}
 			case STORMCUTTER:
 			{
@@ -544,19 +552,18 @@ highFrequency
 				case 3:
 				{
 					gem = MANASTONE;
-					setupExplain("First Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
-					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
-						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
-					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
-
 					setupQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
 						"True", "False", 1);
 					setupExplain("Not only will Silence prevent an enemy's special attacks, their passive abilities are disabled!");
 					setupExplain("For example, silencing a Dryad will prevent them from bleeding poison on death!");
-					setupExplain("However, Silences do not interrupt a special attack that is already being cast.");
 
 					setupQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
 					setupExplain("Silences will only extend the duration of a boss's cooldowns.");
+
+					setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
+					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
+						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
+					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 				}
 				case 4:
 				{

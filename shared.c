@@ -339,18 +339,36 @@ float yGetVar(string db = "", string var = "") {
 	return(trQuestVarGet("xdata"+db+index+var));
 }
 
+string yGetStringAtIndex(string db = "", string var = "", int index = 0) {
+	return(trStringQuestVarGet("xdata"+db+index+var));
+}
+
+string yGetString(string db = "", string var = "") {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	return(trStringQuestVarGet("xdata"+db+index+var));
+}
+
 string yGetVarName(string db = "", string var = "") {
 	int index = trQuestVarGet("xdata"+db+"pointer");
 	return("xdata"+db+index+var);
 }
 
-float ySetVarAtIndex(string db = "", string var = "", float val = 0, int index = 0) {
+void ySetVarAtIndex(string db = "", string var = "", float val = 0, int index = 0) {
 	trQuestVarSet("xdata"+db+index+var, val);
 }
 
-float ySetVar(string db = "", string var = "", float val = 0) {
+void ySetVar(string db = "", string var = "", float val = 0) {
 	int index = trQuestVarGet("xdata"+db+"pointer");
 	ySetVarAtIndex(db, var, val, index);
+}
+
+void ySetStringAtIndex(string db = "", string var = "", string val = "", int index = 0) {
+	trStringQuestVarSet("xdata"+db+index+var, val);
+}
+
+void ySetString(string db = "", string var = "", string val = "") {
+	int index = trQuestVarGet("xdata"+db+"pointer");
+	ySetStringAtIndex(db, var, val, index);
 }
 
 int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
@@ -433,6 +451,10 @@ int yGetNewestPointer(string db = "") {
 
 void yAddUpdateVar(string db = "", string var = "", float val = 0) {
 	ySetVarAtIndex(db, var, val, 1*trQuestVarGet("xdata"+db+"newest"));
+}
+
+void yAddUpdateString(string db = "", string var = "", string val = "") {
+	ySetStringAtIndex(db, var, val, 1*trQuestVarGet("xdata"+db+"newest"));
 }
 
 int yGetDatabaseCount(string db = "") {

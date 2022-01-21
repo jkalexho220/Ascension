@@ -1,5 +1,6 @@
 const int MAP_STANDARD = 0;
 const int MAP_PORTALS = 1;
+const int MAP_WIDE = 2;
 
 void deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
     int n = trGetNextUnitScenarioNameNumber();
@@ -570,10 +571,10 @@ void buildEdge(int edge = 0, int type = 0) {
     int x1 = second - 4 * z1;
     if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
         if (type == EDGE_PORTAL) {
-            if (xsAbs(x0 + 4 * z0 - trQuestVarGet("village")) > 0) {
+            if (x0 + 4 * z0 != trQuestVarGet("village")) {
                 buildRoom(x0, z0, ROOM_BASIC);
             }
-            if (xsAbs(x1 + 4 * z1 - trQuestVarGet("village")) > 0) {
+            if (x1 + 4 * z1 != trQuestVarGet("village")) {
                 buildRoom(x1, z1, ROOM_BASIC);
             }
             trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
@@ -883,6 +884,10 @@ highFrequency
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
             }
+            case 4:
+            {
+
+            }
         }
 
         /* paint entire map cliff and raise it */
@@ -941,11 +946,11 @@ highFrequency
                 buildEdge(1*yGetVar("frontier", "edge"), 1*yGetVar("frontier", "type"));
                 edgeIsPortal = (yGetVar("frontier", "type") == EDGE_PORTAL);
                 trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
-                if (trQuestVarGet("frontier") < 15 && xsAbs(trQuestVarGet("frontier") - trQuestVarGet("village")) > 0) {
+                if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
                     yAddToDatabase("visited", "frontier");
                 }
                 /* only add more edges if the room is not the boss room or the village room */
-                if (trQuestVarGet("frontier") < 15 && xsAbs(trQuestVarGet("frontier") - trQuestVarGet("village")) > 0) {
+                if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
                     for(a=1; >=0) {
                         for(b=1; >=0) {
                             trQuestVarSet("newX", (1 - 2 * b) * a + x);
@@ -970,16 +975,15 @@ highFrequency
                         }
                     }
                     if (edgeIsPortal == false) {
-                        if ((trQuestVarGet("relictransporterguy") == 0) &&
-                            xsAbs(trQuestVarGet("frontier") - trQuestVarGet("villageEntrance")) > 0) {
+                        if ((trQuestVarGet("relictransporterguy") == 0) && trQuestVarGet("frontier") != trQuestVarGet("villageEntrance")) {
                             trQuestVarSet("relicTransporterGuy", trQuestVarGet("frontier"));
                         } else if (trQuestVarGet("mapType") == MAP_PORTALS) {
                             trQuestVarSetFromRand("rand", 1, 14, true);
                             n = trQuestVarGet("rand");
                             if (trQuestVarGet("tile"+n) < TILE_VISITED && 
-                                xsAbs(n - trQuestVarGet("villageEntrance")) > 0 &&
-                                xsAbs(n - trQuestVarGet("relicTransporterGuy")) > 0 &&
-                                xsAbs(trQuestVarGet("villageEntrance") - trQuestVarGet("frontier")) > 0) {
+                                n != trQuestVarGet("villageEntrance") &&
+                                n != trQuestVarGet("relicTransporterGuy") &&
+                                trQuestVarGet("villageEntrance") != trQuestVarGet("frontier")) {
                                 yAddToDatabase("frontier", "rand");
                                 yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
                                 yAddUpdateVar("frontier", "type", EDGE_PORTAL);

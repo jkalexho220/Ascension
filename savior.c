@@ -244,7 +244,6 @@ void saviorAlways(int eventID = -1) {
 				target = 1;
 				if (hit == ON_HIT_SPECIAL) {
 					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-						trPlayerGrantResources(p, "favor", 3);
 						trVectorSetUnitPos("start", "p"+p+"characters");
 						trVectorSetUnitPos("end", "enemies");
 						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
