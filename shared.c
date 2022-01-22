@@ -179,7 +179,21 @@ float zDistanceBetweenVectorsSquared(string start = "", string end = "") {
 	return(dist);
 }
 
-
+bool vectorInRectangle(string pos = "", string bottom = "", string top = "") {
+	if (trQuestVarGet(pos+"x") < trQuestVarGet(bottom+"x")) {
+		return(false);
+	}
+	if (trQuestVarGet(pos+"x") > trQuestVarGet(top+"x")) {
+		return(false);
+	}
+	if (trQuestVarGet(pos+"z") < trQuestVarGet(bottom+"z")) {
+		return(false);
+	}
+	if (trQuestVarGet(pos+"z") > trQuestVarGet(top+"z")) {
+		return(false);
+	}
+	return(true);
+}
 
 float zDistanceBetweenVectors(string start = "", string end = "") {
 	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
@@ -379,7 +393,7 @@ int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
 	if (yGetVar(db, "xActive") == 0) {
 		if (trCurrentPlayer() == 1) {
 			trSoundPlayFN("attackwarning.wav","1",-1,"","");
-			trChatSend(0, "<color=1,0,0>"+db+" is pointing to something wrong!");
+			debugLog("<color=1,0,0>"+db+" is pointing to something wrong!");
 		}
 	}
 	trQuestVarSet("xdata"+db+"pointer", index);

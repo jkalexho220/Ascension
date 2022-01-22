@@ -225,6 +225,7 @@ highFrequency
         trUnitSelectByQV("p1unit");
         trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
     }
+    /*
     */
 }
 

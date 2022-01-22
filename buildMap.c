@@ -2,6 +2,9 @@ const int MAP_STANDARD = 0;
 const int MAP_PORTALS = 1;
 const int MAP_OPEN = 2;
 
+const int TRAP_LASERS = 1;
+const int TRAP_CAROUSEL = 2;
+
 void deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
     int n = trGetNextUnitScenarioNameNumber();
     trArmyDispatch("1,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
@@ -210,32 +213,91 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
     int z0 = 0;
     int x1 = 0;
     int z1 = 0;
+    bool trapped = false;
     trQuestVarSet("room"+room, type);
     if (type < ROOM_CHEST) {
-        for (i=2; >0) {
-            trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
-            trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
-            trQuestVarSetFromRand("x1", x * 35 + 22, x * 35 + 35, true);
-            trQuestVarSetFromRand("z1", z * 35 + 22, z * 35 + 35, true);
-            x0 = trQuestVarGet("x0");
-            x1 = trQuestVarGet("x1");
-            z0 = trQuestVarGet("z0");
-            z1 = trQuestVarGet("z1");
-            trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
-            trVectorQuestVarSet("room"+room+"top"+i, xsVectorSet(x1,0,z1));
-            trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
-            paintSecondary(x0, z0, x1, z1);
-            paintEyecandy(x0, z0, x1, z1, "tree");
-            paintEyecandy(x0, z0, x1, z1, "rock");
-            paintEyecandy(x0, z0, x1, z1, "sprite");
+        if (trQuestVarGet("trapRooms") > 0 && countRoomEntrances(x, z) > 1) {
+            trQuestVarSetFromRand("rand", 1, 3, true);
+            if (trQuestVarGet("rand") == 1) {
+                trQuestVarSet("trapRooms", trQuestVarGet("trapRooms") - 1);
+                trapped = true;
+                switch(1*trQuestVarGet("trapType"))
+                {
+                    case TRAP_LASERS:
+                    {
+                        x0 = x * 35 + 12;
+                        x1 = x * 35 + 28;
+                        z0 = z * 35 + 12;
+                        z1 = z * 35 + 28;
+                        trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                        trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
+                        trVectorQuestVarSet("room"+room+"top1", xsVectorSet(x1,0,z1));
+                        trVectorQuestVarSet("room"+room+"bottom1", xsVectorSet(x0,0,z0));
+                        trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                        trArmyDispatch("1,0","Dwarf",1,x*70+41,0,z*70+41,0,true);
+                        yAddToDatabase("laserRooms","next");
+                        yAddUpdateVar("laserRooms", "posX", x * 70 + 40);
+                        yAddUpdateVar("laserRooms", "posZ", z * 70 + 40);
+                        yAddUpdateVar("laserRooms", "room", room);
+                        yAddUpdateVar("laserRooms", "active", 0);
+                        for(a=0; <8) {
+                            /* z lasers */
+                            trArmyDispatch("1,0","Dwarf",1,2*x0+4*a+3,0,2*z0+1,180,false);
+                            trArmyDispatch("1,0","Dwarf",1,2*x0+4*a+3,0,2*z1-1,0,false);
+                            yAddUpdateVar("laserRooms", "xLaser"+a+"0x", 2*x0+4*a + 2);
+                            yAddUpdateVar("laserRooms", "xLaser"+a+"1x", 2*x0+4*a + 4);
+                            yAddUpdateVar("laserRooms", "xLaser"+a+"0z", 2*z0);
+                            yAddUpdateVar("laserRooms", "xLaser"+a+"1z", 2*z1);
+                            /* x lasers */
+                            trArmyDispatch("1,0","Dwarf",1,2*x0+1,0,2*z0+4*a+3,270,false);
+                            trArmyDispatch("1,0","Dwarf",1,2*x1-1,0,2*z0+4*a+3,90,false);
+                            yAddUpdateVar("laserRooms", "zLaser"+a+"0x", 2*x0);
+                            yAddUpdateVar("laserRooms", "zLaser"+a+"1x", 2*x1);
+                            yAddUpdateVar("laserRooms", "zLaser"+a+"0z", 2*z0+4*a + 2);
+                            yAddUpdateVar("laserRooms", "zLaser"+a+"1z", 2*z0+4*a + 4);
+                        }
+                        trArmySelect("1,0");
+                        trUnitSetStance("Passive");
+                        trSetSelectedScale(0,0,0);
+                        trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 
-            /* relic spawn */
-            for(j=randomLow(11) - 8; >0) {
-                paintRelicEdge(x0, z0, x1, z1);
+                        paintSecondary(x0, z0, x1, z1);
+                        paintEyecandy(x0, z0, x1, z1, "tree");
+                        paintEyecandy(x0, z0, x1, z1, "rock");
+                        paintEyecandy(x0, z0, x1, z1, "sprite");
+                        for(j=randomLow(11) - 8; >0) {
+                            paintRelicEdge(x0, z0, x1, z1);
+                        }
+                    }
+                }
             }
         }
-        paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
+        if (trapped == false) {
+            for (i=2; >0) {
+                trQuestVarSetFromRand("x0", x * 35 + 5, x * 35 + 18, true);
+                trQuestVarSetFromRand("z0", z * 35 + 5, z * 35 + 18, true);
+                trQuestVarSetFromRand("x1", x * 35 + 22, x * 35 + 35, true);
+                trQuestVarSetFromRand("z1", z * 35 + 22, z * 35 + 35, true);
+                x0 = trQuestVarGet("x0");
+                x1 = trQuestVarGet("x1");
+                z0 = trQuestVarGet("z0");
+                z1 = trQuestVarGet("z1");
+                trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
+                trVectorQuestVarSet("room"+room+"top"+i, xsVectorSet(x1,0,z1));
+                trVectorQuestVarSet("room"+room+"bottom"+i, xsVectorSet(x0,0,z0));
+                paintSecondary(x0, z0, x1, z1);
+                paintEyecandy(x0, z0, x1, z1, "tree");
+                paintEyecandy(x0, z0, x1, z1, "rock");
+                paintEyecandy(x0, z0, x1, z1, "sprite");
+
+                /* relic spawn */
+                for(j=randomLow(11) - 8; >0) {
+                    paintRelicEdge(x0, z0, x1, z1);
+                }
+            }
+            paintColumns(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
+        }
     }
     if (trQuestVarGet("room"+room+"key") > 0) {
         vector v0 = randomNearEdge(x0, z0, x1, z1);
@@ -886,6 +948,7 @@ highFrequency
             }
             case 4:
             {
+                xsEnableRule("laser_rooms_always");
                 /* engineers */
                 trTechSetStatus(ENEMY_PLAYER, 59, 4);
                 ambientColor(100,50,0);
@@ -897,6 +960,7 @@ highFrequency
                 trQuestVarSet("bossRoomSize", 10);
                 trQuestVarSet("wallEdges", 4);
                 trQuestVarSet("trapRooms", 3);
+                trQuestVarSet("trapType", TRAP_LASERS);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 5;
                 
@@ -922,10 +986,20 @@ highFrequency
                 
                 trStringQuestVarSet("enemyProto1", "Automaton SPC");
                 trStringQuestVarSet("enemyProto2", "Ballista");
-                trStringQuestVarSet("enemyProto3", "Battle Boar");
-                trStringQuestVarSet("enemyProto4", "Fire Siphon");
+                trStringQuestVarSet("enemyProto3", "Fire Siphon");
+                trStringQuestVarSet("enemyProto4", "Battle Boar");
                 trStringQuestVarSet("enemyProto5", "Colossus");
 
+                trStringQuestVarSet("bossProto", "Helepolis");
+                trQuestVarSet("bossScale", 0.25);
+
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 24, -1);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 25, -1);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 26, -1);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
             }
         }
 
