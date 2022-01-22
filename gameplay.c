@@ -654,6 +654,8 @@ highFrequency
             trModifyProtounit("Medusa", p, 9, 99999);
             trModifyProtounit("Mummy", p, 9, -99990);
             trModifyProtounit("Mummy", p, 9, 99999);
+            trModifyProtounit("Battle Boar", p, 9, -99990);
+            trModifyProtounit("Battle Boar", p, 9, 99999);
         }
     }
 }

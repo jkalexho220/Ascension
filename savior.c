@@ -257,7 +257,7 @@ void saviorAlways(int eventID = -1) {
 						dist = 10.0 + trQuestVarGet("p"+p+"attackRange");
 						yAddToDatabase("playerLasers", "next");
 						yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
-						yAddUpdateVar("playerLasers", "range", dist);
+						yAddUpdateVar("playerLasers", "range", dist * 1.3);
 						amt = trQuestVarGet("p"+p+"attack");
 						for(x=yGetDatabaseCount("enemies"); >1) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {

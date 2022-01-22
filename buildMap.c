@@ -1,6 +1,6 @@
 const int MAP_STANDARD = 0;
 const int MAP_PORTALS = 1;
-const int MAP_WIDE = 2;
+const int MAP_OPEN = 2;
 
 void deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
     int n = trGetNextUnitScenarioNameNumber();
@@ -519,8 +519,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 }
                 case ROOM_SQUARE:
                 {
-                    trPaintTerrain(x*35+20-size,z*35+20-size,x*35+34,z*35+20+size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-                    trChangeTerrainHeight(x*35+20-size,z*35+20-size,x*35+21+size,z*35+20+size, worldHeight, false);
+                    size = trQuestVarGet("bossRoomSize");
+                    trPaintTerrain(x*35+20-size,z*35+20-size,x*35+20+size,z*35+20+size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                    trChangeTerrainHeight(x*35+20-size,z*35+20-size,x*35+21+size,z*35+21+size, worldHeight, false);
                 }
             }
             trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
@@ -837,7 +838,6 @@ highFrequency
                 trQuestVarSet("bossRoomSize", 14);
                 trQuestVarSet("extraEdges", 0);
                 trQuestVarSet("wallEdges", 4);
-                /* this had better be good to hook them in */
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 3;
                 
@@ -886,6 +886,45 @@ highFrequency
             }
             case 4:
             {
+                /* engineers */
+                trTechSetStatus(ENEMY_PLAYER, 59, 4);
+                ambientColor(100,50,0);
+                sunColor(150,150,0);
+                trSetCloudData(1.0, 50.0, 50.0, 0.0, 1.0, 0.0);
+                trSetCloudMap("shockwall");
+                trSetCivAndCulture(0, 3, 1);
+                trQuestVarSet("bossRoomShape", ROOM_SQUARE);
+                trQuestVarSet("bossRoomSize", 10);
+                trQuestVarSet("wallEdges", 4);
+                trQuestVarSet("trapRooms", 3);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 5;
+                
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 70;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 64;
+
+                trQuestVarSet("mapType", MAP_STANDARD);
+                trQuestVarSet("spriteDensity", 0.15);
+                trStringQuestVarSet("spriteProto1", "Cinematic Scorch");
+                trStringQuestVarSet("spriteProto2", "Cinematic Scorch");
+                trStringQuestVarSet("spriteProto3", "Cinematic Scorch");
+
+                trQuestVarSet("rockDensity", 0.1);
+                trStringQuestVarSet("rockProto1", "Smoke");
+                trStringQuestVarSet("rockProto2", "Broken Siege Weapons");
+                trStringQuestVarSet("rockProto3", "Thor Hammer");
+
+                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                trQuestVarSet("enemyProtoCount", 5);
+                
+                trStringQuestVarSet("enemyProto1", "Automaton SPC");
+                trStringQuestVarSet("enemyProto2", "Ballista");
+                trStringQuestVarSet("enemyProto3", "Battle Boar");
+                trStringQuestVarSet("enemyProto4", "Fire Siphon");
+                trStringQuestVarSet("enemyProto5", "Colossus");
 
             }
         }

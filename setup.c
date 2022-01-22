@@ -134,6 +134,10 @@ string stageName(int stage = 0) {
         {
             name = "Frozen Canyon";
         }
+        case 4:
+        {
+            name = "The Factory";
+        }
     }
     return(name);
 }
@@ -153,6 +157,10 @@ string stageIcon(int stage = 0) {
         case 3:
         {
             img = "ui\ui map jotunheim 256x256";
+        }
+        case 4:
+        {
+            img = "icons\building siege workshop icon 64";
         }
     }
     return(img);

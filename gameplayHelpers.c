@@ -824,6 +824,27 @@ void revivePlayer(int p = 0) {
     }
 }
 
+void shootLaser(string start = "", string dir = "", float dist = -1) {
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("next", true);
+	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+	if (dist < 0) {
+		trSetSelectedScale(3.0,0.0,80.0);
+		dist = 60.0;
+	} else {
+		trSetSelectedScale(3.0,0.0,dist * 1.3);
+	}
+	trSetUnitOrientation(xsVectorSet(0.0-trQuestVarGet(dir+"x"),0,0.0-trQuestVarGet(dir+"z")), xsVectorSet(0,1,0), true);
+	yAddToDatabase("delayLasers", "next");
+	yAddUpdateVar("delayLasers", "dirx", trQuestVarGet(dir+"x"));
+	yAddUpdateVar("delayLasers", "dirz", trQuestVarGet(dir+"z"));
+	yAddUpdateVar("delayLasers", "next", trTimeMS() + 2000);
+	yAddUpdateVar("delayLasers", "phase", 0);
+	yAddUpdateVar("delayLasers", "dist", dist);
+}
+
 rule spy_find
 active
 highFrequency

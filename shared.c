@@ -449,6 +449,11 @@ int yGetNewestPointer(string db = "") {
 	return(1*trQuestVarGet("xdata"+db+"newest"));
 }
 
+string yGetNewVarName(string db = "", string var = "") {
+	int index = yGetNewestPointer(db);
+	return("xdata"+db+index+var);
+}
+
 void yAddUpdateVar(string db = "", string var = "", float val = 0) {
 	ySetVarAtIndex(db, var, val, 1*trQuestVarGet("xdata"+db+"newest"));
 }
