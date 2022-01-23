@@ -140,6 +140,10 @@ string stageName(int stage = 0) {
         {
             name = "The Factory";
         }
+        case 5:
+        {
+            name = "Emerald Fields";
+        }
     }
     return(name);
 }
@@ -163,6 +167,10 @@ string stageIcon(int stage = 0) {
         case 4:
         {
             img = "icons\building siege workshop icon 64";
+        }
+        case 5:
+        {
+            img = "ui\ui map open fields 256x256";
         }
     }
     return(img);

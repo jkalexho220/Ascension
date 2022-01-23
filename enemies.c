@@ -102,6 +102,20 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
             yAddToDatabase("automatons", db);
             yAddUpdateVar("automatons", "index", yGetNewestPointer("enemies"));
         }
+        case kbGetProtoUnitID("Behemoth"):
+        {
+            yAddUpdateVar("enemies", "physicalResist", 1);
+        }
+        case kbGetProtoUnitID("Satyr"):
+        {
+            yAddToDatabase("Satyrs", db);
+            yAddUpdateVar("Satyrs", "index", yGetNewestPointer("enemies"));
+        }
+        case kbGetProtoUnitID("Avenger"):
+        {
+            yAddToDatabase("Avengers", db);
+            yAddUpdateVar("Avengers", "index", yGetNewestPointer("enemies"));
+        }
     }
 }
 
@@ -137,6 +151,11 @@ highFrequency
         setupProtounitBounty("Battle Boar", 8, 0.08);
         setupProtounitBounty("Fire Siphon", 8, 0.1);
 
+        setupProtounitBounty("Cyclops", 6, 0.05);
+        setupProtounitBounty("Satyr", 4, 0.03);
+        setupProtounitBounty("Behemoth", 10, 0.08);
+        setupProtounitBounty("Avenger", 12, 0.1);
+
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
         trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
@@ -144,6 +163,9 @@ highFrequency
         trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
         trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
         trModifyProtounit("Lancer Hero", ENEMY_PLAYER, 5, 99);
+        trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
+        trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
+        trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
 		
 		xsDisableSelf();
 	}
@@ -178,6 +200,7 @@ void enemiesAlways() {
     int target = 0;
     int action = 0;
     float amt = 0;
+    float dist = 0;
     float angle = 0;
     string pName = "";
     /*
@@ -648,9 +671,12 @@ void enemiesAlways() {
             yVarToVector("automatonBombs", "pos");
             trUnitSelectClear();
             trUnitSelectByQV("automatonBombs", true);
-            trUnitChangeProtoUnit("Meteorite");
+            trDamageUnitPercent(-100);
+            trUnitChangeProtoUnit("Tartarian Gate Flame");
+            trUnitSelectClear();
+            trUnitSelectByQV("automatonBombs", true);
+            trSetSelectedScale(1.0,1.0,0.4);
             yRemoveFromDatabase("automatonBombs");
-            trSoundPlayFN("meteorsmallhit.wav","1",-1,"","");
             for(x=yGetDatabaseCount("playerUnits"); >0) {
                 if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
                     removePlayerUnit();
@@ -740,6 +766,71 @@ void enemiesAlways() {
         }
     }
 
+    if (yGetDatabaseCount("barrages") > 0) {
+        yDatabaseNext("barrages");
+        if (trTimeMS() > yGetVar("barrages", "next")) {
+            ySetVar("barrages", "next", 300 + yGetVar("barrages", "next"));
+            /* do the damage */
+            yVarToVector("barrages", "pos");
+            yVarToVector("barrages", "dir");
+            for(x=yGetDatabaseCount("playerUnits"); >0) {
+                if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+                    removePlayerUnit();
+                } else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
+                    damagePlayerUnit(100);
+                }
+            }
+
+            trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
+            trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
+            trArmySelect("1,0");
+            trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+            trUnitConvert(0);
+            trUnitChangeProtoUnit("Barrage");
+
+            ySetVar("barrages", "count", yGetVar("barrages", "count") - 1);
+            trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
+            trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+            vectorToGrid("pos", "loc");
+            if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= 0) {
+                yRemoveFromDatabase("barrages");
+            } else {
+                ySetVarFromVector("barrages", "pos", "pos");
+            }
+        }
+    }
+
+    if(yGetDatabaseCount("Satyrs") >0) {
+        id = yDatabaseNext("Satyrs", true);
+        if (id == -1 || trUnitAlive() == false) {
+            yRemoveFromDatabase("Satyrs");
+            yRemoveUpdateVar("Satyrs", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
+            ySetVar("Satyrs", "specialnext", trTimeMS() + 10000);
+        } else if (trTimeMS() > yGetVar("Satyrs", "specialnext")) {
+            if (kbUnitGetAnimationActionType(id) == 12) {
+                target = kbUnitGetTargetUnitID(id);
+                ySetVar("Satyrs", "specialnext", trTimeMS() + 20000);
+                trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+                trVectorSetUnitPos("start", "Satyrs");
+                trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+
+                trQuestVarSetFromRand("sound", 1, 3, true);
+                trSoundPlayFN("rainofarrows"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+
+                yAddToDatabase("barrages", "next");
+                yAddUpdateVar("barrages", "dirx", trQuestVarGet("dirx"));
+                yAddUpdateVar("barrages", "dirz", trQuestVarGet("dirz"));
+                yAddUpdateVar("barrages", "posx", trQuestVarGet("startx"));
+                yAddUpdateVar("barrages", "posz", trQuestVarGet("startz"));
+                yAddUpdateVar("barrages", "next", trTimeMS());
+                yAddUpdateVar("barrages", "count", 20);
+            }
+        }
+    }
+
     if(yGetDatabaseCount("battleBoars") >0) {
         id = yDatabaseNext("battleBoars", true);
         if (id == -1 || trUnitAlive() == false) {
@@ -768,7 +859,7 @@ void enemiesAlways() {
                     for (x=yGetDatabaseCount("playerUnits"); >0) {
                         if (yDatabaseNext("playerUnits") == -1 || trUnitAlive() == false) {
                             removePlayerUnit();
-                        } else if (zDistanceToVectorSquared("playerUnits", "end") < 4.0) {
+                        } else if (zDistanceToVectorSquared("playerUnits", "end") < 9.0) {
                             trVectorSetUnitPos("pos", "playerUnits");
                             vectorSetAsTargetVector("target", "start", "pos", 20.0);
                             launchUnit("playerUnits", "target");
@@ -794,6 +885,97 @@ void enemiesAlways() {
             if (action > 0 && yGetVar("battleBoars", "step") == 1) {
                 ySetVar("battleBoars", "step", 0);
                 ySetVar("battleBoars", "next", trTimeMS() + 18000);
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("AvengerProj") > 0) {
+        if (processGenericProj("AvengerProj") == PROJ_FALLING) {
+            yVarToVector("AvengerProj", "prev");
+            yVarToVector("AvengerProj", "dir");
+            trVectorSetUnitPos("pos", "AvengerProj");
+            amt = zDistanceBetweenVectors("pos", "prev");
+            if (amt > 2.0) {
+                yVarToVector("AvengerProj", "dir");
+                ySetVar("AvengerProj", "currentDist", yGetVar("AvengerProj", "currentDist") + amt);
+                for(x=yGetDatabaseCount("playerUnits"); >0) {
+                    if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+                        removePlayerUnit();
+                    } else {
+                        dist = zDistanceToVector("playerUnits", "prev");
+                        if (dist < amt + 1.0) {
+                            trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
+                            trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
+                            if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9.0) {
+                                damagePlayerUnit(amt * 20.0);
+                                for(p=1; < ENEMY_PLAYER) {
+                                    if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+p+"unit")) {
+                                        silencePlayer(p, 5.0);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ySetVarFromVector("AvengerProj", "prev", "pos");
+            }
+            trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
+            trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+            vectorToGrid("next", "loc");
+            if (yGetVar("AvengerProj", "currentDist") >= yGetVar("AvengerProj", "distance") ||
+                terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+                trUnitSelectClear();
+                trUnitSelectByQV("AvengerProj", true);
+                trDamageUnitPercent(-100);
+                trUnitChangeProtoUnit("Avenger");
+                trUnitSelectClear();
+                trUnitSelectByQV("AvengerProj", true);
+                trDamageUnitPercent(-100);
+                trDamageUnitPercent(yGetVar("AvengerProj", "damaged"));
+                activateEnemy("avengerProj");
+                yAddUpdateVar("Avengers", "specialnext", trTimeMS() + 10000);
+                yRemoveFromDatabase("AvengerProj");
+            }
+        }
+    }
+
+    if(yGetDatabaseCount("Avengers") >0) {
+        id = yDatabaseNext("Avengers", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit("Avenger");
+            yRemoveFromDatabase("Avengers");
+            yRemoveUpdateVar("Avengers", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
+            ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
+        } else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
+            if (kbUnitGetActionType(id) == 6) {
+                trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
+                target = kbUnitGetTargetUnitID(id);
+                trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+                trVectorSetUnitPos("start", "Avengers");
+                if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
+                    trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+                    amt = trUnitPercentDamaged();
+                    trUnitChangeProtoUnit("Dust Large");
+                    addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0);
+                    yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
+                    yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
+                    yAddUpdateVar("avengerProj", "damaged", amt);
+                    yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
+                    yAddUpdateVar("avengerProj", "currentDist", 0);
+                    if (ySetPointer("enemies", 1*yGetVar("Avengers", "index"))) {
+                        yRemoveFromDatabase("enemies");
+                    }
+                    yRemoveFromDatabase("Avengers");
+                }
+            }
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Avengers", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Avengers", "index"));
+            if (action > 0 && yGetVar("Avengers", "step") == 1) {
+                ySetVar("Avengers", "step", 0);
+                ySetVar("Avengers", "next", trTimeMS() + 10000);
             }
         }
     }
