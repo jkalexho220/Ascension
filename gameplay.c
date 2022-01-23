@@ -218,7 +218,7 @@ highFrequency
     }
     /*
     TESTING STUFF BELOW THIS LINE
-    
+    *
     
     if (Multiplayer) {
         trUnitSelectClear();

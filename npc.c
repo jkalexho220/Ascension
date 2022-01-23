@@ -6,6 +6,8 @@ const int NPC_EXPLAIN_SINGLEPLAYER = 2;
 const int NPC_ZENO_NEXT_QUESTION = 3;
 const int NPC_ZENO_QUIZ_END = 4;
 
+const int NPC_BOSS_ENTRANCE = 5;
+
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -53,6 +55,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 		{
 			dialog = -1;
 			uiMessageBox("You want to hire another? What happened to the last guy?!");
+		}
+		case NPC_BOSS_ENTRANCE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Find the relic matching my symbol and bring it to me to open the portal to the boss room.");
+					dialog = 0;
+				}
+			}
 		}
 		case NPC_EXPLAIN_SINGLEPLAYER:
 		{
@@ -341,6 +354,29 @@ highFrequency
 		}
 	}
 }
+
+rule boss_entrance_found
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("bossEntranceStatue");
+	for(p=1; <ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			xsDisableSelf();
+			xsEnableRule("boss_entrance_always");
+			trVectorSetUnitPos("pos", "bossEntranceStatue");
+			trArmyDispatch("1,0","Dwarf",1,
+				trQuestVarGet("Posx"),0,trQuestVarGet("Posz"),0,true);
+			trArmySelect("1,0");
+			trUnitChangeProtoUnit("Revealer");
+			trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+			trMessageSetText("The boss entrance has been found!", -1);
+			break;
+		}
+	}
+}
+
 
 rule relic_transporter_guy_always
 inactive

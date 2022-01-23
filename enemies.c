@@ -143,6 +143,7 @@ highFrequency
         trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
         trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
         trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
+        trModifyProtounit("Lancer Hero", ENEMY_PLAYER, 5, 99);
 		
 		xsDisableSelf();
 	}

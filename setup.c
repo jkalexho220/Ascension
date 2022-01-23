@@ -7,9 +7,11 @@ const int EDGE_NORMAL = 1;
 const int EDGE_BIG = 2;
 const int EDGE_PORTAL = 3;
 const int EDGE_WALL = 4;
+const int EDGE_MOUNTAIN = 5;
 
 const int ROOM_BASIC = 1;
 const int ROOM_AMBUSH = 2;
+const int ROOM_BOSS_ENTRANCE = 3;
 const int ROOM_TRANSPORTER_GUY = 4;
 const int ROOM_CHEST = 5;
 const int ROOM_VILLAGE = 10;
