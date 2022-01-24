@@ -142,7 +142,7 @@ void sunbowAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"searing", 0);
 			} else {
 				trQuestVarSet("p"+p+"searingNext", 
-					trTimeMS() + trQuestVarGet("searingDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + trQuestVarGet("searingDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("forestfirebirth.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
 					yDatabaseNext("p"+p+"Characters");
@@ -165,7 +165,7 @@ void sunbowAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"searing") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"searingNext")) {
 			trQuestVarSet("p"+p+"searingNext", 
-				trQuestVarGet("p"+p+"searingNext") + trQuestVarGet("searingDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+				trQuestVarGet("p"+p+"searingNext") + trQuestVarGet("searingDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 			trPlayerGrantResources(p, "favor", 0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"searing", 0);
@@ -306,5 +306,5 @@ highFrequency
 	trQuestVarSet("healingRaysDuration", 5);
 
 	trQuestVarSet("searingCost", 5);
-	trQuestVarSet("searingDelay", 1000 / trQuestVarGet("searingCost"));
+	trQuestVarSet("searingDelay", 1000.0 / trQuestVarGet("searingCost"));
 }

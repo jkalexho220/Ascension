@@ -142,7 +142,7 @@ void moonbladeAlways(int eventID = -1) {
 			} else {
 				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
 				trQuestVarSet("p"+p+"protectionNext", 
-					trTimeMS() + trQuestVarGet("protectionDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					id = yDatabaseNext("playerUnits", true);
@@ -230,7 +230,7 @@ void moonbladeAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"protection") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
 			trQuestVarSet("p"+p+"protectionNext", 
-				trQuestVarGet("p"+p+"protectionNext") + trQuestVarGet("protectionDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+				trQuestVarGet("p"+p+"protectionNext") + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 			trPlayerGrantResources(p, "favor", 0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);
@@ -290,6 +290,6 @@ highFrequency
 	trQuestVarSet("crescentCount", 3);
 	trQuestVarSet("crescentDamage", 50);
 
-	trQuestVarSet("protectionCost", 15);
-	trQuestVarSet("protectionDelay", 1000 / 12);
+	trQuestVarSet("protectionCost", 12);
+	trQuestVarSet("protectionDelay", 1000.0 / trQuestVarGet("protectionCost"));
 }

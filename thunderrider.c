@@ -312,7 +312,7 @@ void thunderRiderAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"launched", 1);
 				refreshRideLightningTargets(p);
 				trQuestVarSet("p"+p+"rideLightningNext", 
-					trTimeMS() + trQuestVarGet("rideLightningDelay") * trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + trQuestVarGet("rideLightningDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 				zSetProtoUnitStat("Attack Revealer", p, 2, trQuestVarGet("p"+p+"los"));
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));

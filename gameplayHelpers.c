@@ -76,6 +76,12 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
 				}
 			}
+			if (trCurrentPlayer() == p) {
+				trCounterAbort("lure");
+				trCounterAbort("well");
+				trCounterAbort("rain");
+				trCounterAddTime("silence", -1, -9999, "SILENCED");
+			}
 		}
 	}
 }

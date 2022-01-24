@@ -108,7 +108,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 15 favor per second.";
+					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 12 favor per second.";
 					next = 0;
 				}
 				case 6:
@@ -744,7 +744,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\improvement heroic renewal icons 64";
-					msg = "(Q) Guardian Angel: Teleport next to an ally and heal them. Heal increases with distance traveled";
+					msg = "(Q) Guardian Angel: Teleport next to an ally and then heal nearby allies.";
 				}
 				case 5:
 				{
@@ -759,7 +759,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "(W) Unity: Create an aura at your cursor. You have 0.25x bonus attack for each ally in the aura.";
+					msg = "(W) Unity: Create an aura at your cursor. You have 0.5x bonus attack for each ally in the aura.";
 				}
 				case 8:
 				{

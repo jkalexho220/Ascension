@@ -675,6 +675,7 @@ void enemiesAlways() {
             trUnitChangeProtoUnit("Tartarian Gate Flame");
             trUnitSelectClear();
             trUnitSelectByQV("automatonBombs", true);
+            trDamageUnitPercent(-100);
             trSetSelectedScale(1.0,1.0,0.4);
             yRemoveFromDatabase("automatonBombs");
             for(x=yGetDatabaseCount("playerUnits"); >0) {
@@ -826,7 +827,7 @@ void enemiesAlways() {
                 yAddUpdateVar("barrages", "posx", trQuestVarGet("startx"));
                 yAddUpdateVar("barrages", "posz", trQuestVarGet("startz"));
                 yAddUpdateVar("barrages", "next", trTimeMS());
-                yAddUpdateVar("barrages", "count", 20);
+                yAddUpdateVar("barrages", "count", 12);
             }
         }
     }

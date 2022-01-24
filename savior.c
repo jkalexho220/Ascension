@@ -78,10 +78,16 @@ void saviorAlways(int eventID = -1) {
 			trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
 			
 			amt = trQuestVarGet("guardianAngelHeal") * (1.0 + 0.1 * amt);
+			dist = xsPow(trQuestVarGet("guardianAngelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 
-			trUnitSelectClear();
-			trUnitSelectByQV("playerUnits");
-			healUnit(p, amt * trQuestVarGet("p"+p+"spellDamage"), hit);
+			for(x=yGetDatabaseCount("playerUnits"); >0) {
+				yDatabaseNext("playerUnits");
+				if (zDistanceToVectorSquared("playerUnits", "pos") < dist) {
+					trUnitSelectClear();
+					trUnitSelectByQV("playerUnits", true);
+					healUnit(p, amt * trQuestVarGet("p"+p+"spellDamage"));
+				}
+			}
 		} else {
 			trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
 			if (trCurrentPlayer() == p) {
@@ -366,7 +372,7 @@ highFrequency
 	trQuestVarSet("unityCooldown", 20);
 	trQuestVarSet("unityRadius", 10);
 	trQuestVarSet("unityDuration", 8);
-	trQuestVarSet("unityBonus", 0.25);
+	trQuestVarSet("unityBonus", 0.5);
 	trQuestVarSet("unityHeal", 0.5);
 
 	trQuestVarSet("interventionCost", 100);

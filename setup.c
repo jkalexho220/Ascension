@@ -138,11 +138,11 @@ string stageName(int stage = 0) {
         }
         case 4:
         {
-            name = "The Factory";
+            name = "Emerald Fields";
         }
         case 5:
         {
-            name = "Emerald Fields";
+            name = "The Factory";
         }
     }
     return(name);
@@ -166,11 +166,11 @@ string stageIcon(int stage = 0) {
         }
         case 4:
         {
-            img = "icons\building siege workshop icon 64";
+            img = "ui\ui map open fields 256x256";
         }
         case 5:
         {
-            img = "ui\ui map open fields 256x256";
+            img = "icons\building siege workshop icon 64";
         }
     }
     return(img);
@@ -323,7 +323,11 @@ active
 runImmediately
 {
     Multiplayer = aiIsMultiplayer();
-    trSetUnitIdleProcessing(false); 
+    trSetUnitIdleProcessing(false);
+
+    gadgetUnreal("GodPowers");
+    gadgetUnreal("tributedlg-sendButton");
+    gadgetUnreal("tributedlg-clearButton");
     
     trSetObscuredUnits(false);
     configUndef("ErodeBuildingFoundations");

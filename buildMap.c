@@ -1068,6 +1068,54 @@ highFrequency
             }
             case 4:
             {
+                wallHeight = worldHeight + 6;
+                trSetCivAndCulture(0, 3, 1);
+                trQuestVarSet("bossRoomSize", 14);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 1;
+                
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 25;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 3;
+
+                trQuestVarSet("mapType", MAP_OPEN);
+                trQuestVarSet("treeDensity", 0.2);
+                trStringQuestVarSet("treeProto1", "Pine");
+                trStringQuestVarSet("treeProto2", "Pine");
+                trStringQuestVarSet("treeProto3", "Pine");
+                trQuestVarSet("spriteDensity", 0.6);
+                trStringQuestVarSet("spriteProto1", "Flowers");
+                trStringQuestVarSet("spriteProto2", "Grass");
+                trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
+                trQuestVarSet("rockDensity", 0.25);
+                trStringQuestVarSet("rockProto1", "Rock Granite Big");
+                trStringQuestVarSet("rockProto2", "Rock Granite Big");
+                trStringQuestVarSet("rockProto3", "Rock Granite Small");
+
+                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                
+                trQuestVarSet("enemyProtoCount", 5);
+                trStringQuestVarSet("enemyProto1", "Cyclops");
+                trStringQuestVarSet("enemyProto2", "Satyr");
+                trStringQuestVarSet("enemyProto3", "Behemoth");
+                trStringQuestVarSet("enemyProto4", "Medusa");
+                trStringQuestVarSet("enemyProto5", "Avenger");
+                
+                trStringQuestVarSet("bossProto", "Chimera");
+                trQuestVarSet("bossScale", 1.5);
+
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 24, -1);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 13, -2);
+            }
+            case 5:
+            {
                 xsEnableRule("laser_rooms_always");
                 /* engineers */
                 trTechSetStatus(ENEMY_PLAYER, 59, 4);
@@ -1120,46 +1168,6 @@ highFrequency
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 26, -1);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
-            }
-            case 5:
-            {
-                wallHeight = worldHeight + 6;
-                trSetCivAndCulture(0, 3, 1);
-                trQuestVarSet("bossRoomSize", 14);
-                TERRAIN_WALL = 2;
-                TERRAIN_SUB_WALL = 1;
-                
-                TERRAIN_PRIMARY = 0;
-                TERRAIN_SUB_PRIMARY = 25;
-
-                TERRAIN_SECONDARY = 0;
-                TERRAIN_SUB_SECONDARY = 3;
-
-                trQuestVarSet("mapType", MAP_OPEN);
-                trQuestVarSet("treeDensity", 0.2);
-                trStringQuestVarSet("treeProto1", "Pine");
-                trStringQuestVarSet("treeProto2", "Pine");
-                trStringQuestVarSet("treeProto3", "Pine");
-                trQuestVarSet("spriteDensity", 0.6);
-                trStringQuestVarSet("spriteProto1", "Flowers");
-                trStringQuestVarSet("spriteProto2", "Grass");
-                trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
-                trQuestVarSet("rockDensity", 0.25);
-                trStringQuestVarSet("rockProto1", "Rock Granite Big");
-                trStringQuestVarSet("rockProto2", "Rock Granite Big");
-                trStringQuestVarSet("rockProto3", "Rock Granite Small");
-
-                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
-                /*
-                trQuestVarSet("enemyProtoCount", 5);
-                trStringQuestVarSet("enemyProto1", "Cyclops");
-                trStringQuestVarSet("enemyProto2", "Satyr");
-                trStringQuestVarSet("enemyProto3", "Behemoth");
-                trStringQuestVarSet("enemyProto4", "Medusa");
-                trStringQuestVarSet("enemyProto5", "Avenger");
-                */
-                trQuestVarSet("enemyProtoCount", 1);
-                trStringQuestVarSet("enemyProto1", "Avenger");
             }
         }
 

@@ -520,16 +520,34 @@ highFrequency
                     trQuestVarSet("p"+p+"silenced", 0);
                     if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
                         trTechGodPower(p, "Underworld Passage", 1);
+                        if (trCurrentPlayer() == p) {
+                            trCounterAbort("well");
+                            trCounterAddTime("well", 
+                                trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                        }
                     }
                     if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
                         trTechGodPower(p, "Animal magnetism", 1);
+                        if (trCurrentPlayer() == p) {
+                            trCounterAbort("lure");
+                            trCounterAddTime("lure", 
+                                trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                        }
                     }
                     if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
                         trTechGodPower(p, "rain", 1);
+                        if (trCurrentPlayer() == p) {
+                            trCounterAbort("rain");
+                            trCounterAddTime("rain", 
+                                trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                        }
                     }
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"silenceSFX");
                     trUnitChangeProtoUnit("Cinematic Block");
+                    if (trCurrentPlayer() == p) {
+                        trCounterAbort("silence");
+                    }
                 }
             }
         } else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
