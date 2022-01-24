@@ -470,7 +470,7 @@ highFrequency
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8);
         setupPlayerProto("Maceman Hero", 1200, 45, 4.8);
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9);
-        setupPlayerProto("Hero Greek Bellerophon", 1100, 40, 6.0);
+        setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0);
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 16);
         setupPlayerProto("Audrey", 1000, 50, 0);
         setupPlayerProto("Walking Berry Bush", 500, 25, 0);

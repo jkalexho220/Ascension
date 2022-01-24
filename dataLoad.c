@@ -62,7 +62,7 @@ void saveAllData() {
 	/* gemstones */
 	savedata = 0;
 	for(x=3; >=0) {
-		currentdata = 1*xsMin(100, 1*trQuestVarGet("gemstone"+x));
+		currentdata = 1*xsMin(99, 1*trQuestVarGet("gemstone"+x));
 		savedata = savedata * 100 + currentdata;
 	}
 	trSetCurrentScenarioUserData(9, savedata);

@@ -18,7 +18,7 @@ void spellstealerAlways(int eventID = -1) {
 	xsSetContextPlayer(p);
 
 	amt = 0.001 * (trTimeMS() - trQuestVarGet("p"+p+"spellstealerBonusLast"));
-	amt = xsMax(amt, trQuestVarGet("p"+p+"spellstealerBonus") * amt * 0.08);
+	amt = xsMax(amt, trQuestVarGet("p"+p+"spellstealerBonus") * amt * 0.05);
 	trQuestVarSet("p"+p+"spellstealerBonusLast", trTimeMS());
 	trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") - amt);
 	trQuestVarSet("p"+p+"spellstealerBonus", xsMax(0, trQuestVarGet("p"+p+"spellstealerBonus")));
@@ -34,13 +34,16 @@ void spellstealerAlways(int eventID = -1) {
 			if (hit >= ON_HIT_NORMAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 					if (yGetVar("enemies", "poisonStatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "stunStatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (hit == ON_HIT_SPECIAL) {
 						trVectorSetUnitPos("pos", "enemies");
@@ -163,13 +166,16 @@ void spellstealerAlways(int eventID = -1) {
 						stunUnit("enemies", 2.0, p);
 					}
 					if (yGetVar("enemies", "stunstatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "poisonstatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 8.0 + trQuestVarGet("p"+p+"spellstealerBonus"));
+						trQuestVarSet("p"+p+"spellStealerBonus", 
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"spellstealerBonus"));
 					trVectorSetUnitPos("pos", "enemies");

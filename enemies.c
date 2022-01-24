@@ -257,7 +257,7 @@ void enemiesAlways() {
                             trQuestVarSet("intersectX", yGetVar("delayLasers", "dirX") * amt + trQuestVarGet("startX"));
                             trQuestVarSet("intersectZ", yGetVar("delayLasers", "dirZ") * amt + trQuestVarGet("startZ"));
                             if (zDistanceBetweenVectorsSquared("pos", "intersect") < 1.0) {
-                                damagePlayerUnit(500);
+                                damagePlayerUnit(300);
                             }
                         }   
                     }

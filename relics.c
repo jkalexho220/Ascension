@@ -91,15 +91,15 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
-			msg = "Poison resistance x0.3";
+			msg = "Poison resistance x0.4";
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
-			msg = "Stun resistance x0.3";
+			msg = "Stun resistance x0.4";
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
-			msg = "Silence resistance x0.3";
+			msg = "Silence resistance x0.4";
 		}
 		case RELIC_POISON_KILLER:
 		{
@@ -143,7 +143,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_FAVOR_FROM_ATTACKS:
 		{
-			msg = "When your Special Attack triggers, gain 1 favor.";
+			msg = "When you attack, gain 1 favor.";
 		}
 		case RELIC_POISON_DAMAGE_STACKS:
 		{
@@ -331,17 +331,17 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_POISON_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"poisonResistanceCount", trQuestVarGet("p"+p+"poisonResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"poisonResistance", xsPow(0.7, 1*trQuestVarGet("p"+p+"poisonResistanceCount")));
+			trQuestVarSet("p"+p+"poisonResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"poisonResistanceCount")));
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"stunResistanceCount", trQuestVarGet("p"+p+"stunResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"stunResistance", xsPow(0.7, 1*trQuestVarGet("p"+p+"stunResistanceCount")));
+			trQuestVarSet("p"+p+"stunResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"stunResistanceCount")));
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"silenceResistanceCount", trQuestVarGet("p"+p+"silenceResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"silenceResistance", xsPow(0.7, 1*trQuestVarGet("p"+p+"silenceResistanceCount")));
+			trQuestVarSet("p"+p+"silenceResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"silenceResistanceCount")));
 		}
 		case RELIC_POISON_KILLER:
 		{

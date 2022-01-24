@@ -206,6 +206,29 @@ highFrequency
 		trArmySelect("1,0");
 		trUnitConvert(0);
 		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
+
+		if (trQuestVarGet("stage") > 3) {
+			xsEnableRule("boss_stun_recovery");
+		}
+	}
+}
+
+rule boss_stun_recovery
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("bossStunRecoveryLast")) {
+		trQuestVarSet("bossStunRecoveryLast", trTime());
+		int pointer = yGetPointer("enemies");
+		if (ySetPointer("enemies", 1*trQuestVarGet("bossPointer"))) {
+			if (yGetVar("enemies", "stunStatus") == 1) {
+				trQuestVarSet("bossStunResistance", 1 + trQuestVarGet("bossStunResistance"));
+			} else if (trQuestVarGet("bossStunResistance") > 0) {
+				trQuestVarSet("bossStunResistance", trQuestVarGet("bossStunResistance") - 1);
+			}
+			trQuestVarSet("p0stunResistance", xsPow(0.9, trQuestVarGet("bossStunResistance")));
+			ySetPointer("enemies", pointer);
+		}
 	}
 }
 
@@ -301,6 +324,8 @@ highFrequency
 				trQuestVarSetFromRand("bossGemCount", 1, 2, true);
 				xsEnableRule("boss_music");
 				trMessageSetText("Defeat the spawned enemies to damage the Wraithwood!", -1);
+				trStringQuestVarSet("advice", 
+					"The Wraithwood only summons new enemies once the old ones are gone. Make sure to kill the spawns!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -339,6 +364,9 @@ highFrequency
 				bossCooldown(10, 15);
 
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 27, 20);
+
+				trStringQuestVarSet("advice", 
+					"If anything is stunned near an icicle, it will grow. Big icicles will turn into Frost Giants!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -471,6 +499,8 @@ highFrequency
 				bossCooldown(10, 15);
 
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 27, 20);
+
+				trStringQuestVarSet("advice", "Try bringing poison and silence resistance!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -1665,6 +1695,7 @@ highFrequency
 			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			if (trQuestVarGet("bossSpell") == 31) {
+				trStringQuestVarSet("advice", "Having trouble dodging the Extinction Cannon? Try equipping speed relics!");
 				trSetLighting("night", 1.0);
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
@@ -1766,13 +1797,13 @@ highFrequency
 					trQuestVarSet("bossSpell", 35);
 					trQuestVarSet("bossNext", trTimeMS() + 1000);
 					trSoundPlayFN("storehouse.wav","1",-1,"","");
-					if (trQuestVarGet("bossCount") == 5) {
-						trQuestVarSetFromRand("rand", 1, 3, true);
-						if (trQuestVarGet("rand") == 1) {
-							trChatSendSpoofed(ENEMY_PLAYER, "The Exterminator: PARRY THIS YOU FILTHY CASUAL");
-						} else if (trQuestVarGet("rand") == 2) {
-							trChatSendSpoofed(ENEMY_PLAYER, "The Exterminator: EXTERMINATE. EXTERMINATE.");
-						}
+					trQuestVarSetFromRand("rand", 1, 10, true);
+					if (trQuestVarGet("rand") == 1) {
+						trChatSendSpoofed(ENEMY_PLAYER, "The Exterminator: PARRY THIS YOU FILTHY CASUAL");
+					} else if (trQuestVarGet("rand") == 2) {
+						trChatSendSpoofed(ENEMY_PLAYER, "The Exterminator: EXTERMINATE. EXTERMINATE.");
+					} else if (trQuestVarGet("rand") == 3) {
+						trChatSendSpoofed(ENEMY_PLAYER, "The Exterminator: DEATH TO ALL HUMANS");
 					}
 				} else {
 					trQuestVarSet("bossPrevx", trQuestVarGet("bossDirx"));
@@ -1919,7 +1950,7 @@ highFrequency
 						trQuestVarSet("bossTargetPosz", trQuestVarGet("destz"));
 					}
 				}
-				trQuestVarSet("bossNext", trTimeMS() + 500);
+				trQuestVarSet("bossNext", trTimeMS() + 1000);
 				trQuestVarSet("bossSpell", 12);
 				trQuestVarSet("bossCar", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
@@ -1958,6 +1989,7 @@ highFrequency
 					trSoundPlayFN("phoenixattack.wav","1",-1,"","");
 					trQuestVarSet("bossSpell", 13);
 					trQuestVarSet("bossTimeout", trTimeMS() + 3000);
+					yClearDatabase("splatterUnits");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) > -1) {
 							yAddToDatabase("splatterUnits", "playerUnits");
@@ -2258,6 +2290,7 @@ highFrequency
 				trMutateSelected(kbGetProtoUnitID("Meteorite"));
 			} else if (trQuestVarGet("bossSpell") == 22) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trCameraShake(1.5, 0.4);
 					trSoundPlayFN("sonofosirisbolt.wav","1",-1,"","");
 					trQuestVarSet("bossAngle", fModulo(6.283185, trQuestVarGet("bossAngle") + 0.5));
 					trUnitSelectClear();
@@ -2483,6 +2516,9 @@ highFrequency
 					"Zenophobia: Rewards have been sent to your warehouse. You can access them by playing this map in singleplayer.",
 					"icons\infantry g hoplite icon 64");
 				trQuestVarSet("gameOverStep", 1);
+				if (trQuestVarGet("newPlayers") == 0) {
+					trQuestVarSet("gameOverStep", 3);
+				}
 				xsDisableSelf();
 				xsEnableRule("game_over");
 				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));

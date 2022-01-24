@@ -307,6 +307,11 @@ void saviorAlways(int eventID = -1) {
 	}
 
 	if (trQuestVarGet("p"+p+"intervention") == 1) {
+		for(x=yGetDatabaseCount("playerCharacters"); >0) {
+			if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
+				removePlayerCharacter();
+			}
+		}
 		for(x=1; < ENEMY_PLAYER) {
 			if (trQuestVarGet("p"+x+"dead") > 0) {
 				revivePlayer(x);

@@ -527,11 +527,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: When you attack an enemy, gain 8 bonus attack for each status effect on them.";
+					msg = "Passive: When you attack an enemy, gain 0.1x bonus attack for each status effect on them.";
 				}
 				case 2:
 				{
-					msg = "Bonus decays by 8 percent each second.";
+					msg = "Bonus decays by 5 percent each second.";
 				}
 				case 3:
 				{
@@ -569,12 +569,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.2x Damage absorbed";
+					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.3x Damage absorbed";
 				}
 				case 11:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Applies your passive and attack lifesteal";
+					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Applies on-attack effects and lifesteal";
 				}
 				case 12:
 				{

@@ -177,6 +177,7 @@ highFrequency
     trPlayNextMusicTrack();
     trSetFogAndBlackmap(true, true);
     trPlayerResetBlackMapForAllPlayers();
+    trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
 }
 
 rule gameplay_start_2
@@ -522,24 +523,21 @@ highFrequency
                         trTechGodPower(p, "Underworld Passage", 1);
                         if (trCurrentPlayer() == p) {
                             trCounterAbort("well");
-                            trCounterAddTime("well", 
-                                trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                            trCounterAddTime("well", -1, -99999, wellName);
                         }
                     }
                     if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
                         trTechGodPower(p, "Animal magnetism", 1);
                         if (trCurrentPlayer() == p) {
                             trCounterAbort("lure");
-                            trCounterAddTime("lure", 
-                                trQuestVarGet("p"+p+"lureCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                            trCounterAddTime("lure", -1, -99999, lureName);
                         }
                     }
                     if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
                         trTechGodPower(p, "rain", 1);
                         if (trCurrentPlayer() == p) {
                             trCounterAbort("rain");
-                            trCounterAddTime("rain", 
-                                trQuestVarGet("p"+p+"rainCooldown") * trQuestVarGet("p"+p+"cooldownReduction"), 0, wellName);
+                            trCounterAddTime("rain", -1, -99999, rainName);
                         }
                     }
                     trUnitSelectClear();
@@ -661,6 +659,9 @@ highFrequency
         trLetterBox(true);
         trQuestVarSet("gameOverNext", trTime() + 2);
         xsEnableRule("game_over");
+        if (trQuestVarGet("newPlayers") == 0) {
+            trQuestVarSet("gameOverStep", 5);
+        }
     }
 
     /* No specials */
@@ -725,6 +726,12 @@ highFrequency
                     }
                 }
                 trEndGame();
+            }
+            case 6:
+            {
+                trSoundPlayFN("default", "1",-1,"Zenophobia:" + trStringQuestVarGet("advice"),"icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverStep", 3);
+                trQuestVarSet("gameOverNext", trTime() + 5);
             }
         }
     }

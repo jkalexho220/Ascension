@@ -589,7 +589,7 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 		int p = yGetVar("playerUnits", "player");
 		if (trQuestVarGet("protectionCount") == 0) {
 			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
-				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * dmg);
+				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.3 * dmg);
 				trPlayerGrantResources(p, "favor", 1);
 			} else {
 				trDamageUnit(dmg);
