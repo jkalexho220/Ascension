@@ -1003,7 +1003,7 @@ highFrequency
                 trStringQuestVarSet("rockProto2", "Imperial Examination");
                 trStringQuestVarSet("rockProto3", "Rock Granite Small");
 
-                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
                 trQuestVarSet("enemyProtoCount", 5);
                 trStringQuestVarSet("enemyProto1", "Walking Woods Marsh");
                 trStringQuestVarSet("enemyProto2", "Centaur");
@@ -1083,20 +1083,20 @@ highFrequency
                 TERRAIN_SUB_SECONDARY = 3;
 
                 trQuestVarSet("mapType", MAP_OPEN);
-                trQuestVarSet("treeDensity", 0.2);
+                trQuestVarSet("treeDensity", 0.3);
                 trStringQuestVarSet("treeProto1", "Pine");
                 trStringQuestVarSet("treeProto2", "Pine");
-                trStringQuestVarSet("treeProto3", "Pine");
+                trStringQuestVarSet("treeProto3", "Ruins");
                 trQuestVarSet("spriteDensity", 0.6);
                 trStringQuestVarSet("spriteProto1", "Flowers");
                 trStringQuestVarSet("spriteProto2", "Grass");
                 trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
-                trQuestVarSet("rockDensity", 0.25);
+                trQuestVarSet("rockDensity", 0.4);
                 trStringQuestVarSet("rockProto1", "Rock Granite Big");
-                trStringQuestVarSet("rockProto2", "Rock Granite Big");
+                trStringQuestVarSet("rockProto2", "Columns Broken");
                 trStringQuestVarSet("rockProto3", "Rock Granite Small");
 
-                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.045 + 0.045 * ENEMY_PLAYER);
                 
                 trQuestVarSet("enemyProtoCount", 5);
                 trStringQuestVarSet("enemyProto1", "Cyclops");
@@ -1114,9 +1114,58 @@ highFrequency
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 13, -2);
             }
             case 5:
+            {
+                trSetCivAndCulture(0, 3, 1);
+                trQuestVarSet("bossRoomShape", ROOM_SQUARE);
+                trQuestVarSet("bossRoomSize", 12);
+                trSetLighting("dawn", 0.1);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 11;
+                
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 32;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 33;
+
+                trQuestVarSet("mapType", MAP_PORTALS);
+                trQuestVarSet("treeDensity", 0.12);
+                trStringQuestVarSet("treeProto1", "Statue Pharaoh");
+                trStringQuestVarSet("treeProto2", "Statue Pharaoh");
+                trStringQuestVarSet("treeProto3", "Statue Pharaoh");
+                trQuestVarSet("spriteDensity", 0.3);
+                trStringQuestVarSet("spriteProto1", "Rock Dirt Sprite");
+                trStringQuestVarSet("spriteProto2", "Cinematic Scorch");
+                trStringQuestVarSet("spriteProto3", "Skeleton");
+                trQuestVarSet("rockDensity", 0.2);
+                trStringQuestVarSet("rockProto1", "Rock Dirt Big");
+                trStringQuestVarSet("rockProto2", "Columns Broken");
+                trStringQuestVarSet("rockProto3", "Pestilence SFX1");
+
+                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                trQuestVarSet("enemyProtoCount", 6);
+                trStringQuestVarSet("enemyProto1", "Dryad");
+                trStringQuestVarSet("enemyProto2", "Sphinx");
+                trStringQuestVarSet("enemyProto3", "Wadjet");
+                trStringQuestVarSet("enemyProto4", "Scorpion Man");
+                trStringQuestVarSet("enemyProto5", "Scarab");
+                trStringQuestVarSet("enemyProto6", "Mummy");
+
+                trQuestVarSet("columnDensity", 0);
+
+                trStringQuestVarSet("bossProto", "Shade of Hades");
+                trQuestVarSet("bossScale", 1.6);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 24, -1);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 25, -1);
+                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 26, -1);
+                trQuestVarSet("pestilenceStart", trGetNextUnitScenarioNameNumber());
+            }
+            case 6:
             {
                 xsEnableRule("laser_rooms_always");
                 /* engineers */
@@ -1165,7 +1214,7 @@ highFrequency
 
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
-                trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+                trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 26, -1);
@@ -1313,31 +1362,6 @@ highFrequency
             yRemoveFromDatabase("frontier");
             yRemoveUpdateVar("frontier", "edge");
             yRemoveUpdateVar("frontier", "type");
-        }
-
-        if (trQuestVarGet("mapType") == MAP_STANDARD) {
-            /* random bonus paths */
-            for(i=0; <trQuestVarGet("extraEdges")) {
-                trQuestVarSetFromRand("first", 1, 14);
-                trQuestVarSetFromRand("direction", 0, 3);
-                z = 1*trQuestVarGet("first") / 4;
-                x = 1*trQuestVarGet("first") - z * 4;
-                a = 1*trQuestVarGet("direction") / 2;
-                b = 1*trQuestVarGet("direction") - a * 2;
-                trQuestVarSet("newX", (1 - 2 * b) * a + x);
-                trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
-                if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
-                    trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3 ||
-                    (trQuestVarGet("newX") + trQuestVarGet("newZ") == 6)) {
-                    continue;
-                } else {
-                    n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
-                    if (xsAbs(trQuestVarGet("first") - trQuestVarGet("village")) * xsAbs(n - trQuestVarGet("village")) > 0) {
-                        /* Don't build an edge to the village */
-                        buildEdge(edgeName(1*trQuestVarGet("first"), n), EDGE_BIG);
-                    }
-                }
-            }
         }
 
         buildRoom(0,0, ROOM_STARTER);
@@ -1575,6 +1599,19 @@ highFrequency
                         }
                     }
                     ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());
+                }
+            }
+        }
+
+        if (trQuestVarGet("pestilenceStart") > 0) {
+            for(x=trQuestVarGet("pestilenceStart"); < trGetNextUnitScenarioNameNumber()) {
+                if (kbGetUnitBaseTypeID(kbGetBlockID(""+x)) == kbGetProtoUnitID("Pestilence SFX1")) {
+                    trQuestVarSet("next", x);
+                    trVectorSetUnitPos("pos", "next");
+                    trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+                    trArmySelect("1,0");
+                    trUnitConvert(ENEMY_PLAYER);
+                    trUnitChangeProtoUnit("Victory Marker");
                 }
             }
         }

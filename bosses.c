@@ -374,7 +374,7 @@ highFrequency
 	}
 }
 
-rule boss5_init
+rule boss6_init
 inactive
 highFrequency
 {
@@ -458,7 +458,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("biggerBallista", true);
 				trSetSelectedScale(0.7,0.5,0.5);
-				xsEnableRule("boss5_battle");
+				xsEnableRule("boss6_battle");
 				trQuestVarSet("bossGem", SOULSTONE);
 				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
 				xsEnableRule("boss_music");
@@ -1609,7 +1609,7 @@ highFrequency
 }
 
 
-rule boss5_battle
+rule boss6_battle
 inactive
 highFrequency
 {

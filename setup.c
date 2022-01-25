@@ -142,6 +142,10 @@ string stageName(int stage = 0) {
         }
         case 5:
         {
+            name = "Miasma Crypt";
+        }
+        case 6:
+        {
             name = "The Factory";
         }
     }
@@ -169,6 +173,10 @@ string stageIcon(int stage = 0) {
             img = "ui\ui map open fields 256x256";
         }
         case 5:
+        {
+            img = "ui\ui map river styx 256x256";
+        }
+        case 6:
         {
             img = "icons\building siege workshop icon 64";
         }

@@ -3,6 +3,82 @@ void removeFrostKnight(int p = 0) {
 	yRemoveUpdateVar("p"+p+"characters", "blizzardSFX");
 }
 
+void castIcicle(int p = 0, string pos = "") {
+	float dist = 0;
+	float current = 0;
+	float amt = 0;
+	int hit = 0;
+	int target = 0;
+	trQuestVarSetFromRand("heading",1,360,true);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trQuestVarSet("marker", trQuestVarGet("next") + 1);
+	trQuestVarSet("blizzardSFX", trQuestVarGet("next") + 2);
+	trArmyDispatch(""+p+",0","Dwarf",3,
+		trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),trQuestVarGet("heading"),true);
+	
+
+	yAddToDatabase("p"+p+"icicles", "next");
+	yAddUpdateVar("p"+p+"icicles", "blizzardBlock", trQuestVarGet("marker"));
+	yAddUpdateVar("p"+p+"icicles", "blizzardSFX", trQuestVarGet("blizzardSFX"));
+	yAddUpdateVar("p"+p+"icicles", "step", 0);
+	yAddUpdateVar("p"+p+"icicles", "timeout", trTimeMS() + 150);
+	yAddUpdateVar("p"+p+"icicles", "radius", trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
+
+	if (trQuestVarGet("p"+p+"blizzard") == 1) {
+		trUnitSelectClear();
+		trUnitSelectByQV("blizzardSFX", true);
+		trUnitChangeProtoUnit("Frost Drift");
+		trUnitSelectClear();
+		trUnitSelectByQV("marker", true);
+		trUnitChangeProtoUnit("Victory Marker");
+		trUnitSelectClear();
+		trUnitSelectByQV("blizzardSFX", true);
+		trUnitOverrideAnimation(2,0,1,1,-1);
+		trSetSelectedScale(1.25 * trQuestVarGet("p"+p+"spellRange"),1,1.6*trQuestVarGet("p"+p+"spellRange"));
+	} else {
+		trUnitSelectClear();
+		trUnitSelectByQV("marker", true);
+		trUnitChangeProtoUnit("Cinematic Block");
+		trUnitSelectClear();
+		trUnitSelectByQV("blizzardSFX", true);
+		trUnitChangeProtoUnit("Cinematic Block");
+	}
+
+	trUnitSelectClear();
+	trUnitSelectByQV("next", true);
+	trMutateSelected(kbGetProtoUnitID("Ice Block"));
+	trUnitSetAnimationPath("0,0,0,0,0,0,0");
+	trSetSelectedScale(trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"),
+		0,trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
+	trUnitHighlight(trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration"), false);
+
+	dist = xsPow(trQuestVarGet("p"+p+"spellRange") * trQuestVarGet("icicleRadius"), 2);
+	amt = dist;
+	hit = 0;
+	for(x=yGetDatabaseCount("enemies"); >0) {
+		if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+			removeEnemy();
+		} else {
+			current = zDistanceToVectorSquared("enemies", pos);
+			if (current < dist) {
+				hit = 1;
+				trPlayerGrantResources(p, "favor", 1);
+				damageEnemy(p, trQuestVarGet("icicleDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
+				if (current < amt) {
+					amt = current;
+					target = yGetPointer("enemies");
+				}
+			}
+		}
+	}
+	if (hit == 1) {
+		ySetPointer("enemies", target);
+		stunUnit("enemies", 1.5, p);
+		trQuestVarSetFromRand("sound", 1, 2, true);
+		trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+	}
+}
+
 void frostknightAlways(int eventID = -1) {
 	int p = eventID - 12 * FROSTKNIGHT;
 	int id = 0;
@@ -22,23 +98,36 @@ void frostknightAlways(int eventID = -1) {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-					stunUnit("enemies", 1.5, p);
+					trVectorSetUnitPos("pos", "enemies");
+					castIcicle(p, "pos");
 				}
 			}
 		}
 	}
 
-	if (yGetDatabaseCount("p"+p+"icicles") > 0) {
+	for (x=xsMin(3, yGetDatabaseCount("p"+p+"icicles")); > 0) {
 		yDatabaseNext("p"+p+"icicles", true);
-		trQuestVarSet("scale", (yGetVar("p"+p+"icicles", "timeout") - trTimeMS()) / trQuestVarGet("icicleDuration") / 1000);
-		trQuestVarSet("scale", 1.0 + 3.0 * trQuestVarGet("scale"));
-		if (trQuestVarGet("scale") <= 1.0) {
-			trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardSFX"), true);
-			trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardBlock"), true);
-			trUnitDestroy();
-			yRemoveFromDatabase("p"+p+"icicles");
+		if (yGetVar("p"+p+"icicles", "step") == 2) {
+			amt = (yGetVar("p"+p+"icicles", "timeout") - trTimeMS()) / trQuestVarGet("icicleDuration") / 1000;
+			amt = 1.0 + 5.0 * amt;
+			if (amt <= 1.0) {
+				trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardSFX"), true);
+				trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardBlock"), true);
+				trUnitDestroy();
+				yRemoveFromDatabase("p"+p+"icicles");
+			} else {
+				trSetSelectedScale(yGetVar("p"+p+"icicles", "radius"),amt,yGetVar("p"+p+"icicles", "radius"));
+			}
 		} else {
-			trSetSelectedScale(yGetVar("p"+p+"icicles", "radius"),trQuestVarGet("scale"),yGetVar("p"+p+"icicles", "radius"));
+			amt = (150.0 - yGetVar("p"+p+"icicles", "timeout") + trTimeMS()) / 150.0;
+			if (amt >= 1.0) {
+				ySetVar("p"+p+"icicles", "step", 2);
+				ySetVar("p"+p+"icicles", "timeout", 
+					yGetVar("p"+p+"icicles", "timeout") + trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration") * 1000.0);
+				amt = 1.0;
+			}
+			amt = 1.0 + 5.0 * amt;
+			trSetSelectedScale(yGetVar("p"+p+"icicles", "radius"),amt,yGetVar("p"+p+"icicles", "radius"));
 		}
 	}
 
@@ -88,70 +177,7 @@ void frostknightAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
-		trQuestVarSetFromRand("heading",1,360,true);
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trQuestVarSet("marker", trQuestVarGet("next") + 1);
-		trQuestVarSet("blizzardSFX", trQuestVarGet("next") + 2);
-		trArmyDispatch(""+p+",0","Dwarf",3,
-			trQuestVarGet("p"+p+"wellPosx"),0,trQuestVarGet("p"+p+"wellPosz"),trQuestVarGet("heading"),true);
-		
-
-		yAddToDatabase("p"+p+"icicles", "next");
-		yAddUpdateVar("p"+p+"icicles", "blizzardBlock", trQuestVarGet("marker"));
-		yAddUpdateVar("p"+p+"icicles", "blizzardSFX", trQuestVarGet("blizzardSFX"));
-		yAddUpdateVar("p"+p+"icicles", "timeout", 
-			trTimeMS() + 1000 * trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration"));
-		yAddUpdateVar("p"+p+"icicles", "radius", trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
-
-		if (trQuestVarGet("p"+p+"blizzard") == 1) {
-			trUnitSelectClear();
-			trUnitSelectByQV("blizzardSFX", true);
-			trUnitChangeProtoUnit("Frost Drift");
-			trUnitSelectClear();
-			trUnitSelectByQV("marker", true);
-			trUnitChangeProtoUnit("Victory Marker");
-			trUnitSelectClear();
-			trUnitSelectByQV("blizzardSFX", true);
-			trUnitOverrideAnimation(2,0,1,1,-1);
-			trSetSelectedScale(1.25 * trQuestVarGet("p"+p+"spellRange"),1,1.6*trQuestVarGet("p"+p+"spellRange"));
-		} else {
-			trUnitSelectClear();
-			trUnitSelectByQV("marker", true);
-			trUnitChangeProtoUnit("Cinematic Block");
-			trUnitSelectClear();
-			trUnitSelectByQV("blizzardSFX", true);
-			trUnitChangeProtoUnit("Cinematic Block");
-		}
-
-		trUnitSelectClear();
-		trUnitSelectByQV("next", true);
-		trMutateSelected(kbGetProtoUnitID("Ice Block"));
-		trUnitSetAnimationPath("0,0,0,0,0,0,0");
-		trSetSelectedScale(trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"),
-			3,trQuestVarGet("icicleRadius") * trQuestVarGet("p"+p+"spellRange"));
-		trUnitHighlight(trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration"), false);
-
-		trSoundPlayFN("piercemetal3.wav", "1", -1, "", "");
-		trSoundPlayFN("egg2.wav", "1", -1, "", "");
-		trSoundPlayFN("icemono.wav", "1", -1, "", "");
-
-		dist = xsPow(trQuestVarGet("p"+p+"spellRange") * trQuestVarGet("icicleRadius"), 2);
-		hit = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
-			id = yDatabaseNext("enemies", true);
-			if (id == -1 || trUnitAlive() == false) {
-				removeEnemy();
-			} else if (zDistanceToVectorSquared("enemies", "p"+p+"wellPos") < dist) {
-				target = yGetPointer("enemies");
-				hit = hit + 1;
-				trPlayerGrantResources(p, "favor", 1);
-				damageEnemy(p, trQuestVarGet("icicleDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
-			}
-		}
-		if (hit == 1) {
-			ySetPointer("enemies", target);
-			stunUnit("enemies", 1.5, p);
-		}
+		castIcicle(p, "p"+p+"wellPos");
 	}
 
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
@@ -334,8 +360,8 @@ highFrequency
 	trQuestVarSet("icicleRadius", 1.5);
 
 	trQuestVarSet("blizzardCooldown", 16);
-	trQuestVarSet("blizzardDuration", 6);
-	trQuestVarSet("blizzardDamage", 20);
+	trQuestVarSet("blizzardDuration", 8);
+	trQuestVarSet("blizzardDamage", 30);
 	trQuestVarSet("blizzardRadius", 4);
 
 	trQuestVarSet("frostGiantDecay", 3);

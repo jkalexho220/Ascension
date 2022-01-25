@@ -310,11 +310,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Each time you stun an enemy, restore 5 pecent of your health.";
+					msg = "Passive: Each time you stun an enemy, restore 8 pecent of your health.";
 				}
 				case 2:
 				{
-					msg = "Special Attack (5 attacks): Your attack stuns its target.";
+					msg = "Special Attack (5 attacks): Summon an icicle on your target, damaging and stunning it.";
 				}
 				case 3:
 				{
@@ -324,7 +324,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\improvement bite of the shark icons 64";
-					msg = "If this hits only one enemy, stun them.";
+					msg = "Stuns the enemy closest to the center of the icicle.";
 				}
 				case 5:
 				{
@@ -339,7 +339,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power frost icon 64";
-					msg = "Cooldown: 16 | Duration: 6 | Radius: 5 | Damage: 20 per second";
+					msg = "Cooldown: 16 | Duration: 8 | Radius: 5 | Damage: 30 per second";
 				}
 				case 8:
 				{

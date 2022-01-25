@@ -404,9 +404,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		if (trQuestVarGet("p"+p+"class") == FROSTKNIGHT) {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
-			healUnit(p, 0.05 * trQuestVarGet("p"+p+"health"), 1*trQuestVarGet("p"+p+"index"));
+			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + 0.08 * trQuestVarGet("p"+p+"health"));
 		}
 		trUnitSelectClear();
 		trUnitSelectByQV(db);
