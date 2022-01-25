@@ -253,6 +253,9 @@ highFrequency
                     trDamageUnitPercent(yGetVar("playerUnits", "decay"));
                 }
             }
+            if (trCountUnitsInArea(""+1*trQuestVarGet("playerUnits"),ENEMY_PLAYER,"Victory Marker",4) > 0) {
+                poisonUnit("playerUnits", 10, 10);
+            }
 
             stunsAndPoisons("playerUnits");
         }

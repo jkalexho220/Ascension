@@ -61,8 +61,7 @@ void castIcicle(int p = 0, string pos = "") {
 		} else {
 			current = zDistanceToVectorSquared("enemies", pos);
 			if (current < dist) {
-				hit = 1;
-				trPlayerGrantResources(p, "favor", 1);
+				hit = hit + 1;
 				damageEnemy(p, trQuestVarGet("icicleDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
 				if (current < amt) {
 					amt = current;
@@ -71,7 +70,8 @@ void castIcicle(int p = 0, string pos = "") {
 			}
 		}
 	}
-	if (hit == 1) {
+	if (hit >= 1) {
+		trPlayerGrantResources(p, "favor", hit);
 		ySetPointer("enemies", target);
 		stunUnit("enemies", 1.5, p);
 		trQuestVarSetFromRand("sound", 1, 2, true);
@@ -109,7 +109,7 @@ void frostknightAlways(int eventID = -1) {
 		yDatabaseNext("p"+p+"icicles", true);
 		if (yGetVar("p"+p+"icicles", "step") == 2) {
 			amt = (yGetVar("p"+p+"icicles", "timeout") - trTimeMS()) / trQuestVarGet("icicleDuration") / 1000;
-			amt = 1.0 + 5.0 * amt;
+			amt = 1.0 + 3.0 * amt;
 			if (amt <= 1.0) {
 				trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardSFX"), true);
 				trUnitSelect(""+1*yGetVar("p"+p+"icicles", "blizzardBlock"), true);
@@ -126,7 +126,7 @@ void frostknightAlways(int eventID = -1) {
 					yGetVar("p"+p+"icicles", "timeout") + trQuestVarGet("icicleDuration") * trQuestVarGet("p"+p+"spellDuration") * 1000.0);
 				amt = 1.0;
 			}
-			amt = 1.0 + 5.0 * amt;
+			amt = 1.0 + 3.0 * amt;
 			trSetSelectedScale(yGetVar("p"+p+"icicles", "radius"),amt,yGetVar("p"+p+"icicles", "radius"));
 		}
 	}

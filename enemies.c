@@ -111,6 +111,12 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         {
             yAddUpdateVar("enemies", "physicalResist", 1);
         }
+        case kbGetProtoUnitID("Scarab"):
+        {
+            yAddUpdateVar("enemies", "physicalResist", 1);
+            yAddToDatabase("scarabs", db);
+            yAddUpdateVar("scarabs", "index", yGetNewestPointer("enemies"));
+        }
         case kbGetProtoUnitID("Satyr"):
         {
             yAddToDatabase("Satyrs", db);
@@ -120,6 +126,16 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         {
             yAddToDatabase("Avengers", db);
             yAddUpdateVar("Avengers", "index", yGetNewestPointer("enemies"));
+        }
+        case kbGetProtoUnitID("Scorpion Man"):
+        {
+            yAddToDatabase("ScorpionMen", db);
+            yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer("enemies"));
+        }
+        case kbGetProtoUnitID("Mummy"):
+        {
+            yAddToDatabase("Mummies", db);
+            yAddUpdateVar("Mummies", "index", yGetNewestPointer("enemies"));
         }
     }
 }
@@ -161,6 +177,11 @@ highFrequency
         setupProtounitBounty("Behemoth", 10, 0.08);
         setupProtounitBounty("Avenger", 12, 0.1);
 
+        setupProtounitBounty("Wadjet", 4, 0.03);
+        setupProtounitBounty("Scorpion Man", 6, 0.05);
+        setupProtounitBounty("Scarab", 10, 0.08);
+        setupProtounitBounty("Mummy", 12, 0.1);
+
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
         trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
@@ -171,6 +192,11 @@ highFrequency
         trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
         trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
         trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
+        trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
+        trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
+        trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
+        trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 1000);
+        trModifyProtounit("Mummy", ENEMY_PLAYER, 11, 6);
 		
 		xsDisableSelf();
 	}
@@ -221,6 +247,7 @@ void enemiesAlways() {
             }
         }
     }
+
 
     for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
         yDatabaseNext("ballistaShots", true);
@@ -392,6 +419,38 @@ void enemiesAlways() {
                         trVectorSetUnitPos("pos", "target");
                         trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
                         shootLaser("start", "dir");
+                    }
+                }
+            } else if (proto == kbGetProtoUnitID("Mummy Flies")) {
+                if (yGetDatabaseCount("Mummies") > 0) {
+                    trUnitChangeProtoUnit("Rocket");
+                    trVectorSetUnitPos("pos", "nextProj");
+                    trQuestVarSet("closest", -1);
+                    trQuestVarSet("closestName", 0);
+                    trQuestVarSet("closestDistance", 25);
+                    for (x=yGetDatabaseCount("Mummies"); >0) {
+                        id = yDatabaseNext("Mummies", true);
+                        if (id == -1 || trUnitAlive() == false) {
+                            yRemoveFromDatabase("Mummies");
+                        } else if (kbUnitGetAnimationActionType(id) == 12) {
+                            trQuestVarSet("currentDistance", zDistanceToVectorSquared("Mummies", "pos"));
+                            if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
+                                trQuestVarCopy("closestDistance", "currentDistance");
+                                trQuestVarSet("closest", id);
+                                trQuestVarCopy("closestName", "Mummies");
+                            }
+                        }
+                    }
+                    if (trQuestVarGet("closest") >= 0) {
+                        trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
+                        trVectorSetUnitPos("start", "closestName");
+                        trVectorSetUnitPos("pos", "target");
+                        trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
+                        addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Kronny Birth SFX"),2,8,4.5);
+                        yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
+                        yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
+                        yAddUpdateVar("MummyBalls", "dist", 4.0);
+                        yAddUpdateVar("MummyBalls", "type", STATUS_SILENCE);
                     }
                 }
             }
@@ -658,7 +717,7 @@ void enemiesAlways() {
                     if (id == -1 || trUnitAlive() == false) {
                         removePlayerUnit();
                     } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-                        poisonUnit("playerUnits", 12.0, 10.0);
+                        poisonUnit("playerUnits", 10.0, 10.0);
                     }
                 }
             }
@@ -667,6 +726,27 @@ void enemiesAlways() {
             trVectorSetUnitPos("pos", "Dryads");
             ySetVarFromVector("Dryads", "pos", "pos");
             ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")));
+        }
+    }
+
+    if (yGetDatabaseCount("scarabs") > 0) {
+        id = yDatabaseNext("scarabs", true);
+        if (id == -1 || trUnitAlive() == false) {
+            if (yGetVar("scarabs", "silenceStatus") == 0) {
+                yVarToVector("scarabs", "pos");
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                trArmySelect("1,0");
+                trUnitChangeProtoUnit("Pestilence SFX1");
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+                trArmySelect("1,0");
+                trUnitConvert(ENEMY_PLAYER);
+                trUnitChangeProtoUnit("Victory Marker");
+            }
+            yRemoveFromDatabase("scarabs");
+        } else {
+            trVectorSetUnitPos("pos", "scarabs");
+            ySetVarFromVector("scarabs", "pos", "pos");
+            ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("scarabs", "index")));
         }
     }
 
@@ -1008,6 +1088,161 @@ void enemiesAlways() {
                 yDatabaseNext("playerUnits");
                 trVectorSetUnitPos("pos", "playerUnits");
                 trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("MummyBalls") > 0) {
+        if (processGenericProj("MummyBalls") == PROJ_FALLING) {
+            yVarToVector("MummyBalls", "prev");
+            yVarToVector("MummyBalls", "dir");
+            amt = zDistanceBetweenVectors("pos", "prev");
+            ySetVarFromVector("MummyBalls", "prev", "pos");
+            for(x=yGetDatabaseCount("playerUnits"); >0) {
+                if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+                    removePlayerUnit();
+                } else {
+                    dist = zDistanceToVector("playerUnits", "prev");
+                    if (dist < amt + 4.0) {
+                        trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
+                        trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
+                        if (zDistanceToVectorSquared("playerUnits", "hitbox") < yGetVar("MummyBalls", "dist")) {
+                            damagePlayerUnit(xsMin(100.0, amt * 10));
+                            switch(1*yGetVar("MummyBalls", "type"))
+                            {
+                                case STATUS_SILENCE:
+                                {
+                                    target = yGetVar("playerUnits", "player");
+                                    if (trQuestVarGet("p"+target+"unit") == trQuestVarGet("playerUnits")) {
+                                        silencePlayer(target, 3.0);
+                                    }
+                                }
+                                case STATUS_POISON:
+                                {
+                                    poisonUnit("playerUnits", 10, 10);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            vectorToGrid("pos", "loc");
+            if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+                yRemoveFromDatabase("MummyBalls");
+            }
+        }
+    }
+
+    if (yGetDatabaseCount("Mummies") >0) {
+        id = yDatabaseNext("Mummies", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit("Mummy");
+            yRemoveFromDatabase("Mummies");
+            yRemoveUpdateVar("Mummies", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
+            ySetVar("Mummies", "step", 2);
+        } else if (trTimeMS() > yGetVar("Mummies", "next")) {
+            switch(1*yGetVar("Mummies", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 12) {
+                        target = kbUnitGetTargetUnitID(id);
+                        trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+                        trVectorSetUnitPos("start", "Mummies");
+                        trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+                        ySetVarFromVector("Mummies", "dir", "dir");
+                        ySetVarFromVector("Mummies", "start", "start");
+                        ySetVar("Mummies", "step", 1);
+                        ySetVar("Mummies", "next", trTimeMS() + 1000);
+                        trUnitOverrideAnimation(37,0,false,false,-1);
+                    }
+                }
+                case 1:
+                {
+                    yVarToVector("Mummies", "start");
+                    yVarToVector("Mummies", "dir");
+                    addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Lampades Blood"),2,10,4.0);
+                    yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
+                    yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
+                    yAddUpdateVar("MummyBalls", "dist", 16);
+                    yAddUpdateVar("MummyBalls", "type", STATUS_POISON);
+                    ySetVar("Mummies", "step", 2);
+                    ySetVar("Mummies", "next", yGetVar("Mummies", "next") + 3000);
+                }
+                case 2:
+                {
+                    ySetVar("Mummies", "step", 0);
+                    ySetVar("Mummies", "next", trTimeMS() + 18000);
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
+                }
+            }
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Mummies", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Mummies", "index"));
+            if (action > 0 && yGetVar("Mummies", "step") == 1) {
+                ySetVar("Mummies", "step", 0);
+                ySetVar("Mummies", "next", trTimeMS() + 18000);
+            }
+        }
+    }
+
+    if(yGetDatabaseCount("ScorpionMen") >0) {
+        id = yDatabaseNext("ScorpionMen", true);
+        if (id == -1 || trUnitAlive() == false) {
+            trUnitChangeProtoUnit("Scorpion Man");
+            yRemoveFromDatabase("ScorpionMen");
+            yRemoveUpdateVar("ScorpionMen", "step");
+        } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
+            ySetVar("ScorpionMen", "step", 2);
+        } else if (trTimeMS() > yGetVar("ScorpionMen", "specialnext")) {
+            switch(1*yGetVar("ScorpionMen", "step"))
+            {
+                case 0:
+                {
+                    if (kbUnitGetAnimationActionType(id) == 6) {
+                        target = kbUnitGetTargetUnitID(id);
+                        ySetVar("ScorpionMen", "target", trGetUnitScenarioNameNumber(target));
+                        ySetVar("ScorpionMen", "step", 1);
+                        ySetVar("ScorpionMen", "specialnext", trTimeMS() + 500);
+                        trUnitOverrideAnimation(39,0,false,false,-1);
+                    }
+                }
+                case 1:
+                {
+                    action = 0;
+                    for (x=yGetDatabaseCount("playerUnits"); >0) {
+                        if (yGetVar("ScorpionMen", "target") == yDatabaseNext("playerUnits")) {
+                            trUnitSelectClear();
+                            trUnitSelectByQV("playerUnits");
+                            poisonUnit("playerUnits", 10, 10);
+                            action = 1;
+                            break;
+                        }
+                    }
+                    ySetVar("ScorpionMen", "step", 2);
+                    ySetVar("ScorpionMen", "specialnext", yGetVar("ScorpionMen", "specialnext") + 500);
+                    if (action == 0) {
+                        ySetVar("ScorpionMen", "target", -1);
+                    }
+                }
+                case 2:
+                {
+                    trUnitOverrideAnimation(-1,0,false,true,-1);
+                    ySetVar("ScorpionMen", "step", 0);
+                    if (yGetVar("ScorpionMen", "target") == -1) {
+                        ySetVar("ScorpionMen", "specialnext", trTimeMS());
+                    } else {
+                        ySetVar("ScorpionMen", "specialnext", trTimeMS() + 15000);
+                    }
+                }
+            }
+        } else {
+            action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("ScorpionMen", "index")); 
+            action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("ScorpionMen", "index"));
+            if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
+                ySetVar("ScorpionMen", "step", 0);
+                ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
             }
         }
     }

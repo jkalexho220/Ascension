@@ -1145,6 +1145,7 @@ highFrequency
                 trStringQuestVarSet("rockProto3", "Pestilence SFX1");
 
                 trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                
                 trQuestVarSet("enemyProtoCount", 6);
                 trStringQuestVarSet("enemyProto1", "Dryad");
                 trStringQuestVarSet("enemyProto2", "Sphinx");
@@ -1152,6 +1153,7 @@ highFrequency
                 trStringQuestVarSet("enemyProto4", "Scorpion Man");
                 trStringQuestVarSet("enemyProto5", "Scarab");
                 trStringQuestVarSet("enemyProto6", "Mummy");
+                
 
                 trQuestVarSet("columnDensity", 0);
 
