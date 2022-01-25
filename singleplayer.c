@@ -279,7 +279,15 @@ highFrequency
 	    		trUnitSelectByQV("zenoUnit", true);
 	    		trUnitConvert(0);
 	    		xsEnableRule("zeno_quiz_start");
+	    		if (trQuestVarGet("zenoQuiz") == 1) {
+
+	    		}
 	    	}
+	    }
+
+	    /* monster-pedia */
+	    if (trQuestVarGet("p1progress") >= 2) {
+
 	    }
 
 	    if (trQuestVarGet("p1class") == 0) {

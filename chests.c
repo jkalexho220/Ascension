@@ -228,6 +228,7 @@ void processChests() {
     				if (trQuestVarGet("rand") < ENEMY_PLAYER) {
     					trQuestVarSet("rand", ENEMY_PLAYER);
     				}
+    				debugLog("Relic reward count is " + 1*trQuestVarGet("rand"));
     				ySetVar("chests", "state", CHEST_STATE_REWARDING);
     				ySetVar("chests", "next", trTimeMS());
     				ySetVar("chests", "count", trQuestVarGet("rand"));

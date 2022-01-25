@@ -774,28 +774,33 @@ void enemiesAlways() {
             /* do the damage */
             yVarToVector("barrages", "pos");
             yVarToVector("barrages", "dir");
-            for(x=yGetDatabaseCount("playerUnits"); >0) {
-                if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-                    removePlayerUnit();
-                } else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
-                    damagePlayerUnit(100);
+            if (yGetVar("barrages", "count") <= 3) {
+                for(x=yGetDatabaseCount("playerUnits"); >0) {
+                    if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+                        removePlayerUnit();
+                    } else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
+                        damagePlayerUnit(100);
+                    }
                 }
             }
 
-            trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
-            trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
-            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-            trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
-            trArmySelect("1,0");
-            trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-            trUnitConvert(0);
-            trUnitChangeProtoUnit("Barrage");
+            if (yGetVar("barrages", "count") >= 0) {
+                trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
+                trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
+                trArmySelect("1,0");
+                trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+                trUnitConvert(0);
+                trUnitChangeProtoUnit("Barrage");
+            }
+            
 
             ySetVar("barrages", "count", yGetVar("barrages", "count") - 1);
             trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
             trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
             vectorToGrid("pos", "loc");
-            if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= 0) {
+            if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= -2) {
                 yRemoveFromDatabase("barrages");
             } else {
                 ySetVarFromVector("barrages", "pos", "pos");
@@ -824,10 +829,10 @@ void enemiesAlways() {
                 yAddToDatabase("barrages", "next");
                 yAddUpdateVar("barrages", "dirx", trQuestVarGet("dirx"));
                 yAddUpdateVar("barrages", "dirz", trQuestVarGet("dirz"));
-                yAddUpdateVar("barrages", "posx", trQuestVarGet("startx"));
-                yAddUpdateVar("barrages", "posz", trQuestVarGet("startz"));
+                yAddUpdateVar("barrages", "posx", trQuestVarGet("endx") - 8.0 * trQuestVarGet("dirX"));
+                yAddUpdateVar("barrages", "posz", trQuestVarGet("endz") - 8.0 * trQuestVarGet("dirZ"));
                 yAddUpdateVar("barrages", "next", trTimeMS());
-                yAddUpdateVar("barrages", "count", 12);
+                yAddUpdateVar("barrages", "count", 5);
             }
         }
     }
@@ -951,11 +956,11 @@ void enemiesAlways() {
             ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
         } else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
             if (kbUnitGetActionType(id) == 6) {
-                trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
                 target = kbUnitGetTargetUnitID(id);
                 trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
                 trVectorSetUnitPos("start", "Avengers");
                 if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
+                    trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
                     trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
                     amt = trUnitPercentDamaged();
                     trUnitChangeProtoUnit("Dust Large");

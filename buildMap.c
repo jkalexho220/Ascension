@@ -241,7 +241,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
     bool trapped = false;
     trQuestVarSet("room"+room, type);
     if (type < ROOM_CHEST) {
-        if (trQuestVarGet("trapRooms") > 0 && countRoomEntrances(x, z) > 1) {
+        if ((trQuestVarGet("trapRooms") > 0) && 
+            (countRoomEntrances(x, z) > 1) &&
+            (trQuestVarGet("relictransporterguy") != room)) {
             trQuestVarSetFromRand("rand", 1, 3, true);
             if (trQuestVarGet("rand") == 1) {
                 trQuestVarSet("trapRooms", trQuestVarGet("trapRooms") - 1);
@@ -1417,9 +1419,6 @@ highFrequency
             trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
 
             i = trQuestVarGet("bossKeyRoom");
-            /* DELETE ME */
-            debugLog("boss key room is " + i);
-            debugLog("boss entrance is " + 1*trQuestVarGet("bossEntranceRoom"));
             z = i / 4;
             x = i - z * 4;
             trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());

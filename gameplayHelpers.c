@@ -226,7 +226,7 @@ void equipRelicsAgain(int p = 0) {
 /*
 called after confirming that the projectile is on WALL terrain.
 */
-vector getBounceDir(string pos = "", string dir = "") {
+vector getBounceDir(string loc = "", string dir = "") {
 	bool bounced = false;
 	int xMod = 1;
 	int zMod = 1;
@@ -236,13 +236,12 @@ vector getBounceDir(string pos = "", string dir = "") {
 	if (trQuestVarGet(dir+"z") < 0) {
 		zMod = -1;
 	}
-	vectorToGrid(pos, "loc");
 	vector ret = trVectorQuestVarGet(dir);
 	/* time to bounce! */
-	trQuestVarSet("horizontalX", trQuestVarGet("locX") - xMod);
-	trQuestVarSet("horizontalZ", trQuestVarGet("locZ"));
-	trQuestVarSet("verticalX", trQuestVarGet("locX"));
-	trQuestVarSet("verticalZ", trQuestVarGet("locZ") - zMod);
+	trQuestVarSet("horizontalX", trQuestVarGet(loc+"X") - xMod);
+	trQuestVarSet("horizontalZ", trQuestVarGet(loc+"Z"));
+	trQuestVarSet("verticalX", trQuestVarGet(loc+"X"));
+	trQuestVarSet("verticalZ", trQuestVarGet(loc+"Z") - zMod);
 	if (terrainIsType("horizontal", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 		ret = xsVectorSetZ(ret, 0.0 - trQuestVarGet(dir+"z"));
 		bounced = true;
@@ -257,7 +256,7 @@ vector getBounceDir(string pos = "", string dir = "") {
 		a = position of the projectile in a unit square
 		b = normalized vector from the contested corner to the projectile position
 		*/
-		vector a = (trVectorQuestVarGet(pos) - (trVectorQuestVarGet("loc") * 2)) / 2;
+		vector a = (trVectorQuestVarGet(loc) - (trVectorQuestVarGet(loc) * 2)) / 2;
 		vector b = xsVectorSet((1 - xMod) / 2,0,(1 - zMod) / 2);
 		b = trVectorQuestVarGet(dir) + xsVectorNormalize(b - a);
 		/*

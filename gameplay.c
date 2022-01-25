@@ -67,14 +67,14 @@ void checkGodPowers(int p = 0) {
         {
             if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_READY);
-                if (trCurrentPlayer() == p) {
-                    trCounterAddTime("well", -1, -99999, wellName);
-                    if (wellIsUltimate) {
-                        trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-                    }
-                }
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "Underworld Passage", 1);
+                    if (trCurrentPlayer() == p) {
+                        trCounterAddTime("well", -1, -99999, wellName);
+                        if (wellIsUltimate) {
+                            trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
+                        }
+                    }
                 }
             }
         }
@@ -107,14 +107,14 @@ void checkGodPowers(int p = 0) {
         {
             if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_READY);
-                if (trCurrentPlayer() == p) {
-                    trCounterAddTime("rain", -1, -99999, rainName);
-                    if (rainIsUltimate) {
-                        trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-                    }
-                }
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "rain", 1);
+                    if (trCurrentPlayer() == p) {
+                        trCounterAddTime("rain", -1, -99999, rainName);
+                        if (rainIsUltimate) {
+                            trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
+                        }
+                    }
                 }
             }
         }
@@ -149,15 +149,15 @@ void checkGodPowers(int p = 0) {
         {
             if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_READY);
-                if (trCurrentPlayer() == p) {
-                    trCounterAbort("lure");
-                    trCounterAddTime("lure", -1, -99999, lureName);
-                    if (lureIsUltimate) {
-                        trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-                    }
-                }
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "animal magnetism", 1);
+                    if (trCurrentPlayer() == p) {
+                        trCounterAbort("lure");
+                        trCounterAddTime("lure", -1, -99999, lureName);
+                        if (lureIsUltimate) {
+                            trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
+                        }
+                    }
                 }
             }
         }
@@ -361,7 +361,7 @@ highFrequency
                         trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
                         trSetSelectedScale(0,0,-1);
                         trUnitSetAnimationPath("1,0,1,1,0,0,0");
-                        if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
+                        if (trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
                             if (trPlayerResourceCount(p, "gold") >= 100) {
                                 trPlayerGrantResources(p, "gold", -100);
                                 trQuestVarSet("p"+p+"transporterPurchased", 1);
@@ -654,6 +654,7 @@ highFrequency
     /* GAME OVER */
     if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount") && Multiplayer) {
         xsDisableSelf();
+        xsDisableRule("boss"+1*trQuestVarGet("stage")+"_battle");
         trSoundPlayFN("lose.wav","1",-1,"","");
         trUIFadeToColor(0,0,0,1500,0,true);
         trLetterBox(true);

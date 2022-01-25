@@ -36,7 +36,7 @@ void flamethrowersOff(int p = 0) {
 		}
 	}
 	if (trCurrentPlayer() == p) {
-		trSoundPlayFN("godpoewrfailed.wav","1",-1,"","");
+		trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
 	}
 	trQuestVarSet("p"+p+"flamethrowerActive", 0);
 }
@@ -234,7 +234,7 @@ void commandoAlways(int eventID = -1) {
 		vectorToGrid("pos", "loc");
 		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 			hit = 1;
-			trVectorQuestVarSet("dir", getBounceDir("pos","dir"));
+			trVectorQuestVarSet("dir", getBounceDir("loc","dir"));
 		} else {
 			ySetVarFromVector("p"+p+"shrapnelShots", "prev", "pos");
 		}

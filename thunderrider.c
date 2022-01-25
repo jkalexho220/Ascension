@@ -30,7 +30,10 @@ void rideLightningOff(int p = 0) {
 		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lightningBalls", true);
+		trDamageUnitPercent(100);
 		trUnitChangeProtoUnit("Transport Ship Greek");
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"lightningBalls", true);
 		trDamageUnitPercent(-100);
 
 		trUnitSelectClear();
@@ -155,11 +158,13 @@ void thunderRiderAlways(int eventID = -1) {
 					trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * trQuestVarGet("p"+p+"baseAttack"));
 				ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
 
-				vectorToGrid("pos", "loc");
+				trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
+				trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
+				vectorToGrid("dest", "loc");
 				if (yGetVar("p"+p+"lightningBalls", "inWall") == 0) {
 					if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 						yVarToVector("p"+p+"lightningBalls", "dir");
-						trVectorQuestVarSet("dir", getBounceDir("pos", "dir"));
+						trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
 						trQuestVarSetFromRand("sound", 1, 2, true);
 						trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 						ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
