@@ -63,11 +63,11 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_SPELL_RANGE:
 		{
-			msg = "Spell Range +0.2x";
+			msg = "Spell Range +0.3x";
 		}
 		case RELIC_SPELL_DURATION:
 		{
-			msg = "Spell Duration +0.2x";
+			msg = "Spell Duration +0.3x";
 		}
 		case RELIC_ATTACK_LIFESTEAL:
 		{
@@ -79,11 +79,11 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			msg = "Attack +15";
+			msg = "Attack +20";
 		}
 		case RELIC_SPELL_POWER:
 		{
-			msg = "Spell Power +0.3x";
+			msg = "Spell Power +0.4x";
 		}
 		case RELIC_HEAL_BOOST:
 		{
@@ -91,15 +91,15 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
-			msg = "Poison resistance x0.4";
+			msg = "Poison resistance x0.5";
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
-			msg = "Stun resistance x0.4";
+			msg = "Stun resistance x0.5";
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
-			msg = "Silence resistance x0.4";
+			msg = "Silence resistance x0.5";
 		}
 		case RELIC_POISON_KILLER:
 		{
@@ -111,7 +111,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ALL:
 		{
-			msg = "Spell Power, Duration, Range +0.1";
+			msg = "Spell Power, Duration, Range +0.15";
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -127,19 +127,19 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_COOLDOWN_REDUCTION:
 		{
-			msg = "Cooldown Reduction x0.1";
+			msg = "Cooldown Reduction x0.15";
 		}
 		case RELIC_CURSED_RANGE:
 		{
-			msg = "Spell Range +0.5 | Spell Power -0.5";
+			msg = "Spell Range +0.5 | Spell Power -0.3";
 		}
 		case RELIC_CURSED_DURATION:
 		{
-			msg = "Spell Duration +0.5 | Spell Range -0.5";
+			msg = "Spell Duration +0.5 | Spell Range -0.3";
 		}
 		case RELIC_CURSED_POWER:
 		{
-			msg = "Spell Power +0.5 | Spell Duration -0.5";
+			msg = "Spell Power +0.5 | Spell Duration -0.3";
 		}
 		case RELIC_FAVOR_FROM_ATTACKS:
 		{
@@ -299,11 +299,11 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_SPELL_RANGE:
 		{
-			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.2 * m);
+			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.3 * m);
 		}
 		case RELIC_SPELL_DURATION:
 		{
-			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.2 * m);
+			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.3 * m);
 		}
 		case RELIC_ATTACK_LIFESTEAL:
 		{
@@ -315,14 +315,14 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 15.0 * m);
+			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 20.0 * m);
 			trQuestVarSet("p"+p+"Attack", trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
 		}
 		case RELIC_SPELL_POWER:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.3 * m);
+			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.4 * m);
 		}
 		case RELIC_HEAL_BOOST:
 		{
@@ -331,17 +331,17 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_POISON_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"poisonResistanceCount", trQuestVarGet("p"+p+"poisonResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"poisonResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"poisonResistanceCount")));
+			trQuestVarSet("p"+p+"poisonResistance", xsPow(0.5, 1*trQuestVarGet("p"+p+"poisonResistanceCount")));
 		}
 		case RELIC_STUN_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"stunResistanceCount", trQuestVarGet("p"+p+"stunResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"stunResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"stunResistanceCount")));
+			trQuestVarSet("p"+p+"stunResistance", xsPow(0.5, 1*trQuestVarGet("p"+p+"stunResistanceCount")));
 		}
 		case RELIC_SILENCE_RESISTANCE:
 		{
 			trQuestVarSet("p"+p+"silenceResistanceCount", trQuestVarGet("p"+p+"silenceResistanceCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"silenceResistance", xsPow(0.6, 1*trQuestVarGet("p"+p+"silenceResistanceCount")));
+			trQuestVarSet("p"+p+"silenceResistance", xsPow(0.5, 1*trQuestVarGet("p"+p+"silenceResistanceCount")));
 		}
 		case RELIC_POISON_KILLER:
 		{
@@ -353,9 +353,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ALL:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.1 * m);
-			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.1 * m);
-			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.1 * m);
+			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.15 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -374,7 +374,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_COOLDOWN_REDUCTION:
 		{
 			trQuestVarSet("p"+p+"cooldownReductionCount", trQuestVarGet("p"+p+"cooldownReductionCount") + 1.0 * m);
-			trQuestVarSet("p"+p+"cooldownReduction", xsPow(0.9, 1*trQuestVarGet("p"+p+"cooldownReductionCount")));
+			trQuestVarSet("p"+p+"cooldownReduction", xsPow(0.85, 1*trQuestVarGet("p"+p+"cooldownReductionCount")));
 		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (trCurrentPlayer() == p) && equip) {
