@@ -111,7 +111,40 @@ void silenceEnemy(int p = 0, float duration = 9.0) {
 	}
 }
 
+void healUnit(int p = 0, float amt = 0, int index = -1) {
+	int old = yGetPointer("playerUnits");
+	if (index < 0) {
+		index = old;
+	}
+	if (ySetPointer("playerUnits", index)) {
+		amt = amt * trQuestVarGet("p"+p+"healBoost");
+		if (yGetVar("playerUnits", "poisonStatus") == 0) {
+			trDamageUnit(0.0 - amt);
+		}
+		ySetPointer("playerUnits", old);
+	}
+}
+
+void nightriderHarvest(string pos = "") {
+	int index = yGetPointer("playerUnits");
+	for(p=1; < ENEMY_PLAYER) {
+		if ((trQuestVarGet("p"+p+"class") == NIGHTRIDER) &&
+			(trQuestVarGet("p"+p+"dead") == 0)) {
+			if (zDistanceToVectorSquared("p"+p+"unit", pos) < 144) {
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"unit", true);
+				ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
+				healUnit(p, 0.05 * trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage"));
+				trPlayerGrantResources(p, "favor", 1);
+			}
+		}
+	}
+	ySetPointer("playerUnits", index);
+}
+
 void removeEnemy() {
+	yVarToVector("enemies", "pos");
+	nightriderHarvest("pos");
 	if (yGetVar("enemies", "bounty") > 0) {
 		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
 		for(p=1; <ENEMY_PLAYER) {
@@ -122,7 +155,7 @@ void removeEnemy() {
 		}
 	}
 	if (yGetVar("enemies", "relic") > 0) {
-		spawnRelicClosest(yGetVar("enemies", "posX"), yGetVar("enemies", "posZ"), 1*yGetVar("enemies", "relic"));
+		spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
 	}
 	yRemoveFromDatabase("enemies");
 	yRemoveUpdateVar("enemies", "bounty");
@@ -144,9 +177,12 @@ void removeEnemy() {
 	yRemoveUpdateVar("enemies", "silenceTimeout");
 	yRemoveUpdateVar("enemies", "silenceSFX");
 	yRemoveUpdateVar("enemies", "bomb");
+	yRemoveUpdateVar("enemies", "deathSentence");
 }
 
 void removePlayerUnit() {
+	yVarToVector("playerUnits", "pos");
+	nightriderHarvest("pos");
 	yRemoveFromDatabase("playerUnits");
 	yRemoveUpdateVar("playerUnits", "player");
 	yRemoveUpdateVar("playerUnits", "currentHealth");
@@ -343,19 +379,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	}
 }
 
-void healUnit(int p = 0, float amt = 0, int index = -1) {
-	int old = yGetPointer("playerUnits");
-	if (index < 0) {
-		index = old;
-	}
-	if (ySetPointer("playerUnits", index)) {
-		amt = amt * trQuestVarGet("p"+p+"healBoost");
-		if (yGetVar("playerUnits", "poisonStatus") == 0) {
-			trDamageUnit(0.0 - amt);
-		}
-		ySetPointer("playerUnits", old);
-	}
-}
+
 
 /*
 Enemies have elemental resistance and weakness

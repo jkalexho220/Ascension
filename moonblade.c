@@ -12,6 +12,7 @@ void moonbladeAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int index = yGetPointer("enemies");
 	float angle = 0;
 	float posX = 0;
 	float posZ = 0;
@@ -27,17 +28,17 @@ void moonbladeAlways(int eventID = -1) {
 				if (yGetVar("p"+p+"characters", "crescentCount") > 0) {
 					ySetVar("p"+p+"characters", "crescentCount", yGetVar("p"+p+"characters", "crescentCount") - 1);
 					ySetVar("p"+p+"characters", "crescentTimeout", trTimeMS() + 5000);
-					target = trGetUnitScenarioNameNumber(1*yGetVar("p"+p+"characters", "attackTarget"));
-					trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-					trArmySelect("1,0");
-					trUnitChangeProtoUnit("Lightning Sparks Ground");
-					trPlayerGrantResources(p, "favor", 3);
+					target = yGetPointer("enemies");
 					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 						stunUnit("enemies", 2.0, p);
 						trUnitSelectClear();
 						trUnitSelectByQV("enemies");
 						damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
+						trVectorSetUnitPos("pos", "enemies");
+						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+						trArmySelect("1,0");
+						trUnitChangeProtoUnit("Lightning Sparks Ground");
+						trPlayerGrantResources(p, "favor", 3);
 					}
 				}
 				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.01;
@@ -53,7 +54,7 @@ void moonbladeAlways(int eventID = -1) {
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					yAddToDatabase("playerUnits", "next");
 					yAddUpdateVar("playerUnits", "player", p);
-					yAddUpdateVar("playerUnits", "decay", calculateDecay(p, 5));
+					yAddUpdateVar("playerUnits", "decay", calculateDecay(p, 5.0));
 					yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 					yAddToDatabase("p"+p+"wolves", "next");
 					trArmyDispatch(""+p+",0","Wolf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
@@ -239,6 +240,7 @@ void moonbladeAlways(int eventID = -1) {
 			}
 		}
 	}
+	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }

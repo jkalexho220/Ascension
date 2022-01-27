@@ -32,7 +32,7 @@ const int FIREKNIGHT = 3;
 const int THRONESHIELD = 4;
 
 const int STORMCUTTER = 5;
-const int FROSTKNIGHT = 6;
+const int NIGHTRIDER = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
@@ -43,6 +43,7 @@ const int SPELLSTEALER = 12;
 
 const int INVENTOR = 13;
 const int STARSEER = 14;
+const int FROSTKNIGHT = 15;
 
 const int CLASS_COUNT = 16;
 
@@ -374,14 +375,14 @@ runImmediately
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
-    setupClass("Hero Greek Achilles", FROSTKNIGHT, 470, 1000, MANASTONE, 5);
+    setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
     setupClass("Oracle Hero", STARSEER, 510, 1500, STARSTONE, 3);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
     setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, SOULSTONE, 6);
     setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
     setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
-    setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
+    setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
     setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
@@ -466,11 +467,12 @@ highFrequency
 
         setupPlayerProto("Militia", 100, 10, 4.8);
         setupPlayerProto("Wolf", 200, 10, 5);
+        setupPlayerProto("Minion", 240, 10, 5);
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 16);
         setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0);
         setupPlayerProto("Lancer Hero", 1100, 55, 6.05);
-        setupPlayerProto("Hero Greek Achilles", 1100, 45, 5.5);
+        setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5);
         setupPlayerProto("Frost Giant", 1100, 45, 3.8);
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0);
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 20);
@@ -515,6 +517,7 @@ highFrequency
             trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
             zInitProtoUnitStat("Meteorite",p,1,100);
+            trModifyProtounit("Minion", p, 8, -999);
         }
 
         trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);

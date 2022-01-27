@@ -906,12 +906,14 @@ highFrequency
         xsDisableSelf();
         trBlockAllSounds();
         for(i=trQuestVarGet("stage"); >1) {
-            /* monstrous rage */
-            trTechSetStatus(ENEMY_PLAYER, 76, 4);
             /* bacchanalia 10 x stage */
             for(j=10; >0) {
                 trTechSetStatus(ENEMY_PLAYER, 78, 4);
             }
+        }
+        for(i=trQuestVarGet("stage")/2; >0) {
+            /* monstrous rage */
+            trTechSetStatus(ENEMY_PLAYER, 76, 4);
         }
         trQuestVarSet("rotX0", -1);
         trQuestVarSet("rotX1", 1);
@@ -1071,7 +1073,7 @@ highFrequency
             case 4:
             {
                 wallHeight = worldHeight + 6;
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 0, 0);
                 trQuestVarSet("bossRoomSize", 14);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 1;
@@ -1154,8 +1156,7 @@ highFrequency
                 trStringQuestVarSet("enemyProto5", "Scarab");
                 trStringQuestVarSet("enemyProto6", "Mummy");
                 
-
-                trQuestVarSet("columnDensity", 0);
+                trQuestVarSet("columnDensity", 0.05);
 
                 trStringQuestVarSet("bossProto", "Shade of Hades");
                 trQuestVarSet("bossScale", 1.6);

@@ -8,6 +8,7 @@ void spellstealerAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int index = yGetPointer("enemies");
 	int stunned = 0;
 	int poisoned = 0;
 	int silenced = 0;
@@ -357,6 +358,7 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 
+	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }

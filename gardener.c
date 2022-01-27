@@ -236,7 +236,7 @@ void gardenerAlways(int eventID = -1) {
 					yAddToDatabase("playerUnits", "p"+p+"seeds");
 					yAddUpdateVar("playerUnits", "player", p);
 					yAddUpdateVar("playerUnits", "decay", calculateDecay(p, 5.0));
-					yAddUpdateVar("playerUnits", "decayNext", trTimeMS());
+					yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 4500);
 				} else {
 					trUnitConvert(0);
 					trUnitChangeProtoUnit("Uproot 2x2");

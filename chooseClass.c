@@ -54,6 +54,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\hero g chiron icon 64";
 		}
+		case NIGHTRIDER:
+		{
+			icon = "icons\hero g achilles icon 64";
+		}
 	}
 	return(icon);
 }
@@ -848,6 +852,84 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case NIGHTRIDER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Nightrider: A sturdy fighter who thrives upon death of enemies and allies.";
+				}
+				case 1:
+				{
+					msg = "Passive: Whenever a unit dies near you, restore 5 percent health and gain 1 favor.";
+				}
+				case 2:
+				{
+					msg = "Special Attack (6 attacks): Curse your target with a Death Sentence.";
+				}
+				case 3:
+				{
+					msg = "This does not trigger if your target already has a Death Sentence.";
+				}
+				case 4:
+				{
+					icon = "icons\special g shade icon 64";
+					msg = "Death Sentence: For a short duration, the unit is poisoned and it takes double damage.";
+				}
+				case 5:
+				{
+					icon = "icons\special g shade icon 64";
+					msg = "If the cursed unit dies, the curse jumps to a nearby enemy and a Minion is summoned for you.";
+				}
+				case 6:
+				{
+					icon = "icons\special g shade icon 64";
+					msg = "Duration: 6 | Damage: 6 | Radius: 8";
+				}
+				case 7:
+				{
+					icon = "icons\improvement mythic rejuvenation icons 64";
+					msg = "(Q) Abduct: Summon a dark cloud that drags enemies towards you.";
+				}
+				case 8:
+				{
+					icon = "icons\improvement mythic rejuvenation icons 64";
+					msg = "The first enemy hit is given a Death Sentence.";
+				}
+				case 9:
+				{
+					icon = "icons\improvement mythic rejuvenation icons 64";
+					msg = "Cooldown: 15 | Range: 12";
+				}
+				case 10:
+				{
+					icon = "icons\god power ancestors icon 64";
+					msg = "(W) Arise: Summon 3 minions and an additional one for each active Death Sentence.";
+				}
+				case 11:
+				{
+					icon = "icons\god power ancestors icon 64";
+					msg = "Cooldown: 16 | Decay: 5 percent health";
+				}
+				case 12:
+				{
+					icon = "icons\god power chaos icons 64";
+					msg = "(E) Doomsday: For a short duration, your attacks have the following effects:";
+				}
+				case 13:
+				{
+					icon = "icons\god power chaos icons 64";
+					msg = "Heal yourself, summon a Minion, and grant yourself and your Minions bonus attack.";
+				}
+				case 14:
+				{
+					icon = "icons\god power chaos icons 64";
+					msg = "Cost: 80 | Duration: 12 | Heal: 3 percent health | Bonus: 0.1x Attack";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);
@@ -908,6 +990,10 @@ string className(int class = 0) {
 		case GARDENER:
 		{
 			name = "Gardener";
+		}
+		case NIGHTRIDER:
+		{
+			name = "Nightrider";
 		}
 	}
 	return(name);

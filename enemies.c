@@ -31,11 +31,13 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         }
     }
     
-
+    trVectorSetUnitPos("spawnPos", db);
     yAddToDatabase("enemies", db);
     trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
     yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
     yAddUpdateVar("enemies", "relic", relic);
+    yAddUpdateVar("enemies", "posX", trQuestVarGet("spawnPosX"));
+    yAddUpdateVar("enemies", "posZ", trQuestVarGet("spawnPosZ"));
     for(p=1; < ENEMY_PLAYER) {
         if (trQuestVarGet("p"+p+"rideLightning") == 1) {
             yAddToDatabase("p"+p+"rideLightningTargets", db);
@@ -248,6 +250,18 @@ void enemiesAlways() {
         }
     }
 
+    if (yGetDatabaseCount("enemies") > 0) {
+        id = yDatabaseNext("enemies", true);
+        if ((id == -1) || (trUnitAlive() == false)) {
+            removeEnemy();
+        } else {
+            stunsAndPoisons("enemies");
+            trVectorSetUnitPos("pos", "enemies");
+            ySetVar("enemies", "posX", trQuestVarGet("posX"));
+            ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
+        }
+    }
+
 
     for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
         yDatabaseNext("ballistaShots", true);
@@ -456,18 +470,6 @@ void enemiesAlways() {
             }
         }
         trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
-    }
-
-    if (yGetDatabaseCount("enemies") > 0) {
-    	id = yDatabaseNext("enemies", true);
-	    if ((id == -1) || (trUnitAlive() == false)) {
-	    	removeEnemy();
-	    } else {
-	    	stunsAndPoisons("enemies");
-            trVectorSetUnitPos("pos", "enemies");
-            ySetVar("enemies", "posX", trQuestVarGet("posX"));
-            ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
-	    }
     }
 
     /* ambush rooms */

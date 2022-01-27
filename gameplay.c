@@ -256,6 +256,8 @@ highFrequency
             if (trCountUnitsInArea(""+1*trQuestVarGet("playerUnits"),ENEMY_PLAYER,"Victory Marker",4) > 0) {
                 poisonUnit("playerUnits", 10, 10);
             }
+            trVectorSetUnitPos("pos", "playerUnits");
+            ySetVarFromVector("playerUnits", "pos", "pos");
 
             stunsAndPoisons("playerUnits");
         }

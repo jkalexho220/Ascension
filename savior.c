@@ -8,6 +8,7 @@ void saviorAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int index = yGetPointer("enemies");
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
@@ -326,6 +327,7 @@ void saviorAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"intervention", 0);
 	}
 
+	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }
