@@ -87,7 +87,7 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			msg = "Healing Effects +0.4x";
+			msg = "Healing Effects +0.5x";
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
@@ -326,7 +326,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_HEAL_BOOST:
 		{
-			trQuestVarSet("p"+p+"healBoost", trQuestVarGet("p"+p+"healBoost") + 0.4 * m);
+			trQuestVarSet("p"+p+"healBoost", trQuestVarGet("p"+p+"healBoost") + 0.5 * m);
 		}
 		case RELIC_POISON_RESISTANCE:
 		{
