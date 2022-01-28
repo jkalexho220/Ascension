@@ -1133,7 +1133,7 @@ highFrequency
                 TERRAIN_SUB_SECONDARY = 33;
 
                 trQuestVarSet("mapType", MAP_PORTALS);
-                trQuestVarSet("treeDensity", 0.12);
+                trQuestVarSet("treeDensity", 0.1);
                 trStringQuestVarSet("treeProto1", "Statue Pharaoh");
                 trStringQuestVarSet("treeProto2", "Statue Pharaoh");
                 trStringQuestVarSet("treeProto3", "Statue Pharaoh");
@@ -1156,7 +1156,7 @@ highFrequency
                 trStringQuestVarSet("enemyProto5", "Scarab");
                 trStringQuestVarSet("enemyProto6", "Mummy");
                 
-                trQuestVarSet("columnDensity", 0.05);
+                trQuestVarSet("columnDensity", 0.1);
 
                 trStringQuestVarSet("bossProto", "Shade of Hades");
                 trQuestVarSet("bossScale", 1.6);

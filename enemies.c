@@ -719,7 +719,7 @@ void enemiesAlways() {
                     if (id == -1 || trUnitAlive() == false) {
                         removePlayerUnit();
                     } else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-                        poisonUnit("playerUnits", 10.0, 10.0);
+                        poisonUnit("playerUnits", 10.0, 5.0 * trQuestVarGet("stage"));
                     }
                 }
             }
@@ -1121,7 +1121,7 @@ void enemiesAlways() {
                                 }
                                 case STATUS_POISON:
                                 {
-                                    poisonUnit("playerUnits", 10, 10);
+                                    poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
                                 }
                             }
                         }
@@ -1217,7 +1217,7 @@ void enemiesAlways() {
                         if (yGetVar("ScorpionMen", "target") == yDatabaseNext("playerUnits")) {
                             trUnitSelectClear();
                             trUnitSelectByQV("playerUnits");
-                            poisonUnit("playerUnits", 10, 10);
+                            poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
                             action = 1;
                             break;
                         }

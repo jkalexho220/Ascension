@@ -24,6 +24,7 @@ void castDeathSentence(int p = 0) {
 	
 	ySetVar("enemies", "deathSentence", 1);
 	poisonUnit("enemies", trQuestVarGet("deathSentenceDuration"), trQuestVarGet("deathSentenceDamage"), p);
+	silenceEnemy(p, trQuestVarGet("deathSentenceDuration"));
 	trQuestVarSet("poisonSound", 0);
 	yAddToDatabase("p"+p+"Sentences", "enemies");
 	yAddUpdateVar("p"+p+"Sentences", "index", yGetPointer("enemies"));
@@ -117,13 +118,12 @@ void nightriderAlways(int eventID = -1) {
 			trUnitSelect(""+1*yGetVar("p"+p+"sentences", "SFX"), true);
 			trUnitChangeProtoUnit("Kronny Birth SFX");
 			yRemoveFromDatabase("p"+p+"sentences");
+			trQuestVarSetFromRand("heading",1,360,false);
+			spawnMinion(p, "pos", trQuestVarGet("heading"));
 			if (hit > 0) {
 				ySetPointer("enemies", hit);
 				castDeathSentence(p);
 			}
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			trQuestVarSetFromRand("heading",1,360,false);
-			spawnMinion(p, "pos", trQuestVarGet("heading"));
 		} else {
 			hit = yGetPointer("enemies");
 			if (ySetPointer("enemies", 1*yGetVar("p"+p+"sentences", "index"))) {

@@ -108,7 +108,7 @@ void classNewUnlock(int class = 0) {
 			{
 				unlocked = true;
 			}
-			case FROSTKNIGHT:
+			case NIGHTRIDER:
 			{
 				if (trQuestVarGet("chestCount") >= 5) {
 					unlocked = true;
@@ -453,7 +453,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 5.");
 			}
-			case FROSTKNIGHT:
+			case NIGHTRIDER:
 			{
 				uiMessageBox("To unlock this class, open five chests. Current: " + 1*trQuestVarGet("chestCount"));
 			}

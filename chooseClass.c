@@ -875,7 +875,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\special g shade icon 64";
-					msg = "Death Sentence: For a short duration, the unit is poisoned and it takes double damage.";
+					msg = "Death Sentence: For a duration, the unit is poisoned and silenced and it takes double damage";
 				}
 				case 5:
 				{
