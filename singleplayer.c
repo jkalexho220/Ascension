@@ -568,9 +568,9 @@ highFrequency
 					setupQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
 					setupExplain("Silences will only extend the duration of a boss's cooldowns.");
 
-					setupExplain("Next Question: Each cooldown reduction relic grants 0.1x cooldown reduction.");
+					setupExplain("Next Question: Each cooldown reduction relic grants 0.15x cooldown reduction.");
 					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
-						"Cooldowns are 0", "Cooldowns are 0.35x as long", 2);
+						"Cooldowns are 0", "Cooldowns are 0.2x as long", 2);
 					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
 				}
 				case 4:
