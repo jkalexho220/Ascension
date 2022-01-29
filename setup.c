@@ -273,7 +273,12 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"spellRange", 1);
     trQuestVarSet("p"+p+"spellDamage", 1);
     trQuestVarSet("p"+p+"spellDuration", 1);
+    trQuestVarSet("p"+p+"spellRangeTrue", 1);
+    trQuestVarSet("p"+p+"spellDamageTrue", 1);
+    trQuestVarSet("p"+p+"spellDurationTrue", 1);
     trQuestVarSet("p"+p+"healBoost", 1);
+    trQuestVarSet("p"+p+"favorFromAttacks", 0);
+    trQuestVarSet("p"+p+"poisonSpeed", 0);
 
     trQuestVarSet("p"+p+"ultimateCost", 1);
     trQuestVarSet("p"+p+"cooldownReduction", 1);
@@ -412,6 +417,8 @@ runImmediately
         trModifyProtounit("Transport Ship Greek", p, 55, 4);
         trModifyProtounit("Athena", p, 55, 4);
 
+        trModifyProtounit("Servant", p, 55, 1);
+        trModifyProtounit("Phoenix", p, 55, 1);
         trModifyProtounit("Sea Turtle", p, 55, 1);
         trModifyProtounit("Pegasus", p, 55, 1);
         trModifyProtounit("Flying Medic", p, 55, 1);
@@ -623,16 +630,21 @@ highFrequency
             trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
             trMessageSetText("Host: Choose a floor to challenge.",-1);
 
-            int posX = 96 - 2 * trQuestVarGet("p1progress");
+            int posX = 97 - 2 * trQuestVarGet("p1progress");
 
             for(x=0; <= trQuestVarGet("p1progress")) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-                trArmyDispatch("1,0","Flag Numbered",1,posX,0,100,0,true);
+                trArmyDispatch("1,0","Flag Numbered",1,posX,0,101,0,true);
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
                 trUnitSetAnimationPath(""+x+",0,0,0,0,0,0");
                 yAddToDatabase("stageChoices", "next");
                 yAddUpdateVar("stageChoices", "stage", x + 1);
+                yAddUpdateVar("stageChoices", "obelisk", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,posX,0,103,0,true);
+                trArmySelect("1,0");
+                trUnitConvert(0);
+                trMutateSelected(kbGetProtoUnitID("Outpost"));
                 posX = posX + 4;
             }
 

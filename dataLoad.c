@@ -29,7 +29,7 @@ void saveAllData() {
 	savedata = savedata + 100 * trQuestVarGet("p"+p+"transporterLevel") + 1000 * trQuestVarGet("p"+p+"class");
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
-	savedata = trPlayerResourceCount(p, "Gold") - trQuestVarGet("p"+p+"gold");
+	savedata = trQuestVarGet("p"+p+"gold") - trQuestVarGet("p"+p+"startingGold");
 	savedata = savedata + trGetScenarioUserData(1);
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
@@ -190,6 +190,7 @@ inactive
 			savedata = 0;
 		}
 		trQuestVarSet("p1gold", savedata);
+		trQuestVarSet("p1startinggold", savedata);
 
 		/* equipped relics */
 		for(y=0; <2) {
@@ -396,6 +397,7 @@ inactive
 			trQuestVarSet("p"+p+"noob", 1);
 		}
 		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
+		trQuestVarSet("p"+p+"startingGold", trQuestVarGet("p"+p+"gold"));
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");

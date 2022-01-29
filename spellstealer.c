@@ -119,7 +119,7 @@ void spellstealerAlways(int eventID = -1) {
 					id = yGetVar("p"+p+"bladeDanceTargets", "index");
 					hit = yGetVarAtIndex("enemies", "stunStatus", id) * stunned;
 					hit = hit + yGetVarAtIndex("enemies", "poisonStatus", id) * poisoned;
-					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < 3.0 * amt)) {
+					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < 2.0 * amt)) {
 						yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					} else {
 						ySetVar("p"+p+"bladeDanceTargets", "status", trQuestVarGet("p"+p+"spellstealStatus"));
@@ -131,7 +131,7 @@ void spellstealerAlways(int eventID = -1) {
 			ySetPointer("p"+p+"bladeDanceTargets", target);
 			
 			if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 1) {
-				amt = amt * 3;
+				amt = amt * 2;
 			}
 			trPlayerGrantResources(p, "favor", 0 - amt);
 		} else {
@@ -152,6 +152,7 @@ void spellstealerAlways(int eventID = -1) {
 				if (trUnitAlive() == false) {
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 				} else if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
+					trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"favorFromAttacks"));
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
 					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
 					if (hit >= xsPow(2, STATUS_SILENCE)) {

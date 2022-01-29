@@ -588,12 +588,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 13:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "If this hits only one enemy, it only costs 10 favor.";
+					msg = "If this hits only one enemy, it costs half.";
 				}
 				case 14:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "Cost: 30 | Radius: 15 | Damage: Attack x Spell Power";
+					msg = "Cost: 20 | Radius: 15 | Damage: Attack x Spell Power";
 					next = 0;
 				}
 			}
@@ -616,7 +616,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					msg = "Damage per pellet: 0.5 x Attack | Pellets: 4 + Projectiles";
+					msg = "Damage per pellet: 1 x Attack | Pellets: 4 + Projectiles";
 				}
 				case 4:
 				{
@@ -631,7 +631,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement electrum bullets icon 64";
-					msg = "Damage per pellet: 0.5 x Attack | Pellets: 7 + 2 x Projectiles";
+					msg = "Damage per pellet: 1 x Attack | Pellets: 7 + 2 x Projectiles";
 				}
 				case 7:
 				{
@@ -866,7 +866,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (6 attacks): Curse your target with a Death Sentence.";
+					msg = "Special Attack (8 attacks): Curse your target with a Death Sentence.";
 				}
 				case 3:
 				{

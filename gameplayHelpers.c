@@ -149,6 +149,7 @@ void removeEnemy() {
 		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
 		for(p=1; <ENEMY_PLAYER) {
 			if (Multiplayer) {
+				trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + yGetVar("enemies", "bounty"));
 				trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
 			}
 			trPlayerGrantResources(p, "Favor", trQuestVarGet("rand"));
@@ -370,8 +371,8 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	bool targetPlayers = (p == 0);
 	duration = duration * 1000;
 	if (p > 0) {
-		duration = duration * trQuestVarGet("p"+p+"spellDuration");
-		damage = damage * trQuestVarGet("p"+p+"spellDamage");
+		duration = duration * trQuestVarGet("p"+p+"spellDuration") * xsPow(0.5, 1*trQuestVarGet("p"+p+"poisonSpeed"));
+		damage = damage * trQuestVarGet("p"+p+"spellDamage") * xsPow(2, 1*trQuestVarGet("p"+p+"poisonSpeed"));
 	} else {
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"poisonResistance");
@@ -699,6 +700,7 @@ int CheckOnHit(int p = 0, int id = 0) {
     } else {
         if ((action == 12) || (action == 6)) {
             if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
+            	trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"favorFromAttacks"));
             	status = ON_HIT_NORMAL;
                 ySetVar("p"+p+"characters", "attackNext", 
                     yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"nextDelay"));

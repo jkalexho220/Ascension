@@ -9,7 +9,7 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	amt = fModulo(6.283185, amt - 0.5 * dist);
 	dist = dist / (count - 1);
 	yAddToDatabase("p"+p+"shotgunHitboxes","next");
-	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.5 * trQuestVarGet("p"+p+"attack") * count);
+	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", trQuestVarGet("p"+p+"attack") * count);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startx", trQuestVarGet(start+"x"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startz", trQuestVarGet(start+"Z"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle1", amt);

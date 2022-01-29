@@ -182,6 +182,11 @@ void processChests() {
 		                	trQuestVarGet("movingStatuesIn"+room) == 0) {
 		                	ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
 		                	trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+		                	for(x=yGetDatabaseCount("statuesIn"+room); >0) {
+		                		yDatabaseNext("statuesIn"+room, true);
+		                		trDamageUnitPercent(-100);
+		                		trUnitConvert(0);
+		                	}
 		                }
 		            }
 		            case CHEST_ENCOUNTER:
@@ -224,7 +229,8 @@ void processChests() {
     				trSoundPlayFN("attackwarning.wav","1",-1,"","");
     				trMessageSetText("The chest was a bomb! Run!",-1);
     			} else {
-    				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand") + trQuestVarGet("correctStatuesIn"+room), true);
+    				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand"), true);
+    				trQuestVarSet("rand", trQuestVarGet("rand") + trQuestVarGet("correctStatuesIn"+room));
     				if (trQuestVarGet("rand") < ENEMY_PLAYER) {
     					trQuestVarSet("rand", ENEMY_PLAYER);
     				}

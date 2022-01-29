@@ -2603,6 +2603,21 @@ highFrequency
         				if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
         					trQuestVarSet("bossSpell", 1);
         				}
+        				trQuestVarSet("bottomX", trQuestVarGet("bossRoomCenterX") - 2 * trQuestVarGet("bossRoomSize"));
+        				trQuestVarSet("bottomZ", trQuestVarGet("bossRoomCenterZ") - 2 * trQuestVarGet("bossRoomSize"));
+        				trQuestVarSet("topX", trQuestVarGet("bossRoomCenterX") + 2 * trQuestVarGet("bossRoomSize"));
+        				trQuestVarSet("topZ", trQuestVarGet("bossRoomCenterZ") + 2 * trQuestVarGet("bossRoomSize"));
+        				for(x=yGetDatabaseCount("playerUnits"); >0) {
+        					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+        						removePlayerUnit();
+        					} else {
+        						trVectorSetUnitPos("pos", "playerUnits");
+        						if (vectorInRectangle("pos", "bottom", "top") == false) {
+        							trUnitDelete(false);
+        							removePlayerUnit();
+        						}
+        					}
+        				}
 	    			} else {
 		    			trPaintTerrain(x - action, z - action, x + action, z + action, 2, 10, false);
 		    			trPaintTerrain(x - action+1, z - action+1, x + action-1, z + action-1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);

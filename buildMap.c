@@ -27,6 +27,9 @@ highFrequency
         for(x=yGetDatabaseCount("stageChoices"); >0) {
             yDatabaseNext("stageChoices", true);
             trUnitDestroy();
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("stageChoices", "obelisk"), true);
+            trUnitDestroy();
         }
         yClearDatabase("stageChoices");
         xsDisableSelf();
@@ -35,6 +38,14 @@ highFrequency
         trUIFadeToColor(0,0,0,1000,0,true);
         trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
         trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
+    } else {
+        trUnitSelectClear();
+        trUnitSelect(""+1*yGetVar("stageChoices", "obelisk"), true);
+        if (trUnitIsSelected()) {
+            uiClearSelection();
+            trShowImageDialog(stageIcon(1*yGetVar("stageChoices", "stage")), 
+                "Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
+        }
     }
 }
 
@@ -388,6 +399,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_BOSS_ENTRANCE:
         {
+            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 25, z * 35 + 25, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 25, z * 35 + 25, worldHeight, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 25, z * 35 + 25);
             trQuestVarSet("bossEntranceStatue", trGetNextUnitScenarioNameNumber());
             trArmyDispatch("1,0","Dwarf",1,x*70+40,0,z*70+40,225,true);
             trUnitSelectClear();
@@ -461,7 +475,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         case ROOM_VILLAGE + 1:
         {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, worldHeight, false);
             paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
             paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
 
@@ -506,6 +520,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 deployTownEyecandy("Pig",25,13,56);
                 deployTownEyecandy("Pig",21,11,222);
                 trQuestVarSet("pigEnd", trGetNextUnitScenarioNameNumber());
+                for(x=trQuestVarGet("pigStart"); < trQuestVarGet("pigEnd")) {
+                    trUnitSelectClear();
+                    trUnitSelect(""+x, true);
+                    trUnitConvert(ENEMY_PLAYER);
+                }
             }
         }
         case ROOM_VILLAGE + 2:
@@ -596,6 +615,41 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
             yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Ulfsark"));
         }
+        case ROOM_VILLAGE + 4:
+        {
+            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, worldHeight, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+            paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
+
+            trQuestVarSet("villageX", 70 * x + 21);
+            trQuestVarSet("villageZ", 70 * z + 21);
+
+
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Tower Mirror",12,12,0);
+            trUnitSelectClear();
+            trUnitSelectByQV("next");
+            trUnitOverrideAnimation(2,0,true,false,-1);
+            trSetSelectedScale(2,2,2);
+            deployTownEyecandy("Guild",16,12,180);
+            deployTownEyecandy("Guild",12,16,270);
+            deployTownEyecandy("Tamarisk Tree", 16, 16, 0);
+
+            trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
+            trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
+            trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Oracle Scout",8,8,225);
+        }
+        case ROOM_VILLAGE + 5:
+        {
+            trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 31, z * 35 + 31, worldHeight, false);
+            paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+            paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
+        }
         case ROOM_STARTER:
         {
             trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
@@ -666,6 +720,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_NOTTUD:
         {
+            debugLog("nottud room is " + room);
             z0 = 10;
             for(a=0; < 10) {
                 for(b=8; >0) {
@@ -687,6 +742,37 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             yAddToDatabase("stunnedUnits", "nottud");
             yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Minotaur"));
             xsEnableRule("nottud_always");
+            for(i=0; <5) {
+                trQuestVarSet("choice"+i, 21 + i);
+            }
+            trQuestVarSet("obeliskx0", 70*x+46);
+            trQuestVarSet("obeliskz0", 70*z+46);
+            trQuestVarSet("obeliskx1", 70*x+46);
+            trQuestVarSet("obeliskz1", 70*z+34);
+            trQuestVarSet("obeliskx2", 70*x+34);
+            trQuestVarSet("obeliskz2", 70*z+46);
+            for(i=0; <3) {
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("obeliskx"+i),0,trQuestVarGet("obeliskz"+i),225,true);
+                trArmySelect("1,0");
+                trUnitChangeProtoUnit("Spy Eye");
+                trUnitSelectClear();
+                trUnitSelectByQV("next", true);
+                trMutateSelected(kbGetProtoUnitID("Osiris Box Glow"));
+                trSetSelectedScale(0,1,0);
+                trSetSelectedUpVector(0,-1,0);
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("obeliskx"+i),0,trQuestVarGet("obeliskz"+i),225,true);
+                trArmySelect("1,0");
+                trUnitConvert(0);
+                trMutateSelected(kbGetProtoUnitID("Outpost"));
+                trQuestVarSetFromRand("rand", 0, 4 - i, true);
+                yAddToDatabase("nottudShop", "next");
+                yAddUpdateVar("nottudShop", "relic", trQuestVarGet("choice"+1*trQuestVarGet("rand")));
+                yAddUpdateVar("nottudShop", "shopPosx", trQuestVarGet("obeliskx"+i));
+                yAddUpdateVar("nottudShop", "shopPosz", trQuestVarGet("obeliskz"+i));
+                trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
+            }
         }
     }
 }
@@ -1123,7 +1209,7 @@ highFrequency
             {
                 trSetCivAndCulture(0, 3, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
-                trQuestVarSet("bossRoomSize", 12);
+                trQuestVarSet("bossRoomSize", 11);
                 trSetLighting("dawn", 0.1);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 11;
@@ -1390,8 +1476,8 @@ highFrequency
         }
 
         bool nottudSpawn = false;
-        trQuestVarSetFromRand("nick", 0, 20, true);
-        if (trQuestVarGet("nick") < trQuestVarGet("stage")) {
+        trQuestVarSetFromRand("nottud", 0, 20, true);
+        if (trQuestVarGet("nottud") < trQuestVarGet("stage")) {
             nottudSpawn = true;
         }
 

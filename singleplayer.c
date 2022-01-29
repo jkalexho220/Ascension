@@ -321,10 +321,10 @@ highFrequency
 	    trMutateSelected(kbGetProtoUnitID("Outpost"));
 
 	    /* relic warehouse */
-	    trPaintTerrain(45,66, 57,78, 0,70, false);
-	    x = 114;
+	    trPaintTerrain(46,66, 57,78, 0,70, false);
+	    x = 115;
 	    for(a=1; <= 10) {
-	    	z = 154;
+	    	z = 155;
 	    	if (trQuestVarGet("ownedRelics"+a) > 0) {
 	    		trArmyDispatch("1,0","Dwarf",1,x,0,z+2,180,true);
 		    	trArmySelect("1,0");
@@ -341,7 +341,7 @@ highFrequency
 		    	}
 	    	}
 	    	
-	    	z = 134;
+	    	z = 135;
 	    	if (trQuestVarGet("ownedRelics"+(a+10)) > 0) {
 	    		trArmyDispatch("1,0","Dwarf",1,x,0,z-2,0,true);
 		    	trArmySelect("1,0");
@@ -359,6 +359,27 @@ highFrequency
 	    	}
 	    	
 	    	x = x - 2;
+	    }
+
+	    x = 95;
+	    z = 153;
+	    for(a=21; <= 30) {
+	    	if (trQuestVarGet("ownedRelics"+a) > 0) {
+	    		trArmyDispatch("1,0","Dwarf",1,x-2,0,z,90,true);
+		    	trArmySelect("1,0");
+		    	trUnitConvert(0);
+		    	trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a)));
+		    	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+		    	trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
+		    	trArmySelect("1,0");
+		    	trUnitChangeProtoUnit("Relic");
+		    	for(b=0; <trQuestVarGet("ownedRelics"+a)) {
+		    		yAddToDatabase("freeRelics", "next");
+		    		yAddUpdateVar("freeRelics", "type", a);
+		    		trQuestVarSet("next", 1 + trQuestVarGet("next"));
+		    	}
+	    	}
+	    	z = z - 2;
 	    }
 
 	    /* if player is new */
@@ -457,6 +478,7 @@ inactive
 highFrequency
 {
 	int class = 0;
+	int gem = 0;
 	trUnitSelectClear();
 	trUnitSelectByQV("p1unit");
 	if (trUnitGetIsContained("Sky Passage")) {
@@ -492,7 +514,8 @@ highFrequency
 					trDelayedRuleActivation("singleplayer_explain_class");
 				}
 			} else if (trQuestVarGet("class"+x+"level") > 0) {
-				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+")",
+				gem = 1*trQuestVarGet("class"+x+"gemstone");
+				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+") [" + gemstoneName(gem) + "]",
 				"Switch to this class", 3000 + x, "View class details", 4000 + x);
 			}
 		}
@@ -846,7 +869,7 @@ highFrequency
 				desc("It has a large arsenal of explosive weaponry and can also run over players.");
 			}
 		}
-		reselectMyself();
+		uiClearSelection();
 		trChatHistoryClear();
 		trChatSend(0, "<color=1,1,1><u>"+name+"</u></color>");
 		trChatSend(0, trStringQuestVarGet("description1"));

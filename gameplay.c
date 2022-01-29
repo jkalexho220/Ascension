@@ -239,7 +239,9 @@ highFrequency
     int p = 0;
     int simp = 0;
     int count = 0;
+    int relic = 0;
     float amt = 0;
+    bool relicReturned = true;
 
     /* player units always */
     if (yGetDatabaseCount("playerUnits") > 0) {
@@ -303,6 +305,15 @@ highFrequency
     for(p=1; < ENEMY_PLAYER) {
         trEventFire(12*trQuestVarGet("p"+p+"class") + p);
         checkGodPowers(p);
+        /* no gold cheating */
+        if (trPlayerResourceCount(p, "gold") > trQuestVarGet("p"+p+"gold")) {
+            trPlayerGrantResources(p, "gold", trQuestVarGet("p"+p+"gold") - trPlayerResourceCount(p, "gold"));
+            if (trCurrentPlayer() == p) {
+                trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
+            }
+        } else if (trPlayerResourceCount(p, "gold") < trQuestVarGet("p"+p+"gold")) {
+            trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
+        }
     }
 
     /* protection */
@@ -344,6 +355,7 @@ highFrequency
     if (trQuestVarGet("relicPlayer") >= ENEMY_PLAYER) {
         trQuestVarSet("relicPlayer", 1);
     }
+    trQuestVarSet("shopping", 0);
     p = trQuestVarGet("relicPlayer");
     trUnitSelectClear();
     trUnitSelectByQV("p"+p+"unit");
@@ -355,10 +367,9 @@ highFrequency
                 if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
                     trUnitSelectClear();
                     trUnitSelectByQV("p"+p+"relics");
-                    if (trCurrentPlayer() == p) {
-                        trSoundPlayFN("backtowork.wav","1",-1,"","");
-                    }
+                    relicReturned = false;
                     if (zDistanceBetweenVectorsSquared("pos", "relicTransporterGuyPos") < 36) {
+                        relicReturned = true;
                         trUnitChangeProtoUnit("Relic");
                         trUnitSelectClear();
                         trUnitSelectByQV("p"+p+"relics", true);
@@ -385,8 +396,44 @@ highFrequency
                                 trSoundPlayFN("cantdothat.wav","1",-1,"","");
                             }
                         }
-                    } else {
+                    } else if (trQuestVarGet("nottud") > 0) {
+                        for(i=3; >0) {
+                            yDatabaseNext("nottudShop");
+                            yVarToVector("nottudShop", "shopPos");
+                            if (zDistanceBetweenVectorsSquared("pos", "shopPos") < 9) {
+                                break;
+                            }
+                        }
+                        if (i > 0) {
+                            relicReturned = true;
+                            trUnitChangeProtoUnit("Relic");
+                            trUnitSelectClear();
+                            trUnitSelectByQV("p"+p+"relics", true);
+                            trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                            trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                            trSetSelectedScale(0,0,-1);
+                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                            if (trQuestVarGet("shopping") == 0) {
+                                trQuestVarSet("shopping", 1);
+                                if (trPlayerResourceCount(p, "gold") >= 300) {
+                                    relic = yGetVar("nottudShop", "relic");
+                                    trPlayerGrantResources(p, "gold", -300);
+                                    if (trCurrentPlayer() == p) {
+                                        trSoundPlayFN("favordump.wav","1",-1,"","");
+                                        trChatSend(0, "Purchased " + relicName(relic) + "!");
+                                        trChatSend(0, "The purchased relic has been added to your warehouse.");
+                                        trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
+                                    }
+                                } else if (trCurrentPlayer() == p) {
+                                    trChatSend(0, "You don't have enough gold! You need 300!");
+                                    trSoundPlayFN("cantdothat.wav","1",-1,"","");
+                                }
+                            }
+                        }
+                    } 
+                    if (relicReturned == false) {
                         if (trCurrentPlayer() == p) {
+                            trSoundPlayFN("backtowork.wav","1",-1,"","");
                             trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
                         }
                         relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
@@ -680,6 +727,8 @@ highFrequency
             trModifyProtounit("Medusa", p, 9, 99999);
             trModifyProtounit("Mummy", p, 9, -99990);
             trModifyProtounit("Mummy", p, 9, 99999);
+            trModifyProtounit("Scorpion Man", p, 9, -99990);
+            trModifyProtounit("Scorpion Man", p, 9, 99999);
             trModifyProtounit("Battle Boar", p, 9, -99990);
             trModifyProtounit("Battle Boar", p, 9, 99999);
         }

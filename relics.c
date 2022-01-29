@@ -27,7 +27,7 @@ const int RELIC_CURSED_RANGE = 21;
 const int RELIC_CURSED_DURATION = 22;
 const int RELIC_CURSED_POWER = 23;
 const int RELIC_FAVOR_FROM_ATTACKS = 24;
-const int RELIC_POISON_DAMAGE_STACKS = 25;
+const int RELIC_POISON_FASTER = 25;
 
 const int RELIC_YEEBAAGOOON = 26;
 const int RELIC_NICKONHAWK = 27;
@@ -143,11 +143,11 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_FAVOR_FROM_ATTACKS:
 		{
-			msg = "When you attack, gain 1 favor.";
+			msg = "When you attack, gain 1 favor. Ultimate Cost Increased x0.1";
 		}
-		case RELIC_POISON_DAMAGE_STACKS:
+		case RELIC_POISON_FASTER:
 		{
-			msg = "When you poison an enemy that is already poisoned, increase the poison damage by 6";
+			msg = "Poison damage doubled but duration halved.";
 		}
 	}
 	if (relic >= RELIC_KEY_GREEK) {
@@ -240,6 +240,26 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\special x argus icons 64";
 		}
+		case RELIC_CURSED_RANGE:
+		{
+			icon = "icons\siege g petrobolos icon 64";
+		}
+		case RELIC_CURSED_DURATION:
+		{
+			icon = "icons\scenario x folstag icons 64";
+		}
+		case RELIC_CURSED_POWER:
+		{
+			icon = "icons\special e phoenix icon 64";
+		}
+		case RELIC_FAVOR_FROM_ATTACKS:
+		{
+			icon = "icons\special x servant icons 64";
+		}
+		case RELIC_POISON_FASTER:
+		{
+			icon = "icons\special e scorpionman icon 64";
+		}
 		case RELIC_KEY_GREEK:
 		{
 			icon = "ui range indicator greek";
@@ -299,11 +319,11 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_SPELL_RANGE:
 		{
-			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.3 * m);
+			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") + 0.3 * m);
 		}
 		case RELIC_SPELL_DURATION:
 		{
-			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.3 * m);
+			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.3 * m);
 		}
 		case RELIC_ATTACK_LIFESTEAL:
 		{
@@ -322,7 +342,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_SPELL_POWER:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.3 * m);
+			trQuestVarSet("p"+p+"spellDamageTrue", trQuestVarGet("p"+p+"spellDamageTrue") + 0.3 * m);
 		}
 		case RELIC_HEAL_BOOST:
 		{
@@ -376,6 +396,31 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			trQuestVarSet("p"+p+"cooldownReductionCount", trQuestVarGet("p"+p+"cooldownReductionCount") + 1.0 * m);
 			trQuestVarSet("p"+p+"cooldownReduction", xsPow(0.85, 1*trQuestVarGet("p"+p+"cooldownReductionCount")));
 		}
+		case RELIC_CURSED_RANGE:
+		{
+			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") + 0.5 * m);
+			trQuestVarSet("p"+p+"spellDamageTrue", trQuestVarGet("p"+p+"spellDamageTrue") - 0.3 * m);
+		}
+		case RELIC_CURSED_DURATION:
+		{
+			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.5 * m);
+			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") - 0.3 * m);
+		}
+		case RELIC_CURSED_POWER:
+		{
+			trQuestVarSet("p"+p+"spellDamageTrue", trQuestVarGet("p"+p+"spellDamageTrue") + 0.5 * m);
+			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") - 0.3 * m);
+		}
+		case RELIC_FAVOR_FROM_ATTACKS:
+		{
+			trQuestVarSet("p"+p+"favorFromAttacks", trQuestVarGet("p"+p+"favorFromAttacks") + m);
+			trQuestVarSet("p"+p+"ultimateCostCount", trQuestVarGet("p"+p+"ultimateCostCount") - 1.0 * m);
+			trQuestVarSet("p"+p+"ultimateCost", xsPow(0.9, trQuestVarGet("p"+p+"ultimateCostCount")));
+		}
+		case RELIC_POISON_FASTER:
+		{
+			trQuestVarSet("p"+p+"poisonSpeed", trQuestVarGet("p"+p+"poisonSpeed") + 1.0 * m);
+		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
@@ -383,6 +428,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		/* certain classes have special interactions with stats */
 		trEventFire(5000 + 12 * trQuestVarGet("p"+p+"class") + p);
 	}
+	trQuestVarSet("p"+p+"spellDamage", xsMax(0.1, trQuestVarGet("p"+p+"spellDamageTrue")));
+	trQuestVarSet("p"+p+"spellDuration", xsMax(0.1, trQuestVarGet("p"+p+"spellDurationTrue")));
+	trQuestVarSet("p"+p+"spellRange", xsMax(0.1, trQuestVarGet("p"+p+"spellRangeTrue")));
 }
 
 int relicProto(int relic = 0) {
@@ -488,6 +536,26 @@ int relicProto(int relic = 0) {
 		case RELIC_KEY_EGYPT:
 		{
 			proto = kbGetProtoUnitID("UI Range Indicator Egypt SFX");
+		}
+		case RELIC_CURSED_RANGE:
+		{
+			proto = kbGetProtoUnitID("Petrobolos");
+		}
+		case RELIC_CURSED_DURATION:
+		{
+			proto = kbGetProtoUnitID("King Folstag");
+		}
+		case RELIC_CURSED_POWER:
+		{
+			proto = kbGetProtoUnitID("Phoenix");
+		}
+		case RELIC_FAVOR_FROM_ATTACKS:
+		{
+			proto = kbGetProtoUnitID("Servant");
+		}
+		case RELIC_POISON_FASTER:
+		{
+			proto = kbGetProtoUnitID("Scorpion Man");
 		}
 	}
 	return(proto);

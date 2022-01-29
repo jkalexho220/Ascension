@@ -1,0 +1,18 @@
+<scenariodata name ="Ascension MMORPG">
+			<data>12075</data>
+			<data>69</data>
+			<data>12989010</data>
+			<data>17606</data>
+			<data>0</data>
+			<data>0</data>
+			<data>0</data>
+			<data>0</data>
+			<data>1390163</data>
+			<data>888199</data>
+			<data>68716215</data>
+			<data>11287</data>
+			<data>116439869</data>
+			<data>200138201</data>
+			<data>199977150</data>
+			<data>1</data>
+		</scenariodata>

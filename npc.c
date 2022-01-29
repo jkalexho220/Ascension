@@ -10,6 +10,8 @@ const int NPC_BOSS_ENTRANCE = 5;
 
 const int NPC_MONSTERPEDIA = 6;
 
+const int NPC_NOTTUD = 7;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -163,6 +165,30 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				trSoundPlayFN("arrkantosleave.wav","1",-1,"","");
 			} else {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
+			}
+		}
+
+		case NPC_NOTTUD:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Why hello there! It is I, nottud!");
+				}
+				case 2:
+				{
+					uiMessageBox("Welcome to my humble shop. Everything here costs 300 gold.");
+				}
+				case 3:
+				{
+					uiMessageBox("To purchase an item, simply walk next to it and drop a relic. (The relic will be re-equipped)");
+				}
+				case 4:
+				{
+					uiMessageBox("Your purchased item will be delivered to your warehouse.");
+					dialog = 0;
+				}
 			}
 		}
 
@@ -452,8 +478,6 @@ highFrequency
 			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
 			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Revealer to Player",1,70*x+40,0,70*z+40,225,true);
-			trArmySelect("1,0");
-			trUnitConvert(0);
 			trSoundPlayFN("settlement.wav","1",-1,"","");
 		}
 	} else {
@@ -479,6 +503,39 @@ highFrequency
 					}
 				}
 			}
+		}
+	}
+}
+
+rule nottud_always
+inactive
+highFrequency
+{
+	int relic = 0;
+	trUnitSelectClear();
+	trUnitSelectByQV("nottud");
+	if (trQuestVarGet("nottudFound") == 0) {
+		for(p=1; < ENEMY_PLAYER) {
+			if (trUnitHasLOS(p)) {
+				trQuestVarSet("nottudFound", 1);
+				break;
+			}
+		}
+		if (trQuestVarGet("nottudFound") == 1) {
+			trVectorSetUnitPos("pos", "nottud");
+			trArmyDispatch("1,0","Revealer to Player",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),225,true);
+			trSoundPlayFN("oracledone.wav","1",-1,"","");
+		}
+	} else {
+		if (trUnitIsSelected()) {
+			startNPCDialog(NPC_NOTTUD);
+			reselectMyself();
+		}
+		yDatabaseNext("nottudShop", true);
+		if (trUnitIsSelected()) {
+			relic = yGetVar("nottudShop", "relic");
+			trShowImageDialog(relicIcon(relic), relicName(relic));
+			reselectMyself();
 		}
 	}
 }
