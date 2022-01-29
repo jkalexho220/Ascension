@@ -658,6 +658,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             }
             paintSecondary(x*35+20-size,z*35+20-size,x*35+20+size,z*35+20+size);
             trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
+            trQuestVarSet("bossRoomLocX", 0.5 * trQuestVarGet("bossRoomCenterX"));
+            trQuestVarSet("bossRoomLocZ", 0.5 * trQuestVarGet("bossRoomCenterZ"));
             trQuestVarSet("bossRoomEntranceX", trQuestVarGet("bossRoomCenterX"));
             trQuestVarSet("bossRoomEntranceZ", trQuestVarGet("bossRoomCenterZ"));
             xsEnableRule("enter_boss_room");
@@ -1159,7 +1161,7 @@ highFrequency
                 trQuestVarSet("columnDensity", 0.1);
 
                 trStringQuestVarSet("bossProto", "Shade of Hades");
-                trQuestVarSet("bossScale", 1.6);
+                trQuestVarSet("bossScale", 1.5);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);

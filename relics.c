@@ -79,11 +79,11 @@ string relicName(int relic = 0) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			msg = "Attack +20";
+			msg = "Attack +15";
 		}
 		case RELIC_SPELL_POWER:
 		{
-			msg = "Spell Power +0.4x";
+			msg = "Spell Power +0.3x";
 		}
 		case RELIC_HEAL_BOOST:
 		{
@@ -315,14 +315,14 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 20.0 * m);
+			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 15.0 * m);
 			trQuestVarSet("p"+p+"Attack", trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
 		}
 		case RELIC_SPELL_POWER:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.4 * m);
+			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.3 * m);
 		}
 		case RELIC_HEAL_BOOST:
 		{

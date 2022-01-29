@@ -258,6 +258,32 @@ void equipRelicsAgain(int p = 0) {
 	}
 }
 
+vector wallNormalVector(string loc = "") {
+	vector retVal = vector(1,0,0);
+
+	for(x=0; <4) {
+		trQuestVarSet("rotX", trQuestVarGet(loc+"X") + trQuestVarGet("rotX"+x));
+		trQuestVarSet("rotZ", trQuestVarGet(loc+"Z") + trQuestVarGet("rotZ"+x));
+		if (terrainIsType("rot", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+			retVal = xsVectorSet(trQuestVarGet("rotX"+x),0,trQuestVarGet("rotZ"+x));
+		}
+	}
+
+	return(retVal);
+}
+
+bool rayCollision(string db = "", string start = "", string dir = "", float dist = 0, float width = 0) {
+	trVectorSetUnitPos("collidePos", db);
+	float current = zDistanceBetweenVectors("collidePos", start);
+	if (current < dist) {
+		trQuestVarSet("hitboxX", trQuestVarGet(start+"x") + current * trQuestVarGet(dir+"x"));
+		trQuestVarSet("hitboxZ", trQuestVarGet(start+"z") + current * trQuestVarGet(dir+"z"));
+		if (zDistanceBetweenVectorsSquared("collidePos", "hitbox") < width) {
+			return(true);
+		}
+	}
+	return(false);
+}
 
 /*
 called after confirming that the projectile is on WALL terrain.
@@ -761,7 +787,7 @@ int processGenericProj(string db = "") {
 		ySetVar(db, "yeehaw", 1);
 	} else {
 		trVectorSetUnitPos("pos", db);
-		if (trQuestVarGet("posY") < worldHeight + 0.5) {
+		if (trQuestVarGet("posY") < worldHeight + 0.5 || yGetVar(db, "yeehaw") == 99) {
 			action = PROJ_GROUND;
 			yVarToVector(db, "dir");
 			zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar(db, "speed"));

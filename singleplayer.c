@@ -59,6 +59,109 @@ void spAscendClass(int class = -1) {
 	}
 }
 
+void monsterpedia(int stage = 0, int x = 0) {
+	int tPrimary = 0;
+	int tSubPrimary = 34;
+	switch(stage)
+	{
+		case 1:
+		{
+			tPrimary = 0;
+			tSubPrimary = 34;
+			trStringQuestVarSet("enemyProto1", "Golden Lion");
+			trStringQuestVarSet("enemyProto2", "Anubite");
+			trStringQuestVarSet("enemyProto3", "Sphinx");
+			trStringQuestVarSet("enemyProto4", "Petsuchos");
+			trStringQuestVarSet("enemyProto5", "Nemean Lion");
+			trQuestVarSet("bossScale", 2);
+		}
+		case 2:
+		{
+			tPrimary = 0;
+			tSubPrimary = 58;
+			trStringQuestVarSet("enemyProto1", "Centaur");
+			trStringQuestVarSet("enemyProto2", "Dryad");
+			trStringQuestVarSet("enemyProto3", "Medusa");
+			trStringQuestVarSet("enemyProto4", "Mountain Giant");
+			trStringQuestVarSet("enemyProto5", "Tamarisk Tree");
+			trQuestVarSet("bossScale", 0.8);
+		}
+		case 3:
+		{
+			tPrimary = 0;
+			tSubPrimary = 41;
+			trStringQuestVarSet("enemyProto1", "Fenris Wolf");
+            trStringQuestVarSet("enemyProto2", "Valkyrie");
+            trStringQuestVarSet("enemyProto3", "Ballista");
+            trStringQuestVarSet("enemyProto4", "Frost Giant");
+            trStringQuestVarSet("enemyProto5", "King Folstag");
+			trQuestVarSet("bossScale", 1.25);
+		}
+		case 4:
+		{
+			tPrimary = 0;
+			tSubPrimary = 25;
+			trStringQuestVarSet("enemyProto1", "Cyclops");
+            trStringQuestVarSet("enemyProto2", "Satyr");
+            trStringQuestVarSet("enemyProto3", "Behemoth");
+            trStringQuestVarSet("enemyProto4", "Avenger");
+            trStringQuestVarSet("enemyProto5", "Chimera");
+            trQuestVarSet("bossScale", 1.5);
+		}
+		case 5:
+		{
+			tPrimary = 0;
+			tSubPrimary = 32;
+			trStringQuestVarSet("enemyProto1", "Wadjet");
+            trStringQuestVarSet("enemyProto2", "Scorpion Man");
+            trStringQuestVarSet("enemyProto3", "Scarab");
+            trStringQuestVarSet("enemyProto4", "Mummy");
+            trStringQuestVarSet("enemyProto5", "Shade of Hades");
+            trQuestVarSet("bossScale", 1.5);
+		}
+		case 6:
+		{
+			tPrimary = 0;
+			tSubPrimary = 70;
+			trStringQuestVarSet("enemyProto1", "Automaton SPC");
+            trStringQuestVarSet("enemyProto2", "Fire Siphon");
+            trStringQuestVarSet("enemyProto3", "Battle Boar");
+            trStringQuestVarSet("enemyProto4", "Colossus");
+            trStringQuestVarSet("enemyProto5", "Helepolis");
+            trQuestVarSet("bossScale", 0);
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("next");
+            trMutateSelected(kbGetProtoUnitID("Helepolis"));
+            trSetSelectedScale(1.2,0.25,2.0);
+            yAddToDatabase("monsterpedia", "next");
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("next");
+            trMutateSelected(kbGetProtoUnitID("Military Barracks"));
+            trSetSelectedScale(0.7,0.5,0.5);
+		}
+	}
+	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+    trArmyDispatch("1,0","Flag Numbered",1,2*x+3,0,181,0,true);
+    trUnitSelectClear();
+    trUnitSelectByQV("next", true);
+    trUnitSetAnimationPath(""+(stage-1)+",0,0,0,0,0,0");
+	for(i=1; < 6) {
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,2*x+3,0,181+4*i,180,true);
+		trArmySelect("1,0");
+		trUnitConvert(0);
+		trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
+		yAddToDatabase("monsterpedia", "next");
+	}
+	trUnitSelectClear();
+	trUnitSelectByQV("next");
+	trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+}
 
 void answerQuestion(int eventID = -1) {
 	int answer = eventID - 6000;
@@ -207,6 +310,7 @@ highFrequency
 	    	}
 	    }
 
+	    /* pathways */
 	    trPaintTerrain(57,71,73,73,0,53,false);
 	    trPaintTerrain(71,57,73,73,0,53,false);
 
@@ -279,15 +383,21 @@ highFrequency
 	    		trUnitSelectByQV("zenoUnit", true);
 	    		trUnitConvert(0);
 	    		xsEnableRule("zeno_quiz_start");
-	    		if (trQuestVarGet("zenoQuiz") == 1) {
-
+	    		if (trQuestVarGet("zenoQuiz") == 2) {
+	    			/* introduce monsterpedia */
+	    			startNPCDialog(NPC_MONSTERPEDIA);
 	    		}
 	    	}
 	    }
 
 	    /* monster-pedia */
-	    if (trQuestVarGet("p1progress") >= 2) {
-
+	    if (trQuestVarGet("p1progress") >= 3) {
+	    	/* 72 is the center. 15 is the width */
+	    	for(x=0; < trQuestVarGet("p1progress")) {
+	    		monsterpedia(x+1, 57 + 3 * x);
+	    	}
+	    	trPaintTerrain(71,71,73,87,0,53,false);
+	    	xsEnableRule("monsterpedia_always");
 	    }
 
 	    if (trQuestVarGet("p1class") == 0) {
@@ -322,13 +432,6 @@ highFrequency
 	    	trEventSetHandler(3000+a, "spSwitchToClass");
 	    	trEventSetHandler(4000+a, "spExplainClass");
 	    	trEventSetHandler(5000+a, "spAscendClass");
-	    }
-
-	    /* monsterpedia */
-	    if (trQuestVarGet("p1progress") >= 3) {
-	    	/*
-	    	MONSERPEDIA
-	    	*/
 	    }
 
 	    trSetCounterDisplay("To save and exit, enter the Sky Passage.");
@@ -581,7 +684,7 @@ highFrequency
 
 					setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
 						"The poison damage adds up.","Only the strongest poison deals damage.",2);
-					setupQuestion("Only the strongest poison deals damage. Poison damage does not stack.");
+					setupExplain("Only the strongest poison deals damage. Poison damage does not stack.");
 
 					setupQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
 					setupExplain("Some abilities will launch enemies. Launching an enemy into a wall will stun them!");
@@ -601,5 +704,154 @@ highFrequency
 			setupExplain("This time, I'll give you a "+gemstoneName(gem)+" for each correct answer!", 1);
 		}
 		startNPCDialog(NPC_ZENO_NEXT_QUESTION);
+	}
+}
+
+void desc(string description = "") {
+	trQuestVarSet("descriptionCount", 1 + trQuestVarGet("descriptionCount"));
+	trStringQuestVarSet("description"+1*trQuestVarGet("descriptionCount"), description);
+}
+
+rule monsterpedia_always
+inactive
+highFrequency
+{
+	int id = yDatabaseNext("monsterpedia", true);
+	string name = "N/A";
+	if (trUnitIsSelected()) {
+		name = kbGetProtoUnitName(kbGetUnitBaseTypeID(id));
+		trQuestVarSet("descriptionCount", 0);
+		trStringQuestVarSet("description1", "No abilities");
+		switch(kbGetUnitBaseTypeID(id))
+		{
+			case kbGetProtoUnitID("Sphinx"):
+			{
+				desc("Its whirlwind attack will silence nearby players.");
+			}
+			case kbGetProtoUnitID("Dryad"):
+			{
+				desc("On death, it will spill poisonous blood and poison nearby units.");
+			}
+			case kbGetProtoUnitID("Medusa"):
+			{
+				desc("Launches a ball of light that chases a player and stuns if it hits.");
+			}
+			case kbGetProtoUnitID("Mountain Giant"):
+			{
+				desc("Slams the ground with its club, dealing high damage in a small area.");
+			}
+			case kbGetProtoUnitID("Valkyrie"):
+			{
+				desc("Immune to spell damage. (A silence will temporarily disable this effect)");
+			}
+			case kbGetProtoUnitID("Ballista"):
+			{
+				desc("Fires slow-moving rockets in a straight line with its attacks.");
+			}
+			case kbGetProtoUnitID("Frost Giant"):
+			{
+				desc("Breath attack will stun its target.");
+			}
+			case kbGetProtoUnitID("Satyr"):
+			{
+				desc("Calls down a barrage of arrows in a line.");
+			}
+			case kbGetProtoUnitID("Behemoth"):
+			{
+				desc("Immune to physical damage.");
+			}
+			case kbGetProtoUnitID("Avenger"):
+			{
+				desc("Has a spin attack that silences all targets hit.");
+			}
+			case kbGetProtoUnitID("Wadjet"):
+			{
+				desc("On death, spills poisonous blood and poisons nearby units.");
+			}
+			case kbGetProtoUnitID("Scorpion Man"):
+			{
+				desc("It will sting its target and poison them.");
+			}
+			case kbGetProtoUnitID("Scarab"):
+			{
+				desc("Immune to physical attacks.");
+				desc("On death, releases a permanent cloud of miasma that poisons units in it.");
+			}
+			case kbGetProtoUnitID("Mummy"):
+			{
+				desc("Launches dark clouds that damage and silence players.");
+				desc("For its special attack, it launches a cloud of poison in a line.");
+			}
+			case kbGetProtoUnitID("Automaton SPC"):
+			{
+				name = "Automaton";
+				desc("On death, turns into a time bomb that explodes after three seconds.");
+			}
+			case kbGetProtoUnitID("Colossus"):
+			{
+				desc("Immune to spell damage. (A silence will temporarily disable this effect)");
+			}
+			case kbGetProtoUnitID("Battle Boar"):
+			{
+				desc("Its special attack will launch its target and nearby units.");
+			}
+			case kbGetProtoUnitID("Fire Siphon"):
+			{
+				desc("It fires a high-powered laser");
+			}
+			case kbGetProtoUnitID("Nemean Lion"):
+			{
+				name = "The King of Beasts";
+				desc("Drops: Starstone");
+				desc("Common Relic: " + relicName(11));
+				desc("His roar deals high damage but it can be blocked by the terrain.");
+			}
+			case kbGetProtoUnitID("Tamarisk Tree"):
+			{
+				name = "The Wraithwood";
+				desc("Drops: Soulstone");
+				desc("Common Relic: " + relicName(12));
+				desc("It summons animate trees to attack players. The trees must be destroyed to damage it.");
+				desc("It will also try to heal by absorbing lights. Players can intercept the lights to preven this.");
+			}
+			case kbGetProtoUnitID("King Folstag"):
+			{
+				name = "The King of Ice";
+				desc("Drops: Manastone");
+				desc("Common Relic: " + relicName(13));
+				desc("His breath attack will continuously stun and deal high damage.");
+				desc("Whenever a unit is stunned near one of his icicles, it will grow in size.");
+				desc("An icicle at max size will turn into a Frost Giant.");
+			}
+			case kbGetProtoUnitID("Chimera"):
+			{
+				name = "Escaped Amalgam";
+				desc("Drops: Starstone");
+				desc("Common Relic: " + relicName(14));
+				desc("It has various breath attacks and can also spew rotating flames.");
+			}
+			case kbGetProtoUnitID("Shade of Hades"):
+			{
+				name = "The Lonely Ghost";
+				desc("Drops: Soulstone");
+				desc("Common Relic: " + relicName(15));
+				desc("It launches itself at walls, releasing projectiles in all directions.");
+				desc("The battle area will also shrink as it loses health.");
+			}
+			case kbGetProtoUnitID("Helepolis"):
+			{
+				name = "The Exterminator";
+				desc("Drops: Manastone");
+				desc("Common Relic: " + relicName(16));
+				desc("It has a large arsenal of explosive weaponry and can also run over players.");
+			}
+		}
+		reselectMyself();
+		trChatHistoryClear();
+		trChatSend(0, "<color=1,1,1><u>"+name+"</u></color>");
+		trChatSend(0, trStringQuestVarGet("description1"));
+		for(x=2; <= trQuestVarGet("descriptionCount")) {
+			trChatSend(0, trStringQuestVarGet("description"+x));
+		}
 	}
 }

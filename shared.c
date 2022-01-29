@@ -195,6 +195,13 @@ bool vectorInRectangle(string pos = "", string bottom = "", string top = "") {
 	return(true);
 }
 
+vector rotationMatrix(string v = "", float cosT = 0, float sinT = 0) {
+	float x = trQuestVarGet(v+"x");
+	float z = trQuestVarGet(v+"z");
+	vector ret = xsVectorSet(x * cosT - z * sinT, 0, x * sinT + z * cosT);
+	return(ret);
+}
+
 float zDistanceBetweenVectors(string start = "", string end = "") {
 	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
 	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");

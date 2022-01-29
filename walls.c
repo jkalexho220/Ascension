@@ -43,7 +43,9 @@ void processWalls() {
 	    			trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, progress, false);
 	    		} else {
 	    			trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
-	    			trPaintTerrain(x0-1,z0-1,x1+1,z1+1,TERRAIN_PRIMARY,TERRAIN_SUB_PRIMARY,true);
+	    			trPaintTerrain(x0-1,z0-1,x1+1,z1+1,TERRAIN_PRIMARY,TERRAIN_SUB_PRIMARY,false);
+	    			trPaintTerrain(0,0,5,5,0,70,true);
+        			trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 	    			trSoundPlayFN("cinematics\12_in\bang1.mp3","1",-1,"","");
 	    			for(x=yGetVar("unlockWalls", "sfxStart"); < yGetVar("unlockWalls", "greenCirclesStart")) {
 	                	trUnitSelectClear();

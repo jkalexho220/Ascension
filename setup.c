@@ -520,6 +520,8 @@ highFrequency
             trModifyProtounit("Minion", p, 8, -999);
         }
 
+        trModifyProtounit("Minion", 0, 8, -999);
+
         trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);
         trModifyProtounit("Kronny Flying", 0, 1, -9999999999999999999.0);
         zInitProtoUnitStat("Kronny Flying", 0, 1, 0);

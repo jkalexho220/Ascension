@@ -8,6 +8,7 @@ const int NPC_ZENO_QUIZ_END = 4;
 
 const int NPC_BOSS_ENTRANCE = 5;
 
+const int NPC_MONSTERPEDIA = 6;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -63,6 +64,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 1:
 				{
 					uiMessageBox("Find the relic matching my symbol and bring it to me to open the portal to the boss room.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_MONSTERPEDIA:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The Monsterpedia is now open! You can see monster stats and abilities by clicking on them!");
 					dialog = 0;
 				}
 			}
