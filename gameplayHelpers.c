@@ -247,9 +247,10 @@ void removePlayerSpecific(int p = 0) {
 void equipRelicsAgain(int p = 0) {
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics", true);
-		trUnitChangeProtoUnit("Relic");
+		trUnitChangeProtoUnit("Cinematic Block");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"relics");
+		trMutateSelected(kbGetProtoUnitID("Relic"));
 		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
 		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
 		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {

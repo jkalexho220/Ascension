@@ -90,12 +90,14 @@ void lightningBallBounce(int p = 0) {
 	yVarToVector("p"+p+"lightningBalls", "dir");
 	zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"lightningBalls");
+	trUnitSelectByQV("p"+p+"lightningBalls", true);
 	trUnitChangeProtoUnit("Kronny Flying");
 	
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"lightningBalls");
+	trUnitSelectByQV("p"+p+"lightningBalls", true);
 	trDamageUnitPercent(-100);
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"lightningBalls", true);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	trQuestVarSetFromRand("sound", 1, 3, true);
 	if (trUnitVisToPlayer()) {

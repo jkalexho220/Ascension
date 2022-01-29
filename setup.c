@@ -307,9 +307,9 @@ void chooseClass(int p = 0, int class = 0) {
         trCounterAbort("rain");
     }
     if (class > 0) {
-        trQuestVarSet("p"+p+"wellCooldownStatus", 2);
-        trQuestVarSet("p"+p+"lureCooldownStatus", 2);
-        trQuestVarSet("p"+p+"rainCooldownStatus", 2);
+        trQuestVarSet("p"+p+"wellCooldownStatus", 1);
+        trQuestVarSet("p"+p+"lureCooldownStatus", 1);
+        trQuestVarSet("p"+p+"rainCooldownStatus", 1);
     }
 
     if (Multiplayer == false) {
@@ -355,6 +355,9 @@ runImmediately
     }
     
     trQuestVarSet("activePlayerCount", ENEMY_PLAYER - 1);
+
+    xsSetContextPlayer(ENEMY_PLAYER);
+    aiSetAttackResponseDistance(0.0);
 
     trForceNonCinematicModels(true);
     

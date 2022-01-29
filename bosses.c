@@ -180,15 +180,17 @@ highFrequency
 
 		yClearDatabase("playerCharacters");
 		for(p=1; < ENEMY_PLAYER) {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
-			trUnitDestroy();
-			spawnPlayer(p, "bossRoomPlayers");
-			equipRelicsAgain(p);
-			trPlayerKillAllGodPowers(p);
-			trQuestVarSet("p"+p+"dead", 0);
-			trQuestVarSet("p"+p+"silenced", 1);
-			trQuestVarSet("p"+p+"silenceTimeout", 0);
+			if (trQuestVarGet("p"+p+"resigned") == 0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"unit");
+				trUnitDestroy();
+				spawnPlayer(p, "bossRoomPlayers");
+				equipRelicsAgain(p);
+				trPlayerKillAllGodPowers(p);
+				trQuestVarSet("p"+p+"dead", 0);
+				trQuestVarSet("p"+p+"silenced", 1);
+				trQuestVarSet("p"+p+"silenceTimeout", 0);
+			}
 		}
 
 		for(x=yGetDatabaseCount("enemies"); >0) {

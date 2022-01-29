@@ -1476,8 +1476,8 @@ highFrequency
         }
 
         bool nottudSpawn = false;
-        trQuestVarSetFromRand("nottud", 0, 20, true);
-        if (trQuestVarGet("nottud") < trQuestVarGet("stage")) {
+        trQuestVarSetFromRand("nottudSpawn", 0, 20, true);
+        if (trQuestVarGet("nottudSpawn") < trQuestVarGet("stage")) {
             nottudSpawn = true;
         }
 

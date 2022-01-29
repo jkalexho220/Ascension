@@ -92,7 +92,7 @@ void saveAllData() {
 	currentdata = xsMin(5, trQuestVarGet("bossKills"));
 	savedata = savedata * 6 + currentdata;
 	currentdata = trQuestVarGet("playerHasHosted");
-	savedata = savedata * 2 + trQuestVarGet("playerHasHosted");
+	savedata = savedata * 2 + currentdata;
 	trSetCurrentScenarioUserData(8, savedata);
 }
 
