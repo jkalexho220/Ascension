@@ -200,10 +200,9 @@ highFrequency
                 yAddUpdateVar("p"+p+"relics", "type", trQuestVarGet("p"+p+"relic"+x));
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
-                trUnitChangeProtoUnit("Cinematic Block");
+                trUnitChangeProtoUnit("Relic");
                 trUnitSelectClear();
                 trUnitSelectByQV("next", true);
-                trMutateSelected(kbGetProtoUnitID("Relic"));
                 trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
                 trMutateSelected(relicProto(1*trQuestVarGet("p"+p+"relic"+x)));
                 trSetSelectedScale(0,0,-1);
@@ -461,7 +460,7 @@ highFrequency
 
     /* free relics */
     if (Multiplayer) {
-        count = 1;
+        count = 5;
     } else {
         count = 30;
     }
@@ -500,11 +499,6 @@ highFrequency
                     relicEffect(1*yGetVar("freeRelics", "type"), p, true);
                     trUnitSelectClear();
                     trUnitSelectByQV("freeRelics", true);
-                    trUnitChangeProtoUnit("Cinematic Block");
-                    trUnitSelectClear();
-                    trUnitSelectByQV("freeRelics", true);
-                    trMutateSelected(kbGetProtoUnitID("Relic"));
-                    trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
                     trSetSelectedScale(0,0,-1);
                     trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
                     if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
@@ -521,7 +515,7 @@ highFrequency
                 }
             }
         } else if (trUnitIsSelected()) {
-            relicDescription(1*yGetVar("freeRelics", "type"));
+            trShowImageDialog(relicIcon(1*yGetVar("freeRelics", "type")), relicName(1*yGetVar("freeRelics", "type")));
             reselectMyself();
         }
     }
@@ -555,6 +549,26 @@ highFrequency
             if (trQuestVarGet("p"+p+"dead") == 0) {
                 trUnitSelectClear();
                 trUnitSelectByQV("p"+p+"unit");
+                if (Multiplayer) {
+                    if (trUnitIsSelected() && trCurrentPlayer() != p) {
+                        if (trQuestVarGet("ISelected"+p) == 0) {
+                            trQuestVarSet("iSelected"+p, 1);
+                            trChatSend(0, "<color=1,1,1><u>"+trStringQuestVarGet("p"+p+"name")+"</u></color>");
+                            count = yGetPointer("p"+p+"relics");
+                            for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+                                yDatabaseNext("p"+p+"relics");
+                                trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "name")));
+                            }
+                            ySetPointer("p"+p+"relics", count);
+                            /* don't want no desync here */
+                        }
+                    } else if (trQuestVarGet("iSelected"+p) == 1) {
+                        trQuestVarSet("iSelected"+p, 0);
+                    }
+                    if (SAVIOR != trQuestVarGet("p"+p+"class")) {
+                        fixAnimations(p);
+                    }
+                }
                 /* lifesteal */
                 if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
                     healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
@@ -568,11 +582,6 @@ highFrequency
                         trUnitSelectByQV("p"+p+"unit");
                     }
                     trQuestVarSet("p"+p+"lifestealTotal", 0);
-                }
-                if (Multiplayer) {
-                    if (SAVIOR != trQuestVarGet("p"+p+"class")) {
-                        fixAnimations(p);
-                    }
                 }
                 /* undo silence */
                 if (trQuestVarGet("p"+p+"silenced") == 1) {

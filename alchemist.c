@@ -36,9 +36,8 @@ void alchemistAlways(int eventID = -1) {
 							id = yDatabaseNext("playerUnits", true);
 							if (id == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
-							} else {
-								xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
-								healUnit(p, amt * kbUnitGetCurrentHitpoints(id) * 0.01);
+							} else if (yGetVar("playerUnits", "poisonStatus") == 0) {
+								trDamageUnitPercent(0.0 - amt * trQuestVarGet("p"+p+"spellDamage"));
 							}
 						}
 						xsSetContextPlayer(p);
@@ -266,8 +265,7 @@ void alchemistAlways(int eventID = -1) {
 		} else if (trTime() > yGetVar("p"+p+"duplicates", "decayNext")) {
 			ySetVar("p"+p+"duplicates", "decayNext", 1 + yGetVar("p"+p+"duplicates", "decayNext"));
 			ySetVar("p"+p+"duplicates", "decay", yGetVar("p"+p+"duplicates", "decay") + calculateDecay(p, 1.0));
-			damagePlayerUnit(trQuestVarGet("p"+p+"health") * 0.01 * yGetVar("p"+p+"duplicates", "decay"), 
-				1*yGetVar("p"+p+"duplicates", "index"));
+			trDamageUnitPercent(yGetVar("p"+p+"duplicates", "decay"));
 		}
 	}
 

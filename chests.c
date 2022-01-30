@@ -36,12 +36,12 @@ void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate 
 		trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 	} else {
 		trUnitConvert(0);
-		trQuestVarSet("movingStatuesIn"+room, 1 + trQuestVarGet("movingStatuesIn"+room));
 		ySetVar("statuesIn"+room, "state", 1);
 		if (trTimeMS() < yGetVar("statuesIn"+room, "timeout")) {
 			ySetVar("statuesIn"+room, "timeout", 1000 + yGetVar("statuesIn"+room, "timeout"));
 		} else {
 			ySetVar("statuesIn"+room, "timeout", trTimeMS() + 1000);
+			trQuestVarSet("movingStatuesIn"+room, 1 + trQuestVarGet("movingStatuesIn"+room));
 		}
 	}
 
@@ -229,6 +229,7 @@ void processChests() {
     				trSoundPlayFN("attackwarning.wav","1",-1,"","");
     				trMessageSetText("The chest was a bomb! Run!",-1);
     			} else {
+    				room = yGetVar("chests", "room");
     				trQuestVarSetFromRand("rand", 1, 1*trQuestVarGet("rand"), true);
     				trQuestVarSet("rand", trQuestVarGet("rand") + trQuestVarGet("correctStatuesIn"+room));
     				if (trQuestVarGet("rand") < ENEMY_PLAYER) {

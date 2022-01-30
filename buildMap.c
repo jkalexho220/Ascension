@@ -1527,20 +1527,6 @@ highFrequency
                 }
             }
         }
-
-        if (trQuestVarGet("mapType") == MAP_OPEN) {
-            trUnitSelectClear();
-            trUnitSelectByQV("bossEntranceSymbol", true);
-            trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
-
-            i = trQuestVarGet("bossKeyRoom");
-            z = i / 4;
-            x = i - z * 4;
-            trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());
-            spawnRelicSpecific(x * 70 + 40, z * 70 + 40, 1*trQuestVarGet("keyType"));
-            trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
-        }
-        
     
         /* finish making chest rooms */
         int room = 0;
@@ -1692,6 +1678,19 @@ highFrequency
                     ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());
                 }
             }
+        }
+
+        if (trQuestVarGet("mapType") == MAP_OPEN) {
+            trUnitSelectClear();
+            trUnitSelectByQV("bossEntranceSymbol", true);
+            trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
+
+            i = trQuestVarGet("bossKeyRoom");
+            z = i / 4;
+            x = i - z * 4;
+            trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());
+            spawnRelicSpecific(x * 70 + 40, z * 70 + 40, 1*trQuestVarGet("keyType"));
+            trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
         }
 
         if (trQuestVarGet("pestilenceStart") > 0) {

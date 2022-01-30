@@ -356,9 +356,6 @@ runImmediately
     
     trQuestVarSet("activePlayerCount", ENEMY_PLAYER - 1);
 
-    xsSetContextPlayer(ENEMY_PLAYER);
-    aiSetAttackResponseDistance(0.0);
-
     trForceNonCinematicModels(true);
     
     
@@ -376,8 +373,14 @@ runImmediately
     trTechSetStatus(0, 304, 4);
     aiSet("NoAI", 0);
     aiSet("NoAI", ENEMY_PLAYER);
+    xsSetContextPlayer(ENEMY_PLAYER);
+    aiSetAttackResponseDistance(0.0);
 
     setupClass("Militia", 0, 500, 1000);
+    setupClass("Militia", 12, 500, 1000);
+    setupClass("Militia", 13, 500, 1000);
+    setupClass("Militia", 14, 500, 1000);
+    setupClass("Militia", 15, 500, 1000);
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
@@ -528,6 +531,7 @@ highFrequency
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
             zInitProtoUnitStat("Meteorite",p,1,100);
             trModifyProtounit("Minion", p, 8, -999);
+            zInitProtoUnitStat("Cinematic Block", p, 0, 300);
         }
 
         trModifyProtounit("Minion", 0, 8, -999);

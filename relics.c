@@ -428,6 +428,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		/* certain classes have special interactions with stats */
 		trEventFire(5000 + 12 * trQuestVarGet("p"+p+"class") + p);
 	}
+	zSetProtoUnitStat("Cinematic Block", p, 0, trQuestVarGet("p"+p+"health"));
 	trQuestVarSet("p"+p+"spellDamage", xsMax(0.1, trQuestVarGet("p"+p+"spellDamageTrue")));
 	trQuestVarSet("p"+p+"spellDuration", xsMax(0.1, trQuestVarGet("p"+p+"spellDurationTrue")));
 	trQuestVarSet("p"+p+"spellRange", xsMax(0.1, trQuestVarGet("p"+p+"spellRangeTrue")));

@@ -95,7 +95,7 @@ void throneShieldAlways(int eventID = -1) {
 					trQuestVarSet("p"+target+"tetherReady", 1);
 				}
 			}
-		} else {
+		} else if (trCurrentPlayer() == p) {
 			trChatSend(0, "You must target an ally!");
 		}
 		if (target == 0) {
