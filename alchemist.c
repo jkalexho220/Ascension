@@ -37,7 +37,7 @@ void alchemistAlways(int eventID = -1) {
 							if (id == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else if (yGetVar("playerUnits", "poisonStatus") == 0) {
-								trDamageUnitPercent(0.0 - amt * trQuestVarGet("p"+p+"spellDamage"));
+								trDamageUnitPercent(0.0 - amt * trQuestVarGet("p"+p+"spellDamage") * trQuestVarGet("p"+p+"healBoost"));
 							}
 						}
 						xsSetContextPlayer(p);

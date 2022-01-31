@@ -36,10 +36,10 @@ void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate 
 		trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 	} else {
 		trUnitConvert(0);
-		ySetVar("statuesIn"+room, "state", 1);
-		if (trTimeMS() < yGetVar("statuesIn"+room, "timeout")) {
+		if (yGetVar("statuesIn"+room, "state") == 1) {
 			ySetVar("statuesIn"+room, "timeout", 1000 + yGetVar("statuesIn"+room, "timeout"));
 		} else {
+			ySetVar("statuesIn"+room, "state", 1);
 			ySetVar("statuesIn"+room, "timeout", trTimeMS() + 1000);
 			trQuestVarSet("movingStatuesIn"+room, 1 + trQuestVarGet("movingStatuesIn"+room));
 		}

@@ -159,26 +159,6 @@ void removeEnemy() {
 		spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
 	}
 	yRemoveFromDatabase("enemies");
-	yRemoveUpdateVar("enemies", "bounty");
-	yRemoveUpdateVar("enemies", "stunStatus");
-	yRemoveUpdateVar("enemies", "stunTimeout");
-	yRemoveUpdateVar("enemies", "stunSFX");
-	yRemoveUpdateVar("enemies", "poisonStatus");
-	yRemoveUpdateVar("enemies", "poisonTimeout");
-	yRemoveUpdateVar("enemies", "poisonLast");
-	yRemoveUpdateVar("enemies", "poisonDamage");
-	yRemoveUpdateVar("enemies", "poisonSFX");
-	yRemoveUpdateVar("enemies", "relic");
-	yRemoveUpdateVar("enemies", "posX");
-	yRemoveUpdateVar("enemies", "posZ");
-	yRemoveUpdateVar("enemies", "launched");
-	yRemoveUpdateVar("enemies", "magicResist");
-	yRemoveUpdateVar("enemies", "physicalResist");
-	yRemoveUpdateVar("enemies", "silenceStatus");
-	yRemoveUpdateVar("enemies", "silenceTimeout");
-	yRemoveUpdateVar("enemies", "silenceSFX");
-	yRemoveUpdateVar("enemies", "bomb");
-	yRemoveUpdateVar("enemies", "deathSentence");
 }
 
 void removePlayerUnit() {

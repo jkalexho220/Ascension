@@ -385,11 +385,10 @@ highFrequency
                                 }
                             }
                         } else if (1*trQuestVarGet("nottud") > 0) {
-                            debugLog("nottud is " + 1*trQuestVarGet("nottud"));
                             for(i=3; >0) {
                                 yDatabaseNext("nottudShop");
                                 yVarToVector("nottudShop", "shopPos");
-                                if (zDistanceBetweenVectorsSquared("pos", "shopPos") < 9) {
+                                if (zDistanceBetweenVectorsSquared("pos", "shopPos") < 25) {
                                     break;
                                 }
                             }
@@ -557,7 +556,7 @@ highFrequency
                             count = yGetPointer("p"+p+"relics");
                             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                                 yDatabaseNext("p"+p+"relics");
-                                trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "name")));
+                                trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")));
                             }
                             ySetPointer("p"+p+"relics", count);
                             /* don't want no desync here */

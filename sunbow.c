@@ -37,7 +37,7 @@ void sunbowAlways(int eventID = -1) {
 					trSetUnitOrientation(xsVectorSet(0.0 - trQuestVarGet("dirx"),0, 0.0 - trQuestVarGet("dirz")), vector(0,1,0), true);
 					yAddToDatabase("playerLasers", "next");
 					yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
-					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.3);
+					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.4);
 					amt = trQuestVarGet("p"+p+"attack");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {

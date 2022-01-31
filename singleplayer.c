@@ -133,6 +133,7 @@ void monsterpedia(int stage = 0, int x = 0) {
             trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
             trUnitSelectClear();
             trUnitSelectByQV("next");
+            trUnitConvert(0);
             trMutateSelected(kbGetProtoUnitID("Helepolis"));
             trSetSelectedScale(1.2,0.25,2.0);
             yAddToDatabase("monsterpedia", "next");
@@ -140,7 +141,8 @@ void monsterpedia(int stage = 0, int x = 0) {
             trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
             trUnitSelectClear();
             trUnitSelectByQV("next");
-            trMutateSelected(kbGetProtoUnitID("Military Barracks"));
+            trUnitConvert(0);
+            trMutateSelected(kbGetProtoUnitID("Barracks Atlantean"));
             trSetSelectedScale(0.7,0.5,0.5);
 		}
 	}
@@ -720,6 +722,9 @@ highFrequency
 
 					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
 					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
+
+					setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
+					setupExplain("Each of the remaining floors is extremely difficult. You will need to bring coordinated teams!");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);
@@ -781,7 +786,7 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Behemoth"):
 			{
-				desc("Immune to physical damage.");
+				desc("Immune to physical damage. Takes double damage from spells.");
 			}
 			case kbGetProtoUnitID("Avenger"):
 			{
@@ -797,7 +802,7 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Scarab"):
 			{
-				desc("Immune to physical attacks.");
+				desc("Immune to physical damage. Takes double damage from spells.");
 				desc("On death, releases a permanent cloud of miasma that poisons units in it.");
 			}
 			case kbGetProtoUnitID("Mummy"):
@@ -835,7 +840,7 @@ highFrequency
 				desc("Drops: Soulstone");
 				desc("Common Relic: " + relicName(12));
 				desc("It summons animate trees to attack players. The trees must be destroyed to damage it.");
-				desc("It will also try to heal by absorbing lights. Players can intercept the lights to preven this.");
+				desc("It will also try to heal by absorbing lights. Players can intercept the lights to prevent this.");
 			}
 			case kbGetProtoUnitID("King Folstag"):
 			{

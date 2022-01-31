@@ -182,37 +182,20 @@ void saviorAlways(int eventID = -1) {
 				vectorRotate90Deg("dir1");
 				vectorRotate90Deg("dir2");
 			}
-			hit = 0;
-			for (x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
-				if (zDistanceToVectorSquared("playerUnits", "p"+p+"unitypos") < dist) {
-					hit = hit + 1;
-				}
-			}
-			
-			trQuestVarSet("p"+p+"unityBuff", trQuestVarGet("unityBonus") * hit);
-			trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
-			zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
-
-			/*
-			for(x = xsMin(3, ENEMY_PLAYER); >0) {
-				hit = 1 + trQuestVarGet("p"+p+"unitySearch");
-				if (hit >= ENEMY_PLAYER) {
-					hit = 1;
-				}
-				trQuestVarSet("p"+p+"unitySearch", hit);
-				if (trQuestVarGet("p"+hit+"dead") == 0) {
-					if (zDistanceToVectorSquared("p"+hit+"unit", "p"+p+"unityPos") < dist) {
-						trQuestVarSet("p"+hit+"silenceTimeout", 0);
-						if (getBit(p, 1*trQuestVarGet("p"+hit+"unityCount")) == false) {
-							trQuestVarSet("p"+hit+"unityCount", trQuestVarGet("p"+hit+"unityCount") + xsPow(2, p));
-						}
-					} else if (getBit(p, 1*trQuestVarGet("p"+hit+"unityCount")) == true) {
-						trQuestVarSet("p"+hit+"unityCount", trQuestVarGet("p"+hit+"unityCount") - xsPow(2, p));
+			if (trTime() > trQuestVarGet("p"+p+"unityTime")) {
+				trQuestVarSet("p"+p+"unityTime", trTime());
+				hit = 0;
+				for (x=yGetDatabaseCount("playerUnits"); >0) {
+					yDatabaseNext("playerUnits");
+					if (zDistanceToVectorSquared("playerUnits", "p"+p+"unitypos") < dist) {
+						hit = hit + 1;
 					}
 				}
+				
+				trQuestVarSet("p"+p+"unityBuff", trQuestVarGet("unityBonus") * hit);
+				trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
+				zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
 			}
-			*/
 		}
 	}
 
@@ -245,7 +228,6 @@ void saviorAlways(int eventID = -1) {
 				ySetVar("p"+p+"characters", "jumping", 0);
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 					stunUnit("enemies", 1.5, p);
-				} else {
 				}
 			} else if (hit >= ON_HIT_NORMAL) {
 				target = 1;

@@ -36,15 +36,15 @@ void spellstealerAlways(int eventID = -1) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 					if (yGetVar("enemies", "poisonStatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "stunStatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (hit == ON_HIT_SPECIAL) {
 						trVectorSetUnitPos("pos", "enemies");
@@ -169,20 +169,22 @@ void spellstealerAlways(int eventID = -1) {
 					}
 					if (yGetVar("enemies", "stunstatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "poisonstatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
 						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
 					}
 					trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"spellstealerBonus"));
 					trVectorSetUnitPos("pos", "enemies");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"bladeDanceTargets");
 					damageEnemy(p, trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage"), false);
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					break;

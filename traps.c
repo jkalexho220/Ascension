@@ -72,9 +72,9 @@ highFrequency
 						} else {
 							trVectorSetUnitPos("pos", "playerUnits");
 							if (vectorInRectangle("pos", "xLaser"+laser+"0", "xLaser"+laser+"1")) {
-								damagePlayerUnit(500);
+								damagePlayerUnit(300);
 							} else if (vectorInRectangle("pos", "zLaser"+laser+"0", "zLaser"+laser+"1")) {
-								damagePlayerUnit(500);
+								damagePlayerUnit(300);
 							}
 						}
 					}

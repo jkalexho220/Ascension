@@ -531,7 +531,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: When you attack an enemy, gain 0.1x bonus attack for each status effect on them.";
+					msg = "Passive: When you attack an enemy, gain 0.2x bonus attack for each status effect on them.";
 				}
 				case 2:
 				{
@@ -612,7 +612,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (5 attacks): Fire your shotgun, dealing damage in a cone.";
+					msg = "Special Attack (5 attacks): Fire your shotgun, dealing physical damage in a cone.";
 				}
 				case 3:
 				{
@@ -626,7 +626,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement electrum bullets icon 64";
-					msg = "If it hits a wall, it explodes and releases a cone of shrapnel, dealing damage.";
+					msg = "If it hits a wall, it explodes and releases a cone of shrapnel, dealing physical damage.";
 				}
 				case 6:
 				{
@@ -651,7 +651,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\siege x fire siphon icons 64";
-					msg = "(E) Flamethrower: Activate your flamethrower, continuously spewing flames in front of you.";
+					msg = "(E) Flamethrower: Activate your flamethrower, continuously dealing spell damage in front of you.";
 				}
 				case 11:
 				{

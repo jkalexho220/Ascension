@@ -377,10 +377,10 @@ runImmediately
     aiSetAttackResponseDistance(0.0);
 
     setupClass("Militia", 0, 500, 1000);
-    setupClass("Militia", 12, 500, 1000);
     setupClass("Militia", 13, 500, 1000);
     setupClass("Militia", 14, 500, 1000);
     setupClass("Militia", 15, 500, 1000);
+    setupClass("Militia", 16, 500, 1000);
     /* Proto , Enumeration , First delay , Next delay , special attack cooldown */
     setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
     setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
@@ -496,7 +496,7 @@ highFrequency
         setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0);
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 16);
         setupPlayerProto("Audrey", 1000, 50, 0);
-        setupPlayerProto("Walking Berry Bush", 500, 25, 0);
+        setupPlayerProto("Walking Berry Bush", 500, 25, 3.5);
 
         setupPlayerProto("Royal Guard Hero", 1200, 30, 4.6);
 
@@ -506,12 +506,18 @@ highFrequency
 
         trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
 
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, -1);
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, -1);
-        trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, -1);
-        trModifyProtounit("Monument 2", 0, 24, -1);
-        trModifyProtounit("Monument 2", 0, 25, -1);
-        trModifyProtounit("Monument 2", 0, 26, -1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, 1);
+        trModifyProtounit("Monument 2", 0, 24, 1);
+        trModifyProtounit("Monument 2", 0, 25, 1);
+        trModifyProtounit("Monument 2", 0, 26, 1);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+        trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, 100);
+        trModifyProtounit("Monument 2", 0, 0, 9999999999999999999.0);
+        trModifyProtounit("Monument 2", 0, 0, -9999999999999999999.0);
+        trModifyProtounit("Monument 2", 0, 0, 100);
 
         trModifyProtounit("Uproot 2x2", 0, 8, -99);
 

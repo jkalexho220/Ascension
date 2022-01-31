@@ -102,9 +102,6 @@ void lightningBallBounce(int p = 0) {
 	zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 	trUnitSelectClear();
 	trUnitSelectByQV("p"+p+"lightningBalls", true);
-	trDamageUnitPercent(-100);
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"lightningBalls", true);
 	trUnitChangeProtoUnit("Kronny Flying");
 	
 	trUnitSelectClear();
@@ -115,10 +112,8 @@ void lightningBallBounce(int p = 0) {
 	if (trUnitVisToPlayer()) {
 		trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 	}
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"lightningBalls", true);
 	trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-	trSetSelectedScale(0,-5,0);
+	trSetSelectedScale(0,-4.7,0);
 	trDamageUnitPercent(100);
 
 	ySetVar("p"+p+"lightningBalls", "yeehaw", 1);
@@ -172,9 +167,13 @@ void thunderRiderAlways(int eventID = -1) {
 				ySetVar("p"+p+"lightningBalls", "yeehaw", 0);
 			} else {
 				trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
-				if (trQuestVarGet("posY") < (0.5 + worldHeight)) {
+				if (trQuestVarGet("posY") < 0.5 + worldHeight) {
 					lightningBallBounce(p);
 				} else {
+					hit = 0;
+					if (trUnitVisToPlayer()) {
+						hit = 1;
+					}
 					yVarToVector("p"+p+"lightningBalls", "prev");
 					yVarToVector("p"+p+"lightningBalls", "dir");
 					dist = zDistanceBetweenVectors("pos", "prev");
@@ -189,16 +188,18 @@ void thunderRiderAlways(int eventID = -1) {
 						if (id == -1 || trUnitAlive() == false) {
 							yRemoveFromDatabase("p"+p+"rideLightningTargets");
 						} else if (rayCollision("p"+p+"rideLightningTargets","prev","dir",dist,amt)) {
-							trQuestVarSetFromRand("sound", 1, 5, true);
-							if (trUnitVisToPlayer()) {
-								trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-							}
+							hit = hit * 2;
 							if (ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"))) {
 								trUnitHighlight(0.5, false);
 								damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
 							}
 							yRemoveFromDatabase("p"+p+"rideLightningTargets");
 						}
+					}
+
+					if (hit > 1) {
+						trQuestVarSetFromRand("sound", 1, 5, true);
+						trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					}
 
 					trQuestVarSet("destx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
@@ -214,6 +215,10 @@ void thunderRiderAlways(int eventID = -1) {
 						ySetVar("p"+p+"lightningBalls", "damage", amt + yGetVar("p"+p+"lightningBalls", "damage"));
 						lightningBallBounce(p);
 						refreshRideLightningTargets(p);
+					} else if (zDistanceBetweenVectorsSquared("prev", "pos") == 0) {
+						debugLog("Why are we not moving?! WTF?!");
+						debugLog("pos: " + trQuestVarGet("posx") + ", " + trQuestVarGet("posy") + ", " + trQuestVarGet("posz"));
+						lightningBallBounce(p);
 					} else {
 						ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
 					}
@@ -300,13 +305,13 @@ void thunderRiderAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitHighlight(0.5, false);
-			healUnit(p, trQuestVarGet("p"+p+"thunderRiderBonus"), 1*yGetVar("p"+p+"characters", "index"));
+			healUnit(p, trQuestVarGet("p"+p+"attack"), 1*yGetVar("p"+p+"characters", "index"));
 			trVectorSetUnitPos("pos", "p"+p+"characters");
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 			trArmySelect(""+p+",0");
 			trUnitChangeProtoUnit("Regeneration SFX");
 		}
-		trPlayerGrantResources(p, "favor", 0.1 * trQuestVarGet("p"+p+"thunderRiderBonus"));
+		trPlayerGrantResources(p, "favor", 0.1 * trQuestVarGet("p"+p+"attack"));
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 
@@ -356,7 +361,7 @@ void thunderRiderAlways(int eventID = -1) {
 						trUnitSelectByQV("next", true);
 						trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 						trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-						trSetSelectedScale(0, -5, 0);
+						trSetSelectedScale(0, -4.7, 0);
 						trDamageUnitPercent(100);
 
 						trUnitSelectClear();

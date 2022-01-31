@@ -131,7 +131,7 @@ void commandoAlways(int eventID = -1) {
 							current = xsSqrt(current);
 							dist = xsMax(current, dist);
 							/* the farther they are, the lower the damage */
-							damageEnemy(p, (30.0 - current) / 30.0 * amt, true);
+							damageEnemy(p, (30.0 - current) / 30.0 * amt, false);
 							target = 1;
 							trPlayerGrantResources(p, "favor", 1);
 						}

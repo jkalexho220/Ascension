@@ -467,7 +467,7 @@ highFrequency
 				trUnitSelectByQV("biggerBallista", true);
 				trSetSelectedScale(0.7,0.5,0.5);
 				xsEnableRule("boss6_battle");
-				trQuestVarSet("bossGem", STARSTONE);
+				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
 
@@ -501,7 +501,7 @@ highFrequency
 				trUnitConvert(ENEMY_PLAYER);
 				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
 				xsEnableRule("boss4_battle");
-				trQuestVarSet("bossGem", MANASTONE);
+				trQuestVarSet("bossGem", STARSTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
 
@@ -906,7 +906,7 @@ highFrequency
 			}
 		}
 	} else {
-		trUnitChangeProtoUnit("Nemean Lion");
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
@@ -1288,6 +1288,7 @@ highFrequency
 			trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
 	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
@@ -1659,6 +1660,7 @@ highFrequency
 			trSoundPlayFN("icemono.wav","1",-1,"","");
 		}
 	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
@@ -2172,6 +2174,7 @@ highFrequency
 			}
 		}
 	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
@@ -2556,6 +2559,7 @@ highFrequency
 			}
 		}
 	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
@@ -3112,6 +3116,7 @@ highFrequency
 			}
 		}
 	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
