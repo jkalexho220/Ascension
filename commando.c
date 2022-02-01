@@ -1,4 +1,9 @@
 void removeCommando(int p = 0) {
+	for(y=3; >0) {
+		trUnitSelectClear();
+		trUnitSelect(""+1*yGetVar("p"+p+"characters", "chimera"+y));
+		trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+	}
 	removePlayerSpecific(p);
 }
 

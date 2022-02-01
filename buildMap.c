@@ -1063,6 +1063,9 @@ highFrequency
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 26, -1);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, 9999999999999999999.0);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, -9999999999999999999.0);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, 1.0);
             }
             case 2:
             {
@@ -1157,6 +1160,9 @@ highFrequency
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, 9999999999999999999.0);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, -9999999999999999999.0);
+                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, 1.0);
             }
             case 4:
             {
@@ -1204,6 +1210,9 @@ highFrequency
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 24, -1);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, 9999999999999999999.0);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, -9999999999999999999.0);
+                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, 1.0);
             }
             case 5:
             {

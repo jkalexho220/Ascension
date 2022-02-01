@@ -1,18 +1,34 @@
-void setupProtounitBounty(string proto = "", int bounty = 2, float relicChance = 0, int relic = -1) {
+void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, float relicChance = 0, int relic = -1) {
 	int p = kbGetProtoUnitID(proto);
 	trQuestVarSet("proto"+p+"bounty", bounty);
     trQuestVarSet("proto"+p+"relicChance", relicChance);
     trQuestVarSet("proto"+p+"relic", relic);
+    trQuestVarSet("proto"+p+"armor", armor);
 	/* armor */
 	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
 	trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);
-	trModifyProtounit(proto, 1, 24, -1);
-	trModifyProtounit(proto, 1, 25, -1);
-	trModifyProtounit(proto, 1, 26, -1);
+    trModifyProtounit(proto, ENEMY_PLAYER, 24, armor);
+    trModifyProtounit(proto, ENEMY_PLAYER, 25, armor);
+    trModifyProtounit(proto, ENEMY_PLAYER, 26, armor);
 	/* LOS */
 	trModifyProtounit(proto, ENEMY_PLAYER, 6, 10);
 	trModifyProtounit(proto, 1, 6, 10);
+
+    /* damage bonus vs myth */
+    trModifyProtounit(proto, ENEMY_PLAYER, 33, 9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 33, -9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 33, 1.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 44, 9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 44, -9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 44, 1.0);
+    /* damage bonus vs hero */
+    trModifyProtounit(proto, ENEMY_PLAYER, 34, 9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 34, -9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 34, 1.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 45, 9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 45, -9999999999999999999.0);
+    trModifyProtounit(proto, ENEMY_PLAYER, 45, 1.0);
 }
 
 bool checkEnemyDeactivated(string db = "") {
@@ -56,8 +72,8 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
     yAddUpdateVar("enemies", "poisonDamage", 0);
     yAddUpdateVar("enemies", "poisonSFX", 0);
     yAddUpdateVar("enemies", "launched", 0);
-    yAddUpdateVar("enemies", "magicResist", 0);
-    yAddUpdateVar("enemies", "physicalResist", 0);
+    yAddUpdateVar("enemies", "magicResist", trQuestVarGet("proto"+proto+"armor"));
+    yAddUpdateVar("enemies", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
     yAddUpdateVar("enemies", "silenceStatus", 0);
     yAddUpdateVar("enemies", "silenceTimeout", 0);
     yAddUpdateVar("enemies", "silenceSFX", 0);
@@ -119,6 +135,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Ballista"):
         {
             yAddToDatabase("ballistas", db);
+            yAddUpdateVar("ballistas", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Colossus"):
         {
@@ -131,6 +148,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
         case kbGetProtoUnitID("Fire Siphon"):
         {
             yAddToDatabase("siphons", db);
+            yAddUpdateVar("siphons", "index", yGetNewestPointer("enemies"));
         }
         case kbGetProtoUnitID("Battle Boar"):
         {
@@ -191,38 +209,38 @@ highFrequency
 		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
 		trModifyProtounit("Minion", 1, 8, -99);
 		
-        setupProtounitBounty("Golden Lion", 3);
-        setupProtounitBounty("Anubite", 4, 0.03);
-        setupProtounitBounty("Terracotta Soldier", 4, 0.03);
-		setupProtounitBounty("Sphinx", 5, 0.05);
-		setupProtounitBounty("Petsuchos", 6, 0.1, RELIC_ATTACK_RANGE);
+        setupProtounitBounty("Golden Lion", 0.3, 3);
+        setupProtounitBounty("Anubite", 0.3, 4, 0.03);
+        setupProtounitBounty("Terracotta Soldier", 0.3, 4, 0.03);
+		setupProtounitBounty("Sphinx", 0.3, 5, 0.05);
+		setupProtounitBounty("Petsuchos", 0.1, 6, 0.1, RELIC_ATTACK_RANGE);
 
-        setupProtounitBounty("Minion", 2);
-        setupProtounitBounty("Walking Woods Marsh", 3);
-        setupProtounitBounty("Dryad", 4, 0.03);
-        setupProtounitBounty("Centaur", 4, 0.03);
-        setupProtounitBounty("Medusa", 8, 0.15, RELIC_SPELL_DURATION);
-        setupProtounitBounty("Mountain Giant", 10, 0.1);
+        setupProtounitBounty("Minion", 0.1, 2);
+        setupProtounitBounty("Walking Woods Marsh", 0.2, 3);
+        setupProtounitBounty("Dryad", 0.2, 4, 0.03);
+        setupProtounitBounty("Centaur", 0.1, 4, 0.03);
+        setupProtounitBounty("Medusa", 0.1, 8, 0.15, RELIC_SPELL_DURATION);
+        setupProtounitBounty("Mountain Giant", 0.3, 10, 0.1);
 
-        setupProtounitBounty("Fenris Wolf", 4, 0.03);
-        setupProtounitBounty("Valkyrie", 5, 0.05);
-        setupProtounitBounty("Ballista", 4, 0.03);
-        setupProtounitBounty("Frost Giant", 10, 0.1);
+        setupProtounitBounty("Fenris Wolf", 0.2, 4, 0.03);
+        setupProtounitBounty("Valkyrie", 0, 5, 0.05);
+        setupProtounitBounty("Ballista", 0, 4, 0.03);
+        setupProtounitBounty("Frost Giant", 0.3, 10, 0.1);
 
-        setupProtounitBounty("Automaton SPC", 4, 0);
-        setupProtounitBounty("Colossus", 10, 0.1);
-        setupProtounitBounty("Battle Boar", 8, 0.08);
-        setupProtounitBounty("Fire Siphon", 8, 0.1);
+        setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
+        setupProtounitBounty("Colossus", 0.2, 10, 0.1);
+        setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
+        setupProtounitBounty("Fire Siphon", 0, 8, 0.1);
 
-        setupProtounitBounty("Cyclops", 6, 0.05);
-        setupProtounitBounty("Satyr", 4, 0.03);
-        setupProtounitBounty("Behemoth", 10, 0.08);
-        setupProtounitBounty("Avenger", 12, 0.1);
+        setupProtounitBounty("Cyclops", 0.2, 6, 0.05);
+        setupProtounitBounty("Satyr", 0.1, 4, 0.03);
+        setupProtounitBounty("Behemoth", 1, 10, 0.08);
+        setupProtounitBounty("Avenger", 0.2, 12, 0.1);
 
-        setupProtounitBounty("Wadjet", 4, 0.03);
-        setupProtounitBounty("Scorpion Man", 6, 0.05);
-        setupProtounitBounty("Scarab", 10, 0.08);
-        setupProtounitBounty("Mummy", 12, 0.1);
+        setupProtounitBounty("Wadjet", 0.2, 4, 0.03);
+        setupProtounitBounty("Scorpion Man", 0.3, 6, 0.05);
+        setupProtounitBounty("Scarab", 1, 10, 0.08);
+        setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
@@ -237,8 +255,6 @@ highFrequency
         trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
         trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
         trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
-        trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 1000);
-        trModifyProtounit("Mummy", ENEMY_PLAYER, 11, 6);
 		
 		xsDisableSelf();
 	}

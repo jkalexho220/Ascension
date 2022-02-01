@@ -4,8 +4,8 @@ const int RELIC_SPEED = 2;
 const int RELIC_ATTACK_RANGE = 3;
 const int RELIC_SPELL_RANGE = 4;
 const int RELIC_SPELL_DURATION = 5;
-const int RELIC_ATTACK_LIFESTEAL = 6;
-const int RELIC_SPELL_LIFESTEAL = 7;
+const int RELIC_LIFESTEAL = 6;
+const int RELIC_ARMOR = 7;
 const int RELIC_ATTACK_DAMAGE = 8;
 const int RELIC_SPELL_POWER = 9;
 const int RELIC_HEAL_BOOST = 10;
@@ -69,13 +69,13 @@ string relicName(int relic = 0) {
 		{
 			msg = "Spell Duration +0.3x";
 		}
-		case RELIC_ATTACK_LIFESTEAL:
+		case RELIC_LIFESTEAL:
 		{
-			msg = "Attack Lifesteal +0.2";
+			msg = "Lifesteal +0.2 (Half for spells)";
 		}
-		case RELIC_SPELL_LIFESTEAL:
+		case RELIC_ARMOR:
 		{
-			msg = "Spell Lifesteal +0.1";
+			msg = "Armor +0.2x";
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
@@ -180,13 +180,13 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\special n frost giant icon 64";
 		}
-		case RELIC_ATTACK_LIFESTEAL:
+		case RELIC_LIFESTEAL:
 		{
 			icon = "icons\special n troll icon 64";
 		}
-		case RELIC_SPELL_LIFESTEAL:
+		case RELIC_ARMOR:
 		{
-			icon = "icons\special e wadjet icon 64";
+			icon = "icons\special e Scarab icon 64";
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
@@ -290,6 +290,12 @@ void relicDescription(int relic = 0) {
 	trShowImageDialog(icon, msg);
 }
 
+float calculateArmor(float start = 0, float armor = 0) {
+	float remaining = 1.0 - start;
+	float reduction = remaining * (1.0 - armor);
+	return(start + remaining - reduction);
+}
+
 void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	float m = 1.0;
 	if (equip == false) {
@@ -325,13 +331,25 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.3 * m);
 		}
-		case RELIC_ATTACK_LIFESTEAL:
+		case RELIC_LIFESTEAL:
 		{
-			trQuestVarSet("p"+p+"attackLifesteal", trQuestVarGet("p"+p+"attackLifesteal") + 0.2 * m);
+			trQuestVarSet("p"+p+"Lifesteal", trQuestVarGet("p"+p+"Lifesteal") + 0.2 * m);
 		}
-		case RELIC_SPELL_LIFESTEAL:
+		case RELIC_ARMOR:
 		{
-			trQuestVarSet("p"+p+"spellLifesteal", trQuestVarGet("p"+p+"spellLifesteal") + 0.1 * m);
+			trQuestVarSet("p"+p+"armorCount", trQuestVarGet("p"+p+"armorCount") + 1 * m);
+			trQuestVarSet("p"+p+"armor", 1.0 - xsPow(0.8, 1*trQuestVarGet("p"+p+"armorCount")));
+			debugLog("armorCount: " + 1*trQuestVarGet("p"+p+"armorCount") + " armor: " + trQuestVarGet("p"+p+"armor"));
+			trQuestVarSet("p"+p+"physicalResist", 
+				calculateArmor(trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), trQuestVarGet("p"+p+"armor")));
+			trQuestVarSet("p"+p+"magicResist", 
+				calculateArmor(trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), trQuestVarGet("p"+p+"armor")));
+			trModifyProtounit(proto, p, 24, -1);
+			trModifyProtounit(proto, p, 25, -1);
+			trModifyProtounit(proto, p, 26, -1);
+			trModifyProtounit(proto, p, 24, trQuestVarGet("p"+p+"physicalResist"));
+			trModifyProtounit(proto, p, 25, trQuestVarGet("p"+p+"physicalResist"));
+			trModifyProtounit(proto, p, 26, trQuestVarGet("p"+p+"physicalResist"));
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
@@ -458,13 +476,13 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Frost Giant");
 		}
-		case RELIC_ATTACK_LIFESTEAL:
+		case RELIC_LIFESTEAL:
 		{
 			proto = kbGetProtoUnitID("Troll");
 		}
-		case RELIC_SPELL_LIFESTEAL:
+		case RELIC_ARMOR:
 		{
-			proto = kbGetProtoUnitID("Wadjet");
+			proto = kbGetProtoUnitID("Scarab");
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{

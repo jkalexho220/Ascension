@@ -403,10 +403,10 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	trDamageUnit(dmg);
 	if (spell) {
 		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"spellLifesteal") * dmg);
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg * 0.5);
 	} else {
 		trQuestVarSet("p"+p+"lifestealTotal", 
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"attackLifesteal") * dmg);
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg);
 	}
 	return(dmg);
 }
@@ -616,9 +616,9 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 	if (ySetPointer("playerUnits", index)) {
 		int p = yGetVar("playerUnits", "player");
 		if (trQuestVarGet("protectionCount") == 0) {
+			dmg = dmg - dmg * yGetVar("playerUnits", "magicResist");
 			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
-				trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") + 0.3 * dmg);
-				trPlayerGrantResources(p, "favor", 1);
+				healUnit(p, dmg);
 			} else {
 				trDamageUnit(dmg);
 			}
@@ -715,7 +715,7 @@ int CheckOnHit(int p = 0, int id = 0) {
                 		yGetVarAtIndex("enemies", "poisonStatus", 1*yGetVar("p"+p+"characters", "attackTargetIndex")));
                 }
                 /* lifesteal */
-                amt = trQuestVarGet("p"+p+"attackLifesteal") * trQuestVarGet("p"+p+"attack");
+                amt = trQuestVarGet("p"+p+"Lifesteal") * trQuestVarGet("p"+p+"attack");
                 if (trQuestVarGet("p"+p+"poisonKillerActive") == 1) {
                 	amt = amt * (1.0 + trQuestVarGet("p"+p+"poisonKiller"));
                 }
@@ -815,18 +815,30 @@ int addGenericProj(string db = "",string start="",string dir="",
 	return(index);
 }
 
+int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int index = yAddToDatabase("playerUnits", "next");
+	yAddUpdateVar("playerUnits", "player", p);
+	yAddUpdateVar("playerUnits", "hero", 0);
+	yAddUpdateVar("playerUnits", "decay", decay);
+	yAddUpdateVar("playerUnits", "decayNext", trTimeMS());
+	yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
+	yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("proto"+proto+"armor"));
+	string pName = kbGetProtoUnitName(proto);
+    trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+    return(index);
+}
 
 void spawnPlayerClone(int p = 0, string vdb = "") {
     int class = trQuestVarGet("p"+p+"class");
     trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
     yAddToDatabase("p"+p+"characters", "next");
-    yAddUpdateVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "next"));
-    yAddUpdateVar("playerUnits", "player", p);
+    yAddUpdateVar("p"+p+"characters", "index", spawnPlayerUnit(p, 1*trQuestVarGet("class"+class+"proto"), vdb));
     yAddUpdateVar("playerUnits", "hero", 1);
     yAddToDatabase("playerCharacters", "next");
     yAddUpdateVar("playerCharacters", "player", p);
-    string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
-    trArmyDispatch(""+p+",0",proto,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+    yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
+    yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
 }
 
 void spawnPlayer(int p = 0, string vdb = "") {

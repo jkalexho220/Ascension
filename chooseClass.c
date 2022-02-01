@@ -531,66 +531,62 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: When you attack an enemy, gain 0.2x bonus attack for each status effect on them.";
+					msg = "Passive: When you damage an enemy, the damage is doubled for each status effect on them.";
 				}
 				case 2:
 				{
-					msg = "Bonus decays by 5 percent each second.";
+					msg = "Special Attack (6 attacks): Poison your target and nearby enemies.";
 				}
 				case 3:
 				{
-					msg = "Special Attack (6 attacks): Poison your target and nearby enemies.";
-				}
-				case 4:
-				{
 					msg = "Radius: 6 | Duration: 12 | Damage: 12";
 				}
-				case 5:
+				case 4:
 				{
 					icon = "icons\god power barrage icon";
 					msg = "(Q) Spellblades: Throw daggers in a cone that damage enemies.";
 				}
-				case 6:
+				case 5:
 				{
 					icon = "icons\god power barrage icon";
 					msg = "Cooldown: 9 | Damage: 0.5 x Attack x Spell Power | Knives: 5 + 2 x Projectiles";
 				}
-				case 7:
+				case 6:
 				{
 					icon = "icons\god major leto icons 64";
 					msg = "(W) Negation Cloak: For a short duration, you absorb status effects and spell damage that hits you.";
 				}
-				case 8:
+				case 7:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "Convert all spell damage absorbed into bonus attack for yourself.";
+					msg = "During this time, spell damage will heal you instead of damaging you.";
 				}
-				case 9:
+				case 8:
 				{
 					icon = "icons\god major leto icons 64";
 					msg = "When this spell ends, your next spell will apply all the absorbed status effects.";
 				}
-				case 10:
+				case 9:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "Cooldown: 12 | Duration: 3 | Bonus Attack: 0.3x Damage absorbed";
+					msg = "Cooldown: 12 | Duration: 3";
 				}
-				case 11:
+				case 10:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
 					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Applies on-attack effects and lifesteal";
 				}
-				case 12:
+				case 11:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
 					msg = "If the target is affected by a status effect, also attack nearby enemies with the same status";
 				}
-				case 13:
+				case 12:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
 					msg = "If this hits only one enemy, it costs half.";
 				}
-				case 14:
+				case 13:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
 					msg = "Cost: 20 | Radius: 15 | Damage: Attack x Spell Power";
@@ -763,7 +759,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "(W) Unity: Create an aura at your cursor. You have 0.5x bonus attack for each ally in the aura.";
+					msg = "(W) Unity: Create an aura at your cursor. Allies in the aura have 0.5x bonus magic resistance.";
+				}
+				case 8:
+				{
+					icon = "icons\god power cease fire icon 64";
+					msg = "You have 0.5x bonus attack for each ally in the aura.";
 				}
 				case 8:
 				{

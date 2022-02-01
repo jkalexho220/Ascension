@@ -18,14 +18,6 @@ void spellstealerAlways(int eventID = -1) {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
 
-	amt = 0.001 * (trTimeMS() - trQuestVarGet("p"+p+"spellstealerBonusLast"));
-	amt = xsMax(amt, trQuestVarGet("p"+p+"spellstealerBonus") * amt * 0.05);
-	trQuestVarSet("p"+p+"spellstealerBonusLast", trTimeMS());
-	trQuestVarSet("p"+p+"spellstealerBonus", trQuestVarGet("p"+p+"spellstealerBonus") - amt);
-	trQuestVarSet("p"+p+"spellstealerBonus", xsMax(0, trQuestVarGet("p"+p+"spellstealerBonus")));
-	
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"spellstealerBonus"));
-
 	if (yGetDatabaseCount("p"+p+"characters") > 0) {
 		id = yDatabaseNext("p"+p+"characters", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -34,18 +26,20 @@ void spellstealerAlways(int eventID = -1) {
 			hit = CheckOnHit(p, id);
 			if (hit >= ON_HIT_NORMAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					amt = 1;
 					if (yGetVar("enemies", "poisonStatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
 					if (yGetVar("enemies", "stunStatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
+					amt = amt - 1;
+					trUnitSelectClear();
+					trUnitSelectByQV("enemies", true);
+					damageEnemy(p, amt * trQuestVarGet("p"+p+"baseAttack"), false);
 					if (hit == ON_HIT_SPECIAL) {
 						trVectorSetUnitPos("pos", "enemies");
 						dist = xsPow(trQuestVarGet("spellstealerPassiveRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
@@ -155,6 +149,7 @@ void spellstealerAlways(int eventID = -1) {
 					trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"favorFromAttacks"));
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
 					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
+					amt = 1;
 					if (hit >= xsPow(2, STATUS_SILENCE)) {
 						hit = hit - xsPow(2, STATUS_SILENCE);
 						silenceEnemy(p, 9.0);
@@ -168,24 +163,21 @@ void spellstealerAlways(int eventID = -1) {
 						stunUnit("enemies", 2.0, p);
 					}
 					if (yGetVar("enemies", "stunstatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
 					if (yGetVar("enemies", "poisonstatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
 					if (yGetVar("enemies", "silencestatus") > 0) {
-						trQuestVarSet("p"+p+"spellStealerBonus", 
-							trQuestVarGet("p"+p+"spellstealerBonus") + 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+						amt = amt * 2;
 					}
-					trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"spellstealerBonus"));
+					amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage");
 					trVectorSetUnitPos("pos", "enemies");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"bladeDanceTargets");
-					damageEnemy(p, trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage"), false);
+					damageEnemy(p, amt, false);
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					break;
 				}
@@ -231,7 +223,7 @@ void spellstealerAlways(int eventID = -1) {
 					trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + current * trQuestVarGet("dirZ"));
 					if (zDistanceBetweenVectorsSquared("pos", "hitbox") < 9.0) {
 						trQuestVarSet("spellsound", 2);
-						damageEnemy(p, trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage") * 0.5);
+						amt = 1;
 						hit = yGetVar("p"+p+"spellblades", "status");
 						if (hit >= xsPow(2, STATUS_SILENCE)) {
 							hit = hit - xsPow(2, STATUS_SILENCE);
@@ -245,6 +237,17 @@ void spellstealerAlways(int eventID = -1) {
 							hit = hit - xsPow(2, STATUS_STUN);
 							stunUnit("enemies", 2.0, p);
 						}
+						if (yGetVar("enemies", "stunstatus") > 0) {
+							amt = amt * 2;
+						}
+						if (yGetVar("enemies", "poisonstatus") > 0) {
+							amt = amt * 2;
+						}
+						if (yGetVar("enemies", "silencestatus") > 0) {
+							amt = amt * 2;
+						}
+						amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage") * 0.5;
+						damageEnemy(p, amt, true);
 						hit = 1;
 					}
 				}
@@ -387,11 +390,6 @@ void chooseSpellstealer(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
-void spellstealerModify(int eventID = -1) {
-	int p = eventID - 5000 - 12 * SPELLSTEALER;
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"spellstealerBonus"));
-	zSetProtoUnitStat("Swordsman Hero", p, 27, trQuestVarGet("p"+p+"attack"));
-}
 
 rule spellstealer_init
 active
@@ -401,7 +399,6 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * SPELLSTEALER + p, "spellstealerAlways");
 		trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");
-		trEventSetHandler(5000 + 12 * SPELLSTEALER + p, "spellstealerModify");
 	}
 	trQuestVarSet("spellstealerPassiveRadius", 6);
 
