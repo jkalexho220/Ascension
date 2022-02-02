@@ -24,7 +24,7 @@ string classIcon(int class = 0) {
 		}
 		case STARSEER:
 		{
-			icon = "icons\infantry x oracle hero icons 64";
+			icon = "icons\special e priest icon 64";
 		}
 		case STORMCUTTER:
 		{
@@ -364,54 +364,68 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Starseer: A ranged fighter with a unique attack mechanism.";
+					msg = "Starseer: A ranged fighter who calls upon the power of the stars.";
 				}
 				case 1:
 				{
-					msg = "Passive: Your normal attack deals 0 damage. Instead, 3 stars orbit around you, damaging enemies.";
+					msg = "Passive: You cannot gain Projectiles. After you cast a spell, your next attack is empowered.";
 				}
 				case 2:
 				{
-					msg = "Damage: 30 | Star speed scales with Projectiles";
+					msg = "It will deal damage in an area and create a Star. (Area increased by Projectiles)";
 				}
 				case 3:
 				{
-					msg = "Special Attack (3 attacks): Knock your target away from yourself.";
+					msg = "You can store up to three empowered attacks.";
 				}
 				case 4:
 				{
-					icon = "icons\improvement halo of the sun icons 64";
-					msg = "(Q) Solar Flare: Your stars explode, damaging and stunning nearby enemies.";
+					msg = "Damage: 60 | Radius: 4 | Gain 3 favor when empowered attack hits";
 				}
 				case 5:
 				{
-					icon = "icons\improvement halo of the sun icons 64";
-					msg = "Cooldown: 15 | Damage: 50 | Radius: 4";
+					icon = "sfx a implode lighting flair";
+					msg = "Stars remain on the ground for several seconds, damaging nearby enemies.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement eyes of atlas icons 64";
-					msg = "(W) Realign: Change the radius of your stars to match the distance of your cursor from your hero";
+					icon = "sfx a implode lighting flair";
+					msg = "Duration: 10 | Radius: 4 | Damage: 10 per second";
 				}
 				case 7:
 				{
-					icon = "icons\improvement eyes of atlas icons 64";
-					msg = "Cooldown: 5 | Max Range: 15";
+					icon = "icons\god power meteor icon 64";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area.";
 				}
 				case 8:
 				{
-					icon = "icons\improvement celerity icons 64";
-					msg = "(E) The Stars Align: Your stars stop spinning and form a line in the target direction.";
+					icon = "icons\god power meteor icon 64";
+					msg = "Enemies hit by the star will have their magic resist reduced permanently. Leaves behind a Star.";
 				}
 				case 9:
 				{
-					icon = "icons\improvement celerity icons 64";
-					msg = "Consume all your favor over several seconds. When you have none left, fire a massive laser.";
+					icon = "icons\god power meteor icon 64";
+					msg = "Cooldown: 8 | Radius: 5 | Damage: 90 | Resist Reduction: 0.1";
 				}
 				case 10:
 				{
-					icon = "icons\improvement celerity icons 64";
-					msg = "Cost: 50-100 | Damage: 30 x favor spent";
+					icon = "icons\god power vortex icons 64";
+					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Star.";
+				}
+				case 11:
+				{
+					icon = "icons\god power vortex icons 64";
+					msg = "Cooldown: 6 | Range: 8";
+				}
+				case 12:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "(E) Solar Flare: Fire a laser through each of your Stars, dealing damage to enemies.";
+				}
+				case 13:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "Cost: 40 | Range: 40 | Damage: 120";
 					next = 0;
 				}
 			}

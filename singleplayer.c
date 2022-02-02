@@ -217,7 +217,7 @@ void classNewUnlock(int class = 0) {
 			{
 				unlocked = true;
 			}
-			case MAGICMESSENGER:
+			case STARSEER:
 			{
 				if (trQuestVarGet("chestCount") >= 5) {
 					unlocked = true;

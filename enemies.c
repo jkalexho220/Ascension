@@ -584,7 +584,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("sphinxes") > 0) {
         id = yDatabaseNext("sphinxes", true);
         if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("sphinxes")) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Sphinx");
             yRemoveFromDatabase("sphinxes");
             yRemoveUpdateVar("sphinxes", "step");
         } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("sphinxes", "index")) == 1) {
@@ -620,7 +620,7 @@ void enemiesAlways() {
         id = yDatabaseNext("MountainGiants", true);
         if (id == -1 || trUnitAlive() == false) {
             trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Mountain Giant");
             yRemoveFromDatabase("MountainGiants");
             yRemoveUpdateVar("MountainGiants", "step");
         } else if (checkEnemyDeactivated("MountainGiants")) {
@@ -719,7 +719,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("Medusas") >0) {
         id = yDatabaseNext("Medusas", true);
         if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Medusas")) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Medusa");
             yRemoveFromDatabase("Medusas");
             yRemoveUpdateVar("Medusas", "step");
         } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
@@ -889,7 +889,7 @@ void enemiesAlways() {
         id = yDatabaseNext("frostGiants", true);
         if (id == -1 || trUnitAlive() == false) {
             trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Frost Giant");
             yRemoveFromDatabase("frostGiants");
             yRemoveUpdateVar("frostGiants", "step");
         } else if (checkEnemyDeactivated("frostGiants")) {
@@ -1021,7 +1021,7 @@ void enemiesAlways() {
     if(yGetDatabaseCount("battleBoars") >0) {
         id = yDatabaseNext("battleBoars", true);
         if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("battleBoars")) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Battle Boar");
             yRemoveFromDatabase("battleBoars");
             yRemoveUpdateVar("battleBoars", "step");
         } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
@@ -1232,7 +1232,7 @@ void enemiesAlways() {
     if (yGetDatabaseCount("Mummies") >0) {
         id = yDatabaseNext("Mummies", true);
         if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Mummies")) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Mummy");
             yRemoveFromDatabase("Mummies");
             yRemoveUpdateVar("Mummies", "step");
         } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
@@ -1286,7 +1286,7 @@ void enemiesAlways() {
     if(yGetDatabaseCount("ScorpionMen") >0) {
         id = yDatabaseNext("ScorpionMen", true);
         if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ScorpionMen")) {
-            trUnitOverrideAnimation(-1,0,false,true,-1);
+            trUnitChangeProtoUnit("Scorpion Man");
             yRemoveFromDatabase("ScorpionMen");
             yRemoveUpdateVar("ScorpionMen", "step");
         } else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {

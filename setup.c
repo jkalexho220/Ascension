@@ -32,7 +32,7 @@ const int FIREKNIGHT = 3;
 const int THRONESHIELD = 4;
 
 const int STORMCUTTER = 5;
-const int MAGICMESSENGER = 6;
+const int STARSEER = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
@@ -42,7 +42,7 @@ const int COMMANDO = 11;
 const int SPELLSTEALER = 12;
 
 const int NIGHTRIDER = 13;
-const int STARSEER = 14;
+const int MAGICMESSENGER = 14;
 const int FROSTKNIGHT = 15;
 
 const int CLASS_COUNT = 16;
@@ -403,7 +403,7 @@ runImmediately
     setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
-    setupClass("Priest", STARSEER, 500, 800, STARSTONE, 3);
+    setupClass("Priest", STARSEER, 500, 800, STARSTONE);
     setupClass("Javelin Cavalry Hero", MAGICMESSENGER, 1000, 2000, MANASTONE);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
@@ -448,6 +448,9 @@ runImmediately
 
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);
+
+        /* hand of the pharaoh */
+        trTechSetStatus(p, 471, 4);
 
         trForbidProtounit(p, "Trident Soldier Hero");
         trForbidProtounit(p, "Archer Atlantean Hero");
@@ -510,8 +513,8 @@ highFrequency
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
         setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
-        setupPlayerProto("Priest", 1000, 0, 3.6, 0, 12);
-        setupPlayerProto("Javelin Cavalry Hero", 1000, 50, 5.3, 0, 12);
+        setupPlayerProto("Priest", 1000, 10, 3.6, 0, 12);
+        setupPlayerProto("Javelin Cavalry Hero", 1000, 0, 5.3, 0, 12);
         setupPlayerProto("Audrey", 1000, 50, 0);
         setupPlayerProto("Walking Berry Bush", 500, 25, 3.5);
 
@@ -542,6 +545,8 @@ highFrequency
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);
             trModifyProtounit("Pharaoh", p, 14, -999);
+            trModifyProtounit("Priest", p, 15, -999);
+            trModifyProtounit("Priest", p, 14, -999);
             trModifyProtounit("Wadjet Spit", p, 1, -15);
             trModifyProtounit("Ajax", p, 5, 999);
             trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);
@@ -553,6 +558,7 @@ highFrequency
             zInitProtoUnitStat("Kronny Flying", p, 1, 0);
             zInitProtoUnitStat("Meteorite",p,1,100);
             trModifyProtounit("Minion", p, 8, -999);
+            trModifyProtounit("Arkantos God Out", p, 8, 1);
             zInitProtoUnitStat("Cinematic Block", p, 0, 300);
         }
 

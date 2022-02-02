@@ -337,19 +337,26 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ARMOR:
 		{
-			trQuestVarSet("p"+p+"armorCount", trQuestVarGet("p"+p+"armorCount") + 1 * m);
-			trQuestVarSet("p"+p+"armor", 1.0 - xsPow(0.8, 1*trQuestVarGet("p"+p+"armorCount")));
-			debugLog("armorCount: " + 1*trQuestVarGet("p"+p+"armorCount") + " armor: " + trQuestVarGet("p"+p+"armor"));
-			trQuestVarSet("p"+p+"physicalResist", 
-				calculateArmor(trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), trQuestVarGet("p"+p+"armor")));
-			trQuestVarSet("p"+p+"magicResist", 
-				calculateArmor(trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), trQuestVarGet("p"+p+"armor")));
+			if (m == 1) {
+				trQuestVarSet("p"+p+"magicResist", calculateArmor(trQuestVarGet("p"+p+"magicResist"), 0.2));
+				trQuestVarSet("p"+p+"physicalResist", calculateArmor(trQuestVarGet("p"+p+"physicalResist"), 0.2));
+			} else {
+				trQuestVarSet("p"+p+"magicResist", calculateArmor(trQuestVarGet("p"+p+"magicResist"), -0.25));
+				trQuestVarSet("p"+p+"physicalResist", calculateArmor(trQuestVarGet("p"+p+"physicalResist"), -0.25));
+			}
 			trModifyProtounit(proto, p, 24, -1);
 			trModifyProtounit(proto, p, 25, -1);
 			trModifyProtounit(proto, p, 26, -1);
 			trModifyProtounit(proto, p, 24, trQuestVarGet("p"+p+"physicalResist"));
 			trModifyProtounit(proto, p, 25, trQuestVarGet("p"+p+"physicalResist"));
 			trModifyProtounit(proto, p, 26, trQuestVarGet("p"+p+"physicalResist"));
+			for(x=yGetDatabaseCount("playerUnits"); >0) {
+				yDatabaseNext("playerUnits");
+				if ((yGetVar("playerUnits", "player") == p) && (yGetVar("playerUnits", "hero") == 1)) {
+					ySetVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
+					ySetVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+				}
+			}
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{

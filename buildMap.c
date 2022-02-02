@@ -678,7 +678,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             if (trQuestVarGet("mapType") == MAP_OPEN) {
                 trPaintTerrain(x*35+17-size,z*35+17-size,x*35+23+size,z*35+23+size, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
                 trChangeTerrainHeight(x*35+17-size,z*35+17-size,x*35+24+size,z*35+24+size, wallHeight, false);
-                trQuestVarSet("bossEntranceRadius", xsPow(5, 2));
+                trQuestVarSet("bossEntranceRadius", xsPow(8, 2));
             } else {
                 trQuestVarSet("bossEntranceRadius", xsPow(2*size, 2));
             }
