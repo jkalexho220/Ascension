@@ -162,6 +162,7 @@ void starseerAlways(int eventID = -1) {
 			yVarToVector("p"+p+"starfalls", "pos");
 			trVectorQuestVarSet("dir", vector(1,0,0));
 			dist = xsPow(trQuestVarGet("starfallRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+			current = xsPow(trQuestVarGet("starfallStunRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 			amt = trQuestVarGet("starfallDamage") * trQuestVarGet("p"+p+"spellDamage");
 			hit = 0;
 			for(x=yGetDatabaseCount("enemies"); >0) {
@@ -170,6 +171,9 @@ void starseerAlways(int eventID = -1) {
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 					damageEnemy(p, amt, true);
 					ySetVar("enemies", "magicResist", yGetVar("enemies", "magicResist") - 0.1);
+					if (zDistanceToVectorSquared("enemies", "pos") < current) {
+						stunUnit("enemies", 2.0, p);
+					}
 					hit = hit + 1;
 				}
 			}
@@ -332,6 +336,7 @@ void chooseStarseer(int eventID = -1) {
 		lureName = "(W) Warp";
 		lureIsUltimate = false;
 	}
+	zSetProtoUnitStat("Priest Projectile", p, 8, 0.0001);
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("starfallCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
 	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("warpCooldown"));
@@ -365,10 +370,11 @@ highFrequency
 
 	trQuestVarSet("starfallCooldown", 8);
 	trQuestVarSet("starfallRadius", 5);
-	trQuestVarSet("starfallDamage", 90);
+	trQuestVarSet("starfallStunRadius", 1.2);
+	trQuestVarSet("starfallDamage", 120);
 
 	trQuestVarSet("solarFlareCooldown", 20);
-	trQuestVarSet("solarFlareDamage", 120);
+	trQuestVarSet("solarFlareDamage", 90);
 	trQuestVarSet("solarFlareRange", 40);
 	trQuestVarSet("solarFlareCost", 40);
 

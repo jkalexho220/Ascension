@@ -23,7 +23,7 @@ void sunbowAlways(int eventID = -1) {
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_NORMAL) {
 				if (trQuestVarGet("p"+p+"healingRays") == 1) {
-					trPlayerGrantResources(p, "favor", 1);
+					hit = 0;
 					target = trGetUnitScenarioNameNumber(1*yGetVar("p"+p+"characters", "attackTarget"));
 					trVectorQuestVarSet("end", kbGetBlockPosition(""+target));
 					trVectorSetUnitPos("start", "p"+p+"characters");
@@ -38,7 +38,7 @@ void sunbowAlways(int eventID = -1) {
 					yAddToDatabase("playerLasers", "next");
 					yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
 					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.4);
-					amt = trQuestVarGet("p"+p+"attack");
+					amt = trQuestVarGet("healingRaysPower") * trQuestVarGet("p"+p+"spellDamage");
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
@@ -51,11 +51,13 @@ void sunbowAlways(int eventID = -1) {
 									trUnitSelectClear();
 									trUnitSelectByQV("playerUnits", true);
 									healUnit(p, amt);
+									hit = hit + 1;
 								}
 							}
 						}
 					}
 					if (trQuestVarGet("p"+p+"searing") == 1) {
+						amt = amt * trQuestVarGet("p"+p+"healBoost");
 						for(x=yGetDatabaseCount("enemies"); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
@@ -65,14 +67,16 @@ void sunbowAlways(int eventID = -1) {
 									trQuestVarSet("hitboxX", trQuestVarGet("startX") + dist * trQuestVarGet("dirx"));
 									trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + dist * trQuestVarGet("dirz"));
 									if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
+										hit = hit + 1;
 										trUnitSelectClear();
 										trUnitSelectByQV("enemies", true);
-										damageEnemy(p, amt * trQuestVarGet("p"+p+"healBoost"), false);
+										damageEnemy(p, amt, false);
 									}
 								}
 							}
 						}
 					}
+					trPlayerGrantResources(p, "favor", hit);
 				}
 			}
 		}
@@ -194,6 +198,7 @@ void sunbowAlways(int eventID = -1) {
 		target = 0;
 		yDatabaseNext("p"+p+"sunlights");
 		if (trTimeMS() > yGetVar("p"+p+"sunlights", "next")) {
+			trPlayerGrantResources(p, "favor", 1);
 			ySetVar("p"+p+"sunlights", "next", trTimeMS() + 500);
 			trQuestVarSet("centerX", yGetVar("p"+p+"sunlights", "posX"));
 			trQuestVarSet("centerZ", yGetVar("p"+p+"sunlights", "posZ"));
@@ -305,7 +310,7 @@ highFrequency
 
 	trQuestVarSet("healingRaysCooldown", 12);
 	trQuestVarSet("healingRaysPower", 100);
-	trQuestVarSet("healingRaysDuration", 5);
+	trQuestVarSet("healingRaysDuration", 6);
 
 	trQuestVarSet("searingCost", 5);
 	trQuestVarSet("searingDelay", 1000.0 / trQuestVarGet("searingCost"));

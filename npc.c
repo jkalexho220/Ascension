@@ -12,9 +12,18 @@ const int NPC_MONSTERPEDIA = 6;
 
 const int NPC_NOTTUD = 7;
 
-const int FETCH_NPC = 10;
-const int BOUNTY_NPC = 20;
-const int SHOP_NPC = 30;
+const int NPC_QUEST = 100;
+/*
+
+RESERVED TO 200
+
+*/
+const int NPC_QUEST_COMPLETE = 200;
+/*
+
+RESERVED TO 300
+
+*/
 
 const int FETCH_GUY = 1;
 const int BOUNTY_GUY = 2;
@@ -367,6 +376,53 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+
+		case NPC_QUEST + 10 + FETCH_NPC:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers! Help! My pigs have ran off from this impenetrable enclosure!");
+				}
+				case 2:
+				{
+					uiMessageBox("Please, help me find my pigs! There are three of them in total!");
+				}
+				case 3:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Find three pigs and bring them to the enclosure.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + 10 + FETCH_NPC:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("My pigs! Thank you so much!");
+				}
+				case 2:
+				{
+					uiMessageBox("I didn't know what I would be eating tonight.");
+				}
+				case 3:
+				{
+					uiMessageBox("Here, take this as your reward!");
+				}
+				case 4:
+				{
+					trShowImageDialog(gemstoneIcon(STARSTONE), gemstoneName(STARSTONE));
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
+					dialog = 0;
+				}
+			}
+		}
 	}
 	return(dialog);
 }
@@ -486,11 +542,88 @@ highFrequency
 			startNPCDialog(1*yGetVar("npcTalk", "dialog"));
 			reselectMyself();
 		}
-		trUnitSelectClear();
-		trUnitSelectByQV("questGuy");
-		if (false) {
-			uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+		
+		if (trQuestVarGet("questActive") == 0) {
+			trVectorSetUnitPos("questGuyPos", "questGuy");
+			for(p=1; < ENEMY_PLAYER) {
+				if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+					uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+					trQuestVarSet("questActive", 1);
+					startNPCDialog(NPC_QUEST + 10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"));
+					break;
+				}
+			}
+		} else if (trQuestVarGet("questActive") == 1) {
+			/* start the quest */
+			trQuestVarSet("questActive", 2);
+			switch(10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"))
+			{
+				case 10 + FETCH_NPC:
+				{
+					trQuestVarSetFromRand("rand", 1, 8, true);
+					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
+					if (trQuestVarGet("pig") > 14) {
+						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+					}
+					trQuestVarSet("pig1", trGetNextUnitScenarioNameNumber());
+					z = trQuestVarGet("pig") / 4;
+					x = trQuestVarGet("pig") - 4 * z;
+					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("pig1", true);
+					trUnitConvert(0);
+					trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
+					trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
+					if (trQuestVarGet("pig") > 14) {
+						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+					}
+					trQuestVarSet("pig2", trGetNextUnitScenarioNameNumber());
+					z = trQuestVarGet("pig") / 4;
+					x = trQuestVarGet("pig") - 4 * z;
+					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("pig2", true);
+					trUnitConvert(0);
+					trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
+					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
+					if (trQuestVarGet("pig") > 14) {
+						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+					}
+					trQuestVarSet("pig3", trGetNextUnitScenarioNameNumber());
+					z = trQuestVarGet("pig") / 4;
+					x = trQuestVarGet("pig") - 4 * z;
+					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("pig3", true);
+					trUnitConvert(0);
+				}
+			}
+		} else if (trQuestVarGet("questActive") == 2) {
+			/* quest in progress */
+			switch(10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"))
+			{
+				case 10 + FETCH_NPC:
+				{
+					for(i=1; <4) {
+						if (trQuestVarGet("pigReturned"+i) == 0) {
+							trVectorSetUnitPos("pos", "pig"+i);
+							if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
+								trQuestVarSet("pigReturned"+i, 1);
+								trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
+								trChatSend(0, "<color=1,1,1>Pig returned!</color>");
+								trSoundPlayFN("pigambient.wav","1",-1,"","");
+								if (trQuestVarGet("pigReturnCount") == 3) {
+									trQuestVarSet("questActive", 3);
+									uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+									startNPCDialog(NPC_QUEST_COMPLETE + 10 + FETCH_NPC);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+
 
 		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
 			trQuestVarSet("townHealNext", trTime());

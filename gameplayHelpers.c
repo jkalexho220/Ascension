@@ -188,6 +188,11 @@ void removePlayerCharacter() {
 
 void removePlayerSpecific(int p = 0) {
 	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+		if (kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX")) >= 0) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"silenceSFX", true);
+			trUnitChangeProtoUnit("Rocket");
+		}
 		trVectorSetUnitPos("dead"+p+"pos", "p"+p+"unit");
 		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 			yDatabaseNext("p"+p+"relics", true);

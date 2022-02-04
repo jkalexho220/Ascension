@@ -148,7 +148,8 @@ void commandoAlways(int eventID = -1) {
 		if (trTimeMS() > yGetVar("p"+p+"shotgunHitboxes", "startTime") + 1000) {
 			yRemoveFromDatabase("p"+p+"shotgunHitboxes");
 		} else if (target == 1) {
-			ySetVar("p"+p+"shotgunHitboxes", "dist", dist + 0.1);
+			/* move the dist to halfway between */
+			ySetVar("p"+p+"shotgunHitboxes", "dist", 0.5 * (trQuestVarGet("curDist") + dist));
 			trQuestVarSetFromRand("sound", 1,4,true);
 			trSoundPlayFN("arrowonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		} else if (trQuestVarGet("curDist") > yGetVar("p"+p+"shotgunHitboxes", "dist") + 2.0) {

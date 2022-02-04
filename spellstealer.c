@@ -223,7 +223,7 @@ void spellstealerAlways(int eventID = -1) {
 					trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + current * trQuestVarGet("dirZ"));
 					if (zDistanceBetweenVectorsSquared("pos", "hitbox") < 9.0) {
 						trQuestVarSet("spellsound", 2);
-						amt = 1;
+						amt = 0.5;
 						hit = yGetVar("p"+p+"spellblades", "status");
 						if (hit >= xsPow(2, STATUS_SILENCE)) {
 							hit = hit - xsPow(2, STATUS_SILENCE);
@@ -246,7 +246,7 @@ void spellstealerAlways(int eventID = -1) {
 						if (yGetVar("enemies", "silencestatus") > 0) {
 							amt = amt * 2;
 						}
-						amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage") * 0.5;
+						amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage");
 						damageEnemy(p, amt, true);
 						hit = 1;
 					}

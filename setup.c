@@ -407,7 +407,7 @@ runImmediately
     setupClass("Javelin Cavalry Hero", MAGICMESSENGER, 1000, 2000, MANASTONE);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
-    setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, SOULSTONE, 6);
+    setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
     setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
     setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
     setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
@@ -437,6 +437,7 @@ runImmediately
         trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
         trModifyProtounit("Dwarf", p, 55, 4);
+        trModifyProtounit("Dwarf", p, 2, -99);
         trModifyProtounit("Transport Ship Greek", p, 55, 4);
         trModifyProtounit("Athena", p, 55, 4);
 
@@ -513,8 +514,8 @@ highFrequency
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
         setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
-        setupPlayerProto("Priest", 1000, 10, 3.6, 0, 12);
-        setupPlayerProto("Javelin Cavalry Hero", 1000, 0, 5.3, 0, 12);
+        setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
+        setupPlayerProto("Javelin Cavalry Hero", 1000, 20, 5.3, 0, 12);
         setupPlayerProto("Audrey", 1000, 50, 0);
         setupPlayerProto("Walking Berry Bush", 500, 25, 3.5);
 
@@ -560,6 +561,7 @@ highFrequency
             trModifyProtounit("Minion", p, 8, -999);
             trModifyProtounit("Arkantos God Out", p, 8, 1);
             zInitProtoUnitStat("Cinematic Block", p, 0, 300);
+            zInitProtoUnitStat("Priest Projectile", p, 8, 2);
         }
 
         trModifyProtounit("Minion", 0, 8, -999);

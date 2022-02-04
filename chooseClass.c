@@ -182,7 +182,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement sun ray icon 64";
-					msg = "Cooldown: 12 | Duration: 5 | Heal: 100 | Fire rate scales with projectile count.";
+					msg = "Cooldown: 12 | Duration: 6 | Heal: 100 | Fire rate scales with projectile count.";
 					next = 4;
 				}
 			}
@@ -395,37 +395,42 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area.";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Star.";
 				}
 				case 8:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Enemies hit by the star will have their magic resist reduced permanently. Leaves behind a Star.";
+					msg = "Enemies hit by the blast will have their magic resist reduced permanently.";
 				}
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 90 | Resist Reduction: 0.1";
+					msg = "In addition, enemies in the direct center of the area will be stunned.";
 				}
 				case 10:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Star.";
+					icon = "icons\god power meteor icon 64";
+					msg = "Cooldown: 8 | Radius: 5 | Damage: 120 | Resist Reduction: 0.1";
 				}
 				case 11:
 				{
 					icon = "icons\god power vortex icons 64";
-					msg = "Cooldown: 6 | Range: 8";
+					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Star.";
 				}
 				case 12:
 				{
-					icon = "icons\building tower mirror icons 64";
-					msg = "(E) Solar Flare: Fire a laser through each of your Stars, dealing damage to enemies.";
+					icon = "icons\god power vortex icons 64";
+					msg = "Cooldown: 6 | Range: 8";
 				}
 				case 13:
 				{
 					icon = "icons\building tower mirror icons 64";
-					msg = "Cost: 40 | Range: 40 | Damage: 120";
+					msg = "(E) Solar Flare: Fire a laser through each of your Stars, dealing damage to enemies.";
+				}
+				case 14:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "Cost: 40 | Range: 40 | Damage: 90";
 					next = 0;
 				}
 			}
@@ -450,7 +455,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 3:
 				{
 					icon = "icons\god power lightning icon 64";
-					msg = "Cooldown: 12 | Duration: 4 | Damage: 2 x Attack x Spell Power | Fire rate scales with projectiles";
+					msg = "Cooldown: 12 | Duration: 4 | Damage: 1.5 x Attack x Spell Power | Fire rate scales with projectiles";
 				}
 				case 4:
 				{

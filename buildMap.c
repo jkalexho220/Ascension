@@ -502,8 +502,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             deployTownEyecandy("Fence Wood",25,17,270);
             deployTownEyecandy("Fence Wood",27,15,180);
             deployTownEyecandy("Fence Wood",27,11,180);
+            trQuestVarSet("pigpenLowerX", 19 + trQuestVarGet("villageX"));
+            trQuestVarSet("pigpenLowerZ", 9 + trQuestVarGet("villageZ"));
+            trQuestVarSet("pigpenUpperX", 27 + trQuestVarGet("villageX"));
+            trQuestVarSet("pigpenUpperZ", 17 + trQuestVarGet("villageZ"));
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            trQuestVarSet("localQuest", 1);
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Villager Chinese",23,19,315);
