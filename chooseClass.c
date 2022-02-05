@@ -22,7 +22,7 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\hero g achilles icon 64";
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
 			icon = "icons\special e priest icon 64";
 		}
@@ -58,7 +58,7 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\hero g achilles icon 64";
 		}
-		case MAGICMESSENGER:
+		case STARSEER:
 		{
 			icon = "icons\cavalry x jav cav hero icons 64";
 		}
@@ -362,13 +362,13 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
 			switch(tooltip)
 			{
 				case 0:
 				{
-					msg = "Starseer: A ranged fighter who calls upon the power of the stars.";
+					msg = "Blastmage: A ranged fighter who commands powerful magic.";
 				}
 				case 1:
 				{
@@ -376,7 +376,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will grant you 3 favor, deal damage in an area, and create a Star.";
+					msg = "It will grant you 3 favor, deal damage in an area, and create a Mage Fire.";
 				}
 				case 3:
 				{
@@ -389,7 +389,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Stars remain on the ground for several seconds, damaging nearby enemies.";
+					msg = "Mage Fires remain on the ground for several seconds, damaging nearby enemies.";
 				}
 				case 6:
 				{
@@ -399,7 +399,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Star.";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Mage Fire.";
 				}
 				case 8:
 				{
@@ -419,7 +419,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power vortex icons 64";
-					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Star.";
+					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Mage Fire.";
 				}
 				case 12:
 				{
@@ -429,7 +429,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 13:
 				{
 					icon = "icons\building tower mirror icons 64";
-					msg = "(E) Solar Flare: Fire a laser through each of your Stars, dealing damage to enemies.";
+					msg = "(E) Solar Flare: Fire a laser through each of your Mage Fires, dealing damage to enemies.";
 				}
 				case 14:
 				{
@@ -954,7 +954,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case MAGICMESSENGER:
+		case STARSEER:
 		{
 			switch(tooltip)
 			{
@@ -1032,9 +1032,9 @@ string className(int class = 0) {
 		{
 			name = "Frost Knight";
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
-			name = "Starseer";
+			name = "Blastmage";
 		}
 		case STORMCUTTER:
 		{
@@ -1068,7 +1068,7 @@ string className(int class = 0) {
 		{
 			name = "Nightrider";
 		}
-		case MAGICMESSENGER:
+		case STARSEER:
 		{
 			name = "Magic Messenger";
 		}

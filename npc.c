@@ -421,12 +421,63 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
 					trQuestVarSetFromRand("reward", 11, 13, true);
-					trShowImageDialog(relicIcon(1*trQuestVarGet("reward")), "(Relic) " + relicName(1*trQuestVarGet("reward")));
-					trQuestVarSet("ownedRelics"+1*trQuestVarGet("reward"), 1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("reward")));
+					trShowImageDialog("icons\icon resource gold", "300 Gold");
+					for(p=1; < ENEMY_PLAYER) {
+						trQuestVarSet("p"+p+"gold", 300 + trQuestVarGet("p"+p+"gold"));
+						trPlayerGrantResources(p, "gold", 300);
+					}
 				}
 				case 5:
 				{
 					uiMessageBox("I have sent the reward to your warehouse.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers! I have an urgent request!");
+				}
+				case 2:
+				{
+					uiMessageBox("A Mummy has been spotted! Such a high-level enemy should not be on the first floor.");
+				}
+				case 3:
+				{
+					uiMessageBox("Eliminate it at once! I will reward you handsomely.");
+				}
+				case 4:
+				{
+					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("bountyTargetPos"), true);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Defeat the Mummy.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Good work defeating the Mummy. There could have been many casualties.");
+				}
+				case 2:
+				{
+					uiMessageBox("Here is your reward.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(gemstoneIcon(STARSTONE),gemstoneName(STARSTONE) + " x1");
+					trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
 					dialog = 0;
 				}
 			}
@@ -561,72 +612,120 @@ highFrequency
 					break;
 				}
 			}
-		} else if (trQuestVarGet("questActive") == 1) {
+		} else {
 			/* start the quest */
-			trQuestVarSet("questActive", 2);
 			switch(1*trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
 			{
 				case FETCH_NPC + 1:
 				{
-					trQuestVarSetFromRand("rand", 1, 8, true);
-					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
-					if (trQuestVarGet("pig") > 14) {
-						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSetFromRand("rand", 1, 8, true);
+							trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
+							if (trQuestVarGet("pig") > 14) {
+								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+							}
+							trQuestVarSet("pig1", trGetNextUnitScenarioNameNumber());
+							z = trQuestVarGet("pig") / 4;
+							x = trQuestVarGet("pig") - 4 * z;
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("pig1", true);
+							trUnitConvert(0);
+							trUnitChangeProtoUnit("Pig");
+							trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
+							trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
+							if (trQuestVarGet("pig") > 14) {
+								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+							}
+							trQuestVarSet("pig2", trGetNextUnitScenarioNameNumber());
+							z = trQuestVarGet("pig") / 4;
+							x = trQuestVarGet("pig") - 4 * z;
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("pig2", true);
+							trUnitConvert(0);
+							trUnitChangeProtoUnit("Pig");
+							trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
+							trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
+							if (trQuestVarGet("pig") > 14) {
+								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+							}
+							trQuestVarSet("pig3", trGetNextUnitScenarioNameNumber());
+							z = trQuestVarGet("pig") / 4;
+							x = trQuestVarGet("pig") - 4 * z;
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("pig3", true);
+							trUnitConvert(0);
+							trUnitChangeProtoUnit("Pig");
+						}
+						case 2:
+						{
+							for(i=1; <4) {
+								if (trQuestVarGet("pigReturned"+i) == 0) {
+									trVectorSetUnitPos("pos", "pig"+i);
+									if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
+										trQuestVarSet("pigReturned"+i, 1);
+										trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
+										trChatSend(0, "<color=1,1,1>Pig returned!</color>");
+										trSoundPlayFN("pigambient.wav","1",-1,"","");
+										if (trQuestVarGet("pigReturnCount") == 3) {
+											trQuestVarSet("questActive", 3);
+											uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+											startNPCDialog(NPC_QUEST_COMPLETE + FETCH_NPC + 1);
+										}
+									}
+								}
+							}
+						}
 					}
-					trQuestVarSet("pig1", trGetNextUnitScenarioNameNumber());
-					z = trQuestVarGet("pig") / 4;
-					x = trQuestVarGet("pig") - 4 * z;
-					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("pig1", true);
-					trUnitConvert(0);
-					trUnitChangeProtoUnit("Pig");
-					trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
-					trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
-					if (trQuestVarGet("pig") > 14) {
-						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
-					}
-					trQuestVarSet("pig2", trGetNextUnitScenarioNameNumber());
-					z = trQuestVarGet("pig") / 4;
-					x = trQuestVarGet("pig") - 4 * z;
-					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("pig2", true);
-					trUnitConvert(0);
-					trUnitChangeProtoUnit("Pig");
-					trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
-					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
-					if (trQuestVarGet("pig") > 14) {
-						trQuestVarSet("pig", trQuestVarGet("pig") - 14);
-					}
-					trQuestVarSet("pig3", trGetNextUnitScenarioNameNumber());
-					z = trQuestVarGet("pig") / 4;
-					x = trQuestVarGet("pig") - 4 * z;
-					trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("pig3", true);
-					trUnitConvert(0);
-					trUnitChangeProtoUnit("Pig");
 				}
-			}
-		} else if (trQuestVarGet("questActive") == 2) {
-			/* quest in progress */
-			switch(1 * trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
-			{
-				case FETCH_NPC + 1:
+				case BOUNTY_NPC + 1:
 				{
-					for(i=1; <4) {
-						if (trQuestVarGet("pigReturned"+i) == 0) {
-							trVectorSetUnitPos("pos", "pig"+i);
-							if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
-								trQuestVarSet("pigReturned"+i, 1);
-								trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
-								trChatSend(0, "<color=1,1,1>Pig returned!</color>");
-								trSoundPlayFN("pigambient.wav","1",-1,"","");
-								if (trQuestVarGet("pigReturnCount") == 3) {
-									trQuestVarSet("questActive", 3);
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSetFromRand("rand", 6, 9, true);
+							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+							if (trQuestVarGet("rand") > 14) {
+								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+							}
+							z = trQuestVarGet("rand") / 4;
+							x = trQuestVarGet("rand") - 4 * z;
+							trVectorQuestVarSet("bountyTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+							trQuestVarSet("bountyTarget", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,225,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("bountyTarget", true);
+							trUnitConvert(ENEMY_PLAYER);
+							trUnitChangeProtoUnit("Mummy");
+							activateEnemy("bountyTarget", 100);
+							trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 700);
+						}
+						case 2:
+						{
+							trUnitSelectClear();
+							trUnitSelectByQV("bountyTarget", true);
+							if (trUnitAlive() == false) {
+								trMessageSetText("Bounty target defeated! Return to the quest giver for your reward!", -1);
+								trQuestVarSet("questActive", 3);
+							}
+						}
+						case 3:
+						{
+							trVectorSetUnitPos("bountyGuyPos", "questguy");
+							for(p=1; < ENEMY_PLAYER) {
+								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
 									uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
-									startNPCDialog(NPC_QUEST_COMPLETE + 10 + FETCH_NPC);
+									trQuestVarSet("questActive", 4);
+									startNPCDialog(NPC_QUEST_COMPLETE + BOUNTY_NPC + 1);
+									break;
 								}
 							}
 						}

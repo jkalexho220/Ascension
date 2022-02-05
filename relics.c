@@ -460,7 +460,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 }
 
 int relicProto(int relic = 0) {
-	int proto = 0;
+	int proto = kbGetProtoUnitID("Hoplite");
 	switch(relic)
 	{
 		case RELIC_HEALTH:

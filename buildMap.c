@@ -359,11 +359,17 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 }
             }
         }
-    }
-    if (trQuestVarGet("room"+room+"key") > 0) {
-        vector v0 = randomNearEdge(x0, z0, x1, z1);
+        if (trQuestVarGet("room"+room+"key") > 0) {
+            vector v0 = randomNearEdge(x0, z0, x1, z1);
+            ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
+            spawnRelicSpecific(xsVectorGetX(v0),xsVectorGetZ(v0),1*trQuestVarGet("room"+room+"key"));
+            trQuestVarSet("room"+room+"key", 0);
+        }
+    } else if (trQuestVarGet("room"+room+"key") > 0) {
+        debugLog("room was a special room.");
         ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-        spawnRelicSpecific(xsVectorGetX(v0),xsVectorGetZ(v0),1*trQuestVarGet("room"+room+"key"));
+        spawnRelicSpecific(70 * x + 36,70 * z + 36,1*trQuestVarGet("room"+room+"key"));
+        trQuestVarSet("room"+room+"key", 0);
     }
     switch(type)
     {
@@ -457,6 +463,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             z0 = trQuestVarGet("room"+room+"bottom1z");
             x1 = trQuestVarGet("room"+room+"top1x");
             z1 = trQuestVarGet("room"+room+"top1z");
+            trPaintTerrain(x0,z0,x1,z1,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x0,z0,x1,z1,worldHeight, false);
             trVectorQuestVarSet("center", xsVectorSet(x0 + x1, 0, z0 + z1));
             trVectorQuestVarSet("relictransporterguypos", randomNearEdge(x0, z0, x1, z1));
             trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors("relictransporterguypos", "center"));
@@ -509,7 +517,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
 
-            trQuestVarSet("localQuest", 1);
+            /* DELETE ME */
+            trQuestVarSet("localQuest", BOUNTY_GUY);
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Villager Chinese",23,19,315);
