@@ -15,16 +15,19 @@ const int NPC_NOTTUD = 7;
 const int NPC_QUEST = 100;
 /*
 
-RESERVED TO 200
+RESERVED TO 139
 
 */
-const int NPC_QUEST_COMPLETE = 200;
+const int NPC_QUEST_COMPLETE = 140;
 /*
 
-RESERVED TO 300
+RESERVED TO 169
 
 */
 
+const int FETCH_NPC = 10;
+const int BOUNTY_NPC = 20;
+const int SHOP_NPC = 30;
 const int FETCH_GUY = 1;
 const int BOUNTY_GUY = 2;
 const int SHOP_GUY = 3;
@@ -377,7 +380,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
-		case NPC_QUEST + 10 + FETCH_NPC:
+		case NPC_QUEST + FETCH_NPC + 1:
 		{
 			switch(dialog)
 			{
@@ -398,7 +401,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
-		case NPC_QUEST_COMPLETE + 10 + FETCH_NPC:
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 1:
 		{
 			switch(dialog)
 			{
@@ -416,9 +419,14 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					trShowImageDialog(gemstoneIcon(STARSTONE), gemstoneName(STARSTONE));
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
+					trQuestVarSetFromRand("reward", 11, 13, true);
+					trShowImageDialog(relicIcon(1*trQuestVarGet("reward")), "(Relic) " + relicName(1*trQuestVarGet("reward")));
+					trQuestVarSet("ownedRelics"+1*trQuestVarGet("reward"), 1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("reward")));
+				}
+				case 5:
+				{
+					uiMessageBox("I have sent the reward to your warehouse.");
 					dialog = 0;
 				}
 			}
@@ -549,16 +557,16 @@ highFrequency
 				if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
 					uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
 					trQuestVarSet("questActive", 1);
-					startNPCDialog(NPC_QUEST + 10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"));
+					startNPCDialog(NPC_QUEST + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
 					break;
 				}
 			}
 		} else if (trQuestVarGet("questActive") == 1) {
 			/* start the quest */
 			trQuestVarSet("questActive", 2);
-			switch(10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"))
+			switch(1*trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
 			{
-				case 10 + FETCH_NPC:
+				case FETCH_NPC + 1:
 				{
 					trQuestVarSetFromRand("rand", 1, 8, true);
 					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
@@ -572,6 +580,7 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("pig1", true);
 					trUnitConvert(0);
+					trUnitChangeProtoUnit("Pig");
 					trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
 					trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
 					if (trQuestVarGet("pig") > 14) {
@@ -584,6 +593,7 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("pig2", true);
 					trUnitConvert(0);
+					trUnitChangeProtoUnit("Pig");
 					trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
 					trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
 					if (trQuestVarGet("pig") > 14) {
@@ -596,13 +606,14 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("pig3", true);
 					trUnitConvert(0);
+					trUnitChangeProtoUnit("Pig");
 				}
 			}
 		} else if (trQuestVarGet("questActive") == 2) {
 			/* quest in progress */
-			switch(10 * trQuestVarGet("stage") + trQuestVarGet("localQuest"))
+			switch(1 * trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
 			{
-				case 10 + FETCH_NPC:
+				case FETCH_NPC + 1:
 				{
 					for(i=1; <4) {
 						if (trQuestVarGet("pigReturned"+i) == 0) {

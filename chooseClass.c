@@ -58,6 +58,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\hero g achilles icon 64";
 		}
+		case MAGICMESSENGER:
+		{
+			icon = "icons\cavalry x jav cav hero icons 64";
+		}
 	}
 	return(icon);
 }
@@ -372,7 +376,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will deal damage in an area and create a Star. (Area increased by Projectiles)";
+					msg = "It will grant you 3 favor, deal damage in an area, and create a Star.";
 				}
 				case 3:
 				{
@@ -380,7 +384,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					msg = "Damage: 60 | Radius: 4 | Gain 3 favor when empowered attack hits";
+					msg = "Damage: 60 | Radius: 4 (Increased by Projectiles)";
 				}
 				case 5:
 				{
@@ -410,7 +414,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 120 | Resist Reduction: 0.1";
+					msg = "Cooldown: 8 | Radius: 5 | Stun Radius: 1.5 | Damage: 120 | Resist Reduction: 0.1";
 				}
 				case 11:
 				{
@@ -950,6 +954,55 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case MAGICMESSENGER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Magic Messenger: A ranged fighter who damages enemies through movement.";
+				}
+				case 1:
+				{
+					msg = "Passive: Each time you attack, gain 5 favor. Three stars orbit around you, damaging enemies.";
+				}
+				case 2:
+				{
+					msg = "Radius: 3 | Damage: 50";
+				}
+				case 3:
+				{
+					icon = "icons\special x lampades icons 64";
+					msg = "(Q) Frostbolt: Fire a ball of ice at your cursor. It explodes and stuns nearby enemies.";
+				}
+				case 4:
+				{
+					icon = "icons\special x lampades icons 64";
+					msg = "Cooldown: 8 | Damage: 40 | Radius: 4";
+				}
+				case 5:
+				{
+					icon = "icons\improvement poseidons secret icons 64";
+					msg = "(W) Slipstream: Launch nearby enemies away from you and gain a burst of movement speed.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement poseidons secret icons 64";
+					msg = "Cooldown: 15 | Range: 15 | Duration: 4";
+				}
+				case 7:
+				{
+					icon = "icons\god power vision icon 64";
+					msg = "(E) Revolution: Your stars extend away from you and orbit at a higher speed.";
+				}
+				case 8:
+				{
+					icon = "icons\god power vision icon 64";
+					msg = "Cost: 5 per second | Range: 12 | Speed increases with projectiles";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);
@@ -1014,6 +1067,10 @@ string className(int class = 0) {
 		case NIGHTRIDER:
 		{
 			name = "Nightrider";
+		}
+		case MAGICMESSENGER:
+		{
+			name = "Magic Messenger";
 		}
 	}
 	return(name);

@@ -2,7 +2,7 @@ void removeMagicMessenger(int p = 0) {
 	for(x=3; >0) {
 		trUnitSelectClear();
 		trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x), true);
-		trUnitChangeProtoUnit("Rockt");
+		trUnitChangeProtoUnit("Rocket");
 	}
 	removePlayerSpecific(p);
 	/* the star units */
@@ -88,10 +88,11 @@ void magicMessengerAlways(int eventID = -1) {
 							cos(20) is 0.939692 
 							if the previous hitbox is too far back, we reel it back in
 							*/
-							if (trQuestVarGet("angleDiff") < 0.939692) {
-								ySetVar("p"+p+"characters", "last"+x, fModulo(6.283185, current + 0.349065));
+							amt = xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.2);
+							if (trQuestVarGet("angleDiff") < amt) {
+								ySetVar("p"+p+"characters", "last"+x, fModulo(6.283185, current + trQuestVarGet("p"+p+"starAngularVelocity") * 0.2));
 								trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
-								trQuestVarSet("angleDiff", 0.939692);
+								trQuestVarSet("angleDiff", amt);
 							}
 						}
 						trVectorScale("dir", 3.33 * yGetVar("p"+p+"characters", "currentRadius"));
@@ -112,7 +113,7 @@ void magicMessengerAlways(int eventID = -1) {
 				trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
 				trVectorSetUnitPos("center", "p"+p+"characters");
 
-				amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
+				amt = trQuestVarGet("revolutionDamage") * trQuestVarGet("p"+p+"spellDamage");
 				target = 0;
 				for(x=yGetDatabaseCount("enemies"); >0) {
 					id = yDatabaseNext("enemies", true);
@@ -150,12 +151,84 @@ void magicMessengerAlways(int eventID = -1) {
 			}
 		}
 	}
-
-
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	
+	if (yGetDatabaseCount("p"+p+"frostbolts") >0) {
+		yDatabaseNext("p"+p+"frostbolts");
+		trVectorSetUnitPos("pos", "p"+p+"frostbolts");
+		yVarToVector("p"+p+"frostbolts", "prev");
+		yVarToVector("p"+p+"frostbolts", "dir");
+		hit = 0;
+		vectorToGrid("pos", "loc");
+		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			hit = 1;
+		} else {
+			dist = zDistanceBetweenVectors("pos", "prev");
+			for (x=yGetDatabaseCount("enemies"); >0) {
+				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+					removeEnemy();
+				} else if (rayCollision("enemies", "prev", "dir", dist + 2.0, 4.0)) {
+					hit = 1;
+					break;
+				}
+			}
+		}
+		
+		if (hit == 1) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"frostbolts", true);
+			trUnitChangeProtoUnit("Lampades Bolt");
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"frostbolts", true);
+			trMutateSelected(kbGetProtoUnitID("Frost Drift"));
+			trSetSelectedScale(1.25 * trQuestVarGet("p"+p+"spellRange"),1,1.6*trQuestVarGet("p"+p+"spellRange"));
+			dist = xsPow(trQuestVarGet("frostboltRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+			amt = trQuestVarGet("frostboltDamage") * trQuestVarGet("p"+p+"spellDamage");
+			for (x=yGetDatabaseCount("enemies"); >0) {
+				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+					removeEnemy();
+				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+					hit = hit + 1;
+					damageEnemy(p, amt);
+					stunUnit("enemies", 2.0 * trQuestVarGet("p"+p+"spellDuration"), p);
+				}
+			}
+			trPlayerGrantResources(p, "favor", hit);
+			trSoundPlayFN("icemono.wav","1",-1,"","");
+			yRemoveFromDatabase("p"+p+"frostbolts");
+		} else {
+			ySetVarFromVector("p"+p+"frostbolts", "prev", "pos");
+		}
 		
 	}
+
+	
+	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
+		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+		trSoundPlayFN("lampadesshoot.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+				removeMagicMessenger(p);
+			} else {
+				trVectorSetUnitPos("pos", "p"+p+"characters");
+				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
+				vectorSetAsTargetVector("dest", "pos", "p"+p+"wellpos", 300.0);
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				trUnitSelectClear();
+				trUnitSelectByQV("next", true);
+				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
+				trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
+				trUnitMoveToPoint(trQuestVarGet("destx"),0,trQuestVarGet("destz"), -1, false);
+				yAddToDatabase("p"+p+"frostbolts", "next");
+				yAddUpdateVar("p"+p+"frostbolts", "timeout", trTimeMS() + 5000);
+				yAddUpdateVar("p"+p+"frostbolts", "prevx", trQuestVarGet("posx"));
+				yAddUpdateVar("p"+p+"frostbolts", "prevz", trQuestVarGet("posz"));
+				yAddUpdateVar("p"+p+"frostbolts", "dirx", trQuestVarGet("dirx"));
+				yAddUpdateVar("p"+p+"frostbolts", "dirz", trQuestVarGet("dirz"));
+			}
+		}
+	}
+	
 
 	if (trQuestVarGet("p"+p+"revolution") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"revolutionNext")) {
@@ -165,7 +238,7 @@ void magicMessengerAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"revolution", 0);
 				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 					yDatabaseNext("p"+p+"characters");
-					ySetVar("p"+p+"characters", "targetRadius", amt);
+					ySetVar("p"+p+"characters", "targetRadius", 3);
 				}
 				trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
 			}
@@ -178,7 +251,7 @@ void magicMessengerAlways(int eventID = -1) {
 		amt = 3;
 		if (trQuestVarGet("p"+p+"revolution") == 1) {
 			trQuestVarSet("p"+p+"starAngularVelocity", 
-				trQuestVarGet("starAngularVelocity") * (3.0 + trQuestVarGet("p"+p+"projectiles")) / 4.0);
+				trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
 			trQuestVarSet("p"+p+"revolutionDelay", trQuestVarGet("revolutionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 			trQuestVarSet("p"+p+"revolutionNext", trTimeMS());
 			amt = trQuestVarGet("revolutionRadius") * trQuestVarGet("p"+p+"spellRange");
@@ -192,29 +265,68 @@ void magicMessengerAlways(int eventID = -1) {
 		trSoundPlayFN("suckup3.wav","1",-1,"","");
 	}
 
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
-		trSoundPlayFN("godpower.wav","1",-1,"","");
-		trVectorSetUnitPos("target", "p"+p+"lureObject");
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"lureObject", true);
-		trUnitDestroy();
-		trQuestVarSet("p"+p+"starsAlign", 1);
-		trQuestVarSet("p"+p+"soundNext", trTimeMS() + 1000);
-		trQuestVarSet("p"+p+"soundCount", 3);
-		trSoundPlayFN("suckup1.wav","1",-1,"","");
-		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters");
-			trVectorSetUnitPos("pos", "p"+p+"characters");
-			ySetVar("p"+p+"characters", "alignAngle", angleBetweenVectors("pos", "target"));
-			current = yGetVar("p"+p+"characters", "angle");
-			for(x=1; <=3) {
-				ySetVar("p"+p+"characters", "radius"+x, yGetVar("p"+p+"characters", "currentRadius"));
-				ySetVar("p"+p+"characters", "last"+x, current);
-				current = fModulo(6.283185, current + 2.094395);
+	if (trQuestVarGet("p"+p+"slipstream") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"slipstreamTimeout")) {
+			trQuestVarSet("p"+p+"slipstream", 0);
+			zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed"));
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+					removeMagicMessenger(p);
+				} else {
+					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "slipstreamSFX")) >= 0) {
+						trUnitSelectClear();
+						trUnitSelect(""+1*yGetVar("p"+p+"characters", "slipstreamSFX"), true);
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+					}
+				}
 			}
 		}
+	}
+
+	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
+		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+		trSoundPlayFN("meteorsplash.wav","1",-1,"","");
+		zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed") + trQuestVarGet("slipstreamBoost"));
+		trQuestVarSet("p"+p+"slipstream", 1);
+		trQuestVarSet("p"+p+"slipstreamTimeout", 
+			trTimeMS() + 1000 * trQuestVarGet("slipstreamDuration") * trQuestVarGet("p"+p+"spellDuration"));
+		hit = 0;
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+				removeMagicMessenger(p);
+			} else {
+				trVectorSetUnitPos("pos", "p"+p+"characters");
+				if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "slipstreamSFX")) >= 0) {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar("p"+p+"characters", "slipstreamSFX"), true);
+					trMutateSelected(kbGetProtoUnitID("Valkyrie"));
+					trSetSelectedScale(0,0,0);
+					trUnitSetAnimationPath("1,0,0,0,0,0,0");
+					trUnitOverrideAnimation(15,0,true,false,-1);
+				} else {
+					debugLog("valkyrie missing!");
+					spyEffect(1*trQuestVarGet("p"+p+"characters"), 
+						kbGetProtoUnitID("Cinematic Block"), yGetVarName("p"+p+"characters", "slipstreamSFX"));
+				}
+				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Meteor Impact Water");
+				for(y=yGetDatabaseCount("enemies"); >0) {
+					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+						removeEnemy();
+					} else if (zDistanceToVectorSquared("enemies", "pos") < 25.0) {
+						trVectorSetUnitPos("target", "enemies");
+						trVectorQuestVarSet("dir", 
+							zGetUnitVector("pos", "target", trQuestVarGet("slipstreamRange") * trQuestVarGet("p"+p+"spellRange")));
+						trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
+						trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
+						launchUnit("enemies", "dest");
+						hit = hit + 1;
+					}
+				}
+			}
+		}
+		trPlayerGrantResources(p, "favor", hit);
 	}
 
 	ySetPointer("enemies", index);
@@ -225,18 +337,19 @@ void chooseMagicMessenger(int eventID = -1) {
 	int p = eventID - 1000 - 12 * MAGICMESSENGER;
 	if (trCurrentPlayer() == p) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
-		wellName = "(Q) Flashbang";
+		wellName = "(Q) Frostbolt";
 		wellIsUltimate = false;
 		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
 		rainName = "(E) Revolution";
 		rainIsUltimate = false;
 		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(W) Escape";
+		lureName = "(W) Slipstream";
 		lureIsUltimate = false;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("realignCooldown"));
+	zSetProtoUnitStat("Lampades Bolt", p, 1, 10);
+	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("frostboltCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("escapeCooldown"));
+	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("slipstreamCooldown"));
 	trQuestVarSet("p"+p+"lureCost", 0);
 	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
@@ -247,9 +360,13 @@ void magicMessengerModify(int eventID = -1) {
 	/* no attack for u */
 	if (trQuestVarGet("p"+p+"revolution") == 1) {
 		trQuestVarSet("p"+p+"starAngularVelocity", 
-			trQuestVarGet("starAngularVelocity") * (3.0 + trQuestVarGet("p"+p+"projectiles")) / 4.0);
+			trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
 	} else {
 		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
+	}
+
+	if (trQuestVarGet("p"+p+"slipstream") == 1) {
+		zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed") + trQuestVarGet("slipstreamBoost"));
 	}
 }
 
@@ -265,13 +382,14 @@ highFrequency
 		trEventSetHandler(5000 + 12 * MAGICMESSENGER + p, "magicMessengerModify");
 		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
 	}
+	trQuestVarSet("frostboltCooldown", 8);
+	trQuestVarSet("frostboltRadius", 4);
+	trQuestVarSet("frostboltDamage", 40);
 
-	trQuestVarSet("realignCooldown", 5);
-	trQuestVarSet("realignRadius", 15);
-
-	trQuestVarSet("journeyCooldown", 15);
-	trQuestVarSet("journeyRadius", 15);
-	trQuestVarSet("journeyDuration", 4);
+	trQuestVarSet("slipstreamCooldown", 15);
+	trQuestVarSet("slipstreamRange", 15);
+	trQuestVarSet("slipstreamDuration", 4);
+	trQuestVarSet("slipstreamBoost", 3);
 
 	trQuestVarSet("revolutionCost", 5);
 	trQuestVarSet("revolutionDelay", 1000.0 / trQuestVarGet("revolutionCost"));

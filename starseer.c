@@ -370,7 +370,7 @@ highFrequency
 
 	trQuestVarSet("starfallCooldown", 8);
 	trQuestVarSet("starfallRadius", 5);
-	trQuestVarSet("starfallStunRadius", 1.2);
+	trQuestVarSet("starfallStunRadius", 1.5);
 	trQuestVarSet("starfallDamage", 120);
 
 	trQuestVarSet("solarFlareCooldown", 20);
