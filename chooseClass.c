@@ -22,7 +22,7 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\hero g achilles icon 64";
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
 			icon = "icons\special e priest icon 64";
 		}
@@ -40,7 +40,7 @@ string classIcon(int class = 0) {
 		}
 		case COMMANDO:
 		{
-			icon = "icons\infantry x maceman hero icons 64";
+			icon = "icons\cavalry x turma hero icons 64";
 		}
 		case THRONESHIELD:
 		{
@@ -57,6 +57,10 @@ string classIcon(int class = 0) {
 		case NIGHTRIDER:
 		{
 			icon = "icons\hero g achilles icon 64";
+		}
+		case STARSEER:
+		{
+			icon = "icons\infantry x oracle hero icons 64";
 		}
 	}
 	return(icon);
@@ -182,7 +186,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement sun ray icon 64";
-					msg = "Cooldown: 12 | Duration: 5 | Heal: 100 | Fire rate scales with projectile count.";
+					msg = "Cooldown: 12 | Duration: 6 | Heal: 100 | Fire rate scales with projectile count.";
 					next = 4;
 				}
 			}
@@ -358,13 +362,13 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
 			switch(tooltip)
 			{
 				case 0:
 				{
-					msg = "Starseer: A ranged fighter who calls upon the power of the stars.";
+					msg = "Blastmage: A ranged fighter who commands powerful magic.";
 				}
 				case 1:
 				{
@@ -372,7 +376,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will deal damage in an area and create a Star. (Area increased by Projectiles)";
+					msg = "It will grant you 3 favor, deal damage in an area, and create a Mage Fire.";
 				}
 				case 3:
 				{
@@ -380,12 +384,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					msg = "Damage: 60 | Radius: 4 | Gain 3 favor when empowered attack hits";
+					msg = "Damage: 60 | Radius: 4 (Increased by Projectiles)";
 				}
 				case 5:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Stars remain on the ground for several seconds, damaging nearby enemies.";
+					msg = "Mage Fires remain on the ground for several seconds, damaging nearby enemies.";
 				}
 				case 6:
 				{
@@ -395,37 +399,42 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area.";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Mage Fire.";
 				}
 				case 8:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Enemies hit by the star will have their magic resist reduced permanently. Leaves behind a Star.";
+					msg = "Enemies hit by the blast will have their magic resist reduced permanently.";
 				}
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 90 | Resist Reduction: 0.1";
+					msg = "In addition, enemies in the direct center of the area will be stunned.";
 				}
 				case 10:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Star.";
+					icon = "icons\god power meteor icon 64";
+					msg = "Cooldown: 8 | Radius: 5 | Stun Radius: 1.5 | Damage: 120 | Resist Reduction: 0.1";
 				}
 				case 11:
 				{
 					icon = "icons\god power vortex icons 64";
-					msg = "Cooldown: 6 | Range: 8";
+					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Mage Fire.";
 				}
 				case 12:
 				{
-					icon = "icons\building tower mirror icons 64";
-					msg = "(E) Solar Flare: Fire a laser through each of your Stars, dealing damage to enemies.";
+					icon = "icons\god power vortex icons 64";
+					msg = "Cooldown: 6 | Range: 8";
 				}
 				case 13:
 				{
 					icon = "icons\building tower mirror icons 64";
-					msg = "Cost: 40 | Range: 40 | Damage: 120";
+					msg = "(E) Solar Flare: Fire a laser through each of your Mage Fires, dealing damage to enemies.";
+				}
+				case 14:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "Cost: 40 | Range: 40 | Damage: 90";
 					next = 0;
 				}
 			}
@@ -450,7 +459,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 3:
 				{
 					icon = "icons\god power lightning icon 64";
-					msg = "Cooldown: 12 | Duration: 4 | Damage: 2 x Attack x Spell Power | Fire rate scales with projectiles";
+					msg = "Cooldown: 12 | Duration: 4 | Damage: 1.5 x Attack x Spell Power | Fire rate scales with projectiles";
 				}
 				case 4:
 				{
@@ -618,15 +627,15 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Each time you attack, restore 3 favor.";
+					msg = "Passive: You wield a shotgun that shoots piercing bullets in a cone.";
 				}
 				case 2:
 				{
-					msg = "Special Attack (5 attacks): Fire your shotgun, dealing physical damage in a cone.";
+					msg = "Restore 1 favor when these bullets hit an enemy.";
 				}
 				case 3:
 				{
-					msg = "Damage per pellet: 1 x Attack | Pellets: 4 + Projectiles";
+					msg = "Damage per bullet: 0.6 x Attack | Bullets: 4 + Projectiles";
 				}
 				case 4:
 				{
@@ -641,32 +650,37 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement electrum bullets icon 64";
-					msg = "Damage per pellet: 1 x Attack | Pellets: 7 + 2 x Projectiles";
+					msg = "Damage per bullet: 0.6 x Attack | Bullets: 7 + 2 x Projectiles";
 				}
 				case 7:
 				{
-					icon = "sfx a implode lighting flair";
+					icon = "icons\special e phoenix egg icon 64";
 					msg = "(W) Echo Bomb: Attach a bomb to an enemy that records all the damage it takes for several seconds";
 				}
 				case 8:
 				{
-					icon = "sfx a implode lighting flair";
+					icon = "icons\special e phoenix egg icon 64";
 					msg = "When the bomb explodes, deal all the stored damage in a large radius.";
 				}
 				case 9:
 				{
-					icon = "sfx a implode lighting flair";
+					icon = "icons\special e phoenix egg icon 64";
 					msg = "Cooldown: 20 | Duration: 6 | Radius: 12 | An enemy can only have one Echo Bomb at a time";
 				}
 				case 10:
 				{
 					icon = "icons\siege x fire siphon icons 64";
-					msg = "(E) Flamethrower: Activate your flamethrower, continuously dealing spell damage in front of you.";
+					msg = "(E) Minigun: Switch to your minigun, which continuously fires bullets at longer range.";
 				}
 				case 11:
 				{
 					icon = "icons\siege x fire siphon icons 64";
-					msg = "Cost: 7 per second | Range: 8 | Damage: 2 x Attack x Spell Power";
+					msg = "These bullets do not pierce through enemies or grant you favor.";
+				}
+				case 12:
+				{
+					icon = "icons\siege x fire siphon icons 64";
+					msg = "Cost: 1 per bullet | Range: 1.5x | Damage: 1 x Attack | Fire rate: 3 + Projectiles";
 					next = 0;
 				}
 			}
@@ -900,7 +914,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\special g shade icon 64";
-					msg = "Duration: 6 | Damage: 6 | Radius: 8";
+					msg = "Duration: 6 | Damage: 6 | Radius: 8 | Minions have a fifth of your attack and health";
 				}
 				case 7:
 				{
@@ -945,6 +959,64 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case STARSEER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Starseer: A ranged fighter with a unique attack mechanism.";
+				}
+				case 1:
+				{
+					msg = "Passive: Your attack deals zero damage. Instead, three stars orbit around you, damaging enemies.";
+				}
+				case 2:
+				{
+					msg = "Damage: 50 | Rotation speed scales with projectiles";
+				}
+				case 3:
+				{
+					msg = "Special Attack (9 attacks): Stun your target. Your Stars can activate this special attack.";
+				}
+				case 4:
+				{
+					icon = "icons\god power thunder clap icons 64";
+					msg = "(Q) Repel: Launch nearby enemies away from you.";
+				}
+				case 5:
+				{
+					icon = "icons\god power thunder clap icons 64";
+					msg = "Cooldown: 15 | Range: 15";
+				}
+				case 6:
+				{
+					icon = "icons\god power vision icon 64";
+					msg = "(W) Realignment: Change the radius of your stars to match your cursor.";
+				}
+				case 7:
+				{
+					icon = "icons\god power vision icon 64";
+					msg = "The closer they are, the faster you move.";
+				}
+				case 8:
+				{
+					icon = "icons\god power vision icon 64";
+					msg = "Cooldown: 5 | Range: 3 - 15 | Speed: 1.5x - 0.5x";
+				}
+				case 9:
+				{
+					icon = "icons\improvement halo of the sun icons 64";
+					msg = "(E) Supernova: Your stars rotate at double speed and damage enemies in a line.";
+				}
+				case 10:
+				{
+					icon = "icons\improvement halo of the sun icons 64";
+					msg = "Cost: 60 per second | Duration: 6";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);
@@ -974,9 +1046,9 @@ string className(int class = 0) {
 		{
 			name = "Frost Knight";
 		}
-		case STARSEER:
+		case BLASTMAGE:
 		{
-			name = "Starseer";
+			name = "Blastmage";
 		}
 		case STORMCUTTER:
 		{
@@ -1009,6 +1081,10 @@ string className(int class = 0) {
 		case NIGHTRIDER:
 		{
 			name = "Nightrider";
+		}
+		case STARSEER:
+		{
+			name = "Starseer";
 		}
 	}
 	return(name);

@@ -33,7 +33,7 @@ void stormcutterAlways(int eventID = -1) {
 					trUnitSelectByID(target);
 					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 					dist = xsPow(trQuestVarGet("rainOfLightningRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-					amt = 2.0 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
+					amt = 1.5 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
 					for(x=yGetDatabaseCount("enemies"); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {

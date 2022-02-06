@@ -184,7 +184,7 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\special n troll icon 64";
 		}
-		case RELIC_ARMOR:
+		case RELIC_STUN_RESISTANCE:
 		{
 			icon = "icons\special e Scarab icon 64";
 		}
@@ -204,7 +204,7 @@ string relicIcon(int relic = 0) {
 		{
 			icon = "icons\god power dryad icons 64";
 		}
-		case RELIC_STUN_RESISTANCE:
+		case RELIC_ARMOR:
 		{
 			icon = "icons\special x behemoth icons 64";
 		}
@@ -460,7 +460,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 }
 
 int relicProto(int relic = 0) {
-	int proto = 0;
+	int proto = kbGetProtoUnitID("Hoplite");
 	switch(relic)
 	{
 		case RELIC_HEALTH:
@@ -487,7 +487,7 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Troll");
 		}
-		case RELIC_ARMOR:
+		case RELIC_STUN_RESISTANCE:
 		{
 			proto = kbGetProtoUnitID("Scarab");
 		}
@@ -507,7 +507,7 @@ int relicProto(int relic = 0) {
 		{
 			proto = kbGetProtoUnitID("Dryad");
 		}
-		case RELIC_STUN_RESISTANCE:
+		case RELIC_ARMOR:
 		{
 			proto = kbGetProtoUnitID("Behemoth");
 		}

@@ -359,11 +359,17 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 }
             }
         }
-    }
-    if (trQuestVarGet("room"+room+"key") > 0) {
-        vector v0 = randomNearEdge(x0, z0, x1, z1);
+        if (trQuestVarGet("room"+room+"key") > 0) {
+            vector v0 = randomNearEdge(x0, z0, x1, z1);
+            ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
+            spawnRelicSpecific(xsVectorGetX(v0),xsVectorGetZ(v0),1*trQuestVarGet("room"+room+"key"));
+            trQuestVarSet("room"+room+"key", 0);
+        }
+    } else if (trQuestVarGet("room"+room+"key") > 0) {
+        debugLog("room was a special room.");
         ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-        spawnRelicSpecific(xsVectorGetX(v0),xsVectorGetZ(v0),1*trQuestVarGet("room"+room+"key"));
+        spawnRelicSpecific(70 * x + 36,70 * z + 36,1*trQuestVarGet("room"+room+"key"));
+        trQuestVarSet("room"+room+"key", 0);
     }
     switch(type)
     {
@@ -419,6 +425,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             if (trQuestVarGet("chestType") < CHEST_STATUES) {
                 buildRoom(x, z, ROOM_BASIC);
                 trQuestVarSet("room"+room, ROOM_CHEST);
+                trPaintTerrain(x*35+15, z*35+15, x*35+25, z*35+25, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                trChangeTerrainHeight(x*35+15, z*35+15, x*35+25, z*35+25, worldHeight, false);
             } else {
                 size = 12;
                 z0 = size;
@@ -457,6 +465,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             z0 = trQuestVarGet("room"+room+"bottom1z");
             x1 = trQuestVarGet("room"+room+"top1x");
             z1 = trQuestVarGet("room"+room+"top1z");
+            trPaintTerrain(x0,z0,x1,z1,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x0,z0,x1,z1,worldHeight, false);
             trVectorQuestVarSet("center", xsVectorSet(x0 + x1, 0, z0 + z1));
             trVectorQuestVarSet("relictransporterguypos", randomNearEdge(x0, z0, x1, z1));
             trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors("relictransporterguypos", "center"));
@@ -502,8 +512,15 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             deployTownEyecandy("Fence Wood",25,17,270);
             deployTownEyecandy("Fence Wood",27,15,180);
             deployTownEyecandy("Fence Wood",27,11,180);
+            trQuestVarSet("pigpenLowerX", 19 + trQuestVarGet("villageX"));
+            trQuestVarSet("pigpenLowerZ", 9 + trQuestVarGet("villageZ"));
+            trQuestVarSet("pigpenUpperX", 27 + trQuestVarGet("villageX"));
+            trQuestVarSet("pigpenUpperZ", 17 + trQuestVarGet("villageZ"));
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            /* DELETE ME */
+            trQuestVarSet("localQuest", BOUNTY_GUY);
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Villager Chinese",23,19,315);
@@ -1016,7 +1033,7 @@ highFrequency
         {
             case 1:
             {
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 4, 1);
                 trQuestVarSet("bossRoomSize", 16);
                 trQuestVarSet("extraEdges", 9);
                 /* this had better be good to hook them in */
@@ -1216,7 +1233,7 @@ highFrequency
             }
             case 5:
             {
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 5, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 11);
                 trSetLighting("dawn", 0.1);
@@ -1274,7 +1291,7 @@ highFrequency
                 sunColor(150,150,0);
                 trSetCloudData(1.0, 50.0, 50.0, 0.0, 1.0, 0.0);
                 trSetCloudMap("shockwall");
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 4, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 10);
                 trQuestVarSet("wallEdges", 4);

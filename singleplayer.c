@@ -8,7 +8,7 @@ void spExplainClass(int class = -1) {
 }
 
 void spAscendClass(int class = -1) {
-	class = class - 5000;
+	class = class - 7000;
 	int gemstone = trQuestVarGet("class"+class+"gemstone");
 	if (trPlayerResourceCount(1, "Gold") < trQuestVarGet("goldCost")) {
 		trSoundPlayFN("cantdothat.wav","1",-1,"","");
@@ -218,6 +218,10 @@ void classNewUnlock(int class = 0) {
 				unlocked = true;
 			}
 			case STARSEER:
+			{
+				unlocked = true;
+			}
+			case BLASTMAGE:
 			{
 				if (trQuestVarGet("chestCount") >= 5) {
 					unlocked = true;
@@ -458,7 +462,7 @@ highFrequency
 	    	}
 	    	trEventSetHandler(3000+a, "spSwitchToClass");
 	    	trEventSetHandler(4000+a, "spExplainClass");
-	    	trEventSetHandler(5000+a, "spAscendClass");
+	    	trEventSetHandler(7000+a, "spAscendClass");
 	    }
 
 	    trSetCounterDisplay("To save and exit, enter the Sky Passage.");
@@ -538,7 +542,7 @@ highFrequency
 		yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
 		if (trQuestVarGet("p1level") < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
-				yesPrompt, 5000+class, "No", -1);
+				yesPrompt, 7000+class, "No", -1);
 			trChatHistoryClear();
 			trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
 			for(x=0; <3) {

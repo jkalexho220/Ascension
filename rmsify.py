@@ -88,7 +88,7 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'xsSetContextPlayer', 'trVectorQuestVarGetX', 'trSetCivAndCulture', 'xsAbs', 'xsAtan', 'trUnitGetIsContained',
 			'trUnitSelect', 'kbUnitGetActionType', 'trSoundPlayFN', 'trUnitTeleport', 'trUnitOverrideAnimation', 'xsVectorNormalize', 'xsVectorSetZ', 'xsVectorSetX',
 			'trCameraShake', 'trCamTrackPlay', 'kbGetProtoUnitID', 'trDamageUnit', 'trGetStatValue', 'xsDisableRule', 'trRenderSnow',
-			'xsSqrt', 'trSetLighting', 'for', 'trVectorQuestVarSet', 'trTechInvokeGodPower', 'aiSet', 'trCheckGPActive', 
+			'xsSqrt', 'trSetLighting', 'for', 'trVectorQuestVarSet', 'trTechInvokeGodPower', 'aiSet', 'trCheckGPActive', 'trMinimapFlare',
 			'trGetNextUnitScenarioNameNumber', 'trMusicPlay', 'xsSin', 'trPlayerGetPopulation', 'trUnitMoveToUnit', 'trPlayerModifyLOS',
 			'trDelayedRuleActivation', 'trStringQuestVarGet', 'kbGetBlockID', 'trCurrentPlayer', 'trPlayerGrantResources', 'aiSetAttackResponseDistance',
 			'trPaintTerrain', 'trPlayerResourceCount', 'trCounterAbort', 'return', 'unitTransform', 'trPlayerKillAllGodPowers', 
@@ -111,9 +111,9 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'npc.c', 'chooseClass.c', 'gameplayHelpers.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
 		'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c',
-		'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'starseer.c', 'enemies.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
+		'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'blastmage.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:
