@@ -203,7 +203,7 @@ void nightriderAlways(int eventID = -1) {
 				trVectorQuestVarSet("dir", zGetUnitVector("p"+p+"wellPos", "pos"));
 				trQuestVarSet("startx", trQuestVarGet("posx") - dist * trQuestVarGet("dirx"));
 				trQuestVarSet("startz", trQuestVarGet("posz") - dist * trQuestVarGet("dirz"));
-				addGenericProj("p"+p+"abducts","start","dir",kbGetProtoUnitID("Kronny Birth SFX"),2,15.0,4.5);
+				addGenericProj("p"+p+"abducts","start","dir",kbGetProtoUnitID("Kronny Birth SFX"),2,15.0,4.5,0,p);
 				yAddUpdateVar("p"+p+"abducts", "prevx", trQuestVarGet("startx"));
 				yAddUpdateVar("p"+p+"abducts", "prevz", trQuestVarGet("startz"));
 				yAddUpdateVar("p"+p+"abducts", "destx", trQuestVarGet("posx"));

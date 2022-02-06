@@ -7,6 +7,13 @@ void removeCommando(int p = 0) {
 	removePlayerSpecific(p);
 }
 
+void minigunOff(int p = 0) {
+	trQuestVarSet("p"+p+"minigun", 0);
+	trQuestVarSet("p"+p+"firstDelay", 1000);
+	trQuestVarSet("p"+p+"nextDelay", 2000);
+	zSetProtoUnitStat("Javelin Cavalry Hero", p, 11, trQuestVarGet("p"+p+"RANGE"));
+}
+
 void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) {
 	float amt = angleOfVector(dir);
 	/* arc angle starts at 33 degrees */
@@ -14,36 +21,22 @@ void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) 
 	amt = fModulo(6.283185, amt - 0.5 * dist);
 	dist = dist / (count - 1);
 	yAddToDatabase("p"+p+"shotgunHitboxes","next");
-	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", trQuestVarGet("p"+p+"attack") * count);
+	yAddUpdateVar("p"+p+"shotgunHitboxes", "damage", 0.6 * trQuestVarGet("p"+p+"attack") * count);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startx", trQuestVarGet(start+"x"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startz", trQuestVarGet(start+"Z"));
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle1", amt);
 	for(x=count; >0) {
 		trVectorSetFromAngle("dir", amt);
 		amt = fModulo(6.283185, amt + dist);
-		addGenericProj("p"+p+"pelletsIncoming",start,dir,kbGetProtoUnitID("Petosuchus Projectile"),2,30.0,4.5,1.5);
+		addGenericProj("p"+p+"pelletsIncoming",start,dir,kbGetProtoUnitID("Thor Hammer"),2,30.0,4.5,0.3, p);
+		yAddUpdateVar("p"+p+"pelletsIncoming", "type", 0);
+		yAddUpdateVar("p"+p+"pelletsIncoming", "startx", trQuestVarGet(start+"x"));
+		yAddUpdateVar("p"+p+"pelletsIncoming", "startz", trQuestVarGet(start+"z"));
+		yAddUpdateVar("p"+p+"pelletsIncoming", "start", trTimeMS());
 	}
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "angle2", amt);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "dist", 0);
 	yAddUpdateVar("p"+p+"shotgunHitboxes", "startTime", trTimeMS());
-}
-
-void flamethrowersOff(int p = 0) {
-	for (x=yGetDatabaseCount("p"+p+"characters"); >0) {
-		if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-			removeCommando(p);
-		} else {
-			for(y=3; >0) {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "chimera"+y));
-				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-			}
-		}
-	}
-	if (trCurrentPlayer() == p) {
-		trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
-	}
-	trQuestVarSet("p"+p+"flamethrowerActive", 0);
 }
 
 void commandoAlways(int eventID = -1) {
@@ -58,28 +51,55 @@ void commandoAlways(int eventID = -1) {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
 
-	for(x=xsMin(3, yGetDatabaseCount("p"+p+"pellets")); >0) {
+	if (yFindLatest("p"+p+"latestProj", "Javelin Flaming", p) > 0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"latestProj", true);
+		trUnitChangeProtoUnit("Rocket");
+	}
+
+	for(y=xsMin(3 + trQuestVarGet("p"+p+"projectiles"), yGetDatabaseCount("p"+p+"pellets")); >0) {
 		yDatabaseNext("p"+p+"pellets");
-		trVectorSetUnitPos("pos", "p"+p+"pellets");
-		if (trQuestVarGet("posY") < 0.5 + worldHeight) {
+		yVarToVector("p"+p+"pellets", "dir");
+		yVarToVector("p"+p+"pellets", "start");
+		dist = 0.03 * (trTimeMS() - yGetVar("p"+p+"pellets", "start"));
+		trQuestVarSet("posx", trQuestVarGet("startx") + dist * trQuestVarGet("dirx"));
+		trQuestVarSet("posz", trQuestVarGet("startz") + dist * trQuestVarGet("dirz"));
+
+		vectorToGrid("pos", "loc");
+		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || dist > 30.0) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"pellets", true);
 			trUnitChangeProtoUnit("Dust Small");
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"pellets", true);
 			trDamageUnitPercent(-100);
+			if (dist < 30.0) {
+				trQuestVarSet("minesound", 1);
+			}
 			yRemoveFromDatabase("p"+p+"pellets");
-		} else {
-			vectorToGrid("pos", "loc");
-			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+		} else if (yGetVar("p"+p+"pellets","type") == 1) {
+			hit = 0;
+			yVarToVector("p"+p+"pellets", "prev");
+			current = dist - yGetVar("p"+p+"pellets", "dist");
+			for(x=yGetDatabaseCount("enemies"); >0) {
+				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+					removeEnemy();
+				} else if (rayCollision("enemies", "prev", "dir", current + 2.0, 4.0)) {
+					hit = 1;
+					damageEnemy(p, trQuestVarGet("p"+p+"attack"), false);
+				}
+			}
+			if (hit == 1) {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"pellets", true);
-				trUnitChangeProtoUnit("Dust Small");
+				trUnitChangeProtoUnit("Lightning Sparks Ground");
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"pellets", true);
 				trDamageUnitPercent(-100);
-				trQuestVarSet("minesound", 1);
 				yRemoveFromDatabase("p"+p+"pellets");
+			} else {
+				ySetVar("p"+p+"pellets", "dist", dist);
+				ySetVarFromVector("p"+p+"pellets", "prev", "pos");
 			}
 		}
 	}
@@ -90,10 +110,20 @@ void commandoAlways(int eventID = -1) {
 		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 	}
 
-	for(x=xsMin(3, yGetDatabaseCount("p"+p+"pelletsIncoming")); >0) {
+	for(x=yGetDatabaseCount("p"+p+"pelletsIncoming"); >0) {
 		if (processGenericProj("p"+p+"pelletsIncoming") == PROJ_BOUNCE) {
-			trUnitHighlight(3.0, false);
+			trSetSelectedScale(0.3,0.3,-0.3);
+			trUnitSetAnimationPath("3,0,0,0,0,0,0");
 			yAddToDatabase("p"+p+"pellets", "p"+p+"pelletsIncoming");
+			yAddUpdateVar("p"+p+"pellets", "type", yGetVar("p"+p+"pelletsIncoming", "type"));
+			yAddUpdateVar("p"+p+"pellets", "dirx", yGetVar("p"+p+"pelletsIncoming", "dirx"));
+			yAddUpdateVar("p"+p+"pellets", "dirz", yGetVar("p"+p+"pelletsIncoming", "dirz"));
+			yAddUpdateVar("p"+p+"pellets", "prevx", yGetVar("p"+p+"pelletsIncoming", "startx"));
+			yAddUpdateVar("p"+p+"pellets", "prevz", yGetVar("p"+p+"pelletsIncoming", "startz"));
+			yAddUpdateVar("p"+p+"pellets", "startx", yGetVar("p"+p+"pelletsIncoming", "startx"));
+			yAddUpdateVar("p"+p+"pellets", "startz", yGetVar("p"+p+"pelletsIncoming", "startz"));
+			yAddUpdateVar("p"+p+"pellets", "dist", 0);
+			yAddUpdateVar("p"+p+"pellets", "start", yGetVar("p"+p+"pelletsIncoming", "start"));
 			yRemoveFromDatabase("p"+p+"pelletsIncoming");
 		}
 	}
@@ -164,66 +194,28 @@ void commandoAlways(int eventID = -1) {
 		} else {
 			hit = CheckOnHit(p, id);
 			trVectorSetUnitPos("start", "p"+p+"characters");
-			if (hit >= ON_HIT_ATTACKING) {
+			if (hit == ON_HIT_NORMAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
 					trVectorSetUnitPos("end", "enemies");
 					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					ySetVarFromVector("p"+p+"characters", "dir", "dir");
-					if (hit >= ON_HIT_NORMAL) {
-						trPlayerGrantResources(p, "favor", 3);
-						if (hit == ON_HIT_SPECIAL) {
-							trSoundPlayFN("titanfall.wav","1",-1,"","");
-							trSoundPlayFN("implode start.wav","1",-1,"","");
-							shootShotgun(p, "start", "dir", 3 + trQuestVarGet("p"+p+"projectiles"));
-						}
-					}
-				}
-			} else {
-				yVarToVector("p"+p+"characters", "prev");
-				if (zDistanceBetweenVectorsSquared("start", "prev") > 0) {
-					trVectorQuestVarSet("dir", zGetUnitVector("prev", "start"));
-					ySetVarFromVector("p"+p+"characters", "dir", "dir");
-					ySetVarFromVector("p"+p+"characters", "prev", "start");
-				}
-			}
-			
-			if (trQuestVarGet("p"+p+"flamethrower") == 1) {
-				if (trTimeMS() > yGetVar("p"+p+"characters", "flamethrowerNext")) {
-					ySetVar("p"+p+"characters", "flamethrowerNext", trTimeMS() + 750);
-					yVarToVector("p"+p+"characters", "dir");
-					target = 1 + yGetVar("p"+p+"characters", "flamethrowerStep");
-					if (target <= 3) {
-						ySetVar("p"+p+"characters", "flamethrowerStep", target);
-						if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "chimera"+target)) >= 0) {
-							trUnitSelectClear();
-							trUnitSelect(""+1*yGetVar("p"+p+"characters", "chimera"+target), true);
-							trSetSelectedScale(0,1,0);
-							trMutateSelected(kbGetProtoUnitID("Chimera"));
-							trUnitOverrideAnimation(19,0,true,false,-1);
-						} else {
-							spyEffect(1*trQuestVarGet("p"+p+"characters"),
-								kbGetBlockID("Cinematic Block"),yGetVarName("p"+p+"characters", "chimera"+target));
-						}
-					}
-					if (trQuestVarGet("p"+p+"flamethrowerActive") == 1) {
-						dist = trQuestVarGet("flamethrowerRange") * trQuestVarGet("p"+p+"spellRange");
-						amt = 1.5 * trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
-						for(x=yGetDatabaseCount("enemies"); >0) {
-							id = yDatabaseNext("enemies", true);
-							if (id == -1 || trUnitAlive() == false) {
-								removeEnemy();
-							} else {
-								current = zDistanceToVector("enemies", "start");
-								if (current < dist + 3.0) {
-									trQuestVarSet("hitboxX", trQuestVarGet("startx") + current * trQuestVarGet("dirX"));
-									trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + current * trQuestVarGet("dirZ"));
-									current = 0.3 * current + 1.0;
-									if (zDistanceToVector("enemies", "hitbox") < current) {
-										damageEnemy(p, amt);
-									}
-								}
+					trSoundPlayFN("titanfall.wav","1",-1,"","");
+					if (trQuestVarGet("p"+p+"minigun") == 1) {
+						trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") + trQuestVarGet("p"+p+"ultimateCost"));
+						if (trQuestVarGet("p"+p+"favorNext") > 1) {
+							trPlayerGrantResources(p, "favor", -1);
+							trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") - 1);
+							if (trPlayerResourceCount(p, "favor") == 0) {
+								minigunOff(p);
 							}
 						}
+						addGenericProj("p"+p+"pelletsIncoming","start","dir",kbGetProtoUnitID("Thor Hammer"),2,30.0,4.5,0.3, p);
+						yAddUpdateVar("p"+p+"pelletsIncoming", "type", 1);
+						yAddUpdateVar("p"+p+"pelletsIncoming", "startx", trQuestVarGet("startx"));
+						yAddUpdateVar("p"+p+"pelletsIncoming", "startz", trQuestVarGet("startz"));
+						yAddUpdateVar("p"+p+"pelletsIncoming", "start", trTimeMS());
+					} else {
+						trSoundPlayFN("implode start.wav","1",-1,"","");
+						shootShotgun(p, "start", "dir", 3 + trQuestVarGet("p"+p+"projectiles"));
 					}
 				}
 			}
@@ -427,47 +419,24 @@ void commandoAlways(int eventID = -1) {
 		}
 	}
 
-	if (trQuestVarGet("p"+p+"flamethrower") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"flamethrowerNext")) {
-			trQuestVarSet("p"+p+"flamethrowerActive", 1);
-			trQuestVarSet("p"+p+"flamethrowerNext", 
-				trQuestVarGet("p"+p+"flamethrowerNext") + trQuestVarGet("flamethrowerDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			trPlayerGrantResources(p, "favor", -1);
-			if (trPlayerResourceCount(p, "favor") == 0) {
-				trQuestVarSet("p"+p+"flamethrower", 0);
-				flamethrowersOff(p);
-			}
-		}
-	}
-
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
-		trQuestVarSet("p"+p+"flamethrower", 1 - trQuestVarGet("p"+p+"flamethrower"));
-		if (trQuestVarGet("p"+p+"flamethrower") == 0) {
-			flamethrowersOff(p);
-		} else if (trPlayerResourceCount(p, "favor") == 0) {
-			trQuestVarSet("p"+p+"flamethrower", 0);
-			if (trCurrentPlayer() == p) {
-				trSoundPlayFN("cantdothat.wav","1",-1,"","");
-				trChatSend(0, "Not enough favor to activate Flamethrower!");
+		trQuestVarSet("p"+p+"minigun", 1 - trQuestVarGet("p"+p+"minigun"));
+		if (trQuestVarGet("p"+p+"minigun") == 1) {
+			if (trPlayerResourceCount(p, "favor") == 0) {
+				trQuestVarSet("p"+p+"minigun", 0);
+				if (trCurrentPlayer() == p) {
+					trSoundPlayFN("cantdothat.wav","1",-1,"","");
+					trChatSend(0, "Not enough favor to activate minigun!");
+				}
+			} else {
+				trSoundPlayFN("storehouse.wav","1",-1,"","");
+				trQuestVarSet("p"+p+"firstDelay", 1000 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
+				trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("p"+p+"firstDelay"));
+				zSetProtoUnitStat("Javelin Cavalry Hero", p, 11, trQuestVarGet("p"+p+"RANGE") * 1.5);
 			}
 		} else {
-			trSoundPlayFN("storehouse.wav","1",-1,"","");
-			trQuestVarSet("p"+p+"flamethrowerNext", trTimeMS() + 850);
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-					removeCommando(p);
-				} else {
-					ySetVar("p"+p+"characters", "flamethrowerNext", trTimeMS() + 100);
-					ySetVar("p"+p+"characters", "flamethrowerStep", 0);
-					for(y=3; >0) {
-						if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "chimera"+y)) == -1) {
-							spyEffect(1*trQuestVarGet("p"+p+"characters"), 
-								kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "chimera"+y));
-						}
-					}
-				}
-			}
+			minigunOff(p);
 		}
 	}
 
@@ -483,7 +452,7 @@ void chooseCommando(int eventID = -1) {
 		wellName = "(Q) Shrapnel Shot";
 		wellIsUltimate = false;
 		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-		rainName = "(E) Flamethrower";
+		rainName = "(E) Minigun";
 		rainIsUltimate = false;
 		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
 		lureName = "(W) Echo Bomb";
@@ -493,8 +462,16 @@ void chooseCommando(int eventID = -1) {
 	trQuestVarSet("p"+p+"wellCost", 0);
 	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("echoBombCooldown"));
 	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 2);
+	trQuestVarSet("p"+p+"rainCooldown", 1);
 	trQuestVarSet("p"+p+"rainCost", 0);
+}
+
+void modifyCommando(int eventID = -1) {
+	int p = eventID - 5000 - 12 * COMMANDO;
+	zSetProtoUnitStat("Javelin Cavalry Hero", p, 13, 1);
+	if (trQuestVarGet("p"+p+"minigun") == 1) {
+		zSetProtoUnitStat("Javelin Cavalry Hero", p, 11, trQuestVarGet("p"+p+"RANGE") * 1.5);
+	}
 }
 
 rule commando_init
@@ -505,6 +482,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * COMMANDO + p, "commandoAlways");
 		trEventSetHandler(1000 + 12 * COMMANDO + p, "chooseCommando");
+		trEventSetHandler(5000 + 12 * COMMANDO + p, "modifyCommando");
 	}
 
 	trQuestVarSet("shrapnelCooldown", 10);
@@ -513,9 +491,5 @@ highFrequency
 	trQuestVarSet("echoBombDuration", 6);
 	trQuestVarSet("echoBombRadius", 12);
 
-	/* hits every 0.75 seconds for 120 damage */
-	trQuestVarSet("flamethrowerDamage", 90);
-	trQuestVarSet("flamethrowerCost", 7);
-	trQuestVarSet("flamethrowerDelay", 1000 / trQuestVarGet("flamethrowerCost"));
-	trQuestVarSet("flamethrowerRange", 8);
+	trQuestVarSet("minigunRange", 1.5);
 }

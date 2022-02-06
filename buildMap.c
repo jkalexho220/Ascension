@@ -425,6 +425,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             if (trQuestVarGet("chestType") < CHEST_STATUES) {
                 buildRoom(x, z, ROOM_BASIC);
                 trQuestVarSet("room"+room, ROOM_CHEST);
+                trPaintTerrain(x*35+15, z*35+15, x*35+25, z*35+25, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+                trChangeTerrainHeight(x*35+15, z*35+15, x*35+25, z*35+25, worldHeight, false);
             } else {
                 size = 12;
                 z0 = size;
@@ -1031,7 +1033,7 @@ highFrequency
         {
             case 1:
             {
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 4, 1);
                 trQuestVarSet("bossRoomSize", 16);
                 trQuestVarSet("extraEdges", 9);
                 /* this had better be good to hook them in */
@@ -1231,7 +1233,7 @@ highFrequency
             }
             case 5:
             {
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 5, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 11);
                 trSetLighting("dawn", 0.1);
@@ -1289,7 +1291,7 @@ highFrequency
                 sunColor(150,150,0);
                 trSetCloudData(1.0, 50.0, 50.0, 0.0, 1.0, 0.0);
                 trSetCloudMap("shockwall");
-                trSetCivAndCulture(0, 3, 1);
+                trSetCivAndCulture(0, 4, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 10);
                 trQuestVarSet("wallEdges", 4);

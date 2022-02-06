@@ -206,7 +206,8 @@ highFrequency
 		yClearDatabase("enemies");
 		yClearDatabase("enemiesIncoming");
 
-		trQuestVarSet("bossPointer", yAddToDatabase("enemies", "bossUnit"));
+		activateEnemy("bossUnit", 0, 0);
+		trQuestVarSet("bossPointer", yGetNewestPointer("enemies"));
 
 		zSetProtoUnitStat("Revealer", 1, 2, 32);
 		trArmyDispatch("1,0","Revealer",1,trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);

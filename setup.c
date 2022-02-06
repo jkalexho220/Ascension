@@ -404,11 +404,11 @@ runImmediately
     setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
     setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
     setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
-    setupClass("Oracle Hero", STARSEER, 540, 1500, MANASTONE, 5);
+    setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
     setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
     setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
     setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
-    setupClass("Maceman Hero", COMMANDO, 700, 1250, STARSTONE, 5);
+    setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
     setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
     setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
     setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
@@ -510,7 +510,7 @@ highFrequency
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 0, 20);
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
-        setupPlayerProto("Maceman Hero", 1200, 45, 4.8, 0.5);
+        setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
         setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
         setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);

@@ -796,7 +796,10 @@ int processGenericProj(string db = "") {
 }
 
 int addGenericProj(string db = "",string start="",string dir="",
-	int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0) {
+	int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0, int p = 0) {
+	if (p == 0) {
+		p = ENEMY_PLAYER;
+	}
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	int index = yAddToDatabase(db, "next");
 	yAddUpdateVar(db, "proto", proto);
@@ -812,8 +815,8 @@ int addGenericProj(string db = "",string start="",string dir="",
 	trUnitSelectClear();
 	trUnitSelectByQV("next", true);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-	zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, speed);
-	trUnitConvert(ENEMY_PLAYER);
+	zSetProtoUnitStat("Kronny Flying", p, 1, speed);
+	trUnitConvert(p);
 	trSetUnitOrientation(trVectorQuestVarGet(dir), vector(0,1,0), true);
 	trSetSelectedScale(0, 0.0 - height, 0);
 	trDamageUnitPercent(100);

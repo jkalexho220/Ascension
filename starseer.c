@@ -1,17 +1,17 @@
-void removeMagicMessenger(int p = 0) {
+void removeStarseer(int p = 0) {
 	for(x=3; >0) {
 		trUnitSelectClear();
 		trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x), true);
 		trUnitChangeProtoUnit("Rocket");
 		trUnitSelectClear();
-		trUnitSelect(""+1*yGetVar("p"+p+"characters", "valkyrie"+x), true);
+		trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
 		trUnitChangeProtoUnit("Rocket");
 	}
 	removePlayerSpecific(p);
 	/* the star units */
 	for(x=3; >0) {
 		yRemoveUpdateVar("p"+p+"characters", "star"+x);
-		yRemoveUpdateVar("p"+p+"characters", "valkyrie"+x);
+		yRemoveUpdateVar("p"+p+"characters", "Meteorite"+x);
 		yRemoveUpdateVar("p"+p+"characters", "last"+x);
 	}
 	yRemoveUpdateVar("p"+p+"characters", "targetRadius");
@@ -19,10 +19,9 @@ void removeMagicMessenger(int p = 0) {
 	yRemoveUpdateVar("p"+p+"characters", "angle");
 	yRemoveUpdateVar("p"+p+"characters", "hitbox");
 	yRemoveUpdateVar("p"+p+"characters", "last");
-	yRemoveUpdateVar("p"+p+"characters", "slipstreamSFX");
 }
 
-void magicMessengerAlways(int eventID = -1) {
+void starseerAlways(int eventID = -1) {
 	int p = eventID - 12 * STARSEER;
 	int id = 0;
 	int hit = 0;
@@ -37,11 +36,13 @@ void magicMessengerAlways(int eventID = -1) {
 	for (y=yGetDatabaseCount("p"+p+"characters"); > 0) {
 		id = yDatabaseNext("p"+p+"characters", true);
 		if (id == -1 || trUnitAlive() == false) {
-			removeMagicMessenger(p);
+			removeStarseer(p);
 		} else {
 			hit = CheckOnHit(p, id);
-			if (hit == ON_HIT_NORMAL) {
-				trPlayerGrantResources(p, "favor", 5);
+			if (hit == ON_HIT_SPECIAL) {
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					stunUnit("enemies", 1.5, p);
+				}
 			}
 			
 			current = trTimeMS() - yGetVar("p"+p+"characters", "last");
@@ -62,6 +63,12 @@ void magicMessengerAlways(int eventID = -1) {
 				}
 			}
 
+			if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
+				amt = trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange") - 2.0;
+				amt = (amt - yGetVar("p"+p+"characters", "currentRadius") + 2.0) / amt;
+				zSetProtoUnitStat("Oracle Hero", p, 1, trQuestVarGet("p"+p+"speed") * (0.5 + amt));
+			}
+
 			hit = 1 + yGetVar("p"+p+"characters", "hitbox");
 			if (hit > 3) {
 				hit = 1;
@@ -71,10 +78,10 @@ void magicMessengerAlways(int eventID = -1) {
 			current = yGetVar("p"+p+"characters", "angle");
 			for(x=1; <=3) {
 				if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
-					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "valkyrie"+x));
-					if (id == -1 || yGetVar("p"+p+"characters", "valkyrie"+x) == 0) {
+					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "Meteorite"+x));
+					if (id == -1 || yGetVar("p"+p+"characters", "Meteorite"+x) == 0) {
 						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-								kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "valkyrie"+x));
+								kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "Meteorite"+x));
 					}
 				}
 				id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "star"+x));
@@ -111,10 +118,10 @@ void magicMessengerAlways(int eventID = -1) {
 						trSetSelectedScale(0,0,0);
 					}
 					trSetSelectedUpVector(3.33 * trQuestVarGet("dirX"),0.2,3.33 * trQuestVarGet("dirZ"));
-					if (trQuestVarGet("p"+p+"revolution") == 1) {
+					if (trQuestVarGet("p"+p+"supernova") == 1) {
 						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"characters", "valkyrie"+x), true);
-						trSetSelectedUpVector(0.5 * trQuestVarGet("dirX"), 0, 0.5 * trQuestVarGet("dirZ"));
+						trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+						trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
 					}
 				}
 				current = fModulo(6.283185, current + 2.094395);
@@ -124,9 +131,12 @@ void magicMessengerAlways(int eventID = -1) {
 			
 			trQuestVarSet("outer", xsPow(yGetVar("p"+p+"characters", "currentRadius") + 1.5, 2));
 			trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
+			if (trQuestVarGet("p"+p+"supernova") == 1) {
+				trQuestVarSet("inner", 0);
+			}
 			trVectorSetUnitPos("center", "p"+p+"characters");
 
-			amt = trQuestVarGet("revolutionDamage") * trQuestVarGet("p"+p+"spellDamage");
+			amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
 			target = 0;
 			for(x=yGetDatabaseCount("enemies"); >0) {
 				id = yDatabaseNext("enemies", true);
@@ -143,8 +153,15 @@ void magicMessengerAlways(int eventID = -1) {
 						if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
 							if (dotProduct("dir", "prevPos") > trQuestVarGet("angleDiff")) {
 								/* HIT */
+								ySetVar("p"+p+"characters", "specialAttack", yGetVar("p"+p+"characters", "specialAttack") - 1);
+								if (yGetVar("p"+p+"characters", "specialAttack") <= 0) {
+									stunUnit("enemies", 1.5, p);
+									ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
+								}
+								if (trQuestVarGet("p"+p+"supernova") == 0) {
+									trPlayerGrantResources(p, "favor", 1);
+								}
 								trUnitHighlight(0.2, false);
-								trPlayerGrantResources(p, "favor", 1);
 								damageEnemy(p, amt, true);
 								if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
 									target = 1;
@@ -161,269 +178,180 @@ void magicMessengerAlways(int eventID = -1) {
 				trQuestVarSetFromRand("sound", 1, 4, true);
 				trSoundPlayFN("swordonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 			}
-			
 		}
 	}
-	
-	if (yGetDatabaseCount("p"+p+"frostbolts") >0) {
-		yDatabaseNext("p"+p+"frostbolts");
-		trVectorSetUnitPos("pos", "p"+p+"frostbolts");
-		yVarToVector("p"+p+"frostbolts", "prev");
-		yVarToVector("p"+p+"frostbolts", "dir");
-		hit = 0;
-		vectorToGrid("pos", "loc");
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-			hit = 1;
-		} else {
-			dist = zDistanceBetweenVectors("pos", "prev");
-			for (x=yGetDatabaseCount("enemies"); >0) {
-				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
-					removeEnemy();
-				} else if (rayCollision("enemies", "prev", "dir", dist + 2.0, 4.0)) {
-					hit = 1;
-					break;
-				}
-			}
+
+
+	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
+		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			yDatabaseNext("p"+p+"characters", true);
+			trUnitSetStance("Passive");
+			amt = xsMin(trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange"),
+				zDistanceToVector("p"+p+"characters", "p"+p+"wellPos"));
+			amt = xsMax(2, amt);
+			ySetVar("p"+p+"characters", "targetRadius", amt);
 		}
-		
-		if (hit == 1) {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"frostbolts", true);
-			trUnitChangeProtoUnit("Lampades Bolt");
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"frostbolts", true);
-			trMutateSelected(kbGetProtoUnitID("Frost Drift"));
-			trSetSelectedScale(1.25 * trQuestVarGet("p"+p+"spellRange"),1,1.6*trQuestVarGet("p"+p+"spellRange"));
-			dist = xsPow(trQuestVarGet("frostboltRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			amt = trQuestVarGet("frostboltDamage") * trQuestVarGet("p"+p+"spellDamage");
-			for (x=yGetDatabaseCount("enemies"); >0) {
-				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
-					removeEnemy();
-				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-					hit = hit + 1;
-					damageEnemy(p, amt);
-					stunUnit("enemies", 2.0 * trQuestVarGet("p"+p+"spellDuration"), p);
+		trSoundPlayFN("suckup3.wav","1",-1,"","");
+	}
+
+	if (trQuestVarGet("p"+p+"Repel") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"RepelTimeout")) {
+			trQuestVarSet("p"+p+"RepelTimeout", trQuestVarGet("p"+p+"RepelTimeout") + 1000);
+			trQuestVarSet("p"+p+"Repel", 2);
+			hit = 0;
+			dist = xsPow(trQuestVarGet("RepelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+					removeStarseer(p);
+				} else {
+					trVectorSetUnitPos("pos", "p"+p+"characters");
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					trArmySelect("1,0");
+					trUnitChangeProtoUnit("Tremor");
+					for(y=yGetDatabaseCount("enemies"); >0) {
+						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+							removeEnemy();
+						} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+							trVectorSetUnitPos("target", "enemies");
+							trVectorQuestVarSet("dir", 
+								zGetUnitVector("pos", "target", trQuestVarGet("RepelRange") * trQuestVarGet("p"+p+"spellRange")));
+							trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
+							trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
+							launchUnit("enemies", "dest");
+							hit = hit + 1;
+						}
+					}
 				}
 			}
 			trPlayerGrantResources(p, "favor", hit);
-			trSoundPlayFN("icemono.wav","1",-1,"","");
-			yRemoveFromDatabase("p"+p+"frostbolts");
-		} else {
-			ySetVarFromVector("p"+p+"frostbolts", "prev", "pos");
 		}
-		
-	}
-
-	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
-		trSoundPlayFN("lampadesshoot.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-				removeMagicMessenger(p);
-			} else {
-				trVectorSetUnitPos("pos", "p"+p+"characters");
-				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
-				vectorSetAsTargetVector("dest", "pos", "p"+p+"wellpos", 300.0);
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-				trUnitSelectClear();
-				trUnitSelectByQV("next", true);
-				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-				trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
-				trUnitMoveToPoint(trQuestVarGet("destx"),0,trQuestVarGet("destz"), -1, false);
-				yAddToDatabase("p"+p+"frostbolts", "next");
-				yAddUpdateVar("p"+p+"frostbolts", "timeout", trTimeMS() + 5000);
-				yAddUpdateVar("p"+p+"frostbolts", "prevx", trQuestVarGet("posx"));
-				yAddUpdateVar("p"+p+"frostbolts", "prevz", trQuestVarGet("posz"));
-				yAddUpdateVar("p"+p+"frostbolts", "dirx", trQuestVarGet("dirx"));
-				yAddUpdateVar("p"+p+"frostbolts", "dirz", trQuestVarGet("dirz"));
-			}
-		}
-	}
-	
-
-	if (trQuestVarGet("p"+p+"revolution") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"revolutionNext")) {
-			trQuestVarSet("p"+p+"revolutionNext", trQuestVarGet("p"+p+"revolutionNext") + trQuestVarGet("p"+p+"revolutionDelay"));
-			trPlayerGrantResources(p, "favor", -1);
-			if (trPlayerResourceCount(p, "favor") == 0) {
-				trQuestVarSet("p"+p+"revolution", 0);
-				for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-					yDatabaseNext("p"+p+"characters");
-					ySetVar("p"+p+"characters", "targetRadius", 3);
-					for(x=3; >0) {
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"characters", "valkyrie"+x), true);
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-					}
+	} else if (trQuestVarGet("p"+p+"Repel") == 2) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"RepelTimeout")) {
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+					removeStarseer(p);
+				} else {
+					trVectorSetUnitPos("pos", "p"+p+"characters");
+					trUnitOverrideAnimation(-1, 0, false, true, -1);
 				}
-				trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
 			}
+			trQuestVarSet("p"+p+"Repel", 0);
 		}
 	}
 
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
-		trQuestVarSet("p"+p+"revolution", 1 - trQuestVarGet("p"+p+"revolution"));
-		amt = 3;
-		if (trQuestVarGet("p"+p+"revolution") == 1) {
-			trQuestVarSet("p"+p+"starAngularVelocity", 
-				trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
-			trQuestVarSet("p"+p+"revolutionDelay", trQuestVarGet("revolutionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			trQuestVarSet("p"+p+"revolutionNext", trTimeMS());
-			amt = trQuestVarGet("revolutionRadius") * trQuestVarGet("p"+p+"spellRange");
-		} else {
-			trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
+		trQuestVarSet("p"+p+"Repel", 1);
+		trQuestVarSet("p"+p+"RepelTimeout", trTimeMS() + 1200);
+		trSoundPlayFN("oracledone.wav","1",-1,"","");
+		trSoundPlayFN("implode reverse.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+				removeStarseer(p);
+			} else {
+				trUnitOverrideAnimation(52, 0, false, false, -1);
+			}
 		}
-		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters");
-			ySetVar("p"+p+"characters", "targetRadius", amt);
-			for(x=3; >0) {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "valkyrie"+x), true);
-				if (trQuestVarGet("p"+p+"revolution") == 1) {
-					trMutateSelected(kbGetProtoUnitID("Valkyrie"));
-					trSetSelectedScale(0,0,0);
-					trUnitSetAnimationPath("1,0,0,0,0,0,0");
-					trUnitOverrideAnimation(15,0,true,false,-1);
-				} else {
+	}
+
+	if (trQuestVarGet("p"+p+"supernova") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"supernovaTimeout")) {
+			trQuestVarSet("p"+p+"supernova", 0);
+			for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
+				yDatabaseNext("p"+p+"characters");
+				for(x=3; >0) {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
 					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 				}
 			}
-		}
-		trSoundPlayFN("suckup3.wav","1",-1,"","");
-	}
-
-	if (trQuestVarGet("p"+p+"slipstream") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"slipstreamTimeout")) {
-			trQuestVarSet("p"+p+"slipstream", 0);
-			zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed"));
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-					removeMagicMessenger(p);
-				} else {
-					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "slipstreamSFX")) >= 0) {
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"characters", "slipstreamSFX"), true);
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-					}
-				}
-			}
+			trQuestVarSet("p"+p+"starAngularVelocity", 
+				trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
 		}
 	}
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trSoundPlayFN("meteorsplash.wav","1",-1,"","");
-		zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed") + trQuestVarGet("slipstreamBoost"));
-		trQuestVarSet("p"+p+"slipstream", 1);
-		trQuestVarSet("p"+p+"slipstreamTimeout", 
-			trTimeMS() + 1000 * trQuestVarGet("slipstreamDuration") * trQuestVarGet("p"+p+"spellDuration"));
-		hit = 0;
-		dist = xsPow(trQuestVarGet("slipstreamRange") * trQuestVarGet("p"+p+"spellRange"), 2);
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-				removeMagicMessenger(p);
-			} else {
-				trVectorSetUnitPos("pos", "p"+p+"characters");
-				if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "slipstreamSFX")) >= 0) {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "slipstreamSFX"), true);
-					trMutateSelected(kbGetProtoUnitID("Valkyrie"));
-					trSetSelectedScale(0,0,0);
-					trUnitSetAnimationPath("1,0,0,0,0,0,0");
-					trUnitOverrideAnimation(15,0,true,false,-1);
-				} else {
-					debugLog("valkyrie missing!");
-					spyEffect(1*trQuestVarGet("p"+p+"characters"), 
-						kbGetProtoUnitID("Cinematic Block"), yGetVarName("p"+p+"characters", "slipstreamSFX"));
-				}
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-				trArmySelect("1,0");
-				trUnitChangeProtoUnit("Meteor Impact Water");
-				for(y=yGetDatabaseCount("enemies"); >0) {
-					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
-						removeEnemy();
-					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-						trVectorSetUnitPos("target", "enemies");
-						trVectorQuestVarSet("dir", 
-							zGetUnitVector("pos", "target", trQuestVarGet("slipstreamRange") * trQuestVarGet("p"+p+"spellRange")));
-						trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
-						trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
-						launchUnit("enemies", "dest");
-						hit = hit + 1;
-					}
-				}
+		trPlayerGrantResources(p, "favor", 0.0 - trQuestVarGet("supernovaCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		trQuestVarSet("p"+p+"supernova", 1);
+		trQuestVarSet("p"+p+"supernovaTimeout", 
+			trTimeMS() + 1000 * trQuestVarGet("supernovaDuration") * trQuestVarGet("p"+p+"spellDuration"));
+		trQuestVarSet("p"+p+"starAngularVelocity", 
+			2.0 * trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
+			yDatabaseNext("p"+p+"characters");
+			ySetVar("p"+p+"characters", "targetRadius", trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange"));
+			for(x=3; >0) {
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+				trMutateSelected(kbGetProtoUnitID("Meteorite"));
+				trSetSelectedScale(0,0,0);
+				trUnitOverrideAnimation(6,0,true,false,-1);
 			}
 		}
-		trPlayerGrantResources(p, "favor", hit);
+		trSoundPlayFN("suckup3.wav","1",-1,"","");
+		trSoundPlayFN("inferno.wav","1",-1,"","");
 	}
 
 	ySetPointer("enemies", index);
 	xsSetContextPlayer(old);
 }
 
-void chooseMagicMessenger(int eventID = -1) {
+void chooseStarseer(int eventID = -1) {
 	int p = eventID - 1000 - 12 * STARSEER;
 	if (trCurrentPlayer() == p) {
-		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
-		wellName = "(Q) Frostbolt";
+		map("w", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
+		wellName = "(W) Realignment";
 		wellIsUltimate = false;
-		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-		rainName = "(E) Revolution";
+		map("q", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
+		rainName = "(Q) Repel";
 		rainIsUltimate = false;
-		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(W) Slipstream";
-		lureIsUltimate = false;
+		map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
+		lureName = "(E) Supernova";
+		lureIsUltimate = true;
 	}
-	zSetProtoUnitStat("Lampades Bolt", p, 1, 10);
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("frostboltCooldown"));
+	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("realignCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("slipstreamCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
+	trQuestVarSet("p"+p+"lureCooldown", 1);
+	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("supernovaCost"));
+	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("RepelCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
-void magicMessengerModify(int eventID = -1) {
+void starseerModify(int eventID = -1) {
 	int p = eventID - 5000 - 12 * STARSEER;
 	/* no attack for u */
-	if (trQuestVarGet("p"+p+"revolution") == 1) {
-		trQuestVarSet("p"+p+"starAngularVelocity", 
-			trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
-	} else {
-		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
-	}
-
-	if (trQuestVarGet("p"+p+"slipstream") == 1) {
-		zSetProtoUnitStat("Javelin Cavalry Hero", p, 1, trQuestVarGet("p"+p+"speed") + trQuestVarGet("slipstreamBoost"));
+	zSetProtoUnitStat("Oracle Hero", p, 27, 0);
+	trQuestVarSet("p"+p+"starAngularVelocity", 
+		trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+	if (trQuestVarGet("p"+p+"supernova") == 1) {
+		trQuestVarSet("p"+p+"starAngularVelocity", 2.0 * trQuestVarGet("p"+p+"starAngularVelocity"));
 	}
 }
 
-rule magicMessenger_init
+rule starseer_init
 active
 highFrequency
 {
 	xsDisableSelf();
 	trQuestVarSet("starAngularVelocity", 6.283185 / 4.0);
 	for(p=1; < ENEMY_PLAYER) {
-		trEventSetHandler(12 * STARSEER + p, "magicMessengerAlways");
-		trEventSetHandler(1000 + 12 * STARSEER + p, "chooseMagicMessenger");
-		trEventSetHandler(5000 + 12 * STARSEER + p, "magicMessengerModify");
+		trEventSetHandler(12 * STARSEER + p, "starseerAlways");
+		trEventSetHandler(1000 + 12 * STARSEER + p, "chooseStarseer");
+		trEventSetHandler(5000 + 12 * STARSEER + p, "starseerModify");
 		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
 	}
-	trQuestVarSet("frostboltCooldown", 8);
-	trQuestVarSet("frostboltRadius", 4);
-	trQuestVarSet("frostboltDamage", 40);
 
-	trQuestVarSet("slipstreamCooldown", 15);
-	trQuestVarSet("slipstreamRange", 15);
-	trQuestVarSet("slipstreamDuration", 4);
-	trQuestVarSet("slipstreamBoost", 3);
+	trQuestVarSet("starBaseDamage", 50);
 
-	trQuestVarSet("revolutionCost", 5);
-	trQuestVarSet("revolutionDelay", 1000.0 / trQuestVarGet("revolutionCost"));
-	trQuestVarSet("revolutionDamage", 50);
-	trQuestVarSet("revolutionRadius", 12);
+
+	trQuestVarSet("realignCooldown", 5);
+	trQuestVarSet("realignRadius", 15);
+
+	trQuestVarSet("RepelCooldown", 15);
+	trQuestVarSet("RepelRange", 15);
+
+	trQuestVarSet("supernovaCost", 60);
+	trQuestVarSet("supernovaDuration", 6);
 }
