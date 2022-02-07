@@ -12,6 +12,9 @@ void minigunOff(int p = 0) {
 	trQuestVarSet("p"+p+"firstDelay", 1000);
 	trQuestVarSet("p"+p+"nextDelay", 2000);
 	zSetProtoUnitStat("Javelin Cavalry Hero", p, 11, trQuestVarGet("p"+p+"RANGE"));
+	if (trCurrentPlayer() == p) {
+		trSetCounterDisplay("Minigun: OFF");
+	}
 }
 
 void shootShotgun(int p = 0, string start = "", string dir = "", int count = 3) {
@@ -168,7 +171,7 @@ void commandoAlways(int eventID = -1) {
 							/* the farther they are, the lower the damage */
 							damageEnemy(p, (30.0 - current) / 30.0 * amt, false);
 							target = 1;
-							trPlayerGrantResources(p, "favor", 1);
+							gainFavor(p, 1);
 						}
 					}
 				}
@@ -202,7 +205,7 @@ void commandoAlways(int eventID = -1) {
 					if (trQuestVarGet("p"+p+"minigun") == 1) {
 						trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") + trQuestVarGet("p"+p+"ultimateCost"));
 						if (trQuestVarGet("p"+p+"favorNext") > 1) {
-							trPlayerGrantResources(p, "favor", -1);
+							gainFavor(p, -1);
 							trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") - 1);
 							if (trPlayerResourceCount(p, "favor") == 0) {
 								minigunOff(p);
@@ -245,7 +248,7 @@ void commandoAlways(int eventID = -1) {
 			trDamageUnitPercent(100);
 			trUnitChangeProtoUnit("Meteorite");
 			yRemoveFromDatabase("p"+p+"shrapnelShots");
-			shootShotgun(p, "prev", "dir", 5 + 2 * trQuestVarGet("p"+p+"projectiles"));
+			shootShotgun(p, "prev", "dir", 6 + 2 * trQuestVarGet("p"+p+"projectiles"));
 			trSoundPlayFN("shockwave.wav","1",-1,"","");
 		}
 	}
@@ -434,6 +437,9 @@ void commandoAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"firstDelay", 1000 / (2.0 + trQuestVarGet("p"+p+"projectiles")));
 				trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("p"+p+"firstDelay"));
 				zSetProtoUnitStat("Javelin Cavalry Hero", p, 11, trQuestVarGet("p"+p+"RANGE") * 1.5);
+				if (trCurrentPlayer() == p) {
+					trSetCounterDisplay("Minigun: ON");
+				}
 			}
 		} else {
 			minigunOff(p);
@@ -457,6 +463,7 @@ void chooseCommando(int eventID = -1) {
 		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
 		lureName = "(W) Echo Bomb";
 		lureIsUltimate = false;
+		trSetCounterDisplay("Minigun: OFF");
 	}
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("shrapnelCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);

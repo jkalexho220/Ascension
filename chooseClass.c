@@ -186,7 +186,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement sun ray icon 64";
-					msg = "Cooldown: 12 | Duration: 6 | Heal: 100 | Fire rate scales with projectile count.";
+					msg = "Cooldown: 12 | Duration: 6 | Heal: 100 | Fire rate + 0.5x Projectiles";
 					next = 4;
 				}
 			}
@@ -264,7 +264,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Gain Spell Lifesteal equal to your percentage of missing health.";
+					msg = "Passive: Gain Lifesteal equal to your percentage of missing health.";
 				}
 				case 2:
 				{
@@ -459,7 +459,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 3:
 				{
 					icon = "icons\god power lightning icon 64";
-					msg = "Cooldown: 12 | Duration: 4 | Damage: 1.5 x Attack x Spell Power | Fire rate scales with projectiles";
+					msg = "Cooldown: 12 | Duration: 4 | Damage: 1.5 x Attack x Spell Power | Fire rate + 0.33x Projectiles";
 				}
 				case 4:
 				{
@@ -635,7 +635,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					msg = "Damage per bullet: 0.6 x Attack | Bullets: 4 + Projectiles";
+					msg = "Damage per bullet: 0.6 x Attack | Bullets: 4 + Projectiles | Damage falls off with distance.";
 				}
 				case 4:
 				{
@@ -650,7 +650,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement electrum bullets icon 64";
-					msg = "Damage per bullet: 0.6 x Attack | Bullets: 7 + 2 x Projectiles";
+					msg = "Damage per bullet: 0.6 x Attack | Bullets: 8 + 2 x Projectiles | Damage falls off with distance.";
 				}
 				case 7:
 				{
@@ -973,7 +973,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Damage: 50 | Rotation speed scales with projectiles";
+					msg = "Damage: 50 | Rotation speed + 0.33x projectiles";
 				}
 				case 3:
 				{

@@ -28,7 +28,7 @@ void stormcutterAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"stormbonus")));
 				zSetProtoUnitStat("Archer Atlantean Hero", p, 31, trQuestVarGet("p"+p+"attack"));
 				if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
-					trPlayerGrantResources(p, "favor", 1);
+					gainFavor(p, 1);
 					trUnitSelectClear();
 					trUnitSelectByID(target);
 					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
@@ -57,7 +57,7 @@ void stormcutterAlways(int eventID = -1) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+1*trQuestVarGet("enemies"),p,"Archer Atlantean Hero", dist) >0) {
 				stunUnit("enemies", 2.0, p);
-				trPlayerGrantResources(p, "favor", 1);
+				gainFavor(p, 1);
 			}
 		}
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
@@ -103,7 +103,7 @@ void stormcutterAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("whirlwindCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("whirlwindCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
 		trVectorSetUnitPos("center", "p"+p+"lureObject");
 		trUnitSelectClear();

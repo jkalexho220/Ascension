@@ -380,6 +380,46 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case NPC_QUEST + SHOP_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey! It's dangerous to go alone! Buy this!");
+				}
+				case 2:
+				{
+					uiMessageBox("If you want this relic, you can buy it for 200 gold. Just drop a relic here to confirm your purchase.");
+				}
+				case 3:
+				{
+					uiMessageBox("It will be sent straight to your warehouse.");
+				}
+				case 4:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + SHOP_NPC:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The price is 200 gold. This is what's for sale:");
+				}
+				case 2:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_QUEST + FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -727,6 +767,28 @@ highFrequency
 									startNPCDialog(NPC_QUEST_COMPLETE + BOUNTY_NPC + 1);
 									break;
 								}
+							}
+						}
+					}
+				}
+				case SHOP_NPC + 1:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSetFromRand("shopRelic", 5, 10, true);
+							trVectorSetUnitPos("shopGuyPos", "questGuy");
+							trQuestVarSet("shopGuyActive", 1);
+						}
+						case 2:
+						{
+							trUnitSelectClear();
+							trUnitSelectByQV("questGuy");
+							if (trUnitIsSelected()) {
+								startNPCDialog(NPC_QUEST_COMPLETE + SHOP_NPC);
+								reselectMyself();
 							}
 						}
 					}

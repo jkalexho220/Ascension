@@ -1076,13 +1076,7 @@ highFrequency
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 4.8);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 26, -1);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, 9999999999999999999.0);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, -9999999999999999999.0);
-                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 34, 1.0);
+                trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 2.4);
             }
             case 2:
             {
@@ -1174,12 +1168,6 @@ highFrequency
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 1.075);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 26, -1);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, 9999999999999999999.0);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, -9999999999999999999.0);
-                trModifyProtounit("King Folstag", ENEMY_PLAYER, 34, 1.0);
             }
             case 4:
             {
@@ -1224,12 +1212,6 @@ highFrequency
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 26, -1);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, 9999999999999999999.0);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, -9999999999999999999.0);
-                trModifyProtounit("Chimera", ENEMY_PLAYER, 34, 1.0);
             }
             case 5:
             {
@@ -1277,9 +1259,6 @@ highFrequency
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
-                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 26, -1);
                 trQuestVarSet("pestilenceStart", trGetNextUnitScenarioNameNumber());
             }
             case 6:
@@ -1332,10 +1311,52 @@ highFrequency
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
-                trModifyProtounit("Helepolis", ENEMY_PLAYER, 24, -1);
-                trModifyProtounit("Helepolis", ENEMY_PLAYER, 25, -1);
-                trModifyProtounit("Helepolis", ENEMY_PLAYER, 26, -1);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
+            }
+            case 7:
+            {
+                wallHeight = worldHeight + 6;
+                trSetCivAndCulture(0, 11, 3);
+                trQuestVarSet("bossRoomSize", 12);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 1;
+                
+                TERRAIN_PRIMARY = 0;
+                TERRAIN_SUB_PRIMARY = 25;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 3;
+
+                trQuestVarSet("mapType", MAP_OPEN);
+                trQuestVarSet("treeDensity", 0.3);
+                trStringQuestVarSet("treeProto1", "Columns");
+                trStringQuestVarSet("treeProto2", "Broken Columns");
+                trStringQuestVarSet("treeProto3", "Fallen Columns");
+                trQuestVarSet("spriteDensity", 0.7);
+                trStringQuestVarSet("spriteProto1", "Seaweed");
+                trStringQuestVarSet("spriteProto2", "Water Reeds");
+                trStringQuestVarSet("spriteProto3", "Rock Granite Small");
+                trQuestVarSet("rockDensity", 0.6);
+                trStringQuestVarSet("rockProto1", "Rock Granite Big");
+                trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
+                trStringQuestVarSet("rockProto3", "Shipwreck");
+
+                trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
+                
+                trQuestVarSet("enemyProtoCount", 6);
+                trStringQuestVarSet("enemyProto1", "Servant");
+                trStringQuestVarSet("enemyProto2", "Nereid");
+                trStringQuestVarSet("enemyProto3", "Wadjet");
+                trStringQuestVarSet("enemyProto4", "Hydra");
+                trStringQuestVarSet("enemyProto5", "Medusa");
+                trStringQuestVarSet("enemyProto6", "Lampades");
+                
+                trStringQuestVarSet("bossProto", "Scylla");
+                trQuestVarSet("bossScale", 1.5);
+
+                trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
             }
         }
 
@@ -1405,6 +1426,8 @@ highFrequency
         if (trQuestVarGet("mapType") == MAP_OPEN) {
             yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
         }
+
+        trQuestVarSetFromRand("relicTransporterDepth", 1, 5, true);
         
         /* build guaranteed path to every room */
         for(i=0; < 64) {
@@ -1451,7 +1474,10 @@ highFrequency
                         }
                     }
                     if (edgeIsPortal == false) {
-                        if ((trQuestVarGet("relictransporterguy") == 0) && (trQuestVarGet("frontier") != trQuestVarGet("villageEntrance")) &&
+                        trQuestVarSet("relicTransporterDepth", trQuestVarGet("relicTransporterDepth") - 1);
+                        if ((trQuestVarGet("relicTransporterDepth") <= 0) &&
+                            (trQuestVarGet("relictransporterguy") == 0) && 
+                            (trQuestVarGet("frontier") != trQuestVarGet("villageEntrance")) &&
                             (trQuestVarGet("frontier") != trQuestVarGet("bossEntranceRoom"))) {
                             trQuestVarSet("relicTransporterGuy", trQuestVarGet("frontier"));
                         } else if (trQuestVarGet("mapType") == MAP_PORTALS) {

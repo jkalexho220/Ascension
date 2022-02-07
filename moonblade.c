@@ -38,7 +38,7 @@ void moonbladeAlways(int eventID = -1) {
 						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("Lightning Sparks Ground");
-						trPlayerGrantResources(p, "favor", 3);
+						gainFavor(p, 3);
 					}
 				}
 				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.01;
@@ -232,7 +232,7 @@ void moonbladeAlways(int eventID = -1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
 			trQuestVarSet("p"+p+"protectionNext", 
 				trQuestVarGet("p"+p+"protectionNext") + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			trPlayerGrantResources(p, "favor", 0 - 1);
+			gainFavor(p, 0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);
 				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);

@@ -174,7 +174,7 @@ void nightriderAlways(int eventID = -1) {
 							trQuestVarSet("hitboxX", trQuestVarGet("prevX") + current * trQuestVarGet("dirX"));
 							trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + current * trQuestVarGet("dirZ"));
 							if (zDistanceBetweenVectorsSquared("target", "hitbox") < 9.0) {
-								trPlayerGrantResources(p, "favor", 1);
+								gainFavor(p, 1);
 								trQuestVarSet("destX", trQuestVarGet("destX") + trQuestVarGet("targetX") - trQuestVarGet("hitboxX"));
 								trQuestVarSet("destZ", trQuestVarGet("destZ") + trQuestVarGet("targetZ") - trQuestVarGet("hitboxZ"));
 								if ((yGetVar("p"+p+"abducts", "curse") == 1) &&
@@ -267,7 +267,7 @@ void nightriderAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("doomsdayCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("doomsdayCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"doomsday", 1);
 		trQuestVarSet("p"+p+"doomsdayBonus", 1);
 		trQuestVarSet("p"+p+"doomsdayTimeout", 

@@ -127,7 +127,7 @@ void spellstealerAlways(int eventID = -1) {
 			if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 1) {
 				amt = amt * 2;
 			}
-			trPlayerGrantResources(p, "favor", 0 - amt);
+			gainFavor(p, 0 - amt);
 		} else {
 			yClearDatabase("p"+p+"bladeDanceTargets");
 			trQuestVarSet("p"+p+"lureReadyTime", 0);
@@ -146,7 +146,7 @@ void spellstealerAlways(int eventID = -1) {
 				if (trUnitAlive() == false) {
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 				} else if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
-					trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"favorFromAttacks"));
+					gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
 					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
 					amt = 1;
@@ -265,7 +265,7 @@ void spellstealerAlways(int eventID = -1) {
 		}
 
 		if (hit == 1) {
-			trPlayerGrantResources(p, "favor", 1);
+			gainFavor(p, 1);
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"spellblades");
 			trUnitChangeProtoUnit("Lightning Sparks Ground");

@@ -71,7 +71,7 @@ void castIcicle(int p = 0, string pos = "") {
 		}
 	}
 	if (hit >= 1) {
-		trPlayerGrantResources(p, "favor", hit);
+		gainFavor(p, hit);
 		ySetPointer("enemies", target);
 		stunUnit("enemies", 1.5, p);
 		trQuestVarSetFromRand("sound", 1, 2, true);
@@ -241,11 +241,11 @@ void frostknightAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitChangeProtoUnit("Frost Giant");
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		yAddToDatabase("p"+p+"frostGiants", "p"+p+"lureObject");
 		yAddUpdateVar("p"+p+"frostGiants", "specialnext", trTimeMS());
 		yAddUpdateVar("p"+p+"frostGiants", "step", 0);

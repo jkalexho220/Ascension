@@ -168,7 +168,7 @@ void gardenerAlways(int eventID = -1) {
 				target = kbUnitGetTargetUnitID(id);
 				for(x=yGetDatabaseCount("enemies"); >0) {
 					if (yDatabaseNext("enemies", true) == target) {
-						trPlayerGrantResources(p, "favor", 1);
+						gainFavor(p, 1);
 						poisonUnit("enemies", 12.0, 12.0, p);
 						trVectorSetUnitPos("pos", "enemies");
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -223,7 +223,7 @@ void gardenerAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"seeds"); >0) {
 			yDatabaseNext("p"+p+"seeds");
 			if (zDistanceToVectorSquared("p"+p+"seeds", "p"+p+"wellPos") < dist) {
-				trPlayerGrantResources(p, "favor", 1);
+				gainFavor(p, 1);
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"seeds", true);
 				trUnitHighlight(0.01,false);
@@ -288,7 +288,7 @@ void gardenerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trSoundPlayFN("walkingwoods1.wav", "1", -1, "", "");
 		trSoundPlayFN("gaiaforest.wav", "1", -1, "", "");
-		trPlayerGrantResources(p, "favor", 0.0 - trQuestVarGet("natureBountyCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("natureBountyCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"natureBounty", 1);
 		trQuestVarSet("p"+p+"natureBountyTimeout", 
 			trTimeMS() + 1000 * trQuestVarGet("natureBountyDuration") * trQuestVarGet("p"+p+"spellDuration"));

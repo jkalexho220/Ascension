@@ -22,8 +22,8 @@ void fireknightAlways(int eventID = -1) {
 		amt = 0.01 * trUnitPercentDamaged();
 	}
 
-	trQuestVarSet("p"+p+"spellLifesteal", 
-		trQuestVarGet("p"+p+"spellLifesteal") + amt - trQuestVarGet("p"+p+"fireknightBonus"));
+	trQuestVarSet("p"+p+"Lifesteal", 
+		trQuestVarGet("p"+p+"Lifesteal") + amt - trQuestVarGet("p"+p+"fireknightBonus"));
 	trQuestVarSet("p"+p+"fireknightBonus", amt);
 
 	if (yGetDatabaseCount("p"+p+"fireharpies") > 0) {
@@ -78,7 +78,7 @@ void fireknightAlways(int eventID = -1) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 						damageEnemy(p, amt, true);
-						trPlayerGrantResources(p, "favor", 2);
+						gainFavor(p, 2);
 					}
 				}
 				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
@@ -201,7 +201,7 @@ void fireknightAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();

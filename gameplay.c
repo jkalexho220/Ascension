@@ -64,7 +64,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"wellCost") * trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trQuestVarGet("p"+p+"favor") >= trQuestVarGet("p"+p+"wellCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_READY);
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "Underworld Passage", 1);
@@ -104,7 +104,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"rainCost") * trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trQuestVarGet("p"+p+"favor") >= trQuestVarGet("p"+p+"rainCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_READY);
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "rain", 1);
@@ -146,7 +146,7 @@ void checkGodPowers(int p = 0) {
         }
         case ABILITY_COST:
         {
-            if (trPlayerResourceCount(p, "favor") >= trQuestVarGet("p"+p+"lureCost") * trQuestVarGet("p"+p+"ultimateCost")) {
+            if (trQuestVarGet("p"+p+"favor") >= trQuestVarGet("p"+p+"lureCost") * trQuestVarGet("p"+p+"ultimateCost")) {
                 trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_READY);
                 if (trQuestVarGet("p"+p+"silenced") == 0) {
                     trTechGodPower(p, "animal magnetism", 1);
@@ -544,6 +544,12 @@ highFrequency
                 }
             } else if (trPlayerResourceCount(p, "gold") < trQuestVarGet("p"+p+"gold")) {
                 trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
+            }
+            if (trPlayerResourceCount(p, "favor") > trQuestVarGet("p"+p+"favor")) {
+                gainFavor(p, 0);
+                if (trCurrentPlayer() == p) {
+                    trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
+                }
             }
             if (trQuestVarGet("p"+p+"dead") == 0) {
                 trUnitSelectClear();

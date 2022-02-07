@@ -34,7 +34,7 @@ void saviorAlways(int eventID = -1) {
 		}
 		
 		if (hit > 0) {
-			trPlayerGrantResources(p, "favor", 5);
+			gainFavor(p, 5);
 			ySetPointer("playerUnits", hit);
 			trVectorSetUnitPos("pos", "playerUnits");
 			trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos", 2.0));
@@ -275,7 +275,7 @@ void saviorAlways(int eventID = -1) {
 				if (trQuestVarGet("p"+p+"unity") == 1) {
 					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("unityHeal") * target;
 					dist = xsPow(trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-					trPlayerGrantResources(p, "favor", 1);
+					gainFavor(p, 1);
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
@@ -308,7 +308,7 @@ void saviorAlways(int eventID = -1) {
 				trQuestVarSet("p"+x+"dead", 0);
 			}
 		}
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COOLDOWN);
 		trChatSend(0, "<color=1,1,1>Intervention!</color>");
 		trSoundPlayFN("restorationbirth.wav","1",-1,"","");

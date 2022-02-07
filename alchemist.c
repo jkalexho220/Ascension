@@ -28,7 +28,7 @@ void alchemistAlways(int eventID = -1) {
 				target = yGetVar("p"+p+"characters", "attackTarget");
 				ySetVar("p"+p+"characters", "potion", 1+yGetVar("p"+p+"characters", "potion"));
 				if (yGetVar("p"+p+"characters", "potion") == 3) {
-					trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"projectiles"));
+					gainFavor(p, trQuestVarGet("p"+p+"projectiles"));
 					ySetVar("p"+p+"characters", "potion", 0);
 					if (trQuestVarGet("p"+p+"potion") == POTION_HEAL) {
 						amt = trQuestVarGet("potionHeal") * trQuestVarGet("p"+p+"spellDamage") * trQuestVarGet("p"+p+"projectiles");
@@ -211,7 +211,7 @@ void alchemistAlways(int eventID = -1) {
 			}
 		}
 		if (hit > 0) {
-			trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("duplicateCost") * trQuestVarGet("p"+p+"ultimateCost"));
+			gainFavor(p, 0 - trQuestVarGet("duplicateCost") * trQuestVarGet("p"+p+"ultimateCost"));
 			ySetPointer("playerCharacters", hit);
 			trVectorSetUnitPos("pos", "playerCharacters");
 			spawnPlayerClone(1*yGetVar("playerCharacters", "player"), "pos");

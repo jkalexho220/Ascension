@@ -30,13 +30,15 @@ const int RELIC_FAVOR_FROM_ATTACKS = 24;
 const int RELIC_POISON_FASTER = 25;
 
 const int RELIC_YEEBAAGOOON = 26;
-const int RELIC_NICKONHAWK = 27;
+
 const int RELIC_NOTTUD = 28;
 
 const int RELIC_CURSED_COOLDOWNS = 29;
 const int RELIC_ZENOPHOBIA = 30;
 
 /* key relics */
+const int RELIC_NICKONHAWK = 32;
+
 const int RELIC_KEY_GREEK = 33;
 const int RELIC_KEY_NORSE = 34;
 const int RELIC_KEY_ATLANTEAN = 35;
@@ -148,6 +150,10 @@ string relicName(int relic = 0) {
 		case RELIC_POISON_FASTER:
 		{
 			msg = "Poison damage doubled but duration halved.";
+		}
+		case RELIC_NICKONHAWK:
+		{
+			msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
 		}
 	}
 	if (relic >= RELIC_KEY_GREEK) {

@@ -30,6 +30,12 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
+
+void gainFavor(int p = 0, int amt = 0) {
+	trQuestVarSet("p"+p+"favor", 1*xsMin(100, xsMax(0, trQuestVarGet("p"+p+"favor") + amt)));
+	trPlayerGrantResources(p,"favor", trQuestVarGet("p"+p+"favor") - trPlayerResourceCount(p, "favor"));
+}
+
 void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 	trUnitSelectClear();
 	trUnitSelect(""+unit, true);
@@ -47,7 +53,7 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 		if (getBit(STATUS_SILENCE, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_SILENCE));
 			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			trPlayerGrantResources(p, "favor", 5);
+			gainFavor(p, 5);
 			if (trCurrentPlayer() == p) {
 				trChatSend(0, "<color=1,1,1>Silence absorbed! Your next spell will inflict Silence!</color>");
 			}
@@ -135,7 +141,7 @@ void nightriderHarvest(string pos = "") {
 				trUnitSelectByQV("p"+p+"unit", true);
 				ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
 				healUnit(p, 0.05 * trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage"));
-				trPlayerGrantResources(p, "favor", 1);
+				gainFavor(p, 1);
 			}
 		}
 	}
@@ -152,7 +158,7 @@ void removeEnemy() {
 				trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + yGetVar("enemies", "bounty"));
 				trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
 			}
-			trPlayerGrantResources(p, "Favor", trQuestVarGet("rand"));
+			gainFavor(p, trQuestVarGet("rand"));
 		}
 	}
 	if (yGetVar("enemies", "relic") > 0) {
@@ -366,7 +372,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
 			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			trPlayerGrantResources(p, "favor", 5);
+			gainFavor(p, 5);
 			if (trCurrentPlayer() == p) {
 				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
 			}
@@ -455,7 +461,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 		if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
 			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			trPlayerGrantResources(p, "favor", 5);
+			gainFavor(p, 5);
 			if (trCurrentPlayer() == p) {
 				trChatSend(0, "<color=1,1,1>Stun absorbed! Your next spell will inflict Stun!</color>");
 			}
@@ -685,7 +691,7 @@ int CheckOnHit(int p = 0, int id = 0) {
     } else {
         if ((action == 12) || (action == 6)) {
             if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
-            	trPlayerGrantResources(p, "favor", trQuestVarGet("p"+p+"favorFromAttacks"));
+            	gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
             	status = ON_HIT_NORMAL;
                 ySetVar("p"+p+"characters", "attackNext", 
                     yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"nextDelay"));

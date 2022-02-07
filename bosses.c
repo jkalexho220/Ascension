@@ -401,7 +401,6 @@ highFrequency
 				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Helepolis"), "biggerHelepolis");
 				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Barracks Atlantean"), "biggerBallista");
 				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
-				ySetVarAtIndex("enemies", "magicResist", 0.5, 1*trQuestVarGet("bossPointer"));
 
 				trQuestVarSet("bossTurretObject", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
@@ -458,6 +457,7 @@ highFrequency
 				bossCooldown(10, 15);
 				trSetLighting("anatolia",0.1);
 				yAddToDatabase("ballistas", "bossUnit");
+				yAddUpdateVar("ballistas", "index", trQuestVarGet("bossPointer"));
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				xsDisableSelf();

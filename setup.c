@@ -149,6 +149,22 @@ string stageName(int stage = 0) {
         {
             name = "The Factory";
         }
+        case 7:
+        {
+            name = "The Deep";
+        }
+        case 8:
+        {
+            name = "Cloudfield";
+        }
+        case 9:
+        {
+            name = "The Pit";
+        }
+        case 10:
+        {
+            name = "The Peak";
+        }
     }
     return(name);
 }
@@ -180,6 +196,22 @@ string stageIcon(int stage = 0) {
         case 6:
         {
             img = "icons\building siege workshop icon 64";
+        }
+        case 7:
+        {
+            img = "icons\improvement poseidons secret icons 64";
+        }
+        case 8:
+        {
+            img = "icons\improvement safe passage icons 64";
+        }
+        case 9:
+        {
+            img = "ui\ui map erebus 256x256";
+        }
+        case 10:
+        {
+            img = "ui\ui map missing 256x256";
         }
     }
     return(img);
@@ -505,8 +537,8 @@ highFrequency
         setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
         setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
         setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
-        setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0);
-        setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.3);
+        setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
+        setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
         setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 0, 20);
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
@@ -517,7 +549,7 @@ highFrequency
         setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
         setupPlayerProto("Audrey", 1000, 50, 0);
-        setupPlayerProto("Walking Berry Bush", 500, 25, 3.5);
+        setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
 
 
         setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
@@ -558,6 +590,10 @@ highFrequency
             trModifyProtounit("Arkantos God Out", p, 8, 1);
             zInitProtoUnitStat("Cinematic Block", p, 0, 300);
             zInitProtoUnitStat("Priest Projectile", p, 8, 2);
+
+            trModifyProtounit("Servant", p, 55, 1);
+            trModifyProtounit("Nereid", p, 55, 1);
+            trModifyProtounit("Scylla", p, 55, 1);
         }
 
         trModifyProtounit("Minion", 0, 8, -999);

@@ -137,7 +137,7 @@ void thunderRiderAlways(int eventID = -1) {
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+1*trQuestVarGet("enemies"), p, "Victory Marker", 3) > 0) {
-				trPlayerGrantResources(p, "favor", 3);
+				gainFavor(p, 3);
 				damageEnemy(p, trQuestVarGet("blitzDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
 				if (trUnitAlive()) {
 					stunUnit("enemies", 1.5, p);
@@ -228,7 +228,7 @@ void thunderRiderAlways(int eventID = -1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"rideLightningNext")) {
 			trQuestVarSet("p"+p+"rideLightningNext", 
 				trQuestVarGet("p"+p+"rideLightningNext") + trQuestVarGet("rideLightningDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			trPlayerGrantResources(p, "favor", -1);
+			gainFavor(p, -1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"rideLightning", 0);
 				trQuestVarSet("p"+p+"launched", 0);
@@ -311,7 +311,7 @@ void thunderRiderAlways(int eventID = -1) {
 			trArmySelect(""+p+",0");
 			trUnitChangeProtoUnit("Regeneration SFX");
 		}
-		trPlayerGrantResources(p, "favor", 0.1 * trQuestVarGet("p"+p+"attack"));
+		gainFavor(p, 0.1 * trQuestVarGet("p"+p+"attack"));
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 

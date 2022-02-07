@@ -181,7 +181,7 @@ void throneShieldAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Increase Prosperity Small");
 			}
 		}
-		trPlayerGrantResources(p, "favor", 0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"shieldOfLight", 4);
 	}
 
@@ -234,7 +234,7 @@ void throneShieldAlways(int eventID = -1) {
 					} else {
 						stunUnit("enemies", 2.0, p);
 					}
-					trPlayerGrantResources(p, "favor", 1);
+					gainFavor(p, 1);
 				}
 			}
 			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
@@ -326,7 +326,7 @@ void throneShieldAlways(int eventID = -1) {
 						trUnitSelectByQV("p"+p+"characters");
 						trSetSelectedScale(1,1,1);
 					} else if (hit == ON_HIT_SPECIAL) {
-						trPlayerGrantResources(p, "favor", 3);
+						gainFavor(p, 3);
 						stunUnit("enemies", 2.0, p);
 						amt = 0.05 * trQuestVarGet("p"+p+"health");
 						for(x=yGetDatabaseCount("playerCharacters"); >0) {

@@ -70,13 +70,13 @@ void sunbowAlways(int eventID = -1) {
 										hit = hit + 1;
 										trUnitSelectClear();
 										trUnitSelectByQV("enemies", true);
-										damageEnemy(p, amt, false);
+										damageEnemy(p, amt, true);
 									}
 								}
 							}
 						}
 					}
-					trPlayerGrantResources(p, "favor", hit);
+					gainFavor(p, hit);
 				}
 			}
 		}
@@ -171,7 +171,7 @@ void sunbowAlways(int eventID = -1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"searingNext")) {
 			trQuestVarSet("p"+p+"searingNext", 
 				trQuestVarGet("p"+p+"searingNext") + trQuestVarGet("searingDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			trPlayerGrantResources(p, "favor", 0 - 1);
+			gainFavor(p, 0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"searing", 0);
 				trQuestVarSet("p"+p+"searingStarted", 1);
@@ -198,7 +198,7 @@ void sunbowAlways(int eventID = -1) {
 		target = 0;
 		yDatabaseNext("p"+p+"sunlights");
 		if (trTimeMS() > yGetVar("p"+p+"sunlights", "next")) {
-			trPlayerGrantResources(p, "favor", 1);
+			gainFavor(p, 1);
 			ySetVar("p"+p+"sunlights", "next", trTimeMS() + 500);
 			trQuestVarSet("centerX", yGetVar("p"+p+"sunlights", "posX"));
 			trQuestVarSet("centerZ", yGetVar("p"+p+"sunlights", "posZ"));

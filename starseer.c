@@ -159,7 +159,7 @@ void starseerAlways(int eventID = -1) {
 									ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
 								}
 								if (trQuestVarGet("p"+p+"supernova") == 0) {
-									trPlayerGrantResources(p, "favor", 1);
+									gainFavor(p, 1);
 								}
 								trUnitHighlight(0.2, false);
 								damageEnemy(p, amt, true);
@@ -175,8 +175,8 @@ void starseerAlways(int eventID = -1) {
 			/* the star hit something so we update the prev position to be the current position */
 			if (target == 1) {
 				ySetVar("p"+p+"characters", "last"+hit, trQuestVarGet("currentAngle"));
-				trQuestVarSetFromRand("sound", 1, 4, true);
-				trSoundPlayFN("swordonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				trQuestVarSetFromRand("sound", 1, 3, true);
+				trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 			}
 		}
 	}
@@ -224,7 +224,7 @@ void starseerAlways(int eventID = -1) {
 					}
 				}
 			}
-			trPlayerGrantResources(p, "favor", hit);
+			gainFavor(p, hit);
 		}
 	} else if (trQuestVarGet("p"+p+"Repel") == 2) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"RepelTimeout")) {
@@ -250,6 +250,8 @@ void starseerAlways(int eventID = -1) {
 			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 				removeStarseer(p);
 			} else {
+				trMutateSelected(kbGetProtoUnitID("Oracle Hero"));
+				trUnitSetStance("Passive");
 				trUnitOverrideAnimation(52, 0, false, false, -1);
 			}
 		}
@@ -273,7 +275,7 @@ void starseerAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trPlayerGrantResources(p, "favor", 0.0 - trQuestVarGet("supernovaCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("supernovaCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"supernova", 1);
 		trQuestVarSet("p"+p+"supernovaTimeout", 
 			trTimeMS() + 1000 * trQuestVarGet("supernovaDuration") * trQuestVarGet("p"+p+"spellDuration"));
