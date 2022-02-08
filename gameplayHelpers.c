@@ -31,8 +31,8 @@ bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
 
-void gainFavor(int p = 0, int amt = 0) {
-	trQuestVarSet("p"+p+"favor", 1*xsMin(100, xsMax(0, trQuestVarGet("p"+p+"favor") + amt)));
+void gainFavor(int p = 0, float amt = 0) {
+	trQuestVarSet("p"+p+"favor", xsMin(100, xsMax(0, trQuestVarGet("p"+p+"favor") + amt)));
 	trPlayerGrantResources(p,"favor", trQuestVarGet("p"+p+"favor") - trPlayerResourceCount(p, "favor"));
 }
 
@@ -829,15 +829,20 @@ int addGenericProj(string db = "",string start="",string dir="",
 	return(index);
 }
 
-int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	int index = yAddToDatabase("playerUnits", "next");
+int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0) {
+	int index = yAddToDatabase("playerUnits", db);
 	yAddUpdateVar("playerUnits", "player", p);
 	yAddUpdateVar("playerUnits", "hero", 0);
 	yAddUpdateVar("playerUnits", "decay", decay);
-	yAddUpdateVar("playerUnits", "decayNext", trTimeMS());
+	yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 	yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
 	yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("proto"+proto+"armor"));
+    return(index);
+}
+
+int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int index = activatePlayerUnit("next", p, proto, decay);
 	string pName = kbGetProtoUnitName(proto);
     trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
     return(index);

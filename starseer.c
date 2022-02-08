@@ -51,8 +51,8 @@ void starseerAlways(int eventID = -1) {
 			amt = trQuestVarGet("p"+p+"starAngularVelocity") * 0.001 * current;
 			ySetVar("p"+p+"characters", "angle", fModulo(6.283185, yGetVar("p"+p+"characters", "angle") - amt));
 			if (yGetVar("p"+p+"characters", "targetRadius") == 0) {
-				ySetVar("p"+p+"characters", "targetRadius", 3);
-				ySetVar("p"+p+"characters", "currentRadius", 3);
+				ySetVar("p"+p+"characters", "targetRadius", 2);
+				ySetVar("p"+p+"characters", "currentRadius", 2);
 			} else {
 				dist = yGetVar("p"+p+"characters", "targetRadius") - yGetVar("p"+p+"characters", "currentRadius");
 				if (xsAbs(dist) > 0.1) {

@@ -201,7 +201,7 @@ void fireknightAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		gainFavor(p, 0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();

@@ -192,7 +192,7 @@ highFrequency
         spawnPlayer(p, "startPosition");
         trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
         trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
-        for(x=10; >0) {
+        for(x=12; >0) {
             if (trQuestVarGet("p"+p+"relic"+x) > 0) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
                 trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
@@ -418,7 +418,34 @@ highFrequency
                                     }
                                 }
                             }
-                        } 
+                        } else if (trQuestVarGet("shopGuyActive") == 1) {
+                            if (zDistanceBetweenVectorsSquared("pos", "shopGuyPos") < 9) {
+                                relicReturned = true;
+                                trUnitChangeProtoUnit("Relic");
+                                trUnitSelectClear();
+                                trUnitSelectByQV("p"+p+"relics", true);
+                                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                                trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                                trSetSelectedScale(0,0,-1);
+                                trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                                if (trQuestVarGet("shopping") == 0) {
+                                    trQuestVarSet("shopping", 1);
+                                    if (trPlayerResourceCount(p, "gold") >= 200) {
+                                        relic = trQuestVarGet("shopRelic");
+                                        trPlayerGrantResources(p, "gold", -200);
+                                        if (trCurrentPlayer() == p) {
+                                            trSoundPlayFN("favordump.wav","1",-1,"","");
+                                            trChatSend(0, "Purchased " + relicName(relic) + "!");
+                                            trChatSend(0, "The purchased relic has been added to your warehouse.");
+                                            trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
+                                        }
+                                    } else if (trCurrentPlayer() == p) {
+                                        trChatSend(0, "You don't have enough gold! You need 200!");
+                                        trSoundPlayFN("cantdothat.wav","1",-1,"","");
+                                    }
+                                }
+                            }
+                        }
                         if (relicReturned == false) {
                             if (trCurrentPlayer() == p) {
                                 trSoundPlayFN("backtowork.wav","1",-1,"","");
@@ -545,7 +572,7 @@ highFrequency
             } else if (trPlayerResourceCount(p, "gold") < trQuestVarGet("p"+p+"gold")) {
                 trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
             }
-            if (trPlayerResourceCount(p, "favor") > trQuestVarGet("p"+p+"favor")) {
+            if (trPlayerResourceCount(p, "favor") > 1 + trQuestVarGet("p"+p+"favor")) {
                 gainFavor(p, 0);
                 if (trCurrentPlayer() == p) {
                     trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
@@ -638,6 +665,11 @@ highFrequency
                     if (id == -1 || trUnitAlive() == false) {
                         removePlayerCharacter();
                     } else if (zDistanceToVectorSquared("playerCharacters", "dead"+p+"pos") < 100) {
+                        if (trQuestVarGet("p"+1*yGetVar("playerCharacters", "player")+"class") == SUNBOW) {
+                            if (count < 0) {
+                                count = 0;
+                            }
+                        }
                         count = count + 1;
                         trQuestVarSet("playersReviving", 1);
                     }
@@ -701,17 +733,19 @@ highFrequency
 
     /* sky passages */
     if (yGetDatabaseCount("skyPassages") > 0) {
-        yDatabaseNext("skyPassages");
-        trVectorSetUnitPos("pos", "skyPassages");
-        trQuestVarSet("sound", 0);
-        for(x=yGetDatabaseCount("playerUnits"); >0) {
-            yDatabaseNext("playerUnits");
-            if (zDistanceToVectorSquared("playerUnits", "pos") < 6) {
-                yAddToDatabase("magicalJourney", "playerUnits");
-                if (yGetVar("playerUnits", "hero") == 1) {
-                    if (trCurrentPlayer() == yGetVar("playerUnits", "player")) {
-                        uiLookAtUnitByName(""+1*yGetVar("skyPassages", "exit"));
-                        trQuestVarSet("sound", 1);
+        if (trQuestVarGet("portalsActive") == 1) {
+            yDatabaseNext("skyPassages");
+            trVectorSetUnitPos("pos", "skyPassages");
+            trQuestVarSet("sound", 0);
+            for(x=yGetDatabaseCount("playerUnits"); >0) {
+                yDatabaseNext("playerUnits");
+                if (zDistanceToVectorSquared("playerUnits", "pos") < 6) {
+                    yAddToDatabase("magicalJourney", "playerUnits");
+                    if (yGetVar("playerUnits", "hero") == 1) {
+                        if (trCurrentPlayer() == yGetVar("playerUnits", "player")) {
+                            uiLookAtUnitByName(""+1*yGetVar("skyPassages", "exit"));
+                            trQuestVarSet("sound", 1);
+                        }
                     }
                 }
             }

@@ -266,15 +266,15 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Why did I come to this tower? I should've never listened to those bastards!");
+					uiMessageBox("Dammit! To think I could only reach the second floor!");
 				}
 				case 2:
 				{
-					uiMessageBox("What's so great about the Tower of Ascension anyway? It's not like anyone makes it to the top!");
+					uiMessageBox("I'm such a useless father!");
 				}
 				case 3:
 				{
-					uiMessageBox("You should leave too! Before you're killed!");
+					uiMessageBox("Kastor! Please be safe!");
 					dialog = 0;
 				}
 			}
@@ -460,16 +460,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trQuestVarSetFromRand("reward", 11, 13, true);
 					trShowImageDialog("icons\icon resource gold", "300 Gold");
-					for(p=1; < ENEMY_PLAYER) {
-						trQuestVarSet("p"+p+"gold", 300 + trQuestVarGet("p"+p+"gold"));
-						trPlayerGrantResources(p, "gold", 300);
-					}
-				}
-				case 5:
-				{
-					uiMessageBox("I have sent the reward to your warehouse.");
 					dialog = 0;
 				}
 			}
@@ -517,7 +508,153 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
 					trShowImageDialog(gemstoneIcon(STARSTONE),gemstoneName(STARSTONE) + " x1");
-					trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + FETCH_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers. I feel like my time is coming. I just want one last look at my family.");
+				}
+				case 2:
+				{
+					uiMessageBox("I don't remember where I died, but there should be a picture of my son there. Can you retrieve it?");
+				}
+				case 3:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Bring back the ghost's picture.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thank you, adventurers. This is what I was looking for.");
+				}
+				case 2:
+				{
+					uiMessageBox("I don't have hands. Can you do one last thing for me? Please write this down on the picture:");
+				}
+				case 3:
+				{
+					uiMessageBox("I'm sorry, I was wrong. If we ever meet again, I'll be a proper father this time.");
+				}
+				case 4:
+				{
+					uiMessageBox("...");
+				}
+				case 5:
+				{
+					uiMessageBox("Thank you.");
+				}
+				case 6:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(gemstoneIcon(SOULSTONE),gemstoneName(SOULSTONE) + " x1");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Jimmy? Jimmy is that you?");
+				}
+				case 2:
+				{
+					uiMessageBox("Jimmy you bastard! It's your fault we all died!");
+				}
+				case 3:
+				{
+					uiMessageBox("I'm going to kill you Jimmy!");
+				}
+				case 4:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Run!", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I'm sorry... my memory isn't what it used to be. I know you're not Jimmy.");
+				}
+				case 2:
+				{
+					uiMessageBox("Please take this as compensation... and kill Jimmy if you get the chance.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog("icons\icon resource gold", "200 Gold");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + FETCH_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Excuse me! You there! I need your help! I'll pay you handsomely!");
+				}
+				case 2:
+				{
+					uiMessageBox("I have a shipment of goods but it needs an escort. Can you bring it here?");
+				}
+				case 3:
+				{
+					uiMessageBox("Be warned! The goods smell delicious, so wolves may come and attack it!");
+				}
+				case 4:
+				{
+					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("fetchTargetPos"), true);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Escort the goods to the axeman.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thank you, adventurers. Looks like everything's intact.");
+				}
+				case 2:
+				{
+					uiMessageBox("Here is your reward.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog("icons\icon resource gold", "500 Gold");
 					dialog = 0;
 				}
 			}
@@ -611,6 +748,22 @@ highFrequency
 	}
 }
 
+void questComplete(int gem = -1, int gold = -1) {
+	if (gem >= 0) {
+		trQuestVarSet("gemstone"+gem, 1 + trQuestVarGet("gemstone"+gem));
+	}
+	if (gold > 0) {
+		for(p=1; < ENEMY_PLAYER) {
+			trQuestVarSet("p"+p+"gold", 300 + trQuestVarGet("p"+p+"gold"));
+			trPlayerGrantResources(p, "gold", 300);
+		}
+	}
+	trQuestVarSet("questCount", 1 + trQuestVarGet("questCount"));
+	startNPCDialog(NPC_QUEST_COMPLETE + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
+	trQuestVarSet("questActive", 1 + trQuestVarGet("questActive"));
+	uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+}
+
 rule town_always
 inactive
 highFrequency
@@ -650,6 +803,27 @@ highFrequency
 					trQuestVarSet("questActive", 1);
 					startNPCDialog(NPC_QUEST + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
 					break;
+				}
+			}
+		} else if (trQuestVarGet("localQuest") == SHOP_GUY) {
+			switch(1*trQuestVarGet("questActive"))
+			{
+				case 1:
+				{
+					trQuestVarSet("questActive", 2);
+					trQuestVarSetFromRand("shopRelic", 5, 10, true);
+					trQuestVarSet("shopRelic", trQuestVarGet("shopRelic") + trQuestVarGet("stage"));
+					trQuestVarSet("shopGuyActive", 1);
+					trVectorSetUnitPos("shopGuyPos", "questGuy");
+				}
+				case 2:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("questGuy");
+					if (trUnitIsSelected()) {
+						startNPCDialog(NPC_QUEST_COMPLETE + SHOP_NPC);
+						reselectMyself();
+					}
 				}
 			}
 		} else {
@@ -714,9 +888,7 @@ highFrequency
 										trChatSend(0, "<color=1,1,1>Pig returned!</color>");
 										trSoundPlayFN("pigambient.wav","1",-1,"","");
 										if (trQuestVarGet("pigReturnCount") == 3) {
-											trQuestVarSet("questActive", 3);
-											uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
-											startNPCDialog(NPC_QUEST_COMPLETE + FETCH_NPC + 1);
+											questComplete(-1, 300);
 										}
 									}
 								}
@@ -762,34 +934,185 @@ highFrequency
 							trVectorSetUnitPos("bountyGuyPos", "questguy");
 							for(p=1; < ENEMY_PLAYER) {
 								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
-									uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
-									trQuestVarSet("questActive", 4);
-									startNPCDialog(NPC_QUEST_COMPLETE + BOUNTY_NPC + 1);
+									questComplete(STARSTONE, 0);
 									break;
 								}
 							}
 						}
 					}
 				}
-				case SHOP_NPC + 1:
+				case FETCH_NPC + 2:
 				{
 					switch(1*trQuestVarGet("questActive"))
 					{
 						case 1:
 						{
 							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("shopRelic", 5, 10, true);
-							trVectorSetUnitPos("shopGuyPos", "questGuy");
-							trQuestVarSet("shopGuyActive", 1);
+							trQuestVarSetFromRand("rand", 6, 9, true);
+							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+							if (trQuestVarGet("rand") > 14) {
+								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+							}
+							z = trQuestVarGet("rand") / 4;
+							x = trQuestVarGet("rand") - 4 * z;
+							trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+							trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("fetchTarget", true);
+							trUnitChangeProtoUnit("Relic");
+							yAddToDatabase("freeRelics", "fetchTarget");
+							yAddUpdateVar("freeRelics", "type", RELIC_GHOST_PICTURE);
+							debugLog("position is " + 1*trQuestVarGet("rand"));
+						}
+						case 2:
+						{
+							trVectorSetUnitPos("pos", "fetchTarget");
+							if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16.0) {
+								questComplete(SOULSTONE, 0);
+								trUnitSelectClear();
+								trUnitSelectByQV("fetchTarget", true);
+								trUnitChangeProtoUnit("Osiris Box Glow");
+							}
+						}
+					}
+				}
+				case BOUNTY_NPC + 2:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("portalsActive", 0);
+							trCounterAddTime("countdown", 15, 1, "The shade attacks", -1);
+							trQuestVarSet("shadeAttackTime", trTime() + 15);
+							trQuestVarSet("questActive", 2);
+							trModifyProtounit("Shade", 0, 2, 30);
+							trModifyProtounit("Shade", 0, 27, 3000);
+						}
+						case 2:
+						{
+							if (trTime() >= trQuestVarGet("shadeAttackTime")) {
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy", true);
+								trUnitMoveToPoint(0,0,0,-1,true);
+								trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
+								trSoundPlayFN("attackwarning.wav","1",-1,"","");
+								trChatSendSpoofed(0, "Shade: JIMMY!!!!");
+								trQuestVarSet("questActive", 3);
+								trQuestVarSet("shadeAttackTime", trTime() + 30);
+								trCounterAddTime("shadecountdown", 30, 1, "Survive", -1);
+							}
+						}
+						case 3:
+						{
+							if (trTime() >= trQuestVarGet("shadeAttackTime")) {
+								trQuestVarSet("portalsActive", 1);
+								trQuestVarSet("questActive", 4);
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy", true);
+								if (trUnitAlive()) {
+									trUnitDoWorkOnUnit(""+1*trQuestVarGet("questGuy"));
+									questComplete(-1, 200);
+								}
+							} else {
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy", true);
+								if (trUnitAlive() == false) {
+									trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+									trQuestVarSet("questActive", 4);
+									trCounterAbort("shadecountdown");
+									trMessageSetText("Quest failed!", -1);
+								}
+							}
+						}
+					}
+				}
+				case FETCH_NPC + 3:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSetFromRand("rand", 6, 9, true);
+							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+							if (trQuestVarGet("rand") > 14) {
+								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+							}
+							z = trQuestVarGet("rand") / 4;
+							x = trQuestVarGet("rand") - 4 * z;
+							trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+							trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("fetchTarget", true);
+							trUnitConvert(0);
+							trUnitChangeProtoUnit("Ox Cart");
+							trQuestVarSet("fetchWolvesSpawn", zDistanceBetweenVectors("fetchTargetPos", "townCenter") - 20);
 						}
 						case 2:
 						{
 							trUnitSelectClear();
-							trUnitSelectByQV("questGuy");
-							if (trUnitIsSelected()) {
-								startNPCDialog(NPC_QUEST_COMPLETE + SHOP_NPC);
-								reselectMyself();
+							trUnitSelectByQV("fetchTarget", true);
+							for(p=1; < ENEMY_PLAYER) {
+								if (trUnitHasLOS(p)) {
+									trSoundPlayFN("find.wav","1",-1,"","");
+									trUnitConvert(p);
+									trQuestVarSet("questActive", 3);
+									trMessageSetText("Bring the cart back to the town.");
+									break;
+								}
 							}
+						}
+						case 3:
+						{
+							trUnitSelectClear();
+							trUnitSelectByQV("fetchTarget", true);
+							if (trUnitAlive() == false) {
+								trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+								trMessageSetText("Quest failed!");
+								trQuestVarSet("questActive", 4);
+							} else if (zDistanceToVector("fetchTarget", "townCenter") < trQuestVarGet("fetchWolvesSpawn")) {
+								trQuestVarSet("fetchWolvesSpawn", trQuestVarGet("fetchWolvesSpawn") - 20);
+								trVectorSetUnitPos("center", "fetchTarget");
+								trQuestVarSetFromRand("count", 1, ENEMY_PLAYER, true);
+								for(x=trQuestVarGet("count"); >0) {
+									trQuestVarSetFromRand("angle", 0, 6.283185, false);
+									trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+									trQuestVarSet("heading", 57.29578 * trQuestVarGet("angle") - 180);
+									trQuestVarSet("posx", 20.0 * trQuestVarGet("dirx") + trQuestVarGet("centerx"));
+									trQuestVarSet("posz", 20.0 * trQuestVarGet("dirz") + trQuestVarGet("centerz"));
+									trQuestVarSet("next" , trGetNextUnitScenarioNameNumber());
+									vectorToGrid("pos", "loc");
+									if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+										trUnitSelectClear();
+										trUnitSelectByQV("next", true);
+										trUnitConvert(ENEMY_PLAYER);
+										trUnitChangeProtoUnit("Fenris Wolf");
+										trUnitSelectClear();
+										trUnitSelectByQV("next", true);
+										trUnitMoveToPoint(trQuestVarGet("centerx"),0,trQuestVarGet("centerz"),-1,true);
+										activateEnemy("next");
+									}
+								}
+							} else if (zDistanceToVectorSquared("fetchTarget", "townCenter") < 400) {
+								questComplete(-1, 500);
+								trUnitSelectClear();
+								trUnitSelectByQV("fetchTarget", true);
+								trUnitConvert(0);
+							}
+						}
+					}
+				}
+				case BOUNTY_NPC + 3:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							
 						}
 					}
 				}

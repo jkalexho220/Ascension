@@ -211,7 +211,7 @@ void alchemistAlways(int eventID = -1) {
 			}
 		}
 		if (hit > 0) {
-			gainFavor(p, 0 - trQuestVarGet("duplicateCost") * trQuestVarGet("p"+p+"ultimateCost"));
+			gainFavor(p, 0.0 - trQuestVarGet("duplicateCost") * trQuestVarGet("p"+p+"ultimateCost"));
 			ySetPointer("playerCharacters", hit);
 			trVectorSetUnitPos("pos", "playerCharacters");
 			spawnPlayerClone(1*yGetVar("playerCharacters", "player"), "pos");

@@ -8,10 +8,7 @@ void removeNightrider(int p = 0) {
 void spawnMinion(int p = 0, string pos = "", float heading = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch(""+p+",0","Minion",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),heading,true);
-	yAddToDatabase("playerUnits", "next");
-	yAddUpdateVar("playerUnits", "player", p);
-	yAddUpdateVar("playerUnits", "decay", calculateDecay(p, 5.0));
-	yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
+	activatePlayerUnit("next", p, kbGetProtoUnitID("Minion"), calculateDecay(p, 5.0));
 }
 
 /* 
@@ -267,7 +264,7 @@ void nightriderAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		gainFavor(p, 0 - trQuestVarGet("doomsdayCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("doomsdayCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"doomsday", 1);
 		trQuestVarSet("p"+p+"doomsdayBonus", 1);
 		trQuestVarSet("p"+p+"doomsdayTimeout", 

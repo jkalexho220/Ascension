@@ -217,13 +217,15 @@ void classNewUnlock(int class = 0) {
 			{
 				unlocked = true;
 			}
-			case STARSEER:
-			{
-				unlocked = true;
-			}
 			case BLASTMAGE:
 			{
-				if (trQuestVarGet("chestCount") >= 5) {
+				if (trQuestVarGet("questCount") >= 5) {
+					unlocked = true;
+				}
+			}
+			case STARSEER:
+			{
+				if (trQuestVarGet("relicCount") >= 100) {
 					unlocked = true;
 				}
 			}
@@ -443,6 +445,9 @@ highFrequency
 	    for(a=1; <= CLASS_COUNT) {
 			proto = trQuestVarGet("class"+a+"proto");
 			trModifyProtounit(kbGetProtoUnitName(proto),1,5,trQuestVarGet("class"+a+"level")-1);
+			if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+				trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, 2);
+			}
 	    	trQuestVarSet("class"+a+"unit", trGetNextUnitScenarioNameNumber());
 	    	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
 	    	trArmySelect("1,0");
@@ -583,15 +588,19 @@ highFrequency
 			}
 			case THRONESHIELD:
 			{
-				uiMessageBox("To unlock this class, defeat 5 bosses. Current: " + 1*trQuestVarGet("bossKills"));
+				uiMessageBox("To unlock this class, defeat five bosses. Current: " + 1*trQuestVarGet("bossKills"));
 			}
 			case ALCHEMIST:
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 5.");
 			}
-			case NIGHTRIDER:
+			case BLASTMAGE:
 			{
-				uiMessageBox("To unlock this class, open five chests. Current: " + 1*trQuestVarGet("chestCount"));
+				uiMessageBox("To unlock this class, complete five quests. Current: " + 1*trQuestVarGet("questCount"));
+			}
+			case STARSEER:
+			{
+				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
 			case STORMCUTTER:
 			{
@@ -732,7 +741,7 @@ highFrequency
 					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
 
 					setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
-					setupExplain("Each of the remaining floors is extremely difficult. You will need to bring coordinated teams!");
+					setupExplain("Each of the remaining floors is extremely difficult. You will need to coordinate with your friends!");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

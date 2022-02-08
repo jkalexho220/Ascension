@@ -40,7 +40,7 @@ string classIcon(int class = 0) {
 		}
 		case COMMANDO:
 		{
-			icon = "icons\cavalry x turma hero icons 64";
+			icon = "icons\cavalry x jav cav hero icons 64";
 		}
 		case THRONESHIELD:
 		{
@@ -153,7 +153,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: All allies regenerate 1 health each second.";
+					msg = "Passive: You can revive allies even when enemies are nearby.";
 				}
 				case 2:
 				{
@@ -1002,7 +1002,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\god power vision icon 64";
-					msg = "Cooldown: 5 | Range: 3 - 15 | Speed: 1.5x - 0.5x";
+					msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x";
 				}
 				case 9:
 				{
@@ -1012,7 +1012,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\improvement halo of the sun icons 64";
-					msg = "Cost: 60 per second | Duration: 6";
+					msg = "Cost: 60 | Duration: 6";
 					next = 0;
 				}
 			}

@@ -519,9 +519,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
 
-            /* DELETE ME */
-            trQuestVarSet("localQuest", BOUNTY_GUY);
-
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Villager Chinese",23,19,315);
             trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -596,6 +593,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             deployTownEyecandy("Shrine",35,15,270);
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
+            
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Shade",25,35,180);
@@ -620,6 +618,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             deployTownEyecandy("Dwarven Forge",11,11,0);
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            /* DELETE ME */
+            trQuestVarSet("localQuest", FETCH_GUY);
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Throwing Axeman",21,9,270);
@@ -1385,6 +1386,7 @@ highFrequency
 
         trQuestVarSetFromRand("village", 1, 14, true);
         if (trQuestVarGet("mapType") == MAP_PORTALS) {
+            trQuestVarSet("portalsActive", 1);
             total = 1;
             trQuestVarSet("tile"+1*trQuestVarGet("village"), TILE_VISITED);
             trQuestVarSetFromRand("villageEntrance", 1, 13, true);
@@ -1392,7 +1394,6 @@ highFrequency
             if (trQuestVarGet("villageEntrance") > 14) {
                 trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 13);
             }
-            debugLog("Village entrance is " + 1*trQuestVarGet("villageEntrance"));
             buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
         } else if (trQuestVarGet("mapType") == MAP_OPEN) {
             trQuestVarSetFromRand("bossRoomEntranceMod", 1, 13, true);
@@ -1428,6 +1429,9 @@ highFrequency
         }
 
         trQuestVarSetFromRand("relicTransporterDepth", 1, 5, true);
+
+        /* DELETE ME */
+        debugLog("Village is " + 1*trQuestVarGet("village"));
         
         /* build guaranteed path to every room */
         for(i=0; < 64) {

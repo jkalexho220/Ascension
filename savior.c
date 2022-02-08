@@ -308,7 +308,7 @@ void saviorAlways(int eventID = -1) {
 				trQuestVarSet("p"+x+"dead", 0);
 			}
 		}
-		gainFavor(p, 0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COOLDOWN);
 		trChatSend(0, "<color=1,1,1>Intervention!</color>");
 		trSoundPlayFN("restorationbirth.wav","1",-1,"","");

@@ -215,7 +215,6 @@ void blastmageAlways(int eventID = -1) {
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
 		blastmageSpell(p);
-		gainFavor(p, 0 - trQuestVarGet("warpCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
@@ -302,7 +301,7 @@ void blastmageAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
-		gainFavor(p, 0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		blastmageSpell(p);
 		trQuestVarSet("p"+p+"solarFlareNext", trTimeMS());
 		trSoundPlayFN("petsuchosattack.wav","1",-1,"","");

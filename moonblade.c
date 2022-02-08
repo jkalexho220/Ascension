@@ -52,12 +52,8 @@ void moonbladeAlways(int eventID = -1) {
 					}
 					trVectorSetUnitPos("pos", "p"+p+"characters");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					yAddToDatabase("playerUnits", "next");
-					yAddUpdateVar("playerUnits", "player", p);
-					yAddUpdateVar("playerUnits", "decay", calculateDecay(p, 5.0));
-					yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 					yAddToDatabase("p"+p+"wolves", "next");
-					trArmyDispatch(""+p+",0","Wolf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), "pos", calculateDecay(p, 5.0));
 				}
 			}
 			if ((yGetVar("p"+p+"characters", "crescentCount") > 0) && 

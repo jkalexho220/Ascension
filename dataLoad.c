@@ -2,18 +2,20 @@
 progress
 0 = stage progress
 1 = current class level
-2 = transporter level
+2 = god boon
 3 = current class
 4-5 = gold
-6-15 = equipped artifacts
+6-17 = equipped artifacts
 
 data at 13, 14, 15 is unlocked relic data
 */
 int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
+const int VERSION_NUMBER = 6;
 
 void saveAllData() {
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
@@ -26,13 +28,16 @@ void saveAllData() {
 	}
 	/* slot 0 */
 	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
-	savedata = savedata + 100 * trQuestVarGet("p"+p+"transporterLevel") + 1000 * trQuestVarGet("p"+p+"class");
+	savedata = savedata + 100 * trQuestVarGet("p"+p+"godBoon") + 1300 * trQuestVarGet("p"+p+"class");
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
 	savedata = trQuestVarGet("p"+p+"gold") - trQuestVarGet("p"+p+"startingGold");
 	savedata = savedata + trGetScenarioUserData(1);
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
+	for(x=12; > yGetDatabaseCount("p"+p+"relics")) {
+		trQuestVarSet("p"+p+"relic", 0);
+	}
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics");
 		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
@@ -42,9 +47,9 @@ void saveAllData() {
 	/* equipped relics */
 	savedata = 0;
 	currentdata = 0;
-	for(x=5; > 0) {
+	for(x=6; > 0) {
 		savedata = savedata * 32 + (1*trQuestVarGet("p"+p+"relic"+x));
-		currentdata = currentdata * 32 + (1*trQuestVarGet("p"+p+"relic"+(x+5)));
+		currentdata = currentdata * 32 + (1*trQuestVarGet("p"+p+"relic"+(x+6)));
 	}
 	trSetCurrentScenarioUserData(2, savedata);
 	trSetCurrentScenarioUserData(3, currentdata);
@@ -97,7 +102,7 @@ void saveAllData() {
 }
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 16,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 18,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -180,8 +185,8 @@ inactive
 		savedata = savedata / 10;
 		trQuestVarSet("p1level", iModulo(10, savedata));
 		savedata = savedata / 10;
-		trQuestVarSet("p1transporterLevel", iModulo(10, savedata));
-		savedata = savedata / 10;
+		trQuestVarSet("p1godBoon", iModulo(13, savedata));
+		savedata = savedata / 13;
 		trQuestVarSet("p1class", iModulo(100, savedata));
 
 		/* gold */
@@ -198,8 +203,8 @@ inactive
 			if (savedata < 0) {
 				savedata = 0;
 			}
-			for(x=1; <6) {
-				trQuestVarSet("p1relic"+(x+5*y), iModulo(32, savedata));
+			for(x=1; <7) {
+				trQuestVarSet("p1relic"+(x+6*y), iModulo(32, savedata));
 				savedata = savedata / 32;
 			}
 		}
@@ -304,15 +309,15 @@ inactive
 					} else if (loadProgress == 1) {
 						trQuestVarSet("p"+p+"level", x);
 					} else if (loadProgress == 2) {
-						trQuestVarSet("p"+p+"transporterLevel", x);
+						trQuestVarSet("p"+p+"godBoon", x);
 					} else if (loadProgress == 3) {
 						trQuestVarSet("p"+p+"class", x);
 					} else if (loadProgress == 4) {
 						trQuestVarSet("p"+p+"gold", x);
 					} else if (loadProgress == 5) {
 						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
-					} else if (loadProgress < 16) {
-						trQuestVarSet("p"+p+"relic"+(loadProgress - 4), x);
+					} else if (loadProgress < 18) {
+						trQuestVarSet("p"+p+"relic"+(loadProgress - 5), x);
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x + swordsmen);
@@ -323,7 +328,7 @@ inactive
 		}
 		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (loadProgress == 16) {
+		if (loadProgress == 18) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
@@ -347,7 +352,7 @@ inactive
 						savedata = 0;
 					}
 				}
-				case 11:
+				case 12:
 				{
 					savedata = trGetScenarioUserData(3);
 					if (savedata < 0) {
@@ -358,6 +363,9 @@ inactive
 			if (loadProgress >=3) {
 				currentdata = iModulo(32, savedata);
 				savedata = savedata / 32;
+			} else if ((loadProgress == 2) && (trGetScenarioUserData(VERSION_NUMBER) == 1)) {
+				currentdata = iModulo(13, savedata);
+				savedata = savedata / 13;
 			} else {
 				currentdata = iModulo(10, savedata);
 				savedata = savedata / 10;
@@ -392,6 +400,9 @@ inactive
 		class = trQuestVarGet("p"+p+"class");
 		proto = trQuestVarGet("class"+class+"proto");
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"level"));
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_TWO_RELICS) {
+			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, 2);
+		}
 		if (trQuestVarGet("p"+p+"class") == 0) {
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);

@@ -103,7 +103,7 @@ void stormcutterAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		gainFavor(p, 0 - trQuestVarGet("whirlwindCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("whirlwindCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
 		trVectorSetUnitPos("center", "p"+p+"lureObject");
 		trUnitSelectClear();

@@ -181,7 +181,7 @@ void throneShieldAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Increase Prosperity Small");
 			}
 		}
-		gainFavor(p, 0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"shieldOfLight", 4);
 	}
 

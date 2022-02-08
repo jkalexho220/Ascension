@@ -246,18 +246,6 @@ void sunbowAlways(int eventID = -1) {
 		}
 	}
 
-	if (trTime() > trQuestVarGet("p"+p+"sunbowPassiveNext")) {
-		trQuestVarSet("p"+p+"sunbowPassiveNext", trTime());
-		for(x=yGetDatabaseCount("playerUnits"); >0) {
-			id = yDatabaseNext("playerUnits", true);
-			if ((id == -1) || trUnitAlive() == false) {
-				removePlayerUnit();
-			} else {
-				healUnit(1, 1);
-			}
-		}
-	}
-
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);

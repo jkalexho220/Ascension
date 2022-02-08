@@ -485,6 +485,12 @@ runImmediately
         /* hand of the pharaoh */
         trTechSetStatus(p, 471, 4);
 
+        /* ox cart stuff */
+        trTechSetStatus(p, 9, 0);
+        trTechSetStatus(p, 101, 0);
+        trTechSetStatus(p, 34, 0);
+        trTechSetStatus(p, 35, 0);
+
         trForbidProtounit(p, "Trident Soldier Hero");
         trForbidProtounit(p, "Archer Atlantean Hero");
         trForbidProtounit(p, "Royal Guard Hero");
@@ -539,7 +545,7 @@ highFrequency
         setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
         setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
         setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
-        setupPlayerProto("Archer Atlantean Hero", 900, 40, 4.05, 0, 20);
+        setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
         setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
         setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
         setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
@@ -570,6 +576,7 @@ highFrequency
         trModifyProtounit("Uproot 2x2", 0, 8, -99);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Ox Cart", p, 0, 120);
             trModifyProtounit("Spy Eye", p, 2, -99);
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
             trModifyProtounit("Pharaoh", p, 15, -999);

@@ -45,10 +45,13 @@ const int RELIC_KEY_ATLANTEAN = 35;
 const int RELIC_KEY_CHINA = 36;
 const int RELIC_KEY_EGYPT = 37;
 
-const int RELIC_COUNT = 20;
+const int RELIC_GHOST_PICTURE = 38;
 
 string relicName(int relic = 0) {
 	string msg = "WTF That's not a relic!";
+	if (relic >= RELIC_KEY_GREEK) {
+		msg = "A key that opens something";
+	}
 	switch(relic)
 	{
 		case RELIC_HEALTH:
@@ -151,13 +154,16 @@ string relicName(int relic = 0) {
 		{
 			msg = "Poison damage doubled but duration halved.";
 		}
+
+		case RELIC_GHOST_PICTURE:
+		{
+			msg = "A picture of a young man.";
+		}
+
 		case RELIC_NICKONHAWK:
 		{
 			msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
 		}
-	}
-	if (relic >= RELIC_KEY_GREEK) {
-		msg = "A key that opens something";
 	}
 	return(msg);
 }
@@ -285,6 +291,10 @@ string relicIcon(int relic = 0) {
 		case RELIC_KEY_EGYPT:
 		{
 			icon = "ui range indicator egypt";
+		}
+		case RELIC_GHOST_PICTURE:
+		{
+			icon = "icons\special g kastor icon 64";
 		}
 	}
 	return(icon);
@@ -453,7 +463,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			trQuestVarSet("p"+p+"poisonSpeed", trQuestVarGet("p"+p+"poisonSpeed") + 1.0 * m);
 		}
 	}
-	if ((relic >= RELIC_KEY_GREEK) && (trCurrentPlayer() == p) && equip) {
+	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
 	} else {
 		/* certain classes have special interactions with stats */
@@ -588,6 +598,10 @@ int relicProto(int relic = 0) {
 		case RELIC_POISON_FASTER:
 		{
 			proto = kbGetProtoUnitID("Scorpion Man");
+		}
+		case RELIC_GHOST_PICTURE:
+		{
+			proto = kbGetProtoUnitID("Kastor");
 		}
 	}
 	return(proto);

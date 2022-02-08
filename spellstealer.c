@@ -127,7 +127,7 @@ void spellstealerAlways(int eventID = -1) {
 			if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 1) {
 				amt = amt * 2;
 			}
-			gainFavor(p, 0 - amt);
+			gainFavor(p, 0.0 - amt);
 		} else {
 			yClearDatabase("p"+p+"bladeDanceTargets");
 			trQuestVarSet("p"+p+"lureReadyTime", 0);

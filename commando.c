@@ -115,7 +115,7 @@ void commandoAlways(int eventID = -1) {
 
 	for(x=yGetDatabaseCount("p"+p+"pelletsIncoming"); >0) {
 		if (processGenericProj("p"+p+"pelletsIncoming") == PROJ_BOUNCE) {
-			trSetSelectedScale(0.3,0.3,-0.3);
+			trSetSelectedScale(0.3,0.3,-0.2);
 			trUnitSetAnimationPath("3,0,0,0,0,0,0");
 			yAddToDatabase("p"+p+"pellets", "p"+p+"pelletsIncoming");
 			yAddUpdateVar("p"+p+"pellets", "type", yGetVar("p"+p+"pelletsIncoming", "type"));
@@ -203,13 +203,9 @@ void commandoAlways(int eventID = -1) {
 					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
 					trSoundPlayFN("titanfall.wav","1",-1,"","");
 					if (trQuestVarGet("p"+p+"minigun") == 1) {
-						trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") + trQuestVarGet("p"+p+"ultimateCost"));
-						if (trQuestVarGet("p"+p+"favorNext") > 1) {
-							gainFavor(p, -1);
-							trQuestVarSet("p"+p+"favorNext", trQuestVarGet("p"+p+"favorNext") - 1);
-							if (trPlayerResourceCount(p, "favor") == 0) {
-								minigunOff(p);
-							}
+						gainFavor(p, 0.0 - trQuestVarGet("p"+p+"ultimateCost"));
+						if (trPlayerResourceCount(p, "favor") == 0) {
+							minigunOff(p);
 						}
 						addGenericProj("p"+p+"pelletsIncoming","start","dir",kbGetProtoUnitID("Thor Hammer"),2,30.0,4.5,0.3, p);
 						yAddUpdateVar("p"+p+"pelletsIncoming", "type", 1);
