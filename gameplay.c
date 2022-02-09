@@ -350,9 +350,9 @@ highFrequency
         if (trUnitAlive() && trQuestVarGet("p"+p+"launched") == 0 && trQuestVarGet("p"+p+"dead") <= 0) {
             trVectorSetUnitPos("pos", "p"+p+"unit");
             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-                yDatabaseNext("p"+p+"relics", true);
+                id = yDatabaseNext("p"+p+"relics", true);
                 if (trUnitGetIsContained("Unit") == false) {
-                    if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+                    if (yGetVar("p"+p+"relics", "type") < KEY_RELICS) {
                         trUnitSelectClear();
                         trUnitSelectByQV("p"+p+"relics");
                         relicReturned = false;
@@ -452,14 +452,16 @@ highFrequency
                                 trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
                             }
                             relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
-                            trUnitChangeProtoUnit("Relic");
-                            yAddToDatabase("freeRelics", "p"+p+"relics");
-                            yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                            if (kbGetUnitBaseTypeID(id) != kbGetProtoUnitID("Osiris Box Glow")) {
+                                trUnitChangeProtoUnit("Relic");
+                                yAddToDatabase("freeRelics", "p"+p+"relics");
+                                yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+                            }
                             yRemoveFromDatabase("p"+p+"relics");
                             yRemoveUpdateVar("p"+p+"relics", "type");
                         }
                     } else {
-                        /* RELIC_KEY_GREEK */
+                        /* KEY_RELICS */
                         trSoundPlayFN("storehouse.wav","1",-1,"","");
                         yRemoveFromDatabase("p"+p+"relics");
                         yRemoveUpdateVar("p"+p+"relics", "type");
@@ -469,13 +471,15 @@ highFrequency
         }
 
         if (yGetDatabaseCount("p"+p+"warehouse") > 0) {
-            yDatabaseNext("p"+p+"warehouse", true);
+            id = yDatabaseNext("p"+p+"warehouse", true);
             if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
-                if (yGetVar("p"+p+"warehouse", "type") < RELIC_KEY_GREEK ||
+                if (yGetVar("p"+p+"warehouse", "type") < KEY_RELICS ||
                     trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
-                    trUnitChangeProtoUnit("Relic");
-                    yAddToDatabase("freeRelics", "p"+p+"warehouse");
-                    yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
+                    if (kbGetUnitBaseTypeID(id) != kbGetProtoUnitID("Osiris Box Glow")) {
+                        trUnitChangeProtoUnit("Relic");
+                        yAddToDatabase("freeRelics", "p"+p+"warehouse");
+                        yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
+                    }
                 } else {
                     trSoundPlayFN("storehouse.wav","1",-1,"","");
                 }
@@ -499,7 +503,7 @@ highFrequency
                     if (trUnitIsOwnedBy(p)) {
                         trSetSelectedScale(0,0,-1);
                         trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-                        if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                        if (yGetVar("freeRelics", "type") < KEY_RELICS) {
                             trUnitSetAnimationPath("1,0,1,1,0,0,0");
                         }
                         yAddToDatabase("p"+p+"warehouse", "freeRelics");
@@ -527,7 +531,7 @@ highFrequency
                     trUnitSelectByQV("freeRelics", true);
                     trSetSelectedScale(0,0,-1);
                     trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-                    if (yGetVar("freeRelics", "type") < RELIC_KEY_GREEK) {
+                    if (yGetVar("freeRelics", "type") < KEY_RELICS) {
                         trUnitSetAnimationPath("1,0,1,1,0,0,0");
                     }
                     if (trCurrentPlayer() == p) {
@@ -697,7 +701,7 @@ highFrequency
                 trQuestVarSet("activePlayerCount", trQuestVarGet("activePlayerCount") - 1);
                 for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                     yDatabaseNext("p"+p+"relics", true);
-                    if (yGetVar("p"+p+"relics", "type") >= RELIC_KEY_GREEK) {
+                    if (yGetVar("p"+p+"relics", "type") > KEY_RELICS) {
                         yAddToDatabase("freeRelics", "p"+p+"relics");
                         yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
                         trUnitConvert(0);
@@ -706,7 +710,7 @@ highFrequency
                 }
                 for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
                     yDatabaseNext("p"+p+"warehouse", true);
-                    if (yGetVar("p"+p+"warehouse", "type") >= RELIC_KEY_GREEK) {
+                    if (yGetVar("p"+p+"warehouse", "type") > KEY_RELICS) {
                         yAddToDatabase("freeRelics", "p"+p+"warehouse");
                         yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
                         trUnitConvert(0);

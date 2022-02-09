@@ -619,9 +619,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
 
-            /* DELETE ME */
-            trQuestVarSet("localQuest", FETCH_GUY);
-
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Throwing Axeman",21,9,270);
             trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -640,8 +637,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
             paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
 
-            trQuestVarSet("villageX", 70 * x + 21);
-            trQuestVarSet("villageZ", 70 * z + 21);
+            trQuestVarSet("villageX", 70 * x + 24);
+            trQuestVarSet("villageZ", 70 * z + 24);
 
 
             trQuestVarSet("next", trGetNextUnitScenarioNameNumber());

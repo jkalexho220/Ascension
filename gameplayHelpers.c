@@ -243,7 +243,7 @@ void equipRelicsAgain(int p = 0) {
 		trUnitSelectByQV("p"+p+"relics");
 		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
 		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trSetSelectedScale(0,0,-1);
 			trUnitSetAnimationPath("1,0,1,1,0,0,0");
 		}

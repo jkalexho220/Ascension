@@ -22,7 +22,7 @@ void saveAllData() {
 	for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
 		yDatabaseNext("p"+p+"warehouse");
 		relic = yGetVar("p"+p+"warehouse", "type");
-		if (relic < RELIC_KEY_GREEK) {
+		if (relic <= NORMAL_RELICS) {
 			trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
 		}
 	}
@@ -40,7 +40,7 @@ void saveAllData() {
 	}
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics");
-		if (yGetVar("p"+p+"relics", "type") < RELIC_KEY_GREEK) {
+		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
 		}
 	}

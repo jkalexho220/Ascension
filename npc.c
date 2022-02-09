@@ -350,7 +350,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Where am I supposed to find a Frosted Bone to repair this axe?");
+					uiMessageBox("Where am I supposed to find five Frosted Bones to repair this axe?");
 				}
 				case 3:
 				{
@@ -380,6 +380,54 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case FETCH_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The creatures on this floor are my creations. They escaped from their facility.");
+				}
+				case 2:
+				{
+					uiMessageBox("Try not to aggravate them. They are quite ferocious.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Greetings! I am the great wizard Akard!");
+				}
+				case 2:
+				{
+					uiMessageBox("Would you like to be my test subjects?");
+					dialog = 0;
+				}
+			}
+		}
+
+		case SHOP_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Very interesting. What drives people to climb this tower?");
+				}
+				case 2:
+				{
+					uiMessageBox("They don't even know what's at the top and yet they enter without hesitation.");
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_QUEST + SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -397,6 +445,66 @@ int npcDiag(int npc = 0, int dialog = 0) {
 					uiMessageBox("It will be sent straight to your warehouse.");
 				}
 				case 4:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + SHOP_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey you! Wanna buy this relic?");
+				}
+				case 2:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+				}
+				case 3:
+				{
+					uiMessageBox("It's nice and shiny! Only 200 gold!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + SHOP_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Behold! My latest product! I worked for weeks on this!");
+				}
+				case 2:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+				}
+				case 3:
+				{
+					uiMessageBox("Dwarven quality goods! Expect the best! For a small sum of 200 gold, of course.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + SHOP_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers! I have found my research funds running low.");
+				}
+				case 2:
+				{
+					uiMessageBox("Buy this from me please. 200 gold pieces should be enough.");
+				}
+				case 3:
 				{
 					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
 					dialog = 0;
@@ -430,7 +538,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Please, help me find my pigs! There are three of them in total!");
+					uiMessageBox("Please, help me find my precious pigs! There are three of them in total!");
 				}
 				case 3:
 				{
@@ -460,7 +568,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trShowImageDialog("icons\icon resource gold", "300 Gold");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
 					dialog = 0;
 				}
 			}
@@ -548,7 +656,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("I'm sorry, I was wrong. If we ever meet again, I'll be a proper father this time.");
+					uiMessageBox("I'm sorry. I was wrong. If we ever meet again, I'll be a proper father this time.");
 				}
 				case 4:
 				{
@@ -607,7 +715,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trShowImageDialog("icons\icon resource gold", "200 Gold");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "200 Gold");
 					dialog = 0;
 				}
 			}
@@ -654,7 +762,201 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trShowImageDialog("icons\icon resource gold", "500 Gold");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "500 Gold");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh, adventurers! I'm at my wit's end! I need that dwarf to repair my axe!");
+				}
+				case 2:
+				{
+					uiMessageBox("But in order to repair it, he needs five Frosted Bones! They can be collected from Frost Giants.");
+				}
+				case 3:
+				{
+					uiMessageBox("But I can't kill Frost Giants without this axe! You're my only hope!");
+				}
+				case 4:
+				{
+					uiMessageBox("There are Frost Giants in this canyon. Please kill them and bring their bones to me!");
+				}
+				case 5:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Kill five Frost Giants.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Frosted Bones! Thank you so much!");
+				}
+				case 2:
+				{
+					uiMessageBox("Now I'm going to go on a massacre! Mwuahaha!");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(gemstoneIcon(MANASTONE),gemstoneName(MANASTONE) + " x1");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + FETCH_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("This ancient tree will occasionally shed fruits of knowledge.");
+				}
+				case 2:
+				{
+					uiMessageBox("Bring me the fruit that solves this math problem:");
+				}
+				case 3:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText(""+1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = ?", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Impressive. If you had brought the wrong fruit...");
+				}
+				case 2:
+				{
+					uiMessageBox("Nevermind. Here's your reward.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(gemstoneIcon(STARSTONE),gemstoneName(STARSTONE) + " x1");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Congratulations! You have been randomly selected to be my test subjects!");
+				}
+				case 2:
+				{
+					uiMessageBox("Please do not resist.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Defeat the monsters.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("This has been some interesting data.");
+				}
+				case 2:
+				{
+					uiMessageBox("Thank you for volunteering. Here is your reward.");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + FETCH_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers. I have an important task for you.");
+				}
+				case 2:
+				{
+					uiMessageBox("One of my special relics has been stolen.");
+				}
+				case 3:
+				{
+					uiMessageBox("Fortunately, this magic detector can tell you how far the relic is from you.");
+				}
+				case 4:
+				{
+					uiMessageBox("However, this magic detector drains your favor in order to function.");
+				}
+				case 5:
+				{
+					uiMessageBox("If your favor reaches zero while you hold it, it will explode!");
+				}
+				case 6:
+				{
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trMessageSetText("Use the Magic Detector to find the artifact.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Excellent work. You are far more useful than those dwarves I enslaved.");
+				}
+				case 2:
+				{
+					uiMessageBox("One of them betrayed me. That's his smoldering corpse over there.");
+				}
+				case 3:
+				{
+					uiMessageBox("Anyway, here is your reward.");
+				}
+				case 4:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					/*
+					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
+					*/
 					dialog = 0;
 				}
 			}
@@ -742,7 +1044,9 @@ rule npc_talk_02
 inactive
 highFrequency
 {
-	if ((trQuestVarGet("currentNPCProgress") > 0) && (trIsGadgetVisible("ingame-messagedialog") == false)) {
+	if ((trQuestVarGet("currentNPCProgress") > 0) && 
+		(trIsGadgetVisible("ingame-messagedialog") == false) &&
+		(trIsGadgetVisible("ShowImageBox") == false)) {
 		trDelayedRuleActivation("npc_talk_01");
 		xsDisableSelf();
 	}
@@ -754,13 +1058,13 @@ void questComplete(int gem = -1, int gold = -1) {
 	}
 	if (gold > 0) {
 		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"gold", 300 + trQuestVarGet("p"+p+"gold"));
-			trPlayerGrantResources(p, "gold", 300);
+			trQuestVarSet("p"+p+"gold", gold + trQuestVarGet("p"+p+"gold"));
+			trPlayerGrantResources(p, "gold", gold);
 		}
 	}
 	trQuestVarSet("questCount", 1 + trQuestVarGet("questCount"));
 	startNPCDialog(NPC_QUEST_COMPLETE + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
-	trQuestVarSet("questActive", 1 + trQuestVarGet("questActive"));
+	trQuestVarSet("questActive", -1);
 	uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
 }
 
@@ -770,6 +1074,7 @@ highFrequency
 {
 	int x = 0;
 	int z = 0;
+	int action = 0;
 	if (trQuestVarGet("townFound") == 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("guy1");
@@ -826,7 +1131,7 @@ highFrequency
 					}
 				}
 			}
-		} else {
+		} else if (trQuestVarGet("questActive") > 0) {
 			/* start the quest */
 			switch(1*trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
 			{
@@ -963,7 +1268,6 @@ highFrequency
 							trUnitChangeProtoUnit("Relic");
 							yAddToDatabase("freeRelics", "fetchTarget");
 							yAddUpdateVar("freeRelics", "type", RELIC_GHOST_PICTURE);
-							debugLog("position is " + 1*trQuestVarGet("rand"));
 						}
 						case 2:
 						{
@@ -1020,9 +1324,10 @@ highFrequency
 								trUnitSelectByQV("questGuy", true);
 								if (trUnitAlive() == false) {
 									trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
-									trQuestVarSet("questActive", 4);
+									trQuestVarSet("questActive", -1);
 									trCounterAbort("shadecountdown");
 									trMessageSetText("Quest failed!", -1);
+									trQuestVarSet("portalsActive", 1);
 								}
 							}
 						}
@@ -1072,7 +1377,7 @@ highFrequency
 							if (trUnitAlive() == false) {
 								trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
 								trMessageSetText("Quest failed!");
-								trQuestVarSet("questActive", 4);
+								trQuestVarSet("questActive", -1);
 							} else if (zDistanceToVector("fetchTarget", "townCenter") < trQuestVarGet("fetchWolvesSpawn")) {
 								trQuestVarSet("fetchWolvesSpawn", trQuestVarGet("fetchWolvesSpawn") - 20);
 								trVectorSetUnitPos("center", "fetchTarget");
@@ -1112,7 +1417,153 @@ highFrequency
 					{
 						case 1:
 						{
-							
+							trQuestVarSet("questActive", 2);
+							trQuestVarSet("frostGiantBones", 0);
+							trQuestVarSet("frostGiantBonesLast", 0);
+							trQuestVarSet("frostGiantHunt", 1);
+							for(i=1; < 14) {
+								if (i == trQuestVarGet("village")) {
+									continue;
+								} else {
+									z = i / 4;
+									x = i - z * 4;
+									trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+									trQuestVarSetFromRand("heading", 0, 360, true);
+									trArmyDispatch("1,0", "Dwarf", 1, 70*x+40,0,70*z+40,trQuestVarGet("heading"),true);
+									trArmySelect("1,0");
+									trUnitConvert(ENEMY_PLAYER);
+									trUnitChangeProtoUnit("Frost Giant");
+									yAddToDatabase("enemiesIncoming", "next");
+								}
+							}
+						}
+						case 2:
+						{
+							if (trQuestVarGet("frostGiantBones") > trQuestVarGet("frostGiantBonesLast")) {
+								if (trQuestVarGet("frostGiantBones") >= 5) {
+									trQuestVarSet("frostGiantHunt", 0);
+									trMessageSetText("Return to the axeman for your reward.", -1);
+									trQuestVarSet("questActive", 3);
+								} else {
+									trQuestVarSet("frostGiantBonesLast", trQuestVarGet("frostGiantBones"));
+									trChatSend(0, "<color=1,1,1>Frosted Bone collected! ("+1*trQuestVarGet("frostGiantBones")+"/5)");
+								}
+							}
+						}
+						case 3:
+						{
+							trVectorSetUnitPos("bountyGuyPos", "questguy");
+							for(p=1; < ENEMY_PLAYER) {
+								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+									questComplete(MANASTONE, 0);
+									break;
+								}
+							}
+						}
+					}
+				}
+				case BOUNTY_NPC + 4:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSet("questSpawns", 12);
+							trQuestVarSetFromRand("questAngle", 0, 3.14, false);
+							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
+							trQuestVarSet("questNext", trTimeMS());
+							trSoundPlayFN("changeunit.wav","1",-1,"","");
+						}
+						case 2:
+						{
+							if (yGetDatabaseCount("questLeaves") > 0) {
+								action = processGenericProj("questLeaves");
+								if (action == PROJ_GROUND) {
+									trUnitSelectClear();
+									trUnitSelectByQV("questLeaves");
+									trUnitChangeProtoUnit("Dryad");
+									trUnitSelectClear();
+									trUnitSelectByQV("questLeaves");
+									trDamageUnitPercent(-100);
+									activateEnemy("questLeaves",-1,0);
+									yAddToDatabase("questTargets", "questLeaves");
+									yRemoveFromDatabase("questLeaves");
+									if (trQuestVarGet("questSpawns") == 0) {
+										trQuestVarSet("questActive", 3);
+									}
+								}
+							}
+							if (trQuestVarGet("questSpawns") > 0) {
+								if (trTimeMS() > trQuestVarGet("questNext")) {
+									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
+									z = trQuestVarGet("village") / 4;
+									x = trQuestVarGet("village") - 4 * z;
+									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
+									trQuestVarSetFromRand("rand", 8, 20, false);
+									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"));
+								}
+							}
+						}
+						case 3:
+						{
+							if (yGetDatabaseCount("questSpawns") > 0) {
+								if (yDatabaseNext("questSpawns", true) == -1 || trUnitAlive() == false) {
+									yRemoveFromDatabase("questSpawns");
+								}
+							} else {
+								questComplete(-1, 300);
+							}
+						}
+					}
+				}
+				case FETCH_NPC + 4:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSetFromRand("operand1", 1, 15, true);
+							trQuestVarSetFromRand("operand2", 1, 15, true);
+							trQuestVarSet("questAnswer", trQuestVarGet("operand1") + trQuestVarGet("operand2"));
+							trQuestVarSet("questActive", 2);
+							trQuestVarSet("questSpawns", 12);
+							trQuestVarSetFromRand("questAngle", 0, 3.14, false);
+							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
+							trQuestVarSet("questNext", trTimeMS());
+							trSoundPlayFN("changeunit.wav","1",-1,"","");
+						}
+						case 2:
+						{
+							if (yGetDatabaseCount("questLeaves") > 0) {
+								action = processGenericProj("questLeaves");
+								if (action == PROJ_GROUND) {
+									trUnitSelectClear();
+									trUnitSelectByQV("questLeaves");
+									trUnitChangeProtoUnit("Dryad");
+									trUnitSelectClear();
+									trUnitSelectByQV("questLeaves");
+									trDamageUnitPercent(-100);
+									activateEnemy("questLeaves",-1,0);
+									yAddToDatabase("questTargets", "questLeaves");
+									yRemoveFromDatabase("questLeaves");
+									if (trQuestVarGet("questSpawns") == 0) {
+										trQuestVarSet("questActive", 3);
+									}
+								}
+							}
+							if (trQuestVarGet("questSpawns") > 0) {
+								if (trTimeMS() > trQuestVarGet("questNext")) {
+									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
+									z = trQuestVarGet("village") / 4;
+									x = trQuestVarGet("village") - 4 * z;
+									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
+									trQuestVarSetFromRand("rand", 8, 20, false);
+									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"));
+								}
+							}
 						}
 					}
 				}

@@ -903,6 +903,9 @@ void enemiesAlways() {
         id = yDatabaseNext("frostGiants", true);
         if (id == -1 || trUnitAlive() == false) {
             trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
+            if (trQuestVarGet("frostGiantHunt") == 1) {
+                trQuestVarSet("frostGiantBones", 1 + trQuestVarGet("frostGiantBones"));
+            }
             trUnitChangeProtoUnit("Frost Giant");
             yRemoveFromDatabase("frostGiants");
             yRemoveUpdateVar("frostGiants", "step");

@@ -36,133 +36,146 @@ const int RELIC_NOTTUD = 28;
 const int RELIC_CURSED_COOLDOWNS = 29;
 const int RELIC_ZENOPHOBIA = 30;
 
+const int NORMAL_RELICS = 30;
 /* key relics */
-const int RELIC_NICKONHAWK = 32;
 
-const int RELIC_KEY_GREEK = 33;
-const int RELIC_KEY_NORSE = 34;
-const int RELIC_KEY_ATLANTEAN = 35;
-const int RELIC_KEY_CHINA = 36;
-const int RELIC_KEY_EGYPT = 37;
+const int RELIC_NICKONHAWK_POTION = 36;
+const int RELIC_NICKONHAWK_GOGGLES = 37;
 
 const int RELIC_GHOST_PICTURE = 38;
 
+const int RELIC_MATH_PROBLEM = 40;
+/* 
+reserved to 60
+*/
+const int RELIC_MATH_PROBLEM_END = 60;
+
+const int KEY_RELICS = 100;
+const int RELIC_KEY_GREEK = 101;
+const int RELIC_KEY_NORSE = 102;
+const int RELIC_KEY_ATLANTEAN = 103;
+const int RELIC_KEY_CHINA = 104;
+const int RELIC_KEY_EGYPT = 105;
+
 string relicName(int relic = 0) {
 	string msg = "WTF That's not a relic!";
-	if (relic >= RELIC_KEY_GREEK) {
+	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT)) {
 		msg = "A key that opens something";
-	}
-	switch(relic)
-	{
-		case RELIC_HEALTH:
+	} else if ((relic >= RELIC_MATH_PROBLEM) && (relic <= RELIC_MATH_PROBLEM_END)) {
+		msg = "" + (relic - RELIC_MATH_PROBLEM);
+	} else {
+		switch(relic)
 		{
-			msg = "Health +300";
-		}
-		case RELIC_SPEED:
-		{
-			msg = "Speed +1";
-		}
-		case RELIC_ATTACK_RANGE:
-		{
-			msg = "Attack Range and LOS +5";
-		}
-		case RELIC_SPELL_RANGE:
-		{
-			msg = "Spell Range +0.3x";
-		}
-		case RELIC_SPELL_DURATION:
-		{
-			msg = "Spell Duration +0.3x";
-		}
-		case RELIC_LIFESTEAL:
-		{
-			msg = "Lifesteal +0.2 (Half for spells)";
-		}
-		case RELIC_ARMOR:
-		{
-			msg = "Armor +0.2x";
-		}
-		case RELIC_ATTACK_DAMAGE:
-		{
-			msg = "Attack +15";
-		}
-		case RELIC_SPELL_POWER:
-		{
-			msg = "Spell Power +0.3x";
-		}
-		case RELIC_HEAL_BOOST:
-		{
-			msg = "Healing Effects +0.5x";
-		}
-		case RELIC_POISON_RESISTANCE:
-		{
-			msg = "Poison resistance x0.5";
-		}
-		case RELIC_STUN_RESISTANCE:
-		{
-			msg = "Stun resistance x0.5";
-		}
-		case RELIC_SILENCE_RESISTANCE:
-		{
-			msg = "Silence resistance x0.5";
-		}
-		case RELIC_POISON_KILLER:
-		{
-			msg = "+0.5x damage to poisoned enemies.";
-		}
-		case RELIC_WEIGHTED_BLOWS:
-		{
-			msg = "Your stuns deal damage equal to 10 percent of your health.";
-		}
-		case RELIC_ALL:
-		{
-			msg = "Spell Power, Duration, Range +0.15";
-		}
-		case RELIC_ULTIMATE_COST:
-		{
-			msg = "Ultimate Cost Reduction x0.1";
-		}
-		case RELIC_PROJECTILES:
-		{
-			msg = "Projectiles +1";
-		}
-		case RELIC_SPECIAL_ATTACK:
-		{
-			msg = "Special Attack Cooldown -1";
-		}
-		case RELIC_COOLDOWN_REDUCTION:
-		{
-			msg = "Cooldown Reduction x0.15";
-		}
-		case RELIC_CURSED_RANGE:
-		{
-			msg = "Spell Range +0.5 | Spell Power -0.3";
-		}
-		case RELIC_CURSED_DURATION:
-		{
-			msg = "Spell Duration +0.5 | Spell Range -0.3";
-		}
-		case RELIC_CURSED_POWER:
-		{
-			msg = "Spell Power +0.5 | Spell Duration -0.3";
-		}
-		case RELIC_FAVOR_FROM_ATTACKS:
-		{
-			msg = "When you attack, gain 1 favor. Ultimate Cost Increased x0.1";
-		}
-		case RELIC_POISON_FASTER:
-		{
-			msg = "Poison damage doubled but duration halved.";
-		}
+			case RELIC_HEALTH:
+			{
+				msg = "Health +300";
+			}
+			case RELIC_SPEED:
+			{
+				msg = "Speed +1";
+			}
+			case RELIC_ATTACK_RANGE:
+			{
+				msg = "Attack Range and LOS +5";
+			}
+			case RELIC_SPELL_RANGE:
+			{
+				msg = "Spell Range +0.3x";
+			}
+			case RELIC_SPELL_DURATION:
+			{
+				msg = "Spell Duration +0.3x";
+			}
+			case RELIC_LIFESTEAL:
+			{
+				msg = "Lifesteal +0.2 (Half for spells)";
+			}
+			case RELIC_ARMOR:
+			{
+				msg = "Armor +0.2x";
+			}
+			case RELIC_ATTACK_DAMAGE:
+			{
+				msg = "Attack +15";
+			}
+			case RELIC_SPELL_POWER:
+			{
+				msg = "Spell Power +0.3x";
+			}
+			case RELIC_HEAL_BOOST:
+			{
+				msg = "Healing Effects +0.5x";
+			}
+			case RELIC_POISON_RESISTANCE:
+			{
+				msg = "Poison resistance x0.5";
+			}
+			case RELIC_STUN_RESISTANCE:
+			{
+				msg = "Stun resistance x0.5";
+			}
+			case RELIC_SILENCE_RESISTANCE:
+			{
+				msg = "Silence resistance x0.5";
+			}
+			case RELIC_POISON_KILLER:
+			{
+				msg = "+0.5x damage to poisoned enemies.";
+			}
+			case RELIC_WEIGHTED_BLOWS:
+			{
+				msg = "Your stuns deal damage equal to 10 percent of your health.";
+			}
+			case RELIC_ALL:
+			{
+				msg = "Spell Power, Duration, Range +0.15";
+			}
+			case RELIC_ULTIMATE_COST:
+			{
+				msg = "Ultimate Cost Reduction x0.1";
+			}
+			case RELIC_PROJECTILES:
+			{
+				msg = "Projectiles +1";
+			}
+			case RELIC_SPECIAL_ATTACK:
+			{
+				msg = "Special Attack Cooldown -1";
+			}
+			case RELIC_COOLDOWN_REDUCTION:
+			{
+				msg = "Cooldown Reduction x0.15";
+			}
+			case RELIC_CURSED_RANGE:
+			{
+				msg = "Spell Range +0.5 | Spell Power -0.3";
+			}
+			case RELIC_CURSED_DURATION:
+			{
+				msg = "Spell Duration +0.5 | Spell Range -0.3";
+			}
+			case RELIC_CURSED_POWER:
+			{
+				msg = "Spell Power +0.5 | Spell Duration -0.3";
+			}
+			case RELIC_FAVOR_FROM_ATTACKS:
+			{
+				msg = "When you attack, gain 1 favor. Ultimate Cost Increased x0.1";
+			}
+			case RELIC_POISON_FASTER:
+			{
+				msg = "Poison damage doubled but duration halved.";
+			}
 
-		case RELIC_GHOST_PICTURE:
-		{
-			msg = "A picture of a young man.";
-		}
+			case RELIC_GHOST_PICTURE:
+			{
+				msg = "A picture of a young man.";
+			}
 
-		case RELIC_NICKONHAWK:
-		{
-			msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
+			case RELIC_NICKONHAWK_GOGGLES:
+			{
+				msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
+			}
 		}
 	}
 	return(msg);
@@ -170,131 +183,135 @@ string relicName(int relic = 0) {
 
 string relicIcon(int relic = 0) {
 	string icon = "icons\infantry g hoplite icon 64";
-	switch(relic)
-	{
-		case RELIC_HEALTH:
+	if ((relic >= RELIC_MATH_PROBLEM) && (relic <= RELIC_MATH_PROBLEM_END)) {
+		icon = "";
+	} else {
+		switch(relic)
 		{
-			icon = "icons\special g sea turtle icon 64";
-		}
-		case RELIC_SPEED:
-		{
-			icon = "icons\special g pegasus icon 64";
-		}
-		case RELIC_ATTACK_RANGE:
-		{
-			icon = "icons\cavalry e chariot archer icon 64";
-		}
-		case RELIC_SPELL_RANGE:
-		{
-			icon = "icons\special e petosuchus icon 64";
-		}
-		case RELIC_SPELL_DURATION:
-		{
-			icon = "icons\special n frost giant icon 64";
-		}
-		case RELIC_LIFESTEAL:
-		{
-			icon = "icons\special n troll icon 64";
-		}
-		case RELIC_STUN_RESISTANCE:
-		{
-			icon = "icons\special e Scarab icon 64";
-		}
-		case RELIC_ATTACK_DAMAGE:
-		{
-			icon = "icons\siege n ballista icon 64";
-		}
-		case RELIC_SPELL_POWER:
-		{
-			icon = "icons\special n fire giant icon 64";
-		}
-		case RELIC_HEAL_BOOST:
-		{
-			icon = "icons\special x flying medic icons 64";
-		}
-		case RELIC_POISON_RESISTANCE:
-		{
-			icon = "icons\god power dryad icons 64";
-		}
-		case RELIC_ARMOR:
-		{
-			icon = "icons\special x behemoth icons 64";
-		}
-		case RELIC_SILENCE_RESISTANCE:
-		{
-			icon = "icons\special e sphinx icon 64";
-		}
-		case RELIC_POISON_KILLER:
-		{
-			icon = "icons\special e mummy icon 64";
-		}
-		case RELIC_WEIGHTED_BLOWS:
-		{
-			icon = "icons\special g medusa icon 64";
-		}
-		case RELIC_ALL:
-		{
-			icon = "icons\special g chimera icon 64";
-		}
-		case RELIC_ULTIMATE_COST:
-		{
-			icon = "icons\special g arkantos icon 64";
-		}
-		case RELIC_PROJECTILES:
-		{
-			icon = "icons\special g manticore icon 64";
-		}
-		case RELIC_SPECIAL_ATTACK:
-		{
-			icon = "icons\special e avenger icon 64";
-		}
-		case RELIC_COOLDOWN_REDUCTION:
-		{
-			icon = "icons\special x argus icons 64";
-		}
-		case RELIC_CURSED_RANGE:
-		{
-			icon = "icons\siege g petrobolos icon 64";
-		}
-		case RELIC_CURSED_DURATION:
-		{
-			icon = "icons\scenario x folstag icons 64";
-		}
-		case RELIC_CURSED_POWER:
-		{
-			icon = "icons\special e phoenix icon 64";
-		}
-		case RELIC_FAVOR_FROM_ATTACKS:
-		{
-			icon = "icons\special x servant icons 64";
-		}
-		case RELIC_POISON_FASTER:
-		{
-			icon = "icons\special e scorpionman icon 64";
-		}
-		case RELIC_KEY_GREEK:
-		{
-			icon = "ui range indicator greek";
-		}
-		case RELIC_KEY_NORSE:
-		{
-			icon = "ui range indicator norse";
-		}
-		case RELIC_KEY_ATLANTEAN:
-		{
-			icon = "ui range indicator atlantean";
-		}
-		case RELIC_KEY_CHINA:
-		{
-			icon = "ui range indicator chinese";
-		}
-		case RELIC_KEY_EGYPT:
-		{
-			icon = "ui range indicator egypt";
-		}
-		case RELIC_GHOST_PICTURE:
-		{
-			icon = "icons\special g kastor icon 64";
+			case RELIC_HEALTH:
+			{
+				icon = "icons\special g sea turtle icon 64";
+			}
+			case RELIC_SPEED:
+			{
+				icon = "icons\special g pegasus icon 64";
+			}
+			case RELIC_ATTACK_RANGE:
+			{
+				icon = "icons\cavalry e chariot archer icon 64";
+			}
+			case RELIC_SPELL_RANGE:
+			{
+				icon = "icons\special e petosuchus icon 64";
+			}
+			case RELIC_SPELL_DURATION:
+			{
+				icon = "icons\special n frost giant icon 64";
+			}
+			case RELIC_LIFESTEAL:
+			{
+				icon = "icons\special n troll icon 64";
+			}
+			case RELIC_STUN_RESISTANCE:
+			{
+				icon = "icons\special e Scarab icon 64";
+			}
+			case RELIC_ATTACK_DAMAGE:
+			{
+				icon = "icons\siege n ballista icon 64";
+			}
+			case RELIC_SPELL_POWER:
+			{
+				icon = "icons\special n fire giant icon 64";
+			}
+			case RELIC_HEAL_BOOST:
+			{
+				icon = "icons\special x flying medic icons 64";
+			}
+			case RELIC_POISON_RESISTANCE:
+			{
+				icon = "icons\god power dryad icons 64";
+			}
+			case RELIC_ARMOR:
+			{
+				icon = "icons\special x behemoth icons 64";
+			}
+			case RELIC_SILENCE_RESISTANCE:
+			{
+				icon = "icons\special e sphinx icon 64";
+			}
+			case RELIC_POISON_KILLER:
+			{
+				icon = "icons\special e mummy icon 64";
+			}
+			case RELIC_WEIGHTED_BLOWS:
+			{
+				icon = "icons\special g medusa icon 64";
+			}
+			case RELIC_ALL:
+			{
+				icon = "icons\special g chimera icon 64";
+			}
+			case RELIC_ULTIMATE_COST:
+			{
+				icon = "icons\special g arkantos icon 64";
+			}
+			case RELIC_PROJECTILES:
+			{
+				icon = "icons\special g manticore icon 64";
+			}
+			case RELIC_SPECIAL_ATTACK:
+			{
+				icon = "icons\special e avenger icon 64";
+			}
+			case RELIC_COOLDOWN_REDUCTION:
+			{
+				icon = "icons\special x argus icons 64";
+			}
+			case RELIC_CURSED_RANGE:
+			{
+				icon = "icons\siege g petrobolos icon 64";
+			}
+			case RELIC_CURSED_DURATION:
+			{
+				icon = "icons\scenario x folstag icons 64";
+			}
+			case RELIC_CURSED_POWER:
+			{
+				icon = "icons\special e phoenix icon 64";
+			}
+			case RELIC_FAVOR_FROM_ATTACKS:
+			{
+				icon = "icons\special x servant icons 64";
+			}
+			case RELIC_POISON_FASTER:
+			{
+				icon = "icons\special e scorpionman icon 64";
+			}
+			case RELIC_KEY_GREEK:
+			{
+				icon = "ui range indicator greek";
+			}
+			case RELIC_KEY_NORSE:
+			{
+				icon = "ui range indicator norse";
+			}
+			case RELIC_KEY_ATLANTEAN:
+			{
+				icon = "ui range indicator atlantean";
+			}
+			case RELIC_KEY_CHINA:
+			{
+				icon = "ui range indicator chinese";
+			}
+			case RELIC_KEY_EGYPT:
+			{
+				icon = "ui range indicator egypt";
+			}
+			case RELIC_GHOST_PICTURE:
+			{
+				icon = "icons\special g kastor icon 64";
+			}
 		}
 	}
 	return(icon);
