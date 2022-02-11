@@ -208,7 +208,6 @@ highFrequency
                 trSetSelectedScale(0,0,-1);
                 trUnitSetAnimationPath("1,0,1,1,0,0,0");
                 relicEffect(1*trQuestVarGet("p"+p+"relic"+x), p, true);
-                trQuestVarSet("p"+p+"relic"+x, 0);
             }
         }
         trSetCivilizationNameOverride(p, "Level " + (1+trQuestVarGet("p"+p+"level")));

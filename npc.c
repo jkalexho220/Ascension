@@ -12,6 +12,8 @@ const int NPC_MONSTERPEDIA = 6;
 
 const int NPC_NOTTUD = 7;
 
+const int NPC_ZENOS_PARADOX = 8;
+
 const int NPC_QUEST = 100;
 /*
 
@@ -41,6 +43,7 @@ void startNPCDialog(int npc = 0) {
 int npcDiag(int npc = 0, int dialog = 0) {
 	dialog = dialog + 1;
 	int gem = 0;
+	string extra = "";
 	switch(npc)
 	{
 		case NPC_RELIC_TRANSPORTER:
@@ -902,6 +905,27 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case NPC_ZENOS_PARADOX:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh no, not like this! We've entered Zeno's Paradox!");
+				}
+				case 2:
+				{
+					extra = "" + 1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = " + 1*trQuestVarGet("wrongAnswer");
+					uiMessageBox("You fools! We're now trapped in a world where " + extra + "!");
+				}
+				case 3:
+				{
+					uiMessageBox("We're doomed! We're doomed!");
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_QUEST + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -1474,6 +1498,7 @@ highFrequency
 							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
 							trQuestVarSet("questNext", trTimeMS());
 							trSoundPlayFN("changeunit.wav","1",-1,"","");
+							trBlockAllSounds(true);
 						}
 						case 2:
 						{
@@ -1491,26 +1516,45 @@ highFrequency
 									yRemoveFromDatabase("questLeaves");
 									if (trQuestVarGet("questSpawns") == 0) {
 										trQuestVarSet("questActive", 3);
+										trUnblockAllSounds();
 									}
 								}
 							}
 							if (trQuestVarGet("questSpawns") > 0) {
 								if (trTimeMS() > trQuestVarGet("questNext")) {
+									for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
+										trUnitSelectClear();
+										trUnitSelect(""+i, true);
+										trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+									}
 									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
-									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
+									trQuestVarSet("questNext", trQuestVarGet("questNext") + 500);
 									z = trQuestVarGet("village") / 4;
 									x = trQuestVarGet("village") - 4 * z;
 									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
 									trQuestVarSetFromRand("rand", 8, 20, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"));
+									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"),1);
+									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardTower", true);
+									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardGuild1", true);
+									trMutateSelected(kbGetProtoUnitID("Guild"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardGuild2", true);
+									trMutateSelected(kbGetProtoUnitID("Guild"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardTree", true);
+									trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
 								}
 							}
 						}
 						case 3:
 						{
-							if (yGetDatabaseCount("questSpawns") > 0) {
-								if (yDatabaseNext("questSpawns", true) == -1 || trUnitAlive() == false) {
-									yRemoveFromDatabase("questSpawns");
+							if (yGetDatabaseCount("questTargets") > 0) {
+								if (yDatabaseNext("questTargets", true) == -1 || trUnitAlive() == false) {
+									yRemoveFromDatabase("questTargets");
 								}
 							} else {
 								questComplete(-1, 300);
@@ -1524,15 +1568,16 @@ highFrequency
 					{
 						case 1:
 						{
-							trQuestVarSetFromRand("operand1", 1, 15, true);
-							trQuestVarSetFromRand("operand2", 1, 15, true);
+							trQuestVarSetFromRand("operand1", 1, 10, true);
+							trQuestVarSetFromRand("operand2", 1, 10, true);
 							trQuestVarSet("questAnswer", trQuestVarGet("operand1") + trQuestVarGet("operand2"));
 							trQuestVarSet("questActive", 2);
-							trQuestVarSet("questSpawns", 12);
+							trQuestVarSet("questSpawns", 20);
 							trQuestVarSetFromRand("questAngle", 0, 3.14, false);
 							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
 							trQuestVarSet("questNext", trTimeMS());
 							trSoundPlayFN("changeunit.wav","1",-1,"","");
+							trBlockAllSounds(true);
 						}
 						case 2:
 						{
@@ -1541,27 +1586,82 @@ highFrequency
 								if (action == PROJ_GROUND) {
 									trUnitSelectClear();
 									trUnitSelectByQV("questLeaves");
-									trUnitChangeProtoUnit("Dryad");
+									trUnitChangeProtoUnit("Relic");
 									trUnitSelectClear();
 									trUnitSelectByQV("questLeaves");
 									trDamageUnitPercent(-100);
-									activateEnemy("questLeaves",-1,0);
-									yAddToDatabase("questTargets", "questLeaves");
+									yAddToDatabase("freeRelics", "questLeaves");
+									yAddUpdateVar("freeRelics", "type", yGetVar("questLeaves", "type"));
+									yAddToDatabase("questApples", "questLeaves");
+									yAddUpdateVar("questApples", "type", yGetVar("questLeaves", "type"));
 									yRemoveFromDatabase("questLeaves");
-									if (trQuestVarGet("questSpawns") == 0) {
+									if (yGetDatabaseCount("questLeaves") + trQuestVarGet("questSpawns") == 0) {
 										trQuestVarSet("questActive", 3);
+										trUnblockAllSounds();
 									}
 								}
 							}
 							if (trQuestVarGet("questSpawns") > 0) {
 								if (trTimeMS() > trQuestVarGet("questNext")) {
-									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+									
+									for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
+										trUnitSelectClear();
+										trUnitSelect(""+i, true);
+										trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+									}
+									
 									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
 									z = trQuestVarGet("village") / 4;
 									x = trQuestVarGet("village") - 4 * z;
-									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
-									trQuestVarSetFromRand("rand", 8, 20, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"));
+									trVectorQuestVarSet("start", xsVectorSet(70*x+36,0,70*z+36));
+									trQuestVarSetFromRand("rand", 12, 16, false);
+									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Einheriar"),18,trQuestVarGet("rand"),1);
+									yAddUpdateVar("questLeaves", "type", RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
+									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardTower", true);
+									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardGuild1", true);
+									trMutateSelected(kbGetProtoUnitID("Guild"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardGuild2", true);
+									trMutateSelected(kbGetProtoUnitID("Guild"));
+									trUnitSelectClear();
+									trUnitSelectByQV("akardTree", true);
+									trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
+									
+								}
+							}
+						}
+						case 3:
+						{
+							yDatabaseNext("questApples");
+							if (zDistanceToVectorSquared("questApples", "questGuyPos") < 9) {
+								trUnitSelectClear();
+								trUnitSelectByQV("questApples", true);
+								if (yGetVar("questApples", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
+									trUnitChangeProtoUnit("Osiris Box Glow");
+									questComplete(STARSTONE, -1);
+								} else {
+									trQuestVarSet("wrongAnswer", yGetVar("questApples", "type") - RELIC_MATH_PROBLEM);
+									yClearDatabase("questApples");
+									xsDisableRule("gameplay_always");
+									xsDisableRule("town_always");
+									xsDisableRule("boss_entrance_always");
+									xsDisableRule("enter_boss_room");
+									xsDisableRule("nottud_always");
+									xsDisableRule("class_shop_always");
+									xsDisableRule("relic_transporter_guy_always");
+									xsDisableRule("relic_transporter_guy_found");
+									trUnitChangeProtoUnit("Implode Sphere Effect");
+									trSoundPlayFN("wonderdeath.wav","1",-1,"","");
+									trSoundPlayFN("changeunit.wav","1",-1,"","");
+									trChatSendSpoofed(0, "Akard: OH GOD! WHAT HAVE YOU DONE?! THAT'S THE WRONG-");
+									xsEnableRule("zenos_paradox_00");
+									trQuestVarSet("cinNext", 0);
+									trQuestVarSet("cinStep", 0);
 								}
 							}
 						}
@@ -1615,6 +1715,38 @@ highFrequency
 			relic = yGetVar("nottudShop", "relic");
 			trShowImageDialog(relicIcon(relic), relicName(relic));
 			reselectMyself();
+		}
+	}
+}
+
+rule zenos_paradox_00
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinNext")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trUIFadeToColor(255,255,255,5000,0,true);
+				trCameraShake(5.0, 0.3);
+				trQuestVarSet("cinNext", trTime() + 6);
+			}
+			case 2:
+			{
+				trChatHistoryClear();
+				trQuestVarSet("cinNext", trTime() + 3);
+				trQuestVarSet("stage", 11);
+				xsEnableRule("rebuild_map");
+				trOverlayText("Zeno's Paradox",3,-1,-1,-1);
+			}
+			case 3:
+			{
+				xsDisableRule("enter_boss_room");
+				xsDisableSelf();
+				startNPCDialog(NPC_ZENOS_PARADOX);
+			}
 		}
 	}
 }

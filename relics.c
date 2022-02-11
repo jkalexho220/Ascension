@@ -184,7 +184,7 @@ string relicName(int relic = 0) {
 string relicIcon(int relic = 0) {
 	string icon = "icons\infantry g hoplite icon 64";
 	if ((relic >= RELIC_MATH_PROBLEM) && (relic <= RELIC_MATH_PROBLEM_END)) {
-		icon = "";
+		icon = "icons\god power audrey icons 64";
 	} else {
 		switch(relic)
 		{
@@ -494,131 +494,135 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 
 int relicProto(int relic = 0) {
 	int proto = kbGetProtoUnitID("Hoplite");
-	switch(relic)
-	{
-		case RELIC_HEALTH:
+	if ((relic >= RELIC_MATH_PROBLEM) && (relic <= RELIC_MATH_PROBLEM_END)) {
+		proto = kbGetProtoUnitID("Audrey");
+	} else {
+		switch(relic)
 		{
-			proto = kbGetProtoUnitID("Sea Turtle");
-		}
-		case RELIC_SPEED:
-		{
-			proto = kbGetProtoUnitID("Pegasus");
-		}
-		case RELIC_ATTACK_RANGE:
-		{
-			proto = kbGetProtoUnitID("Chariot Archer");
-		}
-		case RELIC_SPELL_RANGE:
-		{
-			proto = kbGetProtoUnitID("Petsuchos");
-		}
-		case RELIC_SPELL_DURATION:
-		{
-			proto = kbGetProtoUnitID("Frost Giant");
-		}
-		case RELIC_LIFESTEAL:
-		{
-			proto = kbGetProtoUnitID("Troll");
-		}
-		case RELIC_STUN_RESISTANCE:
-		{
-			proto = kbGetProtoUnitID("Scarab");
-		}
-		case RELIC_ATTACK_DAMAGE:
-		{
-			proto = kbGetProtoUnitID("Ballista");
-		}
-		case RELIC_SPELL_POWER:
-		{
-			proto = kbGetProtoUnitID("Fire Giant");
-		}
-		case RELIC_HEAL_BOOST:
-		{
-			proto = kbGetProtoUnitID("Flying Medic");
-		}
-		case RELIC_POISON_RESISTANCE:
-		{
-			proto = kbGetProtoUnitID("Dryad");
-		}
-		case RELIC_ARMOR:
-		{
-			proto = kbGetProtoUnitID("Behemoth");
-		}
-		case RELIC_SILENCE_RESISTANCE:
-		{
-			proto = kbGetProtoUnitID("Sphinx");
-		}
-		case RELIC_POISON_KILLER:
-		{
-			proto = kbGetProtoUnitID("Mummy");
-		}
-		case RELIC_WEIGHTED_BLOWS:
-		{
-			proto = kbGetProtoUnitID("Medusa");
-		}
-		case RELIC_ALL:
-		{
-			proto = kbGetProtoUnitID("Chimera");
-		}
-		case RELIC_ULTIMATE_COST:
-		{
-			proto = kbGetProtoUnitID("Arkantos");
-		}
-		case RELIC_PROJECTILES:
-		{
-			proto = kbGetProtoUnitID("Manticore");
-		}
-		case RELIC_SPECIAL_ATTACK:
-		{
-			proto = kbGetProtoUnitID("Avenger");
-		}
-		case RELIC_COOLDOWN_REDUCTION:
-		{
-			proto = kbGetProtoUnitID("Argus");
-		}
-		case RELIC_KEY_GREEK:
-		{
-			proto = kbGetProtoUnitID("UI Range Indicator Greek SFX");
-		}
-		case RELIC_KEY_NORSE:
-		{
-			proto = kbGetProtoUnitID("UI Range Indicator Norse SFX");
-		}
-		case RELIC_KEY_ATLANTEAN:
-		{
-			proto = kbGetProtoUnitID("UI Range Indicator Atlantean SFX");
-		}
-		case RELIC_KEY_CHINA:
-		{
-			proto = kbGetProtoUnitID("UI Range Indicator Chinese SFX");
-		}
-		case RELIC_KEY_EGYPT:
-		{
-			proto = kbGetProtoUnitID("UI Range Indicator Egypt SFX");
-		}
-		case RELIC_CURSED_RANGE:
-		{
-			proto = kbGetProtoUnitID("Petrobolos");
-		}
-		case RELIC_CURSED_DURATION:
-		{
-			proto = kbGetProtoUnitID("King Folstag");
-		}
-		case RELIC_CURSED_POWER:
-		{
-			proto = kbGetProtoUnitID("Phoenix");
-		}
-		case RELIC_FAVOR_FROM_ATTACKS:
-		{
-			proto = kbGetProtoUnitID("Servant");
-		}
-		case RELIC_POISON_FASTER:
-		{
-			proto = kbGetProtoUnitID("Scorpion Man");
-		}
-		case RELIC_GHOST_PICTURE:
-		{
-			proto = kbGetProtoUnitID("Kastor");
+			case RELIC_HEALTH:
+			{
+				proto = kbGetProtoUnitID("Sea Turtle");
+			}
+			case RELIC_SPEED:
+			{
+				proto = kbGetProtoUnitID("Pegasus");
+			}
+			case RELIC_ATTACK_RANGE:
+			{
+				proto = kbGetProtoUnitID("Chariot Archer");
+			}
+			case RELIC_SPELL_RANGE:
+			{
+				proto = kbGetProtoUnitID("Petsuchos");
+			}
+			case RELIC_SPELL_DURATION:
+			{
+				proto = kbGetProtoUnitID("Frost Giant");
+			}
+			case RELIC_LIFESTEAL:
+			{
+				proto = kbGetProtoUnitID("Troll");
+			}
+			case RELIC_STUN_RESISTANCE:
+			{
+				proto = kbGetProtoUnitID("Scarab");
+			}
+			case RELIC_ATTACK_DAMAGE:
+			{
+				proto = kbGetProtoUnitID("Ballista");
+			}
+			case RELIC_SPELL_POWER:
+			{
+				proto = kbGetProtoUnitID("Fire Giant");
+			}
+			case RELIC_HEAL_BOOST:
+			{
+				proto = kbGetProtoUnitID("Flying Medic");
+			}
+			case RELIC_POISON_RESISTANCE:
+			{
+				proto = kbGetProtoUnitID("Dryad");
+			}
+			case RELIC_ARMOR:
+			{
+				proto = kbGetProtoUnitID("Behemoth");
+			}
+			case RELIC_SILENCE_RESISTANCE:
+			{
+				proto = kbGetProtoUnitID("Sphinx");
+			}
+			case RELIC_POISON_KILLER:
+			{
+				proto = kbGetProtoUnitID("Mummy");
+			}
+			case RELIC_WEIGHTED_BLOWS:
+			{
+				proto = kbGetProtoUnitID("Medusa");
+			}
+			case RELIC_ALL:
+			{
+				proto = kbGetProtoUnitID("Chimera");
+			}
+			case RELIC_ULTIMATE_COST:
+			{
+				proto = kbGetProtoUnitID("Arkantos");
+			}
+			case RELIC_PROJECTILES:
+			{
+				proto = kbGetProtoUnitID("Manticore");
+			}
+			case RELIC_SPECIAL_ATTACK:
+			{
+				proto = kbGetProtoUnitID("Avenger");
+			}
+			case RELIC_COOLDOWN_REDUCTION:
+			{
+				proto = kbGetProtoUnitID("Argus");
+			}
+			case RELIC_KEY_GREEK:
+			{
+				proto = kbGetProtoUnitID("UI Range Indicator Greek SFX");
+			}
+			case RELIC_KEY_NORSE:
+			{
+				proto = kbGetProtoUnitID("UI Range Indicator Norse SFX");
+			}
+			case RELIC_KEY_ATLANTEAN:
+			{
+				proto = kbGetProtoUnitID("UI Range Indicator Atlantean SFX");
+			}
+			case RELIC_KEY_CHINA:
+			{
+				proto = kbGetProtoUnitID("UI Range Indicator Chinese SFX");
+			}
+			case RELIC_KEY_EGYPT:
+			{
+				proto = kbGetProtoUnitID("UI Range Indicator Egypt SFX");
+			}
+			case RELIC_CURSED_RANGE:
+			{
+				proto = kbGetProtoUnitID("Petrobolos");
+			}
+			case RELIC_CURSED_DURATION:
+			{
+				proto = kbGetProtoUnitID("King Folstag");
+			}
+			case RELIC_CURSED_POWER:
+			{
+				proto = kbGetProtoUnitID("Phoenix");
+			}
+			case RELIC_FAVOR_FROM_ATTACKS:
+			{
+				proto = kbGetProtoUnitID("Servant");
+			}
+			case RELIC_POISON_FASTER:
+			{
+				proto = kbGetProtoUnitID("Scorpion Man");
+			}
+			case RELIC_GHOST_PICTURE:
+			{
+				proto = kbGetProtoUnitID("Kastor");
+			}
 		}
 	}
 	return(proto);

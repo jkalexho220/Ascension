@@ -641,17 +641,24 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
             trQuestVarSet("villageZ", 70 * z + 24);
 
 
-            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            trQuestVarSet("akardTower", trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Tower Mirror",12,12,0);
             trUnitSelectClear();
-            trUnitSelectByQV("next");
+            trUnitSelectByQV("akardTower");
             trUnitOverrideAnimation(2,0,true,false,-1);
             trSetSelectedScale(2,2,2);
+            trQuestVarSet("akardGuild1", trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Guild",16,12,180);
+            trQuestVarSet("akardGuild2", trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Guild",12,16,270);
+            trQuestVarSet("akardTree", trGetNextUnitScenarioNameNumber());
             deployTownEyecandy("Tamarisk Tree", 16, 16, 0);
+            trQuestVarSet("akardTowerEnd", trGetNextUnitScenarioNameNumber());
 
             trQuestVarSetFromRand("localQuest", 1, 3, true);
+
+            /* DELETE ME */
+            trQuestVarSet("localQuest", FETCH_GUY);
 
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -996,6 +1003,16 @@ highFrequency
 {
     if (trQuestVarGet("stage") > 0) {
         xsEnableRule("choose_stage_02");
+        for(i=trQuestVarGet("stage"); >1) {
+            /* bacchanalia 10 x stage */
+            for(j=10; >0) {
+                trTechSetStatus(ENEMY_PLAYER, 78, 4);
+            }
+        }
+        for(i=trQuestVarGet("stage")/2; >0) {
+            /* monstrous rage */
+            trTechSetStatus(ENEMY_PLAYER, 76, 4);
+        }
         xsDisableSelf();
     }
 }
@@ -1008,16 +1025,21 @@ highFrequency
     if (trTime() > cActivationTime + 1) {
         xsDisableSelf();
         trBlockAllSounds();
-        for(i=trQuestVarGet("stage"); >1) {
-            /* bacchanalia 10 x stage */
-            for(j=10; >0) {
-                trTechSetStatus(ENEMY_PLAYER, 78, 4);
-            }
-        }
-        for(i=trQuestVarGet("stage")/2; >0) {
-            /* monstrous rage */
-            trTechSetStatus(ENEMY_PLAYER, 76, 4);
-        }
+
+        int chests = 3;
+        int x = 0;
+        int z = 0;
+        int n = 0;
+        int total = 0;
+        int backtrack = 5;
+
+        int room = 0;
+        int x0 = 0;
+        int z0 = 0;
+        int x1 = 0;
+        int z1 = 0;
+        string pName = "";
+        
         trQuestVarSet("rotX0", -1);
         trQuestVarSet("rotX1", 1);
         trQuestVarSet("rotX2", 0);
@@ -1058,7 +1080,7 @@ highFrequency
                 trStringQuestVarSet("rockProto2", "Rock River Sandy");
                 trStringQuestVarSet("rockProto3", "Rock Sandstone Small");
 
-                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
                 trQuestVarSet("enemyProtoCount", 5);
                 trStringQuestVarSet("enemyProto1", "Golden Lion");
                 trStringQuestVarSet("enemyProto2", "Anubite");
@@ -1105,7 +1127,7 @@ highFrequency
                 trStringQuestVarSet("rockProto2", "Imperial Examination");
                 trStringQuestVarSet("rockProto3", "Rock Granite Small");
 
-                trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
                 trQuestVarSet("enemyProtoCount", 5);
                 trStringQuestVarSet("enemyProto1", "Walking Woods Marsh");
                 trStringQuestVarSet("enemyProto2", "Centaur");
@@ -1169,6 +1191,7 @@ highFrequency
             }
             case 4:
             {
+                trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
                 wallHeight = worldHeight + 6;
                 trSetCivAndCulture(0, 0, 0);
                 trQuestVarSet("bossRoomSize", 14);
@@ -1339,7 +1362,7 @@ highFrequency
                 trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
                 trStringQuestVarSet("rockProto3", "Shipwreck");
 
-                trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
                 
                 trQuestVarSet("enemyProtoCount", 6);
                 trStringQuestVarSet("enemyProto1", "Servant");
@@ -1356,6 +1379,55 @@ highFrequency
                 trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
             }
+            case 11:
+            {
+                trSetCivAndCulture(0, 2, 0);
+                worldHeight = 5;
+                wallHeight = 0;
+                trQuestVarSet("bossRoomShape", ROOM_SQUARE);
+                trQuestVarSet("bossRoomSize", 11);
+                trSetLighting("eclipse", 0.1);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 7;
+                
+                TERRAIN_PRIMARY = 4;
+                TERRAIN_SUB_PRIMARY = 15;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 73;
+
+                trQuestVarSet("mapType", MAP_STANDARD);
+                trQuestVarSet("treeDensity", 0.1);
+                trStringQuestVarSet("treeProto1", "Oak Tree Burning");
+                trStringQuestVarSet("treeProto2", "Marsh Tree");
+                trStringQuestVarSet("treeProto3", "Pine Snow");
+                trQuestVarSet("spriteDensity", 0.2);
+                trStringQuestVarSet("spriteProto1", "Imperial Examination");
+                trStringQuestVarSet("spriteProto2", "Healing SFX");
+                trStringQuestVarSet("spriteProto3", "Dust Devil");
+                trQuestVarSet("rockDensity", 0.2);
+                trStringQuestVarSet("rockProto1", "Ruins");
+                trStringQuestVarSet("rockProto2", "Columns Broken");
+                trStringQuestVarSet("rockProto3", "Columns");
+
+                trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
+                
+                
+                trQuestVarSet("enemyProtoCount", ENEMY_PLAYER - 1);
+                for(p=1; < ENEMY_PLAYER) {
+                    trStringQuestVarSet("enemyProto" + p, 
+                        kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
+                }
+
+                for(x=1; < 20) {
+                    trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                    trQuestVarSetFromRand("rand",1,360,true);
+                    trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
+                    yAddToDatabase("timeshiftHawks", "next");
+                    spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Timeshift In"), yGetNewVarName("timeshiftHawks", "sfx"));
+                }
+                xsEnableRule("timeshift_hawks_off");
+            }
         }
 
         /* paint entire map cliff and raise it */
@@ -1370,12 +1442,7 @@ highFrequency
 
         /* build the grid */
         trQuestVarSet("keyType", RELIC_KEY_EGYPT);
-        int chests = 3;
-        int x = 0;
-        int z = 0;
-        int n = 0;
-        int total = 0;
-        int backtrack = 5;
+        
         bool edgeIsPortal = false;
         trQuestVarSet("tile0", TILE_VISITED);
         trQuestVarSet("tile1", TILE_FOUND);
@@ -1534,6 +1601,14 @@ highFrequency
             nottudSpawn = true;
         }
 
+        if (trQuestVarGet("stage") > 10) {
+            trQuestVarSet("relicTransporterGuy", -1);
+            trQuestVarSet("village", -1);
+            trQuestVarSet("bossEntranceRoom", -1);
+            chests = 0;
+            nottudSpawn = false;
+        }
+
         for (i=1; < 15) {
             z = i / 4;
             x = i - z * 4;
@@ -1566,7 +1641,6 @@ highFrequency
                 } else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
                     buildRoom(x, z, ROOM_NOTTUD);
                     nottudSpawn = false;
-                    xsEnableRule("nick_00_visit");
                 } else if (trQuestVarGet("chestRand") == 1) {
                     chests = chests - 1;
                     buildRoom(x, z, ROOM_CHEST);
@@ -1582,12 +1656,6 @@ highFrequency
         }
     
         /* finish making chest rooms */
-        int room = 0;
-        int x0 = 0;
-        int z0 = 0;
-        int x1 = 0;
-        int z1 = 0;
-        string pName = "";
         trQuestVarSet("keyType", RELIC_KEY_GREEK);
         for(i=yGetDatabaseCount("chests"); >0) {
             yDatabaseNext("chests");
@@ -1809,4 +1877,60 @@ highFrequency
         xsEnableRule("gameplay_start");
         xsDisableSelf();
     }
+}
+
+rule timeshift_hawks_off
+inactive
+highFrequency
+{
+    if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+        for(x=yGetDatabaseCount("timeshiftHawks"); >0) {
+            yDatabaseNext("timeshiftHawks", true);
+            trMutateSelected(kbGetProtoUnitID("Hawk"));
+            trSetSelectedScale(0,0,0);
+            trUnitSelectClear();
+            trUnitSelect(""+1*yGetVar("timeshiftHawks", "sfx"), true);
+            trUnitSetAnimationPath("0,1,1,0,0,0,0");
+        }
+        xsDisableSelf();
+    }
+}
+
+rule rebuild_map
+inactive
+highFrequency
+{
+    xsDisableSelf();
+    for(p=1; < ENEMY_PLAYER) {
+        trQuestVarSet("p"+p+"unit", 0);
+        yClearDatabase("p"+p+"characters");
+        yClearDatabase("p"+p+"relics");
+        yClearDatabase("p"+p+"warehouse");
+    }
+    yClearDatabase("freeRelics");
+    yClearDatabase("enemies");
+    yClearDatabase("enemiesIncoming");
+    yClearDatabase("ambushRooms");
+    yClearDatabase("playerCharacters");
+    yClearDatabase("playerUnits");
+    yClearDatabase("chests");
+    yClearDatabase("frontier");
+    yClearDatabase("visited");
+    for(i = trQuestVarGet("eyecandyStart"); < trGetNextUnitScenarioNameNumber()) {
+        trUnitSelectClear();
+        trUnitSelect(""+i, true);
+        trUnitDestroy();
+    }
+    int x = 0;
+    int z = 0;
+    for(i = 0; <16) {
+        trQuestVarSet("tile"+i, 0);
+        trQuestVarSet("room"+i, 0);
+        z = i / 4;
+        x = i - z * 4;
+        for(j=0; <4) {
+            trQuestVarSet("edge"+edgeName(i, x + trQuestVarGet("rotX"+j) + 4 * (z + trQuestVarGet("rotZ"+j))), EDGE_NOT_FOUND);
+        }
+    }
+    xsEnableRule("choose_stage_02");
 }

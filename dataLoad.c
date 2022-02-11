@@ -36,7 +36,7 @@ void saveAllData() {
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
 	for(x=12; > yGetDatabaseCount("p"+p+"relics")) {
-		trQuestVarSet("p"+p+"relic", 0);
+		trQuestVarSet("p"+p+"relic"+x, 0);
 	}
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics");
