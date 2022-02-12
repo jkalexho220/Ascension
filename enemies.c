@@ -250,6 +250,10 @@ highFrequency
         setupProtounitBounty("Scarab", 1, 10, 0.08);
         setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 
+        for(class = 1; <= 16) {
+            setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")), 0.5, 8, 0);
+        }
+
         /* ballista projectiles */
         trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
         trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);

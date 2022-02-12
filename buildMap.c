@@ -742,7 +742,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         }
         case ROOM_NOTTUD:
         {
-            debugLog("nottud room is " + room);
             z0 = 10;
             for(a=0; < 10) {
                 for(b=8; >0) {
@@ -795,6 +794,40 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 yAddUpdateVar("nottudShop", "shopPosz", trQuestVarGet("obeliskz"+i));
                 trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
             }
+        }
+        case ROOM_TEMPLE + 11:
+        {
+            size = 12;
+            z0 = size;
+            for(a=0; < size+3) {
+                for(b=size+3; >0) {
+                    if (a*a + z0 * z0 <= size * size) {
+                        trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, 53, false);
+                        trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
+                        break;
+                    } else {
+                        z0 = z0 - 1;
+                    }
+                }
+            }
+            trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("templeRevealer", true);
+            trUnitChangeProtoUnit("Cinematic Block");
+            trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,225,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("temple", true);
+            trUnitConvert(0);
+            trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+            trSetSelectedScale(2,2,2);
+            trUnitOverrideAnimation(2,0,true,false,-1);
+            trQuestVarSet("templeLOS", 20);
+            trQuestVarSet("templePosX", 70 * x + 40);
+            trQuestVarSet("templePosY", worldHeight + 15.0);
+            trQuestVarSet("templePosZ", 70 * z + 40);
+            xsEnableRule("zeno_temple_always");
         }
     }
 }
@@ -1013,6 +1046,15 @@ highFrequency
             /* monstrous rage */
             trTechSetStatus(ENEMY_PLAYER, 76, 4);
         }
+        trQuestVarSet("rotX0", -1);
+        trQuestVarSet("rotX1", 1);
+        trQuestVarSet("rotX2", 0);
+        trQuestVarSet("rotX3", 0);
+        trQuestVarSet("rotZ0", 0);
+        trQuestVarSet("rotZ1", 0);
+        trQuestVarSet("rotZ2", -1);
+        trQuestVarSet("rotZ3", 1);
+        trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
         xsDisableSelf();
     }
 }
@@ -1025,6 +1067,8 @@ highFrequency
     if (trTime() > cActivationTime + 1) {
         xsDisableSelf();
         trBlockAllSounds();
+
+        trQuestVarSet("templeRoom", -1);
 
         int chests = 3;
         int x = 0;
@@ -1039,21 +1083,13 @@ highFrequency
         int x1 = 0;
         int z1 = 0;
         string pName = "";
-        
-        trQuestVarSet("rotX0", -1);
-        trQuestVarSet("rotX1", 1);
-        trQuestVarSet("rotX2", 0);
-        trQuestVarSet("rotX3", 0);
-        trQuestVarSet("rotZ0", 0);
-        trQuestVarSet("rotZ1", 0);
-        trQuestVarSet("rotZ2", -1);
-        trQuestVarSet("rotZ3", 1);
+
         /* minecraft time! */
         switch(1*trQuestVarGet("stage"))
         {
             case 1:
             {
-                trSetCivAndCulture(0, 4, 1);
+                trSetCivAndCulture(0, 5, 1);
                 trQuestVarSet("bossRoomSize", 16);
                 trQuestVarSet("extraEdges", 9);
                 /* this had better be good to hook them in */
@@ -1193,7 +1229,7 @@ highFrequency
             {
                 trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
                 wallHeight = worldHeight + 6;
-                trSetCivAndCulture(0, 0, 0);
+                trSetCivAndCulture(0, 2, 0);
                 trQuestVarSet("bossRoomSize", 14);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 1;
@@ -1236,7 +1272,7 @@ highFrequency
             }
             case 5:
             {
-                trSetCivAndCulture(0, 5, 1);
+                trSetCivAndCulture(0, 3, 1);
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 11);
                 trSetLighting("dawn", 0.1);
@@ -1381,12 +1417,17 @@ highFrequency
             }
             case 11:
             {
+                trStringQuestVarSet("advice", "And then there were none...");
+                xsEnableRule("laser_rooms_always");
                 trSetCivAndCulture(0, 2, 0);
                 worldHeight = 5;
                 wallHeight = 0;
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 11);
                 trSetLighting("eclipse", 0.1);
+
+                trQuestVarSet("trapRooms", 3);
+                trQuestVarSet("trapType", TRAP_LASERS);
                 TERRAIN_WALL = 2;
                 TERRAIN_SUB_WALL = 7;
                 
@@ -1401,16 +1442,16 @@ highFrequency
                 trStringQuestVarSet("treeProto1", "Oak Tree Burning");
                 trStringQuestVarSet("treeProto2", "Marsh Tree");
                 trStringQuestVarSet("treeProto3", "Pine Snow");
-                trQuestVarSet("spriteDensity", 0.2);
+                trQuestVarSet("spriteDensity", 0.3);
                 trStringQuestVarSet("spriteProto1", "Imperial Examination");
                 trStringQuestVarSet("spriteProto2", "Healing SFX");
-                trStringQuestVarSet("spriteProto3", "Dust Devil");
+                trStringQuestVarSet("spriteProto3", "Mist");
                 trQuestVarSet("rockDensity", 0.2);
                 trStringQuestVarSet("rockProto1", "Ruins");
                 trStringQuestVarSet("rockProto2", "Columns Broken");
                 trStringQuestVarSet("rockProto3", "Columns");
 
-                trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
+                trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
                 
                 
                 trQuestVarSet("enemyProtoCount", ENEMY_PLAYER - 1);
@@ -1426,7 +1467,15 @@ highFrequency
                     yAddToDatabase("timeshiftHawks", "next");
                     spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Timeshift In"), yGetNewVarName("timeshiftHawks", "sfx"));
                 }
-                xsEnableRule("timeshift_hawks_off");
+                xsEnableRule("zenos_paradox_build_01");
+
+                trQuestVarSet("templeRoom", 5);
+
+                trQuestVarSet("akard", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,50,0,50,225,true);
+                trArmySelect("1,0");
+                trUnitConvert(0);
+                trUnitChangeProtoUnit("Oracle Scout");
             }
         }
 
@@ -1469,6 +1518,14 @@ highFrequency
             trQuestVarSet("bossKeyRoom", trQuestVarGet("bossEntranceRoom") + trQuestVarGet("bossKeyRoomMod"));
             if (trQuestVarGet("bossKeyRoom") > 14) {
                 trQuestVarSet("bossKeyRoom", trQuestVarGet("bossKeyRoom") - 14);
+            }
+        }
+
+        if (trQuestVarGet("templeRoom") == 0) {
+            trQuestVarSetFromRand("templeRoom", 1, 14, true);
+            trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") + trQuestVarGet("village"));
+            if (trQuestVarGet("templeRoom") > 14) {
+                trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") - 14);
             }
         }
 
@@ -1641,6 +1698,9 @@ highFrequency
                 } else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
                     buildRoom(x, z, ROOM_NOTTUD);
                     nottudSpawn = false;
+                } else if (trQuestVarGet("templeRoom") == i) {
+                    xsEnableRule("find_temple");
+                    buildRoom(x, z, ROOM_TEMPLE + trQuestVarGet("stage"));
                 } else if (trQuestVarGet("chestRand") == 1) {
                     chests = chests - 1;
                     buildRoom(x, z, ROOM_CHEST);
@@ -1879,7 +1939,7 @@ highFrequency
     }
 }
 
-rule timeshift_hawks_off
+rule zenos_paradox_build_01
 inactive
 highFrequency
 {
@@ -1893,6 +1953,23 @@ highFrequency
             trUnitSetAnimationPath("0,1,1,0,0,0,0");
         }
         xsDisableSelf();
+
+        int jump = yGetDatabaseCount("enemiesIncoming") / 20;
+        for(x=20; >0) {
+            for(i=jump; >0) {
+                yDatabaseNext("enemiesIncoming");
+            }
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("next", true);
+            trUnitChangeProtoUnit("Relic");
+            trUnitSelectClear();
+            trUnitSelectByQV("next", true);
+            trImmediateUnitGarrison(""+1*trQuestVarGet("enemiesIncoming"));
+            yAddToDatabase("zenoRelicsIncoming", "next");
+            yAddUpdateVar("zenoRelicsIncoming", "type", RELIC_MATH_PROBLEM + x);
+        }
     }
 }
 
@@ -1901,6 +1978,7 @@ inactive
 highFrequency
 {
     xsDisableSelf();
+    trQuestVarSet("play", 0);
     for(p=1; < ENEMY_PLAYER) {
         trQuestVarSet("p"+p+"unit", 0);
         yClearDatabase("p"+p+"characters");

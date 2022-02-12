@@ -27,6 +27,11 @@ RESERVED TO 169
 
 */
 
+const int NPC_TEMPLE = 200;
+/*
+RESERVED TO 300
+*/
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -985,6 +990,18 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+
+		case NPC_TEMPLE + 11:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("WHAT IS " + 1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = ?");
+					dialog = 0;
+				}
+			}
+		}
 	}
 	return(dialog);
 }
@@ -1004,6 +1021,7 @@ highFrequency
 			trArmyDispatch("1,0","Dwarf",1,
 				trQuestVarGet("relicTransporterGuyPosx"),0,trQuestVarGet("relicTransporterGuyPosz"),0,true);
 			trArmySelect("1,0");
+			trUnitConvert(0);
 			trUnitChangeProtoUnit("Revealer");
 			trSoundPlayFN("villagercreate.wav","1",-1,"","");
 			break;
@@ -1025,6 +1043,7 @@ highFrequency
 			trArmyDispatch("1,0","Dwarf",1,
 				trQuestVarGet("Posx"),0,trQuestVarGet("Posz"),0,true);
 			trArmySelect("1,0");
+			trUnitConvert(0);
 			trUnitChangeProtoUnit("Revealer");
 			trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 			trMessageSetText("The boss entrance has been found!", -1);
@@ -1655,6 +1674,10 @@ highFrequency
 									xsDisableRule("class_shop_always");
 									xsDisableRule("relic_transporter_guy_always");
 									xsDisableRule("relic_transporter_guy_found");
+									trUnitChangeProtoUnit("Dwarf");
+									trUnitSelectClear();
+									trUnitSelectByQV("questApples", true);
+									trUnitConvert(0);
 									trUnitChangeProtoUnit("Implode Sphere Effect");
 									trSoundPlayFN("wonderdeath.wav","1",-1,"","");
 									trSoundPlayFN("changeunit.wav","1",-1,"","");
@@ -1745,7 +1768,6 @@ highFrequency
 			{
 				xsDisableRule("enter_boss_room");
 				xsDisableSelf();
-				startNPCDialog(NPC_ZENOS_PARADOX);
 			}
 		}
 	}

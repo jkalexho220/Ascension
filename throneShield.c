@@ -241,7 +241,6 @@ void throneShieldAlways(int eventID = -1) {
 			trArmySelect("1,0");
 			trUnitChangeProtoUnit("Olympus Temple SFX");
 		}
-		trSoundPlayFN("ageadvance.wav","1",-1,"","");
 	}
 
 	xsSetContextPlayer(p);

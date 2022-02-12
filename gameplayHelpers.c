@@ -449,7 +449,7 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + 0.08 * trQuestVarGet("p"+p+"health"));
 		}
 		trUnitSelectClear();
-		trUnitSelectByQV(db);
+		trUnitSelectByQV(db, true);
 		if (trQuestVarGet("p"+p+"stunDamage") > 0) {
 			damageEnemy(p, trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"stunDamage"), true);
 		}
@@ -482,6 +482,8 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 					trUnitSelectClear();
 					trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
 					trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
+					trUnitSelectClear();
+					trUnitSelectByQV(db, true);
 				}
 				ySetVar(db, "stunStatus", index);
 			} else if (sound) {

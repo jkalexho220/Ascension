@@ -18,6 +18,7 @@ const int ROOM_VILLAGE = 10;
 const int ROOM_STARTER = 20;
 const int ROOM_BOSS = 21;
 const int ROOM_NOTTUD = 22;
+const int ROOM_TEMPLE = 30;
 
 const int ROOM_CIRCLE = 0;
 const int ROOM_SQUARE = 1;
@@ -465,8 +466,6 @@ runImmediately
         /* carry capacity */
         trModifyProtounit("Ajax", p, 5, 99);
         trModifyProtounit("Transport Ship Greek", p, 5, 99);
-        /* health */
-        trModifyProtounit("Vision SFX", p, 0, -9999);
         /* flying */
         trModifyProtounit("Dwarf", p, 55, 4);
         trModifyProtounit("Dwarf", p, 2, -99);

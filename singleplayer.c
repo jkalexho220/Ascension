@@ -394,6 +394,16 @@ highFrequency
 	    	z = z - 2;
 	    }
 
+	    /* monster-pedia */
+	    if (trQuestVarGet("p1progress") >= 3) {
+	    	/* 72 is the center. 15 is the width */
+	    	for(x=0; < trQuestVarGet("p1progress")) {
+	    		monsterpedia(x+1, 57 + 3 * x);
+	    	}
+	    	trPaintTerrain(71,71,73,87,0,53,false);
+	    	xsEnableRule("monsterpedia_always");
+	    }
+
 	    /* if player is new */
 	    if (trQuestVarGet("class1level") == 0) {
 	    	xsEnableRule("singleplayer_cin");
@@ -418,19 +428,10 @@ highFrequency
 	    		xsEnableRule("zeno_quiz_start");
 	    		if (trQuestVarGet("zenoQuiz") == 2) {
 	    			/* introduce monsterpedia */
+	    			uiLookAtUnitByName(1*yDatabaseNext("monsterpedia"));
 	    			startNPCDialog(NPC_MONSTERPEDIA);
 	    		}
 	    	}
-	    }
-
-	    /* monster-pedia */
-	    if (trQuestVarGet("p1progress") >= 3) {
-	    	/* 72 is the center. 15 is the width */
-	    	for(x=0; < trQuestVarGet("p1progress")) {
-	    		monsterpedia(x+1, 57 + 3 * x);
-	    	}
-	    	trPaintTerrain(71,71,73,87,0,53,false);
-	    	xsEnableRule("monsterpedia_always");
 	    }
 
 	    if (trQuestVarGet("p1class") == 0) {
@@ -742,6 +743,12 @@ highFrequency
 
 					setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
 					setupExplain("Each of the remaining floors is extremely difficult. You will need to coordinate with your friends!");
+				}
+				case 6:
+				{
+					setupQuestion("You can press Escape to close a relic image box.","True","False",1);
+					setupExplain("I painstakingly coded this myself. It's not a default AoM feature. So use it you bastards.");
+					setupExplain("No one appreciates the work I put into this... *sniffle*");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

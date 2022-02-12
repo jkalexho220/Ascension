@@ -176,7 +176,7 @@ highFrequency
     trPlayNextMusicTrack();
     trSetFogAndBlackmap(true, true);
     trPlayerResetBlackMapForAllPlayers();
-    trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
+    trQuestVarSet("play", 1);
 }
 
 rule gameplay_start_2

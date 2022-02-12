@@ -111,9 +111,9 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['main.c', 'shared.c', 'relics.c', 'boons.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
 		'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c',
-		'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'blastmage.c', 'bosses.c', 'gameplay.c', 'singleplayer.c']
+		'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
 first = True
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:
