@@ -111,10 +111,10 @@ functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGP
 			'trChangeTerrainHeight'}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'relics.c', 'boons.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['main.c', 'globals.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
 		'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c',
 		'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
-first = True
+first = 0
 try:
 	with open('XS/' + FILE_2, 'w') as file_data_2:
 		file_data_2.write('void code(string xs="") {\n')
@@ -136,11 +136,8 @@ try:
 							templine = line.strip()
 							checkQuestVarSet(templine, ln)
 							checkQuestVarGet(templine, ln)
-							if not first:
+							if first > 1:
 								checkUnknownFunctions(templine, ln)
-							if ('//' in templine):
-								print("Invalid // comment found!")
-								print("Line " + str(ln) + ":\n    " + line)
 							if (len(templine) > 120):
 								print("Line length greater than 120! Length is " + str(len(templine)))
 								print("Line " + str(ln) + ":\n    " + line)
@@ -167,9 +164,11 @@ try:
 							if 'trMutateSelected("' in templine:
 								print("Needs kbGetProtoUnitID()")
 								print("Line " + str(ln) + ":\n    " + line)
-							if first:
+							if first <= 1:
 								file_data_2.write(templine + '\n')
 							else:
+								if ('//' in templine):
+									templine = templine[:templine.find('//')]
 								file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
 						if ('*/' in line):
 							comment = False
@@ -177,7 +176,18 @@ try:
 						file_data_2.write('\n')
 					line = file_data_1.readline()
 					ln = ln + 1
-			if first:
+			if first == 0:
+				file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("zenowasherefirst"));\n')
+				file_data_2.write('rmSetTriggerPriority(4);\n')
+				file_data_2.write('rmSetTriggerActive(false);\n')
+				file_data_2.write('rmSetTriggerLoop(false);\n')
+				file_data_2.write('rmSetTriggerRunImmediately(true);\n')
+				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");}}/*");\n')
+				first = 1
+			elif first == 1:
+				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowasherefirstagain inactive {if(true){xsDisableSelf();//");\n')
 				file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("zenowashere"));\n')
 				file_data_2.write('rmSetTriggerPriority(4);\n')
 				file_data_2.write('rmSetTriggerActive(false);\n')
@@ -185,7 +195,7 @@ try:
 				file_data_2.write('rmSetTriggerRunImmediately(true);\n')
 				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");}}/*");\n')
-				first = False
+				first = 2
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowashereagain inactive {if(true){xsDisableSelf();//");\n')
 		file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("get_player_names"));\n')
