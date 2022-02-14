@@ -478,6 +478,7 @@ runImmediately
         trModifyProtounit("Sea Turtle", p, 55, 1);
         trModifyProtounit("Pegasus", p, 55, 1);
         trModifyProtounit("Flying Medic", p, 55, 1);
+        trModifyProtounit("Junk", p, 55, 1);
 
         trPlayerKillAllGodPowers(p);
         trPlayerTechTreeEnabledGodPowers(p, false);

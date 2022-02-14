@@ -48,8 +48,8 @@ void saveAllData() {
 	savedata = 0;
 	currentdata = 0;
 	for(x=6; > 0) {
-		savedata = savedata * 32 + (1*trQuestVarGet("p"+p+"relic"+x));
-		currentdata = currentdata * 32 + (1*trQuestVarGet("p"+p+"relic"+(x+6)));
+		savedata = savedata * 31 + (1*trQuestVarGet("p"+p+"relic"+x));
+		currentdata = currentdata * 31 + (1*trQuestVarGet("p"+p+"relic"+(x+6)));
 	}
 	trSetCurrentScenarioUserData(2, savedata);
 	trSetCurrentScenarioUserData(3, currentdata);
@@ -65,7 +65,7 @@ void saveAllData() {
 	}
 
 	/* gemstones */
-	savedata = 0;
+	savedata = 1*xsMin(10, 1*trQuestVarGet("dreamGogglesCount"));
 	for(x=3; >=0) {
 		currentdata = 1*xsMin(99, 1*trQuestVarGet("gemstone"+x));
 		savedata = savedata * 100 + currentdata;
@@ -107,10 +107,24 @@ void saveAllData() {
 		savedata = savedata * 2 + currentdata;
 	}
 	trSetCurrentScenarioUserData(7, savedata);
+
+	/* Quest data */
+	savedata = 0;
+	for(x=5; >0) {
+		currentdata = trQuestVarGet("p"+p+"runestone"+x);
+		savedata = savedata * 2 + currentdata;
+	}
+	currentdata = trQuestVarGet("yeebHit");
+	savedata = savedata * 2 + currentdata;
+	currentdata = trQuestVarGet("p"+p+"nickEquipped");
+	savedata = savedata * 2 + currentdata;
+	currentdata = trQuestVarGet("p"+p+"nickQuestProgress");
+	savedata = savedata * 7 + currentdata;
+	trSetCurrentScenarioUserData(4, savedata);
 }
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 18,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 20,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -222,8 +236,8 @@ inactive
 				savedata = 0;
 			}
 			for(x=1; <7) {
-				trQuestVarSet("p1relic"+(x+6*y), iModulo(32, savedata));
-				savedata = savedata / 32;
+				trQuestVarSet("p1relic"+(x+6*y), iModulo(31, savedata));
+				savedata = savedata / 31;
 			}
 		}
 
@@ -237,6 +251,23 @@ inactive
 				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
 				savedata = savedata / 11;
 			}
+		}
+
+		/* quest data */
+		savedata = trGetScenarioUserData(4);
+		if (savedata < 0) {
+			savedata = 0;
+		}
+		trQuestVarSet("p1nickQuestProgress", iModulo(7, savedata));
+		savedata = savedata / 7;
+		trQuestVarSet("p1nickEquipped", iModulo(2, savedata));
+		savedata = savedata / 2;
+		trQuestVarSet("p1yeebHit", iModulo(2, savedata));
+		trQuestVarSet("yeebHit", trQuestVarGet("p1yeebHit"));
+		savedata = savedata / 2;
+		for(x=5; >0) {
+			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
+			savedata = savedata / 2;
 		}
 
 		xsEnableRule("singleplayer_init");
@@ -336,6 +367,19 @@ inactive
 						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
 					} else if (loadProgress < 18) {
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 5), x);
+					} else if (loadProgress == 18) {
+						currentdata = x;
+						trQuestVarSet("p"+p+"nickQuestProgress", iModulo(7, currentdata));
+						currentdata = currentdata / 7;
+						trQuestVarSet("p"+p+"nickEquipped", iModulo(2, currentdata));
+						currentdata = currentdata / 2;
+						trQuestVarSet("p"+p+"yeebHit", currentdata);
+					} else if (loadProgress == 19) {
+						currentdata = x;
+						for(i=5; >0) {
+							trQuestVarSet("p"+p+"runestone"+i, iModulo(2, currentdata));
+							currentdata = currentdata / 2;
+						}
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x + swordsmen);
@@ -346,7 +390,7 @@ inactive
 		}
 		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (loadProgress == 18) {
+		if (loadProgress == 20) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
@@ -377,13 +421,34 @@ inactive
 						savedata = 0;
 					}
 				}
+				case 18:
+				{
+					savedata = trGetScenarioUserData(4);
+					if (savedata < 0) {
+						savedata = 0;
+					}
+				}
 			}
-			if (loadProgress >=3) {
-				currentdata = iModulo(32, savedata);
-				savedata = savedata / 32;
-			} else if ((loadProgress == 2) && (trGetScenarioUserData(VERSION_NUMBER) == 1)) {
-				currentdata = iModulo(13, savedata);
-				savedata = savedata / 13;
+			if (loadProgress == 18) {
+				currentdata = iModulo(28, savedata);
+				savedata = savedata / 28;
+			} else if (loadProgress >= 6 && trGetScenarioUserData(VERSION_NUMBER) > 0) {
+				currentdata = iModulo(31, savedata);
+				savedata = savedata / 31;
+			} else if (loadProgress >=3) {
+				if ((trGetScenarioUserData(VERSION_NUMBER) == 0) && (loadProgress == 3)) {
+					currentdata = savedata;
+				} else {
+					currentdata = iModulo(32, savedata);
+					savedata = savedata / 32;
+				}
+			} else if (loadProgress == 2) {
+				if (trGetScenarioUserData(VERSION_NUMBER) > 0) {
+					currentdata = iModulo(13, savedata);
+					savedata = savedata / 13;
+				} else {
+					currentdata = 0;
+				}
 			} else {
 				currentdata = iModulo(10, savedata);
 				savedata = savedata / 10;
@@ -429,6 +494,9 @@ inactive
 		}
 		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
 		trQuestVarSet("p"+p+"startingGold", trQuestVarGet("p"+p+"gold"));
+	}
+	if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit")) {
+		trQuestVarSet("yeebHit", 1);
 	}
 	trUnblockAllSounds();
 	trSoundPlayFN("favordump.wav","1",-1,"Done!","icons\god power reverse time icons 64");

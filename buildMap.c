@@ -525,8 +525,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
             trQuestVarSetFromRand("localQuest", 1, 2, true);
 
-            trQuestVarSet("localQuest", BOUNTY_GUY);
-
             trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
             trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
             trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
@@ -555,6 +553,29 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
         case ROOM_VILLAGE + 11:
         {
             // another runestone
+            trPaintTerrain(x * 35 + 13, z * 35 + 13, x * 35 + 27, z * 35 + 27, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x * 35 + 13, z * 35 + 13, x * 35 + 28, z * 35 + 28, worldHeight, false);
+
+            trQuestVarSet("villageX", 70 * x + 26);
+            trQuestVarSet("villageZ", 70 * z + 26);
+
+            trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+            deployTownEyecandy("Runestone", 15, 15, 225);
+            trUnitSelectClear();
+            trUnitSelectByQV("next", true);
+            trSetSelectedScale(2.5, 2.5, 2.5);
+
+            deployTownEyecandy("Columns", 23, 19);
+            deployTownEyecandy("Columns", 23, 11);
+
+            deployTownEyecandy("Columns", 19, 23);
+            deployTownEyecandy("Columns", 11, 23);
+
+            deployTownEyecandy("Columns", 7, 19);
+            deployTownEyecandy("Columns", 7, 11);
+
+            deployTownEyecandy("Columns", 19, 7);
+            deployTownEyecandy("Columns", 11, 7);
         }
         case ROOM_STARTER:
         {
