@@ -94,6 +94,9 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 
 void silenceEnemy(int p = 0, float duration = 9.0) {
 	duration = 1000 * duration * trQuestVarGet("p"+p+"spellDuration");
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
+		duration = 2.0 * duration;
+	}
 	if (trTimeMS() + duration > yGetVar("enemies", "silenceTimeout")) {
 		ySetVar("enemies", "silenceTimeout", trTimeMS() + duration);
 	}
@@ -149,14 +152,19 @@ void nightriderHarvest(string pos = "") {
 }
 
 void removeEnemy() {
+	int bounty = yGetVar("enemies", "bounty");
 	yVarToVector("enemies", "pos");
 	nightriderHarvest("pos");
 	if (yGetVar("enemies", "bounty") > 0) {
 		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
 		for(p=1; <ENEMY_PLAYER) {
 			if (Multiplayer) {
-				trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + yGetVar("enemies", "bounty"));
-				trPlayerGrantResources(p, "Gold", yGetVar("enemies", "bounty"));
+				trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
+				trPlayerGrantResources(p, "Gold", bounty);
+				if (trQuestVarGet("p"+p+"godBoon") == BOON_MORE_GOLD) {
+					trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
+					trPlayerGrantResources(p, "Gold", bounty);
+				}
 			}
 			gainFavor(p, trQuestVarGet("rand"));
 		}
@@ -243,7 +251,7 @@ void equipRelicsAgain(int p = 0) {
 		trUnitSelectByQV("p"+p+"relics");
 		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
 		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
+		if (yGetVar("p"+p+"relics", "type") < KEY_RELICS) {
 			trSetSelectedScale(0,0,-1);
 			trUnitSetAnimationPath("1,0,1,1,0,0,0");
 		}
@@ -391,7 +399,9 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 			trQuestVarSet("poisonSound", 1);
 		}
 		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
-		if (damage > yGetVar(db, "poisonDamage")) {
+		if ((targetPlayers == false) && (trQuestVarGet("p"+p+"godBoon") == BOON_POISON_STACKS)) {
+			ySetVar(db, "poisonDamage", damage + yGetVar(db, "poisonDamage"));
+		} else if (damage > yGetVar(db, "poisonDamage")) {
 			ySetVar(db, "poisonDamage", damage);
 		}
 	}
@@ -413,6 +423,9 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
 	}
 	trDamageUnit(dmg);
 	if (spell) {
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_SPELL_POISON) {
+			poisonUnit("enemies", 12.0, 12.0, p);
+		}
 		trQuestVarSet("p"+p+"lifestealTotal", 
 			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg * 0.5);
 	} else {
@@ -445,6 +458,9 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
+			duration = 2.0 * duration;
+		}
 		if (trQuestVarGet("p"+p+"class") == FROSTKNIGHT) {
 			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + 0.08 * trQuestVarGet("p"+p+"health"));
 		}
@@ -759,6 +775,9 @@ void poisonKillerBonus(int p = 0) {
 }
 
 float calculateDecay(int p = 0, float decay = 0) {
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_DECAY_HALVED) {
+		decay = decay * 0.5;
+	}
 	return(decay / trQuestVarGet("p"+p+"spellDuration"));
 }
 

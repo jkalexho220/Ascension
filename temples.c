@@ -17,7 +17,7 @@ highFrequency
 				trUnitSelectByQV("templeRevealer");
 				trUnitConvert(0);
 				trQuestVarSet("templeFound", 1);
-				trSoundPlayFN("wonder.wav","1",-1,"","");
+				trSoundPlayFN("temple.wav","1",-1,"","");
 				trVectorSetUnitPos("pos", "templeRevealer");
 				trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 				trArmySelect("1,0");
@@ -65,12 +65,22 @@ highFrequency
 				yAddToDatabase("zenoRelics", "zenoRelicsIncoming");
 				yAddUpdateVar("zenoRelics", "type", yGetVar("zenoRelicsIncoming", "type"));
 			}
-			yAddToDatabase("zenoRelics", "zenoRelicsIncoming");
-			yAddUpdateVar("zenoRelics", "type", yGetVar("zenoRelicsIncoming", "type"));
 			yRemoveFromDatabase("zenoRelicsIncoming");
 		}
 	}
 	if (trQuestVarGet("templeFound") == 1) {
+		if (zDistanceToVectorSquared("correctRelic", "templePos") < 16) {
+			trUnitSelectClear();
+			trUnitSelectByQV("correctRelic", true);
+			trUnitChangeProtoUnit("Implode Sphere Effect");
+			trQuestVarSet("templeFound", 2);
+			trQuestVarSet("templeNext", trTime() + 4);
+			trSoundPlayFN("wonder.wav","1",-1,"","");
+			trSoundPlayFN("xpack\xcinematics\8_in\pyramidscrape.mp3","1",-1,"","");
+			uiLookAtUnitByName(""+1*trQuestVarGet("temple"));
+			trUIFadeToColor(0,0,0,3000,0,true);
+			trQuestVarSet("boonUnlocked"+BOON_MORE_GOLD, 1);
+		}
 		if (yGetDatabaseCount("zenoRelics") > 0) {
 			yDatabaseNext("zenoRelics");
 			if (zDistanceToVectorSquared("zenoRelics", "templePos") < 400) {
@@ -82,7 +92,7 @@ highFrequency
 				if (trUnitVisToPlayer()) {
 					trCameraShake(0.5,0.5);
 				}
-				trUnitChangeProtoUnit("Osiris Box Glow");
+				trUnitChangeProtoUnit("Meteor Impact Ground");
 				trVectorQuestVarSet("left", zGetUnitVector("pos", "templePos"));
 				trVectorQuestVarSet("left", rotationMatrix("left", 0.0, 1.0));
 				trVectorQuestVarSet("forward", zGetUnitVector3d("templePos", "pos"));
@@ -130,6 +140,46 @@ highFrequency
 				amt = amt / 75;
 				trSetSelectedScale(amt, amt, yGetVar("mirrorTowerLasers", "length"));
 			}
+		}
+	} else if (trQuestVarGet("templeFound") > 1) {
+		if (trTime() > trQuestVarGet("templeNext")) {
+			switch(1*trQuestVarGet("templeFound"))
+			{
+				case 2:
+				{
+					trLetterBox(true);
+					trSoundPlayFN("","1",-1,
+						"Zenophobia:So you've solved the math problem. Congratulations!", 
+						"icons\infantry g hoplite icon 64");
+					trQuestVarSet("templeNext", trTime() + 4);
+				}
+				case 3:
+				{
+					trSoundPlayFN("","1",-1,
+						"Zenophobia:Here is your reward. The Blessing of Zenophobia.", 
+						"icons\infantry g hoplite icon 64");
+					trQuestVarSet("templeNext", trTime() + 5);
+					trShowImageDialog(boonIcon(BOON_MORE_GOLD), boonName(BOON_MORE_GOLD));
+					gadgetUnreal("ShowImageBox-CloseButton");
+				}
+				case 4:
+				{
+					trSoundPlayFN("","1",-1,
+						"Zenophobia:You can equip this Blessing in singleplayer.", 
+						"icons\infantry g hoplite icon 64");
+					trQuestVarSet("templeNext", trTime() + 5);
+				}
+				case 5:
+				{
+					xsDisableSelf();
+					gadgetUnreal("ShowImageBox");
+					xsEnableRule("game_over");
+					trQuestVarSet("gameOverStep", 4);
+					trQuestVarSet("gameOverNext", trTime());
+					trQuestVarSet("playersWon", 1);
+				}
+			}
+			trQuestVarSet("templeFound", 1 + trQuestVarGet("templeFound"));
 		}
 	}
 }

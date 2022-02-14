@@ -14,6 +14,11 @@ const int NPC_NOTTUD = 7;
 
 const int NPC_ZENOS_PARADOX = 8;
 
+const int NPC_EXPLAIN_BOONS = 9;
+
+const int NPC_KASTOR = 10;
+
+
 const int NPC_QUEST = 100;
 /*
 
@@ -31,6 +36,9 @@ const int NPC_TEMPLE = 200;
 /*
 RESERVED TO 300
 */
+
+const int NPC_ATE_CORPSE = 301;
+const int NPC_ATE_BERRIES = 302;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -97,6 +105,27 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 1:
 				{
 					uiMessageBox("The Monsterpedia is now open! You can see monster stats and abilities by clicking on them!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_EXPLAIN_BOONS:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiLookAtUnitByName(""+1*yDatabaseNext("boons"));
+					uiMessageBox("You have acquired a Blessing! A Blessing is a powerful passive effect.");
+				}
+				case 2:
+				{
+					uiMessageBox("However, you can only have one Blessing at a time. Choose your Blessing by selecting it.");
+				}
+				case 3:
+				{
+					uiMessageBox("There are more Blessings to be found in the Tower, and each one requires a unique unlock condition.");
+					trQuestVarSet("boonUnlocked0", 1);
 					dialog = 0;
 				}
 			}
@@ -436,6 +465,151 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case SHOP_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Eek! Put on your masks! There's a deadly plague on this floor!");
+				}
+				case 2:
+				{
+					uiMessageBox("It deals 25 damage per second!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case FETCH_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I'm running low on rations...");
+				}
+				case 2:
+				{
+					uiMessageBox("This is my last piece of fresh pork. The rest of it rotted away.");
+				}
+				case 3:
+				{
+					uiMessageBox("Oh, I hope the next floor has something edible.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Mmm, the meat on this floor is absolutely delicious!");
+				}
+				case 2:
+				{
+					uiMessageBox("Much better than the junk I had back at home.");
+				}
+				case 3:
+				{
+					uiMessageBox("Y'all got any more of that decaying meat?");
+					dialog = 0;
+				}
+			}
+		}
+
+		case FETCH_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Alright, when I laugh maniacally, you quiver in fear, got it?");
+				}
+				case 2:
+				{
+					uiMessageBox("3...");
+				}
+				case 3:
+				{
+					uiMessageBox("2...");
+				}
+				case 4:
+				{
+					uiMessageBox("1...");
+				}
+				case 5:
+				{
+					uiMessageBox("MWUAHAHAHA!!!");
+					trSoundPlayFN("xpack\xdialog\xkri075.mp3","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case BOUNTY_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("What do you want?");
+				}
+				case 2:
+				{
+					uiMessageBox("Stop bothering me. I have important business to tend to.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case SHOP_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Once I attain the power of RMS, I shall be unstoppable!");
+				}
+				case 2:
+				{
+					uiMessageBox("Ahem...");
+				}
+				case 3:
+				{
+					uiMessageBox("What? Stop staring or I'll vaporize you.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_KASTOR:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Damn, to think I could only make it up to the fifth floor...");
+				}
+				case 2:
+				{
+					uiMessageBox("Now how am I going to prove my old man wrong?!");
+				}
+				case 3:
+				{
+					uiMessageBox("...Huh?");
+				}
+				case 4:
+				{
+					uiMessageBox("What the hell are you looking at?");
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_QUEST + SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -495,26 +669,6 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					uiMessageBox("Dwarven quality goods! Expect the best! For a small sum of 200 gold, of course.");
-					dialog = 0;
-				}
-			}
-		}
-
-		case NPC_QUEST + SHOP_NPC + 4:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Adventurers! I have found my research funds running low.");
-				}
-				case 2:
-				{
-					uiMessageBox("Buy this from me please. 200 gold pieces should be enough.");
-				}
-				case 3:
-				{
-					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
 					dialog = 0;
 				}
 			}
@@ -770,7 +924,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					trShowImageDialog("icons\improvement tax collectors icon 64", "500 Gold");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
 					dialog = 0;
 				}
 			}
@@ -931,6 +1085,147 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case NPC_QUEST + FETCH_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey... please help me... I'm starving...");
+				}
+				case 2:
+				{
+					uiMessageBox("There must be... something edible... on this floor...");
+				}
+				case 3:
+				{
+					uiMessageBox("I'll pay you anything... I just need some food...");
+				}
+				case 4:
+				{
+					trMessageSetText("Find something edible for the adventurer.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_ATE_CORPSE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Is this all there is? Well, here goes nothing.");
+				}
+				case 2:
+				{
+					uiMessageBox("Hrrrk! Oh god, what is this?!");
+				}
+				case 3:
+				{
+					uiMessageBox("I'm dying!!!!!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_ATE_BERRIES:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Berries? Thank you so much! I'll never forget this!");
+				}
+				case 2:
+				{
+					uiMessageBox("Wait, what's going on? What's happening to my body?");
+				}
+				case 3:
+				{
+					uiMessageBox("AaaAaAhHhhHH!!1!");
+					dialog = 0;
+				}
+			}
+		}
+
+		/*
+		literal feces
+		mysterious berry
+		a fucking corpse
+		*/
+		case NPC_QUEST_COMPLETE + FETCH_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh thank goodness! I thought I was going to starve!");
+				}
+				case 2:
+				{
+					uiMessageBox("This is just what I needed! Thank you so much! You're a lifesaver!");
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey you! I can't get enough of this marvelous meat!");
+				}
+				case 2:
+				{
+					uiMessageBox("But it needs a bit more seasoning.");
+				}
+				case 3:
+				{
+					uiMessageBox("Please collect some poison using this bucket and bring it back to me.");
+				}
+				case 4:
+				{
+					trMessageSetText("Equip the Bucket and collect some Poison.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Simply exquisite! This is luxury! This is true cuisine!");
+				}
+				case 2:
+				{
+					uiMessageBox("Would you like to have a bite?");
+				}
+				case 3:
+				{
+					uiMessageBox("No? Okay fine. Have this instead.");
+				}
+				case 4:
+				{
+					trShowImageDialog(gemstoneIcon(SOULSTONE),gemstoneName(SOULSTONE) + " x1");
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_QUEST + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -958,7 +1253,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 6:
 				{
 					trSoundPlayFN("new_objective.wav","1",-1,"","");
-					trMessageSetText("Use the Magic Detector to find the artifact.", -1);
+					trMessageSetText("Use the Magic Detector to find Yeebaagooon's missing relic and return it to him.", -1);
 					dialog = 0;
 				}
 			}
@@ -983,9 +1278,53 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trSoundPlayFN("favordump.wav","1",-1,"","");
-					/*
 					trShowImageDialog("icons\improvement tax collectors icon 64", "300 Gold");
-					*/
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST + BOUNTY_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Ah, right on time, adventurers.");
+				}
+				case 2:
+				{
+					uiMessageBox("There is a lot of useless junk in my storage. Please get rid of it.");
+				}
+				case 3:
+				{
+					uiMessageBox("Don't touch anything else, however.");
+				}
+				case 4:
+				{
+					trMessageSetText("Move the Worthless Junk out of Yeebaagooon's storage room.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Excellent work. Now I can fill this place with other worthless junk.");
+				}
+				case 2:
+				{
+					uiMessageBox("Here is your reward.");
+				}
+				case 3:
+				{
+					trShowImageDialog(gemstoneIcon(MANASTONE), gemstoneName(MANASTONE));
+					trSoundPlayFN("favordump.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -1117,7 +1456,10 @@ highFrequency
 {
 	int x = 0;
 	int z = 0;
+	int p = 0;
+	int room = 0;
 	int action = 0;
+	float amt = 0;
 	if (trQuestVarGet("townFound") == 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("guy1");
@@ -1446,7 +1788,7 @@ highFrequency
 									}
 								}
 							} else if (zDistanceToVectorSquared("fetchTarget", "townCenter") < 400) {
-								questComplete(-1, 500);
+								questComplete(-1, 300);
 								trUnitSelectClear();
 								trUnitSelectByQV("fetchTarget", true);
 								trUnitConvert(0);
@@ -1690,6 +2032,247 @@ highFrequency
 						}
 					}
 				}
+				case FETCH_NPC + 5:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("questActive", 2);
+							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							for(i=0; < trQuestVarGet("rand")) {
+								yDatabaseNext("basicRooms");
+							}
+							room = trQuestVarGet("basicRooms");
+							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							trQuestVarSet("fecesRelic", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							for(i=0; < trQuestVarGet("rand")) {
+								yDatabaseNext("basicRooms");
+							}
+							room = trQuestVarGet("basicRooms");
+							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							trQuestVarSet("berryRelic", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
+							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							for(i=0; < trQuestVarGet("rand")) {
+								yDatabaseNext("basicRooms");
+							}
+							room = trQuestVarGet("basicRooms");
+							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							trQuestVarSet("corpseRelic", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Relic");
+							yAddToDatabase("freeRelics", "fecesRelic");
+							yAddUpdateVar("freeRelics", "type", RELIC_LITERAL_FECES);
+							yAddToDatabase("freeRelics", "berryRelic");
+							yAddUpdateVar("freeRelics", "type", RELIC_BERRY_BUSH);
+							yAddToDatabase("freeRelics", "corpseRelic");
+							yAddUpdateVar("freeRelics", "type", RELIC_A_FUCKING_CORPSE);
+						}
+						case 2:
+						{
+							if (zDistanceToVectorSquared("berryRelic", "questGuyPos") < 16) {
+								trUnitSelectClear();
+								trUnitSelectByQV("berryRelic", true);
+								trUnitChangeProtoUnit("Regeneration SFX");
+								trQuestVarSet("questActive", 4);
+								trQuestVarSet("questNext", trTime() + 5);
+								trSoundPlayFN("colossuseat.wav","1",-1,"","");
+								startNPCDialog(NPC_ATE_BERRIES);
+							} else if (zDistanceToVectorSquared("corpseRelic", "questGuyPos") < 16) {
+								trUnitSelectClear();
+								trUnitSelectByQV("corpseRelic", true);
+								trUnitChangeProtoUnit("Scarab Blood");
+								trQuestVarSet("questActive", 5);
+								trQuestVarSet("questNext", trTime() + 5);
+								trSoundPlayFN("colossuseat.wav","1",-1,"","");
+								startNPCDialog(NPC_ATE_CORPSE);
+							} else if (zDistanceToVectorSquared("fecesRelic", "questGuyPos") < 16) {
+								trUnitSelectClear();
+								trUnitSelectByQV("fecesRelic", true);
+								trUnitChangeProtoUnit("Osiris Box Glow");
+								trSoundPlayFN("colossuseat.wav","1",-1,"","");
+								trSoundPlayFN("heal.wav","1",-1,"","");
+								questComplete(-1, 300);
+							}
+						}
+						case 4:
+						{
+							if (trTime() > trQuestVarGet("questNext")) {
+								trQuestVarSet("questActive", -1);
+								trMessageSetText("Quest failed!", -1);
+								trSoundPlayFN("changeunit.wav","1",-1,"","");
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy", true);
+								trUnitDestroy();
+								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX"),0,trQuestVarGet("questGuyPosZ"),180,true);
+								trUnitSelectClear();
+								trUnitSelectByQV("next");
+								trUnitConvert(ENEMY_PLAYER);
+								trUnitChangeProtoUnit("Walking Berry Bush");
+								activateEnemy("next", 10);
+							}
+						}
+						case 5:
+						{
+							if (trTime() > trQuestVarGet("questNext")) {
+								trQuestVarSet("questActive", -1);
+								trMessageSetText("Quest failed!", -1);
+								trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy", true);
+								trUnitDelete(false);
+							}
+						}
+					}
+				}
+				case BOUNTY_NPC + 5:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSet("poisonBucket", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questGuyPosZ"),0,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("poisonBucket", true);
+							trUnitChangeProtoUnit("Relic");
+							yAddToDatabase("freeRelics", "poisonBucket");
+							yAddUpdateVar("freeRelics", "type", RELIC_POISON_BUCKET);
+							trQuestVarSet("questActive", 2);
+						}
+						case 2:
+						{
+							p = trQuestVarGet("poisonBucketHolder");
+							if (p > 0) {
+								if (yGetVarAtIndex("playerUnits", "poisonStatus", 1*trQuestVarGet("p"+p+"index")) > 0) {
+									if (trTime() > trQuestVarGet("poisonBucketNext")) {
+										trQuestVarSet("poisonBucketNext", trTime());
+										trQuestVarSet("poisonBucketFill", trQuestVarGet("poisonBucketFill") + 3);
+										if (trQuestVarGet("poisonBucketFill") >= 100) {
+											trQuestVarSet("poisonBucketFill", 100);
+											trMessageSetText("Poison bucket has been filled. Return to the quest giver.", -1);
+											trQuestVarSet("questActive", 3);
+										}
+										trChatSend(0, "<color=0.3,1,0.5>Poison bucket: " + 1*trQuestVarGet("poisonBucketFill") + "/100");
+									}
+								}
+							}
+						}
+						case 3:
+						{
+							if (zDistanceToVectorSquared("poisonBucket", "questGuyPos") < 16) {
+								trUnitSelectClear();
+								trUnitSelectByQV("poisonBucket", true);
+								trUnitChangeProtoUnit("Lampades Blood");
+								trSoundPlayFN("lampadesblood.wav","1",-1,"","");
+								questComplete(SOULSTONE, -1);
+							}
+						}
+					}
+				}
+				case FETCH_NPC + 6:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"), true);
+							for(i=0; < trQuestVarGet("rand")) {
+								yDatabaseNext("basicRooms");
+							}
+							room = trQuestVarGet("basicRooms");
+							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Relic");
+							trQuestVarSet("questActive", 2);
+							trQuestVarSet("magicDetectorRelic", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questguyposz")-2,0,true);
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Relic");
+							yAddToDatabase("freeRelics", "yeebRelic");
+							yAddUpdateVar("freeRelics", "type", RELIC_YEEBAAGOOON);
+							yAddToDatabase("freeRelics", "magicDetectorRelic");
+							yAddUpdateVar("freeRelics", "type", RELIC_MAGIC_DETECTOR);
+							xsEnableRule("yeeb_hit_list");
+						}
+						case 2:
+						{
+							p = trQuestVarGet("magicDetectorHolder");
+							trVectorSetUnitPos("pos", "yeebRelic");
+							if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16) {
+								trUnitSelectClear();
+								trUnitSelectByQV("yeebRelic", true);
+								trUnitChangeProtoUnit("Osiris Box Glow");
+								questComplete(-1, 300);
+								xsDisableRule("yeeb_hit_list");
+								trQuestVarSet("yeebHit", 0);
+							} else if (p > 0) {
+								if (trTime() > trQuestVarGet("magicDetectorNext")) {
+									trQuestVarSet("magicDetectorNext", trTime());
+									amt = zDistanceToVector("magicDetectorRelic", "pos");
+									if (trCurrentPlayer() == p) {
+										if (trPlayerResourceCount(p, "favor") < 10) {
+											trChatSend(0, "<color=1,0,0>Distance: " + 1*amt);
+											trSoundPlayFN("attackwarning.wav","1",-1,"","");
+										} else {
+											trChatSend(0, "<color=1,1,1>Distance: " + 1*amt);
+										}
+									}
+								}
+								if (trPlayerResourceCount(p, "favor") == 0) {
+									trMessageSetText("Quest failed!");
+									trQuestVarSet("questActive", -1);
+									trUnitSelectClear();
+									trUnitSelectByQV("yeebRelic", true);
+									trUnitDestroy();
+									trUnitSelectClear();
+									trUnitSelectByQV("magicDetectorRelic", true);
+									trUnitDestroy();
+									trVectorSetUnitPos("pos", "p"+p+"unit");
+									trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+									trArmySelect("1,0");
+									trDamageUnitPercent(100);
+									trUnitChangeProtoUnit("Implode Sphere Effect");
+									trUnitSelectClear();
+									trUnitSelectByQV("p"+p+"unit");
+									trUnitDelete(false);
+									trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
+									trCameraShake(1.0, 0.5);
+								}
+							}							
+						}
+					}
+				}
+				case BOUNTY_NPC + 6:
+				{
+					switch(1*trQuestVarGet("questActive"))
+					{
+						case 1:
+						{
+							if (yGetDatabaseCount("worthlessJunk") > 0) {
+								yDatabaseNext("worthlessJunk");
+								trVectorSetUnitPos("pos", "worthlessJunk");
+								if (vectorInRectangle("pos", "yeebRoomBottom", "yeebRoomTop") == false) {
+									trUnitSelectClear();
+									trUnitSelectByQV("worthlessJunk", true);
+									trUnitChangeProtoUnit("Dust Large");
+									trSoundPlayFN("swing2.wav","1",-1,"","");
+									trChatSend(0, "<color=1,1,1>Worthless junk removed.");
+									yRemoveFromDatabase("worthlessJunk");
+								}
+							} else {
+								questComplete(MANASTONE, -1);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -1770,5 +2353,18 @@ highFrequency
 				xsDisableSelf();
 			}
 		}
+	}
+}
+
+rule yeeb_hit_list
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("yeebRelic", true);
+	if (trUnitIsOwnedBy(trCurrentPlayer())) {
+		trQuestVarSet("yeebHit", 1);
+	} else if (trUnitIsOwnedBy(0)) {
+		trQuestVarSet("yeebHit", 0);
 	}
 }

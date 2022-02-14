@@ -251,7 +251,8 @@ highFrequency
         setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 
         for(class = 1; <= 16) {
-            setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")), 0.5, 8, 0);
+            setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")), 
+                trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
         }
 
         /* ballista projectiles */
@@ -1070,7 +1071,7 @@ void enemiesAlways() {
                     trVectorSetUnitPos("start", "battleBoars");
                     trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("battleBoars", "target")));
                     for (x=yGetDatabaseCount("playerUnits"); >0) {
-                        if (yDatabaseNext("playerUnits") == -1 || trUnitAlive() == false) {
+                        if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
                             removePlayerUnit();
                         } else if (zDistanceToVectorSquared("playerUnits", "end") < 9.0) {
                             trVectorSetUnitPos("pos", "playerUnits");

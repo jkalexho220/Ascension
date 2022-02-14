@@ -50,6 +50,15 @@ reserved to 60
 */
 const int RELIC_MATH_PROBLEM_END = 60;
 
+const int RELIC_LITERAL_FECES = 61;
+const int RELIC_BERRY_BUSH = 62;
+const int RELIC_A_FUCKING_CORPSE = 63;
+
+const int RELIC_POISON_BUCKET = 64;
+
+const int RELIC_WORTHLESS_JUNK = 65;
+const int RELIC_MAGIC_DETECTOR = 66;
+
 const int KEY_RELICS = 100;
 const int RELIC_KEY_GREEK = 101;
 const int RELIC_KEY_NORSE = 102;
@@ -164,7 +173,11 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_POISON_FASTER:
 			{
-				msg = "Poison damage doubled but duration halved.";
+				msg = "Poison damage doubled but duration halved";
+			}
+			case RELIC_YEEBAAGOOON:
+			{
+				msg = "Regenerate 0.3 favor per second";
 			}
 
 			case RELIC_GHOST_PICTURE:
@@ -175,6 +188,35 @@ string relicName(int relic = 0) {
 			case RELIC_NICKONHAWK_GOGGLES:
 			{
 				msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
+			}
+
+			case RELIC_LITERAL_FECES:
+			{
+				msg = "Literal feces";
+			}
+
+			case RELIC_A_FUCKING_CORPSE:
+			{
+				msg = "A fucking corpse";
+			}
+
+			case RELIC_BERRY_BUSH:
+			{
+				msg = "A berry bush";
+			}
+
+			case RELIC_POISON_BUCKET:
+			{
+				msg = "A bucket for holding a liquid";
+			}
+
+			case RELIC_WORTHLESS_JUNK:
+			{
+				msg = "Worthless junk";
+			}
+			case RELIC_MAGIC_DETECTOR:
+			{
+				msg = "Magic Detector";
 			}
 		}
 	}
@@ -288,6 +330,10 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\special e scorpionman icon 64";
 			}
+			case RELIC_YEEBAAGOOON:
+			{
+				icon = "icons\special e son of osiris icon 64";
+			}
 			case RELIC_KEY_GREEK:
 			{
 				icon = "ui range indicator greek";
@@ -311,6 +357,30 @@ string relicIcon(int relic = 0) {
 			case RELIC_GHOST_PICTURE:
 			{
 				icon = "icons\special g kastor icon 64";
+			}
+			case RELIC_LITERAL_FECES:
+			{
+				icon = "icons\special x promethean icons 64";
+			}
+			case RELIC_A_FUCKING_CORPSE:
+			{
+				icon = "icons\special e minion icon 64";
+			}
+			case RELIC_BERRY_BUSH:
+			{
+				icon = "icons\world berry bush icon 64";
+			}
+			case RELIC_POISON_BUCKET:
+			{
+				icon = "icons\special c jiangshi icon";
+			}
+			case RELIC_WORTHLESS_JUNK:
+			{
+				icon = "icons\boat c junk icon";
+			}
+			case RELIC_MAGIC_DETECTOR:
+			{
+				icon = "icons\siege g helepolis icon 64";
 			}
 		}
 	}
@@ -393,7 +463,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ATTACK_DAMAGE:
 		{
-			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttack") + 15.0 * m);
+			trQuestVarSet("p"+p+"baseAttackTrue", trQuestVarGet("p"+p+"baseAttackTrue") + 15.0 * m);
+			trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"baseAttackTrue"));
 			trQuestVarSet("p"+p+"Attack", trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
@@ -479,6 +550,32 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"poisonSpeed", trQuestVarGet("p"+p+"poisonSpeed") + 1.0 * m);
 		}
+		case RELIC_YEEBAAGOOON:
+		{
+			trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
+			trQuestVarSet("p"+p+"favorRegen", trQuestVarGet("p"+p+"favorRegen") + 0.3 * m);
+		}
+		case RELIC_MAGIC_DETECTOR:
+		{
+			trQuestVarSet("p"+p+"favorRegen", trQuestVarGet("p"+p+"favorRegen") - m);
+			trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
+			if (trQuestVarGet("questActive") > 0) {
+				if (m > 0) {
+					trQuestVarSet("magicDetectorHolder", p);
+				} else {
+					trQuestVarSet("magicDetectorHolder", 0);
+				}
+			}
+		}
+		case RELIC_POISON_BUCKET:
+		{
+			trQuestVarSet("p"+p+"poisonBucket", m);
+			if (m > 0) {
+				trQuestVarSet("poisonBucketHolder", p);
+			} else {
+				trQuestVarSet("poisonBucketHolder", 0);
+			}
+		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
@@ -490,6 +587,12 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	trQuestVarSet("p"+p+"spellDamage", xsMax(0.1, trQuestVarGet("p"+p+"spellDamageTrue")));
 	trQuestVarSet("p"+p+"spellDuration", xsMax(0.1, trQuestVarGet("p"+p+"spellDurationTrue")));
 	trQuestVarSet("p"+p+"spellRange", xsMax(0.1, trQuestVarGet("p"+p+"spellRangeTrue")));
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_SPELL_ATTACK) {
+		trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("p"+p+"spellDamage") * trQuestVarGet("p"+p+"baseAttackTrue"));
+		trQuestVarSet("p"+p+"Attack", trQuestVarGet("p"+p+"baseAttack"));
+		zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
+		zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
+	}
 }
 
 int relicProto(int relic = 0) {
@@ -619,9 +722,37 @@ int relicProto(int relic = 0) {
 			{
 				proto = kbGetProtoUnitID("Scorpion Man");
 			}
+			case RELIC_YEEBAAGOOON:
+			{
+				proto = kbGetProtoUnitID("Pharaoh of Osiris");
+			}
 			case RELIC_GHOST_PICTURE:
 			{
 				proto = kbGetProtoUnitID("Kastor");
+			}
+			case RELIC_LITERAL_FECES:
+			{
+				proto = kbGetProtoUnitID("Promethean");
+			}
+			case RELIC_A_FUCKING_CORPSE:
+			{
+				proto = kbGetProtoUnitID("Minion");
+			}
+			case RELIC_BERRY_BUSH:
+			{
+				proto = kbGetProtoUnitID("Walking Berry Bush");
+			}
+			case RELIC_POISON_BUCKET:
+			{
+				proto = kbGetProtoUnitID("Jiangshi");
+			}
+			case RELIC_WORTHLESS_JUNK:
+			{
+				proto = kbGetProtoUnitID("Junk");
+			}
+			case RELIC_MAGIC_DETECTOR:
+			{
+				proto = kbGetProtoUnitID("Helepolis");
 			}
 		}
 	}

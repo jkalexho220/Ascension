@@ -450,12 +450,12 @@ highFrequency
                                 trSoundPlayFN("backtowork.wav","1",-1,"","");
                                 trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
                             }
-                            relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
-                            if (kbGetUnitBaseTypeID(id) != kbGetProtoUnitID("Osiris Box Glow")) {
+                            if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"relics", "type"))) {
                                 trUnitChangeProtoUnit("Relic");
                                 yAddToDatabase("freeRelics", "p"+p+"relics");
                                 yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
                             }
+                            relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                             yRemoveFromDatabase("p"+p+"relics");
                             yRemoveUpdateVar("p"+p+"relics", "type");
                         }
@@ -474,7 +474,7 @@ highFrequency
             if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
                 if (yGetVar("p"+p+"warehouse", "type") < KEY_RELICS ||
                     trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
-                    if (kbGetUnitBaseTypeID(id) != kbGetProtoUnitID("Osiris Box Glow")) {
+                    if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"warehouse", "type"))) {
                         trUnitChangeProtoUnit("Relic");
                         yAddToDatabase("freeRelics", "p"+p+"warehouse");
                         yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
@@ -589,6 +589,9 @@ highFrequency
                         if (trQuestVarGet("ISelected"+p) == 0) {
                             trQuestVarSet("iSelected"+p, 1);
                             trChatSend(0, "<color=1,1,1><u>"+trStringQuestVarGet("p"+p+"name")+"</u></color>");
+                            if (trQuestVarGet("p"+p+"godBoon") > 0) {
+                                trChatSend(0, boonName(1*trQuestVarGet("p"+p+"godBoon")));
+                            }
                             count = yGetPointer("p"+p+"relics");
                             for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
                                 yDatabaseNext("p"+p+"relics");
@@ -649,6 +652,22 @@ highFrequency
                         if (trCurrentPlayer() == p) {
                             trCounterAbort("silence");
                         }
+                    }
+                }
+                if (trQuestVarGet("p"+p+"favorRegen") != 0) {
+                    if (trTimeMS() > trQuestVarGet("p"+p+"regenerateFavorLast") + 1000) {
+                        amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateFavorLast");
+                        amt = amt * 0.001 * trQuestVarGet("p"+p+"favorRegen");
+                        gainFavor(p, amt);
+                        trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
+                    }
+                }
+                if (trQuestVarGet("p"+p+"godBoon") == BOON_REGENERATE_HEALTH) {
+                    if (trTimeMS() > trQuestVarGet("p"+p+"regenerateHealthLast") + 1000) {
+                        amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateHealthLast");
+                        amt = amt * 0.00003;
+                        trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
+                        trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
                     }
                 }
             } else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
@@ -810,7 +829,7 @@ highFrequency
         trQuestVarSet("gameOverNext", trTime() + 2);
         xsEnableRule("game_over");
         if (trQuestVarGet("newPlayers") == 0) {
-            trQuestVarSet("gameOverStep", 5);
+            trQuestVarSet("gameOverStep", 6);
         }
     }
 
@@ -862,12 +881,19 @@ highFrequency
             }
             case 4:
             {
+                trSoundPlayFN("default", "1",-1,
+                    "Zenophobia: That's Singleplayer -> Random Map -> Ascension MMORPG",
+                    "icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverNext", trTime() + 6);
+            }
+            case 5:
+            {
                 trQuestVarSet("gameOverNext", trTime() + 1);
                 trUIFadeToColor(0,0,0,1000,0,false);
                 trLetterBox(false);
                 saveAllData();
             }
-            case 5:
+            case 6:
             {
                 xsDisableSelf();
                 for(p=1; < ENEMY_PLAYER) {
@@ -879,10 +905,10 @@ highFrequency
                 }
                 trEndGame();
             }
-            case 6:
+            case 7:
             {
                 trSoundPlayFN("default", "1",-1,"Zenophobia:" + trStringQuestVarGet("advice"),"icons\infantry g hoplite icon 64");
-                trQuestVarSet("gameOverStep", 3);
+                trQuestVarSet("gameOverStep", 4);
                 trQuestVarSet("gameOverNext", trTime() + 5);
             }
         }

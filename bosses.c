@@ -3212,7 +3212,7 @@ highFrequency
 					"icons\infantry g hoplite icon 64");
 				trQuestVarSet("gameOverStep", 1);
 				if (trQuestVarGet("newPlayers") == 0) {
-					trQuestVarSet("gameOverStep", 3);
+					trQuestVarSet("gameOverStep", 4);
 				}
 				xsDisableSelf();
 				xsEnableRule("game_over");

@@ -1,3 +1,38 @@
+void spChooseBoon(int eventID = -1) {
+	int proto = 0;
+	/* TWO RELICS off */
+	if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+		for(a=1; <= CLASS_COUNT) {
+			proto = trQuestVarGet("class"+a+"proto");
+			trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, -2);
+	    }
+	    trUnitSelectClear();
+	    trUnitSelectByQV("p1unit");
+	    trUnitChangeProtoUnit(kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p1class")+"proto")));
+	    equipRelicsAgain(1);
+	} else if (trQuestVarGet("p1godBoon") == BOON_DOUBLE_FAVOR) {
+		trSetCivAndCulture(1, 1, 0);
+	}
+
+	trQuestVarSet("p1godBoon", trQuestVarGet("selectedBoon"));
+	trQuestVarSetFromRand("rand", 1, 5, true);
+	trSoundPlayFN("ui\thunder"+1*trQuestVarGet("rand")+".wav","1",-1,"","");
+	trVectorSetUnitPos("pos", "selectedBoonUnit");
+	trUnitSelectClear();
+	trUnitSelectByQV("boonSpotlight", true);
+	trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+
+	/* TWO RELICS on */
+	if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+		for(a=1; <= CLASS_COUNT) {
+			proto = trQuestVarGet("class"+a+"proto");
+			trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, 2);
+	    }
+	} else if (trQuestVarGet("p1godBoon") == BOON_DOUBLE_FAVOR) {
+		trSetCivAndCulture(1, 0, 0);
+	}
+}
+
 void spSwitchToClass(int class = -1) {
 	chooseClass(1, class - 3000);
 }
@@ -288,6 +323,7 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 2) {
+		bool boons = false;
 		int proto = 0;
 		xsDisableSelf();
 		trLetterBox(false);
@@ -404,6 +440,39 @@ highFrequency
 	    	xsEnableRule("monsterpedia_always");
 	    }
 
+	    /* boons */
+	    for(a=1; <=12) {
+	    	if (trQuestVarGet("boonUnlocked"+a) == 1) {
+	    		if (boons == false) {
+	    			trQuestVarSet("boonSpotlight", trGetNextUnitScenarioNameNumber());
+	    			trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+	    			trArmySelect("1,0");
+	    			trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+	    			xsEnableRule("select_boon");
+	    			trEventSetHandler(8000, "spChooseBoon");
+	    			trPaintTerrain(71,71,87,73,0,53,false);
+	    			trPaintTerrain(88,69, 92,75, 4,15, false);
+	    			boons = true;
+	    		}
+	    		x = 176 + 4 * iModulo(3, a-1);
+	    		z = 138 + 4 * ((a-1) / 3);
+	    		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	    		trArmyDispatch("1,0","Statue of Lightning",1,x,0,z,180,true);
+	    		trUnitSelectClear();
+	    		trUnitSelectByQV("next");
+	    		trUnitConvert(0);
+	    		overrideStatue(a);
+	    		yAddToDatabase("boons", "next");
+	    		yAddUpdateVar("boons", "type", a);
+	    		if (trQuestVarGet("p1godBoon") == a) {
+	    			trVectorSetUnitPos("pos", "next");
+	    			trUnitSelectClear();
+	    			trUnitSelectByQV("boonSpotlight", true);
+	    			trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+	    		}
+	    	}
+	    }
+
 	    /* if player is new */
 	    if (trQuestVarGet("class1level") == 0) {
 	    	xsEnableRule("singleplayer_cin");
@@ -419,6 +488,9 @@ highFrequency
 	    	for(a=4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2)); >2) {
 	    		classNewUnlock(a);
 	    	}
+	    	if (boons && (trQuestVarGet("boonUnlocked0") == 0)) {
+	    		startNPCDialog(NPC_EXPLAIN_BOONS);
+	    	}
 	    	if (trQuestVarGet("p1progress") > trQuestVarGet("zenoQuiz")) {
 	    		trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
 	    		trArmyDispatch("1,0", "Hoplite", 1, 130, 0, 160, 225, false);
@@ -428,7 +500,7 @@ highFrequency
 	    		xsEnableRule("zeno_quiz_start");
 	    		if (trQuestVarGet("zenoQuiz") == 2) {
 	    			/* introduce monsterpedia */
-	    			uiLookAtUnitByName(1*yDatabaseNext("monsterpedia"));
+	    			uiLookAtUnitByName(""+1*yDatabaseNext("monsterpedia"));
 	    			startNPCDialog(NPC_MONSTERPEDIA);
 	    		}
 	    	}
@@ -904,6 +976,35 @@ highFrequency
 		trChatSend(0, trStringQuestVarGet("description1"));
 		for(x=2; <= trQuestVarGet("descriptionCount")) {
 			trChatSend(0, trStringQuestVarGet("description"+x));
+		}
+	}
+}
+
+rule choose_boon
+inactive
+highFrequency
+{
+	if (trIsGadgetVisible("ShowImageBox") == false) {
+		xsEnableRule("select_boon");
+		xsDisableSelf();
+		trShowChoiceDialog("Choose this Blessing?","Yes", 8000, "No", -1);
+	}
+}
+
+rule select_boon
+inactive
+highFrequency
+{
+	yDatabaseNext("boons", true);
+	int boon = yGetVar("boons", "type");
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		trShowImageDialog(boonIcon(boon), boonName(boon));
+		if (trQuestVarGet("p1godBoon") != boon) {
+			trQuestVarSet("selectedBoon", boon);
+			trQuestVarSet("selectedBoonUnit", trQuestVarGet("boons"));
+			xsEnableRule("choose_boon");
+			xsDisableSelf();
 		}
 	}
 }

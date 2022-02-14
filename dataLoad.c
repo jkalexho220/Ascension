@@ -99,6 +99,14 @@ void saveAllData() {
 	currentdata = trQuestVarGet("playerHasHosted");
 	savedata = savedata * 2 + currentdata;
 	trSetCurrentScenarioUserData(8, savedata);
+
+	/* boon unlocks */
+	savedata = 0;
+	for(x=12; >=0) {
+		currentdata = trQuestVarGet("boonUnlocked"+x);
+		savedata = savedata * 2 + currentdata;
+	}
+	trSetCurrentScenarioUserData(7, savedata);
 }
 
 void showLoadProgress() {
@@ -151,6 +159,16 @@ inactive
 
 	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);
+	}
+
+	/* boons */
+	savedata = trGetScenarioUserData(7);
+	if (savedata < 0) {
+		savedata = 0;
+	}
+	for(x=0; <= 12) {
+		trQuestVarSet("boonUnlocked"+x, iModulo(2, savedata));
+		savedata = savedata / 2;
 	}
 
 	if (Multiplayer) {
@@ -402,6 +420,8 @@ inactive
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"level"));
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_TWO_RELICS) {
 			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, 2);
+		} else if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_FAVOR) {
+			trSetCivAndCulture(p, 0, 0);
 		}
 		if (trQuestVarGet("p"+p+"class") == 0) {
 			trQuestVarSet("newPlayers", 1);

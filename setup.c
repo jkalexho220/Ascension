@@ -306,6 +306,7 @@ void chooseClass(int p = 0, int class = 0) {
     int proto = trQuestVarGet("class"+class+"proto");
     trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
     trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
+    trQuestVarSet("p"+p+"baseAttackTrue", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
     trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
@@ -325,7 +326,7 @@ void chooseClass(int p = 0, int class = 0) {
     trQuestVarSet("p"+p+"favorFromAttacks", 0);
     trQuestVarSet("p"+p+"poisonSpeed", 0);
     trQuestVarSet("p"+p+"lifesteal", 0);
-    trQuestVarSet("p"+p+"armorCount", 0);
+    trQuestVarSet("p"+p+"favorRegen", 0);
     trQuestVarSet("p"+p+"physicalResist", trQuestVarGet("proto"+proto+"armor"));
     trQuestVarSet("p"+p+"magicResist", trQuestVarGet("proto"+proto+"armor"));
 
