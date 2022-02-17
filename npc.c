@@ -17,7 +17,11 @@ const int NPC_ZENOS_PARADOX = 8;
 const int NPC_EXPLAIN_BOONS = 9;
 
 const int NPC_KASTOR = 10;
+/*
 
+RESERVED TO 40
+
+*/
 
 const int NPC_QUEST = 100;
 /*
@@ -39,6 +43,14 @@ RESERVED TO 300
 
 const int NPC_ATE_CORPSE = 301;
 const int NPC_ATE_BERRIES = 302;
+
+const int NPC_NICK_NO = 303;
+const int NPC_NICK_START = 304;
+/* reserved to 307 */
+const int NPC_NICK_DROP = 308;
+const int NPC_NICK_NEXT = 309;
+/* reserved to 312 */
+const int NPC_NICK_QUEST_COMPLETE = 313;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -236,6 +248,185 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("Your purchased item will be delivered to your warehouse.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_NO:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Ahhh!! I hate donkeys!");
+				}
+				case 2:
+				{
+					uiMessageBox("Get away from me you filthy animal!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh thank goodness! Finally a human being!");
+				}
+				case 2:
+				{
+					uiMessageBox("Please help me! I accidentally spilled a quantum potion on myself!");
+				}
+				case 3:
+				{
+					uiMessageBox("I need to absorb some magical energies in order to return to my original form!");
+				}
+				case 4:
+				{
+					uiMessageBox("You're my only hope! First, I need to absorb a Sphinx's sandstorm!");
+				}
+				case 5:
+				{
+					trMessageSetText("Touch a Sphinx's sandstorm while holding the talking relic.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_START + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Remember: I need a Sphinx's sandstorm!");
+				}
+				case 2:
+				{
+					uiMessageBox("There should be some Sphinxes on the first floor of the tower.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_START + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I need to absorb a Dryad's Blood.");
+				}
+				case 2:
+				{
+					uiMessageBox("We can find Dryads on the second floor of the tower.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_START + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I need to absorb a Frost Giant's Breath.");
+				}
+				case 2:
+				{
+					uiMessageBox("There are Frost Giants on the third floor.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("*cough* *cough* Oh dear, some of that got in my nose.");
+				}
+				case 2:
+				{
+					uiMessageBox("Wait, I don't have a nose! Oh please, I just want my body back.");
+				}
+				case 3:
+				{
+					uiMessageBox("Let's hurry up and get the next ingredient! I need a Dryad's Blood!");
+				}
+				case 4:
+				{
+					trMessageSetText("Absorb Dryad's Blood while holding the talking relic.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_NEXT + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Gross! Tastes awful every time.");
+				}
+				case 2:
+				{
+					uiMessageBox("Anyway, there's one more ingredient that I need to return to my original body.");
+				}
+				case 3:
+				{
+					uiMessageBox("I need the Breath of a Frost Giant. Please help me out one more time!");
+				}
+				case 4:
+				{
+					uiMessageBox("I promise I'll reward you with something good!");
+				}
+				case 5:
+				{
+					trMessageSetText("Absorb a Frost Giant's breath attack while holding the talking relic.", -1);
+					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_NEXT + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Alright! Feeling better already!");
+				}
+				case 2:
+				{
+					uiMessageBox("Let's return to the Guild to complete my transformation!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_DROP:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey! Don't leave me!");
+				}
+				case 2:
+				{
+					uiMessageBox("Where are you going?!");
 					dialog = 0;
 				}
 			}
@@ -2366,5 +2557,37 @@ highFrequency
 		trQuestVarSet("yeebHit", 1);
 	} else if (trUnitIsOwnedBy(0)) {
 		trQuestVarSet("yeebHit", 0);
+	}
+}
+
+rule nick_dialog
+inactive
+highFrequency
+{
+	int p = trCurrentPlayer();
+	if (trQuestVarGet("nickEquippedLocal") != trQuestVarGet("p"+p+"nickEquipped")) {
+		trQuestVarSet("nickEquippedLocal", trQuestVarGet("p"+p+"nickEquipped"));
+		if (trQuestVarGet("nickEquippedLocal") == 0) {
+			if (Multiplayer) {
+				startNPCDialog(NPC_NICK_DROP);
+			}
+		} else if (trQuestVarGet("nickQuestProgressLocal") < 5) {
+			startNPCDialog(NPC_NICK_START + trQuestVarGet("nickQuestProgressLocal"));
+			if (trQuestVarGet("nickQuestProgressLocal") == 0) {
+				trQuestVarSet("nickQuestProgressLocal", 1);
+			}
+		}
+	}
+}
+
+rule nick_next_dialog
+inactive
+highFrequency
+{
+	int p = trCurrentPlayer();
+	if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
+		xsDisableSelf();
+		startNPCDialog(NPC_NICK_NEXT + trQuestVarGet("p"+p+"nickQuestProgress") - 2);
+		trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+p+"nickQuestProgress"));
 	}
 }

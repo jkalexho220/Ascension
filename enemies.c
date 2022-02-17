@@ -297,6 +297,7 @@ void ballistaShotPop() {
 
 void enemiesAlways() {
     int old = xsGetContextPlayer();
+    int p = 0;
     int proto = 0;
     int id = 0;
     int target = 0;
@@ -619,6 +620,13 @@ void enemiesAlways() {
                         for(p=1; < ENEMY_PLAYER) {
                             if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
                                 silencePlayer(p, 5);
+                                if ((trQuestVarGet("p"+p+"nickQuestProgress") == 1) &&
+                                    trQuestVarGet("p"+p+"nickEquipped") == 1) {
+                                    trQuestVarSet("p"+p+"nickQuestProgress", 2);
+                                    if (trCurrentPlayer() == p) {
+                                        xsEnableRule("nick_next_dialog");
+                                    }
+                                }
                             }
                         }
                     }
@@ -827,6 +835,12 @@ void enemiesAlways() {
                         poisonUnit("playerUnits", 10.0, 5.0 * trQuestVarGet("stage"));
                     }
                 }
+                if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
+                    if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+                        trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
+                        xsEnableRule("nick_next_dialog");
+                    }
+                }
             }
             yRemoveFromDatabase("Dryads");
         } else if (checkEnemyDeactivated("Dryads")) {
@@ -948,6 +962,11 @@ void enemiesAlways() {
                     ySetVar("frostGiants", "specialnext", yGetVar("frostGiants", "specialnext") + 600);
                     if (action == 0) {
                         ySetVar("frostGiants", "target", -1);
+                    } else if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) {
+                        if (yGetVar("frostGiants", "target") == trQuestVarGet("p"+trCurrentPlayer()+"unit")) {
+                            trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 4);
+                            xsEnableRule("nick_next_dialog");
+                        }
                     }
                 }
                 case 2:

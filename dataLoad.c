@@ -26,6 +26,11 @@ void saveAllData() {
 			trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
 		}
 	}
+
+	if ((trQuestVarGet("p"+p+"nickQuestProgress") < 5) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
+		trQuestVarSet("p"+p+"nickQuestProgress", 0);
+	}
+
 	/* slot 0 */
 	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
 	savedata = savedata + 100 * trQuestVarGet("p"+p+"godBoon") + 1300 * trQuestVarGet("p"+p+"class");
@@ -42,6 +47,8 @@ void saveAllData() {
 		yDatabaseNext("p"+p+"relics");
 		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+		} else {
+			trQuestVarSet("p"+p+"relic"+x, 0);
 		}
 	}
 	/* equipped relics */
@@ -153,6 +160,8 @@ inactive
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
 	}
+	trQuestVarSet("dreamGogglesCount", iModulo(11, savedata));
+	savedata = savedata / 11;
 	/* class unlock progress */
 	savedata = trGetScenarioUserData(8);
 	if (savedata < 0) {
@@ -492,10 +501,13 @@ inactive
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
+		if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
+			trQuestVarSet("nickQuestSpawn", 1);
+		}
 		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
 		trQuestVarSet("p"+p+"startingGold", trQuestVarGet("p"+p+"gold"));
 	}
-	if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit")) {
+	if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
 		trQuestVarSet("yeebHit", 1);
 	}
 	trUnblockAllSounds();

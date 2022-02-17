@@ -39,7 +39,7 @@ const int RELIC_ZENOPHOBIA = 30;
 const int NORMAL_RELICS = 30;
 /* key relics */
 
-const int RELIC_NICKONHAWK_POTION = 36;
+const int RELIC_NICKONHAWK = 36;
 const int RELIC_NICKONHAWK_GOGGLES = 37;
 
 const int RELIC_GHOST_PICTURE = 38;
@@ -184,7 +184,10 @@ string relicName(int relic = 0) {
 			{
 				msg = "A picture of a young man.";
 			}
-
+			case RELIC_NICKONHAWK:
+			{
+				msg = "Help! Someone help me!";
+			}
 			case RELIC_NICKONHAWK_GOGGLES:
 			{
 				msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
@@ -382,6 +385,14 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\siege g helepolis icon 64";
 			}
+			case RELIC_NICKONHAWK:
+			{
+				icon = "icons\trade x caravan icons 64";
+			}
+			case RELIC_NICKONHAWK_GOGGLES:
+			{
+				icon = "icons\hero g odysseus icon 64";
+			}
 		}
 	}
 	return(icon);
@@ -576,6 +587,34 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				trQuestVarSet("poisonBucketHolder", 0);
 			}
 		}
+		case RELIC_NICKONHAWK:
+		{
+			trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") + m);
+			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) || 
+				(trQuestVarGet("nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
+				/* No duplicates */
+				for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+					yDatabaseNext("p"+p+"relics");
+					if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK) {
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"relics", true);
+						trUnitChangeProtoUnit("Relic");
+						break;
+					}
+				}
+			} else if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
+				trQuestVarSet("p"+p+"nickQuestProgress", 1);
+			}
+		}
+		case RELIC_NICKONHAWK_GOGGLES:
+		{
+			trQuestVarSet("p"+p+"equippedGoggles", trQuestVarGet("p"+p+"equippedGoggles") + m);
+			if (trQuestVarGet("p"+p+"equippedGoggles") > 0) {
+				trSetLighting("eclipse", 0.1);
+			} else {
+				trSetLighting("default", 0.1);
+			}
+		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
@@ -753,6 +792,14 @@ int relicProto(int relic = 0) {
 			case RELIC_MAGIC_DETECTOR:
 			{
 				proto = kbGetProtoUnitID("Helepolis");
+			}
+			case RELIC_NICKONHAWK:
+			{
+				proto = kbGetProtoUnitID("Caravan Atlantean");
+			}
+			case RELIC_NICKONHAWK_GOGGLES:
+			{
+				proto = kbGetProtoUnitID("Hero Greek Odysseus");
 			}
 		}
 	}

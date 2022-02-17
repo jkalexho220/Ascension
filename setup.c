@@ -1,27 +1,4 @@
-const int TILE_NOT_FOUND = 0;
-const int TILE_FOUND = 1;
-const int TILE_VISITED = 2;
 
-const int EDGE_NOT_FOUND = 0;
-const int EDGE_NORMAL = 1;
-const int EDGE_BIG = 2;
-const int EDGE_PORTAL = 3;
-const int EDGE_WALL = 4;
-const int EDGE_MOUNTAIN = 5;
-
-const int ROOM_BASIC = 1;
-const int ROOM_AMBUSH = 2;
-const int ROOM_BOSS_ENTRANCE = 3;
-const int ROOM_TRANSPORTER_GUY = 4;
-const int ROOM_CHEST = 5;
-const int ROOM_VILLAGE = 10;
-const int ROOM_STARTER = 20;
-const int ROOM_BOSS = 21;
-const int ROOM_NOTTUD = 22;
-const int ROOM_TEMPLE = 30;
-
-const int ROOM_CIRCLE = 0;
-const int ROOM_SQUARE = 1;
 
 const int CHEST_KEY = 1;
 const int CHEST_ENCOUNTER = 2;

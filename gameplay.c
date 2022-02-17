@@ -188,10 +188,19 @@ highFrequency
     
     trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
     xsEnableRule("gameplay_always");
+    if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") < 5) {
+        trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress"));
+        trQuestVarSet("nickEquippedLocal", trQuestVarGet("p"+trCurrentPlayer()+"nickEquipped"));
+        xsEnableRule("nick_dialog");
+    }
     for(p=1; < ENEMY_PLAYER) {
         spawnPlayer(p, "startPosition");
         trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
         trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
+        if (trQuestVarGet("p"+p+"nickEquipped") == 1) {
+            trQuestVarSet("p"+p+"nickEquipped", 0); // Set it to 0 because relicEffect will set it back to 1
+            trQuestVarSet("p"+p+"relic12", RELIC_NICKONHAWK);
+        }
         for(x=12; >0) {
             if (trQuestVarGet("p"+p+"relic"+x) > 0) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -498,18 +507,25 @@ highFrequency
         yDatabaseNext("freeRelics", true);
         if (trUnitGetIsContained("Unit")) {
             if (trUnitGetIsContained("Villager Atlantean Hero")) {
-                for(p=1; < ENEMY_PLAYER) {
-                    if (trUnitIsOwnedBy(p)) {
-                        trSetSelectedScale(0,0,-1);
-                        trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-                        if (yGetVar("freeRelics", "type") < KEY_RELICS) {
-                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                if (yGetVar("freeRelics", "type") == RELIC_NICKONHAWK) {
+                    if (trUnitIsOwnedBy(trCurrentPlayer())) {
+                        startNPCDialog(NPC_NICK_NO);
+                    }
+                    trUnitChangeProtoUnit("Relic");
+                } else {
+                    for(p=1; < ENEMY_PLAYER) {
+                        if (trUnitIsOwnedBy(p)) {
+                            trSetSelectedScale(0,0,-1);
+                            trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+                            if (yGetVar("freeRelics", "type") < KEY_RELICS) {
+                                trUnitSetAnimationPath("1,0,1,1,0,0,0");
+                            }
+                            yAddToDatabase("p"+p+"warehouse", "freeRelics");
+                            yAddUpdateVar("p"+p+"warehouse", "type", yGetVar("freeRelics", "type"));
+                            yRemoveFromDatabase("freeRelics");
+                            yRemoveUpdateVar("freeRelics", "type");
+                            break;
                         }
-                        yAddToDatabase("p"+p+"warehouse", "freeRelics");
-                        yAddUpdateVar("p"+p+"warehouse", "type", yGetVar("freeRelics", "type"));
-                        yRemoveFromDatabase("freeRelics");
-                        yRemoveUpdateVar("freeRelics", "type");
-                        break;
                     }
                 }
             } else {
@@ -525,7 +541,6 @@ highFrequency
                     }
                 }
                 if (amt == 1) {
-                    relicEffect(1*yGetVar("freeRelics", "type"), p, true);
                     trUnitSelectClear();
                     trUnitSelectByQV("freeRelics", true);
                     trSetSelectedScale(0,0,-1);
@@ -539,6 +554,7 @@ highFrequency
                     }
                     yAddToDatabase("p"+p+"relics", "freeRelics");
                     yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
+                    relicEffect(1*yGetVar("freeRelics", "type"), p, true);
                     yRemoveFromDatabase("freeRelics");
                     yRemoveUpdateVar("freeRelics", "type");
                 }

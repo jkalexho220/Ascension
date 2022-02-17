@@ -1802,6 +1802,18 @@ highFrequency
             }
         }
 
+        if ((trQuestVarGet("nickQuestSpawn") == 1) &&
+            (trQuestVarGet("stage") < 6)) {
+            trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"));
+            for(x=trQuestVarGet("rand"); >0) {
+                yDatabaseNext("basicRooms");
+            }
+            trVectorQuestVarSet("pos", randomNearEdgeOfRoom(1*trQuestVarGet("basicRooms")));
+            trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
+            spawnRelicSpecific(trQuestVarGet("posx"),trQuestVarGet("posz"), RELIC_NICKONHAWK);
+            debugLog("Nickonhawk room is " + 1*trQuestVarGet("basicRooms"));
+        }
+
         /* 
         paint tiny square at bottom of map for spawning units 
         and then cover it up

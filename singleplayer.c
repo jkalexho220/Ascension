@@ -493,7 +493,7 @@ highFrequency
 	    	}
 	    	if (trQuestVarGet("p1progress") > trQuestVarGet("zenoQuiz")) {
 	    		trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
-	    		trArmyDispatch("1,0", "Hoplite", 1, 130, 0, 160, 225, false);
+	    		trArmyDispatch("1,0", "Hoplite", 1, 131, 0, 161, 225, true);
 	    		trUnitSelectClear();
 	    		trUnitSelectByQV("zenoUnit", true);
 	    		trUnitConvert(0);
@@ -502,6 +502,22 @@ highFrequency
 	    			/* introduce monsterpedia */
 	    			uiLookAtUnitByName(""+1*yDatabaseNext("monsterpedia"));
 	    			startNPCDialog(NPC_MONSTERPEDIA);
+	    		}
+	    	}
+	    	if (trQuestVarGet("p1nickQuestProgress") > 0) {
+	    		if (trQuestVarGet("p1nickEquipped") == 0) {
+	    			trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
+	    			trArmyDispatch("1,0", "Dwarf", 1, 161, 0, 131, 270, true);
+	    			trUnitSelectClear();
+	    			trUnitSelectByQV("nickonhawk", trGetNextUnitScenarioNameNumber());
+	    			trUnitConvert(0);
+	    			if (trQuestVarGet("p1nickQuestProgress") < 5) {
+	    				trUnitChangeProtoUnit("Relic");
+	    			} else {
+	    				trUnitChangeProtoUnit("Hero Greek Odysseus");
+	    			}
+	    		} else if (trQuestVarGet("p1nickQuestProgress") == 4) {
+	    			/* quest complete */
 	    		}
 	    	}
 	    }
