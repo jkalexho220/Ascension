@@ -29,6 +29,8 @@ void stormcutterAlways(int eventID = -1) {
 				zSetProtoUnitStat("Archer Atlantean Hero", p, 31, trQuestVarGet("p"+p+"attack"));
 				if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
 					gainFavor(p, 1);
+					trChatSetStatus(false);
+					trDelayedRuleActivation("enable_chat");
 					trUnitSelectClear();
 					trUnitSelectByID(target);
 					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));

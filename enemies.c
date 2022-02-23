@@ -216,6 +216,7 @@ highFrequency
         setupProtounitBounty("Helepolis", 0.25, 0, 0);
         setupProtounitBounty("Scylla", 0.5, 0, 0);
         setupProtounitBounty("Theris", 0.5, 0, 0);
+        setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 		
         setupProtounitBounty("Golden Lion", 0.3, 3);
         setupProtounitBounty("Anubite", 0.3, 4, 0.03);
@@ -268,6 +269,13 @@ highFrequency
         trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
         trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
         trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
+
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 47);
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
+        trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);
 		
 		xsDisableSelf();
 	}

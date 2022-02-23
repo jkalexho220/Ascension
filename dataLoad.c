@@ -382,7 +382,7 @@ inactive
 						currentdata = currentdata / 7;
 						trQuestVarSet("p"+p+"nickEquipped", iModulo(2, currentdata));
 						currentdata = currentdata / 2;
-						trQuestVarSet("p"+p+"yeebHit", currentdata);
+						trQuestVarSet("p"+p+"yeebHit", iModulo(2, currentdata));
 					} else if (loadProgress == 19) {
 						currentdata = x;
 						for(i=5; >0) {
@@ -503,6 +503,9 @@ inactive
 		}
 		if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
 			trQuestVarSet("nickQuestSpawn", 1);
+		}
+		if (trQuestVarGet("p"+p+"yeebHit") == 1) {
+			trQuestVarSet("yeebBossFight", p);
 		}
 		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
 		trQuestVarSet("p"+p+"startingGold", trQuestVarGet("p"+p+"gold"));

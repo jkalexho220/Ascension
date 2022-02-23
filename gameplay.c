@@ -163,6 +163,14 @@ void checkGodPowers(int p = 0) {
     }
 }
 
+rule enable_chat
+inactive
+highFrequency
+{
+    xsDisableSelf();
+    trChatSetStatus(true);
+}
+
 rule gameplay_start
 inactive
 highFrequency

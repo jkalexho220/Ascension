@@ -366,6 +366,13 @@ runImmediately
     Multiplayer = aiIsMultiplayer();
     trSetUnitIdleProcessing(false);
 
+    %
+    for(p=1; < cNumberNonGaiaPlayers) {
+        code("trStringQuestVarSet(\"p"+p+"name\", \""+rmGetPlayerName(p)+"\");");
+    }
+    code("map(\"esc\", \"ShowImageBox\", \"gadgetUnreal("+quote+"ShowImageBox"+quote+")\");");
+    %
+
     gadgetUnreal("GodPowers");
     gadgetUnreal("tributedlg-sendButton");
     gadgetUnreal("tributedlg-clearButton");

@@ -2447,6 +2447,11 @@ highFrequency
 					{
 						case 1:
 						{
+							xsEnableRule("yeeb_hit_list");
+							trQuestVarSet("questActive", 2);
+						}
+						case 2:
+						{
 							if (yGetDatabaseCount("worthlessJunk") > 0) {
 								yDatabaseNext("worthlessJunk");
 								trVectorSetUnitPos("pos", "worthlessJunk");

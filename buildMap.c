@@ -1814,23 +1814,34 @@ highFrequency
             debugLog("Nickonhawk room is " + 1*trQuestVarGet("basicRooms"));
         }
 
+        trUnblockAllSounds();
+        if (trQuestVarGet("newPlayers") > 0) {
+            xsEnableRule("choose_stage_03");
+            trSoundPlayFN("default","1",-1,
+                "Zenophobia: Looks like we have some new faces today!", "icons\infantry g hoplite icon 64");
+        } else if (trQuestVarGet("yeebBossFight") > 0) {
+            xsEnableRule("yeeb_boss_message");
+            trQuestVarSet("yeebStep", 0);
+            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
+            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
+            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 47000);
+            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 2, 20);
+            trPaintTerrain(30, 5, 32, 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+            trPaintTerrain(5, 30, 30, 32, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+            trChangeTerrainHeight(31, 5, 32, 32, wallHeight, false);
+            trChangeTerrainHeight(5, 31, 32, 32, wallHeight, false);
+        } else {
+            xsEnableRule("gameplay_start");
+            trUIFadeToColor(0,0,0,1000,0,false);
+            trLetterBox(false);
+        }
+
         /* 
         paint tiny square at bottom of map for spawning units 
         and then cover it up
         */
         trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-
-        trUnblockAllSounds();
-        if (trQuestVarGet("newPlayers") == 0) {
-            xsEnableRule("gameplay_start");
-            trUIFadeToColor(0,0,0,1000,0,false);
-            trLetterBox(false);
-        } else {
-            xsEnableRule("choose_stage_03");
-            trSoundPlayFN("default","1",-1,
-                "Zenophobia: Looks like we have some new faces today!", "icons\infantry g hoplite icon 64");
-        }
     }
 }
 
@@ -1906,6 +1917,7 @@ highFrequency
 {
     xsDisableSelf();
     trQuestVarSet("play", 0);
+    trQuestVarSet("yeebBossFight", 0);
     for(p=1; < ENEMY_PLAYER) {
         trQuestVarSet("p"+p+"unit", 0);
         yClearDatabase("p"+p+"characters");

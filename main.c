@@ -8,3 +8,5 @@ rmTerrainInitialize("OlympusA",1);
 rmSetGaiaCiv(cCivZeus);
 rmSetLightingSet("Default");
 rmSetStatusText("", 0.1);
+
+string quote = "\\";
