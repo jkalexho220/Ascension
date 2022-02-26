@@ -591,17 +591,15 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") + m);
 			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) || 
-				(trQuestVarGet("nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
+				(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
 				/* No duplicates */
-				for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-					yDatabaseNext("p"+p+"relics");
-					if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK) {
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"relics", true);
-						trUnitChangeProtoUnit("Relic");
-						break;
-					}
-				}
+				ySetPointer("p"+p+"relics", yGetNewestPointer("p"+p+"relics"));
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"relics", true);
+				trUnitChangeProtoUnit("Relic");
+				yAddToDatabase("freeRelics", "p"+p+"relics");
+				yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK);
+				yRemoveFromDatabase("p"+p+"relics");
 			} else if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 1);
 			}

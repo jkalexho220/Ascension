@@ -451,12 +451,50 @@ highFrequency
                                 trSoundPlayFN("backtowork.wav","1",-1,"","");
                                 trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
                             }
-                            if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"relics", "type"))) {
+                            relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+                            /* Nickonhawk's Quantum Slot Machine */
+                            if ((Multiplayer == false) && 
+                                (trQuestVarGet("p1nickQuestProgress") >= 5) &&
+                                (zDistanceBetweenVectorsSquared("pos", "nickPos") < 9) &&
+                                (yGetDatabaseCount("slotRelics") < 3)) {
+                                trSoundPlayFN("storehouse.wav","1",-1,"","");
+                                trUnitSelectClear();
+                                trUnitSelectByQV("p"+p+"relics", true);
+                                trUnitChangeProtoUnit("Conversion SFX");
+                                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                                trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+                                yAddToDatabase("slotRelics", "next");
+                                yAddUpdateVar("slotRelics", "type", yGetVar("p"+p+"relics", "type"));
+                                ySetPointer("slotRelics", yGetNewestPointer("slotRelics"));
+                                if (yGetVar("slotRelics", "pad") == 0) {
+                                    trQuestVarSet("nextPad", 1 + trQuestVarGet("nextPad"));
+                                    ySetVar("slotRelics", "pad", trQuestVarGet("pad"+1*trQuestVarGet("nextPad")));
+                                }
+                                trUnitSelectClear();
+                                trUnitSelect(""+1*yGetVar("slotRelics", "pad"));
+                                trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
+                                trUnitSelectClear();
+                                trUnitSelectByQV("next", true);
+                                trImmediateUnitGarrison(""+1*yGetVar("slotRelics", "pad"));
+                                trUnitChangeProtoUnit("Dwarf");
+                                trUnitSelectClear();
+                                trUnitSelectByQV("next", true);
+                                trUnitSetHeading(225);
+                                trUnitConvert(0);
+                                trUnitChangeProtoUnit("Relic");
+                                trUnitSelectClear();
+                                trUnitSelect(""+1*yGetVar("slotRelics", "pad"));
+                                trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
+                                if (yGetDatabaseCount("slotRelics") == 3) {
+                                    trUnitSelectClear();
+                                    trUnitSelectByQV("nickonhawk", true);
+                                    trUnitHighlight(3.0, true);
+                                }
+                            } else if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"relics", "type"))) {
                                 trUnitChangeProtoUnit("Relic");
                                 yAddToDatabase("freeRelics", "p"+p+"relics");
                                 yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
                             }
-                            relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                             yRemoveFromDatabase("p"+p+"relics");
                             yRemoveUpdateVar("p"+p+"relics", "type");
                         } else {

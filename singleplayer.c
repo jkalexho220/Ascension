@@ -94,6 +94,25 @@ void spAscendClass(int class = -1) {
 	}
 }
 
+void spinQuantumSlotMachine(int eventID = -1) {
+	trQuestVarSet("quantumRelic", 0);
+	for(x=yGetDatabaseCount("slotRelics"); >0) {
+		yDatabaseNext("slotRelics");
+		trQuestVarSet("quantumRelic", trQuestVarGet("quantumRelic") + yGetVar("slotRelics", "type"));
+	}
+	trQuestVarSetFromRand("quantumRelic", 1, xsMin(25, trQuestVarGet("quantumRelic")), true);
+	for(x=yGetDatabaseCount("slotRelics"); >0) {
+		yDatabaseNext("slotRelics");
+		if (trQuestVarGet("quantumRelic") == yGetVar("slotRelics", "type")) {
+			trQuestVarSet("quantumRelic", RELIC_NICKONHAWK_GOGGLES);
+		}
+	}
+	trQuestVarSet("quantumSlotMachine", 2);
+	trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 3000);
+	trSoundPlayFN("plentybirth.wav","1",-1,"","");
+	trSoundPlayFN("skypassageout.wav","1",-1,"","");
+}
+
 void monsterpedia(int stage = 0, int x = 0) {
 	int tPrimary = 0;
 	int tSubPrimary = 34;
@@ -377,7 +396,8 @@ highFrequency
 	    		trArmyDispatch("1,0","Dwarf",1,x,0,z+2,180,true);
 		    	trArmySelect("1,0");
 		    	trUnitConvert(0);
-		    	trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a)));
+		    	trMutateSelected(relicProto(a));
+		    	trSetSelectedScale(0.5,0.5,0.5);
 		    	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		    	trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 		    	trArmySelect("1,0");
@@ -394,7 +414,8 @@ highFrequency
 	    		trArmyDispatch("1,0","Dwarf",1,x,0,z-2,0,true);
 		    	trArmySelect("1,0");
 		    	trUnitConvert(0);
-		    	trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a+10)));
+		    	trMutateSelected(relicProto(a+10));
+		    	trSetSelectedScale(0.5,0.5,0.5);
 		    	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		    	trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+(a+10)),x,0,z,0,true);
 		    	trArmySelect("1,0");
@@ -416,7 +437,8 @@ highFrequency
 	    		trArmyDispatch("1,0","Dwarf",1,x-2,0,z,90,true);
 		    	trArmySelect("1,0");
 		    	trUnitConvert(0);
-		    	trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a)));
+		    	trMutateSelected(relicProto(a));
+		    	trSetSelectedScale(0.5,0.5,0.5);
 		    	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		    	trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 		    	trArmySelect("1,0");
@@ -505,19 +527,44 @@ highFrequency
 	    		}
 	    	}
 	    	if (trQuestVarGet("p1nickQuestProgress") > 0) {
+	    		trQuestVarSet("nextPad", 0);
+	    		trEventSetHandler(9000, "spinQuantumSlotMachine");
+	    		trVectorQuestVarSet("nickPos", vector(161,0,161));
 	    		if (trQuestVarGet("p1nickEquipped") == 0) {
 	    			trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
-	    			trArmyDispatch("1,0", "Dwarf", 1, 161, 0, 131, 270, true);
+	    			trArmyDispatch("1,0", "Dwarf", 1, 161, 0, 161, 225, true);
 	    			trUnitSelectClear();
 	    			trUnitSelectByQV("nickonhawk", trGetNextUnitScenarioNameNumber());
 	    			trUnitConvert(0);
 	    			if (trQuestVarGet("p1nickQuestProgress") < 5) {
 	    				trUnitChangeProtoUnit("Relic");
 	    			} else {
+	    				xsEnableRule("quantum_slot_machine");
+	    				trQuestVarSet("quantumSlotMachine", 1);
 	    				trUnitChangeProtoUnit("Hero Greek Odysseus");
+	    				trVectorQuestVarSet("padPos", vector(161,0,165));
+	    				for(x=1; <= 3) {
+	    					trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
+	    					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+	    					trUnitSelectClear();
+	    					trUnitSelectByQV("pad"+x, true);
+	    					trUnitConvert(0);
+	    					trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
+	    					trSetSelectedScale(1.5,1,1.5);
+	    					trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
+	    					trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+	    				}
 	    			}
 	    		} else if (trQuestVarGet("p1nickQuestProgress") == 4) {
 	    			/* quest complete */
+	    			startNPCDialog(NPC_NICK_START + 4);
+	    			trQuestVarSet("nickspotlight", trGetNextUnitScenarioNameNumber());
+	    			trArmyDispatch("1,0","Dwarf",1,161,0,161,225,true);
+	    			trArmySelect("1,0");
+	    			trUnitChangeProtoUnit("Relic");
+	    			trUnitSelectClear();
+	    			trUnitSelectByQV("nickSpotlight", true);
+	    			trMutateSelected(kbGetProtoUnitID("Hero Birth"));
 	    		}
 	    	}
 	    }
@@ -1021,6 +1068,139 @@ highFrequency
 			trQuestVarSet("selectedBoonUnit", trQuestVarGet("boons"));
 			xsEnableRule("choose_boon");
 			xsDisableSelf();
+		}
+	}
+}
+
+rule nick_transform
+inactive
+highFrequency
+{
+	if (trTimeMS() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk", true);
+				trUnitTeleport(161,0,161);
+				trUnitChangeProtoUnit("Hero Greek Odysseus");
+				trUnitSetHeading(225);
+				trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				trSoundPlayFN("lightthunder.wav","1",-1,"","");
+				trQuestVarSet("cinTime", trTimeMS() + 2000);
+			}
+			case 2:
+			{
+				startNPCDialog(NPC_NICK_QUEST_COMPLETE);
+				xsDisableSelf();
+
+				trVectorQuestVarSet("padPos", vector(161,0,165));
+				for(x=1; <= 3) {
+					trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("pad"+x, true);
+					trUnitConvert(0);
+					trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
+					trSetSelectedScale(1.5,1,1.5);
+					
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("next", true);
+					trUnitConvert(0);
+					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+					yAddToDatabase("slotRelics", "next");
+
+					trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
+					trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+				}
+			}
+		}
+	}
+}
+
+rule quantum_slot_machine
+inactive
+highFrequency
+{
+	int id = 0;
+	switch(1*trQuestVarGet("quantumSlotMachine"))
+	{
+		case 1:
+		{
+			trUnitSelectClear();
+			trUnitSelectByQV("nickonhawk", true);
+			if (trUnitIsSelected()) {
+				if (yGetDatabaseCount("slotRelics") < 3) {
+					startNPCDialog(NPC_NICK_SLOT_MACHINE);
+				} else {
+					trShowChoiceDialog("Sacrifice these relics to get a random new one?","Yes",9000,"No",-1);
+				}
+				reselectMyself();
+			}
+			if (yGetDatabaseCount("slotRelics") > 0) {
+				id = yDatabaseNext("slotRelics", true);
+				if (trUnitIsOwnedBy(1)) {
+					yAddToDatabase("freeRelics", "slotRelics");
+					yAddUpdateVar("freeRelics", "type", yGetVar("slotRelics", "type"));
+					yRemoveFromDatabase("slotRelics");
+				} else if (trUnitIsSelected()) {
+					relicDescription(1*yGetVar("slotRelics", "type"));
+					reselectMyself();
+				}
+			}
+		}
+		case 2:
+		{
+			trQuestVarSetFromRand("type", 1, 26, true);
+			yDatabaseNext("slotRelics", true);
+			trMutateSelected(relicProto(1*trQuestVarGet("type")));
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 1000);
+				trSoundPlayFN("plentyvaultstolen.wav","1",-1,"","");
+				trSoundPlayFN("skypassagein.wav","1",-1,"","");
+				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("quantumRelic"))));
+				yAddToDatabase("slotUnits", "slotRelics");
+				yRemoveFromDatabase("slotRelics");
+				if (yGetDatabaseCount("slotRelics") == 0) {
+					trQuestVarSet("quantumSlotMachine", 3);
+				}
+			}
+		}
+		case 3:
+		{
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				trQuestVarSet("newRelic", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Cinematic Block");
+				trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Traitors effect");
+				trQuestVarSet("quantumSlotMachine", 4);
+				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 2000);
+			}
+		}
+		case 4:
+		{
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				for(x=yGetDatabaseCount("slotUnits"); >0) {
+					yDatabaseNext("slotUnits", true);
+					trUnitChangeProtoUnit("Hero Death");
+				}
+				yClearDatabase("slotUnits");
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+				trUnitSelectClear();
+				trUnitSelectByQV("newRelic", true);
+				trUnitChangeProtoUnit("Relic");
+				yAddToDatabase("freeRelics", "newRelic");
+				yAddUpdateVar("freeRelics", "type", trQuestVarGet("quantumRelic"));
+				trQuestVarSet("quantumSlotMachine", 1);
+			}
 		}
 	}
 }

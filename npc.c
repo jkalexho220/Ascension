@@ -51,11 +51,12 @@ const int NPC_ATE_BERRIES = 402;
 
 const int NPC_NICK_NO = 403;
 const int NPC_NICK_START = 404;
-/* reserved to 307 */
-const int NPC_NICK_DROP = 408;
-const int NPC_NICK_NEXT = 409;
-/* reserved to 312 */
-const int NPC_NICK_QUEST_COMPLETE = 413;
+/* reserved to 408 */
+const int NPC_NICK_DROP = 409;
+const int NPC_NICK_NEXT = 410;
+/* reserved to 413 */
+const int NPC_NICK_QUEST_COMPLETE = 414;
+const int NPC_NICK_SLOT_MACHINE = 415;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -351,6 +352,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case NPC_NICK_START + 4:
+		{
+			if (Multiplayer == false) {
+				uiMessageBox("Alright, just set me down over there at the glowing spotlight.");
+				trMinimapFlare(1, 3.0, trVectorQuestVarGet("nickPos"), true);
+			} else {
+				uiMessageBox("Let's return to the Guild to complete my transformation!");
+			}
+			dialog = 0;
+		}
+
 		case NPC_NICK_NEXT:
 		{
 			switch(dialog)
@@ -432,6 +444,60 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("Where are you going?!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_NICK_QUEST_COMPLETE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Ahh, back to my sexy body. Thank you for rescuing me, friend.");
+				}
+				case 2:
+				{
+					uiMessageBox("As a reward, I'll let you use my Quantum Relic Machine.");
+				}
+				case 3:
+				{
+					uiMessageBox("To use it, drop three relics in front of me and then select me to confirm.");
+				}
+				case 4:
+				{
+					uiMessageBox("The three relics will be consumed and a new random relic will be generated.");
+				}
+				case 5:
+				{
+					uiMessageBox("First roll is free. Let's give it a whirl!");
+				}
+				case 6:
+				{
+					trQuestVarSet("p1nickQuestProgress", 5);
+					dialog = 0;
+					trQuestVarSet("quantumSlotMachine", 2);
+					trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 3000);
+					trQuestVarSetFromRand("quantumRelic", 10, 26, true);
+					xsEnableRule("quantum_slot_machine");
+					trSoundPlayFN("plentybirth.wav","1",-1,"","");
+					trSoundPlayFN("skypassageout.wav","1",-1,"","");
+				}
+			}
+		}
+
+		case NPC_NICK_SLOT_MACHINE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Want to spin the Quantum Slot Machine? Drop three relics here to start the machine!");
+				}
+				case 2:
+				{
+					uiMessageBox("You will get a new random relic that is guaranteed to not be one of the ones you dropped.");
 					dialog = 0;
 				}
 			}
@@ -2632,8 +2698,28 @@ highFrequency
 		if (trQuestVarGet("nickEquippedLocal") == 0) {
 			if (Multiplayer) {
 				startNPCDialog(NPC_NICK_DROP);
+			} else if (trQuestVarGet("nickQuestProgressLocal") == 4) {
+				if (zDistanceToVectorSquared("p"+p+"unit", "nickPos") < 4) {
+					ySetPointer("freeRelics", yGetNewestPointer("freeRelics"));
+					trUnitSelectClear();
+					trUnitSelectByQV("freeRelics", true);
+					trUnitChangeProtoUnit("Cinematic Block");
+					trQuestVarSet("nickonhawk", trQuestVarGet("freeRelics"));
+					yRemoveFromDatabase("freeRelics");
+					trQuestVarSet("cinTime", trTimeMS() + 5000);
+					trQuestVarSet("cinStep", 0);
+					xsEnableRule("nick_transform");
+					trUnitSelectClear();
+					trUnitSelectByQV("nickSpotlight", true);
+					trUnitChangeProtoUnit("Osiris Birth");
+					trUnitSelectClear();
+					trUnitSelectByQV("nickSpotlight", true);
+					trSetSelectedScale(0,0,0);
+					xsDisableSelf();
+					trSoundPlayFN("cinematics\24_in\magic.mp3", "5", -1, "","");
+				}
 			}
-		} else if (trQuestVarGet("nickQuestProgressLocal") < 5) {
+		} else {
 			startNPCDialog(NPC_NICK_START + trQuestVarGet("nickQuestProgressLocal"));
 			if (trQuestVarGet("nickQuestProgressLocal") == 0) {
 				trQuestVarSet("nickQuestProgressLocal", 1);
