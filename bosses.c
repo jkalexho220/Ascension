@@ -26,12 +26,14 @@ rule yeeb_boss_message
 inactive
 highFrequency
 {
+	bool found = false;
 	if (trTime() > trQuestVarGet("yeebNext")) {
 		trQuestVarSet("yeebStep", 1 + trQuestVarGet("yeebStep"));
 		switch(1*trQuestVarGet("yeebStep"))
 		{
 			case 1:
 			{
+				trSetLighting("anatolia", 1.0);
 				if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
 					trSoundPlayFN("","1",-1,"Yeebaagooon: Oh, " + trStringQuestVarGet("p"+trCurrentPlayer()+"name")+" you utter fool.",
 						"icons\special e son of osiris icon 64");
@@ -44,13 +46,13 @@ highFrequency
 			}
 			case 2:
 			{
-				trSoundPlayFN("","1",-1,"Yeebaagooon: Did you really think I wouldn't notice you stealing my relic?",
+				trSoundPlayFN("","1",-1,"Yeebaagooon: Did you really think you could escape me by resigning before the bossfight?",
 					"icons\special e son of osiris icon 64");
 				trQuestVarSet("yeebNext", trTime() + 6);
 			}
 			case 3:
 			{
-				trSoundPlayFN("","1",-1,"Yeebaagooon: I'll be taking back what's mine now. And also... your LIFE.",
+				trSoundPlayFN("","1",-1,"Yeebaagooon: Foolish. I'll be taking back what's mine, no matter what.",
 					"icons\special e son of osiris icon 64");
 				trQuestVarSet("yeebNext", trTime() + 6);
 			}
@@ -99,11 +101,33 @@ highFrequency
 	            trQuestVarSet("yeebNext", trTime() + 3);
 	            xsEnableRule("boss_music");
 	            trQuestVarSet("boss", 1);
+	            trQuestVarSet("yeebPosx", trQuestVarGet("startPositionx"));
+	            trQuestVarSet("yeebPosz", trQuestVarGet("startPositionz"));
 			}
 			case 5:
 			{
 				trMessageSetText("Yeebaagooon's spells will drain your favor if they hit you!", -1);
 				xsDisableSelf();
+
+				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"yeebHit") == 1) {
+						found = false;
+						for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+							yDatabaseNext("p"+p+"relics");
+							if (yGetVar("p"+p+"relics", "type") == RELIC_YEEBAAGOOON) {
+								found = true;
+								yAddToDatabase("yeebRelics", "p"+p+"relics");
+								break;
+							}
+						}
+						if (found == false) {
+							if (trCurrentPlayer() == p) {
+								trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) - 1);
+								trQuestVarSet("yeebRelicRetrieved", 1);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -200,7 +224,7 @@ inactive
 				}
 				case 5:
 				{
-					trMusicPlay("music\fight\rot loaf.mp3","1",3.0);	
+					trMusicPlay("music\fight\rot loaf.mp3","1",3.0);
 				}
 				case 6:
 				{
@@ -237,12 +261,12 @@ highFrequency
 			trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),
 			TERRAIN_WALL, TERRAIN_SUB_WALL);
 		trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") - 3,
-			trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),5,false);
+			trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),wallHeight,false);
 		trPaintTerrain(trQuestVarGet("bossRoomEntranceX")-4, trQuestVarGet("bossRoomEntranceZ"),
 			trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,
 			TERRAIN_WALL, TERRAIN_SUB_WALL);
 		trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX") - 3, trQuestVarGet("bossRoomEntranceZ"),
-			trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,5,false);
+			trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,wallHeight,false);
 
 		trPaintTerrain(0,0,5,5,0,70,true);
         trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
@@ -478,65 +502,81 @@ highFrequency
 		{
 			case 0:
 			{
-				trOverlayText("The Exterminator", 3.0, -1, -1, -1);
-				trQuestVarSet("cinTime", trTime() + 2);
-				trUnitSelectClear();
-				trUnitSelectByQV("bossUnit", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
-				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Helepolis"), "biggerHelepolis");
-				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Barracks Atlantean"), "biggerBallista");
-				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
+				if (trQuestVarGet("yeebBossFight") == 1) {
+					yAddToDatabase("yeebRelics", "yeebRelic");
+					trQuestVarSet("cinTime", trTime() + 6);
+					trUnitSelectClear();
+					trUnitSelectByQV("yeebRelic", true);
+					for(p=1; < ENEMY_PLAYER) {
+						if (trUnitIsOwnedBy(p)) {
+							trSoundPlayFN("","1",-1,
+								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + "Did you really think I wouldn't notice you stealing my relic?",
+								"icons\special e son of osiris icon 64");
+							break;
+						}
+					}
+					trQuestVarSet("cinStep", 1);
+				} else {
+					trOverlayText("The Exterminator", 3.0, -1, -1, -1);
+					trQuestVarSet("cinTime", trTime() + 2);
+					trUnitSelectClear();
+					trUnitSelectByQV("bossUnit", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+					spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Helepolis"), "biggerHelepolis");
+					spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Barracks Atlantean"), "biggerBallista");
+					ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
 
-				trQuestVarSet("bossTurretObject", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-				trQuestVarSet("bossTurret", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+					trQuestVarSet("bossTurretObject", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+					trQuestVarSet("bossTurret", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 
-				trQuestVarSet("bossBarrelObject", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-				trQuestVarSet("bossBarrel", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+					trQuestVarSet("bossBarrelObject", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+					trQuestVarSet("bossBarrel", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 
-				trUnitSelectClear();
-				trUnitSelectByQV("bossBarrel", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
-				trUnitSelectClear();
-				trUnitSelectByQV("bossTurret", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+					trUnitSelectClear();
+					trUnitSelectByQV("bossBarrel", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+					trUnitSelectClear();
+					trUnitSelectByQV("bossTurret", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
 
-				trUnitSelectClear();
-				trUnitSelectByQV("bossTurretObject", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trMutateSelected(kbGetProtoUnitID("Relic"));
-				trImmediateUnitGarrison(""+1*trQuestVarGet("bossTurret"));
-				trMutateSelected(kbGetProtoUnitID("Fire Siphon"));
+					trUnitSelectClear();
+					trUnitSelectByQV("bossTurretObject", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trMutateSelected(kbGetProtoUnitID("Relic"));
+					trImmediateUnitGarrison(""+1*trQuestVarGet("bossTurret"));
+					trMutateSelected(kbGetProtoUnitID("Fire Siphon"));
 
-				trUnitSelectClear();
-				trUnitSelectByQV("bossBarrelObject", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trMutateSelected(kbGetProtoUnitID("Relic"));
-				trImmediateUnitGarrison(""+1*trQuestVarGet("bossBarrel"));
-				trMutateSelected(kbGetProtoUnitID("Torch"));
-				trUnitSetAnimationPath("1,0,0,0,0,0,0");
-				trSetSelectedScale(1.5, 1.0, 1.5);
-				
+					trUnitSelectClear();
+					trUnitSelectByQV("bossBarrelObject", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trMutateSelected(kbGetProtoUnitID("Relic"));
+					trImmediateUnitGarrison(""+1*trQuestVarGet("bossBarrel"));
+					trMutateSelected(kbGetProtoUnitID("Torch"));
+					trUnitSetAnimationPath("1,0,0,0,0,0,0");
+					trSetSelectedScale(1.5, 1.0, 1.5);
+					
 
-				trUnitSelectClear();
-				trUnitSelectByQV("bossBarrel", true);
-				trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
-				trUnitSelectClear();
-				trUnitSelectByQV("bossTurret", true);
-				trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+					trUnitSelectClear();
+					trUnitSelectByQV("bossBarrel", true);
+					trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+					trUnitSelectClear();
+					trUnitSelectByQV("bossTurret", true);
+					trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
 
-				trQuestVarSet("volcano1", trGetNextUnitScenarioNameNumber());
-				trQuestVarSet("volcano2", 1 + trQuestVarGet("volcano1"));
-				trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("bossRoomCenterx"),0,trQuestVarGet("bossRoomCenterZ"),0,true);
-				trArmySelect("1,0");
-				trUnitConvert(ENEMY_PLAYER);
-				trUnitChangeProtoUnit("Cinematic Block");
+					trQuestVarSet("volcano1", trGetNextUnitScenarioNameNumber());
+					trQuestVarSet("volcano2", 1 + trQuestVarGet("volcano1"));
+					trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("bossRoomCenterx"),0,trQuestVarGet("bossRoomCenterZ"),0,true);
+					trArmySelect("1,0");
+					trUnitConvert(ENEMY_PLAYER);
+					trUnitChangeProtoUnit("Cinematic Block");
+				}
 			}
 			case 1:
 			{
@@ -559,6 +599,55 @@ highFrequency
 				xsEnableRule("boss_music");
 
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 27, 20);
+			}
+			case 2:
+			{
+				trQuestVarSet("cinTime", trTime() + 6);
+				trSoundPlayFN("","1",-1,"Yeebaagooon: I'll be taking back what's mine now... along with your LIFE!",
+					"icons\special e son of osiris icon 64");
+				trQuestVarSet("bossScale", 1);
+				trQuestVarSet("yeebaagooon", trQuestVarGet("bossUnit"));
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trUnitChangeProtoUnit("Pharaoh of Osiris XP");
+				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
+				ySetVarAtIndex("enemies", "physicalResist", 0.47, 1*trQuestVarGet("bossPointer"));
+				ySetVarAtIndex("enemies", "magicResist", 0.47, 1*trQuestVarGet("bossPointer"));
+
+				spyEffect(1*trQuestVarGet("yeebaagooon"), kbGetProtoUnitID("Cinematic Block"), "yeebShieldSFX");
+
+				trQuestVarSet("bossRoomUpperX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomUpperz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomLowerX") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomLowerZ") + trQuestVarGet("bossRoomSize"));
+
+				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
+
+				trQuestVarSet("yeebPosx", trQuestVarGet("bossRoomCenterX"));
+				trQuestVarSet("yeebPosz", trQuestVarGet("bossRoomCenterZ"));
+
+				trOverlayText("Yeebaagooon",3.0,-1,-1,-1);
+
+				trQuestVarSet("lightningBolts", trGetNextUnitScenarioNameNumber());
+			}
+			case 3:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trUnitConvert(ENEMY_PLAYER);
+				xsEnableRule("yeebaagooon_battle");
+				xsEnableRule("boss_stun_recovery");
+				bossCooldown(10, 12);
+
+	            trUIFadeToColor(0,0,0,1000,0,false);
+	            trLetterBox(false);
+	            xsEnableRule("boss_music");
+	            trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 4:
+			{
+				trMessageSetText("Yeebaagooon's spells will drain your favor if they hit you.", -1);
+				xsDisableSelf();
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -2866,6 +2955,7 @@ highFrequency
 				amt = trQuestVarGet("bossNext") - trTimeMS();
 				if (amt < 0) {
 					trQuestVarSet("bossAnim", 1);
+					trMutateSelected(kbGetProtoUnitID("Shade of Hades"));
 					trUnitOverrideAnimation(15,0,true,false,-1);
 					for(x=1; <3) {
 						trUnitSelectClear();
@@ -3263,24 +3353,43 @@ highFrequency
 	bool hit = false;
 	if (trUnitAlive() == true) {
 
-		for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
-			yDatabaseNext("yeebLightningEnd", true);
-			trVectorSetUnitPos("pos", "yeebLightningEnd");
-			trUnitChangeProtoUnit("Lightning sparks");
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-					removePlayerUnit();
-				} else if (zDistanceToVectorSquared("playerUnits", "pos") < 1.0) {
-					damagePlayerUnit(470);
-					if (yGetVar("playerUnits", "hero") == 1) {
-						gainFavor(1*yGetVar("playerUnits", "player"), -5.0);
+		if (yGetDatabaseCount("yeebLightningEnd") > 0) {
+			trQuestVarSetFromRand("sound", 1, 5, true);
+			hit = false;
+			for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
+				yDatabaseNext("yeebLightningEnd", true);
+				if (trUnitVisToPlayer()) {
+					hit = true;
+				}
+				trVectorSetUnitPos("pos", "yeebLightningEnd");
+				trUnitChangeProtoUnit("Lightning sparks");
+				for(x=yGetDatabaseCount("playerUnits"); >0) {
+					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 1.0) {
+						damagePlayerUnit(470);
+						if (yGetVar("playerUnits", "hero") == 1) {
+							gainFavor(1*yGetVar("playerUnits", "player"), -5.0);
+						}
+					}
+				}
+				if (trQuestVarGet("boss") > 999) {
+					for(x=yGetDatabaseCount("enemies"); >0) {
+						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+							removeEnemy();
+						} else if (zDistanceToVectorSquared("enemies", "pos") < 1.0) {
+							damageEnemy(0, 470, true);
+							damageEnemy(0, 470, false);
+						}
 					}
 				}
 			}
+			yClearDatabase("yeebLightningEnd");
+			if (hit) {
+				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			}
 		}
-		yClearDatabase("yeebLightningEnd");
-
-		hit = false;
+			
 		for(x=xsMin(10, yGetDatabaseCount("yeebLightning")); >0) {
 			yDatabaseNext("yeebLightning");
 			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
@@ -3297,10 +3406,6 @@ highFrequency
 				trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 				yRemoveFromDatabase("yeebLightning");
 			}
-		}
-		if (hit) {
-			trQuestVarSetFromRand("sound", 1, 5, true);
-			trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
 
 		for(y=xsMin(4, yGetDatabaseCount("yeebLightningBalls")); >0) {
@@ -3514,7 +3619,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("hammerObject", true);
 				if (trUnitDead()) {
-					trQuestVarSet("bossNext", trTime() + 1000);
+					trQuestVarSet("bossNext", trTimeMS() + 1000);
 					trQuestVarSet("bossSpell", 35);
 					trMutateSelected(kbGetProtoUnitID("Thor Hammer"));
 					trSetSelectedScale(2,-2,2);
@@ -3523,7 +3628,58 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 35) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trQuestVarSet("bossSpell", 36);
+					trQuestVarSet("bossCount", 0);
+					trQuestVarSet("bossRadius", 0);
+					trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
+					trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
+					trCameraShake(1.0, 0.5);
+					trVectorQuestVarSet("bossdir", vector(1,0,0));
+					for(x=trQuestVarGet("hammerIndicatorsStart"); < trQuestVarGet("hammerIndicatorsEnd")) {
+						trUnitSelectClear();
+						trUnitSelect(""+x, true);
+						trUnitDestroy();
+					}
+				}
+			} else if (trQuestVarGet("bossSpell") == 36) {
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trQuestVarSet("bossNext", trTimeMS() + 200);
+					trQuestVarSet("bossCount", 1 + trQuestVarGet("bossCount"));
+					angle = 3.141592 / trQuestVarGet("bossCount");
+					trQuestVarSet("cos", xsCos(angle));
+					trQuestVarSet("sin", xsSin(angle));
+					for(x=trQuestVarGet("bossCount")*2; >0) {
+						trVectorQuestVarSet("bossdir", rotationMatrix("bossdir", trQuestVarGet("cos"), trQuestVarGet("sin")));
+						trQuestVarSet("posx", trQuestVarGet("bossdirx") * trQuestVarGet("bossRadius") + trQuestVarGet("hammerPosx"));
+						trQuestVarSet("posz", trQuestVarGet("bossdirz") * trQuestVarGet("bossRadius") + trQuestVarGet("hammerPosz"));
+						trArmyDispatch("1,0","Meteor Impact Ground",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					}
+					trQuestVarSet("bossRadius", trQuestVarGet("bossRadius") + 4);
+					dist = xsPow(trQuestVarGet("bossRadius"), 2);
+					for(x=yGetDatabaseCount("playerUnits"); >0) {
+						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (zDistanceToVectorSquared("playerUnits", "hammerPos") < dist) {
+							damagePlayerUnit(999);
+						}
+					}
 
+					if (trQuestVarGet("boss") > 999) {
+						for(x=yGetDatabaseCount("enemies"); >0) {
+							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+								removeEnemy();
+							} else if (zDistanceToVectorSquared("enemies", "hammerPos") < dist) {
+								damageEnemy(0, 999);
+								damageEnemy(0, 999, false);
+							}
+						}
+					}
+
+					if (trQuestVarGet("bossCount") == 4) {
+						trSetLighting("anatolia", 1.0);
+						bossCooldown(12, 16);
+						trQuestVarSet("bossUltimate", 3);
+					}
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
@@ -3584,7 +3740,27 @@ highFrequency
 						trQuestVarSet("cageRadius", trQuestVarGet("cageRadius") - 1);
 						trQuestVarSet("cageCount", trQuestVarGet("cageRadius") * 2);
 						if (trQuestVarGet("cageRadius") <= 0) {
-							bossCooldown(8, 12);
+							bossCooldown(6, 12);
+							if (trQuestVarGet("boss") > 999) {
+								/* phase 2 */
+								trQuestVarSet("boat", trGetNextUnitScenarioNameNumber());
+								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("cageCenterx"),0,trQuestVarGet("cageCenterz"),0,true);
+								trUnitSelectClear();
+								trUnitSelectByQV("boat", true);
+								trUnitConvert(0);
+								trUnitChangeProtoUnit("Transport Ship Greek");
+								trUnitSelectClear();
+								trUnitSelectByQV("yeebBird", true);
+								trImmediateUnitGarrison(""+1*trQuestVarGet("boat"));
+								trUnitChangeProtoUnit("Dwarf");
+								trUnitSelectClear();
+								trUnitSelectByQV("yeebBird", true);
+								trMutateSelected(kbGetProtoUnitID("Stymphalian Bird"));
+								trSetSelectedScale(0,0,0);
+								trUnitSelectClear();
+								trUnitSelectByQV("boat", true);
+								trUnitChangeProtoUnit("Hero Birth");
+							}
 						}
 					}
 				}
@@ -3604,7 +3780,7 @@ highFrequency
 				trQuestVarSet("bossSpell", 2);
 				trQuestVarSet("bossTimeout", trTimeMS() + 500);
 				trQuestVarSet("bossNext", 500);
-				trQuestVarSet("zappyStart", trQuestVarGet("bossUnit"));
+				trQuestVarSet("zappyStart", trQuestVarGet("yeebaagooon"));
 				trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("playerUnits"), true);
 				for(x=trQuestVarGet("rand"); >0) {
 					yDatabaseNext("playerUnits");
@@ -3629,7 +3805,23 @@ highFrequency
 						trUnitHighlight(0.2, false);
 						damagePlayerUnit(150, 1*trQuestVarGet("zappyIndex"));
 						if (yGetVarAtIndex("playerUnits", "hero", 1*trQuestVarGet("zappyIndex")) == 1) {
-							gainFavor(1*yGetVarAtIndex("playerUnits", "player", 1*trQuestVarGet("zappyIndex")), -5.0);
+							p = 1*yGetVarAtIndex("playerUnits", "player", 1*trQuestVarGet("zappyIndex"));
+							gainFavor(p, -5.0);
+							if (trQuestVarGet("boss") > 999) {
+								if (trQuestVarGet("p"+p+"unit") == trQuestVarGet("zappyEnd")) {
+									if (yGetDatabaseCount("p"+p+"relics") > 0) {
+										yDatabaseNext("p"+p+"relics", true);
+										trUnitChangeProtoUnit("Relic");
+										relicEffect(p, 1*yGetVar("p"+p+"relics", "type"), false);
+										yAddToDatabase("freeRelics", "p"+p+"relics");
+										yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+										yRemoveFromDatabase("p"+p+"relics");
+										if (trCurrentPlayer() == p) {
+											trChatSend(0, "<color=1,0,0>Yeebaagooon has forced you to drop a relic!");
+										}
+									}
+								}
+							}
 						}
 						trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 						trQuestVarSet("zappyStart", trQuestVarGet("zappyEnd"));
@@ -3656,30 +3848,257 @@ highFrequency
 							trQuestVarSet("bossTimeout", trTimeMS() + 500);
 							trQuestVarSet("bossNext", 500);
 						} else {
-							bossCooldown(8, 12);
+							bossCooldown(6, 12);
 						}
 					}
 				}
 			}
+		} else if (trQuestVarGet("boss") > 999) {
+			/* phase 2 */
+			trQuestVarSetFromRand("bossSpell", 0, 3, true);
+			trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 		} else if (yGetVarAtIndex("enemies", "stunStatus", 1*trQuestVarGet("bossPointer")) == 0) {
 			trQuestVarSetFromRand("bossSpell", 0, xsMin(5, 1 * (trUnitPercentDamaged() * 0.05)), true);
 			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
-			trQuestVarSet("bossSpell", 31);
 			if (trQuestVarGet("bossSpell") == 21 && trQuestVarGet("bossUltimate") > 0) {
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
+		xsDisableRule("boss_music");
+		xsEnableRule("yeebaagooon_ded");
+
 		trMusicStop();
-		trQuestVarSet("boss", 0);
-		trSetLighting("default", 1.0);
+		trSetLighting("anatolia", 1.0);
 		
 		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
 	}
+
+	if (trQuestVarGet("gameOverStep") > 0) {
+		trQuestVarSet("gameOverStep", 7);
+		trQuestVarSet("yeebhit", 0);
+		for(x=yGetDatabaseCount("yeebRelics"); >0) {
+			yDatabaseNext("yeebRelics", true);
+			trUnitDestroy();
+		}
+		for(p=1; < ENEMY_PLAYER) {
+			for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+				if (yDatabaseNext("p"+p+"relics", true) == -1) {
+					yRemoveFromDatabase("p"+p+"relics");
+				}
+			}
+		}
+		xsDisableSelf();
+	}
 	xsSetContextPlayer(old);
+}
+
+rule yeebaagooon_ded
+inactive
+highFrequency
+{
+	int x = 0;
+	if (trTime() > trQuestVarGet("yeebOverNext")) {
+		trQuestVarSet("yeebOverStep", 1 + trQuestVarGet("yeebOverStep"));
+		switch(1*trQuestVarGet("yeebOverStep"))
+		{
+			case 1:
+			{
+				trSetUnitIdleProcessing(false);
+				trUIFadeToColor(0,0,0,1000,0,true);
+				trLetterBox(true);
+				trQuestVarSet("yeebOverNext", trTime() + 2);
+			}
+			case 2:
+			{
+				if (trQuestVarGet("boss") == 1) {
+					trPaintTerrain(30, 10, 32, 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+		            trPaintTerrain(10, 30, 30, 32, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+		            trChangeTerrainHeight(31, 10, 32, 32, worldHeight, false);
+		            trChangeTerrainHeight(10, 31, 32, 32, worldHeight, false);
+				} else {
+					trPaintTerrain(trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") - 3,
+						trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),
+						TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY);
+					trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") - 3,
+						trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),worldHeight,false);
+					trPaintTerrain(trQuestVarGet("bossRoomEntranceX")-4, trQuestVarGet("bossRoomEntranceZ"),
+						trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,
+						TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY);
+					trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX") - 3, trQuestVarGet("bossRoomEntranceZ"),
+						trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,worldHeight,false);
+				}
+	            trPaintTerrain(0,0,5,5,0,70,true);
+        		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+	            trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Enemy");
+	            trSoundPlayFN("","1",-1,"Yeebaagooon: Blargh, I am dead.","icons\special e son of osiris icon 64");
+	            trQuestVarSet("yeebOverNext", trTime() + 4);
+	            trUnitSelectClear();
+	            trUnitSelectByQV("yeebaagooon", true);
+	            trUnitDestroy();
+			}
+			case 3:
+			{
+				trSoundPlayFN("","1",-1,"Yeebaagooon: Just kidding. Did you think you were the only ones who could revive?",
+					"icons\special e son of osiris icon 64");
+				trQuestVarSet("yeebOverNext", trTime() + 6);
+				trQuestVarSet("yeebBird", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Stymphalian Bird",1,trQuestVarGet("yeebPosx"),0,trQuestVarGet("yeebPosz"),0,true);
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebBird", true);
+				trUnitConvert(0);
+				trTechGodPower(ENEMY_PLAYER, "spy", 1);
+				trTechInvokeGodPower(ENEMY_PLAYER,"spy",vector(1,1,1),vector(1,1,1));
+				x = modularCounterNext("spyFind");
+				trQuestVarSet("spyEye"+x, kbGetProtoUnitID("Pharaoh of Osiris"));
+				trQuestVarSet("spyEye"+x+"unit", trQuestVarGet("yeebBird"));
+				trStringQuestVarSet("spyName"+x, "yeebaagooon");
+			}
+			case 4:
+			{
+				trQuestVarSet("yeebBirdID", kbGetBlockID(""+1*trQuestVarGet("yeebBird")));
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebaagooon", true);
+				trUnitOverrideAnimation(33,0,true,false,-1);
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebBird", true);
+				trSetSelectedScale(0,0,0);
+				trSetUnitIdleProcessing(true);
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trSoundPlayFN("herorevived.wav","1",-1,"","");
+				uiLookAtUnitByName(""+1*trQuestVarGet("yeebBird"));
+				trQuestVarSet("yeebOverNext", trTime() + 3);
+				trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Now, die!");
+			}
+			case 5:
+			{
+				trQuestVarSet("bossUnit", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Cinematic Block");
+				xsEnableRule("yeebaagooon_battle");
+				bossCooldown(10, 12);
+				trQuestVarSet("musicTime", 0);
+				xsEnableRule("boss_music");
+				trVectorQuestVarSet("yeebDir", vector(1,0,0));
+				trQuestVarSet("yeebLightningNext", trTimeMS());
+				if (trQuestVarGet("boss") == 1) {
+					trQuestVarSet("yeebBossFight", 0);
+					trQuestVarSet("boss", 1000);
+					trMessageSetText("Reach the boss room to escape. You will get to keep the stolen relic.", 60);
+					trVectorQuestVarSet("yeebDestination", trVectorQuestVarGet("bossRoomCenter"));
+				} else {
+					trQuestVarSet("boss", 1001);
+					trMessageSetText("Return to the starting room to escape. You will get to keep the stolen relic.", 60);
+					trVectorQuestVarSet("yeebDestination", trVectorQuestVarGet("startPosition"));
+				}
+				trQuestVarSet("yeebLatestFeather", trGetNextUnitScenarioNameNumber() - 1);
+				trMinimapFlare(trCurrentPlayer(), 60, trVectorQuestVarGet("yeebDestination"), true);
+				trSoundPlayFN("new_objective.wav","1",-1,"","");
+				xsEnableRule("yeebaagooon_battle_2");
+				xsDisableSelf();
+			}
+		}
+	}
+}
+
+rule yeebaagooon_battle_2
+inactive
+highFrequency
+{
+	bool hit = false;
+	int id = 0;
+	if (kbUnitGetAnimationActionType(1*trQuestVarGet("yeebBirdID")) == 9) {
+		if (trTime() > trQuestVarGet("yeebBirdMoveTime")) {
+			trQuestVarSet("yeebBirdMoveTime", trTime());
+			yDatabaseNext("playerUnits");
+			trVectorSetUnitPos("pos", "playerUnits");
+			trUnitSelectClear();
+			trUnitSelectByQV("yeebBird", true);
+			trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
+		}
+	}
+
+	if (yGetDatabaseCount("yeebFeathers") > 0) {
+		hit = false;
+		id = yDatabaseNext("yeebFeathers", true);
+		if (id == -1) {
+			yVarToVector("yeebFeathers", "pos");
+			hit = true;
+		} else {
+			trVectorSetUnitPos("pos", "yeebFeathers");
+			if (trQuestVarGet("posY") < worldHeight + 0.5) {
+				hit = true;
+			} else {
+				ySetVarFromVector("yeebFeathers", "pos", "pos");
+			}
+		}
+
+		if (hit) {
+			spawnLightning("pos");
+			yRemoveFromDatabase("yeebFeathers");
+		}
+	}
+
+	while (yFindLatest("yeebLatestFeather", "Stymph Bird Feather", 0) > 0) {
+		trVectorSetUnitPos("pos", "yeebLatestFeather");
+		yAddToDatabase("yeebFeathers", "yeebLatestFeather");
+		yAddUpdateVar("yeebFeathers", "posx", trQuestVarGet("posx"));
+		yAddUpdateVar("yeebFeathers", "posz", trQuestVarGet("posz"));
+		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
+	}
+
+	if (trTimeMS() > trQuestVarGet("yeebLightningNext")) {
+		trVectorSetUnitPos("pos", "yeebaagooon");
+		trQuestVarSet("yeebLightningNext", 
+			trQuestVarGet("yeebLightningNext") + 2.0 * zDistanceBetweenVectors("pos", "yeebDestination"));
+		trQuestVarSetFromRand("dist", 4, 20, false);
+		trVectorQuestVarSet("yeebDir", rotationMatrix("yeebDir", -0.757323, 0.653041));
+		trQuestVarSet("posx", trQuestVarGet("posx") + trQuestVarGet("yeebDirx") * trQuestVarGet("dist"));
+		trQuestVarSet("posz", trQuestVarGet("posz") + trQuestVarGet("yeebDirz") * trQuestVarGet("dist"));
+		vectorSnapToGrid("pos");
+		spawnLightning("pos");
+	}
+
+	/* all dead */
+	if (trQuestVarGet("gameOverStep") > 0) {
+		xsDisableSelf();
+	} else if ((trQuestVarGet("boss") == 1000) && (trQuestVarGet("deadPlayerCount") < trQuestVarGet("activePlayerCount"))) {
+		/* successful escape */
+		int escape = 0;
+		for(p=1; < ENEMY_PLAYER) {
+			if (zDistanceToVectorSquared("p"+p+"unit", "yeebDestination") < 300) {
+				escape = escape + 1;
+			}
+		}
+		if (escape == trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount")) {
+			trSoundPlayFN("win.wav","1",-1,"","");
+			trQuestVarSet("gameOverStep", 4);
+			trQuestVarSet("playersWon", 1);
+			xsEnableRule("game_over");
+			xsDisableRule("gameplay_always");
+			xsDisableRule("yeebaagooon_battle");
+			xsDisableSelf();
+			trQuestVarSet("yeebhit", 0);
+			trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, 
+				trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) + trQuestVarGet("yeebRelicRetrieved"));
+		}
+	} else if (trQuestVarGet("boss") < 1000) {
+		xsDisableRule("yeebaagooon_battle");
+		xsDisableSelf();
+		trQuestVarSet("yeebhit", 0);
+		trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, 
+			trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) + trQuestVarGet("yeebRelicRetrieved"));
+		trUnitSelectClear();
+		trUnitSelectByQV("yeebBird");
+		trUnitChangeProtoUnit("Cinematic Block");
+		trUnitSelectClear();
+		trUnitSelectByQV("yeebaagooon");
+		trUnitChangeProtoUnit("Cinematic Block");
+	}
 }
 
 /**/

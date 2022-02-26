@@ -41,16 +41,21 @@ const int NPC_TEMPLE = 200;
 RESERVED TO 300
 */
 
-const int NPC_ATE_CORPSE = 301;
-const int NPC_ATE_BERRIES = 302;
+const int NPC_TEMPLE_COMPLETE = 300;
+/* 
+RESERVED TO 400
+*/
 
-const int NPC_NICK_NO = 303;
-const int NPC_NICK_START = 304;
+const int NPC_ATE_CORPSE = 401;
+const int NPC_ATE_BERRIES = 402;
+
+const int NPC_NICK_NO = 403;
+const int NPC_NICK_START = 404;
 /* reserved to 307 */
-const int NPC_NICK_DROP = 308;
-const int NPC_NICK_NEXT = 309;
+const int NPC_NICK_DROP = 408;
+const int NPC_NICK_NEXT = 409;
 /* reserved to 312 */
-const int NPC_NICK_QUEST_COMPLETE = 313;
+const int NPC_NICK_QUEST_COMPLETE = 413;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -1521,13 +1526,61 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 
+		case NPC_TEMPLE + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("A trial of thunder and lightning. Only the worthy may succeed.");
+				}
+				case 2:
+				{
+					uiMessageBox("If you can survive 47 seconds, my power is yours.");
+				}
+				case 3:
+				{
+					uiMessageBox("To begin the trial, drop a relic at my feet.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_TEMPLE_COMPLETE + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You have proven yourself worthy, and as such, I grant you this power.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(BOON_SPELL_ATTACK), boonName(BOON_SPELL_ATTACK));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+
 		case NPC_TEMPLE + 11:
 		{
 			switch(dialog)
 			{
 				case 1:
 				{
-					uiMessageBox("WHAT IS " + 1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = ?");
+					uiMessageBox("A single question, yet infinite possibilities.");
+				}
+				case 2:
+				{
+					uiMessageBox("Show thy mettle, and be rewarded with glorious treasure.");
+				}
+				case 3:
+				{
+					uiMessageBox("What is " + 1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + "?");
 					dialog = 0;
 				}
 			}
@@ -2558,10 +2611,14 @@ highFrequency
 {
 	trUnitSelectClear();
 	trUnitSelectByQV("yeebRelic", true);
-	if (trUnitIsOwnedBy(trCurrentPlayer())) {
-		trQuestVarSet("yeebHit", 1);
-	} else if (trUnitIsOwnedBy(0)) {
+	if (trUnitIsOwnedBy(0)) {
 		trQuestVarSet("yeebHit", 0);
+		trQuestVarSet("yeebBossFight", 0);
+	} else {
+		trQuestVarSet("yeebBossFight", 1);
+		if (trUnitIsOwnedBy(trCurrentPlayer())) {
+			trQuestVarSet("yeebHit", 1);
+		}
 	}
 }
 

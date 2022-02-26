@@ -700,6 +700,34 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
                 trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
             }
         }
+        case ROOM_TEMPLE + 6:
+        {
+            debugLog("temple room is " + room);
+            trQuestVarSet("templeSize", 16);
+            trQuestVarSet("templePosX", 70 * x + 40);
+            trQuestVarSet("templePosZ", 70 * z + 40);
+            trQuestVarSet("templeRoomUpperX", 70*x+56);
+            trQuestVarSet("templeRoomUpperZ", 70*z+56);
+            trQuestVarSet("templeRoomLowerX", 70*x+24);
+            trQuestVarSet("templeRoomLowerZ", 70*z+24);
+            trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+            trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
+            trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("templeRevealer", true);
+            trUnitChangeProtoUnit("Cinematic Block");
+            trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
+            trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,225,true);
+            trUnitSelectClear();
+            trUnitSelectByQV("temple", true);
+            trUnitConvert(0);
+            trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+            trSetSelectedScale(2,2,2);
+            trUnitOverrideAnimation(2,0,true,false,-1);
+            trQuestVarSet("templeLOS", 20);
+            xsEnableRule("yeebaagooon_temple_always");
+        }
         case ROOM_TEMPLE + 11:
         {
             size = 12;
@@ -1229,7 +1257,7 @@ highFrequency
             }
             case 6:
             {
-                trQuestVarSet("templeRoom", -1);
+                trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
                 xsEnableRule("laser_rooms_always");
                 /* engineers */
                 trTechSetStatus(ENEMY_PLAYER, 59, 4);
@@ -1822,10 +1850,6 @@ highFrequency
         } else if (trQuestVarGet("yeebBossFight") > 0) {
             xsEnableRule("yeeb_boss_message");
             trQuestVarSet("yeebStep", 0);
-            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
-            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
-            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 47000);
-            trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 2, 20);
             trPaintTerrain(30, 5, 32, 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
             trPaintTerrain(5, 30, 30, 32, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
             trChangeTerrainHeight(31, 5, 32, 32, wallHeight, false);

@@ -405,6 +405,7 @@ runImmediately
     player 0 omniscience
     */
     trTechSetStatus(0, 304, 4);
+    trTechSetStatus(ENEMY_PLAYER, 304, 4);
     aiSet("NoAI", 0);
     aiSet("NoAI", ENEMY_PLAYER);
     xsSetContextPlayer(ENEMY_PLAYER);

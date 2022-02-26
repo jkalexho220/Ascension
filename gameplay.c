@@ -374,13 +374,6 @@ highFrequency
                         relicReturned = false;
                         if (zDistanceBetweenVectorsSquared("pos", "relicTransporterGuyPos") < 36) {
                             relicReturned = true;
-                            trUnitChangeProtoUnit("Relic");
-                            trUnitSelectClear();
-                            trUnitSelectByQV("p"+p+"relics", true);
-                            trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-                            trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-                            trSetSelectedScale(0,0,-1);
-                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
                             if (trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
                                 if (trPlayerResourceCount(p, "gold") >= 100) {
                                     trPlayerGrantResources(p, "gold", -100);
@@ -400,6 +393,11 @@ highFrequency
                                     trSoundPlayFN("cantdothat.wav","1",-1,"","");
                                 }
                             }
+                        } else if (zDistanceToVectorSquared("temple", "pos") < 36) {
+                            if (trQuestVarGet("templeChallengeActive") == 0) {
+                                trQuestVarSet("templeChallengeActive", 1);
+                                relicReturned = true;
+                            }
                         } else if (1*trQuestVarGet("nottud") > 0) {
                             for(i=3; >0) {
                                 yDatabaseNext("nottudShop");
@@ -410,13 +408,6 @@ highFrequency
                             }
                             if (i > 0) {
                                 relicReturned = true;
-                                trUnitChangeProtoUnit("Relic");
-                                trUnitSelectClear();
-                                trUnitSelectByQV("p"+p+"relics", true);
-                                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-                                trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-                                trSetSelectedScale(0,0,-1);
-                                trUnitSetAnimationPath("1,0,1,1,0,0,0");
                                 if (trQuestVarGet("shopping") == 0) {
                                     trQuestVarSet("shopping", 1);
                                     if (trPlayerResourceCount(p, "gold") >= 300) {
@@ -437,13 +428,6 @@ highFrequency
                         } else if (trQuestVarGet("shopGuyActive") == 1) {
                             if (zDistanceBetweenVectorsSquared("pos", "shopGuyPos") < 9) {
                                 relicReturned = true;
-                                trUnitChangeProtoUnit("Relic");
-                                trUnitSelectClear();
-                                trUnitSelectByQV("p"+p+"relics", true);
-                                trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-                                trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-                                trSetSelectedScale(0,0,-1);
-                                trUnitSetAnimationPath("1,0,1,1,0,0,0");
                                 if (trQuestVarGet("shopping") == 0) {
                                     trQuestVarSet("shopping", 1);
                                     if (trPlayerResourceCount(p, "gold") >= 200) {
@@ -475,6 +459,16 @@ highFrequency
                             relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
                             yRemoveFromDatabase("p"+p+"relics");
                             yRemoveUpdateVar("p"+p+"relics", "type");
+                        } else {
+                            trUnitSelectClear();
+                            trUnitSelectByQV("p"+p+"relics", true);
+                            trUnitChangeProtoUnit("Relic");
+                            trUnitSelectClear();
+                            trUnitSelectByQV("p"+p+"relics", true);
+                            trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
+                            trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
+                            trSetSelectedScale(0,0,-1);
+                            trUnitSetAnimationPath("1,0,1,1,0,0,0");
                         }
                     } else {
                         /* KEY_RELICS */
@@ -932,6 +926,20 @@ highFrequency
             case 7:
             {
                 trSoundPlayFN("default", "1",-1,"Zenophobia:" + trStringQuestVarGet("advice"),"icons\infantry g hoplite icon 64");
+                trQuestVarSet("gameOverStep", 4);
+                trQuestVarSet("gameOverNext", trTime() + 5);
+            }
+            case 8:
+            {
+                trSoundPlayFN("","1",-1,"Yeebaagooon: That'll teach you to steal from me.",
+                    "icons\special e son of osiris icon 64");
+                trQuestVarSet("gameOverNext", trTime() + 5);
+            }
+            case 9:
+            {
+                if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
+                    trSoundPlayFN("","1",-1,":Yeebaagooon has taken back his stolen relic!","");
+                }
                 trQuestVarSet("gameOverStep", 4);
                 trQuestVarSet("gameOverNext", trTime() + 5);
             }

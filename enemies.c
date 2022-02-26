@@ -276,6 +276,13 @@ highFrequency
         trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
         trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
         trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);
+
+        trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
+        trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
+        trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 47000);
+        trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 2, 20);
+
+        trModifyProtounit("Stymphalian Bird", 0, 1, 2);
 		
 		xsDisableSelf();
 	}

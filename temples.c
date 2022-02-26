@@ -41,6 +41,385 @@ highFrequency
 	}
 }
 
+rule yeebaagooon_temple_always
+inactive
+highFrequency
+{
+	bool hit = false;
+	float amt = 0;
+	int p = 0;
+	if (trQuestVarGet("templeChallengeActive") == 1) {
+		trSoundPlayFN("attackwarning.wav","1",-1,"","");
+		trMessageSetText("Stay in the room and survive for 47 seconds.", -1);
+		trCounterAddTime("countdown47",,48,1,"Survive",-1);
+		trQuestVarSet("templeChallengeActive", 2);
+		trQuestVarSet("templeChallengeEnd", trTimeMS() + 47000);
+		trQuestVarSet("templeChallengeNext", trTimeMS());
+		trQuestVarSet("templeChallengeTimeout", trTimeMS() + 6400);
+		trMusicPlay("music\fight\rot loaf.mp3","1",0.0);
+		for(p=1; < ENEMY_PLAYER) {
+			if (trQuestVarGet("p"+p+"dead") == 0) {
+				yAddToDatabase("applicants", "p"+p+"unit");
+			}
+		}
+		trSoundPlayFN("lightningbirth.wav","1",-1,"","");
+		trQuestVarSet("lightningClouds", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("templePosX"),0,trQuestVarGet("templePosZ"),0,true);
+		trArmySelect("1,0");
+		trUnitChangeProtoUnit("Lightning Cloud");
+	} else {
+		if (yGetDatabaseCount("applicants") > 0) {
+			yDatabaseNext("applicants", true);
+			if (trUnitAlive() == false) {
+				yRemoveFromDatabase("applicants");
+			} else {
+				trVectorSetUnitPos("pos", "applicants");
+				if (vectorInRectangle("pos", "templeRoomLower", "templeRoomUpper") == false) {
+					if (trUnitIsOwnedBy(trCurrentPlayer())) {
+						uiMessageBox("You have left the room and have been disqualified.");
+					}
+					yRemoveFromDatabase("applicants");
+				}
+			}
+		}
+		
+		if (yGetDatabaseCount("yeebLightningEnd") > 0) {
+			trQuestVarSetFromRand("sound", 1, 5, true);
+			hit = false;
+			for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
+				yDatabaseNext("yeebLightningEnd", true);
+				if (trUnitVisToPlayer()) {
+					hit = true;
+				}
+				trVectorSetUnitPos("pos", "yeebLightningEnd");
+				trUnitChangeProtoUnit("Lightning sparks");
+				for(x=yGetDatabaseCount("playerUnits"); >0) {
+					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 0.75) {
+						trUnitDelete(false);
+					}
+				}
+			}
+			yClearDatabase("yeebLightningEnd");
+			if (hit) {
+				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			}
+		}
+			
+		for(x=xsMin(12, yGetDatabaseCount("yeebLightning")); >0) {
+			yDatabaseNext("yeebLightning");
+			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
+				hit = true;
+				trChatSetStatus(false);
+				trDelayedRuleActivation("enable_chat");
+				yAddToDatabase("yeebLightningEnd", "yeebLightning");
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebLightning", true);
+				trUnitChangeProtoUnit("Militia");
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebLightning", true);
+				trSetSelectedScale(0,0,0);
+				trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
+				yRemoveFromDatabase("yeebLightning");
+			}
+		}
+
+		
+		if (trQuestVarGet("templeChallengeActive") == 2) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 1000);
+				for(x=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants");
+					trVectorSetUnitPos("pos", "applicants");
+					spawnLightning("pos");
+				}
+
+				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trQuestVarSet("templeChallengeActive", 3);
+					trQuestVarSet("templeChallengeNext", 0);
+					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+				}
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 3) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartX", trQuestVarGet("lightningStartX") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 4);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 2000);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 4) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+				trQuestVarSet("templeChallengeActive", 5);
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeTimeout"));
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 6400);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 5) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 500);
+				for(x=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants");
+					trVectorSetUnitPos("pos", "applicants");
+					spawnLightning("pos");
+				}
+
+				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trQuestVarSet("templeChallengeActive", 6);
+					trQuestVarSet("templeChallengeNext", 0);
+					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+				}
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 6) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartZ", trQuestVarGet("lightningStartZ") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 7);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 2000);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 7) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+				trQuestVarSet("templeChallengeActive", 8);
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeTimeout"));
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 6400);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 8) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 1000);
+				trQuestVarSetFromRand("shape", 0, 2, true);
+				for(y=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants");
+					trVectorSetUnitPos("center", "applicants");
+					switch(1*trQuestVarGet("shape"))
+					{
+						case 0:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,0));
+							trVectorQuestVarSet("dir2", vector(4,0,0));
+						}
+						case 1:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,2));
+							trVectorQuestVarSet("dir2", vector(4,0,4));
+						}
+						case 2:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,2));
+							trVectorQuestVarSet("dir2", vector(2,0,0));
+						}
+					}
+					spawnLightning("center");
+					for(x=4; >0) {
+						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir1x"));
+						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir1z"));
+						spawnLightning("pos");
+						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir2x"));
+						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir2z"));
+						spawnLightning("pos");
+						trVectorQuestVarSet("dir1", rotationMatrix("dir1", 0, 1));
+						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
+					}
+				}
+
+				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trQuestVarSet("templeChallengeActive", 9);
+					trQuestVarSet("templeChallengeNext", 0);
+					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+				}
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 9) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 10);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 2000);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 10) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+				trQuestVarSet("templeChallengeActive", 11);
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeTimeout"));
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 6400);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 11) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 500);
+				trQuestVarSetFromRand("shape", 0, 2, true);
+				for(y=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants");
+					trVectorSetUnitPos("center", "applicants");
+					switch(1*trQuestVarGet("shape"))
+					{
+						case 0:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,0));
+							trVectorQuestVarSet("dir2", vector(4,0,0));
+						}
+						case 1:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,2));
+							trVectorQuestVarSet("dir2", vector(4,0,4));
+						}
+						case 2:
+						{
+							trVectorQuestVarSet("dir1", vector(2,0,2));
+							trVectorQuestVarSet("dir2", vector(2,0,0));
+						}
+					}
+					spawnLightning("center");
+					for(x=4; >0) {
+						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir1x"));
+						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir1z"));
+						spawnLightning("pos");
+						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir2x"));
+						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir2z"));
+						spawnLightning("pos");
+						trVectorQuestVarSet("dir1", rotationMatrix("dir1", 0, 1));
+						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
+					}
+				}
+
+				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trQuestVarSet("templeChallengeActive", 12);
+					trQuestVarSet("templeChallengeNext", 0);
+					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+				}
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 12) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trQuestVarSet("templeChallengeActive", 13);
+				trQuestVarSet("templeChallengeNext", 0);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 13) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 14);
+				trQuestVarSet("templeChallengeNext", 0);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 2000);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 14) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trQuestVarSet("templeChallengeActive", 15);
+				trQuestVarSet("templeChallengeNext", 0);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 15) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 16);
+				trQuestVarSet("templeChallengeNext", 0);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 2000);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 16) {
+			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
+				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
+				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trQuestVarSet("templeChallengeActive", 17);
+				trQuestVarSet("templeChallengeNext", 0);
+				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 17) {
+			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
+			while(trQuestVarGet("templeChallengeNext") < amt) {
+				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
+				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				for(x=0; < 8) {
+					spawnLightning("pos");
+					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+					if (trQuestVarGet("posz") < trQuestVarGet("templeRoomLowerZ")) {
+						trQuestVarSet("posZ", trQuestVarGet("posZ") + 32);
+					}
+				}
+				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
+				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
+				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+			}
+			if (amt > 1600) {
+				trQuestVarSet("templeChallengeActive", 18);
+			}
+		} else if (trQuestVarGet("templeChallengeActive") == 18) {
+			if (yGetDatabaseCount("yeebLightningEnd") + yGetDatabaseCount("yeebLightning") == 0) {
+				for(x=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants", true);
+					if (trUnitAlive() && trUnitIsOwnedBy(trCurrentPlayer())) {
+						startNPCDialog(NPC_TEMPLE_COMPLETE + 6);
+						trQuestVarSet("boonUnlocked"+BOON_SPELL_ATTACK, 1);
+					}
+				}
+			}
+		}
+	}
+}
+
 rule zeno_temple_always
 inactive
 highFrequency
