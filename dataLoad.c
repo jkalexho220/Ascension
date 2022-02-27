@@ -23,7 +23,7 @@ void saveAllData() {
 		yDatabaseNext("p"+p+"warehouse");
 		relic = yGetVar("p"+p+"warehouse", "type");
 		if (relic <= NORMAL_RELICS) {
-			trQuestVarSet("ownedRelics"+relic, xsMin(10, 1 + trQuestVarGet("ownedRelics"+relic)));
+			trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
 		}
 	}
 
@@ -47,6 +47,8 @@ void saveAllData() {
 		yDatabaseNext("p"+p+"relics");
 		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+		} else if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_GOGGLES) {
+			trQuestVarSet("p"+p+"nickQuestProgress", 6);
 		} else {
 			trQuestVarSet("p"+p+"relic"+x, 0);
 		}
@@ -65,8 +67,8 @@ void saveAllData() {
 	for(y=0; < 4) {
 		savedata = 0;
 		for(x=8; >0) {
-			currentdata = 1*xsMin(10, 1*trQuestVarGet("ownedRelics"+(x+8*y)));
-			savedata = savedata * 11 + currentdata;
+			currentdata = 1*xsMin(12, 1*trQuestVarGet("ownedRelics"+(x+8*y)));
+			savedata = savedata * 13 + currentdata;
 		}
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
@@ -141,22 +143,36 @@ inactive
 	int proto = 0;
 	/* only the local client needs this info */
 	/* owned relics */
-	for(y=0; < 4) {
-		savedata = trGetScenarioUserData(12 + y);
-		if (savedata < 0) {
-			savedata = 0;
+	if (trGetScenarioUserData(VERSION_NUMBER) == 0) {
+		for(y=0; < 4) {
+			savedata = trGetScenarioUserData(12 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
+			for(x=1; < 9) {
+				trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
+				savedata = savedata / 11;
+			}
 		}
-		for(x=1; < 9) {
-			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
-			savedata = savedata / 11;
+	} else {
+		for(y=0; < 4) {
+			savedata = trGetScenarioUserData(12 + y);
+			if (savedata < 0) {
+				savedata = 0;
+			}
+			for(x=1; < 9) {
+				trQuestVarSet("ownedRelics"+(x+8*y), iModulo(13, savedata));
+				savedata = savedata / 13;
+			}
 		}
 	}
+	
 	/* gemstones */
 	savedata = trGetScenarioUserData(9);
 	if (savedata < 0) {
 		savedata = 0;
 	}
-	for(x=0; <4) {
+	for(x=0; <3) {
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
 	}

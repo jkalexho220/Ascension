@@ -412,11 +412,11 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 /*
 Enemies have elemental resistance and weakness
 */
-float damageEnemy(int p = 0, float dmg = 0, bool spell = true) {
+float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
 	if (spell) {
-		dmg = dmg - dmg * yGetVar("enemies", "magicResist");
+		dmg = dmg - dmg * yGetVar("enemies", "magicResist") * (1.0 - pierce);
 	} else {
-		dmg = dmg - dmg * yGetVar("enemies", "physicalResist");
+		dmg = dmg - dmg * yGetVar("enemies", "physicalResist") * (1.0 - pierce);
 	}
 	if (yGetVar("enemies", "poisonStatus") == 1) {
 		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");

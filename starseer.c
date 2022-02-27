@@ -38,12 +38,6 @@ void starseerAlways(int eventID = -1) {
 		if (id == -1 || trUnitAlive() == false) {
 			removeStarseer(p);
 		} else {
-			hit = CheckOnHit(p, id);
-			if (hit == ON_HIT_SPECIAL) {
-				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-					stunUnit("enemies", 1.5, p);
-				}
-			}
 			
 			current = trTimeMS() - yGetVar("p"+p+"characters", "last");
 			ySetVar("p"+p+"characters", "last", trTimeMS());
@@ -118,10 +112,11 @@ void starseerAlways(int eventID = -1) {
 						trSetSelectedScale(0,0,0);
 					}
 					trSetSelectedUpVector(3.33 * trQuestVarGet("dirX"),0.2,3.33 * trQuestVarGet("dirZ"));
-					if (trQuestVarGet("p"+p+"supernova") == 1) {
+					if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
-						trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
+						//trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
+						trSetSelectedUpVector(1.0 * trQuestVarGet("dirX"),0,1.0 * trQuestVarGet("dirZ"));
 					}
 				}
 				current = fModulo(6.283185, current + 2.094395);
@@ -131,9 +126,6 @@ void starseerAlways(int eventID = -1) {
 			
 			trQuestVarSet("outer", xsPow(yGetVar("p"+p+"characters", "currentRadius") + 1.5, 2));
 			trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
-			if (trQuestVarGet("p"+p+"supernova") == 1) {
-				trQuestVarSet("inner", 0);
-			}
 			trVectorSetUnitPos("center", "p"+p+"characters");
 
 			amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
@@ -153,12 +145,10 @@ void starseerAlways(int eventID = -1) {
 						if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
 							if (dotProduct("dir", "prevPos") > trQuestVarGet("angleDiff")) {
 								/* HIT */
-								ySetVar("p"+p+"characters", "specialAttack", yGetVar("p"+p+"characters", "specialAttack") - 1);
-								if (yGetVar("p"+p+"characters", "specialAttack") <= 0) {
+								if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 									stunUnit("enemies", 1.5, p);
-									ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
 								}
-								if (trQuestVarGet("p"+p+"supernova") == 0) {
+								if (trQuestVarGet("p"+p+"eventHorizon") == 0) {
 									gainFavor(p, 1);
 								}
 								trUnitHighlight(0.2, false);
@@ -257,9 +247,9 @@ void starseerAlways(int eventID = -1) {
 		}
 	}
 
-	if (trQuestVarGet("p"+p+"supernova") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"supernovaTimeout")) {
-			trQuestVarSet("p"+p+"supernova", 0);
+	if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"eventHorizonTimeout")) {
+			trQuestVarSet("p"+p+"eventHorizon", 0);
 			for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 				yDatabaseNext("p"+p+"characters");
 				for(x=3; >0) {
@@ -275,25 +265,23 @@ void starseerAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		gainFavor(p, 0.0 - trQuestVarGet("supernovaCost") * trQuestVarGet("p"+p+"ultimateCost"));
-		trQuestVarSet("p"+p+"supernova", 1);
-		trQuestVarSet("p"+p+"supernovaTimeout", 
-			trTimeMS() + 1000 * trQuestVarGet("supernovaDuration") * trQuestVarGet("p"+p+"spellDuration"));
+		gainFavor(p, 0.0 - trQuestVarGet("eventHorizonCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		trQuestVarSet("p"+p+"eventHorizon", 1);
+		trQuestVarSet("p"+p+"eventHorizonTimeout", 
+			trTimeMS() + 1000 * trQuestVarGet("eventHorizonDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trQuestVarSet("p"+p+"starAngularVelocity", 
 			2.0 * trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
 		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
-			ySetVar("p"+p+"characters", "targetRadius", trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange"));
 			for(x=3; >0) {
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
-				trMutateSelected(kbGetProtoUnitID("Meteorite"));
+				trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
 				trSetSelectedScale(0,0,0);
-				trUnitOverrideAnimation(6,0,true,false,-1);
+				trUnitSetAnimationPath("0,0,1,0,0,0,0");
 			}
 		}
-		trSoundPlayFN("suckup3.wav","1",-1,"","");
-		trSoundPlayFN("inferno.wav","1",-1,"","");
+		trSoundPlayFN("cinematics\24_in\magic.mp3", "5", -1, "","");
 	}
 
 	ySetPointer("enemies", index);
@@ -310,13 +298,13 @@ void chooseStarseer(int eventID = -1) {
 		rainName = "(Q) Repel";
 		rainIsUltimate = false;
 		map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(E) Supernova";
+		lureName = "(E) Event Horizon";
 		lureIsUltimate = true;
 	}
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("realignCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
 	trQuestVarSet("p"+p+"lureCooldown", 1);
-	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("supernovaCost"));
+	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("eventHorizonCost"));
 	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("RepelCooldown"));
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
@@ -327,7 +315,7 @@ void starseerModify(int eventID = -1) {
 	zSetProtoUnitStat("Oracle Hero", p, 27, 0);
 	trQuestVarSet("p"+p+"starAngularVelocity", 
 		trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
-	if (trQuestVarGet("p"+p+"supernova") == 1) {
+	if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 		trQuestVarSet("p"+p+"starAngularVelocity", 2.0 * trQuestVarGet("p"+p+"starAngularVelocity"));
 	}
 }
@@ -354,6 +342,6 @@ highFrequency
 	trQuestVarSet("RepelCooldown", 15);
 	trQuestVarSet("RepelRange", 15);
 
-	trQuestVarSet("supernovaCost", 60);
-	trQuestVarSet("supernovaDuration", 6);
+	trQuestVarSet("eventHorizonCost", 60);
+	trQuestVarSet("eventHorizonDuration", 10);
 }

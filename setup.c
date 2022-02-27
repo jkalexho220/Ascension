@@ -15,16 +15,16 @@ const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
 
 const int GARDENER = 9;
-const int SAVIOR = 10;
+const int STARSEER = 10;
 const int COMMANDO = 11;
 const int SPELLSTEALER = 12;
 
 const int NIGHTRIDER = 13;
-const int STARSEER = 14;
-const int FROSTKNIGHT = 15;
+const int SPARKWITCH = 14;
+const int SAVIOR = 15;
 
 const int CLASS_COUNT = 16;
-
+const int FROSTKNIGHT = 17;
 
 const int STARSTONE = 0;
 const int SOULSTONE = 1;
@@ -133,7 +133,7 @@ string stageName(int stage = 0) {
         }
         case 8:
         {
-            name = "Cloudfield";
+            name = "The Clouds";
         }
         case 9:
         {
@@ -141,7 +141,11 @@ string stageName(int stage = 0) {
         }
         case 10:
         {
-            name = "The Peak";
+            name = "The Unknown";
+        }
+        case 0:
+        {
+            name = "Dream Realm";
         }
     }
     return(name);
@@ -190,6 +194,10 @@ string stageIcon(int stage = 0) {
         case 10:
         {
             img = "ui\ui map missing 256x256";
+        }
+        case 0:
+        {
+            img = "ui\ui map land unknown 256x256";
         }
     }
     return(img);
@@ -431,6 +439,7 @@ runImmediately
     setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
     setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
     setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
+    setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
 
     trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
     trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -540,6 +549,7 @@ highFrequency
         setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
         setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
         setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
+        setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
         setupPlayerProto("Audrey", 1000, 50, 0);
         setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
 
@@ -562,6 +572,7 @@ highFrequency
         trModifyProtounit("Uproot 2x2", 0, 8, -99);
 
         for(p=ENEMY_PLAYER; >0) {
+            trModifyProtounit("Circe", p, 9, -99);
             trModifyProtounit("Ox Cart", p, 0, 120);
             trModifyProtounit("Spy Eye", p, 2, -99);
             trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
@@ -583,6 +594,8 @@ highFrequency
             trModifyProtounit("Arkantos God Out", p, 8, 1);
             zInitProtoUnitStat("Cinematic Block", p, 0, 300);
             zInitProtoUnitStat("Priest Projectile", p, 8, 2);
+
+            zInitProtoUnitStat("Ballista Shot", p, 1, 30);
 
             trModifyProtounit("Servant", p, 55, 1);
             trModifyProtounit("Nereid", p, 55, 1);
@@ -693,6 +706,18 @@ highFrequency
             trMessageSetText("Host: Choose a floor to challenge.",-1);
 
             int posX = 97 - 2 * trQuestVarGet("p1progress");
+            if (trQuestVarGet("p1nickQuestProgress") == 6) {
+                posX = posX - 2;
+                trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+                trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);
+                trArmySelect("1,0");
+                trUnitConvert(0);
+                trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
+                yAddToDatabase("stageChoices", "next");
+                yAddUpdateVar("stageChoices", "stage", 0);
+                yAddUpdateVar("stageChoices", "obelisk", trQuestVarGet("next"));
+                posX = posX + 4;
+            }
 
             for(x=0; <= trQuestVarGet("p1progress")) {
                 trQuestVarSet("next", trGetNextUnitScenarioNameNumber());

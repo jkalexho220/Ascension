@@ -105,6 +105,7 @@ void spinQuantumSlotMachine(int eventID = -1) {
 		yDatabaseNext("slotRelics");
 		if (trQuestVarGet("quantumRelic") == yGetVar("slotRelics", "type")) {
 			trQuestVarSet("quantumRelic", RELIC_NICKONHAWK_GOGGLES);
+			trQuestVarSet("dreamGogglesCount", 1 + trQuestVarGet("dreamGogglesCount"));
 		}
 	}
 	trQuestVarSet("quantumSlotMachine", 2);
@@ -527,6 +528,9 @@ highFrequency
 	    		}
 	    	}
 	    	if (trQuestVarGet("p1nickQuestProgress") > 0) {
+	    		if (trQuestVarGet("p1nickQuestProgress") == 6) {
+	    			trQuestVarSet("p1nickQuestProgress", 5);
+	    		}
 	    		trQuestVarSet("nextPad", 0);
 	    		trEventSetHandler(9000, "spinQuantumSlotMachine");
 	    		trVectorQuestVarSet("nickPos", vector(161,0,161));
@@ -553,6 +557,15 @@ highFrequency
 	    					trSetSelectedScale(1.5,1,1.5);
 	    					trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
 	    					trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+	    				}
+	    				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	    				trArmyDispatch("1,0","Dwarf",trQuestVarGet("dreamGogglesCount"),163,0,159,225,true);
+	    				trArmySelect("1,0");
+	    				trUnitChangeProtoUnit("Relic");
+	    				for(x=trQuestVarGet("dreamGogglesCount"); >0) {
+	    					yAddToDatabase("freeRelics", "next");
+	    					yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK_GOGGLES);
+	    					trQuestVarSet("next", 1 + trQuestVarGet("next"));
 	    				}
 	    			}
 	    		} else if (trQuestVarGet("p1nickQuestProgress") == 4) {
@@ -637,13 +650,13 @@ highFrequency
 		xsDisableRule("gameplay_always");
 
 		/* free relics go into ownedRelics */
-		for(x=31; >0) {
+		for(x=30; >0) {
 			trQuestVarSet("ownedRelics"+x, 0);
 		}
 		for(x=yGetDatabaseCount("freeRelics"); >0) {
 			yDatabaseNext("freeRelics");
 			class = yGetVar("freeRelics", "type");
-			trQuestVarSet("ownedRelics"+class, xsMin(10, 1 + trQuestVarGet("ownedRelics"+class)));
+			trQuestVarSet("ownedRelics"+class, 1 + trQuestVarGet("ownedRelics"+class));
 		}
 		saveAllData();
 		

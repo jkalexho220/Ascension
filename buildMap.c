@@ -1360,7 +1360,7 @@ highFrequency
                 trStringQuestVarSet("advice", "And then there were none...");
                 xsEnableRule("laser_rooms_always");
                 trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
-                worldHeight = 5;
+                worldHeight = 0;
                 wallHeight = 0;
                 trQuestVarSet("bossRoomShape", ROOM_SQUARE);
                 trQuestVarSet("bossRoomSize", 11);
@@ -1369,27 +1369,27 @@ highFrequency
                 trQuestVarSet("trapRooms", 3);
                 trQuestVarSet("trapType", TRAP_LASERS);
                 TERRAIN_WALL = 2;
-                TERRAIN_SUB_WALL = 7;
+                TERRAIN_SUB_WALL = 13;
                 
-                TERRAIN_PRIMARY = 4;
-                TERRAIN_SUB_PRIMARY = 15;
+                TERRAIN_PRIMARY = 9;
+                TERRAIN_SUB_PRIMARY = 0;
 
                 TERRAIN_SECONDARY = 0;
                 TERRAIN_SUB_SECONDARY = 73;
 
                 trQuestVarSet("mapType", MAP_STANDARD);
-                trQuestVarSet("treeDensity", 0.1);
+                trQuestVarSet("treeDensity", 0.2);
                 trStringQuestVarSet("treeProto1", "Oak Tree Burning");
                 trStringQuestVarSet("treeProto2", "Marsh Tree");
                 trStringQuestVarSet("treeProto3", "Pine Snow");
-                trQuestVarSet("spriteDensity", 0.3);
-                trStringQuestVarSet("spriteProto1", "Imperial Examination");
-                trStringQuestVarSet("spriteProto2", "Healing SFX");
-                trStringQuestVarSet("spriteProto3", "Mist");
+                trQuestVarSet("spriteDensity", 0.5);
+                trStringQuestVarSet("spriteProto1", "Cinematic Dead Bodies");
+                trStringQuestVarSet("spriteProto2", "Cinematic Dead Bodies Xpack");
+                trStringQuestVarSet("spriteProto3", "Columns");
                 trQuestVarSet("rockDensity", 0.2);
                 trStringQuestVarSet("rockProto1", "Ruins");
                 trStringQuestVarSet("rockProto2", "Columns Broken");
-                trStringQuestVarSet("rockProto3", "Columns");
+                trStringQuestVarSet("rockProto3", "Cinematic Dead Bodies");
 
                 trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
                 
@@ -1416,6 +1416,41 @@ highFrequency
                 trArmySelect("1,0");
                 trUnitConvert(0);
                 trUnitChangeProtoUnit("Oracle Scout");
+            }
+            case 0:
+            {
+                trQuestVarSet("stageTemple", BOON_TWO_RELICS);
+                trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
+                worldHeight = 0;
+                wallHeight = 0;
+                trQuestVarSet("bossRoomShape", ROOM_SQUARE);
+                trQuestVarSet("bossRoomSize", 11);
+                TERRAIN_WALL = 2;
+                TERRAIN_SUB_WALL = 7;
+                
+                TERRAIN_PRIMARY = 4;
+                TERRAIN_SUB_PRIMARY = 15;
+
+                TERRAIN_SECONDARY = 0;
+                TERRAIN_SUB_SECONDARY = 73;
+
+                trQuestVarSet("mapType", MAP_STANDARD);
+                trQuestVarSet("treeDensity", 0.1);
+                trStringQuestVarSet("treeProto1", "Oak Tree Burning");
+                trStringQuestVarSet("treeProto2", "Marsh Tree");
+                trStringQuestVarSet("treeProto3", "Pine Snow");
+                trQuestVarSet("spriteDensity", 0.3);
+                trStringQuestVarSet("spriteProto1", "Imperial Examination");
+                trStringQuestVarSet("spriteProto2", "Healing SFX");
+                trStringQuestVarSet("spriteProto3", "Mist");
+                trQuestVarSet("rockDensity", 0.2);
+                trStringQuestVarSet("rockProto1", "Ruins");
+                trStringQuestVarSet("rockProto2", "Columns Broken");
+                trStringQuestVarSet("rockProto3", "Columns");
+
+                trQuestVarSet("enemyDensity", 0);
+
+                trQuestVarSet("templeRoom", 1);
             }
         }
 

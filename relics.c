@@ -190,7 +190,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_NICKONHAWK_GOGGLES:
 			{
-				msg = "Dream Goggles: Host a map with these equipped to see something peculiar...";
+				msg = "Dream Goggles. What do they do?";
 			}
 
 			case RELIC_LITERAL_FECES:

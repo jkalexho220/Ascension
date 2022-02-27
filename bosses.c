@@ -3772,22 +3772,26 @@ highFrequency
 				if (trQuestVarGet("rand") == 1) {
 					trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Zappy Zap");
 				} else if (trQuestVarGet("rand") == 2) {
-					trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Hope you like friends!");
+					trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Relics begone!");
 				} else if (trQuestVarGet("rand") == 3) {
-					trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: It's bouncing time!");
+					trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Want to see a magic trick?");
 				}
-				trQuestVarSet("bossCount", 12);
 				trQuestVarSet("bossSpell", 2);
 				trQuestVarSet("bossTimeout", trTimeMS() + 500);
 				trQuestVarSet("bossNext", 500);
 				trQuestVarSet("zappyStart", trQuestVarGet("yeebaagooon"));
-				trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("playerUnits"), true);
-				for(x=trQuestVarGet("rand"); >0) {
-					yDatabaseNext("playerUnits");
+				z = 0;
+				for(x=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+x+"dead") == 0) {
+						z = z + 1;
+						trQuestVarSet("choose"+z, x);
+					}
 				}
-				trQuestVarSet("zappyEnd", trQuestVarGet("playerUnits"));
+				trQuestVarSetFromRand("zappyTarget", 1, z, true);
+				p = trQuestVarGet("choose"+1*trQuestVarGet("zappyTarget"));
+				trQuestVarSet("zappyTarget", p);
+				trQuestVarSet("zappyEnd", trQuestVarGet("p"+p+"unit"));
 				trQuestVarSet("zappyIndex", yGetPointer("playerUnits"));
-				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 			} else if (trQuestVarGet("bossSpell") == 2) {
 				if (trQuestVarGet("bossTimeout") - trTimeMS() < trQuestVarGet("bossNext")) {
 					trQuestVarSet("bossNext", trQuestVarGet("bossNext") - 100);
@@ -3800,56 +3804,29 @@ highFrequency
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lightning sparks Ground");
 					if (trQuestVarGet("bossNext") <= 0) {
+						if (trQuestVarGet("boss") > 999) {
+							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Relic");
+							yAddToDatabase("freeRelics", "next");
+							yAddUpdateVar("freeRelics", "type", RELIC_MAGIC_DETECTOR);
+						}
 						trUnitSelectClear();
 						trUnitSelectByQV("zappyEnd", true);
 						trUnitHighlight(0.2, false);
 						damagePlayerUnit(150, 1*trQuestVarGet("zappyIndex"));
-						if (yGetVarAtIndex("playerUnits", "hero", 1*trQuestVarGet("zappyIndex")) == 1) {
-							p = 1*yGetVarAtIndex("playerUnits", "player", 1*trQuestVarGet("zappyIndex"));
-							gainFavor(p, -5.0);
-							if (trQuestVarGet("boss") > 999) {
-								if (trQuestVarGet("p"+p+"unit") == trQuestVarGet("zappyEnd")) {
-									if (yGetDatabaseCount("p"+p+"relics") > 0) {
-										yDatabaseNext("p"+p+"relics", true);
-										trUnitChangeProtoUnit("Relic");
-										relicEffect(p, 1*yGetVar("p"+p+"relics", "type"), false);
-										yAddToDatabase("freeRelics", "p"+p+"relics");
-										yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
-										yRemoveFromDatabase("p"+p+"relics");
-										if (trCurrentPlayer() == p) {
-											trChatSend(0, "<color=1,0,0>Yeebaagooon has forced you to drop a relic!");
-										}
-									}
-								}
-							}
-						}
-						trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
-						trQuestVarSet("zappyStart", trQuestVarGet("zappyEnd"));
+						p = trQuestVarGet("zappyTarget");
+						action = trQuestVarGet("p"+p+"class");
+						trUnitChangeProtoUnit(kbGetProtoUnitName(1*trQuestVarGet("class"+action+"proto")));
 						trQuestVarSetFromRand("sound", 1, 5, true);
 						trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-						hit = false;
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-								removePlayerUnit();
-							} else if (trQuestVarGet("playerUnits") == trQuestVarGet("zappyStart")) {
-								continue;
-							} else {
-								if (zDistanceToVectorSquared("playerUnits", "end") < 100) {
-									hit = true;
-									trQuestVarSet("zappyEnd", trQuestVarGet("playerUnits"));
-									trQuestVarSet("zappyIndex", yGetPointer("playerUnits"));
-									if (yGetVar("playerUnits", "hero") == 1) {
-										break;
-									}
-								}
-							}
+						gainFavor(p, -5.0);
+						if (trCurrentPlayer() == p) {
+							trChatSend(0, "<color=1,1,1>Yeebaagooon has ejected all of your relics!");
 						}
-						if (hit && (trQuestVarGet("bossCount") > 0)) {
-							trQuestVarSet("bossTimeout", trTimeMS() + 500);
-							trQuestVarSet("bossNext", 500);
-						} else {
-							bossCooldown(6, 12);
-						}
+						
+						bossCooldown(6, 12);
 					}
 				}
 			}

@@ -62,6 +62,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\infantry x oracle hero icons 64";
 		}
+		case SPARKWITCH:
+		{
+			icon = "icons\hero g circe icon 64";
+		}
 	}
 	return(icon);
 }
@@ -453,33 +457,43 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					icon = "icons\god power lightning icon 64";
-					msg = "(Q) Rain of Lightning: Your attacks call lightning to strike your foes, dealing damage in an area";
+					icon = "icons\building archery range icon 64";
+					msg = "(Q) Shock Arrow: Fire an arrow at your cursor that damages and launches the first enemy hit.";
 				}
 				case 3:
 				{
-					icon = "icons\god power lightning icon 64";
-					msg = "Cooldown: 12 | Duration: 4 | Damage: 1.5 x Attack x Spell Power | Fire rate + 0.33x Projectiles";
+					icon = "icons\building archery range icon 64";
+					msg = "If they are launched into a wall, they take the same amount of damage again.";
 				}
 				case 4:
 				{
-					icon = "icons\god power shifting sand icon 64";
-					msg = "(W) Disengage: Stun nearby enemies and then teleport a short distance towards your cursor.";
+					icon = "icons\building archery range icon 64";
+					msg = "Cooldown: 10 | Range: 30 | Damage: 100";
 				}
 				case 5:
 				{
 					icon = "icons\god power shifting sand icon 64";
-					msg = "Cooldown: 8 | Stun Radius: 4 | Teleport Range: 12";
+					msg = "(W) Disengage: Stun nearby enemies and then teleport a short distance towards your cursor.";
 				}
 				case 6:
 				{
-					icon = "icons\god power tornado icon 64";
-					msg = "(E) Whirlwind: Create a storm that instantly pulls in nearby enemies.";
+					icon = "icons\god power shifting sand icon 64";
+					msg = "Cooldown: 8 | Stun Radius: 4 | Teleport Range: 12";
 				}
 				case 7:
 				{
-					icon = "icons\god power tornado icon 64";
-					msg = "Cost: 70 | Range: 18";
+					icon = "icons\god power lightning icon 64";
+					msg = "(E) Rain of Lightning: Your attacks call lightning to strike your foes, dealing damage in an area";
+				}
+				case 8:
+				{
+					icon = "icons\god power lightning icon 64";
+					msg = "The damage is multiplied by your spell power and it ignores enemy armor.";
+				}
+				case 9:
+				{
+					icon = "icons\god power lightning icon 64";
+					msg = "Cost: 50 | Duration: 10 | Radius: 5 | Damage: Attack x Spell Power | Fire rate + 0.3x Projectiles";
 					next = 0;
 				}
 			}
@@ -977,42 +991,38 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					msg = "Special Attack (9 attacks): Stun your target. Your Stars can activate this special attack.";
+					icon = "icons\god power thunder clap icons 64";
+					msg = "(Q) Repel: Launch nearby enemies away from you.";
 				}
 				case 4:
 				{
 					icon = "icons\god power thunder clap icons 64";
-					msg = "(Q) Repel: Launch nearby enemies away from you.";
-				}
-				case 5:
-				{
-					icon = "icons\god power thunder clap icons 64";
 					msg = "Cooldown: 15 | Range: 15";
 				}
-				case 6:
+				case 5:
 				{
 					icon = "icons\god power vision icon 64";
 					msg = "(W) Realignment: Change the radius of your stars to match your cursor.";
 				}
-				case 7:
+				case 6:
 				{
 					icon = "icons\god power vision icon 64";
 					msg = "The closer they are, the faster you move.";
 				}
-				case 8:
+				case 7:
 				{
 					icon = "icons\god power vision icon 64";
 					msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x";
 				}
+				case 8:
+				{
+					icon = "icons\god power eclipse icon 64";
+					msg = "(E) Event Horizon: Your stars rotate at double speed and stun enemies.";
+				}
 				case 9:
 				{
-					icon = "icons\improvement halo of the sun icons 64";
-					msg = "(E) Supernova: Your stars rotate at double speed and damage enemies in a line.";
-				}
-				case 10:
-				{
-					icon = "icons\improvement halo of the sun icons 64";
-					msg = "Cost: 60 | Duration: 6";
+					icon = "icons\god power eclipse icon 64";
+					msg = "Cost: 60 | Duration: 10";
 					next = 0;
 				}
 			}
@@ -1085,6 +1095,10 @@ string className(int class = 0) {
 		case STARSEER:
 		{
 			name = "Starseer";
+		}
+		case SPARKWITCH:
+		{
+			name = "Spark Witch";
 		}
 	}
 	return(name);
