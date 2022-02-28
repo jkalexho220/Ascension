@@ -14,7 +14,7 @@ void sparkWitchAlways(int eventID = -1) {
 	float current = 0;
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
+	for (y=yGetDatabaseCount("p"+p+"characters"); > 0) {
 		id = yDatabaseNext("p"+p+"characters", true);
 		if (id == -1 || trUnitAlive() == false) {
 			removeSparkWitch(p);
@@ -108,6 +108,7 @@ void sparkWitchAlways(int eventID = -1) {
 					if ((1*yGetVar("p"+p+"zaps", "index") > 0) && ySetPointer("enemies", 1*yGetVar("p"+p+"zaps", "index"))) {
 						damageEnemy(p, 100.0 * trQuestVarGet("p"+p+"spellDamage"));
 					}
+					ySetPointer("enemies", index);
 				}
 				ySetVar("p"+p+"zaps", "bounces", yGetVar("p"+p+"zaps", "bounces") - 1);
 				if (yGetVar("p"+p+"zaps", "bounces") > 0) {

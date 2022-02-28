@@ -171,9 +171,6 @@ void blastmageAlways(int eventID = -1) {
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 					damageEnemy(p, amt, true);
 					ySetVar("enemies", "magicResist", yGetVar("enemies", "magicResist") - 0.1);
-					if (zDistanceToVectorSquared("enemies", "pos") < current) {
-						stunUnit("enemies", 2.0, p);
-					}
 					hit = hit + 1;
 				}
 			}
@@ -369,7 +366,6 @@ highFrequency
 
 	trQuestVarSet("starfallCooldown", 8);
 	trQuestVarSet("starfallRadius", 5);
-	trQuestVarSet("starfallStunRadius", 1.5);
 	trQuestVarSet("starfallDamage", 120);
 
 	trQuestVarSet("solarFlareCooldown", 20);

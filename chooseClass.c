@@ -413,29 +413,24 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "In addition, enemies in the direct center of the area will be stunned.";
+					msg = "Cooldown: 8 | Radius: 5 | Damage: 120 | Resist Reduction: 0.1";
 				}
 				case 10:
-				{
-					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Stun Radius: 1.5 | Damage: 120 | Resist Reduction: 0.1";
-				}
-				case 11:
 				{
 					icon = "icons\god power vortex icons 64";
 					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Mage Fire.";
 				}
-				case 12:
+				case 11:
 				{
 					icon = "icons\god power vortex icons 64";
 					msg = "Cooldown: 6 | Range: 8";
 				}
-				case 13:
+				case 12:
 				{
 					icon = "icons\building tower mirror icons 64";
 					msg = "(E) Solar Flare: Fire a laser through each of your Mage Fires, dealing damage to enemies.";
 				}
-				case 14:
+				case 13:
 				{
 					icon = "icons\building tower mirror icons 64";
 					msg = "Cost: 40 | Range: 40 | Damage: 90";
