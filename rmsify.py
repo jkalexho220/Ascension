@@ -1,59 +1,9 @@
 import os
 import sys
 
-FILE_1 = None
-FILE_2 = 'Ascension MMORPG.xs'
-NAME = None
-named = False
-comment = False
+FILENAME = 'Ascension MMORPG.xs'
+files = ['main.c', 'test.c']
 
-
-def checkQuestVarSet(templine, ln):
-	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').split(' ')
-	findComma = False
-	foundComma = False
-	depth = 0
-	for x in tokens:
-		if (x == 'trQuestVarSet'):
-			findComma = True
-		if findComma:
-			if (depth == 1):
-				if x == ',':
-					if not foundComma:
-						foundComma = True
-					else:
-						print("trQuestVarSet instead of trQuestVarSetFromRand")
-						print("Line " + str(ln) + ":\n    " + line)
-				elif x == ')' and not foundComma:
-					print("trQuestVarSet instead of trQuestVarGet")
-					print("Line " + str(ln) + ":\n    " + line)
-			if (x == '('):
-				depth = depth + 1
-			elif (x == ')'):
-				depth = depth - 1
-
-def checkQuestVarGet(templine, ln):
-	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').split(' ')
-	findComma = False
-	foundComma = False
-	depth = 0
-	for x in tokens:
-		if (x == 'trQuestVarGet'):
-			findComma = True
-		if findComma:
-			if (depth == 1):
-				if x == ',':
-					foundComma = True
-				elif x == ')':
-					if (foundComma):
-						print("trQuestVarGet instead of trQuestVarSet")
-						print("Line " + str(ln) + ":\n    " + line)
-					else:
-						break
-			if (x == '('):
-				depth = depth + 1
-			elif (x == ')'):
-				depth = depth - 1
 
 def checkStringConcatenation(templine, ln):
 	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').replace('+', ' + ').replace('=', ' = ').replace('"', ' " ').split(' ')
@@ -93,52 +43,33 @@ def checkUnknownFunctions(templine, ln):
 						if not tokens[t-1] in unknowns:
 							unknowns.add(tokens[t-1])
 
+def removeStrings(line):
+	retline = ""
+	isString = False
+	for token in line:
+		if token == '"':
+			isString = not isString
+		if not isString:
+			retline = retline + token
+	if "//" in retline:
+		retline = retline[:retline.find("//")]
+	return retline
+
+def resolveArithmetic(linelist, depth):
+	resolved = ""
+	
 
 print("rmsification start!")
 
-functions = {' ', 'xsPow', 'trQuestVarGet', 'trQuestVarSet', '', 'trSetDisableGPBlocking', 'kbIsPlayerHuman', 'trPlayNextMusicTrack',
-			'trDamageUnitsInArea', 'trCameraCut', 'trUnitSetAnimation', 'trPlayerTechTreeEnabledGodPowers', 'uiLookAtUnitByName',
-			'trGetUnitScenarioNameNumber', 'trUnitIsOwnedBy', 'trCounterAddTime', 'trMutateSelected', 'xsMin', 'trSetSelectedUpVector',
-			'trChatSend', 'trUnitIsSelected', 'kbGetProtoUnitName', 'trUnitSetStance', 'trForceNonCinematicModels', 'trackGotoSelectedWaypoint',
-			'trLetterBox', 'trUnitDead', 'trUnitPercentDamaged', 'trDamageUnitPercent', 'trCamTrackLoad', 'trUnitVisToPlayer',
-			'trTechGodPower', 'xsCos', 'trModifyProtounit', 'while', 'trPlayerSetDiplomacy', 'trIsGadgetVisible', 'trackRemove',
-			'trSetUnitOrientation', 'trMessageSetText', 'kbUnitGetAnimationActionType', 'trUnitHighlight', 'trUnitConvert', 
-			'xsVectorSet', 'trVectorQuestVarGetZ', 'map', 'if', 'trSetUnitIdleProcessing', 'configUndef', 'uiMessageBox', 'trUnitDelete',
-			'trCountUnitsInArea', 'trArmyDispatch', 'trTime', 'xsEnableRule', 'trUnitDestroy', 'trPlayerUnitCountSpecific', 
-			'xsSetContextPlayer', 'trVectorQuestVarGetX', 'trSetCivAndCulture', 'xsAbs', 'xsAtan', 'trUnitGetIsContained',
-			'trUnitSelect', 'kbUnitGetActionType', 'trSoundPlayFN', 'trUnitTeleport', 'trUnitOverrideAnimation', 'xsVectorNormalize', 'xsVectorSetZ', 'xsVectorSetX',
-			'trCameraShake', 'trCamTrackPlay', 'kbGetProtoUnitID', 'trDamageUnit', 'trGetStatValue', 'xsDisableRule', 'trRenderSnow',
-			'xsSqrt', 'trSetLighting', 'for', 'trVectorQuestVarSet', 'trTechInvokeGodPower', 'aiSet', 'trCheckGPActive', 'trMinimapFlare',
-			'trGetNextUnitScenarioNameNumber', 'trMusicPlay', 'xsSin', 'trPlayerGetPopulation', 'trUnitMoveToUnit', 'trPlayerModifyLOS',
-			'trDelayedRuleActivation', 'trStringQuestVarGet', 'kbGetBlockID', 'trCurrentPlayer', 'trPlayerGrantResources', 'aiSetAttackResponseDistance',
-			'trPaintTerrain', 'trPlayerResourceCount', 'trCounterAbort', 'return', 'unitTransform', 'trPlayerKillAllGodPowers', 
-			'sunColor', 'trSetCounterDisplay', 'trUnitSelectClear', 'trArmySelect', 'kbGetBlockPosition', 'trPlayerResetBlackMapForAllPlayers',
-			'trQuestVarSetFromRand', 'vector', 'trTechSetStatus', 'trRevealEntireMap', 'trSetObscuredUnits', 'trEventFire',
-			'kbUnitGetTargetUnitID', 'ambientColor', 'trUIFadeToColor', 'trClearCounterDisplay', 'trUnitChangeProtoUnit', 'trSetCloudData',
-			'switch', 'trVectorQuestVarGetY', 'trQuestVarCopy', 'trUnitAlive', 'trSetSelectedScale', 'trUnitDoWorkOnUnit', 'trSetCloudMap',
-			'kbGetUnitBaseTypeID', 'trImmediateUnitGarrison', 'trStringQuestVarSet', 'trOverlayTextColour', 'trUnitSelectByID', 
-			'trOverlayText', 'trUnitMoveToPoint', 'trSetFogAndBlackmap', 'xsMax', 'trForbidProtounit', 'xsGetContextPlayer', 
-			'trSetPlayerWon', 'trEndGame', 'trSetPlayerDefeated', 'trUnitChangeName', 'trChatSendSpoofed', 'trUnitSetAnimationPath',
-			'trMusicPlayCurrent', 'trVectorQuestVarGet', 'trUnitEjectContained', 'trObjectiveSetID', 'trUIFlash', 'kbUnitGetCurrentHitpoints', 
-			'trMusicStop', 'uiFindType', 'xsRound', 'xsFloor', 'trChatHistoryClear', 'trSetCivilizationNameOverride', 'kbIsPlayerResigned',
-			'trSoundPlayDialog', 'trChangeTerrainHeight', 'trRenderSky', 'trFadeOutAllSounds', 'aiIsMultiplayer', 'trShowWinLose', 
-			'gadgetUnreal', 'trGetScenarioUserData', 'uiLookAtUnit', 'uiClearSelection', 'uiCreateNumberGroup', 'kbLookAtAllUnitsOnMap',
-			'trTimeMS', 'trChatSendToPlayer', 'uiTransformSelectedUnit', 'trBlockAllSounds', 'xsDisableSelf', 'trUnblockAllSounds', 
-			'trSetCurrentScenarioUserData','trModeEnter', 'exit', 'musicToggleBattleMode', 'trEventSetHandler', 'kbProtoUnitIsUnitType',
-			'uiCopyToClipboard', 'uiPasteFromClipboard', 'trGetTerrainType', 'trGetTerrainSubType', 'trUnitHasLOS', 'trUnitDistanceToPoint',
-			'trShowImageDialog', 'trShowChoiceDialog', 'trGameLoadScenario', 'xsVectorGetX', 'xsVectorGetY', 'xsVectorGetZ', 'kbArmyCreate', 
-			'kbArmyGetName', 'kbArmyDestroy', 'trackEditWaypoint', 'trackInsert', 'trackAddWaypoint', 'trackPlay', 'trPlayerKillAllUnits', 
-			'trChangeTerrainHeight', 'trChatSetStatus', 'trUnitSetHeading'}
+functions = {''}
 unknowns = {''}
 ln = 1
-files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
-		'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
-		'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'frostknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
-
+FILE_1 = None
+comment = False
 first = True
 escape = False
 try:
-	with open('XS/' + FILE_2, 'w') as file_data_2:
+	with open('XS/' + FILENAME, 'w') as file_data_2:
 		file_data_2.write('void code(string xs="") {\n')
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}\n')
@@ -154,17 +85,21 @@ try:
 			with open(FILE_1, 'r') as file_data_1:
 				line = file_data_1.readline()
 				while line:
+					# Rewrite history
 					reline = line.strip()
-					if '(' in reline:
-						thedepth = thedepth + 1
-					if ')' in reline:
-						thedepth = thedepth - 1
-					if '}' in reline:
+					nostrings = removeStrings(reline)
+					if '}' in nostrings:
 						thedepth = thedepth - 1
 					reline = "\t" * thedepth + reline
 					rewrite.append(reline)
-					if '{' in reline:
+					if '{' in nostrings:
 						thedepth = thedepth + 1
+					if '(' in nostrings:
+						thedepth = thedepth + 1
+					if ')' in nostrings:
+						thedepth = thedepth - 1
+					pcount = pcount + nostrings.count('(') - nostrings.count(')')
+					bcount = bcount + nostrings.count('{') - nostrings.count('}')
 					
 					if not line.isspace():
 						if ('/*' in line):
@@ -178,12 +113,8 @@ try:
 							else:
 								templine = line.strip()
 								checkStringConcatenation(templine, ln)
-								checkQuestVarSet(templine, ln)
-								checkQuestVarGet(templine, ln)
 								if not first:
 									checkUnknownFunctions(templine, ln)
-								pcount = pcount + line.count('(') - line.count(')')
-								bcount = bcount + line.count('{') - line.count('}')
 								if (len(templine) > 120):
 									print("Line length greater than 120! Length is " + str(len(templine)))
 									print("Line " + str(ln) + ":\n    " + line)
@@ -210,6 +141,8 @@ try:
 								if 'trMutateSelected("' in templine:
 									print("Needs kbGetProtoUnitID()")
 									print("Line " + str(ln) + ":\n    " + line)
+
+								# reWrite the line
 								if first:
 									file_data_2.write(templine + '\n')
 								else:
@@ -222,9 +155,9 @@ try:
 						file_data_2.write('\n')
 					line = file_data_1.readline()
 					ln = ln + 1
-			#with open(FILE_1, 'w') as file_data_1:
-			#	for line in rewrite:
-			#		file_data_1.write(line + '\n')
+			with open(FILE_1, 'w') as file_data_1:
+				for line in rewrite:
+					file_data_1.write(line + '\n')
 			if pcount < 0:
 				print("ERROR: Extra close parenthesis detected!\n")
 			elif pcount > 0:
