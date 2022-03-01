@@ -46,33 +46,72 @@ def error(msg):
 	print("Line " + str(ln) + ":\n    " + line)
 
 class StackFrame:
-	name = ''
-	parent = None
-	type = ''
-	datatype = ''
-	closed = False
-	expected = []
-	children = []
-
 	def __init__(self, name, parent):
 		self.name = name
 		self.parent = parent
+		self.type = ''
+		self.datatype = ''
+		self.closed = False
+		self.expected = []
+		self.children = []
 	
 	def debug(self):
-		if self.parent and not self.parent == self:
-			return self.parent.debug() + ' ' + self.name
-		else:
-			return self.name
+		val = self.name
+		if len(self.children) > 0:
+			val = val + '('
+			for c in self.children:
+				val = val + c.debug() + ','
+			val = val + ')'
+		return val
 
-	def resolve(self, inputs):
+	def resolve(self):
 		global CURRENT_JOB
-		if self.closed:
-			CURRENT_JOB = self.parent
-			inputs = [self] + inputs
-			self.parent.resolve(inputs)
 		self.closed = True
+		for c in self.children:
+			c.resolve()
 
 	def accept(self, token):
+		if len(self.children) > 0:
+			# Do you want this token?
+			return self.children[-1].accept(token)
+		else:
+			return False
+
+	def insertAbove(self, frametype, token):
+		self.parent.children.remove(self)
+		self.parent.children.append(frametype(token, self.parent))
+		self.parent = self.parent.children[-1]
+		self.parent.children.append(self)
+
+	def parseGeneric(self, token):
+		accepted = True
+		if token in FUNCTIONS:
+			self.children.append(Function(token, self))
+		elif token in KNOWN_VARIABLES:
+			self.children.append(Variable(token, self))
+		elif token == '""':
+			self.children.append(Literal(token, self, 'string'))
+		elif token.isnumeric():
+			self.children.append(Literal(token, self, 'int'))
+		elif '.' in token:
+			isFloat = True
+			for c in token[:token.find('.')]:
+				isFloat = isFloat and c.isnumeric()
+			for c in token[token.find('.')+1:]:
+				isFloat = isFloat and c.isnumeric()
+			if isFloat:
+				self.children.append(Literal(token, self, 'float'))
+			else:
+				accepted = False
+		elif token in ['true', 'false']:
+			self.children.append(Literal(token, self, 'bool'))
+		elif token == '(':
+			self.children.append(Parenthesis(token, self))
+		else:
+			accepted = False
+		return accepted
+
+	def fakefunc(self, token):
 		global CURRENT_JOB
 		if token in ARITHMETIC or token in BINARY:
 			lastOpen = CURRENT_JOB
@@ -132,14 +171,127 @@ class StackFrame:
 			if self.closed:
 				CURRENT_JOB = Parenthesis(token, CURRENT_JOB)
 
-class Literal(StackFrame):
+# Mathables will check for arithmetic operators and act accordingly
+class Mathable(StackFrame):
+	def accept(self, token):
+		if not super().accept(token):
+			accepted = True
+			if token in ARITHMETIC:
+				if token in ['*', '/']:
+					self.insertAbove(Arithmetic, token)
+				else:
+					self.parent.insertAbove(Arithmetic, token)
+			elif token in BINARY:
+				self.insertAbove(Binary, token)
+			else:
+				accepted = False
+			return accepted
+
+class BaseFrame(StackFrame):
+	def __init__(self):
+		super().__init__("Base", None)
+
+	def debug(self):
+		for c in self.children:
+			print(c.debug())
+
+	def accept(self, token):
+		accepted = True
+		# The only things that exist in the BaseFrame are functions and triggers
+		if not super().accept(token):
+			if token in DATATYPE:
+				self.children.append(Declaration(token, self))
+			elif token == 'rule':
+				self.children.append(Trigger(token, self))
+			else:
+				error("Unrecognized token on base layer: " + token)
+				accepted = False
+		return accepted
+
+class Declaration(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__('', parent)
+		self.state = 0
+		self.type = 'VARIABLE'
+		self.datatype = name
+		print(self.children)
+
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
+			self.closed = True
+			KNOWN_VARIABLES.append(self.name)
+			KNOWN_TYPES.append(self.datatype)
+			if self.type == 'FUNCTION':
+				self.state = 2
+				FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
+				for frame in self.children:
+					FUNCTIONS[self.name].add(frame.datatype)
+
+	def accept(self, token):
+		accepted = True
+		if not super().accept(token):
+			if self.state == 0:
+				self.name = token
+				self.state = 1
+			elif self.state == 1:
+				self.state = 2
+				if not token in ['=', '(']:
+					accepted = False
+				elif token == '(':
+					self.type = 'FUNCTION'
+				else:
+					self.resolve()
+					self.insertAbove(Assignment, token)
+			elif self.state == 2:
+				if self.type == 'FUNCTION' and token in DATATYPE:
+					self.children.append(DECLARATION(token, self))
+					self.state = 3
+				else:
+					accepted = False
+			elif self.state == 3:
+				if not token in [',',')']:
+					accepted = False
+				else:
+					self.children[-1].resolve()
+					self.state = 2
+					if token == ')':
+						self.resolve()
+						self.state = 4
+				
+		return accepted
+
+class Assignment(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'ASSIGNMENT'
+
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
+			self.closed = True
+			if len(self.children) != 2:
+				error("Incorrect number of inputs for assignment operator " + self.name)
+			else:
+				self.datatype = self.children[0].datatype
+				if self.datatype not in ['int', 'float']:
+					if self.datatype != self.children[1].datatype:
+						error("Cannot assign " + self.children[1].datatype + " to " + self.datatype)
+				elif self.children[1].datatype not in ['int', 'float']:
+					error("Cannot assign " + self.children[1].datatype + " to " + self.datatype)
+
+	def accept(self, token):
+		if not super().accept(token):
+			return self.parseGeneric(token)
+
+class Literal(Mathable):
 	def __init__(self, name, parent, datatype):
 		super().__init__(name, parent)
 		self.type = 'LITERAL'
 		self.datatype = datatype
 		self.closed = True
 
-class Function(StackFrame):
+class Function(Mathable):
 	def __init__(self, name, parent):
 		super().__init__(name, parent)
 		self.name = name
@@ -147,19 +299,18 @@ class Function(StackFrame):
 		self.datatype = FUNCTIONS[name].datatype
 		self.expected = FUNCTIONS[name].parameters
 
-	def resolve(self, inputs):
-		if self.closed == True:
-			super().resolve(inputs)
-		else:
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
 			self.closed = True
-			if len(inputs) > len(self.expected):
+			if len(self.children) > len(self.expected):
 				error("Too many inputs for " + self.name)
-			for i in range(len(inputs)):
-				if self.expected[i] != inputs[i].datatype:
-					if not self.expected[i] in ['int', 'float'] and not inputs[i].datatype in ['int', 'float']:
-						error("Incorrect datatype in parameter " + i + "! Expected " + self.expected[i] + " but got " + inputs[i].datatype)
+			for i in range(len(self.children)):
+				if self.expected[i] != self.children[i].datatype:
+					if not self.expected[i] in ['int', 'float'] and not self.children[i].datatype in ['int', 'float']:
+						error("Incorrect datatype in parameter " + i + "! Expected " + self.expected[i] + " but got " + self.children[i].datatype)
 
-class Variable(StackFrame):
+class Variable(Mathable):
 	def __init__(self, name, parent):
 		super().__init__(name, parent)
 		self.name = name
@@ -167,16 +318,73 @@ class Variable(StackFrame):
 		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.index(name)]
 		self.closed = True
 
-class BaseFrame(StackFrame):
-	def __init__(self):
-		self.name = "Base"
-		self.parent = self
 
-	def resolve(self, inputs):
-		pass
+class Arithmetic(Mathable):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'ARITHMETIC'
 
-	def debug(self):
-		return ''
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
+			self.closed = True
+			if len(self.children) != 2:
+				error("Incorrect number of inputs for arithmetic operator " + self.name)
+			else:
+				self.datatype = self.children[0].datatype
+				for i in range(2):
+					if self.children[i].datatype in ['bool', 'void']:		
+						error("Cannot perform arithmetic operator " + self.name + " on " + self.children[i].name + " of type " + self.children[i].datatype)
+				
+				if self.datatype == 'string' and self.name in ['-', '/', '*']:
+					error("Cannot perform arithmetic operator " + self.name + " on a string!")
+				elif self.datatype != self.children[1].datatype and self.children[1].datatype == 'string':
+					error("Cannot add a string to a " + self.datatype)
+
+				self.name = self.datatype
+
+
+class Binary(Mathable):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'BINARY'
+		self.datatype = 'bool'
+		if self.name in ['&&', '||']:
+			self.expected = ['bool', 'bool']
+
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
+			self.closed = True
+			if len(self.children) != 2:
+				error("Incorrect number of inputs for boolean operator " + self.name)
+			elif len(self.expected) > 0:
+				self.datatype = self.expected[0]
+				for i in range(2):
+					if self.children[i].datatype != self.expected[i]:
+						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + self.children[i].datatype)
+			else:
+				self.datatype = self.children[0].datatype
+				if self.datatype not in ['int', 'float']:
+					if self.datatype != self.children[1].datatype:
+						error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + self.children[1].datatype)
+				elif self.children[1].datatype not in ['int', 'float']:
+					error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + self.children[1].datatype)
+				self.name = self.datatype
+
+class Parenthesis(Mathable):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'PARENTHESIS'
+
+	def resolve(self):
+		if not self.closed:
+			self.closed = True
+			if len(self.children) != 1:
+				error("Unresolved operations in parenthesis")
+			else:
+				self.datatype = self.children[0].datatype
+				self.name = self.datatype
 
 class Trigger(StackFrame):
 	def accept(self, token):
@@ -186,128 +394,6 @@ class Trigger(StackFrame):
 			error("Unknown syntax for trigger declaration: " + token)
 		else:
 			super().accept(token)
-
-class Arithmetic(StackFrame):
-	def __init__(self, name, parent):
-		super().__init__(name, parent)
-		self.type = 'ARITHMETIC'
-
-	def resolve(self, inputs):
-		if self.closed:
-			super().resolve(inputs)
-		else:
-			self.closed = True
-			if len(inputs) != 2:
-				error("Incorrect number of inputs for arithmetic operator " + self.name)
-			else:
-				self.datatype = inputs[0].datatype
-				for i in range(2):
-					if inputs[i].datatype in ['bool', 'void']:		
-						error("Cannot perform arithmetic operator " + self.name + " on " + inputs[i].name + " of type " + inputs[i].datatype)
-				
-				if self.datatype == 'string' and self.name in ['-', '/', '*']:
-					error("Cannot perform arithmetic operator " + self.name + " on a string!")
-				elif self.datatype != inputs[1].datatype and inputs[1].datatype == 'string':
-					error("Cannot add a string to a " + self.datatype)
-
-				self.name = self.datatype
-
-
-class Binary(StackFrame):
-	def __init__(self, name, parent):
-		super().__init__(name, parent)
-		self.type = 'BINARY'
-		self.datatype = 'bool'
-		if self.name in ['&&', '||']:
-			self.expected = ['bool', 'bool']
-
-	def resolve(self, inputs):
-		if self.closed:
-			super().resolve(inputs)
-		else:
-			self.closed = True
-			if len(inputs) != 2:
-				error("Incorrect number of inputs for boolean operator " + self.name)
-			elif len(self.expected) > 0:
-				self.datatype = self.expected[0]
-				for i in range(2):
-					if inputs[i].datatype != self.expected[i]:
-						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + inputs[i].datatype)
-			else:
-				self.datatype = inputs[0].datatype
-				if self.datatype not in ['int', 'float']:
-					if self.datatype != inputs[1].datatype:
-						error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
-				elif inputs[1].datatype not in ['int', 'float']:
-					error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
-				self.name = self.datatype
-
-class Assignment(StackFrame):
-	def __init__(self, name, parent):
-		super().__init__(name, parent)
-		self.type = 'ASSIGNMENT'
-
-	def resolve(self, inputs):
-		if self.closed:
-			super().resolve(inputs)
-		else:
-			self.closed = True
-			if len(inputs) != 2:
-				error("Incorrect number of inputs for assignment operator " + self.name)
-			else:
-				self.datatype = inputs[0].datatype
-				if self.datatype not in ['int', 'float']:
-					if self.datatype != inputs[1].datatype:
-						error("Cannot assign " + inputs[1].datatype + " to " + self.datatype)
-				elif inputs[1].datatype not in ['int', 'float']:
-					error("Cannot assign " + inputs[1].datatype + " to " + self.datatype)
-
-class Parenthesis(StackFrame):
-	def __init__(self, name, parent):
-		super().__init__(name, parent)
-		self.type = 'PARENTHESIS'
-
-	def resolve(self, inputs):
-		if self.closed:
-			super().resolve(inputs)
-		else:
-			self.closed = True
-			if len(inputs) != 1:
-				error("Unresolved operations in parenthesis")
-			else:
-				self.datatype = inputs[0].datatype
-				self.name = self.datatype
-
-class Declaration(StackFrame):
-	def __init__(self, name, parent):
-		super().__init__('', parent)
-		self.state = 0
-		self.type = 'VARIABLE'
-		self.datatype = name
-
-	def resolve(self, inputs):
-		KNOWN_VARIABLES.append(self.name)
-		KNOWN_TYPES.append(self.datatype)
-		if self.type == 'FUNCTION':
-			self.state = 2
-			FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
-			for frame in inputs:
-				FUNCTIONS[self.name].add(frame.datatype)
-		super().resolve(inputs)
-
-	def accept(self, token):
-		if self.state == 0:
-			self.name = token
-			self.state = 1
-		elif self.state == 1:
-			self.state = 2
-			if token == '(':
-				self.type = 'FUNCTION'
-			else:
-				super().accept(token)
-		else:
-			super().accept(token)
-
 
 def checkStringConcatenation(templine, ln):
 	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').replace('+', ' + ').replace('=', ' = ').replace('"', ' " ').split(' ')
@@ -441,7 +527,7 @@ try:
 										if not token in IGNORE:
 											CURRENT_JOB.accept(token)
 											print(token)
-											print(CURRENT_JOB.debug())
+											CURRENT_JOB.debug()
 								
 								templine = reline.strip()
 
