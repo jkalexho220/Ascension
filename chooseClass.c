@@ -1036,7 +1036,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Lightning can bounce to yourself if there are no nearby targets (Doesn’t deal damage to yourself)";
+					msg = "Lightning can bounce to yourself if there are no nearby targets (Doesn't deal damage to yourself)";
 				}
 				case 3:
 				{
