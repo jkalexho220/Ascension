@@ -1022,6 +1022,73 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case SPARKWITCH:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Spark Witch: A powerful spellcaster who excels at destroying mobs of enemies.";
+				}
+				case 1:
+				{
+					msg = "Passive: Your attack shoots lightning that deals magic damage and bounces between enemies.";
+				}
+				case 2:
+				{
+					msg = "Lightning can bounce to yourself if there are no nearby targets (Doesn’t deal damage to yourself)";
+				}
+				case 3:
+				{
+					msg = "Bounce range increased by Range. Each time you cast a spell, your next attack gains +1 bounce.";
+				}
+				case 4:
+				{
+					msg = "Bounce Range: 10 | Damage: 100 | Bounces: Projectiles + Spells Cast";
+				}
+				case 5:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "(Q) Thunderstrike: Lightning deals damage in an area. Cooldown reduced by 1 for each enemy hit";
+				}
+				case 6:
+				{
+					icon = "icons\god power bolt icon 64";
+					msg = "Cooldown: 12 | Radius: 6 | Damage: 60";
+				}
+				case 7:
+				{
+					icon = "icons\special x lampades icons 64";
+					msg = "(W) Hexbolt: Your next attack applies a special effect. It changes each time you cast this spell";
+				}
+				case 8:
+				{
+					icon = "sfx g arkantos flash";
+					msg = "Electrify: Electrocutes your targets, dealing area damage per second.";
+				}
+				case 9:
+				{
+					icon = "icons\god power curse icon 64";
+					msg = "Polymorph: Transforms your targets into pigs with 0 attack and armor.";
+				}
+				case 10:
+				{
+					icon = "icons\special x lampades icons 64";
+					msg = "Cooldown: 18 | Duration: 4 | Electrify Damage: 20 per second";
+				}
+				case 11:
+				{
+					icon = "sfx x arkantos birth ring";
+					msg = "(E) Vortex: Create a storm that pulls in nearby enemies.";
+				}
+				case 12:
+				{
+					icon = "sfx x arkantos birth ring";
+					msg = "Cost: 80 | Range: 12";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);

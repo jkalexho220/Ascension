@@ -1065,6 +1065,10 @@ highFrequency
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
                 trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 2.4);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
             }
             case 2:
             {
@@ -1158,6 +1162,10 @@ highFrequency
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
                 trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 1.075);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
             }
             case 4:
             {
@@ -1205,6 +1213,10 @@ highFrequency
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
             }
             case 5:
             {
@@ -1253,6 +1265,11 @@ highFrequency
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+
                 trQuestVarSet("pestilenceStart", trGetNextUnitScenarioNameNumber());
             }
             case 6:
@@ -1306,6 +1323,11 @@ highFrequency
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
+
                 trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
             }
             case 7:
@@ -1353,6 +1375,10 @@ highFrequency
                 trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 9999999999999999999.0);
                 trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
                 trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+                trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
             }
             case 11:
             {

@@ -251,6 +251,11 @@ highFrequency
         setupProtounitBounty("Scarab", 1, 10, 0.08);
         setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 
+        setupProtounitBounty("Hero Boar", 0, 0, 0);
+        setupProtounitBounty("Hero Boar 2", 0, 0, 0);
+        trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack
+        trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
+
         for(class = 1; <= 16) {
             setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")), 
                 trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
@@ -339,7 +344,8 @@ void enemiesAlways() {
         id = yDatabaseNext("enemies", true);
         if ((id == -1) || (trUnitAlive() == false)) {
             removeEnemy();
-        } else if ((kbUnitGetAnimationActionType(id) == 9) && (yGetVar("enemies", "stunStatus") == 0)) {
+        } else if ((kbUnitGetAnimationActionType(id) == 9) && 
+            (yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
             /* if idle and out of LOS, we remove it */
             ySetVar("enemies", "missing", 1 + yGetVar("enemies", "missing"));
             if (yGetVar("enemies", "missing") >= 10) {

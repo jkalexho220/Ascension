@@ -693,7 +693,7 @@ inactive
 highFrequency
 {
     if (trTime() > cActivationTime + 5) {
-        
+        trModifyProtounit("Curse SFX", 1, 8, -8);
         if (trQuestVarGet("p1progress") == 0) {
             trQuestVarSet("stage", 1);
         } else {
