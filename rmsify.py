@@ -1,8 +1,308 @@
 import os
 import sys
 
+###############################
+####### CUSTOMIZE THESE #######
+###############################
 FILENAME = 'Ascension MMORPG.xs'
 files = ['main.c', 'test.c']
+
+
+#########################################
+####### CODE BELOW (DO NOT TOUCH) #######
+#########################################
+
+DATATYPE = ['int', 'float', 'string', 'void', 'vector', 'bool']
+ARITHMETIC = ['+', '-', '/', '*']
+BINARY = ['==', '!=', '<=', '>=', '>', '<', '&&', '||']
+FLOW = ['(', ')', '{', '}', ',', ';']
+
+DELIMITER = [',', ';']
+IGNORE = ['const']
+
+SYMBOLS = [ARITHMETIC, BINARY, FLOW]
+
+class CustomFunction:
+	def __init__(self, name, datatype):
+		self.name = name
+		self.datatype = datatype
+		self.parameters = []
+
+	def add(self, datatype):
+		self.parameters.append(datatype)
+
+CURRENT_DEPTH = 0
+FUNCTIONS = {}
+CURRENT_JOB = None
+
+KNOWN_VARIABLES = []
+KNOWN_TYPES = []
+STACK_FRAMES = []
+
+def error(msg):
+	global ln
+	global line
+	print(msg)
+	print("Line " + str(ln) + ":\n    " + line)
+
+class StackFrame:
+	name = ''
+	parent = None
+	type = ''
+	datatype = ''
+	closed = False
+	expected = []
+
+	def __init__(self, name, parent):
+		self.name = name
+		self.parent = parent
+	
+	def debug(self):
+		if self.parent and not self.parent == self:
+			return self.parent.debug() + ' ' + self.name
+		else:
+			return self.name
+
+	def resolve(self, inputs):
+		global CURRENT_JOB
+		if self.closed:
+			CURRENT_JOB = self.parent
+			inputs = [self] + inputs
+			self.parent.resolve(inputs)
+		self.closed = True
+
+	def accept(self, token):
+		global CURRENT_JOB
+		if token in ARITHMETIC or token in BINARY:
+			lastOpen = CURRENT_JOB
+			if not token in ['*', '/']:
+				while lastOpen.parent.closed:
+					lastOpen = lastOpen.parent
+				if lastOpen.parent.type == 'ARITHMETIC':
+					CURRENT_JOB.resolve([])
+			if token in ARITHMETIC:
+				CURRENT_JOB.parent = Arithmetic(token, CURRENT_JOB.parent)
+			elif token in BINARY:
+				CURRENT_JOB.parent = Binary(token, CURRENT_JOB.parent)
+		elif token in DATATYPE:
+			CURRENT_JOB = Declaration(token, CURRENT_JOB)
+		elif token in FUNCTIONS:
+			CURRENT_JOB = Function(token, CURRENT_JOB)
+		elif token in KNOWN_VARIABLES:
+			CURRENT_JOB = Variable(token, CURRENT_JOB)
+		elif token == ';':
+			self.closed = True
+			self.resolve([])
+			CURRENT_JOB = BaseFrame()
+		elif token == ')':
+			self.closed = True
+			self.resolve([])
+			while CURRENT_JOB.type == 'ARITHMETIC' or CURRENT_JOB.type == 'BINARY':
+				CURRENT_JOB.resolve([])
+		elif token == ',' and not self.closed:
+			self.resolve([])
+		elif token == '""':
+			CURRENT_JOB = Literal(token, CURRENT_JOB, 'string')
+		elif token.isnumeric():
+			CURRENT_JOB = Literal(token, CURRENT_JOB, 'int')
+		elif '.' in token:
+			isFloat = True
+			for c in token[:token.find('.')]:
+				isFloat = isFloat and c.isnumeric()
+			for c in token[token.find('.')+1:]:
+				isFloat = isFloat and c.isnumeric()
+			if isFloat:
+				CURRENT_JOB = Literal(token, CURRENT_JOB, 'float')
+			else:
+				error("Unrecognized symbol: " + token)
+		elif token in ['true', 'false']:
+			CURRENT_JOB = Literal(token, CURRENT_JOB, 'bool')
+		elif token == '=':
+			if not CURRENT_JOB.type == 'VARIABLE':
+				error("Cannot use assignment operator on this token: " + self.name)
+			else:
+				CURRENT_JOB.resolve([])
+				CURRENT_JOB.parent = Assignment(token, CURRENT_JOB.parent)
+		elif token == '(':
+			if self.closed:
+				CURRENT_JOB = Parenthesis(token, CURRENT_JOB)
+
+class Literal(StackFrame):
+	def __init__(self, name, parent, datatype):
+		super().__init__(name, parent)
+		self.type = 'LITERAL'
+		self.datatype = datatype
+		self.closed = True
+
+class Function(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.name = name
+		self.type = 'FUNCTION'
+		self.datatype = FUNCTIONS[name].datatype
+		self.expected = FUNCTIONS[name].parameters
+
+	def resolve(self, inputs):
+		if self.closed == True:
+			super().resolve(inputs)
+		else:
+			self.closed = True
+			if len(inputs) > len(self.expected):
+				error("Too many inputs for " + self.name)
+			for i in range(len(inputs)):
+				if self.expected[i] != inputs[i].datatype:
+					if not self.expected[i] in ['int', 'float'] and not inputs[i].datatype in ['int', 'float']:
+						error("Incorrect datatype in parameter " + i + "! Expected " + self.expected[i] + " but got " + inputs[i].datatype)
+
+class Variable(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.name = name
+		self.type = 'VARIABLE'
+		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.find(name)]
+		self.closed = True
+
+class BaseFrame(StackFrame):
+	def __init__(self):
+		self.name = "Base"
+		self.parent = self
+
+	def resolve(self, inputs):
+		pass
+
+	def debug(self):
+		return 'Base'
+
+class Trigger(StackFrame):
+	def accept(self, token):
+		if token == '{':
+			self.closed = True
+		elif not token in ['active', 'inactive', 'highFrequency'] or 'minInterval' in token:
+			error("Unknown syntax for trigger declaration: " + token)
+		else:
+			super().accept(token)
+
+class Arithmetic(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'ARITHMETIC'
+
+	def resolve(self, inputs):
+		if self.closed:
+			super().resolve(inputs)
+		else:
+			self.closed = True
+			if len(inputs) != 2:
+				error("Incorrect number of inputs for arithmetic operator " + self.name)
+			else:
+				self.datatype = inputs[0].datatype
+				self.name = self.datatype
+				for i in range(2):
+					if inputs[i].datatype in ['bool', 'void']:		
+						error("Cannot perform arithmetic operator " + self.name + " on " + inputs[i].name + " of type " + inputs[i].datatype)
+				
+				if self.datatype != inputs[1].datatype:
+					if self.datatype == 'string' and self.name in ['-', '/', '*']:
+						error("Cannot perform arithmetic operator " + self.name + " on a string!")
+					elif inputs[1].datatype == 'string':
+						error("Cannot add a string to a " + self.datatype)
+
+
+class Binary(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'BINARY'
+		self.datatype = 'bool'
+		if self.name in ['&&', '||']:
+			self.expected = ['bool', 'bool']
+
+	def resolve(self, inputs):
+		if self.closed:
+			super().resolve(inputs)
+		else:
+			self.closed = True
+			if len(inputs) != 2:
+				error("Incorrect number of inputs for boolean operator " + self.name)
+			elif len(self.expected) > 0:
+				self.datatype = self.expected[0]
+				for i in range(2):
+					if inputs[i].datatype != self.expected[i]:
+						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + inputs[i].datatype)
+			else:
+				self.datatype = inputs[0].datatype
+				self.name = self.datatype
+				if self.datatype not in ['int', 'float']:
+					if self.datatype != inputs[1].datatype:
+						error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
+				elif inputs[1].datatype not in ['int', 'float']:
+					error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
+
+class Assignment(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'ASSIGNMENT'
+
+	def resolve(self, inputs):
+		if self.closed:
+			super().resolve(inputs)
+		else:
+			self.closed = True
+			if len(inputs) != 2:
+				error("Incorrect number of inputs for assignment operator " + self.name)
+			else:
+				self.datatype = inputs[0].datatype
+				if self.datatype not in ['int', 'float']:
+					if self.datatype != inputs[1].datatype:
+						error("Cannot assign " + inputs[1].datatype + " to " + self.datatype)
+				elif inputs[1].datatype not in ['int', 'float']:
+					error("Cannot assign " + inputs[1].datatype + " to " + self.datatype)
+
+class Parenthesis(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__(name, parent)
+		self.type = 'PARENTHESIS'
+
+	def resolve(self, inputs):
+		if self.closed:
+			super().resolve(inputs)
+		else:
+			self.closed = True
+			if len(inputs) != 1:
+				error("Unresolved operations in parenthesis")
+			else:
+				self.datatype = inputs[0].datatype
+				self.name = self.datatype
+
+class Declaration(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__('', parent)
+		self.state = 0
+		self.type = 'VARIABLE'
+		self.datatype = name
+
+	def resolve(self, inputs):
+		KNOWN_VARIABLES.append(self.name)
+		KNOWN_TYPES.append(self.datatype)
+		if self.type == 'FUNCTION':
+			self.state = 2
+			FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
+			for frame in inputs:
+				FUNCTIONS[self.name].add(frame.datatype)
+		super().resolve(inputs)
+
+	def accept(self, token):
+		if self.state == 0:
+			self.name = token
+			self.state = 1
+		elif self.state == 1:
+			if token == '(':
+				self.type = 'FUNCTION'
+				self.state = 2
+			else:
+				self.state = 2
+				super().accept(token)
+		else:
+			super().accept(token)
 
 
 def checkStringConcatenation(templine, ln):
@@ -49,18 +349,31 @@ def removeStrings(line):
 	for token in line:
 		if token == '"':
 			isString = not isString
-		if not isString:
+		if not isString or token == '"':
 			retline = retline + token
 	if "//" in retline:
 		retline = retline[:retline.find("//")]
 	return retline
 
-def resolveArithmetic(linelist, depth):
-	resolved = ""
-	
+print("Reading Command Viewer")
+with open('Commands.xml', 'r') as fd:
+	line = fd.readline()
+	while line:
+		if '<method' in line:
+			fq = line.find('"') + 1
+			lq = line.rfind('"')
+			name = line[line.rfind('"',0,lq-1)+1:lq] # The thing between the last two quotes
+			FUNCTIONS.update({name: CustomFunction(name, line[fq:line.find('"',fq+1)])})
+			while not '</method' in line:
+				if '<parameters' in line:
+					fq = line.find('"') + 1
+					FUNCTIONS[name].add(line[fq:line.find('"',fq+1)])
+				line = fd.readline()
+		line = fd.readline()
 
 print("rmsification start!")
 
+CURRENT_JOB = BaseFrame()
 functions = {''}
 unknowns = {''}
 ln = 1
@@ -82,6 +395,7 @@ try:
 			print("parsing " + FILE_1 + "...")
 			rewrite = []
 			thedepth = 0
+			CURRENT_DEPTH = 0
 			with open(FILE_1, 'r') as file_data_1:
 				line = file_data_1.readline()
 				while line:
@@ -111,10 +425,26 @@ try:
 							elif escape:
 								file_data_2.write(line)
 							else:
-								templine = line.strip()
-								checkStringConcatenation(templine, ln)
 								if not first:
-									checkUnknownFunctions(templine, ln)
+									templine = nostrings
+									templine = templine.replace('=', ' = ').replace(' =  = ', '==').replace(' !  = ', '!=').replace(' >  = ', '>=').replace(' <  = ', '<=')
+									for s in SYMBOLS:
+										for n in s:
+											templine = templine.replace(n, ' ' + n + ' ')
+									tokens = [token for token in templine.split(' ') if token != '']
+
+									for token in tokens:
+										if not token in IGNORE:
+											CURRENT_JOB.accept(token)
+											print(token)
+											print(CURRENT_JOB.debug())
+								
+								templine = reline.strip()
+
+								# Obsolete Sanity Checks
+								checkStringConcatenation(templine, ln)
+								#if not first:
+									#checkUnknownFunctions(templine, ln)
 								if (len(templine) > 120):
 									print("Line length greater than 120! Length is " + str(len(templine)))
 									print("Line " + str(ln) + ":\n    " + line)
