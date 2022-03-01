@@ -52,6 +52,7 @@ class StackFrame:
 	datatype = ''
 	closed = False
 	expected = []
+	children = []
 
 	def __init__(self, name, parent):
 		self.name = name
@@ -92,15 +93,19 @@ class StackFrame:
 			CURRENT_JOB = Variable(token, CURRENT_JOB)
 		elif token == ';':
 			self.closed = True
-			self.resolve([])
-			CURRENT_JOB = BaseFrame()
+			while CURRENT_JOB.parent != CURRENT_JOB:
+				CURRENT_JOB.resolve([])
 		elif token == ')':
 			self.closed = True
 			self.resolve([])
-			while CURRENT_JOB.type == 'ARITHMETIC' or CURRENT_JOB.type == 'BINARY':
+			while not CURRENT_JOB.type in ['PARENTHESIS', 'FUNCTION']:
 				CURRENT_JOB.resolve([])
-		elif token == ',' and not self.closed:
-			self.resolve([])
+		elif token == ',':
+			lastOpen = CURRENT_JOB
+			while lastOpen.parent.closed:
+				lastOpen = lastOpen.parent
+				if lastOpen.parent.type in ['ARITHMETIC', 'BINARY', 'ASSIGNMENT']:
+					CURRENT_JOB.resolve([])
 		elif token == '""':
 			CURRENT_JOB = Literal(token, CURRENT_JOB, 'string')
 		elif token.isnumeric():
@@ -159,7 +164,7 @@ class Variable(StackFrame):
 		super().__init__(name, parent)
 		self.name = name
 		self.type = 'VARIABLE'
-		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.find(name)]
+		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.index(name)]
 		self.closed = True
 
 class BaseFrame(StackFrame):
@@ -171,7 +176,7 @@ class BaseFrame(StackFrame):
 		pass
 
 	def debug(self):
-		return 'Base'
+		return ''
 
 class Trigger(StackFrame):
 	def accept(self, token):
@@ -196,16 +201,16 @@ class Arithmetic(StackFrame):
 				error("Incorrect number of inputs for arithmetic operator " + self.name)
 			else:
 				self.datatype = inputs[0].datatype
-				self.name = self.datatype
 				for i in range(2):
 					if inputs[i].datatype in ['bool', 'void']:		
 						error("Cannot perform arithmetic operator " + self.name + " on " + inputs[i].name + " of type " + inputs[i].datatype)
 				
-				if self.datatype != inputs[1].datatype:
-					if self.datatype == 'string' and self.name in ['-', '/', '*']:
-						error("Cannot perform arithmetic operator " + self.name + " on a string!")
-					elif inputs[1].datatype == 'string':
-						error("Cannot add a string to a " + self.datatype)
+				if self.datatype == 'string' and self.name in ['-', '/', '*']:
+					error("Cannot perform arithmetic operator " + self.name + " on a string!")
+				elif self.datatype != inputs[1].datatype and inputs[1].datatype == 'string':
+					error("Cannot add a string to a " + self.datatype)
+
+				self.name = self.datatype
 
 
 class Binary(StackFrame):
@@ -230,12 +235,12 @@ class Binary(StackFrame):
 						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + inputs[i].datatype)
 			else:
 				self.datatype = inputs[0].datatype
-				self.name = self.datatype
 				if self.datatype not in ['int', 'float']:
 					if self.datatype != inputs[1].datatype:
 						error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
 				elif inputs[1].datatype not in ['int', 'float']:
 					error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + inputs[1].datatype)
+				self.name = self.datatype
 
 class Assignment(StackFrame):
 	def __init__(self, name, parent):
@@ -295,11 +300,10 @@ class Declaration(StackFrame):
 			self.name = token
 			self.state = 1
 		elif self.state == 1:
+			self.state = 2
 			if token == '(':
 				self.type = 'FUNCTION'
-				self.state = 2
 			else:
-				self.state = 2
 				super().accept(token)
 		else:
 			super().accept(token)
