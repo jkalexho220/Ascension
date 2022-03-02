@@ -21,10 +21,14 @@ STATE_WAITING_BRACKETS = 4
 STATE_IN_BRACKETS = 5
 STATE_DONE = 6
 
+STATE_WAITING_CLOSE_PARENTHESIS = 7
+
 DATATYPE = ['int', 'float', 'string', 'void', 'vector', 'bool']
 ARITHMETIC = ['+', '-', '/', '*']
 BINARY = ['==', '!=', '<=', '>=', '>', '<', '&&', '||']
 FLOW = ['(', ')', '{', '}', ',', ';']
+
+LOGIC = ['if', 'for', 'while']
 
 DELIMITER = [',', ';']
 IGNORE = ['const']
@@ -43,6 +47,8 @@ class CustomFunction:
 FUNCTIONS = {}
 CURRENT_JOB = None
 
+KNOWN_FOR = []
+KNOWN_TRIGGERS = []
 KNOWN_VARIABLES = []
 KNOWN_TYPES = []
 STACK_FRAMES = []
@@ -119,10 +125,27 @@ class Job:
 				self.children.append(Literal(token, self, 'float'))
 			else:
 				accepted = False
+		elif token[0] == '-' and len(token) > 0:
+			if token[1:].isnumeric():
+				self.children.append(Literal(token, self, 'int'))
+			elif '.' in token[1:]:
+				isFloat = True
+				for c in token[:token.find('.',1)]:
+					isFloat = isFloat and c.isnumeric()
+				for c in token[token.find('.',1)+1:]:
+					isFloat = isFloat and c.isnumeric()
+				if isFloat:
+					self.children.append(Literal(token, self, 'float'))
+				else:
+					accepted = False
+			else:
+				accepted = False
 		elif token in ['true', 'false']:
 			self.children.append(Literal(token, self, 'bool'))
 		elif token == '(':
 			self.children.append(Parenthesis(token, self))
+		elif token == 'return':
+			self.children.append(Returner(self))
 		else:
 			accepted = False
 		return accepted
@@ -138,7 +161,10 @@ class Mathable(Job):
 				else:
 					self.insertAbove(Arithmetic, token)
 			elif token in BINARY:
-				self.insertAbove(Binary, token)
+				if self.parent.type in ['ARITHMETIC', 'BINARY'] and not token in ['*', '/']:
+					self.parent.insertAbove(Binary, token)
+				else:
+					self.insertAbove(Binary, token)
 			else:
 				accepted = False
 		return accepted
@@ -146,15 +172,17 @@ class Mathable(Job):
 class BaseFrame(Job):
 	def __init__(self):
 		super().__init__("Base", None)
+		self.broken = False
 
 	def debug(self):
-		for c in self.children:
-			print(c.debug())
+		if not self.broken:
+			for c in self.children:
+				print(c.debug())
 
 	def accept(self, token):
 		accepted = True
 		# The only things that exist in the BaseFrame are functions and triggers
-		if not super().accept(token):
+		if not self.broken and not super().accept(token):
 			if token in DATATYPE:
 				self.children.append(Declaration(token, self))
 			elif token == 'rule':
@@ -163,6 +191,7 @@ class BaseFrame(Job):
 				self.children.pop()
 			else:
 				error("Unrecognized token: " + token)
+				self.broken = True
 				accepted = False
 		return accepted
 
@@ -175,7 +204,6 @@ class StackFrame(Job):
 
 	def resolve(self):
 		super().resolve()
-		print(KNOWN_VARIABLES)
 
 	def accept(self, token):
 		global KNOWN_VARIABLES
@@ -184,10 +212,15 @@ class StackFrame(Job):
 		if not super().accept(token):
 			if self.state == STATE_WAITING_BRACKETS:
 				if token == '{':
-					self.resolve()
+					if len(self.children) > 0:
+						error("Invalid syntax before {")
 					self.state = STATE_IN_BRACKETS
+				elif token == ';':
+					self.state = STATE_DONE
+					self.resolve()
+					self.parent.children.remove(self)
 				else:
-					accepted = False
+					accepted = self.parseGeneric(token)
 			elif self.state == STATE_IN_BRACKETS:
 				if token == ';':
 					self.children[0].resolve()
@@ -196,7 +229,8 @@ class StackFrame(Job):
 					KNOWN_VARIABLES = KNOWN_VARIABLES[:self.depth]
 					KNOWN_TYPES = KNOWN_TYPES[:self.depth]
 					self.parent.children.pop()
-					print(KNOWN_VARIABLES)
+				elif token in LOGIC:
+					self.children.append(Logic(token, self))
 				elif self.parseGeneric(token):
 					accepted = True
 				elif token in DATATYPE:
@@ -206,8 +240,165 @@ class StackFrame(Job):
 					else:
 						self.children.append(Declaration(token, self))
 				else:
-					self.resolve()
 					accepted = False
+					if token != 'return':
+						self.resolve()
+			else:
+				accepted = False
+		return accepted
+
+class Logic(StackFrame):
+	def __init__(self, name, parent):
+		global KNOWN_FOR
+		super().__init__(name, parent)
+		self.state = STATE_NEED_PARENTHESIS
+		self.type = 'LOGIC'
+		self.datatype = 'void'
+		self.fordepth = len(KNOWN_FOR)
+
+	def resolve(self):
+		global KNOWN_FOR
+		super().resolve()
+		if self.name == 'for':
+			KNOWN_FOR = KNOWN_FOR[:self.fordepth]
+
+	def accept(self, token):
+		global KNOWN_VARIABLES
+		global KNOWN_TYPES
+		global KNOWN_FOR
+		accepted = True
+		if not super().accept(token):
+			if self.state == STATE_NEED_PARENTHESIS:
+				if token == '(':
+					self.state = STATE_IN_PARENTHESIS
+				else:
+					accepted = False
+					error("Invalid syntax before parenthesis: " + token)
+			elif self.state == STATE_IN_PARENTHESIS:
+				if self.name == 'for':
+					# the first item in the for loop is the variable name
+					self.children.append(Declaration('int', self))
+					self.children[0].name = token
+					self.children[0].state = STATE_NEED_PARENTHESIS
+					if token in KNOWN_FOR:
+						error("Using duplicate variable in nested for loop")
+						accepted = False
+					elif token in KNOWN_VARIABLES:
+						if KNOWN_TYPES[KNOWN_VARIABLES.index(token)] != 'int':
+							error("Using a non-integer variable in for-loop: " + token)
+							accepted = False
+						else:
+							KNOWN_FOR.append(token)
+					else:
+						KNOWN_VARIABLES.append(token)
+						KNOWN_TYPES.append('int')
+						self.depth = len(KNOWN_VARIABLES) # variables declared in for loops persist
+						KNOWN_FOR.append(token)
+					self.state = STATE_WAITING_COMMA
+				elif token == ')':
+					if len(self.children) == 0:
+						error("Empty " + self.name)
+						accepted = False
+					elif self.children[0].datatype is not 'bool':
+						error("Contents of " + self.name + " do not resolve to a boolean!")
+						accepted = False
+					else:
+						self.children[0].resolve()
+						self.children.clear()
+						self.state = STATE_WAITING_BRACKETS
+				else:
+					accepted = self.parseGeneric(token)
+			elif self.state == STATE_WAITING_COMMA:
+				if token == ';':
+					self.state = STATE_WAITING_CLOSE_PARENTHESIS
+					self.children[0].resolve()
+					self.children.pop()
+					self.children.append(Literal('0', self, 'int'))
+				else:
+					accepted = False
+			elif self.state == STATE_WAITING_CLOSE_PARENTHESIS:
+				if token == ')':
+					if len(self.children) == 0:
+						error("Empty " + self.name)
+						accepted = False
+					elif self.children[0].name not in ['<','>','<=','>=']:
+						error("Invalid syntax in for loop: " + self.children[0].name)
+						accepted = False
+					else:
+						self.children[0].resolve()
+						self.children.clear()
+						self.state = STATE_WAITING_BRACKETS
+				else:
+					accepted = self.parseGeneric(token)
+			else:
+				accepted = False
+		return accepted
+
+
+class Trigger(StackFrame):
+	def __init__(self, name, parent):
+		super().__init__('', parent)
+		self.state = STATE_NEED_NAME
+		self.type = 'TRIGGER'
+		self.datatype = 'void'
+
+	def accept(self, token):
+		global KNOWN_VARIABLES
+		global KNOWN_TRIGGERS
+		accepted = True
+		if not super().accept(token):
+			if self.state == STATE_NEED_NAME:
+				if token in KNOWN_VARIABLES:
+					error("Declaring a trigger that shares a name with a function or variable: " + token)
+					accepted = False
+				elif token in KNOWN_TRIGGERS:
+					error("Declaring a trigger that shares a name with another trigger: " + token)
+					accepted = False
+				else:
+					KNOWN_TRIGGERS.append(token)
+					self.name = token
+					self.state = STATE_WAITING_BRACKETS
+			elif self.state == STATE_WAITING_BRACKETS:
+				if not token in ['active', 'inactive', 'highFrequency', 'runImmediately'] or 'minInterval' in token:
+					error("Unknown syntax for trigger declaration: " + token)
+					accepted = False
+			else:
+				accepted = False
+		return accepted
+
+class Returner(Job):
+	def __init__(self, parent):
+		super().__init__('return', parent)
+		self.state = STATE_NEED_PARENTHESIS
+		self.datatype = 'void'
+
+	def resolve(self):
+		if not self.closed:
+			super().resolve()
+			if len(self.children) != 1:
+				error("Invalid syntax in return statement")
+			else:
+				self.datatype = self.children[0].datatype
+			self.children.clear()
+			self.state = STATE_DONE
+
+	def accept(self, token):
+		accepted = True
+		if not super().accept(token):
+			if self.state == STATE_NEED_PARENTHESIS:
+				if token == '(':
+					self.state = STATE_IN_PARENTHESIS
+				else:
+					accepted = False
+					if token == ';':
+						self.datatype = 'void'
+						self.closed = True
+						self.state = STATE_DONE
+			elif self.state == STATE_IN_PARENTHESIS:
+				if token == ')':
+					self.resolve()
+				else:
+					accepted = self.parseGeneric(token)
 			else:
 				accepted = False
 		return accepted
@@ -215,13 +406,12 @@ class StackFrame(Job):
 class Declaration(StackFrame):
 	def __init__(self, name, parent):
 		super().__init__('', parent)
-		self.state = 0
+		self.state = STATE_NEED_NAME
 		self.type = 'VARIABLE'
 		self.datatype = name
+		self.returner = None
 
 	def resolve(self):
-		global KNOWN_VARIABLES
-		global KNOWN_TYPES
 		if not self.closed:
 			self.closed = True
 			super().resolve()
@@ -229,10 +419,12 @@ class Declaration(StackFrame):
 				FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
 				for frame in self.children:
 					FUNCTIONS[self.name].add(frame.datatype)
-			self.children.clear()
 
 	def accept(self, token):
+		global KNOWN_VARIABLES
+		global KNOWN_TYPES
 		accepted = True
+		# intercept return statements
 		if not super().accept(token):
 			if self.state == STATE_NEED_NAME:
 				if token in KNOWN_VARIABLES:
@@ -268,10 +460,27 @@ class Declaration(StackFrame):
 					self.children[-1].resolve()
 					self.state = STATE_IN_PARENTHESIS
 					if token == ')':
+						self.resolve()
+						self.children.clear()
 						self.state = STATE_WAITING_BRACKETS
+			elif self.state == STATE_IN_BRACKETS:
+				if token == 'return':
+					self.returner = Returner(self)
+				else:
+					accepted = False
 			else:
 				accepted = False
-				
+		if self.returner is not None:
+			if token == ';':
+				self.returner.resolve()
+				if self.returner.datatype != self.datatype:
+					error("Return type of " + self.returner.datatype + " does not match function return type of " + self.datatype)
+				self.returner = None
+		elif token == 'return':
+			child = self
+			while len(child.children) > 0:
+				child = child.children[-1]
+			self.returner = child
 		return accepted
 
 class Assignment(Job):
@@ -310,7 +519,37 @@ class Literal(Mathable):
 		super().__init__(name, parent)
 		self.type = 'LITERAL'
 		self.datatype = datatype
-		self.closed = True
+		if datatype != 'vector':
+			self.closed = True
+		else:
+			self.state = 0
+
+	def resolve(self):
+		super().resolve()
+		if self.datatype == 'vector':
+			if len(self.children) != 3:
+				error("vector literal must contain 3 numeric components but only found " + str(len(self.children)))
+
+	def accept(self, token):
+		accepted = True
+		if not super().accept(token):
+			if self.closed:
+				accepted = False
+			else:
+				if self.state == 0:
+					if token == '(':
+						self.state = 1
+					else:
+						accepted = False
+				elif self.state == 1:
+					if token == ')':
+						self.resolve()
+					elif token == ',':
+						accepted = False
+					elif self.parseGeneric(token):
+						accepted = self.children[-1].type == 'LITERAL' and self.children[-1].datatype in ['int', 'float']
+		return accepted
+
 
 class Function(Mathable):
 	def __init__(self, name, parent):
@@ -342,7 +581,6 @@ class Function(Mathable):
 				accepted = False
 			elif self.state == 0:
 				if token == '(':
-					accepted = True
 					self.state = 1
 				else:
 					accepted = False
@@ -425,13 +663,13 @@ class Binary(Mathable):
 					if self.children[i].datatype != self.expected[i]:
 						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + self.children[i].datatype)
 			else:
-				self.datatype = self.children[0].datatype
-				if self.datatype not in ['int', 'float']:
-					if self.datatype != self.children[1].datatype:
-						error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + self.children[1].datatype)
+				self.children[0].datatype
+				if self.children[0].datatype not in ['int', 'float']:
+					if self.children[0].datatype != self.children[1].datatype:
+						error("Cannot perform boolean operator " + self.name + " on data of type " + self.children[0].datatype + " and " + self.children[1].datatype)
 				elif self.children[1].datatype not in ['int', 'float']:
-					error("Cannot perform boolean operator " + self.name + " on data of type " + self.datatype + " and " + self.children[1].datatype)
-				self.name = self.datatype
+					error("Cannot perform boolean operator " + self.name + " on data of type " + self.children[0].datatype + " and " + self.children[1].datatype)
+				#self.name = self.datatype
 				self.children = []
 
 	def accept(self, token):
@@ -439,10 +677,11 @@ class Binary(Mathable):
 		if not super().accept(token):
 			if self.closed:
 				accepted = False
-			else:
+			elif len(self.children) < 2:
 				accepted = self.parseGeneric(token)
-				if len(self.children) == 2:
-					self.resolve()
+			else:
+				self.resolve()
+				accepted = False
 		return accepted
 
 class Parenthesis(Mathable):
@@ -460,14 +699,11 @@ class Parenthesis(Mathable):
 				self.name = self.datatype
 				self.children = []
 
-class Trigger(Job):
-	def accept(self, token):
-		if token == '{':
-			self.closed = True
-		elif not token in ['active', 'inactive', 'highFrequency'] or 'minInterval' in token:
-			error("Unknown syntax for trigger declaration: " + token)
-		else:
-			super().accept(token)
+
+##########################
+####### END SYNTAX #######
+##########################
+
 
 def checkStringConcatenation(templine, ln):
 	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').replace('+', ' + ').replace('=', ' = ').replace('"', ' " ').split(' ')
@@ -590,10 +826,20 @@ try:
 							else:
 								if not first:
 									templine = nostrings
-									templine = templine.replace('=', ' = ').replace(' =  = ', '==').replace(' !  = ', '!=').replace(' >  = ', '>=').replace(' <  = ', '<=')
+									templine = templine.replace('=', ' = ').replace(' =  = ', '==').replace('! = ', '!=').replace('> = ', '>=').replace('< = ', '<=')
 									for s in SYMBOLS:
 										for n in s:
-											templine = templine.replace(n, ' ' + n + ' ')
+											if n == '-':
+												templine = list(templine)
+												for i in range(len(templine)-1):
+													if templine[i] == '-':
+														if templine[i+1].isnumeric():
+															templine[i] = ' -'
+														else:
+															templine[i] = ' - '
+												templine = "".join(templine)
+											else:
+												templine = templine.replace(n, ' ' + n + ' ')
 									tokens = [token for token in templine.split(' ') if token != '']
 
 									for token in tokens:
