@@ -3003,6 +3003,19 @@ When called, the player is set to be victorious on the local machine.&#xD;
         <parameters type="string" name="previousQueryName"/>
         <javadoc>Executes the current query on the previous query's results; returns the new number of results.</javadoc>
     </method>
+    <method return="float" name="trQuestVarGet">
+        <parameters type="string" name="Name"/>
+    </method>
+    <method return="void" name="trQuestVarSet">
+        <parameters type="string" name="Name"/>
+        <parameters type="float" name="Value"/>
+    </method>
+    <method return="void" name="trQuestVarSetFromRand">
+        <parameters type="string" name="Name"/>
+        <parameters type="float" name="Min"/>
+        <parameters type="float" name="Max"/>
+        <parameters type="bool" name="Round"/>
+    </method>
     <method return="void" name="trQuestVarCopy">
         <parameters type="string" name="QV1"/>
         <parameters type="string" name="QV2"/>
@@ -3066,7 +3079,17 @@ Chats out the value of one of the trigger scratch variables.&#xD;
         <parameters type="int" name="z"/>
         <javadoc>Sets the size of the map.*/</javadoc>
     </method>
+    <method return="void" name="rmSetStatusText">
+        <parameters type="string" name="Text"/>
+        <parameters type="float" name="Progress"/>
+        <javadoc>Sets the status of the RM loading progress bar.</javadoc>
+    </method>
+    <method return="void" name="rmSetGaiaCiv">
+        <parameters type="int" name="Civ"/>
+        <javadoc>Sets the civilization of Gaia</javadoc>
+    </method>
     <method return="void" name="rmSetSeaLevel">
+        <parameters type="float" name="Level"/>
         <javadoc>Sets the sea level for the map.*/</javadoc>
     </method>
     <method return="void" name="rmSetSeaType">
