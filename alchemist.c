@@ -56,7 +56,7 @@ void alchemistAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"potions") >0) {
 		yDatabaseNext("p"+p+"potions");
 		if (trTimeMS() > yGetVar("p"+p+"potions", "timeout")) {
@@ -108,7 +108,7 @@ void alchemistAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"potions");
 		}
 	}
-
+	
 	for(y=trQuestVarGet("p"+p+"projectiles"); >0) {
 		if (yFindLatest("p"+p+"latestProj", "Priest Projectile", p) > 0) {
 			for (x=yGetDatabaseCount("p"+p+"characters"); >0) {
@@ -142,8 +142,8 @@ void alchemistAlways(int eventID = -1) {
 			break;
 		}
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		dist = 100;
@@ -189,7 +189,7 @@ void alchemistAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
@@ -228,8 +228,8 @@ void alchemistAlways(int eventID = -1) {
 			trSoundPlayFN("cantdothat.wav","1",-1,"","");
 		}
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trQuestVarSet("p"+p+"potion", 1 + trQuestVarGet("p"+p+"potion"));
@@ -257,7 +257,7 @@ void alchemistAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"duplicates") > 0) {
 		id = yDatabaseNext("p"+p+"duplicates", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -268,7 +268,7 @@ void alchemistAlways(int eventID = -1) {
 			trDamageUnitPercent(yGetVar("p"+p+"duplicates", "decay"));
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -308,11 +308,11 @@ highFrequency
 		trEventSetHandler(12 * ALCHEMIST + p, "alchemistAlways");
 		trEventSetHandler(1000 + 12 * ALCHEMIST + p, "chooseAlchemist");
 	}
-
+	
 	trQuestVarSet("potionHeal", 5);
-
+	
 	trQuestVarSet("elixirCooldown", 12);
 	trQuestVarSet("elixirHeal", 200);
-
+	
 	trQuestVarSet("duplicateCost", 50);
 }

@@ -26,11 +26,11 @@ void saveAllData() {
 			trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
 		}
 	}
-
+	
 	if ((trQuestVarGet("p"+p+"nickQuestProgress") < 5) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
 		trQuestVarSet("p"+p+"nickQuestProgress", 0);
 	}
-
+	
 	/* slot 0 */
 	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
 	savedata = savedata + 100 * trQuestVarGet("p"+p+"godBoon") + 1300 * trQuestVarGet("p"+p+"class");
@@ -62,7 +62,7 @@ void saveAllData() {
 	}
 	trSetCurrentScenarioUserData(2, savedata);
 	trSetCurrentScenarioUserData(3, currentdata);
-
+	
 	/* owned relics */
 	for(y=0; < 4) {
 		savedata = 0;
@@ -72,7 +72,7 @@ void saveAllData() {
 		}
 		trSetCurrentScenarioUserData(12 + y, savedata);
 	}
-
+	
 	/* gemstones */
 	savedata = 1*xsMin(10, 1*trQuestVarGet("dreamGogglesCount"));
 	for(x=3; >=0) {
@@ -80,7 +80,7 @@ void saveAllData() {
 		savedata = savedata * 100 + currentdata;
 	}
 	trSetCurrentScenarioUserData(9, savedata);
-
+	
 	if (Multiplayer == false) {
 		/* class levels */
 		for(y=0; <2) {
@@ -92,7 +92,7 @@ void saveAllData() {
 			trSetCurrentScenarioUserData(10 + y, savedata);
 		}
 	}
-
+	
 	/* class unlock progress */
 	savedata = 0;
 	currentdata = xsMin(10, trQuestVarGet("chestCount"));
@@ -108,7 +108,7 @@ void saveAllData() {
 	currentdata = trQuestVarGet("playerHasHosted");
 	savedata = savedata * 2 + currentdata;
 	trSetCurrentScenarioUserData(8, savedata);
-
+	
 	/* boon unlocks */
 	savedata = 0;
 	for(x=12; >=0) {
@@ -116,7 +116,7 @@ void saveAllData() {
 		savedata = savedata * 2 + currentdata;
 	}
 	trSetCurrentScenarioUserData(7, savedata);
-
+	
 	/* Quest data */
 	savedata = 0;
 	for(x=5; >0) {
@@ -195,11 +195,11 @@ inactive
 	savedata = savedata / 10;
 	trQuestVarSet("chestCount", iModulo(11, savedata));
 	savedata = savedata / 11;
-
+	
 	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);
 	}
-
+	
 	/* boons */
 	savedata = trGetScenarioUserData(7);
 	if (savedata < 0) {
@@ -209,9 +209,9 @@ inactive
 		trQuestVarSet("boonUnlocked"+x, iModulo(2, savedata));
 		savedata = savedata / 2;
 	}
-
+	
 	if (Multiplayer) {
-
+		
 		int posX = 10;
 		
 		for(p=1; < ENEMY_PLAYER) {
@@ -232,7 +232,7 @@ inactive
 		xsEnableRule("data_load_01_ready");
 	} else {
 		trForbidProtounit(1, "Swordsman Hero");
-
+		
 		/* progress, level, class */
 		savedata = trGetScenarioUserData(0);
 		if (savedata < 0) {
@@ -245,7 +245,7 @@ inactive
 		trQuestVarSet("p1godBoon", iModulo(13, savedata));
 		savedata = savedata / 13;
 		trQuestVarSet("p1class", iModulo(100, savedata));
-
+		
 		/* gold */
 		savedata = trGetScenarioUserData(1);
 		if (savedata < 0) {
@@ -253,7 +253,7 @@ inactive
 		}
 		trQuestVarSet("p1gold", savedata);
 		trQuestVarSet("p1startinggold", savedata);
-
+		
 		/* equipped relics */
 		for(y=0; <2) {
 			savedata = trGetScenarioUserData(2 + y);
@@ -265,7 +265,7 @@ inactive
 				savedata = savedata / 31;
 			}
 		}
-
+		
 		/* class levels */
 		for(y=0; <2) {
 			savedata = trGetScenarioUserData(10 + y);
@@ -277,7 +277,7 @@ inactive
 				savedata = savedata / 11;
 			}
 		}
-
+		
 		/* quest data */
 		savedata = trGetScenarioUserData(4);
 		if (savedata < 0) {
@@ -294,7 +294,7 @@ inactive
 			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
-
+		
 		xsEnableRule("singleplayer_init");
 	}
 	/*
@@ -323,7 +323,7 @@ inactive
 		}
 		currentdata = iModulo(10, savedata);
 		savedata = savedata / 10;
-
+		
 		xsEnableRule("data_load_01_load_data");
 		xsEnableRule("data_load_02_detect_data");
 		xsEnableRule("data_load_emergency_exit");
@@ -356,7 +356,7 @@ inactive
 	trForceNonCinematicModels(true);
 	
 	trLetterBox(true);
-
+	
 	showLoadProgress();
 	xsDisableSelf();
 }
@@ -557,7 +557,7 @@ inactive
 				}
 			}
 		}
-	}	
+	}
 }
 
 rule data_load_emergency_exit_01
@@ -568,8 +568,8 @@ inactive
 		xsDisableSelf();
 		xsEnableRule("data_load_emergency_exit_02");
 		trSoundPlayFN("default","1",-1,
-					"Zenophobia:Host, make sure all spots are filled and the last player is a CPU.",
-					"icons\infantry g hoplite icon 64");
+			"Zenophobia:Host, make sure all spots are filled and the last player is a CPU.",
+			"icons\infantry g hoplite icon 64");
 	}
 }
 

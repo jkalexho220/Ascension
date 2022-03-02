@@ -55,7 +55,7 @@ highFrequency
 					
 					yAddToDatabase("shrinkingLasers", "next");
 					yAddUpdateVar("shrinkingLasers", "timeout", trTimeMS() + 500);
-
+					
 					for(x=1;<=4) {
 						trUnitSelectClear();
 						trUnitSelect(""+(x+trQuestVarGet("laserRooms") + 4*laser));
@@ -80,7 +80,7 @@ highFrequency
 					}
 				}
 				
-
+				
 				ySetVar("laserRooms", "active", yGetVar("laserRooms", "active") + 1);
 				if (yGetVar("laserRooms", "active") == 9) {
 					ySetVar("laserRooms", "next", yGetVar("laserRooms", "next") + 400);
