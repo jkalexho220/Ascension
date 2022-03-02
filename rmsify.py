@@ -8,7 +8,7 @@ FILENAME = 'Ascension MMORPG.xs'
 files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
-files = ['main.c', 'test.c']
+
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -933,12 +933,6 @@ try:
 									print("Line " + str(ln) + ":\n    " + line)
 								if 'return' in templine and not '(' in templine:
 									print("Needs parenthesis")
-									print("Line " + str(ln) + ":\n    " + line)
-								if ('for(' in templine or 'for (' in templine) and '";' in templine:
-									print("Wrong parenthesis")
-									print("Line " + str(ln) + ":\n    " + line)
-								if 'for' in templine and not ';' in templine:
-									print("Missing semicolon in for statement")
 									print("Line " + str(ln) + ":\n    " + line)
 
 								# reWrite the line
