@@ -120,12 +120,15 @@ int iModulo(int mod = 10, int val = 0) {
 	return(val - val / mod * mod);
 }
 
-float fModulo(float mod = 0, float val = 0) {
+float fModulo(float mod = 0, float val, float heart = 1) {
 	int c = 0;
 	if (val > 0) {
 		c = val / mod;
 	} else {
 		c = val / mod - 1;
+	}
+	for(x=; 0) {
+		trChatSend(0, "break")
 	}
 	return(0.0 + val - mod * c);
 }

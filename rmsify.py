@@ -8,7 +8,7 @@ FILENAME = 'Ascension MMORPG.xs'
 files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
-
+files = ['main.c', 'test.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -928,28 +928,17 @@ try:
 								if (len(templine) > 120):
 									print("Line length greater than 120! Length is " + str(len(templine)))
 									print("Line " + str(ln) + ":\n    " + line)
-								if ('if ' in templine or 'if(' in templine) and not 'ySetPointer' in templine and ('yGetVar' in templine or 'trQuestVarGet' in templine) and not ('=' in templine or '>' in templine or '<' in templine or 'ySetContains' in templine or 'trUnitIsOwnedBy' in templine or 'cWatchActive' in templine or 'yDatabaseContains' in templine or 'HasKeyword' in templine or 'trCheckGPActive' in templine):
-									print("Missing equality statement")
-									print("Line " + str(ln) + ":\n    " + line)
 								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch('):
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
-								if '{' in templine and '(' in templine and not 'else' in templine and not 'if' in templine and not 'for' in templine and not 'while' in templine and ')' in templine and not '{P' in templine:
-									equalCount = templine.count('string', templine.index('(')) + templine.count('int ', templine.index('(')) + templine.count('float', templine.index('(')) + templine.count('bool', templine.index('('))
-									if equalCount > templine.count('='):
-										print("Needs equals sign")
-										print("Line " + str(ln) + ":\n    " + line)
 								if 'return' in templine and not '(' in templine:
 									print("Needs parenthesis")
 									print("Line " + str(ln) + ":\n    " + line)
 								if ('for(' in templine or 'for (' in templine) and '";' in templine:
 									print("Wrong parenthesis")
 									print("Line " + str(ln) + ":\n    " + line)
-								if 'for' in templine and not ';' in templine and not '//':
+								if 'for' in templine and not ';' in templine:
 									print("Missing semicolon in for statement")
-									print("Line " + str(ln) + ":\n    " + line)
-								if 'trMutateSelected("' in templine:
-									print("Needs kbGetProtoUnitID()")
 									print("Line " + str(ln) + ":\n    " + line)
 
 								# reWrite the line
