@@ -64,7 +64,7 @@ string classIcon(int class = 0) {
 		}
 		case SPARKWITCH:
 		{
-			icon = "icons\hero g circe icon 64";
+			icon = "icons\special g circe icon 64";
 		}
 	}
 	return(icon);
