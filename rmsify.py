@@ -1,6 +1,9 @@
 import os
 import sys
 
+# The syntax validator will stop after encountering the first error.
+# After fixing that error, additional ones may be reported.
+
 ###############################
 ####### CUSTOMIZE THESE #######
 ###############################
@@ -59,8 +62,8 @@ BASE_JOB = None
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime']
-KNOWN_TYPES = ['int', 'vector', 'vector', 'int']
+KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime', 'cNumberNonGaiaPlayers']
+KNOWN_TYPES = ['int', 'vector', 'vector', 'int', 'int']
 
 ERRORED = False
 
