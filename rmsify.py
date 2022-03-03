@@ -5,12 +5,19 @@ import sys
 ####### CUSTOMIZE THESE #######
 ###############################
 FILENAME = 'Ascension MMORPG.xs'
-files = ['main.c', 'test.c']
+files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+        'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
+        'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
 
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
 #########################################
+
+VERBOSE = False
+for t in sys.argv:
+	if t == '-v':
+		VERBOSE = True
 
 # Stack Frame states
 STATE_NEED_NAME = 0
@@ -22,13 +29,16 @@ STATE_IN_BRACKETS = 5
 STATE_DONE = 6
 
 STATE_WAITING_CLOSE_PARENTHESIS = 7
+STATE_CLOSED = 8
 
 DATATYPE = ['int', 'float', 'string', 'void', 'vector', 'bool']
-ARITHMETIC = ['+', '-', '/', '*']
+ARITHMETIC = ['/', '*', '+', '-']
 BINARY = ['==', '!=', '<=', '>=', '>', '<', '&&', '||']
-FLOW = ['(', ')', '{', '}', ',', ';']
+FLOW = ['(', ')', '{', '}', ',', ';', ':']
 
-LOGIC = ['if', 'for', 'while']
+COMBINED = ARITHMETIC + BINARY
+
+LOGIC = ['if', 'for', 'while', 'switch', 'case']
 
 DELIMITER = [',', ';']
 IGNORE = ['const']
@@ -45,17 +55,21 @@ class CustomFunction:
 		self.parameters.append(datatype)
 
 FUNCTIONS = {}
-CURRENT_JOB = None
+BASE_JOB = None
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = []
-KNOWN_TYPES = []
+KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime']
+KNOWN_TYPES = ['int', 'vector', 'vector', 'int']
 STACK_FRAMES = []
+
+ERRORED = False
 
 def error(msg):
 	global ln
 	global line
+	global ERRORED
+	ERRORED = True
 	print(msg)
 	print("Line " + str(ln) + ":\n    " + line)
 
@@ -84,7 +98,7 @@ class Job:
 		return val
 
 	def resolve(self):
-		global CURRENT_JOB
+		global BASE_JOB
 		self.closed = True
 		for c in self.children:
 			c.resolve()
@@ -115,6 +129,21 @@ class Job:
 			self.children.append(Literal(token, self, 'string'))
 		elif token.isnumeric():
 			self.children.append(Literal(token, self, 'int'))
+		elif token[0] == '-' and len(token) > 0:
+			if token[1:].isnumeric():
+				self.children.append(Literal(token, self, 'int'))
+			elif '.' in token[1:]:
+				isFloat = True
+				for c in token[1:token.find('.')]:
+					isFloat = isFloat and c.isnumeric()
+				for c in token[token.find('.')+1:]:
+					isFloat = isFloat and c.isnumeric()
+				if isFloat:
+					self.children.append(Literal(token, self, 'float'))
+				else:
+					accepted = False
+			else:
+				accepted = False
 		elif '.' in token:
 			isFloat = True
 			for c in token[:token.find('.')]:
@@ -123,21 +152,6 @@ class Job:
 				isFloat = isFloat and c.isnumeric()
 			if isFloat:
 				self.children.append(Literal(token, self, 'float'))
-			else:
-				accepted = False
-		elif token[0] == '-' and len(token) > 0:
-			if token[1:].isnumeric():
-				self.children.append(Literal(token, self, 'int'))
-			elif '.' in token[1:]:
-				isFloat = True
-				for c in token[:token.find('.',1)]:
-					isFloat = isFloat and c.isnumeric()
-				for c in token[token.find('.',1)+1:]:
-					isFloat = isFloat and c.isnumeric()
-				if isFloat:
-					self.children.append(Literal(token, self, 'float'))
-				else:
-					accepted = False
 			else:
 				accepted = False
 		elif token in ['true', 'false']:
@@ -156,15 +170,15 @@ class Mathable(Job):
 		accepted = True
 		if not super().accept(token):
 			if token in ARITHMETIC:
-				if self.parent.type in ['ARITHMETIC', 'BINARY'] and not token in ['*', '/']:
-					self.parent.insertAbove(Arithmetic, token)
-				else:
-					self.insertAbove(Arithmetic, token)
+				insertPoint = self
+				while insertPoint.parent.name in COMBINED and COMBINED.index(insertPoint.parent.name) <= COMBINED.index(token):
+					insertPoint = insertPoint.parent
+				insertPoint.insertAbove(Arithmetic, token)
 			elif token in BINARY:
-				if self.parent.type in ['ARITHMETIC', 'BINARY'] and not token in ['*', '/']:
-					self.parent.insertAbove(Binary, token)
-				else:
-					self.insertAbove(Binary, token)
+				insertPoint = self
+				while insertPoint.parent.name in COMBINED and COMBINED.index(insertPoint.parent.name) <= COMBINED.index(token):
+					insertPoint = insertPoint.parent
+				insertPoint.insertAbove(Binary, token)
 			else:
 				accepted = False
 		return accepted
@@ -228,21 +242,33 @@ class StackFrame(Job):
 				elif token == '}':
 					KNOWN_VARIABLES = KNOWN_VARIABLES[:self.depth]
 					KNOWN_TYPES = KNOWN_TYPES[:self.depth]
-					self.parent.children.pop()
+					self.state = STATE_CLOSED
+				elif self.name == 'switch' and not token == 'case':
+					accepted = False
 				elif token in LOGIC:
 					self.children.append(Logic(token, self))
-				elif self.parseGeneric(token):
-					accepted = True
 				elif token in DATATYPE:
 					if len(self.children) > 0:
 						error("Invalid syntax: " + token)
 						accepted = False
 					else:
 						self.children.append(Declaration(token, self))
+				elif self.parseGeneric(token):
+					accepted = True
 				else:
 					accepted = False
 					if token != 'return':
 						self.resolve()
+			elif self.state == STATE_CLOSED:
+				if self.name != 'if' or token != 'else':
+					accepted = False
+					self.resolve()
+					self.parent.children.pop()
+				else:
+					self.resolve()
+					self.parent.children.pop()
+					self.parent.children.append(Logic('else', self.parent))
+					self.parent.children[-1].state = STATE_WAITING_BRACKETS
 			else:
 				accepted = False
 		return accepted
@@ -255,12 +281,13 @@ class Logic(StackFrame):
 		self.type = 'LOGIC'
 		self.datatype = 'void'
 		self.fordepth = len(KNOWN_FOR)
+		if name == 'case':
+			self.state = STATE_IN_PARENTHESIS
 
 	def resolve(self):
 		global KNOWN_FOR
 		super().resolve()
-		if self.name == 'for':
-			KNOWN_FOR = KNOWN_FOR[:self.fordepth]
+		KNOWN_FOR = KNOWN_FOR[:self.fordepth]
 
 	def accept(self, token):
 		global KNOWN_VARIABLES
@@ -295,14 +322,18 @@ class Logic(StackFrame):
 						self.depth = len(KNOWN_VARIABLES) # variables declared in for loops persist
 						KNOWN_FOR.append(token)
 					self.state = STATE_WAITING_COMMA
-				elif token == ')':
+				elif (self.name == 'case' and token == ':') or (self.name != 'case' and token == ')'):
 					if len(self.children) == 0:
 						error("Empty " + self.name)
 						accepted = False
-					elif self.children[0].datatype is not 'bool':
-						error("Contents of " + self.name + " do not resolve to a boolean!")
+					elif self.name == 'switch' or self.name == 'case':
+						if self.children[0].datatype != 'int':
+							error("Contents of " + self.name + " do not resolve to an integer! " + self.children[0].datatype)
+							accepted = False
+					elif self.children[0].datatype != 'bool':
+						error("Contents of " + self.name + " do not resolve to a boolean! " + self.children[0].datatype)
 						accepted = False
-					else:
+					if accepted:
 						self.children[0].resolve()
 						self.children.clear()
 						self.state = STATE_WAITING_BRACKETS
@@ -330,6 +361,17 @@ class Logic(StackFrame):
 						self.state = STATE_WAITING_BRACKETS
 				else:
 					accepted = self.parseGeneric(token)
+			elif self.state == STATE_WAITING_BRACKETS:
+				if token == 'if' and self.name == 'else':
+					self.state = STATE_NEED_PARENTHESIS
+					self.name = 'if'
+				else:
+					accepted = False
+			elif self.state == STATE_IN_BRACKETS:
+				if self.name in ['for', 'while'] and token in ['break', 'continue']:
+					self.children.append(Literal('0',self,'int'))
+				else:
+					accepted = False
 			else:
 				accepted = False
 		return accepted
@@ -359,7 +401,7 @@ class Trigger(StackFrame):
 					self.name = token
 					self.state = STATE_WAITING_BRACKETS
 			elif self.state == STATE_WAITING_BRACKETS:
-				if not token in ['active', 'inactive', 'highFrequency', 'runImmediately'] or 'minInterval' in token:
+				if not (token in ['active', 'inactive', 'highFrequency', 'runImmediately'] or 'minInterval' in token or 'maxInterval' in token):
 					error("Unknown syntax for trigger declaration: " + token)
 					accepted = False
 			else:
@@ -451,6 +493,13 @@ class Declaration(StackFrame):
 				if self.type == 'FUNCTION' and token in DATATYPE:
 					self.children.append(Declaration(token, self))
 					self.state = STATE_WAITING_COMMA
+				elif self.type == 'FUNCTION' and token == ')':
+					if len(self.children) > 0:
+						error("Invalid syntax in function declaration. All parameters must have default values")
+					else:
+						self.resolve()
+						self.children.clear()
+						self.state = STATE_WAITING_BRACKETS
 				else:
 					accepted = False
 			elif self.state == STATE_WAITING_COMMA:
@@ -458,6 +507,8 @@ class Declaration(StackFrame):
 					accepted = False
 				else:
 					self.children[-1].resolve()
+					if self.children[-1].type != 'ASSIGNMENT':
+						error("Invalid syntax in function declaration. All parameters must have default values")
 					self.state = STATE_IN_PARENTHESIS
 					if token == ')':
 						self.resolve()
@@ -474,7 +525,8 @@ class Declaration(StackFrame):
 			if token == ';':
 				self.returner.resolve()
 				if self.returner.datatype != self.datatype:
-					error("Return type of " + self.returner.datatype + " does not match function return type of " + self.datatype)
+					if not (self.returner.datatype in ['int', 'float'] and self.datatype in ['int', 'float']):
+						error("Return type of " + self.returner.datatype + " does not match function return type of " + self.datatype)
 				self.returner = None
 		elif token == 'return':
 			child = self
@@ -496,11 +548,9 @@ class Assignment(Job):
 				error("Incorrect number of inputs for assignment operator " + self.name)
 			else:
 				self.datatype = self.children[0].datatype
-				if self.datatype not in ['int', 'float']:
-					if self.datatype != self.children[1].datatype:
+				if self.datatype != self.children[1].datatype:
+					if not (self.datatype in ['int', 'float'] and self.children[1].datatype in ['int', 'float']):
 						error("Cannot assign " + self.children[1].datatype + " to " + self.datatype)
-				elif self.children[1].datatype not in ['int', 'float']:
-					error("Cannot assign " + self.children[1].datatype + " to " + self.datatype)
 
 	def accept(self, token):
 		accepted = True
@@ -569,8 +619,8 @@ class Function(Mathable):
 			else:
 				for i in range(len(self.children)):
 					if self.expected[i] != self.children[i].datatype:
-						if not self.expected[i] in ['int', 'float'] and not self.children[i].datatype in ['int', 'float']:
-							error("Incorrect datatype in parameter " + str(i) + "! Expected " + self.expected[i] + " but got " + self.children[i].datatype)
+						if not (self.expected[i] in ['int', 'float'] and self.children[i].datatype in ['int', 'float']):
+							error("Incorrect datatype in parameter " + str(i+1) + "! Expected " + self.expected[i] + " but got " + self.children[i].datatype)
 				self.name = self.datatype
 				self.children = []
 
@@ -602,6 +652,15 @@ class Variable(Mathable):
 		self.type = 'VARIABLE'
 		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.index(name)]
 		self.closed = True
+
+	def accept(self, token):
+		accepted = True
+		if not super().accept(token):
+			if token == '=':
+				self.insertAbove(Assignment, token)
+			else:
+				accepted = False
+		return accepted
 
 
 class Arithmetic(Mathable):
@@ -663,13 +722,10 @@ class Binary(Mathable):
 					if self.children[i].datatype != self.expected[i]:
 						error("Invalid datatype used in logic statement " + self.name + ". Expected boolean but received " + self.children[i].datatype)
 			else:
-				self.children[0].datatype
-				if self.children[0].datatype not in ['int', 'float']:
-					if self.children[0].datatype != self.children[1].datatype:
+				if self.children[0].datatype != self.children[1].datatype:
+					if not (self.children[0].datatype in ['int', 'float'] and self.children[1].datatype in ['int', 'float']):
 						error("Cannot perform boolean operator " + self.name + " on data of type " + self.children[0].datatype + " and " + self.children[1].datatype)
-				elif self.children[1].datatype not in ['int', 'float']:
-					error("Cannot perform boolean operator " + self.name + " on data of type " + self.children[0].datatype + " and " + self.children[1].datatype)
-				#self.name = self.datatype
+
 				self.children = []
 
 	def accept(self, token):
@@ -698,6 +754,18 @@ class Parenthesis(Mathable):
 				self.datatype = self.children[0].datatype
 				self.name = self.datatype
 				self.children = []
+
+	def accept(self, token):
+		accepted = True
+		if not super().accept(token):
+			if self.closed:
+				accepted = False
+			else:
+				if token == ')':
+					self.resolve()
+				else:
+					accepted = self.parseGeneric(token)
+		return accepted
 
 
 ##########################
@@ -773,7 +841,6 @@ with open('Commands.xml', 'r') as fd:
 
 print("rmsification start!")
 
-CURRENT_JOB = BaseFrame()
 functions = {''}
 unknowns = {''}
 ln = 1
@@ -795,6 +862,7 @@ try:
 			print("parsing " + FILE_1 + "...")
 			rewrite = []
 			thedepth = 0
+			BASE_JOB = BaseFrame()
 			with open(FILE_1, 'r') as file_data_1:
 				line = file_data_1.readline()
 				while line:
@@ -824,33 +892,34 @@ try:
 							elif escape:
 								file_data_2.write(line)
 							else:
-								if not first:
+								if not first and not ERRORED:
 									templine = nostrings
-									templine = templine.replace('=', ' = ').replace(' =  = ', '==').replace('! = ', '!=').replace('> = ', '>=').replace('< = ', '<=')
 									for s in SYMBOLS:
 										for n in s:
 											if n == '-':
 												templine = list(templine)
 												for i in range(len(templine)-1):
 													if templine[i] == '-':
-														if templine[i+1].isnumeric():
+														if templine[i+1].isnumeric() and templine[i-1] in [' ', '(', ',']:
 															templine[i] = ' -'
 														else:
 															templine[i] = ' - '
 												templine = "".join(templine)
 											else:
 												templine = templine.replace(n, ' ' + n + ' ')
+									templine = templine.replace('=', ' = ').replace(' =  = ', ' == ').replace('! = ', ' != ').replace(' >  = ', ' >= ').replace(' <  = ', '<=').replace('minInterval ', 'minInterval').replace('maxInterval ', 'maxInterval')
 									tokens = [token for token in templine.split(' ') if token != '']
 
 									for token in tokens:
 										if not token in IGNORE:
 											#print(token)
-											CURRENT_JOB.accept(token)
-											CURRENT_JOB.debug()
+											BASE_JOB.accept(token)
+											if VERBOSE and not ERRORED:
+												BASE_JOB.debug()
 								
 								templine = reline.strip()
 								if '//' in templine:
-									templine = templine[:templine.find('//')]
+									templine = templine[:templine.find('//')].strip()
 
 								# Obsolete Sanity Checks
 								checkStringConcatenation(templine, ln)
@@ -859,28 +928,11 @@ try:
 								if (len(templine) > 120):
 									print("Line length greater than 120! Length is " + str(len(templine)))
 									print("Line " + str(ln) + ":\n    " + line)
-								if ('if ' in templine or 'if(' in templine) and not 'ySetPointer' in templine and ('yGetVar' in templine or 'trQuestVarGet' in templine) and not ('=' in templine or '>' in templine or '<' in templine or 'ySetContains' in templine or 'trUnitIsOwnedBy' in templine or 'cWatchActive' in templine or 'yDatabaseContains' in templine or 'HasKeyword' in templine or 'trCheckGPActive' in templine):
-									print("Missing equality statement")
-									print("Line " + str(ln) + ":\n    " + line)
 								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch('):
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
-								if '{' in templine and '(' in templine and not 'else' in templine and not 'if' in templine and not 'for' in templine and not 'while' in templine and ')' in templine and not '{P' in templine:
-									equalCount = templine.count('string', templine.index('(')) + templine.count('int ', templine.index('(')) + templine.count('float', templine.index('(')) + templine.count('bool', templine.index('('))
-									if equalCount > templine.count('='):
-										print("Needs equals sign")
-										print("Line " + str(ln) + ":\n    " + line)
 								if 'return' in templine and not '(' in templine:
 									print("Needs parenthesis")
-									print("Line " + str(ln) + ":\n    " + line)
-								if ('for(' in templine or 'for (' in templine) and '";' in templine:
-									print("Wrong parenthesis")
-									print("Line " + str(ln) + ":\n    " + line)
-								if 'for' in templine and not ';' in templine and not '//':
-									print("Missing semicolon in for statement")
-									print("Line " + str(ln) + ":\n    " + line)
-								if 'trMutateSelected("' in templine:
-									print("Needs kbGetProtoUnitID()")
 									print("Line " + str(ln) + ":\n    " + line)
 
 								# reWrite the line
@@ -894,6 +946,7 @@ try:
 						file_data_2.write('\n')
 					line = file_data_1.readline()
 					ln = ln + 1
+			# reformat the .c raw code
 			with open(FILE_1, 'w') as file_data_1:
 				for line in rewrite:
 					file_data_1.write(line + '\n')

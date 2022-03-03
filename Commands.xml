@@ -994,6 +994,7 @@ If the given duration is -1, the duration of the track is used.</javadoc>
         <javadoc>Pretends a player has requested a cinematic to be skipped, i.e. {@link #trCinematicAbort()} will return true after this call.</javadoc>
     </method>
     <method return="void" name="trForceNonCinematicModels">
+        <parameters type="bool" name="Active"/>
         <javadoc>Forces models to be in non-cinematic mode.</javadoc>
     </method>
     <method return="void" name="trLetterBox">
@@ -1797,7 +1798,7 @@ You'll probably want to use some other echo instead.&#xD;
     </method>
     <method return="void" name="trMusicPlay">
         <parameters type="string" name="filename"/>
-        <parameters type="float" name="volume"/>
+        <parameters type="string" name="volume"/>
         <parameters type="float" name="duration"/>
         <javadoc>Plays the music file.</javadoc>
     </method>
@@ -1828,7 +1829,7 @@ You'll probably want to use some other echo instead.&#xD;
     </method>
     <method return="void" name="trSoundPlayDialog">
         <parameters type="string" name="filename"/>
-        <parameters type="string" name="unknown"/>
+        <parameters type="string" name="volume"/>
         <parameters type="int" name="eventID"/>
         <parameters type="bool" name="ignoreOnAbort"/>
         <parameters type="string" name="subtitle"/>
@@ -1839,7 +1840,7 @@ You'll probably want to use some other echo instead.&#xD;
     </method>
     <method return="void" name="trSoundPlayFN">
         <parameters type="string" name="filename"/>
-        <parameters type="string" name="unknown"/>
+        <parameters type="string" name="volume"/>
         <parameters type="int" name="eventID"/>
         <parameters type="string" name="subtitle"/>
         <parameters type="string" name="portrait"/>
@@ -3029,6 +3030,10 @@ Copies value of one of the trigger scratch variables.&#xD;
 Chats out the value of one of the trigger scratch variables.&#xD;
 @since AoT</javadoc>
     </method>
+    <method return="void" name="configUndef">
+        <parameters type="string" name="parameter"/>
+        <javadoc>Sets the specified configuration to false</javadoc>
+    </method>
     <method return="void" name="sqrt">
         <parameters type="float" name="x"/>
         <javadoc>Returns the square root of x.</javadoc>
@@ -3540,6 +3545,10 @@ In addition, the default condition (Always) and effect (SetIdleProcessing) are a
 Creates the units in the army specified.&#xD;
 Only works for human players online.&#xD;
 Returns true if successful.</javadoc>
+    </method>
+    <method return="void" name="trArmySelect">
+        <parameters type="string" name="SrcArmy"/>
+        <javadoc>Selects the army. Automatically deselects previously selected units.</javadoc>
     </method>
     <method return="bool" name="trCheckGPActive">
         <parameters type="string" name="godPower"/>
@@ -6013,6 +6022,18 @@ but it turns out to work fine for every unit.</javadoc>
 &#xD;
 @see aom.scripting.xs.tr.Unit#trUnitHasLOS(int)</javadoc>
     </method>
+    <method return="int" name="trCountUnitsInArea">
+        <parameters type="string" name="Unit Name"/>
+        <parameters type="int" name="Player"/>
+        <parameters type="string" name="ProtoName"/>
+        <parameters type="float" name="Radius"/>
+        <javadoc>Counts the number of units that fit the criteria near the source unit</javadoc>
+    </method>
+    <method return="void" name="trUnitHighlight">
+        <parameters type="float" name="duration"/>
+        <parameters type="bool" name="flash"/>
+        <javadoc>Causes the unit to highlight (false) or flash (true)</javadoc>
+    </method>
     <method return="void" name="trDamageUnit">
         <parameters type="float" name="amt"/>
         <javadoc>Does a specific amount of damage to HP in instant typeless damage.</javadoc>
@@ -6111,6 +6132,11 @@ Only works in scenarios, not in RMS.</javadoc>
     </method>
     <method return="int" name="trUnitGetContained">
         <javadoc>Returns the number of units contained.</javadoc>
+    </method>
+    <method return="bool" name="trUnitGetIsContained">
+        <parameters type="string" name="Proto"/>
+        <javadoc>Returns true if unit is garrisoned in a unit of type Proto</javadoc>
+    </method>
     </method>
     <method return="int" name="trUnitGetHeading">
         <parameters type="string" name="scenarioName"/>

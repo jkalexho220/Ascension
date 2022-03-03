@@ -106,7 +106,7 @@ highFrequency
 				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 			}
 		}
-			
+		
 		for(x=xsMin(12, yGetDatabaseCount("yeebLightning")); >0) {
 			yDatabaseNext("yeebLightning");
 			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
@@ -124,7 +124,7 @@ highFrequency
 				yRemoveFromDatabase("yeebLightning");
 			}
 		}
-
+		
 		
 		if (trQuestVarGet("templeChallengeActive") == 2) {
 			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
@@ -134,7 +134,7 @@ highFrequency
 					trVectorSetUnitPos("pos", "applicants");
 					spawnLightning("pos");
 				}
-
+				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
 					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
 					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
@@ -173,7 +173,7 @@ highFrequency
 					trVectorSetUnitPos("pos", "applicants");
 					spawnLightning("pos");
 				}
-
+				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
 					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
 					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
@@ -241,7 +241,7 @@ highFrequency
 						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
 					}
 				}
-
+				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
 					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
 					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
@@ -309,7 +309,7 @@ highFrequency
 						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
 					}
 				}
-
+				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
 					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
 					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
@@ -486,7 +486,7 @@ highFrequency
 				yAddToDatabase("mirrorTowerLasers", "next");
 				yAddUpdateVar("mirrorTowerLasers", "length", zDistanceBetweenVectors3d("pos", "templePos") * 1.25);
 				yAddUpdateVar("mirrorTowerLasers", "timeout", trTimeMS() + 1500);
-
+				
 				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Meteor Impact Ground");
@@ -528,14 +528,14 @@ highFrequency
 				{
 					trLetterBox(true);
 					trSoundPlayFN("","1",-1,
-						"Zenophobia:So you've solved the math problem. Congratulations!", 
+						"Zenophobia:So you've solved the math problem. Congratulations!",
 						"icons\infantry g hoplite icon 64");
 					trQuestVarSet("templeNext", trTime() + 4);
 				}
 				case 3:
 				{
 					trSoundPlayFN("","1",-1,
-						"Zenophobia:Here is your reward. The Blessing of Zenophobia.", 
+						"Zenophobia:Here is your reward. The Blessing of Zenophobia.",
 						"icons\infantry g hoplite icon 64");
 					trQuestVarSet("templeNext", trTime() + 5);
 					trShowImageDialog(boonIcon(BOON_MORE_GOLD), boonName(BOON_MORE_GOLD));
@@ -544,7 +544,7 @@ highFrequency
 				case 4:
 				{
 					trSoundPlayFN("","1",-1,
-						"Zenophobia:You can equip this Blessing in singleplayer.", 
+						"Zenophobia:You can equip this Blessing in singleplayer.",
 						"icons\infantry g hoplite icon 64");
 					trQuestVarSet("templeNext", trTime() + 5);
 				}

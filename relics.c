@@ -45,7 +45,7 @@ const int RELIC_NICKONHAWK_GOGGLES = 37;
 const int RELIC_GHOST_PICTURE = 38;
 
 const int RELIC_MATH_PROBLEM = 40;
-/* 
+/*
 reserved to 60
 */
 const int RELIC_MATH_PROBLEM_END = 60;
@@ -179,7 +179,7 @@ string relicName(int relic = 0) {
 			{
 				msg = "Regenerate 0.3 favor per second";
 			}
-
+			
 			case RELIC_GHOST_PICTURE:
 			{
 				msg = "A picture of a young man.";
@@ -192,27 +192,27 @@ string relicName(int relic = 0) {
 			{
 				msg = "Dream Goggles. What do they do?";
 			}
-
+			
 			case RELIC_LITERAL_FECES:
 			{
 				msg = "Literal feces";
 			}
-
+			
 			case RELIC_A_FUCKING_CORPSE:
 			{
 				msg = "A fucking corpse";
 			}
-
+			
 			case RELIC_BERRY_BUSH:
 			{
 				msg = "A berry bush";
 			}
-
+			
 			case RELIC_POISON_BUCKET:
 			{
 				msg = "A bucket for holding a liquid";
 			}
-
+			
 			case RELIC_WORTHLESS_JUNK:
 			{
 				msg = "Worthless junk";
@@ -590,8 +590,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_NICKONHAWK:
 		{
 			trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") + m);
-			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) || 
-				(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
+			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) ||
+			(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
 				/* No duplicates */
 				ySetPointer("p"+p+"relics", yGetNewestPointer("p"+p+"relics"));
 				trUnitSelectClear();
@@ -843,7 +843,7 @@ void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
 
 void spawnRelicClosest(float x = 0, float z = 0, int target = 0) {
 	trQuestVarSetFromRand("rand", 0, 10, true);
-	trQuestVarSetFromRand("rand", 
+	trQuestVarSetFromRand("rand",
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
-	spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
-}
+		spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
+	}

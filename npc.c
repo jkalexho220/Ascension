@@ -42,7 +42,7 @@ RESERVED TO 300
 */
 
 const int NPC_TEMPLE_COMPLETE = 300;
-/* 
+/*
 RESERVED TO 400
 */
 
@@ -214,13 +214,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			if (dialog > trQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explainations")) {
 				dialog = 0;
 				trShowChoiceDialog(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")),
-					trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"first"), 6001,
-					trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"second"), 6002);
+				trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"first"), 6001,
+				trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"second"), 6002);
 			} else {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
 			}
 		}
-
+		
 		case NPC_ZENO_QUIZ_END:
 		{
 			if (dialog > trQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explainations")) {
@@ -234,7 +234,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
 			}
 		}
-
+		
 		case NPC_NOTTUD:
 		{
 			switch(dialog)
@@ -258,7 +258,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NO:
 		{
 			switch(dialog)
@@ -274,7 +274,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START:
 		{
 			switch(dialog)
@@ -303,7 +303,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 1:
 		{
 			switch(dialog)
@@ -319,7 +319,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 2:
 		{
 			switch(dialog)
@@ -335,7 +335,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 3:
 		{
 			switch(dialog)
@@ -351,7 +351,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 4:
 		{
 			if (Multiplayer == false) {
@@ -362,7 +362,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 			dialog = 0;
 		}
-
+		
 		case NPC_NICK_NEXT:
 		{
 			switch(dialog)
@@ -387,7 +387,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NEXT + 1:
 		{
 			switch(dialog)
@@ -416,7 +416,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NEXT + 2:
 		{
 			switch(dialog)
@@ -432,7 +432,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_DROP:
 		{
 			switch(dialog)
@@ -448,7 +448,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_QUEST_COMPLETE:
 		{
 			switch(dialog)
@@ -486,7 +486,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_SLOT_MACHINE:
 		{
 			switch(dialog)
@@ -502,7 +502,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -522,7 +522,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -538,7 +538,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -558,7 +558,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -578,7 +578,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -598,7 +598,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 2:
 		{
 			switch(dialog)
@@ -618,7 +618,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -638,7 +638,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -658,7 +658,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 3:
 		{
 			switch(dialog)
@@ -678,7 +678,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -694,7 +694,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -710,7 +710,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 4:
 		{
 			switch(dialog)
@@ -726,7 +726,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 5:
 		{
 			switch(dialog)
@@ -742,7 +742,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 5:
 		{
 			switch(dialog)
@@ -762,7 +762,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -782,7 +782,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -811,7 +811,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -827,7 +827,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 6:
 		{
 			switch(dialog)
@@ -847,7 +847,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_KASTOR:
 		{
 			switch(dialog)
@@ -871,7 +871,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -895,7 +895,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 2:
 		{
 			switch(dialog)
@@ -915,7 +915,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 3:
 		{
 			switch(dialog)
@@ -935,7 +935,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + SHOP_NPC:
 		{
 			switch(dialog)
@@ -951,7 +951,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -972,7 +972,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -997,7 +997,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -1023,7 +1023,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -1044,7 +1044,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -1065,7 +1065,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -1098,7 +1098,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -1123,7 +1123,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -1144,7 +1144,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -1170,7 +1170,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -1191,7 +1191,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -1220,7 +1220,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -1241,7 +1241,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -1262,7 +1262,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -1283,7 +1283,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -1304,7 +1304,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -1325,7 +1325,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_ZENOS_PARADOX:
 		{
 			switch(dialog)
@@ -1346,7 +1346,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 5:
 		{
 			switch(dialog)
@@ -1371,7 +1371,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_ATE_CORPSE:
 		{
 			switch(dialog)
@@ -1391,7 +1391,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_ATE_BERRIES:
 		{
 			switch(dialog)
@@ -1411,7 +1411,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		/*
 		literal feces
 		mysterious berry
@@ -1437,7 +1437,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -1462,7 +1462,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -1487,7 +1487,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -1520,7 +1520,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -1545,7 +1545,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -1570,7 +1570,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -1591,7 +1591,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_TEMPLE + 6:
 		{
 			switch(dialog)
@@ -1611,7 +1611,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_TEMPLE_COMPLETE + 6:
 		{
 			switch(dialog)
@@ -1631,7 +1631,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_TEMPLE + 11:
 		{
 			switch(dialog)
@@ -1669,1073 +1669,1073 @@ highFrequency
 			xsEnableRule("relic_transporter_guy_always");
 			trArmyDispatch("1,0","Dwarf",1,
 				trQuestVarGet("relicTransporterGuyPosx"),0,trQuestVarGet("relicTransporterGuyPosz"),0,true);
-			trArmySelect("1,0");
-			trUnitConvert(0);
-			trUnitChangeProtoUnit("Revealer");
-			trSoundPlayFN("villagercreate.wav","1",-1,"","");
-			break;
-		}
-	}
-}
-
-rule boss_entrance_found
-inactive
-highFrequency
-{
-	trUnitSelectClear();
-	trUnitSelectByQV("bossEntranceStatue");
-	for(p=1; <ENEMY_PLAYER) {
-		if (trUnitHasLOS(p)) {
-			xsDisableSelf();
-			xsEnableRule("boss_entrance_always");
-			trVectorSetUnitPos("pos", "bossEntranceStatue");
-			trArmyDispatch("1,0","Dwarf",1,
-				trQuestVarGet("Posx"),0,trQuestVarGet("Posz"),0,true);
-			trArmySelect("1,0");
-			trUnitConvert(0);
-			trUnitChangeProtoUnit("Revealer");
-			trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
-			trMessageSetText("The boss entrance has been found!", -1);
-			break;
-		}
-	}
-}
-
-
-rule relic_transporter_guy_always
-inactive
-highFrequency
-{
-	trUnitSelectClear();
-	trUnitSelectByQV("relicTransporterGuyName");
-	if (trUnitIsSelected()) {
-		trUnitHighlight(5.0, true);
-		int p = trCurrentPlayer();
-		if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
-			startNPCDialog(NPC_RELIC_TRANSPORTER);
-		} else {
-			startNPCDialog(NPC_RELIC_TRANSPORTER_WTF);
-		}
-		reselectMyself();
-	}
-}
-
-rule npc_talk_01
-inactive
-highFrequency
-{
-	xsDisableSelf();
-	trQuestVarSet("currentNPCProgress", 
-		npcDiag(1*trQuestVarGet("currentNPC"), 1*trQuestVarGet("currentNPCProgress")));
-	if (trQuestVarGet("currentNPCProgress") > 0) {
-		trDelayedRuleActivation("npc_talk_02");
-	}
-}
-
-rule npc_talk_02
-inactive
-highFrequency
-{
-	if ((trQuestVarGet("currentNPCProgress") > 0) && 
-		(trIsGadgetVisible("ingame-messagedialog") == false) &&
-		(trIsGadgetVisible("ShowImageBox") == false)) {
-		trDelayedRuleActivation("npc_talk_01");
-		xsDisableSelf();
-	}
-}
-
-void questComplete(int gem = -1, int gold = -1) {
-	if (gem >= 0) {
-		trQuestVarSet("gemstone"+gem, 1 + trQuestVarGet("gemstone"+gem));
-	}
-	if (gold > 0) {
-		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"gold", gold + trQuestVarGet("p"+p+"gold"));
-			trPlayerGrantResources(p, "gold", gold);
-		}
-	}
-	trQuestVarSet("questCount", 1 + trQuestVarGet("questCount"));
-	startNPCDialog(NPC_QUEST_COMPLETE + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
-	trQuestVarSet("questActive", -1);
-	uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
-}
-
-rule town_always
-inactive
-highFrequency
-{
-	int x = 0;
-	int z = 0;
-	int p = 0;
-	int room = 0;
-	int action = 0;
-	float amt = 0;
-	if (trQuestVarGet("townFound") == 0) {
-		trUnitSelectClear();
-		trUnitSelectByQV("guy1");
-		for(p=1; < ENEMY_PLAYER) {
-			if (trUnitHasLOS(p)) {
-				trQuestVarSet("townFound", 1);
+				trArmySelect("1,0");
+				trUnitConvert(0);
+				trUnitChangeProtoUnit("Revealer");
+				trSoundPlayFN("villagercreate.wav","1",-1,"","");
 				break;
 			}
 		}
-		if (trQuestVarGet("townFound") == 1) {
-			x = trQuestVarGet("village");
-			z = x / 4;
-			x = trQuestVarGet("village") - 4 * z;
-			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
-			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Revealer to Player",1,70*x+40,0,70*z+40,225,true);
-			trSoundPlayFN("settlement.wav","1",-1,"","");
-		}
-	} else {
-		yDatabaseNext("npcTalk", true);
-		if (trUnitIsSelected()) {
-			startNPCDialog(1*yGetVar("npcTalk", "dialog"));
-			reselectMyself();
-		}
-		
-		if (trQuestVarGet("questActive") == 0) {
-			trVectorSetUnitPos("questGuyPos", "questGuy");
-			for(p=1; < ENEMY_PLAYER) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
-					uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
-					trQuestVarSet("questActive", 1);
-					startNPCDialog(NPC_QUEST + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
+	}
+	
+	rule boss_entrance_found
+	inactive
+	highFrequency
+	{
+		trUnitSelectClear();
+		trUnitSelectByQV("bossEntranceStatue");
+		for(p=1; <ENEMY_PLAYER) {
+			if (trUnitHasLOS(p)) {
+				xsDisableSelf();
+				xsEnableRule("boss_entrance_always");
+				trVectorSetUnitPos("pos", "bossEntranceStatue");
+				trArmyDispatch("1,0","Dwarf",1,
+					trQuestVarGet("Posx"),0,trQuestVarGet("Posz"),0,true);
+					trArmySelect("1,0");
+					trUnitConvert(0);
+					trUnitChangeProtoUnit("Revealer");
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+					trMessageSetText("The boss entrance has been found!", -1);
 					break;
 				}
 			}
-		} else if (trQuestVarGet("localQuest") == SHOP_GUY) {
-			switch(1*trQuestVarGet("questActive"))
-			{
-				case 1:
-				{
-					trQuestVarSet("questActive", 2);
-					trQuestVarSetFromRand("shopRelic", 5, 10, true);
-					trQuestVarSet("shopRelic", trQuestVarGet("shopRelic") + trQuestVarGet("stage"));
-					trQuestVarSet("shopGuyActive", 1);
-					trVectorSetUnitPos("shopGuyPos", "questGuy");
+		}
+		
+		
+		rule relic_transporter_guy_always
+		inactive
+		highFrequency
+		{
+			trUnitSelectClear();
+			trUnitSelectByQV("relicTransporterGuyName");
+			if (trUnitIsSelected()) {
+				trUnitHighlight(5.0, true);
+				int p = trCurrentPlayer();
+				if (trQuestVarGet("p"+p+"transporterPurchased") == 0) {
+					startNPCDialog(NPC_RELIC_TRANSPORTER);
+				} else {
+					startNPCDialog(NPC_RELIC_TRANSPORTER_WTF);
 				}
-				case 2:
-				{
-					trUnitSelectClear();
-					trUnitSelectByQV("questGuy");
-					if (trUnitIsSelected()) {
-						startNPCDialog(NPC_QUEST_COMPLETE + SHOP_NPC);
-						reselectMyself();
-					}
+				reselectMyself();
+			}
+		}
+		
+		rule npc_talk_01
+		inactive
+		highFrequency
+		{
+			xsDisableSelf();
+			trQuestVarSet("currentNPCProgress",
+				npcDiag(1*trQuestVarGet("currentNPC"), 1*trQuestVarGet("currentNPCProgress")));
+				if (trQuestVarGet("currentNPCProgress") > 0) {
+					trDelayedRuleActivation("npc_talk_02");
 				}
 			}
-		} else if (trQuestVarGet("questActive") > 0) {
-			/* start the quest */
-			switch(1*trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
+			
+			rule npc_talk_02
+			inactive
+			highFrequency
 			{
-				case FETCH_NPC + 1:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 1, 8, true);
-							trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
-							if (trQuestVarGet("pig") > 14) {
-								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
-							}
-							trQuestVarSet("pig1", trGetNextUnitScenarioNameNumber());
-							z = trQuestVarGet("pig") / 4;
-							x = trQuestVarGet("pig") - 4 * z;
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("pig1", true);
-							trUnitConvert(0);
-							trUnitChangeProtoUnit("Pig");
-							trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
-							trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
-							if (trQuestVarGet("pig") > 14) {
-								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
-							}
-							trQuestVarSet("pig2", trGetNextUnitScenarioNameNumber());
-							z = trQuestVarGet("pig") / 4;
-							x = trQuestVarGet("pig") - 4 * z;
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("pig2", true);
-							trUnitConvert(0);
-							trUnitChangeProtoUnit("Pig");
-							trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
-							trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
-							if (trQuestVarGet("pig") > 14) {
-								trQuestVarSet("pig", trQuestVarGet("pig") - 14);
-							}
-							trQuestVarSet("pig3", trGetNextUnitScenarioNameNumber());
-							z = trQuestVarGet("pig") / 4;
-							x = trQuestVarGet("pig") - 4 * z;
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("pig3", true);
-							trUnitConvert(0);
-							trUnitChangeProtoUnit("Pig");
+				if ((trQuestVarGet("currentNPCProgress") > 0) &&
+				(trIsGadgetVisible("ingame-messagedialog") == false) &&
+				(trIsGadgetVisible("ShowImageBox") == false)) {
+					trDelayedRuleActivation("npc_talk_01");
+					xsDisableSelf();
+				}
+			}
+			
+			void questComplete(int gem = -1, int gold = -1) {
+				if (gem >= 0) {
+					trQuestVarSet("gemstone"+gem, 1 + trQuestVarGet("gemstone"+gem));
+				}
+				if (gold > 0) {
+					for(p=1; < ENEMY_PLAYER) {
+						trQuestVarSet("p"+p+"gold", gold + trQuestVarGet("p"+p+"gold"));
+						trPlayerGrantResources(p, "gold", gold);
+					}
+				}
+				trQuestVarSet("questCount", 1 + trQuestVarGet("questCount"));
+				startNPCDialog(NPC_QUEST_COMPLETE + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
+				trQuestVarSet("questActive", -1);
+				uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+			}
+			
+			rule town_always
+			inactive
+			highFrequency
+			{
+				int x = 0;
+				int z = 0;
+				int p = 0;
+				int room = 0;
+				int action = 0;
+				float amt = 0;
+				if (trQuestVarGet("townFound") == 0) {
+					trUnitSelectClear();
+					trUnitSelectByQV("guy1");
+					for(p=1; < ENEMY_PLAYER) {
+						if (trUnitHasLOS(p)) {
+							trQuestVarSet("townFound", 1);
+							break;
 						}
-						case 2:
+					}
+					if (trQuestVarGet("townFound") == 1) {
+						x = trQuestVarGet("village");
+						z = x / 4;
+						x = trQuestVarGet("village") - 4 * z;
+						trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
+						trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
+						trArmyDispatch("1,0","Revealer to Player",1,70*x+40,0,70*z+40,225,true);
+						trSoundPlayFN("settlement.wav","1",-1,"","");
+					}
+				} else {
+					yDatabaseNext("npcTalk", true);
+					if (trUnitIsSelected()) {
+						startNPCDialog(1*yGetVar("npcTalk", "dialog"));
+						reselectMyself();
+					}
+					
+					if (trQuestVarGet("questActive") == 0) {
+						trVectorSetUnitPos("questGuyPos", "questGuy");
+						for(p=1; < ENEMY_PLAYER) {
+							if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+								uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
+								trQuestVarSet("questActive", 1);
+								startNPCDialog(NPC_QUEST + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
+								break;
+							}
+						}
+					} else if (trQuestVarGet("localQuest") == SHOP_GUY) {
+						switch(1*trQuestVarGet("questActive"))
 						{
-							for(i=1; <4) {
-								if (trQuestVarGet("pigReturned"+i) == 0) {
-									trVectorSetUnitPos("pos", "pig"+i);
-									if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
-										trQuestVarSet("pigReturned"+i, 1);
-										trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
-										trChatSend(0, "<color=1,1,1>Pig returned!</color>");
-										trSoundPlayFN("pigambient.wav","1",-1,"","");
-										if (trQuestVarGet("pigReturnCount") == 3) {
+							case 1:
+							{
+								trQuestVarSet("questActive", 2);
+								trQuestVarSetFromRand("shopRelic", 5, 10, true);
+								trQuestVarSet("shopRelic", trQuestVarGet("shopRelic") + trQuestVarGet("stage"));
+								trQuestVarSet("shopGuyActive", 1);
+								trVectorSetUnitPos("shopGuyPos", "questGuy");
+							}
+							case 2:
+							{
+								trUnitSelectClear();
+								trUnitSelectByQV("questGuy");
+								if (trUnitIsSelected()) {
+									startNPCDialog(NPC_QUEST_COMPLETE + SHOP_NPC);
+									reselectMyself();
+								}
+							}
+						}
+					} else if (trQuestVarGet("questActive") > 0) {
+						/* start the quest */
+						switch(1*trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"))
+						{
+							case FETCH_NPC + 1:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSetFromRand("rand", 1, 8, true);
+										trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("village"));
+										if (trQuestVarGet("pig") > 14) {
+											trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+										}
+										trQuestVarSet("pig1", trGetNextUnitScenarioNameNumber());
+										z = trQuestVarGet("pig") / 4;
+										x = trQuestVarGet("pig") - 4 * z;
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("pig1", true);
+										trUnitConvert(0);
+										trUnitChangeProtoUnit("Pig");
+										trQuestVarSetFromRand("rand2", 1, 11 - trQuestVarGet("rand"));
+										trQuestVarSet("pig", trQuestVarGet("rand2") + trQuestVarGet("pig"));
+										if (trQuestVarGet("pig") > 14) {
+											trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+										}
+										trQuestVarSet("pig2", trGetNextUnitScenarioNameNumber());
+										z = trQuestVarGet("pig") / 4;
+										x = trQuestVarGet("pig") - 4 * z;
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("pig2", true);
+										trUnitConvert(0);
+										trUnitChangeProtoUnit("Pig");
+										trQuestVarSetFromRand("rand3", 1, 15 - trQuestVarGet("rand") - trQuestVarGet("rand2"));
+										trQuestVarSet("pig", trQuestVarGet("rand") + trQuestVarGet("pig"));
+										if (trQuestVarGet("pig") > 14) {
+											trQuestVarSet("pig", trQuestVarGet("pig") - 14);
+										}
+										trQuestVarSet("pig3", trGetNextUnitScenarioNameNumber());
+										z = trQuestVarGet("pig") / 4;
+										x = trQuestVarGet("pig") - 4 * z;
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,0,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("pig3", true);
+										trUnitConvert(0);
+										trUnitChangeProtoUnit("Pig");
+									}
+									case 2:
+									{
+										for(i=1; <4) {
+											if (trQuestVarGet("pigReturned"+i) == 0) {
+												trVectorSetUnitPos("pos", "pig"+i);
+												if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
+													trQuestVarSet("pigReturned"+i, 1);
+													trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
+													trChatSend(0, "<color=1,1,1>Pig returned!</color>");
+													trSoundPlayFN("pigambient.wav","1",-1,"","");
+													if (trQuestVarGet("pigReturnCount") == 3) {
+														questComplete(-1, 300);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+							case BOUNTY_NPC + 1:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSetFromRand("rand", 6, 9, true);
+										trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+										if (trQuestVarGet("rand") > 14) {
+											trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+										}
+										z = trQuestVarGet("rand") / 4;
+										x = trQuestVarGet("rand") - 4 * z;
+										trVectorQuestVarSet("bountyTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+										trQuestVarSet("bountyTarget", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,225,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("bountyTarget", true);
+										trUnitConvert(ENEMY_PLAYER);
+										trUnitChangeProtoUnit("Mummy");
+										activateEnemy("bountyTarget", 100);
+										trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 700);
+									}
+									case 2:
+									{
+										trUnitSelectClear();
+										trUnitSelectByQV("bountyTarget", true);
+										if (trUnitAlive() == false) {
+											trMessageSetText("Bounty target defeated! Return to the quest giver for your reward!", -1);
+											trQuestVarSet("questActive", 3);
+										}
+									}
+									case 3:
+									{
+										trVectorSetUnitPos("bountyGuyPos", "questguy");
+										for(p=1; < ENEMY_PLAYER) {
+											if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+												questComplete(STARSTONE, 0);
+												break;
+											}
+										}
+									}
+								}
+							}
+							case FETCH_NPC + 2:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSetFromRand("rand", 6, 9, true);
+										trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+										if (trQuestVarGet("rand") > 14) {
+											trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+										}
+										z = trQuestVarGet("rand") / 4;
+										x = trQuestVarGet("rand") - 4 * z;
+										trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+										trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("fetchTarget", true);
+										trUnitChangeProtoUnit("Relic");
+										yAddToDatabase("freeRelics", "fetchTarget");
+										yAddUpdateVar("freeRelics", "type", RELIC_GHOST_PICTURE);
+									}
+									case 2:
+									{
+										trVectorSetUnitPos("pos", "fetchTarget");
+										if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16.0) {
+											questComplete(SOULSTONE, 0);
+											trUnitSelectClear();
+											trUnitSelectByQV("fetchTarget", true);
+											trUnitChangeProtoUnit("Osiris Box Glow");
+										}
+									}
+								}
+							}
+							case BOUNTY_NPC + 2:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("portalsActive", 0);
+										trCounterAddTime("countdown", 15, 1, "The shade attacks", -1);
+										trQuestVarSet("shadeAttackTime", trTime() + 15);
+										trQuestVarSet("questActive", 2);
+										trModifyProtounit("Shade", 0, 2, 30);
+										trModifyProtounit("Shade", 0, 27, 3000);
+									}
+									case 2:
+									{
+										if (trTime() >= trQuestVarGet("shadeAttackTime")) {
+											trUnitSelectClear();
+											trUnitSelectByQV("questGuy", true);
+											trUnitMoveToPoint(0,0,0,-1,true);
+											trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
+											trSoundPlayFN("attackwarning.wav","1",-1,"","");
+											trChatSendSpoofed(0, "Shade: JIMMY!!!!");
+											trQuestVarSet("questActive", 3);
+											trQuestVarSet("shadeAttackTime", trTime() + 30);
+											trCounterAddTime("shadecountdown", 30, 1, "Survive", -1);
+										}
+									}
+									case 3:
+									{
+										if (trTime() >= trQuestVarGet("shadeAttackTime")) {
+											trQuestVarSet("portalsActive", 1);
+											trQuestVarSet("questActive", 4);
+											trUnitSelectClear();
+											trUnitSelectByQV("questGuy", true);
+											if (trUnitAlive()) {
+												trUnitDoWorkOnUnit(""+1*trQuestVarGet("questGuy"));
+												questComplete(-1, 200);
+											}
+										} else {
+											trUnitSelectClear();
+											trUnitSelectByQV("questGuy", true);
+											if (trUnitAlive() == false) {
+												trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+												trQuestVarSet("questActive", -1);
+												trCounterAbort("shadecountdown");
+												trMessageSetText("Quest failed!", -1);
+												trQuestVarSet("portalsActive", 1);
+											}
+										}
+									}
+								}
+							}
+							case FETCH_NPC + 3:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSetFromRand("rand", 6, 9, true);
+										trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
+										if (trQuestVarGet("rand") > 14) {
+											trQuestVarSet("rand", trQuestVarGet("rand") - 14);
+										}
+										z = trQuestVarGet("rand") / 4;
+										x = trQuestVarGet("rand") - 4 * z;
+										trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
+										trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("fetchTarget", true);
+										trUnitConvert(0);
+										trUnitChangeProtoUnit("Ox Cart");
+										trQuestVarSet("fetchWolvesSpawn", zDistanceBetweenVectors("fetchTargetPos", "townCenter") - 20);
+									}
+									case 2:
+									{
+										trUnitSelectClear();
+										trUnitSelectByQV("fetchTarget", true);
+										for(p=1; < ENEMY_PLAYER) {
+											if (trUnitHasLOS(p)) {
+												trSoundPlayFN("find.wav","1",-1,"","");
+												trUnitConvert(p);
+												trQuestVarSet("questActive", 3);
+												trMessageSetText("Bring the cart back to the town.");
+												break;
+											}
+										}
+									}
+									case 3:
+									{
+										trUnitSelectClear();
+										trUnitSelectByQV("fetchTarget", true);
+										if (trUnitAlive() == false) {
+											trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+											trMessageSetText("Quest failed!");
+											trQuestVarSet("questActive", -1);
+										} else if (zDistanceToVector("fetchTarget", "townCenter") < trQuestVarGet("fetchWolvesSpawn")) {
+											trQuestVarSet("fetchWolvesSpawn", trQuestVarGet("fetchWolvesSpawn") - 20);
+											trVectorSetUnitPos("center", "fetchTarget");
+											trQuestVarSetFromRand("count", 1, ENEMY_PLAYER, true);
+											for(x=trQuestVarGet("count"); >0) {
+												trQuestVarSetFromRand("angle", 0, 6.283185, false);
+												trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+												trQuestVarSet("heading", 57.29578 * trQuestVarGet("angle") - 180);
+												trQuestVarSet("posx", 20.0 * trQuestVarGet("dirx") + trQuestVarGet("centerx"));
+												trQuestVarSet("posz", 20.0 * trQuestVarGet("dirz") + trQuestVarGet("centerz"));
+												trQuestVarSet("next" , trGetNextUnitScenarioNameNumber());
+												vectorToGrid("pos", "loc");
+												if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+													trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+													trUnitSelectClear();
+													trUnitSelectByQV("next", true);
+													trUnitConvert(ENEMY_PLAYER);
+													trUnitChangeProtoUnit("Fenris Wolf");
+													trUnitSelectClear();
+													trUnitSelectByQV("next", true);
+													trUnitMoveToPoint(trQuestVarGet("centerx"),0,trQuestVarGet("centerz"),-1,true);
+													activateEnemy("next");
+												}
+											}
+										} else if (zDistanceToVectorSquared("fetchTarget", "townCenter") < 400) {
+											questComplete(-1, 300);
+											trUnitSelectClear();
+											trUnitSelectByQV("fetchTarget", true);
+											trUnitConvert(0);
+										}
+									}
+								}
+							}
+							case BOUNTY_NPC + 3:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSet("frostGiantBones", 0);
+										trQuestVarSet("frostGiantBonesLast", 0);
+										trQuestVarSet("frostGiantHunt", 1);
+										for(i=1; < 14) {
+											if (i == trQuestVarGet("village")) {
+												continue;
+											} else {
+												z = i / 4;
+												x = i - z * 4;
+												trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+												trQuestVarSetFromRand("heading", 0, 360, true);
+												trArmyDispatch("1,0", "Dwarf", 1, 70*x+40,0,70*z+40,trQuestVarGet("heading"),true);
+												trArmySelect("1,0");
+												trUnitConvert(ENEMY_PLAYER);
+												trUnitChangeProtoUnit("Frost Giant");
+												yAddToDatabase("enemiesIncoming", "next");
+											}
+										}
+									}
+									case 2:
+									{
+										if (trQuestVarGet("frostGiantBones") > trQuestVarGet("frostGiantBonesLast")) {
+											if (trQuestVarGet("frostGiantBones") >= 5) {
+												trQuestVarSet("frostGiantHunt", 0);
+												trMessageSetText("Return to the axeman for your reward.", -1);
+												trQuestVarSet("questActive", 3);
+											} else {
+												trQuestVarSet("frostGiantBonesLast", trQuestVarGet("frostGiantBones"));
+												trChatSend(0, "<color=1,1,1>Frosted Bone collected! ("+1*trQuestVarGet("frostGiantBones")+"/5)");
+											}
+										}
+									}
+									case 3:
+									{
+										trVectorSetUnitPos("bountyGuyPos", "questguy");
+										for(p=1; < ENEMY_PLAYER) {
+											if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+												questComplete(MANASTONE, 0);
+												break;
+											}
+										}
+									}
+								}
+							}
+							case BOUNTY_NPC + 4:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSet("questSpawns", 12);
+										trQuestVarSetFromRand("questAngle", 0, 3.14, false);
+										trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
+										trQuestVarSet("questNext", trTimeMS());
+										trSoundPlayFN("changeunit.wav","1",-1,"","");
+										trBlockAllSounds(true);
+									}
+									case 2:
+									{
+										if (yGetDatabaseCount("questLeaves") > 0) {
+											action = processGenericProj("questLeaves");
+											if (action == PROJ_GROUND) {
+												trUnitSelectClear();
+												trUnitSelectByQV("questLeaves");
+												trUnitChangeProtoUnit("Dryad");
+												trUnitSelectClear();
+												trUnitSelectByQV("questLeaves");
+												trDamageUnitPercent(-100);
+												activateEnemy("questLeaves",-1,0);
+												yAddToDatabase("questTargets", "questLeaves");
+												yRemoveFromDatabase("questLeaves");
+												if (trQuestVarGet("questSpawns") == 0) {
+													trQuestVarSet("questActive", 3);
+													trUnblockAllSounds();
+												}
+											}
+										}
+										if (trQuestVarGet("questSpawns") > 0) {
+											if (trTimeMS() > trQuestVarGet("questNext")) {
+												for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
+													trUnitSelectClear();
+													trUnitSelect(""+i, true);
+													trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+												}
+												trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+												trQuestVarSet("questNext", trQuestVarGet("questNext") + 500);
+												z = trQuestVarGet("village") / 4;
+												x = trQuestVarGet("village") - 4 * z;
+												trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
+												trQuestVarSetFromRand("rand", 8, 20, false);
+												addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"),1);
+												trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardTower", true);
+												trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardGuild1", true);
+												trMutateSelected(kbGetProtoUnitID("Guild"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardGuild2", true);
+												trMutateSelected(kbGetProtoUnitID("Guild"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardTree", true);
+												trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
+											}
+										}
+									}
+									case 3:
+									{
+										if (yGetDatabaseCount("questTargets") > 0) {
+											if (yDatabaseNext("questTargets", true) == -1 || trUnitAlive() == false) {
+												yRemoveFromDatabase("questTargets");
+											}
+										} else {
 											questComplete(-1, 300);
 										}
 									}
 								}
 							}
-						}
-					}
-				}
-				case BOUNTY_NPC + 1:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 6, 9, true);
-							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
-							if (trQuestVarGet("rand") > 14) {
-								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
-							}
-							z = trQuestVarGet("rand") / 4;
-							x = trQuestVarGet("rand") - 4 * z;
-							trVectorQuestVarSet("bountyTargetPos", xsVectorSet(70*x+40,0,70*z+40));
-							trQuestVarSet("bountyTarget", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 40,0,70 * z + 40,225,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("bountyTarget", true);
-							trUnitConvert(ENEMY_PLAYER);
-							trUnitChangeProtoUnit("Mummy");
-							activateEnemy("bountyTarget", 100);
-							trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 700);
-						}
-						case 2:
-						{
-							trUnitSelectClear();
-							trUnitSelectByQV("bountyTarget", true);
-							if (trUnitAlive() == false) {
-								trMessageSetText("Bounty target defeated! Return to the quest giver for your reward!", -1);
-								trQuestVarSet("questActive", 3);
-							}
-						}
-						case 3:
-						{
-							trVectorSetUnitPos("bountyGuyPos", "questguy");
-							for(p=1; < ENEMY_PLAYER) {
-								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
-									questComplete(STARSTONE, 0);
-									break;
-								}
-							}
-						}
-					}
-				}
-				case FETCH_NPC + 2:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 6, 9, true);
-							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
-							if (trQuestVarGet("rand") > 14) {
-								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
-							}
-							z = trQuestVarGet("rand") / 4;
-							x = trQuestVarGet("rand") - 4 * z;
-							trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
-							trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("fetchTarget", true);
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "fetchTarget");
-							yAddUpdateVar("freeRelics", "type", RELIC_GHOST_PICTURE);
-						}
-						case 2:
-						{
-							trVectorSetUnitPos("pos", "fetchTarget");
-							if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16.0) {
-								questComplete(SOULSTONE, 0);
-								trUnitSelectClear();
-								trUnitSelectByQV("fetchTarget", true);
-								trUnitChangeProtoUnit("Osiris Box Glow");
-							}
-						}
-					}
-				}
-				case BOUNTY_NPC + 2:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("portalsActive", 0);
-							trCounterAddTime("countdown", 15, 1, "The shade attacks", -1);
-							trQuestVarSet("shadeAttackTime", trTime() + 15);
-							trQuestVarSet("questActive", 2);
-							trModifyProtounit("Shade", 0, 2, 30);
-							trModifyProtounit("Shade", 0, 27, 3000);
-						}
-						case 2:
-						{
-							if (trTime() >= trQuestVarGet("shadeAttackTime")) {
-								trUnitSelectClear();
-								trUnitSelectByQV("questGuy", true);
-								trUnitMoveToPoint(0,0,0,-1,true);
-								trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
-								trSoundPlayFN("attackwarning.wav","1",-1,"","");
-								trChatSendSpoofed(0, "Shade: JIMMY!!!!");
-								trQuestVarSet("questActive", 3);
-								trQuestVarSet("shadeAttackTime", trTime() + 30);
-								trCounterAddTime("shadecountdown", 30, 1, "Survive", -1);
-							}
-						}
-						case 3:
-						{
-							if (trTime() >= trQuestVarGet("shadeAttackTime")) {
-								trQuestVarSet("portalsActive", 1);
-								trQuestVarSet("questActive", 4);
-								trUnitSelectClear();
-								trUnitSelectByQV("questGuy", true);
-								if (trUnitAlive()) {
-									trUnitDoWorkOnUnit(""+1*trQuestVarGet("questGuy"));
-									questComplete(-1, 200);
-								}
-							} else {
-								trUnitSelectClear();
-								trUnitSelectByQV("questGuy", true);
-								if (trUnitAlive() == false) {
-									trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
-									trQuestVarSet("questActive", -1);
-									trCounterAbort("shadecountdown");
-									trMessageSetText("Quest failed!", -1);
-									trQuestVarSet("portalsActive", 1);
-								}
-							}
-						}
-					}
-				}
-				case FETCH_NPC + 3:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 6, 9, true);
-							trQuestVarSet("rand", trQuestVarGet("village") + trQuestVarGet("rand"));
-							if (trQuestVarGet("rand") > 14) {
-								trQuestVarSet("rand", trQuestVarGet("rand") - 14);
-							}
-							z = trQuestVarGet("rand") / 4;
-							x = trQuestVarGet("rand") - 4 * z;
-							trVectorQuestVarSet("fetchTargetPos", xsVectorSet(70*x+40,0,70*z+40));
-							trQuestVarSet("fetchTarget", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0", "Dwarf",1,70 * x + 36,0,70 * z + 36,225,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("fetchTarget", true);
-							trUnitConvert(0);
-							trUnitChangeProtoUnit("Ox Cart");
-							trQuestVarSet("fetchWolvesSpawn", zDistanceBetweenVectors("fetchTargetPos", "townCenter") - 20);
-						}
-						case 2:
-						{
-							trUnitSelectClear();
-							trUnitSelectByQV("fetchTarget", true);
-							for(p=1; < ENEMY_PLAYER) {
-								if (trUnitHasLOS(p)) {
-									trSoundPlayFN("find.wav","1",-1,"","");
-									trUnitConvert(p);
-									trQuestVarSet("questActive", 3);
-									trMessageSetText("Bring the cart back to the town.");
-									break;
-								}
-							}
-						}
-						case 3:
-						{
-							trUnitSelectClear();
-							trUnitSelectByQV("fetchTarget", true);
-							if (trUnitAlive() == false) {
-								trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
-								trMessageSetText("Quest failed!");
-								trQuestVarSet("questActive", -1);
-							} else if (zDistanceToVector("fetchTarget", "townCenter") < trQuestVarGet("fetchWolvesSpawn")) {
-								trQuestVarSet("fetchWolvesSpawn", trQuestVarGet("fetchWolvesSpawn") - 20);
-								trVectorSetUnitPos("center", "fetchTarget");
-								trQuestVarSetFromRand("count", 1, ENEMY_PLAYER, true);
-								for(x=trQuestVarGet("count"); >0) {
-									trQuestVarSetFromRand("angle", 0, 6.283185, false);
-									trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-									trQuestVarSet("heading", 57.29578 * trQuestVarGet("angle") - 180);
-									trQuestVarSet("posx", 20.0 * trQuestVarGet("dirx") + trQuestVarGet("centerx"));
-									trQuestVarSet("posz", 20.0 * trQuestVarGet("dirz") + trQuestVarGet("centerz"));
-									trQuestVarSet("next" , trGetNextUnitScenarioNameNumber());
-									vectorToGrid("pos", "loc");
-									if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
-										trUnitSelectClear();
-										trUnitSelectByQV("next", true);
-										trUnitConvert(ENEMY_PLAYER);
-										trUnitChangeProtoUnit("Fenris Wolf");
-										trUnitSelectClear();
-										trUnitSelectByQV("next", true);
-										trUnitMoveToPoint(trQuestVarGet("centerx"),0,trQuestVarGet("centerz"),-1,true);
-										activateEnemy("next");
+							case FETCH_NPC + 4:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSetFromRand("operand1", 1, 10, true);
+										trQuestVarSetFromRand("operand2", 1, 10, true);
+										trQuestVarSet("questAnswer", trQuestVarGet("operand1") + trQuestVarGet("operand2"));
+										trQuestVarSet("questActive", 2);
+										trQuestVarSet("questSpawns", 20);
+										trQuestVarSetFromRand("questAngle", 0, 3.14, false);
+										trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
+										trQuestVarSet("questNext", trTimeMS());
+										trSoundPlayFN("changeunit.wav","1",-1,"","");
+										trBlockAllSounds(true);
 									}
-								}
-							} else if (zDistanceToVectorSquared("fetchTarget", "townCenter") < 400) {
-								questComplete(-1, 300);
-								trUnitSelectClear();
-								trUnitSelectByQV("fetchTarget", true);
-								trUnitConvert(0);
-							}
-						}
-					}
-				}
-				case BOUNTY_NPC + 3:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSet("frostGiantBones", 0);
-							trQuestVarSet("frostGiantBonesLast", 0);
-							trQuestVarSet("frostGiantHunt", 1);
-							for(i=1; < 14) {
-								if (i == trQuestVarGet("village")) {
-									continue;
-								} else {
-									z = i / 4;
-									x = i - z * 4;
-									trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-									trQuestVarSetFromRand("heading", 0, 360, true);
-									trArmyDispatch("1,0", "Dwarf", 1, 70*x+40,0,70*z+40,trQuestVarGet("heading"),true);
-									trArmySelect("1,0");
-									trUnitConvert(ENEMY_PLAYER);
-									trUnitChangeProtoUnit("Frost Giant");
-									yAddToDatabase("enemiesIncoming", "next");
-								}
-							}
-						}
-						case 2:
-						{
-							if (trQuestVarGet("frostGiantBones") > trQuestVarGet("frostGiantBonesLast")) {
-								if (trQuestVarGet("frostGiantBones") >= 5) {
-									trQuestVarSet("frostGiantHunt", 0);
-									trMessageSetText("Return to the axeman for your reward.", -1);
-									trQuestVarSet("questActive", 3);
-								} else {
-									trQuestVarSet("frostGiantBonesLast", trQuestVarGet("frostGiantBones"));
-									trChatSend(0, "<color=1,1,1>Frosted Bone collected! ("+1*trQuestVarGet("frostGiantBones")+"/5)");
-								}
-							}
-						}
-						case 3:
-						{
-							trVectorSetUnitPos("bountyGuyPos", "questguy");
-							for(p=1; < ENEMY_PLAYER) {
-								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
-									questComplete(MANASTONE, 0);
-									break;
-								}
-							}
-						}
-					}
-				}
-				case BOUNTY_NPC + 4:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSet("questSpawns", 12);
-							trQuestVarSetFromRand("questAngle", 0, 3.14, false);
-							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
-							trQuestVarSet("questNext", trTimeMS());
-							trSoundPlayFN("changeunit.wav","1",-1,"","");
-							trBlockAllSounds(true);
-						}
-						case 2:
-						{
-							if (yGetDatabaseCount("questLeaves") > 0) {
-								action = processGenericProj("questLeaves");
-								if (action == PROJ_GROUND) {
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
-									trUnitChangeProtoUnit("Dryad");
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
-									trDamageUnitPercent(-100);
-									activateEnemy("questLeaves",-1,0);
-									yAddToDatabase("questTargets", "questLeaves");
-									yRemoveFromDatabase("questLeaves");
-									if (trQuestVarGet("questSpawns") == 0) {
-										trQuestVarSet("questActive", 3);
-										trUnblockAllSounds();
-									}
-								}
-							}
-							if (trQuestVarGet("questSpawns") > 0) {
-								if (trTimeMS() > trQuestVarGet("questNext")) {
-									for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
-										trUnitSelectClear();
-										trUnitSelect(""+i, true);
-										trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-									}
-									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
-									trQuestVarSet("questNext", trQuestVarGet("questNext") + 500);
-									z = trQuestVarGet("village") / 4;
-									x = trQuestVarGet("village") - 4 * z;
-									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
-									trQuestVarSetFromRand("rand", 8, 20, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"),1);
-									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardTower", true);
-									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardGuild1", true);
-									trMutateSelected(kbGetProtoUnitID("Guild"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardGuild2", true);
-									trMutateSelected(kbGetProtoUnitID("Guild"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardTree", true);
-									trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
-								}
-							}
-						}
-						case 3:
-						{
-							if (yGetDatabaseCount("questTargets") > 0) {
-								if (yDatabaseNext("questTargets", true) == -1 || trUnitAlive() == false) {
-									yRemoveFromDatabase("questTargets");
-								}
-							} else {
-								questComplete(-1, 300);
-							}
-						}
-					}
-				}
-				case FETCH_NPC + 4:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSetFromRand("operand1", 1, 10, true);
-							trQuestVarSetFromRand("operand2", 1, 10, true);
-							trQuestVarSet("questAnswer", trQuestVarGet("operand1") + trQuestVarGet("operand2"));
-							trQuestVarSet("questActive", 2);
-							trQuestVarSet("questSpawns", 20);
-							trQuestVarSetFromRand("questAngle", 0, 3.14, false);
-							trVectorSetFromAngle("questDir", trQuestVarGet("questAngle"));
-							trQuestVarSet("questNext", trTimeMS());
-							trSoundPlayFN("changeunit.wav","1",-1,"","");
-							trBlockAllSounds(true);
-						}
-						case 2:
-						{
-							if (yGetDatabaseCount("questLeaves") > 0) {
-								action = processGenericProj("questLeaves");
-								if (action == PROJ_GROUND) {
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
-									trUnitChangeProtoUnit("Relic");
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
-									trDamageUnitPercent(-100);
-									yAddToDatabase("freeRelics", "questLeaves");
-									yAddUpdateVar("freeRelics", "type", yGetVar("questLeaves", "type"));
-									yAddToDatabase("questApples", "questLeaves");
-									yAddUpdateVar("questApples", "type", yGetVar("questLeaves", "type"));
-									yRemoveFromDatabase("questLeaves");
-									if (yGetDatabaseCount("questLeaves") + trQuestVarGet("questSpawns") == 0) {
-										trQuestVarSet("questActive", 3);
-										trUnblockAllSounds();
-									}
-								}
-							}
-							if (trQuestVarGet("questSpawns") > 0) {
-								if (trTimeMS() > trQuestVarGet("questNext")) {
-									
-									for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
-										trUnitSelectClear();
-										trUnitSelect(""+i, true);
-										trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-									}
-									
-									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
-									z = trQuestVarGet("village") / 4;
-									x = trQuestVarGet("village") - 4 * z;
-									trVectorQuestVarSet("start", xsVectorSet(70*x+36,0,70*z+36));
-									trQuestVarSetFromRand("rand", 12, 16, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Einheriar"),18,trQuestVarGet("rand"),1);
-									yAddUpdateVar("questLeaves", "type", RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
-									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
-									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardTower", true);
-									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardGuild1", true);
-									trMutateSelected(kbGetProtoUnitID("Guild"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardGuild2", true);
-									trMutateSelected(kbGetProtoUnitID("Guild"));
-									trUnitSelectClear();
-									trUnitSelectByQV("akardTree", true);
-									trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
-									
-								}
-							}
-						}
-						case 3:
-						{
-							yDatabaseNext("questApples");
-							if (zDistanceToVectorSquared("questApples", "questGuyPos") < 9) {
-								trUnitSelectClear();
-								trUnitSelectByQV("questApples", true);
-								if (yGetVar("questApples", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
-									trUnitChangeProtoUnit("Osiris Box Glow");
-									questComplete(STARSTONE, -1);
-								} else {
-									trQuestVarSet("wrongAnswer", yGetVar("questApples", "type") - RELIC_MATH_PROBLEM);
-									yClearDatabase("questApples");
-									xsDisableRule("gameplay_always");
-									xsDisableRule("town_always");
-									xsDisableRule("boss_entrance_always");
-									xsDisableRule("enter_boss_room");
-									xsDisableRule("nottud_always");
-									xsDisableRule("class_shop_always");
-									xsDisableRule("relic_transporter_guy_always");
-									xsDisableRule("relic_transporter_guy_found");
-									trUnitChangeProtoUnit("Dwarf");
-									trUnitSelectClear();
-									trUnitSelectByQV("questApples", true);
-									trUnitConvert(0);
-									trUnitChangeProtoUnit("Implode Sphere Effect");
-									trSoundPlayFN("wonderdeath.wav","1",-1,"","");
-									trSoundPlayFN("changeunit.wav","1",-1,"","");
-									trChatSendSpoofed(0, "Akard: OH GOD! WHAT HAVE YOU DONE?! THAT'S THE WRONG-");
-									xsEnableRule("zenos_paradox_00");
-									trQuestVarSet("cinNext", 0);
-									trQuestVarSet("cinStep", 0);
-								}
-							}
-						}
-					}
-				}
-				case FETCH_NPC + 5:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
-							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
-							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
-							trQuestVarSet("fecesRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
-							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
-							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
-							trQuestVarSet("berryRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
-							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
-							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
-							trQuestVarSet("corpseRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "fecesRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_LITERAL_FECES);
-							yAddToDatabase("freeRelics", "berryRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_BERRY_BUSH);
-							yAddToDatabase("freeRelics", "corpseRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_A_FUCKING_CORPSE);
-						}
-						case 2:
-						{
-							if (zDistanceToVectorSquared("berryRelic", "questGuyPos") < 16) {
-								trUnitSelectClear();
-								trUnitSelectByQV("berryRelic", true);
-								trUnitChangeProtoUnit("Regeneration SFX");
-								trQuestVarSet("questActive", 4);
-								trQuestVarSet("questNext", trTime() + 5);
-								trSoundPlayFN("colossuseat.wav","1",-1,"","");
-								startNPCDialog(NPC_ATE_BERRIES);
-							} else if (zDistanceToVectorSquared("corpseRelic", "questGuyPos") < 16) {
-								trUnitSelectClear();
-								trUnitSelectByQV("corpseRelic", true);
-								trUnitChangeProtoUnit("Scarab Blood");
-								trQuestVarSet("questActive", 5);
-								trQuestVarSet("questNext", trTime() + 5);
-								trSoundPlayFN("colossuseat.wav","1",-1,"","");
-								startNPCDialog(NPC_ATE_CORPSE);
-							} else if (zDistanceToVectorSquared("fecesRelic", "questGuyPos") < 16) {
-								trUnitSelectClear();
-								trUnitSelectByQV("fecesRelic", true);
-								trUnitChangeProtoUnit("Osiris Box Glow");
-								trSoundPlayFN("colossuseat.wav","1",-1,"","");
-								trSoundPlayFN("heal.wav","1",-1,"","");
-								questComplete(-1, 300);
-							}
-						}
-						case 4:
-						{
-							if (trTime() > trQuestVarGet("questNext")) {
-								trQuestVarSet("questActive", -1);
-								trMessageSetText("Quest failed!", -1);
-								trSoundPlayFN("changeunit.wav","1",-1,"","");
-								trUnitSelectClear();
-								trUnitSelectByQV("questGuy", true);
-								trUnitDestroy();
-								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX"),0,trQuestVarGet("questGuyPosZ"),180,true);
-								trUnitSelectClear();
-								trUnitSelectByQV("next");
-								trUnitConvert(ENEMY_PLAYER);
-								trUnitChangeProtoUnit("Walking Berry Bush");
-								activateEnemy("next", 10);
-							}
-						}
-						case 5:
-						{
-							if (trTime() > trQuestVarGet("questNext")) {
-								trQuestVarSet("questActive", -1);
-								trMessageSetText("Quest failed!", -1);
-								trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
-								trUnitSelectClear();
-								trUnitSelectByQV("questGuy", true);
-								trUnitDelete(false);
-							}
-						}
-					}
-				}
-				case BOUNTY_NPC + 5:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSet("poisonBucket", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questGuyPosZ"),0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("poisonBucket", true);
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "poisonBucket");
-							yAddUpdateVar("freeRelics", "type", RELIC_POISON_BUCKET);
-							trQuestVarSet("questActive", 2);
-						}
-						case 2:
-						{
-							p = trQuestVarGet("poisonBucketHolder");
-							if (p > 0) {
-								if (yGetVarAtIndex("playerUnits", "poisonStatus", 1*trQuestVarGet("p"+p+"index")) > 0) {
-									if (trTime() > trQuestVarGet("poisonBucketNext")) {
-										trQuestVarSet("poisonBucketNext", trTime());
-										trQuestVarSet("poisonBucketFill", trQuestVarGet("poisonBucketFill") + 3);
-										if (trQuestVarGet("poisonBucketFill") >= 100) {
-											trQuestVarSet("poisonBucketFill", 100);
-											trMessageSetText("Poison bucket has been filled. Return to the quest giver.", -1);
-											trQuestVarSet("questActive", 3);
+									case 2:
+									{
+										if (yGetDatabaseCount("questLeaves") > 0) {
+											action = processGenericProj("questLeaves");
+											if (action == PROJ_GROUND) {
+												trUnitSelectClear();
+												trUnitSelectByQV("questLeaves");
+												trUnitChangeProtoUnit("Relic");
+												trUnitSelectClear();
+												trUnitSelectByQV("questLeaves");
+												trDamageUnitPercent(-100);
+												yAddToDatabase("freeRelics", "questLeaves");
+												yAddUpdateVar("freeRelics", "type", yGetVar("questLeaves", "type"));
+												yAddToDatabase("questApples", "questLeaves");
+												yAddUpdateVar("questApples", "type", yGetVar("questLeaves", "type"));
+												yRemoveFromDatabase("questLeaves");
+												if (yGetDatabaseCount("questLeaves") + trQuestVarGet("questSpawns") == 0) {
+													trQuestVarSet("questActive", 3);
+													trUnblockAllSounds();
+												}
+											}
 										}
-										trChatSend(0, "<color=0.3,1,0.5>Poison bucket: " + 1*trQuestVarGet("poisonBucketFill") + "/100");
+										if (trQuestVarGet("questSpawns") > 0) {
+											if (trTimeMS() > trQuestVarGet("questNext")) {
+												
+												for(i=trQuestVarGet("akardTower"); < trQuestVarGet("akardTowerEnd")) {
+													trUnitSelectClear();
+													trUnitSelect(""+i, true);
+													trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+												}
+												
+												trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
+												z = trQuestVarGet("village") / 4;
+												x = trQuestVarGet("village") - 4 * z;
+												trVectorQuestVarSet("start", xsVectorSet(70*x+36,0,70*z+36));
+												trQuestVarSetFromRand("rand", 12, 16, false);
+												addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Einheriar"),18,trQuestVarGet("rand"),1);
+												yAddUpdateVar("questLeaves", "type", RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
+												trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
+												trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardTower", true);
+												trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardGuild1", true);
+												trMutateSelected(kbGetProtoUnitID("Guild"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardGuild2", true);
+												trMutateSelected(kbGetProtoUnitID("Guild"));
+												trUnitSelectClear();
+												trUnitSelectByQV("akardTree", true);
+												trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
+												
+											}
+										}
+									}
+									case 3:
+									{
+										yDatabaseNext("questApples");
+										if (zDistanceToVectorSquared("questApples", "questGuyPos") < 9) {
+											trUnitSelectClear();
+											trUnitSelectByQV("questApples", true);
+											if (yGetVar("questApples", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
+												trUnitChangeProtoUnit("Osiris Box Glow");
+												questComplete(STARSTONE, -1);
+											} else {
+												trQuestVarSet("wrongAnswer", yGetVar("questApples", "type") - RELIC_MATH_PROBLEM);
+												yClearDatabase("questApples");
+												xsDisableRule("gameplay_always");
+												xsDisableRule("town_always");
+												xsDisableRule("boss_entrance_always");
+												xsDisableRule("enter_boss_room");
+												xsDisableRule("nottud_always");
+												xsDisableRule("class_shop_always");
+												xsDisableRule("relic_transporter_guy_always");
+												xsDisableRule("relic_transporter_guy_found");
+												trUnitChangeProtoUnit("Dwarf");
+												trUnitSelectClear();
+												trUnitSelectByQV("questApples", true);
+												trUnitConvert(0);
+												trUnitChangeProtoUnit("Implode Sphere Effect");
+												trSoundPlayFN("wonderdeath.wav","1",-1,"","");
+												trSoundPlayFN("changeunit.wav","1",-1,"","");
+												trChatSendSpoofed(0, "Akard: OH GOD! WHAT HAVE YOU DONE?! THAT'S THE WRONG-");
+												xsEnableRule("zenos_paradox_00");
+												trQuestVarSet("cinNext", 0);
+												trQuestVarSet("cinStep", 0);
+											}
+										}
 									}
 								}
 							}
-						}
-						case 3:
-						{
-							if (zDistanceToVectorSquared("poisonBucket", "questGuyPos") < 16) {
-								trUnitSelectClear();
-								trUnitSelectByQV("poisonBucket", true);
-								trUnitChangeProtoUnit("Lampades Blood");
-								trSoundPlayFN("lampadesblood.wav","1",-1,"","");
-								questComplete(SOULSTONE, -1);
+							case FETCH_NPC + 5:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("questActive", 2);
+										trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+										for(i=0; < trQuestVarGet("rand")) {
+											yDatabaseNext("basicRooms");
+										}
+										room = trQuestVarGet("basicRooms");
+										trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+										trQuestVarSet("fecesRelic", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+										trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+										for(i=0; < trQuestVarGet("rand")) {
+											yDatabaseNext("basicRooms");
+										}
+										room = trQuestVarGet("basicRooms");
+										trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+										trQuestVarSet("berryRelic", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
+										trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+										for(i=0; < trQuestVarGet("rand")) {
+											yDatabaseNext("basicRooms");
+										}
+										room = trQuestVarGet("basicRooms");
+										trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+										trQuestVarSet("corpseRelic", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
+										trArmySelect("1,0");
+										trUnitChangeProtoUnit("Relic");
+										yAddToDatabase("freeRelics", "fecesRelic");
+										yAddUpdateVar("freeRelics", "type", RELIC_LITERAL_FECES);
+										yAddToDatabase("freeRelics", "berryRelic");
+										yAddUpdateVar("freeRelics", "type", RELIC_BERRY_BUSH);
+										yAddToDatabase("freeRelics", "corpseRelic");
+										yAddUpdateVar("freeRelics", "type", RELIC_A_FUCKING_CORPSE);
+									}
+									case 2:
+									{
+										if (zDistanceToVectorSquared("berryRelic", "questGuyPos") < 16) {
+											trUnitSelectClear();
+											trUnitSelectByQV("berryRelic", true);
+											trUnitChangeProtoUnit("Regeneration SFX");
+											trQuestVarSet("questActive", 4);
+											trQuestVarSet("questNext", trTime() + 5);
+											trSoundPlayFN("colossuseat.wav","1",-1,"","");
+											startNPCDialog(NPC_ATE_BERRIES);
+										} else if (zDistanceToVectorSquared("corpseRelic", "questGuyPos") < 16) {
+											trUnitSelectClear();
+											trUnitSelectByQV("corpseRelic", true);
+											trUnitChangeProtoUnit("Scarab Blood");
+											trQuestVarSet("questActive", 5);
+											trQuestVarSet("questNext", trTime() + 5);
+											trSoundPlayFN("colossuseat.wav","1",-1,"","");
+											startNPCDialog(NPC_ATE_CORPSE);
+										} else if (zDistanceToVectorSquared("fecesRelic", "questGuyPos") < 16) {
+											trUnitSelectClear();
+											trUnitSelectByQV("fecesRelic", true);
+											trUnitChangeProtoUnit("Osiris Box Glow");
+											trSoundPlayFN("colossuseat.wav","1",-1,"","");
+											trSoundPlayFN("heal.wav","1",-1,"","");
+											questComplete(-1, 300);
+										}
+									}
+									case 4:
+									{
+										if (trTime() > trQuestVarGet("questNext")) {
+											trQuestVarSet("questActive", -1);
+											trMessageSetText("Quest failed!", -1);
+											trSoundPlayFN("changeunit.wav","1",-1,"","");
+											trUnitSelectClear();
+											trUnitSelectByQV("questGuy", true);
+											trUnitDestroy();
+											trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+											trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX"),0,trQuestVarGet("questGuyPosZ"),180,true);
+											trUnitSelectClear();
+											trUnitSelectByQV("next");
+											trUnitConvert(ENEMY_PLAYER);
+											trUnitChangeProtoUnit("Walking Berry Bush");
+											activateEnemy("next", 10);
+										}
+									}
+									case 5:
+									{
+										if (trTime() > trQuestVarGet("questNext")) {
+											trQuestVarSet("questActive", -1);
+											trMessageSetText("Quest failed!", -1);
+											trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
+											trUnitSelectClear();
+											trUnitSelectByQV("questGuy", true);
+											trUnitDelete(false);
+										}
+									}
+								}
 							}
-						}
-					}
-				}
-				case FETCH_NPC + 6:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"), true);
-							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
+							case BOUNTY_NPC + 5:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSet("poisonBucket", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questGuyPosZ"),0,true);
+										trUnitSelectClear();
+										trUnitSelectByQV("poisonBucket", true);
+										trUnitChangeProtoUnit("Relic");
+										yAddToDatabase("freeRelics", "poisonBucket");
+										yAddUpdateVar("freeRelics", "type", RELIC_POISON_BUCKET);
+										trQuestVarSet("questActive", 2);
+									}
+									case 2:
+									{
+										p = trQuestVarGet("poisonBucketHolder");
+										if (p > 0) {
+											if (yGetVarAtIndex("playerUnits", "poisonStatus", 1*trQuestVarGet("p"+p+"index")) > 0) {
+												if (trTime() > trQuestVarGet("poisonBucketNext")) {
+													trQuestVarSet("poisonBucketNext", trTime());
+													trQuestVarSet("poisonBucketFill", trQuestVarGet("poisonBucketFill") + 3);
+													if (trQuestVarGet("poisonBucketFill") >= 100) {
+														trQuestVarSet("poisonBucketFill", 100);
+														trMessageSetText("Poison bucket has been filled. Return to the quest giver.", -1);
+														trQuestVarSet("questActive", 3);
+													}
+													trChatSend(0, "<color=0.3,1,0.5>Poison bucket: " + 1*trQuestVarGet("poisonBucketFill") + "/100");
+												}
+											}
+										}
+									}
+									case 3:
+									{
+										if (zDistanceToVectorSquared("poisonBucket", "questGuyPos") < 16) {
+											trUnitSelectClear();
+											trUnitSelectByQV("poisonBucket", true);
+											trUnitChangeProtoUnit("Lampades Blood");
+											trSoundPlayFN("lampadesblood.wav","1",-1,"","");
+											questComplete(SOULSTONE, -1);
+										}
+									}
+								}
 							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
-							trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
-							trQuestVarSet("questActive", 2);
-							trQuestVarSet("magicDetectorRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questguyposz")-2,0,true);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "yeebRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_YEEBAAGOOON);
-							yAddToDatabase("freeRelics", "magicDetectorRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_MAGIC_DETECTOR);
-							xsEnableRule("yeeb_hit_list");
-						}
-						case 2:
-						{
-							p = trQuestVarGet("magicDetectorHolder");
-							trVectorSetUnitPos("pos", "yeebRelic");
-							if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16) {
-								trUnitSelectClear();
-								trUnitSelectByQV("yeebRelic", true);
-								trUnitChangeProtoUnit("Osiris Box Glow");
-								questComplete(-1, 300);
-								xsDisableRule("yeeb_hit_list");
-								trQuestVarSet("yeebHit", 0);
-							} else if (p > 0) {
-								if (trTime() > trQuestVarGet("magicDetectorNext")) {
-									trQuestVarSet("magicDetectorNext", trTime());
-									amt = zDistanceToVector("magicDetectorRelic", "pos");
-									if (trCurrentPlayer() == p) {
-										if (trPlayerResourceCount(p, "favor") < 10) {
-											trChatSend(0, "<color=1,0,0>Distance: " + 1*amt);
-											trSoundPlayFN("attackwarning.wav","1",-1,"","");
+							case FETCH_NPC + 6:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"), true);
+										for(i=0; < trQuestVarGet("rand")) {
+											yDatabaseNext("basicRooms");
+										}
+										room = trQuestVarGet("basicRooms");
+										trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+										trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+										trArmySelect("1,0");
+										trUnitChangeProtoUnit("Relic");
+										trQuestVarSet("questActive", 2);
+										trQuestVarSet("magicDetectorRelic", trGetNextUnitScenarioNameNumber());
+										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questguyposz")-2,0,true);
+										trArmySelect("1,0");
+										trUnitChangeProtoUnit("Relic");
+										yAddToDatabase("freeRelics", "yeebRelic");
+										yAddUpdateVar("freeRelics", "type", RELIC_YEEBAAGOOON);
+										yAddToDatabase("freeRelics", "magicDetectorRelic");
+										yAddUpdateVar("freeRelics", "type", RELIC_MAGIC_DETECTOR);
+										xsEnableRule("yeeb_hit_list");
+									}
+									case 2:
+									{
+										p = trQuestVarGet("magicDetectorHolder");
+										trVectorSetUnitPos("pos", "yeebRelic");
+										if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16) {
+											trUnitSelectClear();
+											trUnitSelectByQV("yeebRelic", true);
+											trUnitChangeProtoUnit("Osiris Box Glow");
+											questComplete(-1, 300);
+											xsDisableRule("yeeb_hit_list");
+											trQuestVarSet("yeebHit", 0);
+										} else if (p > 0) {
+											if (trTime() > trQuestVarGet("magicDetectorNext")) {
+												trQuestVarSet("magicDetectorNext", trTime());
+												amt = zDistanceToVector("magicDetectorRelic", "pos");
+												if (trCurrentPlayer() == p) {
+													if (trPlayerResourceCount(p, "favor") < 10) {
+														trChatSend(0, "<color=1,0,0>Distance: " + 1*amt);
+														trSoundPlayFN("attackwarning.wav","1",-1,"","");
+													} else {
+														trChatSend(0, "<color=1,1,1>Distance: " + 1*amt);
+													}
+												}
+											}
+											if (trPlayerResourceCount(p, "favor") == 0) {
+												trMessageSetText("Quest failed!");
+												trQuestVarSet("questActive", -1);
+												trUnitSelectClear();
+												trUnitSelectByQV("yeebRelic", true);
+												trUnitDestroy();
+												trUnitSelectClear();
+												trUnitSelectByQV("magicDetectorRelic", true);
+												trUnitDestroy();
+												trVectorSetUnitPos("pos", "p"+p+"unit");
+												trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+												trArmySelect("1,0");
+												trDamageUnitPercent(100);
+												trUnitChangeProtoUnit("Implode Sphere Effect");
+												trUnitSelectClear();
+												trUnitSelectByQV("p"+p+"unit");
+												trUnitDelete(false);
+												trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
+												trCameraShake(1.0, 0.5);
+											}
+										}
+									}
+								}
+							}
+							case BOUNTY_NPC + 6:
+							{
+								switch(1*trQuestVarGet("questActive"))
+								{
+									case 1:
+									{
+										xsEnableRule("yeeb_hit_list");
+										trQuestVarSet("questActive", 2);
+									}
+									case 2:
+									{
+										if (yGetDatabaseCount("worthlessJunk") > 0) {
+											yDatabaseNext("worthlessJunk");
+											trVectorSetUnitPos("pos", "worthlessJunk");
+											if (vectorInRectangle("pos", "yeebRoomBottom", "yeebRoomTop") == false) {
+												trUnitSelectClear();
+												trUnitSelectByQV("worthlessJunk", true);
+												trUnitChangeProtoUnit("Dust Large");
+												trSoundPlayFN("swing2.wav","1",-1,"","");
+												trChatSend(0, "<color=1,1,1>Worthless junk removed.");
+												yRemoveFromDatabase("worthlessJunk");
+											}
 										} else {
-											trChatSend(0, "<color=1,1,1>Distance: " + 1*amt);
+											questComplete(MANASTONE, -1);
 										}
 									}
 								}
-								if (trPlayerResourceCount(p, "favor") == 0) {
-									trMessageSetText("Quest failed!");
-									trQuestVarSet("questActive", -1);
-									trUnitSelectClear();
-									trUnitSelectByQV("yeebRelic", true);
-									trUnitDestroy();
-									trUnitSelectClear();
-									trUnitSelectByQV("magicDetectorRelic", true);
-									trUnitDestroy();
-									trVectorSetUnitPos("pos", "p"+p+"unit");
-									trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-									trArmySelect("1,0");
-									trDamageUnitPercent(100);
-									trUnitChangeProtoUnit("Implode Sphere Effect");
-									trUnitSelectClear();
-									trUnitSelectByQV("p"+p+"unit");
-									trUnitDelete(false);
-									trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
-									trCameraShake(1.0, 0.5);
-								}
-							}							
+							}
 						}
 					}
-				}
-				case BOUNTY_NPC + 6:
-				{
-					switch(1*trQuestVarGet("questActive"))
-					{
-						case 1:
-						{
-							xsEnableRule("yeeb_hit_list");
-							trQuestVarSet("questActive", 2);
-						}
-						case 2:
-						{
-							if (yGetDatabaseCount("worthlessJunk") > 0) {
-								yDatabaseNext("worthlessJunk");
-								trVectorSetUnitPos("pos", "worthlessJunk");
-								if (vectorInRectangle("pos", "yeebRoomBottom", "yeebRoomTop") == false) {
-									trUnitSelectClear();
-									trUnitSelectByQV("worthlessJunk", true);
-									trUnitChangeProtoUnit("Dust Large");
-									trSoundPlayFN("swing2.wav","1",-1,"","");
-									trChatSend(0, "<color=1,1,1>Worthless junk removed.");
-									yRemoveFromDatabase("worthlessJunk");
+					
+					
+					if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
+						trQuestVarSet("townHealNext", trTime());
+						for(p=1; < ENEMY_PLAYER) {
+							if (zDistanceToVectorSquared("p"+p+"unit", "townCenter") < 400) {
+								trUnitSelectClear();
+								trUnitSelectByQV("p"+p+"unit");
+								if (trUnitAlive()) {
+									trDamageUnitPercent(-1);
 								}
-							} else {
-								questComplete(MANASTONE, -1);
 							}
 						}
 					}
 				}
 			}
-		}
-
-
-		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
-			trQuestVarSet("townHealNext", trTime());
-			for(p=1; < ENEMY_PLAYER) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "townCenter") < 400) {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
-					if (trUnitAlive()) {
-						trDamageUnitPercent(-1);
+			
+			rule nottud_always
+			inactive
+			highFrequency
+			{
+				int relic = 0;
+				trUnitSelectClear();
+				trUnitSelectByQV("nottud");
+				if (trQuestVarGet("nottudFound") == 0) {
+					for(p=1; < ENEMY_PLAYER) {
+						if (trUnitHasLOS(p)) {
+							trQuestVarSet("nottudFound", 1);
+							break;
+						}
+					}
+					if (trQuestVarGet("nottudFound") == 1) {
+						trVectorSetUnitPos("pos", "nottud");
+						trArmyDispatch("1,0","Revealer to Player",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),225,true);
+						trSoundPlayFN("oracledone.wav","1",-1,"","");
+					}
+				} else {
+					if (trUnitIsSelected()) {
+						startNPCDialog(NPC_NOTTUD);
+						reselectMyself();
+					}
+					yDatabaseNext("nottudShop", true);
+					if (trUnitIsSelected()) {
+						relic = yGetVar("nottudShop", "relic");
+						trShowImageDialog(relicIcon(relic), relicName(relic));
+						reselectMyself();
 					}
 				}
 			}
-		}
-	}
-}
-
-rule nottud_always
-inactive
-highFrequency
-{
-	int relic = 0;
-	trUnitSelectClear();
-	trUnitSelectByQV("nottud");
-	if (trQuestVarGet("nottudFound") == 0) {
-		for(p=1; < ENEMY_PLAYER) {
-			if (trUnitHasLOS(p)) {
-				trQuestVarSet("nottudFound", 1);
-				break;
-			}
-		}
-		if (trQuestVarGet("nottudFound") == 1) {
-			trVectorSetUnitPos("pos", "nottud");
-			trArmyDispatch("1,0","Revealer to Player",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),225,true);
-			trSoundPlayFN("oracledone.wav","1",-1,"","");
-		}
-	} else {
-		if (trUnitIsSelected()) {
-			startNPCDialog(NPC_NOTTUD);
-			reselectMyself();
-		}
-		yDatabaseNext("nottudShop", true);
-		if (trUnitIsSelected()) {
-			relic = yGetVar("nottudShop", "relic");
-			trShowImageDialog(relicIcon(relic), relicName(relic));
-			reselectMyself();
-		}
-	}
-}
-
-rule zenos_paradox_00
-inactive
-highFrequency
-{
-	if (trTime() > trQuestVarGet("cinNext")) {
-		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
-		switch(1*trQuestVarGet("cinStep"))
-		{
-			case 1:
+			
+			rule zenos_paradox_00
+			inactive
+			highFrequency
 			{
-				trUIFadeToColor(255,255,255,5000,0,true);
-				trCameraShake(5.0, 0.3);
-				trQuestVarSet("cinNext", trTime() + 6);
-			}
-			case 2:
-			{
-				trChatHistoryClear();
-				trQuestVarSet("cinNext", trTime() + 3);
-				trQuestVarSet("stage", 11);
-				xsEnableRule("rebuild_map");
-				trOverlayText("Zeno's Paradox",3,-1,-1,-1);
-			}
-			case 3:
-			{
-				xsDisableRule("enter_boss_room");
-				xsDisableSelf();
-			}
-		}
-	}
-}
-
-rule yeeb_hit_list
-inactive
-highFrequency
-{
-	trUnitSelectClear();
-	trUnitSelectByQV("yeebRelic", true);
-	if (trUnitIsOwnedBy(0)) {
-		trQuestVarSet("yeebHit", 0);
-		trQuestVarSet("yeebBossFight", 0);
-	} else {
-		trQuestVarSet("yeebBossFight", 1);
-		if (trUnitIsOwnedBy(trCurrentPlayer())) {
-			trQuestVarSet("yeebHit", 1);
-		}
-	}
-}
-
-rule nick_dialog
-inactive
-highFrequency
-{
-	int p = trCurrentPlayer();
-	if (trQuestVarGet("nickEquippedLocal") != trQuestVarGet("p"+p+"nickEquipped")) {
-		trQuestVarSet("nickEquippedLocal", trQuestVarGet("p"+p+"nickEquipped"));
-		if (trQuestVarGet("nickEquippedLocal") == 0) {
-			if (Multiplayer) {
-				startNPCDialog(NPC_NICK_DROP);
-			} else if (trQuestVarGet("nickQuestProgressLocal") == 4) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "nickPos") < 4) {
-					ySetPointer("freeRelics", yGetNewestPointer("freeRelics"));
-					trUnitSelectClear();
-					trUnitSelectByQV("freeRelics", true);
-					trUnitChangeProtoUnit("Cinematic Block");
-					trQuestVarSet("nickonhawk", trQuestVarGet("freeRelics"));
-					yRemoveFromDatabase("freeRelics");
-					trQuestVarSet("cinTime", trTimeMS() + 5000);
-					trQuestVarSet("cinStep", 0);
-					xsEnableRule("nick_transform");
-					trUnitSelectClear();
-					trUnitSelectByQV("nickSpotlight", true);
-					trUnitChangeProtoUnit("Osiris Birth");
-					trUnitSelectClear();
-					trUnitSelectByQV("nickSpotlight", true);
-					trSetSelectedScale(0,0,0);
-					xsDisableSelf();
-					trSoundPlayFN("cinematics\24_in\magic.mp3", "5", -1, "","");
+				if (trTime() > trQuestVarGet("cinNext")) {
+					trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+					switch(1*trQuestVarGet("cinStep"))
+					{
+						case 1:
+						{
+							trUIFadeToColor(255,255,255,5000,0,true);
+							trCameraShake(5.0, 0.3);
+							trQuestVarSet("cinNext", trTime() + 6);
+						}
+						case 2:
+						{
+							trChatHistoryClear();
+							trQuestVarSet("cinNext", trTime() + 3);
+							trQuestVarSet("stage", 11);
+							xsEnableRule("rebuild_map");
+							trOverlayText("Zeno's Paradox",3,-1,-1,-1);
+						}
+						case 3:
+						{
+							xsDisableRule("enter_boss_room");
+							xsDisableSelf();
+						}
+					}
 				}
 			}
-		} else {
-			startNPCDialog(NPC_NICK_START + trQuestVarGet("nickQuestProgressLocal"));
-			if (trQuestVarGet("nickQuestProgressLocal") == 0) {
-				trQuestVarSet("nickQuestProgressLocal", 1);
+			
+			rule yeeb_hit_list
+			inactive
+			highFrequency
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebRelic", true);
+				if (trUnitIsOwnedBy(0)) {
+					trQuestVarSet("yeebHit", 0);
+					trQuestVarSet("yeebBossFight", 0);
+				} else {
+					trQuestVarSet("yeebBossFight", 1);
+					if (trUnitIsOwnedBy(trCurrentPlayer())) {
+						trQuestVarSet("yeebHit", 1);
+					}
+				}
 			}
-		}
-	}
-}
-
-rule nick_next_dialog
-inactive
-highFrequency
-{
-	int p = trCurrentPlayer();
-	if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
-		xsDisableSelf();
-		startNPCDialog(NPC_NICK_NEXT + trQuestVarGet("p"+p+"nickQuestProgress") - 2);
-		trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+p+"nickQuestProgress"));
-	}
-}
+			
+			rule nick_dialog
+			inactive
+			highFrequency
+			{
+				int p = trCurrentPlayer();
+				if (trQuestVarGet("nickEquippedLocal") != trQuestVarGet("p"+p+"nickEquipped")) {
+					trQuestVarSet("nickEquippedLocal", trQuestVarGet("p"+p+"nickEquipped"));
+					if (trQuestVarGet("nickEquippedLocal") == 0) {
+						if (Multiplayer) {
+							startNPCDialog(NPC_NICK_DROP);
+						} else if (trQuestVarGet("nickQuestProgressLocal") == 4) {
+							if (zDistanceToVectorSquared("p"+p+"unit", "nickPos") < 4) {
+								ySetPointer("freeRelics", yGetNewestPointer("freeRelics"));
+								trUnitSelectClear();
+								trUnitSelectByQV("freeRelics", true);
+								trUnitChangeProtoUnit("Cinematic Block");
+								trQuestVarSet("nickonhawk", trQuestVarGet("freeRelics"));
+								yRemoveFromDatabase("freeRelics");
+								trQuestVarSet("cinTime", trTimeMS() + 5000);
+								trQuestVarSet("cinStep", 0);
+								xsEnableRule("nick_transform");
+								trUnitSelectClear();
+								trUnitSelectByQV("nickSpotlight", true);
+								trUnitChangeProtoUnit("Osiris Birth");
+								trUnitSelectClear();
+								trUnitSelectByQV("nickSpotlight", true);
+								trSetSelectedScale(0,0,0);
+								xsDisableSelf();
+								trSoundPlayFN("cinematics\24_in\magic.mp3", "5", -1, "","");
+							}
+						}
+					} else {
+						startNPCDialog(NPC_NICK_START + trQuestVarGet("nickQuestProgressLocal"));
+						if (trQuestVarGet("nickQuestProgressLocal") == 0) {
+							trQuestVarSet("nickQuestProgressLocal", 1);
+						}
+					}
+				}
+			}
+			
+			rule nick_next_dialog
+			inactive
+			highFrequency
+			{
+				int p = trCurrentPlayer();
+				if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
+					xsDisableSelf();
+					startNPCDialog(NPC_NICK_NEXT + trQuestVarGet("p"+p+"nickQuestProgress") - 2);
+					trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+p+"nickQuestProgress"));
+				}
+			}

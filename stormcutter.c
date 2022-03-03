@@ -50,7 +50,7 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		dist = trQuestVarGet("disengageRadius") * trQuestVarGet("p"+p+"spellRange");
@@ -73,8 +73,8 @@ void stormcutterAlways(int eventID = -1) {
 				trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 				trArmySelect(""+p+",0");
 				trUnitChangeProtoUnit("Dust Large");
-				target = 1 + xsMin(trQuestVarGet("disengageRange") * trQuestVarGet("p"+p+"spellRange"), 
-					zDistanceBetweenVectors("pos", "p"+p+"wellPos")) / 2;
+				target = 1 + xsMin(trQuestVarGet("disengageRange") * trQuestVarGet("p"+p+"spellRange"),
+				zDistanceBetweenVectors("pos", "p"+p+"wellPos")) / 2;
 				trVectorQuestVarSet("step", zGetUnitVector("pos", "p"+p+"wellPos"));
 				for(i=target; >0) {
 					trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("stepx"));
@@ -103,7 +103,7 @@ void stormcutterAlways(int eventID = -1) {
 		/* reload relics */
 		equipRelicsAgain(p);
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"spearedUnits") > 0) {
 		yDatabaseNext("p"+p+"spearedUnits");
 		if (yGetVarAtIndex("enemies", "launched", 1*yGetVar("p"+p+"spearedUnits", "index")) == 0) {
@@ -133,7 +133,7 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"shockArrows") > 0) {
 		yDatabaseNext("p"+p+"shockArrows");
 		trVectorSetUnitPos("pos", "p"+p+"shockArrows");
@@ -168,7 +168,7 @@ void stormcutterAlways(int eventID = -1) {
 						yAddUpdateVar("p"+p+"spearedUnits", "dist", yGetVar("p"+p+"shockArrows", "dist"));
 						launchUnit("enemies", "dest");
 					}
-
+					
 					break;
 				}
 			}
@@ -189,7 +189,7 @@ void stormcutterAlways(int eventID = -1) {
 		} else if (zDistanceToVectorSquared("pos", "dest") < 1.0) {
 			hit = 1;
 		}
-
+		
 		if (hit >= 1) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"shockArrows");
@@ -201,7 +201,7 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
@@ -236,7 +236,7 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainOfLightning") == 2) {
 		trQuestVarSet("p"+p+"rainOfLightning", 1);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
@@ -250,104 +250,104 @@ void stormcutterAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		gainFavor(p, 0.0 - trQuestVarGet("rainOfLightningCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"rainOfLightning", 2);
-		trQuestVarSet("p"+p+"rainOfLightningTimeout", 
+		trQuestVarSet("p"+p+"rainOfLightningTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("rainOfLightningDuration") * trQuestVarGet("p"+p+"spellDuration"));
-		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
-		zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
-		trQuestVarSet("p"+p+"arrowNext", trGetNextUnitScenarioNameNumber() - 1);
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-				removeStormcutter(p);
-			} else if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "rainSFX")) == -1) {
-				spyEffect(1*trQuestVarGet("p"+p+"characters"),kbGetProtoUnitID("Cinematic Block"),
-					yGetVarName("p"+p+"characters", "rainSFX"));
-			}
-		}
-	}
-
-	if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"rainOfLightningTimeout")) {
-			trQuestVarSet("p"+p+"rainOfLightning", 0);
-			trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+STORMCUTTER+"nextDelay"));
-			zSetProtoUnitStat("Archer Atlantean Hero", p, 13, trQuestVarGet("p"+p+"projectiles"));
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
-					removeStormcutter(p);
-				} else {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "rainSFX"), true);
-					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			trQuestVarSet("p"+p+"nextDelay",
+				trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
+				zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
+				trQuestVarSet("p"+p+"arrowNext", trGetNextUnitScenarioNameNumber() - 1);
+				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+					if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+						removeStormcutter(p);
+					} else if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "rainSFX")) == -1) {
+						spyEffect(1*trQuestVarGet("p"+p+"characters"),kbGetProtoUnitID("Cinematic Block"),
+						yGetVarName("p"+p+"characters", "rainSFX"));
+					}
 				}
 			}
+			
+			if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
+				if (trTimeMS() > trQuestVarGet("p"+p+"rainOfLightningTimeout")) {
+					trQuestVarSet("p"+p+"rainOfLightning", 0);
+					trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+STORMCUTTER+"nextDelay"));
+					zSetProtoUnitStat("Archer Atlantean Hero", p, 13, trQuestVarGet("p"+p+"projectiles"));
+					for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+						if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+							removeStormcutter(p);
+						} else {
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("p"+p+"characters", "rainSFX"), true);
+							trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+						}
+					}
+				}
+				id = yFindLatest("p"+p+"arrowNext", "Arrow Flaming", p);
+				if (id > 0) {
+					trUnitDestroy();
+				}
+			}
+			
+			ySetPointer("enemies", index);
+			poisonKillerBonus(p);
+			xsSetContextPlayer(old);
 		}
-		id = yFindLatest("p"+p+"arrowNext", "Arrow Flaming", p);
-		if (id > 0) {
-			trUnitDestroy();
+		
+		void chooseStormcutter(int eventID = -1) {
+			int p = eventID - 1000 - 12 * STORMCUTTER;
+			if (trCurrentPlayer() == p) {
+				map("w", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
+				wellName = "(W) Disengage";
+				wellIsUltimate = false;
+				map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
+				rainName = "(E) Rain of Lightning";
+				rainIsUltimate = true;
+				map("q", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
+				lureName = "(Q) Shock Arrow";
+				lureIsUltimate = false;
+			}
+			trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("disengageCooldown"));
+			trQuestVarSet("p"+p+"wellCost", 0);
+			trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("shockArrowCooldown"));
+			trQuestVarSet("p"+p+"lureCost", 0);
+			trQuestVarSet("p"+p+"rainCooldown", 1);
+			trQuestVarSet("p"+p+"rainCost", trQuestVarGet("rainOfLightningCost"));
 		}
-	}
-
-	ySetPointer("enemies", index);
-	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
-}
-
-void chooseStormcutter(int eventID = -1) {
-	int p = eventID - 1000 - 12 * STORMCUTTER;
-	if (trCurrentPlayer() == p) {
-		map("w", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
-		wellName = "(W) Disengage";
-		wellIsUltimate = false;
-		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-		rainName = "(E) Rain of Lightning";
-		rainIsUltimate = true;
-		map("q", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(Q) Shock Arrow";
-		lureIsUltimate = false;
-	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("disengageCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("shockArrowCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", trQuestVarGet("rainOfLightningCost"));
-}
-
-void modifyStormcutter(int eventID = -1) {
-	int p = eventID - 5000 - 12 * STORMCUTTER;
-	if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
-		zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
-		trQuestVarSet("p"+p+"nextDelay", 
-			trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
-	}
-}
-
-rule stormcutter_init
-active
-highFrequency
-{
-	xsDisableSelf();
-	for(p=1; < ENEMY_PLAYER) {
-		trEventSetHandler(12 * STORMCUTTER + p, "stormcutterAlways");
-		trEventSetHandler(1000 + 12 * STORMCUTTER + p, "chooseStormcutter");
-		trEventSetHandler(5000 + 12 * STORMCUTTER + p, "modifyStormcutter");
-	}
-
-	trQuestVarSet("rainOfLightningCost", 50);
-	trQuestVarSet("rainOfLightningDuration", 10);
-	trQuestVarSet("rainOfLightningRadius", 5);
-
-	trQuestVarSet("disengageCooldown", 8);
-	trQuestVarSet("disengageRadius", 4);
-	trQuestVarSet("disengageRange", 12);
-
-	trQuestVarSet("shockArrowCooldown", 10);
-	trQuestVarSet("shockArrowRange", 30);
-	trQuestVarSet("shockArrowDamage", 50);
-}
+		
+		void modifyStormcutter(int eventID = -1) {
+			int p = eventID - 5000 - 12 * STORMCUTTER;
+			if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
+				zSetProtoUnitStat("Archer Atlantean Hero", p, 13, 1);
+				trQuestVarSet("p"+p+"nextDelay",
+					trQuestVarGet("class"+STORMCUTTER+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
+				}
+			}
+			
+			rule stormcutter_init
+			active
+			highFrequency
+			{
+				xsDisableSelf();
+				for(p=1; < ENEMY_PLAYER) {
+					trEventSetHandler(12 * STORMCUTTER + p, "stormcutterAlways");
+					trEventSetHandler(1000 + 12 * STORMCUTTER + p, "chooseStormcutter");
+					trEventSetHandler(5000 + 12 * STORMCUTTER + p, "modifyStormcutter");
+				}
+				
+				trQuestVarSet("rainOfLightningCost", 50);
+				trQuestVarSet("rainOfLightningDuration", 10);
+				trQuestVarSet("rainOfLightningRadius", 5);
+				
+				trQuestVarSet("disengageCooldown", 8);
+				trQuestVarSet("disengageRadius", 4);
+				trQuestVarSet("disengageRange", 12);
+				
+				trQuestVarSet("shockArrowCooldown", 10);
+				trQuestVarSet("shockArrowRange", 30);
+				trQuestVarSet("shockArrowDamage", 50);
+			}
