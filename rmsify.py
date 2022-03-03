@@ -237,6 +237,8 @@ class StackFrame(Job):
 			elif self.state == STATE_IN_BRACKETS:
 				if token == ';':
 					self.children[0].resolve()
+					if not self.children[0].type in ['ASSIGNMENT', 'FUNCTION', 'BREAK']:
+						error("Unrecognized command.")
 					self.children.pop()
 				elif token == '}':
 					KNOWN_VARIABLES = KNOWN_VARIABLES[:self.depth]
@@ -367,8 +369,16 @@ class Logic(StackFrame):
 				else:
 					accepted = False
 			elif self.state == STATE_IN_BRACKETS:
-				if self.name in ['for', 'while'] and token in ['break', 'continue']:
-					self.children.append(Literal('0',self,'int'))
+				if token in ['break', 'continue']:
+					searchState = self
+					while searchState.name not in ['for', 'while'] and searchState.parent:
+						searchState = searchState.parent
+					if searchState.name in ['for','while']:
+						self.children.append(Literal('0',self,'int'))
+						self.children[-1].closed = True
+						self.children[-1].type = 'BREAK'
+					else:
+						accepted = False
 				else:
 					accepted = False
 			else:
@@ -410,6 +420,7 @@ class Trigger(StackFrame):
 class Returner(Job):
 	def __init__(self, parent):
 		super().__init__('return', parent)
+		self.type = 'FUNCTION'
 		self.state = STATE_NEED_PARENTHESIS
 		self.datatype = 'void'
 
@@ -619,7 +630,7 @@ class Function(Mathable):
 				for i in range(len(self.children)):
 					if self.expected[i] != self.children[i].datatype:
 						if not (self.expected[i] in ['int', 'float'] and self.children[i].datatype in ['int', 'float']):
-							error("Incorrect datatype in parameter " + str(i+1) + "! Expected " + self.expected[i] + " but got " + self.children[i].datatype)
+							error("Incorrect datatype in " + self.name + " parameter " + str(i+1) + "! Expected " + self.expected[i] + " but got " + self.children[i].datatype)
 				self.name = self.datatype
 				self.children = []
 
