@@ -859,6 +859,7 @@ try:
 			ln = 1
 			pcount = 0 # parenthesis
 			bcount = 0 # brackets
+			sys.stdout.flush()
 			print("parsing " + FILE_1 + "...")
 			rewrite = []
 			thedepth = 0
@@ -875,10 +876,7 @@ try:
 					rewrite.append(reline)
 					if '{' in nostrings:
 						thedepth = thedepth + 1
-					if '(' in nostrings:
-						thedepth = thedepth + 1
-					if ')' in nostrings:
-						thedepth = thedepth - 1
+					thedepth = thedepth + nostrings.count('(') - nostrings.count(')')
 					pcount = pcount + nostrings.count('(') - nostrings.count(')')
 					bcount = bcount + nostrings.count('{') - nostrings.count('}')
 					

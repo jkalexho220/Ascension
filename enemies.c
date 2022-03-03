@@ -34,7 +34,7 @@ void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, fl
 bool checkEnemyDeactivated(string db = "") {
 	int index = 1*yGetVar(db, "index");
 	if ((yGetVarAtIndex("enemies", "xActive", index) == 0) ||
-	yGetUnitAtIndex("enemies", index) != trQuestVarGet(db)) {
+		yGetUnitAtIndex("enemies", index) != trQuestVarGet(db)) {
 		return(true);
 	}
 	return(false);
@@ -130,7 +130,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 			yAddUpdateVar("Valkyries", "index", yGetNewestPointer("enemies"));
 			yAddUpdateVar("Valkyries", "silenced", 0);
 			spyEffect(1*trQuestVarGet(db),
-			kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
 		}
 		case kbGetProtoUnitID("Ballista"):
 		{
@@ -143,7 +143,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 			yAddToDatabase("Valkyries", db);
 			yAddUpdateVar("Valkyries", "index", yGetNewestPointer("enemies"));
 			spyEffect(1*trQuestVarGet(db),
-			kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
 		}
 		case kbGetProtoUnitID("Fire Siphon"):
 		{
@@ -258,7 +258,7 @@ highFrequency
 		
 		for(class = 1; <= 16) {
 			setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),
-			trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
+				trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
 		}
 		
 		/* ballista projectiles */
@@ -345,7 +345,7 @@ void enemiesAlways() {
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removeEnemy();
 		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
-		(yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
+			(yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
 			/* if idle and out of LOS, we remove it */
 			ySetVar("enemies", "missing", 1 + yGetVar("enemies", "missing"));
 			if (yGetVar("enemies", "missing") >= 10) {
@@ -642,7 +642,7 @@ void enemiesAlways() {
 							if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
 								silencePlayer(p, 5);
 								if ((trQuestVarGet("p"+p+"nickQuestProgress") == 1) &&
-								trQuestVarGet("p"+p+"nickEquipped") == 1) {
+									trQuestVarGet("p"+p+"nickEquipped") == 1) {
 									trQuestVarSet("p"+p+"nickQuestProgress", 2);
 									if (trCurrentPlayer() == p) {
 										xsEnableRule("nick_next_dialog");
@@ -756,672 +756,672 @@ void enemiesAlways() {
 		} else if (action == PROJ_REMOVE ||
 			terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) ||
 			yGetVar("MedusaBalls", "bounces") <= 0) {
-				trUnitSelectClear();
-				trUnitSelectByQV("MedusaBalls");
-				trUnitChangeProtoUnit("Conversion SFX");
-				yRemoveFromDatabase("MedusaBalls");
-			}
+			trUnitSelectClear();
+			trUnitSelectByQV("MedusaBalls");
+			trUnitChangeProtoUnit("Conversion SFX");
+			yRemoveFromDatabase("MedusaBalls");
 		}
-		
-		if (yGetDatabaseCount("Medusas") >0) {
-			id = yDatabaseNext("Medusas", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Medusas")) {
-				trUnitChangeProtoUnit("Medusa");
-				yRemoveFromDatabase("Medusas");
-				yRemoveUpdateVar("Medusas", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
-				trUnitOverrideAnimation(-1,0,false,true,-1);
-				ySetVar("Medusas", "step", 2);
-			} else if (trTimeMS() > yGetVar("Medusas", "next")) {
-				switch(1*yGetVar("Medusas", "step"))
+	}
+	
+	if (yGetDatabaseCount("Medusas") >0) {
+		id = yDatabaseNext("Medusas", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Medusas")) {
+			trUnitChangeProtoUnit("Medusa");
+			yRemoveFromDatabase("Medusas");
+			yRemoveUpdateVar("Medusas", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			ySetVar("Medusas", "step", 2);
+		} else if (trTimeMS() > yGetVar("Medusas", "next")) {
+			switch(1*yGetVar("Medusas", "step"))
+			{
+				case 0:
 				{
-					case 0:
-					{
-						if (kbUnitGetAnimationActionType(id) == 12) {
-							target = kbUnitGetTargetUnitID(id);
-							ySetVar("Medusas", "target", trGetUnitScenarioNameNumber(target));
-							
-							ySetVar("Medusas", "step", 1);
-							ySetVar("Medusas", "next", trTimeMS() + 1200);
-							trUnitOverrideAnimation(40,0,false,false,-1);
-						}
-					}
-					case 1:
-					{
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
-						trVectorSetUnitPos("start", "Medusas");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-						addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
-						yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
-						yAddUpdateVar("MedusaBalls", "bounces", 10);
-						ySetVar("Medusas", "step", 2);
-						ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
-					}
-					case 2:
-					{
-						ySetVar("Medusas", "step", 0);
-						ySetVar("Medusas", "next", trTimeMS() + 18000);
-						trUnitOverrideAnimation(-1,0,false,true,-1);
+					if (kbUnitGetAnimationActionType(id) == 12) {
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("Medusas", "target", trGetUnitScenarioNameNumber(target));
+						
+						ySetVar("Medusas", "step", 1);
+						ySetVar("Medusas", "next", trTimeMS() + 1200);
+						trUnitOverrideAnimation(40,0,false,false,-1);
 					}
 				}
-			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Medusas", "index"));
-				if (action > 0 && yGetVar("Medusas", "step") == 1) {
+				case 1:
+				{
+					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
+					trVectorSetUnitPos("start", "Medusas");
+					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+					addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
+					yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
+					yAddUpdateVar("MedusaBalls", "bounces", 10);
+					ySetVar("Medusas", "step", 2);
+					ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
+				}
+				case 2:
+				{
 					ySetVar("Medusas", "step", 0);
 					ySetVar("Medusas", "next", trTimeMS() + 18000);
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+				}
+			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Medusas", "index"));
+			if (action > 0 && yGetVar("Medusas", "step") == 1) {
+				ySetVar("Medusas", "step", 0);
+				ySetVar("Medusas", "next", trTimeMS() + 18000);
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("Valkyries") > 0) {
+		id = yDatabaseNext("Valkyries", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Valkyries")) {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
+			trUnitDestroy();
+			yRemoveFromDatabase("Valkyries");
+		} else {
+			id = yGetPointer("enemies");
+			if (ySetPointer("enemies", 1*yGetVar("Valkyries", "index"))) {
+				ySetVar("enemies", "magicResist", 1 - yGetVar("enemies", "silenceStatus"));
+				if (yGetVar("enemies", "silenceStatus") != yGetVar("Valkyries", "silenced")) {
+					ySetVar("Valkyries", "silenced", yGetVar("enemies", "silenceStatus"));
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
+					if (yGetVar("enemies", "silenceStatus") == 1) {
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+					} else {
+						trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
+					}
+				}
+				ySetPointer("enemies", id);
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("Dryads") > 0) {
+		id = yDatabaseNext("Dryads", true);
+		if (id == -1 || trUnitAlive() == false) {
+			if (yGetVar("dryads", "silenceStatus") == 0) {
+				yVarToVector("Dryads", "pos");
+				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Lampades Blood");
+				for(x=yGetDatabaseCount("playerUnits"); >0) {
+					id = yDatabaseNext("playerUnits", true);
+					if (id == -1 || trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
+						poisonUnit("playerUnits", 10.0, 5.0 * trQuestVarGet("stage"));
+					}
+				}
+				if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
+					if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+						trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
+						xsEnableRule("nick_next_dialog");
+					}
+				}
+			}
+			yRemoveFromDatabase("Dryads");
+		} else if (checkEnemyDeactivated("Dryads")) {
+			yRemoveFromDatabase("Dryads");
+		} else {
+			trVectorSetUnitPos("pos", "Dryads");
+			ySetVarFromVector("Dryads", "pos", "pos");
+			ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")));
+		}
+	}
+	
+	if (yGetDatabaseCount("scarabs") > 0) {
+		id = yDatabaseNext("scarabs", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("scarabs")) {
+			if (yGetVar("scarabs", "silenceStatus") == 0) {
+				yVarToVector("scarabs", "pos");
+				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Pestilence SFX1");
+				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmySelect("1,0");
+				trUnitConvert(ENEMY_PLAYER);
+				trUnitChangeProtoUnit("Victory Marker");
+			}
+			yRemoveFromDatabase("scarabs");
+		} else if (checkEnemyDeactivated("scarabs")) {
+			yRemoveFromDatabase("scarabs");
+		} else {
+			trVectorSetUnitPos("pos", "scarabs");
+			ySetVarFromVector("scarabs", "pos", "pos");
+			ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("scarabs", "index")));
+		}
+	}
+	
+	if (yGetDatabaseCount("automatonBombs") > 0) {
+		yDatabaseNext("automatonBombs");
+		if (trTimeMS() > yGetVar("automatonBombs", "timeout")) {
+			yVarToVector("automatonBombs", "pos");
+			trUnitSelectClear();
+			trUnitSelectByQV("automatonBombs", true);
+			trDamageUnitPercent(-100);
+			trUnitChangeProtoUnit("Tartarian Gate Flame");
+			trUnitSelectClear();
+			trUnitSelectByQV("automatonBombs", true);
+			trDamageUnitPercent(-100);
+			trSetSelectedScale(1.0,1.0,0.4);
+			yRemoveFromDatabase("automatonBombs");
+			for(x=yGetDatabaseCount("playerUnits"); >0) {
+				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+					removePlayerUnit();
+				} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
+					damagePlayerUnit(200);
 				}
 			}
 		}
-		
-		if (yGetDatabaseCount("Valkyries") > 0) {
-			id = yDatabaseNext("Valkyries", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Valkyries")) {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
-				trUnitDestroy();
-				yRemoveFromDatabase("Valkyries");
-			} else {
-				id = yGetPointer("enemies");
-				if (ySetPointer("enemies", 1*yGetVar("Valkyries", "index"))) {
-					ySetVar("enemies", "magicResist", 1 - yGetVar("enemies", "silenceStatus"));
-					if (yGetVar("enemies", "silenceStatus") != yGetVar("Valkyries", "silenced")) {
-						ySetVar("Valkyries", "silenced", yGetVar("enemies", "silenceStatus"));
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
-						if (yGetVar("enemies", "silenceStatus") == 1) {
-							trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-						} else {
-							trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
-						}
-					}
-					ySetPointer("enemies", id);
-				}
+	}
+	
+	if (yGetDatabaseCount("automatons") > 0) {
+		if (yDatabaseNext("automatons", true) == -1 || trUnitAlive() == false) {
+			if (yGetVar("automatons", "silenceStatus") == 0) {
+				trUnitHighlight(3.0, true);
+				trSoundPlayFN("gatherpoint.wav","1",-1,"","");
+				yAddToDatabase("automatonBombs", "automatons");
+				yAddUpdateVar("automatonBombs", "timeout", trTimeMS() + 3000);
+				yAddUpdateVar("automatonBombs", "posx", yGetVar("automatons", "posx"));
+				yAddUpdateVar("automatonBombs", "posz", yGetVar("automatons", "posz"));
 			}
+			yRemoveFromDatabase("automatons");
+		} else if (checkEnemyDeactivated("automatons")) {
+			yRemoveFromDatabase("automatons");
+		} else {
+			trVectorSetUnitPos("pos", "automatons");
+			ySetVarFromVector("automatons", "pos", "pos");
+			ySetVar("automatons", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("automatons", "index")));
 		}
-		
-		if (yGetDatabaseCount("Dryads") > 0) {
-			id = yDatabaseNext("Dryads", true);
-			if (id == -1 || trUnitAlive() == false) {
-				if (yGetVar("dryads", "silenceStatus") == 0) {
-					yVarToVector("Dryads", "pos");
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-					trArmySelect("1,0");
-					trUnitChangeProtoUnit("Lampades Blood");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
-						id = yDatabaseNext("playerUnits", true);
-						if (id == -1 || trUnitAlive() == false) {
-							removePlayerUnit();
-						} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-							poisonUnit("playerUnits", 10.0, 5.0 * trQuestVarGet("stage"));
+	}
+	
+	if(yGetDatabaseCount("frostGiants") >0) {
+		id = yDatabaseNext("frostGiants", true);
+		if (id == -1 || trUnitAlive() == false) {
+			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
+			if (trQuestVarGet("frostGiantHunt") == 1) {
+				trQuestVarSet("frostGiantBones", 1 + trQuestVarGet("frostGiantBones"));
+			}
+			trUnitChangeProtoUnit("Frost Giant");
+			yRemoveFromDatabase("frostGiants");
+			yRemoveUpdateVar("frostGiants", "step");
+		} else if (checkEnemyDeactivated("frostGiants")) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			yRemoveFromDatabase("frostGiants");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
+			ySetVar("frostGiants", "step", 2);
+		} else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
+			switch(1*yGetVar("frostGiants", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("frostGiants", "target", trGetUnitScenarioNameNumber(target));
+						ySetVar("frostGiants", "step", 1);
+						ySetVar("frostGiants", "specialnext", trTimeMS() + 1400);
+						trUnitOverrideAnimation(40,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					action = 0;
+					for (x=yGetDatabaseCount("playerUnits"); >0) {
+						if (yGetVar("frostGiants", "target") == yDatabaseNext("playerUnits")) {
+							trUnitSelectClear();
+							trUnitSelectByQV("playerUnits");
+							stunUnit("playerUnits", 3.0);
+							action = 1;
+							break;
 						}
 					}
-					if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
-						if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
-							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
+					ySetVar("frostGiants", "step", 2);
+					ySetVar("frostGiants", "specialnext", yGetVar("frostGiants", "specialnext") + 600);
+					if (action == 0) {
+						ySetVar("frostGiants", "target", -1);
+					} else if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) {
+						if (yGetVar("frostGiants", "target") == trQuestVarGet("p"+trCurrentPlayer()+"unit")) {
+							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 4);
 							xsEnableRule("nick_next_dialog");
 						}
 					}
 				}
-				yRemoveFromDatabase("Dryads");
-			} else if (checkEnemyDeactivated("Dryads")) {
-				yRemoveFromDatabase("Dryads");
-			} else {
-				trVectorSetUnitPos("pos", "Dryads");
-				ySetVarFromVector("Dryads", "pos", "pos");
-				ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")));
-			}
-		}
-		
-		if (yGetDatabaseCount("scarabs") > 0) {
-			id = yDatabaseNext("scarabs", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("scarabs")) {
-				if (yGetVar("scarabs", "silenceStatus") == 0) {
-					yVarToVector("scarabs", "pos");
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-					trArmySelect("1,0");
-					trUnitChangeProtoUnit("Pestilence SFX1");
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-					trArmySelect("1,0");
-					trUnitConvert(ENEMY_PLAYER);
-					trUnitChangeProtoUnit("Victory Marker");
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					ySetVar("frostGiants", "step", 0);
+					if (yGetVar("frostGiants", "target") == -1) {
+						ySetVar("frostGiants", "specialnext", trTimeMS());
+					} else {
+						ySetVar("frostGiants", "specialnext", trTimeMS() + 15000);
+					}
 				}
-				yRemoveFromDatabase("scarabs");
-			} else if (checkEnemyDeactivated("scarabs")) {
-				yRemoveFromDatabase("scarabs");
-			} else {
-				trVectorSetUnitPos("pos", "scarabs");
-				ySetVarFromVector("scarabs", "pos", "pos");
-				ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("scarabs", "index")));
+			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("frostGiants", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("frostGiants", "index"));
+			if (action > 0 && yGetVar("frostGiants", "step") == 1) {
+				ySetVar("frostGiants", "step", 0);
+				ySetVar("frostGiants", "next", trTimeMS() + 18000);
 			}
 		}
-		
-		if (yGetDatabaseCount("automatonBombs") > 0) {
-			yDatabaseNext("automatonBombs");
-			if (trTimeMS() > yGetVar("automatonBombs", "timeout")) {
-				yVarToVector("automatonBombs", "pos");
-				trUnitSelectClear();
-				trUnitSelectByQV("automatonBombs", true);
-				trDamageUnitPercent(-100);
-				trUnitChangeProtoUnit("Tartarian Gate Flame");
-				trUnitSelectClear();
-				trUnitSelectByQV("automatonBombs", true);
-				trDamageUnitPercent(-100);
-				trSetSelectedScale(1.0,1.0,0.4);
-				yRemoveFromDatabase("automatonBombs");
+	}
+	
+	if (yGetDatabaseCount("barrages") > 0) {
+		yDatabaseNext("barrages");
+		if (trTimeMS() > yGetVar("barrages", "next")) {
+			ySetVar("barrages", "next", 300 + yGetVar("barrages", "next"));
+			/* do the damage */
+			yVarToVector("barrages", "pos");
+			yVarToVector("barrages", "dir");
+			if (yGetVar("barrages", "count") <= 3) {
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-						damagePlayerUnit(200);
+					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
+						damagePlayerUnit(100);
 					}
 				}
 			}
-		}
-		
-		if (yGetDatabaseCount("automatons") > 0) {
-			if (yDatabaseNext("automatons", true) == -1 || trUnitAlive() == false) {
-				if (yGetVar("automatons", "silenceStatus") == 0) {
-					trUnitHighlight(3.0, true);
-					trSoundPlayFN("gatherpoint.wav","1",-1,"","");
-					yAddToDatabase("automatonBombs", "automatons");
-					yAddUpdateVar("automatonBombs", "timeout", trTimeMS() + 3000);
-					yAddUpdateVar("automatonBombs", "posx", yGetVar("automatons", "posx"));
-					yAddUpdateVar("automatonBombs", "posz", yGetVar("automatons", "posz"));
-				}
-				yRemoveFromDatabase("automatons");
-			} else if (checkEnemyDeactivated("automatons")) {
-				yRemoveFromDatabase("automatons");
+			
+			if (yGetVar("barrages", "count") >= 0) {
+				trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
+				trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
+				trArmySelect("1,0");
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trUnitConvert(0);
+				trUnitChangeProtoUnit("Barrage");
+			}
+			
+			
+			ySetVar("barrages", "count", yGetVar("barrages", "count") - 1);
+			trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
+			trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+			vectorToGrid("pos", "loc");
+			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= -2) {
+				yRemoveFromDatabase("barrages");
 			} else {
-				trVectorSetUnitPos("pos", "automatons");
-				ySetVarFromVector("automatons", "pos", "pos");
-				ySetVar("automatons", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("automatons", "index")));
+				ySetVarFromVector("barrages", "pos", "pos");
 			}
 		}
-		
-		if(yGetDatabaseCount("frostGiants") >0) {
-			id = yDatabaseNext("frostGiants", true);
-			if (id == -1 || trUnitAlive() == false) {
-				trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
-				if (trQuestVarGet("frostGiantHunt") == 1) {
-					trQuestVarSet("frostGiantBones", 1 + trQuestVarGet("frostGiantBones"));
-				}
-				trUnitChangeProtoUnit("Frost Giant");
-				yRemoveFromDatabase("frostGiants");
-				yRemoveUpdateVar("frostGiants", "step");
-			} else if (checkEnemyDeactivated("frostGiants")) {
+	}
+	
+	if(yGetDatabaseCount("Satyrs") >0) {
+		id = yDatabaseNext("Satyrs", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Satyrs")) {
+			yRemoveFromDatabase("Satyrs");
+			yRemoveUpdateVar("Satyrs", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
+			ySetVar("Satyrs", "specialnext", trTimeMS() + 10000);
+		} else if (trTimeMS() > yGetVar("Satyrs", "specialnext")) {
+			if (kbUnitGetAnimationActionType(id) == 12) {
+				target = kbUnitGetTargetUnitID(id);
+				ySetVar("Satyrs", "specialnext", trTimeMS() + 20000);
+				trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+				trVectorSetUnitPos("start", "Satyrs");
+				trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+				
+				trQuestVarSetFromRand("sound", 1, 3, true);
+				trSoundPlayFN("rainofarrows"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				
+				yAddToDatabase("barrages", "next");
+				yAddUpdateVar("barrages", "dirx", trQuestVarGet("dirx"));
+				yAddUpdateVar("barrages", "dirz", trQuestVarGet("dirz"));
+				yAddUpdateVar("barrages", "posx", trQuestVarGet("endx") - 8.0 * trQuestVarGet("dirX"));
+				yAddUpdateVar("barrages", "posz", trQuestVarGet("endz") - 8.0 * trQuestVarGet("dirZ"));
+				yAddUpdateVar("barrages", "next", trTimeMS());
+				yAddUpdateVar("barrages", "count", 5);
+			}
+		}
+	}
+	
+	if(yGetDatabaseCount("battleBoars") >0) {
+		id = yDatabaseNext("battleBoars", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("battleBoars")) {
+			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
-				yRemoveFromDatabase("frostGiants");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
-				ySetVar("frostGiants", "step", 2);
-			} else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
-				switch(1*yGetVar("frostGiants", "step"))
-				{
-					case 0:
-					{
-						if (kbUnitGetAnimationActionType(id) == 6) {
-							target = kbUnitGetTargetUnitID(id);
-							ySetVar("frostGiants", "target", trGetUnitScenarioNameNumber(target));
-							ySetVar("frostGiants", "step", 1);
-							ySetVar("frostGiants", "specialnext", trTimeMS() + 1400);
-							trUnitOverrideAnimation(40,0,false,false,-1);
-						}
-					}
-					case 1:
-					{
-						action = 0;
-						for (x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yGetVar("frostGiants", "target") == yDatabaseNext("playerUnits")) {
-								trUnitSelectClear();
-								trUnitSelectByQV("playerUnits");
-								stunUnit("playerUnits", 3.0);
-								action = 1;
-								break;
-							}
-						}
-						ySetVar("frostGiants", "step", 2);
-						ySetVar("frostGiants", "specialnext", yGetVar("frostGiants", "specialnext") + 600);
-						if (action == 0) {
-							ySetVar("frostGiants", "target", -1);
-						} else if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) {
-							if (yGetVar("frostGiants", "target") == trQuestVarGet("p"+trCurrentPlayer()+"unit")) {
-								trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 4);
-								xsEnableRule("nick_next_dialog");
-							}
-						}
-					}
-					case 2:
-					{
-						trUnitOverrideAnimation(-1,0,false,true,-1);
-						ySetVar("frostGiants", "step", 0);
-						if (yGetVar("frostGiants", "target") == -1) {
-							ySetVar("frostGiants", "specialnext", trTimeMS());
-						} else {
-							ySetVar("frostGiants", "specialnext", trTimeMS() + 15000);
-						}
-					}
-				}
 			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("frostGiants", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("frostGiants", "index"));
-				if (action > 0 && yGetVar("frostGiants", "step") == 1) {
-					ySetVar("frostGiants", "step", 0);
-					ySetVar("frostGiants", "next", trTimeMS() + 18000);
-				}
+				trUnitChangeProtoUnit("Battle Boar");
 			}
-		}
-		
-		if (yGetDatabaseCount("barrages") > 0) {
-			yDatabaseNext("barrages");
-			if (trTimeMS() > yGetVar("barrages", "next")) {
-				ySetVar("barrages", "next", 300 + yGetVar("barrages", "next"));
-				/* do the damage */
-				yVarToVector("barrages", "pos");
-				yVarToVector("barrages", "dir");
-				if (yGetVar("barrages", "count") <= 3) {
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+			yRemoveFromDatabase("battleBoars");
+			yRemoveUpdateVar("battleBoars", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
+			ySetVar("battleBoars", "step", 2);
+		} else if (trTimeMS() > yGetVar("battleBoars", "specialnext")) {
+			switch(1*yGetVar("battleBoars", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("battleBoars", "target", trGetUnitScenarioNameNumber(target));
+						ySetVar("battleBoars", "step", 1);
+						ySetVar("battleBoars", "specialnext", trTimeMS() + 450);
+						trUnitOverrideAnimation(26,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					trVectorSetUnitPos("start", "battleBoars");
+					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("battleBoars", "target")));
+					for (x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
-							damagePlayerUnit(100);
+						} else if (zDistanceToVectorSquared("playerUnits", "end") < 9.0) {
+							trVectorSetUnitPos("pos", "playerUnits");
+							vectorSetAsTargetVector("target", "start", "pos", 20.0);
+							launchUnit("playerUnits", "target");
 						}
 					}
+					ySetVar("battleBoars", "step", 2);
+					ySetVar("battleBoars", "specialnext", yGetVar("battleBoars", "specialnext") + 300);
 				}
-				
-				if (yGetVar("barrages", "count") >= 0) {
-					trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
-					trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
-					trArmySelect("1,0");
-					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-					trUnitConvert(0);
-					trUnitChangeProtoUnit("Barrage");
-				}
-				
-				
-				ySetVar("barrages", "count", yGetVar("barrages", "count") - 1);
-				trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-				trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-				vectorToGrid("pos", "loc");
-				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= -2) {
-					yRemoveFromDatabase("barrages");
-				} else {
-					ySetVarFromVector("barrages", "pos", "pos");
-				}
-			}
-		}
-		
-		if(yGetDatabaseCount("Satyrs") >0) {
-			id = yDatabaseNext("Satyrs", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Satyrs")) {
-				yRemoveFromDatabase("Satyrs");
-				yRemoveUpdateVar("Satyrs", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
-				ySetVar("Satyrs", "specialnext", trTimeMS() + 10000);
-			} else if (trTimeMS() > yGetVar("Satyrs", "specialnext")) {
-				if (kbUnitGetAnimationActionType(id) == 12) {
-					target = kbUnitGetTargetUnitID(id);
-					ySetVar("Satyrs", "specialnext", trTimeMS() + 20000);
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-					trVectorSetUnitPos("start", "Satyrs");
-					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					
-					trQuestVarSetFromRand("sound", 1, 3, true);
-					trSoundPlayFN("rainofarrows"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-					
-					yAddToDatabase("barrages", "next");
-					yAddUpdateVar("barrages", "dirx", trQuestVarGet("dirx"));
-					yAddUpdateVar("barrages", "dirz", trQuestVarGet("dirz"));
-					yAddUpdateVar("barrages", "posx", trQuestVarGet("endx") - 8.0 * trQuestVarGet("dirX"));
-					yAddUpdateVar("barrages", "posz", trQuestVarGet("endz") - 8.0 * trQuestVarGet("dirZ"));
-					yAddUpdateVar("barrages", "next", trTimeMS());
-					yAddUpdateVar("barrages", "count", 5);
-				}
-			}
-		}
-		
-		if(yGetDatabaseCount("battleBoars") >0) {
-			id = yDatabaseNext("battleBoars", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("battleBoars")) {
-				if (trUnitAlive()) {
-					trUnitOverrideAnimation(-1,0,false,true,-1);
-				} else {
-					trUnitChangeProtoUnit("Battle Boar");
-				}
-				yRemoveFromDatabase("battleBoars");
-				yRemoveUpdateVar("battleBoars", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
-				ySetVar("battleBoars", "step", 2);
-			} else if (trTimeMS() > yGetVar("battleBoars", "specialnext")) {
-				switch(1*yGetVar("battleBoars", "step"))
+				case 2:
 				{
-					case 0:
-					{
-						if (kbUnitGetAnimationActionType(id) == 6) {
-							target = kbUnitGetTargetUnitID(id);
-							ySetVar("battleBoars", "target", trGetUnitScenarioNameNumber(target));
-							ySetVar("battleBoars", "step", 1);
-							ySetVar("battleBoars", "specialnext", trTimeMS() + 450);
-							trUnitOverrideAnimation(26,0,false,false,-1);
-						}
-					}
-					case 1:
-					{
-						trVectorSetUnitPos("start", "battleBoars");
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("battleBoars", "target")));
-						for (x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-								removePlayerUnit();
-							} else if (zDistanceToVectorSquared("playerUnits", "end") < 9.0) {
-								trVectorSetUnitPos("pos", "playerUnits");
-								vectorSetAsTargetVector("target", "start", "pos", 20.0);
-								launchUnit("playerUnits", "target");
-							}
-						}
-						ySetVar("battleBoars", "step", 2);
-						ySetVar("battleBoars", "specialnext", yGetVar("battleBoars", "specialnext") + 300);
-					}
-					case 2:
-					{
-						trUnitOverrideAnimation(-1,0,false,true,-1);
-						ySetVar("battleBoars", "step", 0);
-						if (yGetVar("battleBoars", "target") == -1) {
-							ySetVar("battleBoars", "specialnext", trTimeMS());
-						} else {
-							ySetVar("battleBoars", "specialnext", trTimeMS() + 15000);
-						}
-					}
-				}
-			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("battleBoars", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("battleBoars", "index"));
-				if (action > 0 && yGetVar("battleBoars", "step") == 1) {
+					trUnitOverrideAnimation(-1,0,false,true,-1);
 					ySetVar("battleBoars", "step", 0);
-					ySetVar("battleBoars", "next", trTimeMS() + 18000);
+					if (yGetVar("battleBoars", "target") == -1) {
+						ySetVar("battleBoars", "specialnext", trTimeMS());
+					} else {
+						ySetVar("battleBoars", "specialnext", trTimeMS() + 15000);
+					}
 				}
 			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("battleBoars", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("battleBoars", "index"));
+			if (action > 0 && yGetVar("battleBoars", "step") == 1) {
+				ySetVar("battleBoars", "step", 0);
+				ySetVar("battleBoars", "next", trTimeMS() + 18000);
+			}
 		}
-		
-		if (yGetDatabaseCount("AvengerProj") > 0) {
-			if (processGenericProj("AvengerProj") == PROJ_FALLING) {
-				yVarToVector("AvengerProj", "prev");
+	}
+	
+	if (yGetDatabaseCount("AvengerProj") > 0) {
+		if (processGenericProj("AvengerProj") == PROJ_FALLING) {
+			yVarToVector("AvengerProj", "prev");
+			yVarToVector("AvengerProj", "dir");
+			trVectorSetUnitPos("pos", "AvengerProj");
+			amt = zDistanceBetweenVectors("pos", "prev");
+			if (amt > 2.0) {
 				yVarToVector("AvengerProj", "dir");
-				trVectorSetUnitPos("pos", "AvengerProj");
-				amt = zDistanceBetweenVectors("pos", "prev");
-				if (amt > 2.0) {
-					yVarToVector("AvengerProj", "dir");
-					ySetVar("AvengerProj", "currentDist", yGetVar("AvengerProj", "currentDist") + amt);
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
-						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-							removePlayerUnit();
-						} else {
-							dist = zDistanceToVector("playerUnits", "prev");
-							if (dist < amt + 1.0) {
-								trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
-								trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-								if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9.0) {
-									damagePlayerUnit(amt * 20.0);
-									for(p=1; < ENEMY_PLAYER) {
-										if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+p+"unit")) {
-											silencePlayer(p, 5.0);
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-					ySetVarFromVector("AvengerProj", "prev", "pos");
-				}
-				trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-				trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-				vectorToGrid("next", "loc");
-				if (yGetVar("AvengerProj", "currentDist") >= yGetVar("AvengerProj", "distance") ||
-				terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-					trUnitSelectClear();
-					trUnitSelectByQV("AvengerProj", true);
-					trDamageUnitPercent(-100);
-					trUnitChangeProtoUnit("Avenger");
-					trUnitSelectClear();
-					trUnitSelectByQV("AvengerProj", true);
-					trDamageUnitPercent(-100);
-					trDamageUnitPercent(yGetVar("AvengerProj", "damaged"));
-					activateEnemy("avengerProj");
-					yAddUpdateVar("Avengers", "specialnext", trTimeMS() + 10000);
-					yRemoveFromDatabase("AvengerProj");
-				}
-			}
-		}
-		
-		if(yGetDatabaseCount("Avengers") >0) {
-			id = yDatabaseNext("Avengers", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Avengers")) {
-				if (trUnitAlive()) {
-					trUnitOverrideAnimation(-1,0,false,true,-1);
-				} else {
-					trUnitChangeProtoUnit("Avengers");
-				}
-				yRemoveFromDatabase("Avengers");
-				yRemoveUpdateVar("Avengers", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
-				ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
-			} else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
-				if (kbUnitGetActionType(id) == 6) {
-					target = kbUnitGetTargetUnitID(id);
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-					trVectorSetUnitPos("start", "Avengers");
-					if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
-						trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-						amt = trUnitPercentDamaged();
-						trUnitChangeProtoUnit("Dust Large");
-						addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0);
-						yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
-						yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
-						yAddUpdateVar("avengerProj", "damaged", amt);
-						yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
-						yAddUpdateVar("avengerProj", "currentDist", 0);
-						if (ySetPointer("enemies", 1*yGetVar("Avengers", "index"))) {
-							yRemoveFromDatabase("enemies");
-						}
-						yRemoveFromDatabase("Avengers");
-					}
-				}
-			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Avengers", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Avengers", "index"));
-				if (action > 0 && yGetVar("Avengers", "step") == 1) {
-					ySetVar("Avengers", "step", 0);
-					ySetVar("Avengers", "next", trTimeMS() + 10000);
-				}
-			}
-		}
-		
-		if (yGetDatabaseCount("ballistas") > 0) {
-			id = yDatabaseNext("ballistas", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ballistas")) {
-				yRemoveFromDatabase("ballistas");
-			}
-		}
-		
-		if (yGetDatabaseCount("siphons") > 0) {
-			id = yDatabaseNext("siphons", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("siphons")) {
-				yRemoveFromDatabase("siphons");
-			} else if (kbUnitGetAnimationActionType(id) == 9) {
-				if (trTimeMS() > yGetVar("siphons", "next")) {
-					ySetVar("siphons", "next", trTimeMS() + 3000);
-					yDatabaseNext("playerUnits");
-					trVectorSetUnitPos("pos", "playerUnits");
-					trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
-				}
-			}
-		}
-		
-		if (yGetDatabaseCount("MummyBalls") > 0) {
-			if (processGenericProj("MummyBalls") == PROJ_FALLING) {
-				yVarToVector("MummyBalls", "prev");
-				yVarToVector("MummyBalls", "dir");
-				amt = zDistanceBetweenVectors("pos", "prev");
-				ySetVarFromVector("MummyBalls", "prev", "pos");
+				ySetVar("AvengerProj", "currentDist", yGetVar("AvengerProj", "currentDist") + amt);
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else {
 						dist = zDistanceToVector("playerUnits", "prev");
-						if (dist < amt + 4.0) {
+						if (dist < amt + 1.0) {
 							trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
 							trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-							if (zDistanceToVectorSquared("playerUnits", "hitbox") < yGetVar("MummyBalls", "dist")) {
-								damagePlayerUnit(xsMin(100.0, amt * 10));
-								switch(1*yGetVar("MummyBalls", "type"))
-								{
-									case STATUS_SILENCE:
-									{
-										target = yGetVar("playerUnits", "player");
-										if (trQuestVarGet("p"+target+"unit") == trQuestVarGet("playerUnits")) {
-											silencePlayer(target, 3.0);
-										}
-									}
-									case STATUS_POISON:
-									{
-										poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
+							if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9.0) {
+								damagePlayerUnit(amt * 20.0);
+								for(p=1; < ENEMY_PLAYER) {
+									if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+p+"unit")) {
+										silencePlayer(p, 5.0);
+										break;
 									}
 								}
 							}
 						}
 					}
 				}
-				vectorToGrid("pos", "loc");
-				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-					yRemoveFromDatabase("MummyBalls");
-				}
+				ySetVarFromVector("AvengerProj", "prev", "pos");
+			}
+			trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
+			trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+			vectorToGrid("next", "loc");
+			if (yGetVar("AvengerProj", "currentDist") >= yGetVar("AvengerProj", "distance") ||
+				terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				trUnitSelectClear();
+				trUnitSelectByQV("AvengerProj", true);
+				trDamageUnitPercent(-100);
+				trUnitChangeProtoUnit("Avenger");
+				trUnitSelectClear();
+				trUnitSelectByQV("AvengerProj", true);
+				trDamageUnitPercent(-100);
+				trDamageUnitPercent(yGetVar("AvengerProj", "damaged"));
+				activateEnemy("avengerProj");
+				yAddUpdateVar("Avengers", "specialnext", trTimeMS() + 10000);
+				yRemoveFromDatabase("AvengerProj");
 			}
 		}
-		
-		if (yGetDatabaseCount("Mummies") >0) {
-			id = yDatabaseNext("Mummies", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Mummies")) {
-				if (trUnitAlive()) {
-					trUnitOverrideAnimation(-1,0,false,true,-1);
-				} else {
-					trUnitChangeProtoUnit("Mummy");
-				}
-				yRemoveFromDatabase("Mummies");
-				yRemoveUpdateVar("Mummies", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
-				ySetVar("Mummies", "step", 2);
-			} else if (trTimeMS() > yGetVar("Mummies", "next")) {
-				switch(1*yGetVar("Mummies", "step"))
-				{
-					case 0:
-					{
-						if (kbUnitGetAnimationActionType(id) == 12) {
-							target = kbUnitGetTargetUnitID(id);
-							trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-							trVectorSetUnitPos("start", "Mummies");
-							trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-							ySetVarFromVector("Mummies", "dir", "dir");
-							ySetVarFromVector("Mummies", "start", "start");
-							ySetVar("Mummies", "step", 1);
-							ySetVar("Mummies", "next", trTimeMS() + 1000);
-							trUnitOverrideAnimation(37,0,false,false,-1);
-						}
-					}
-					case 1:
-					{
-						yVarToVector("Mummies", "start");
-						yVarToVector("Mummies", "dir");
-						addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Lampades Blood"),2,10,4.0);
-						yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
-						yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
-						yAddUpdateVar("MummyBalls", "dist", 16);
-						yAddUpdateVar("MummyBalls", "type", STATUS_POISON);
-						ySetVar("Mummies", "step", 2);
-						ySetVar("Mummies", "next", yGetVar("Mummies", "next") + 3000);
-					}
-					case 2:
-					{
-						ySetVar("Mummies", "step", 0);
-						ySetVar("Mummies", "next", trTimeMS() + 18000);
-						trUnitOverrideAnimation(-1,0,false,true,-1);
-					}
-				}
-			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Mummies", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Mummies", "index"));
-				if (action > 0 && yGetVar("Mummies", "step") == 1) {
-					ySetVar("Mummies", "step", 0);
-					ySetVar("Mummies", "next", trTimeMS() + 18000);
-				}
-			}
-		}
-		
-		if(yGetDatabaseCount("ScorpionMen") >0) {
-			id = yDatabaseNext("ScorpionMen", true);
-			if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ScorpionMen")) {
-				if (trUnitAlive()) {
-					trUnitOverrideAnimation(-1,0,false,true,-1);
-				} else {
-					trUnitChangeProtoUnit("Scorpion Man");
-				}
-				yRemoveFromDatabase("ScorpionMen");
-				yRemoveUpdateVar("ScorpionMen", "step");
-			} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
-				ySetVar("ScorpionMen", "step", 2);
-			} else if (trTimeMS() > yGetVar("ScorpionMen", "specialnext")) {
-				switch(1*yGetVar("ScorpionMen", "step"))
-				{
-					case 0:
-					{
-						if (kbUnitGetAnimationActionType(id) == 6) {
-							target = kbUnitGetTargetUnitID(id);
-							ySetVar("ScorpionMen", "target", trGetUnitScenarioNameNumber(target));
-							ySetVar("ScorpionMen", "step", 1);
-							ySetVar("ScorpionMen", "specialnext", trTimeMS() + 500);
-							trUnitOverrideAnimation(39,0,false,false,-1);
-						}
-					}
-					case 1:
-					{
-						action = 0;
-						for (x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yGetVar("ScorpionMen", "target") == yDatabaseNext("playerUnits")) {
-								trUnitSelectClear();
-								trUnitSelectByQV("playerUnits");
-								poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
-								action = 1;
-								break;
-							}
-						}
-						ySetVar("ScorpionMen", "step", 2);
-						ySetVar("ScorpionMen", "specialnext", yGetVar("ScorpionMen", "specialnext") + 500);
-						if (action == 0) {
-							ySetVar("ScorpionMen", "target", -1);
-						}
-					}
-					case 2:
-					{
-						trUnitOverrideAnimation(-1,0,false,true,-1);
-						ySetVar("ScorpionMen", "step", 0);
-						if (yGetVar("ScorpionMen", "target") == -1) {
-							ySetVar("ScorpionMen", "specialnext", trTimeMS());
-						} else {
-							ySetVar("ScorpionMen", "specialnext", trTimeMS() + 15000);
-						}
-					}
-				}
-			} else {
-				action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("ScorpionMen", "index"));
-				action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("ScorpionMen", "index"));
-				if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
-					ySetVar("ScorpionMen", "step", 0);
-					ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
-				}
-			}
-		}
-		
-		xsSetContextPlayer(old);
 	}
 	
+	if(yGetDatabaseCount("Avengers") >0) {
+		id = yDatabaseNext("Avengers", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Avengers")) {
+			if (trUnitAlive()) {
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else {
+				trUnitChangeProtoUnit("Avengers");
+			}
+			yRemoveFromDatabase("Avengers");
+			yRemoveUpdateVar("Avengers", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
+			ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
+		} else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
+			if (kbUnitGetActionType(id) == 6) {
+				target = kbUnitGetTargetUnitID(id);
+				trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+				trVectorSetUnitPos("start", "Avengers");
+				if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
+					trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
+					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+					amt = trUnitPercentDamaged();
+					trUnitChangeProtoUnit("Dust Large");
+					addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0);
+					yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
+					yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
+					yAddUpdateVar("avengerProj", "damaged", amt);
+					yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
+					yAddUpdateVar("avengerProj", "currentDist", 0);
+					if (ySetPointer("enemies", 1*yGetVar("Avengers", "index"))) {
+						yRemoveFromDatabase("enemies");
+					}
+					yRemoveFromDatabase("Avengers");
+				}
+			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Avengers", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Avengers", "index"));
+			if (action > 0 && yGetVar("Avengers", "step") == 1) {
+				ySetVar("Avengers", "step", 0);
+				ySetVar("Avengers", "next", trTimeMS() + 10000);
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("ballistas") > 0) {
+		id = yDatabaseNext("ballistas", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ballistas")) {
+			yRemoveFromDatabase("ballistas");
+		}
+	}
+	
+	if (yGetDatabaseCount("siphons") > 0) {
+		id = yDatabaseNext("siphons", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("siphons")) {
+			yRemoveFromDatabase("siphons");
+		} else if (kbUnitGetAnimationActionType(id) == 9) {
+			if (trTimeMS() > yGetVar("siphons", "next")) {
+				ySetVar("siphons", "next", trTimeMS() + 3000);
+				yDatabaseNext("playerUnits");
+				trVectorSetUnitPos("pos", "playerUnits");
+				trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("MummyBalls") > 0) {
+		if (processGenericProj("MummyBalls") == PROJ_FALLING) {
+			yVarToVector("MummyBalls", "prev");
+			yVarToVector("MummyBalls", "dir");
+			amt = zDistanceBetweenVectors("pos", "prev");
+			ySetVarFromVector("MummyBalls", "prev", "pos");
+			for(x=yGetDatabaseCount("playerUnits"); >0) {
+				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+					removePlayerUnit();
+				} else {
+					dist = zDistanceToVector("playerUnits", "prev");
+					if (dist < amt + 4.0) {
+						trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
+						trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
+						if (zDistanceToVectorSquared("playerUnits", "hitbox") < yGetVar("MummyBalls", "dist")) {
+							damagePlayerUnit(xsMin(100.0, amt * 10));
+							switch(1*yGetVar("MummyBalls", "type"))
+							{
+								case STATUS_SILENCE:
+								{
+									target = yGetVar("playerUnits", "player");
+									if (trQuestVarGet("p"+target+"unit") == trQuestVarGet("playerUnits")) {
+										silencePlayer(target, 3.0);
+									}
+								}
+								case STATUS_POISON:
+								{
+									poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
+								}
+							}
+						}
+					}
+				}
+			}
+			vectorToGrid("pos", "loc");
+			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				yRemoveFromDatabase("MummyBalls");
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("Mummies") >0) {
+		id = yDatabaseNext("Mummies", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Mummies")) {
+			if (trUnitAlive()) {
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else {
+				trUnitChangeProtoUnit("Mummy");
+			}
+			yRemoveFromDatabase("Mummies");
+			yRemoveUpdateVar("Mummies", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
+			ySetVar("Mummies", "step", 2);
+		} else if (trTimeMS() > yGetVar("Mummies", "next")) {
+			switch(1*yGetVar("Mummies", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 12) {
+						target = kbUnitGetTargetUnitID(id);
+						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+						trVectorSetUnitPos("start", "Mummies");
+						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+						ySetVarFromVector("Mummies", "dir", "dir");
+						ySetVarFromVector("Mummies", "start", "start");
+						ySetVar("Mummies", "step", 1);
+						ySetVar("Mummies", "next", trTimeMS() + 1000);
+						trUnitOverrideAnimation(37,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					yVarToVector("Mummies", "start");
+					yVarToVector("Mummies", "dir");
+					addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Lampades Blood"),2,10,4.0);
+					yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
+					yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
+					yAddUpdateVar("MummyBalls", "dist", 16);
+					yAddUpdateVar("MummyBalls", "type", STATUS_POISON);
+					ySetVar("Mummies", "step", 2);
+					ySetVar("Mummies", "next", yGetVar("Mummies", "next") + 3000);
+				}
+				case 2:
+				{
+					ySetVar("Mummies", "step", 0);
+					ySetVar("Mummies", "next", trTimeMS() + 18000);
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+				}
+			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Mummies", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Mummies", "index"));
+			if (action > 0 && yGetVar("Mummies", "step") == 1) {
+				ySetVar("Mummies", "step", 0);
+				ySetVar("Mummies", "next", trTimeMS() + 18000);
+			}
+		}
+	}
+	
+	if(yGetDatabaseCount("ScorpionMen") >0) {
+		id = yDatabaseNext("ScorpionMen", true);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ScorpionMen")) {
+			if (trUnitAlive()) {
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else {
+				trUnitChangeProtoUnit("Scorpion Man");
+			}
+			yRemoveFromDatabase("ScorpionMen");
+			yRemoveUpdateVar("ScorpionMen", "step");
+		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
+			ySetVar("ScorpionMen", "step", 2);
+		} else if (trTimeMS() > yGetVar("ScorpionMen", "specialnext")) {
+			switch(1*yGetVar("ScorpionMen", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("ScorpionMen", "target", trGetUnitScenarioNameNumber(target));
+						ySetVar("ScorpionMen", "step", 1);
+						ySetVar("ScorpionMen", "specialnext", trTimeMS() + 500);
+						trUnitOverrideAnimation(39,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					action = 0;
+					for (x=yGetDatabaseCount("playerUnits"); >0) {
+						if (yGetVar("ScorpionMen", "target") == yDatabaseNext("playerUnits")) {
+							trUnitSelectClear();
+							trUnitSelectByQV("playerUnits");
+							poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
+							action = 1;
+							break;
+						}
+					}
+					ySetVar("ScorpionMen", "step", 2);
+					ySetVar("ScorpionMen", "specialnext", yGetVar("ScorpionMen", "specialnext") + 500);
+					if (action == 0) {
+						ySetVar("ScorpionMen", "target", -1);
+					}
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					ySetVar("ScorpionMen", "step", 0);
+					if (yGetVar("ScorpionMen", "target") == -1) {
+						ySetVar("ScorpionMen", "specialnext", trTimeMS());
+					} else {
+						ySetVar("ScorpionMen", "specialnext", trTimeMS() + 15000);
+					}
+				}
+			}
+		} else {
+			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("ScorpionMen", "index"));
+			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("ScorpionMen", "index"));
+			if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
+				ySetVar("ScorpionMen", "step", 0);
+				ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
+			}
+		}
+	}
+	
+	xsSetContextPlayer(old);
+}
+

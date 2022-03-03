@@ -92,7 +92,7 @@ void processChests() {
 			trVectorSetUnitPos("pos", "rainingFire");
 			vectorToGrid("pos", "loc");
 			if (trQuestVarGet("posY") <= 0 ||
-			terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 				trUnitChangeProtoUnit("Cinematic Scorch");
 				trUnitSelectClear();
 				trUnitSelectByQV("rainingFire", true);
@@ -179,7 +179,7 @@ void processChests() {
 							}
 						}
 						if ((trQuestVarGet("correctStatuesIn"+room) == yGetDatabaseCount("statuesIn"+room)) &&
-						trQuestVarGet("movingStatuesIn"+room) == 0) {
+							trQuestVarGet("movingStatuesIn"+room) == 0) {
 							ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
 							trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 							for(x=yGetDatabaseCount("statuesIn"+room); >0) {

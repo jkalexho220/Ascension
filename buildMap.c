@@ -30,7 +30,7 @@ highFrequency
 		if (trUnitIsSelected()) {
 			uiClearSelection();
 			trShowImageDialog(stageIcon(1*yGetVar("stageChoices", "stage")),
-			"Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
+				"Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
 		}
 	}
 }
@@ -47,8 +47,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 	trQuestVarSet("room"+room, type);
 	if (type < ROOM_CHEST) {
 		if ((trQuestVarGet("trapRooms") > 0) &&
-		(countRoomEntrances(x, z) > 1) &&
-		(trQuestVarGet("relictransporterguy") != room)) {
+			(countRoomEntrances(x, z) > 1) &&
+			(trQuestVarGet("relictransporterguy") != room)) {
 			trQuestVarSetFromRand("rand", 1, 3, true);
 			if (trQuestVarGet("rand") == 1) {
 				trQuestVarSet("trapRooms", trQuestVarGet("trapRooms") - 1);
@@ -1424,615 +1424,615 @@ highFrequency
 				for(p=1; < ENEMY_PLAYER) {
 					trStringQuestVarSet("enemyProto" + p,
 						kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
-					}
-					
-					for(x=1; < 20) {
-						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-						trQuestVarSetFromRand("rand",1,360,true);
-						trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
-						yAddToDatabase("timeshiftHawks", "next");
-						spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Timeshift In"), yGetNewVarName("timeshiftHawks", "sfx"));
-					}
-					xsEnableRule("zenos_paradox_build_01");
-					
-					trQuestVarSet("templeRoom", 5);
-					
-					trQuestVarSet("akard", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,50,0,50,225,true);
-					trArmySelect("1,0");
-					trUnitConvert(0);
-					trUnitChangeProtoUnit("Oracle Scout");
 				}
-				case 0:
-				{
-					trQuestVarSet("stageTemple", BOON_TWO_RELICS);
-					trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
-					worldHeight = 0;
-					wallHeight = 0;
-					trQuestVarSet("bossRoomShape", ROOM_SQUARE);
-					trQuestVarSet("bossRoomSize", 11);
-					TERRAIN_WALL = 2;
-					TERRAIN_SUB_WALL = 7;
-					
-					TERRAIN_PRIMARY = 4;
-					TERRAIN_SUB_PRIMARY = 15;
-					
-					TERRAIN_SECONDARY = 0;
-					TERRAIN_SUB_SECONDARY = 73;
-					
-					trQuestVarSet("mapType", MAP_STANDARD);
-					trQuestVarSet("treeDensity", 0.1);
-					trStringQuestVarSet("treeProto1", "Oak Tree Burning");
-					trStringQuestVarSet("treeProto2", "Marsh Tree");
-					trStringQuestVarSet("treeProto3", "Pine Snow");
-					trQuestVarSet("spriteDensity", 0.3);
-					trStringQuestVarSet("spriteProto1", "Imperial Examination");
-					trStringQuestVarSet("spriteProto2", "Healing SFX");
-					trStringQuestVarSet("spriteProto3", "Mist");
-					trQuestVarSet("rockDensity", 0.2);
-					trStringQuestVarSet("rockProto1", "Ruins");
-					trStringQuestVarSet("rockProto2", "Columns Broken");
-					trStringQuestVarSet("rockProto3", "Columns");
-					
-					trQuestVarSet("enemyDensity", 0);
-					
-					trQuestVarSet("templeRoom", 1);
+				
+				for(x=1; < 20) {
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trQuestVarSetFromRand("rand",1,360,true);
+					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
+					yAddToDatabase("timeshiftHawks", "next");
+					spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Timeshift In"), yGetNewVarName("timeshiftHawks", "sfx"));
 				}
+				xsEnableRule("zenos_paradox_build_01");
+				
+				trQuestVarSet("templeRoom", 5);
+				
+				trQuestVarSet("akard", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,50,0,50,225,true);
+				trArmySelect("1,0");
+				trUnitConvert(0);
+				trUnitChangeProtoUnit("Oracle Scout");
 			}
-			
-			/* paint entire map cliff and raise it */
-			trChangeTerrainHeight(0,0,145,145,wallHeight,false);
-			trPaintTerrain(0,0,145,145,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
-			
-			if (trQuestVarGet("mapType") == MAP_OPEN) {
-				trChangeTerrainHeight(5,5,140,140,worldHeight,false);
-				trPaintTerrain(5,5,139,139,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY,false);
-				paintSecondary(5,5,139,139);
+			case 0:
+			{
+				trQuestVarSet("stageTemple", BOON_TWO_RELICS);
+				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
+				worldHeight = 0;
+				wallHeight = 0;
+				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
+				trQuestVarSet("bossRoomSize", 11);
+				TERRAIN_WALL = 2;
+				TERRAIN_SUB_WALL = 7;
+				
+				TERRAIN_PRIMARY = 4;
+				TERRAIN_SUB_PRIMARY = 15;
+				
+				TERRAIN_SECONDARY = 0;
+				TERRAIN_SUB_SECONDARY = 73;
+				
+				trQuestVarSet("mapType", MAP_STANDARD);
+				trQuestVarSet("treeDensity", 0.1);
+				trStringQuestVarSet("treeProto1", "Oak Tree Burning");
+				trStringQuestVarSet("treeProto2", "Marsh Tree");
+				trStringQuestVarSet("treeProto3", "Pine Snow");
+				trQuestVarSet("spriteDensity", 0.3);
+				trStringQuestVarSet("spriteProto1", "Imperial Examination");
+				trStringQuestVarSet("spriteProto2", "Healing SFX");
+				trStringQuestVarSet("spriteProto3", "Mist");
+				trQuestVarSet("rockDensity", 0.2);
+				trStringQuestVarSet("rockProto1", "Ruins");
+				trStringQuestVarSet("rockProto2", "Columns Broken");
+				trStringQuestVarSet("rockProto3", "Columns");
+				
+				trQuestVarSet("enemyDensity", 0);
+				
+				trQuestVarSet("templeRoom", 1);
 			}
-			
-			/* build the grid */
-			trQuestVarSet("keyType", RELIC_KEY_EGYPT);
-			
-			bool edgeIsPortal = false;
-			trQuestVarSet("tile0", TILE_VISITED);
-			trQuestVarSet("tile1", TILE_FOUND);
-			trQuestVarSet("tile4", TILE_FOUND);
-			
-			trQuestVarSetFromRand("village", 1, 14, true);
-			if (trQuestVarGet("mapType") == MAP_PORTALS) {
-				trQuestVarSet("portalsActive", 1);
-				total = 1;
-				trQuestVarSet("tile"+1*trQuestVarGet("village"), TILE_VISITED);
-				trQuestVarSetFromRand("villageEntrance", 1, 13, true);
-				trQuestVarSet("villageEntrance", trQuestVarGet("village") + trQuestVarGet("villageEntrance"));
-				if (trQuestVarGet("villageEntrance") > 14) {
-					trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 14);
+		}
+		
+		/* paint entire map cliff and raise it */
+		trChangeTerrainHeight(0,0,145,145,wallHeight,false);
+		trPaintTerrain(0,0,145,145,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
+		
+		if (trQuestVarGet("mapType") == MAP_OPEN) {
+			trChangeTerrainHeight(5,5,140,140,worldHeight,false);
+			trPaintTerrain(5,5,139,139,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY,false);
+			paintSecondary(5,5,139,139);
+		}
+		
+		/* build the grid */
+		trQuestVarSet("keyType", RELIC_KEY_EGYPT);
+		
+		bool edgeIsPortal = false;
+		trQuestVarSet("tile0", TILE_VISITED);
+		trQuestVarSet("tile1", TILE_FOUND);
+		trQuestVarSet("tile4", TILE_FOUND);
+		
+		trQuestVarSetFromRand("village", 1, 14, true);
+		if (trQuestVarGet("mapType") == MAP_PORTALS) {
+			trQuestVarSet("portalsActive", 1);
+			total = 1;
+			trQuestVarSet("tile"+1*trQuestVarGet("village"), TILE_VISITED);
+			trQuestVarSetFromRand("villageEntrance", 1, 13, true);
+			trQuestVarSet("villageEntrance", trQuestVarGet("village") + trQuestVarGet("villageEntrance"));
+			if (trQuestVarGet("villageEntrance") > 14) {
+				trQuestVarSet("villageEntrance", trQuestVarGet("villageEntrance") - 14);
+			}
+			buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
+		} else if (trQuestVarGet("mapType") == MAP_OPEN) {
+			trQuestVarSetFromRand("bossRoomEntranceMod", 1, 13, true);
+			trQuestVarSet("bossEntranceRoom", trQuestVarGet("village") + trQuestVarGet("bossRoomEntranceMod"));
+			if (trQuestVarGet("bossEntranceRoom") > 14) {
+				trQuestVarSet("bossEntranceRoom", trQuestVarGet("bossEntranceRoom") - 14);
+			}
+			trQuestVarSetFromRand("bossKeyRoomMod", 1, 13, true);
+			trQuestVarSet("bossKeyRoom", trQuestVarGet("bossEntranceRoom") + trQuestVarGet("bossKeyRoomMod"));
+			if (trQuestVarGet("bossKeyRoom") > 14) {
+				trQuestVarSet("bossKeyRoom", trQuestVarGet("bossKeyRoom") - 14);
+			}
+		}
+		
+		if (trQuestVarGet("templeRoom") == 0) {
+			trQuestVarSetFromRand("templeRoom", 1, 14, true);
+			trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") + trQuestVarGet("village"));
+			if (trQuestVarGet("templeRoom") > 14) {
+				trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") - 14);
+			}
+		}
+		
+		if (trQuestVarGet("tile1") == TILE_FOUND) {
+			trQuestVarSet("next", 1);
+			yAddToDatabase("frontier", "next");
+			yAddUpdateVar("frontier", "edge", edgeName(0, 1));
+			yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+		}
+		if (trQuestVarGet("mapType") == MAP_OPEN) {
+			yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
+		}
+		
+		if (trQuestVarGet("tile4") == TILE_FOUND) {
+			trQuestVarSet("next", 4);
+			yAddToDatabase("frontier", "next");
+			yAddUpdateVar("frontier", "edge", edgeName(0, 4));
+			yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+		}
+		if (trQuestVarGet("mapType") == MAP_OPEN) {
+			yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
+		}
+		
+		trQuestVarSetFromRand("relicTransporterDepth", 1, 5, true);
+		
+		/* DELETE ME */
+		debugLog("Village is " + 1*trQuestVarGet("village"));
+		if (trQuestVarGet("mapType") == MAP_PORTALS) {
+			debugLog("Village entrance is " + 1*trQuestVarGet("villageEntrance"));
+		}
+		
+		/* build guaranteed path to every room */
+		for(i=0; < 64) {
+			trQuestVarSetFromRand("search", 1, backtrack, true);
+			for(j=trQuestVarGet("search"); >0) {
+				yDatabaseNext("frontier", false, false);
+			}
+			if (trQuestVarGet("tile"+1*trQuestVarGet("frontier")) < TILE_VISITED) {
+				z = 1*trQuestVarGet("frontier") / 4;
+				x = 1*trQuestVarGet("frontier") - 4 * z;
+				buildEdge(1*yGetVar("frontier", "edge"), 1*yGetVar("frontier", "type"));
+				
+				edgeIsPortal = (yGetVar("frontier", "type") == EDGE_PORTAL);
+				trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
+				if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
+					yAddToDatabase("visited", "frontier");
 				}
-				buildEdge(edgeName(1*trQuestVarGet("villageEntrance"), 1*trQuestVarGet("village")), EDGE_PORTAL);
-			} else if (trQuestVarGet("mapType") == MAP_OPEN) {
-				trQuestVarSetFromRand("bossRoomEntranceMod", 1, 13, true);
-				trQuestVarSet("bossEntranceRoom", trQuestVarGet("village") + trQuestVarGet("bossRoomEntranceMod"));
-				if (trQuestVarGet("bossEntranceRoom") > 14) {
-					trQuestVarSet("bossEntranceRoom", trQuestVarGet("bossEntranceRoom") - 14);
-				}
-				trQuestVarSetFromRand("bossKeyRoomMod", 1, 13, true);
-				trQuestVarSet("bossKeyRoom", trQuestVarGet("bossEntranceRoom") + trQuestVarGet("bossKeyRoomMod"));
-				if (trQuestVarGet("bossKeyRoom") > 14) {
-					trQuestVarSet("bossKeyRoom", trQuestVarGet("bossKeyRoom") - 14);
-				}
-			}
-			
-			if (trQuestVarGet("templeRoom") == 0) {
-				trQuestVarSetFromRand("templeRoom", 1, 14, true);
-				trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") + trQuestVarGet("village"));
-				if (trQuestVarGet("templeRoom") > 14) {
-					trQuestVarSet("templeRoom", trQuestVarGet("templeRoom") - 14);
-				}
-			}
-			
-			if (trQuestVarGet("tile1") == TILE_FOUND) {
-				trQuestVarSet("next", 1);
-				yAddToDatabase("frontier", "next");
-				yAddUpdateVar("frontier", "edge", edgeName(0, 1));
-				yAddUpdateVar("frontier", "type", EDGE_NORMAL);
-			}
-			if (trQuestVarGet("mapType") == MAP_OPEN) {
-				yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
-			}
-			
-			if (trQuestVarGet("tile4") == TILE_FOUND) {
-				trQuestVarSet("next", 4);
-				yAddToDatabase("frontier", "next");
-				yAddUpdateVar("frontier", "edge", edgeName(0, 4));
-				yAddUpdateVar("frontier", "type", EDGE_NORMAL);
-			}
-			if (trQuestVarGet("mapType") == MAP_OPEN) {
-				yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
-			}
-			
-			trQuestVarSetFromRand("relicTransporterDepth", 1, 5, true);
-			
-			/* DELETE ME */
-			debugLog("Village is " + 1*trQuestVarGet("village"));
-			if (trQuestVarGet("mapType") == MAP_PORTALS) {
-				debugLog("Village entrance is " + 1*trQuestVarGet("villageEntrance"));
-			}
-			
-			/* build guaranteed path to every room */
-			for(i=0; < 64) {
-				trQuestVarSetFromRand("search", 1, backtrack, true);
-				for(j=trQuestVarGet("search"); >0) {
-					yDatabaseNext("frontier", false, false);
-				}
-				if (trQuestVarGet("tile"+1*trQuestVarGet("frontier")) < TILE_VISITED) {
-					z = 1*trQuestVarGet("frontier") / 4;
-					x = 1*trQuestVarGet("frontier") - 4 * z;
-					buildEdge(1*yGetVar("frontier", "edge"), 1*yGetVar("frontier", "type"));
-					
-					edgeIsPortal = (yGetVar("frontier", "type") == EDGE_PORTAL);
-					trQuestVarSet("tile"+1*trQuestVarGet("frontier"), TILE_VISITED);
-					if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
-						yAddToDatabase("visited", "frontier");
-					}
-					/* only add more edges if the room is not the boss room or the village room */
-					if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
-						for(a=1; >=0) {
-							for(b=1; >=0) {
-								trQuestVarSet("newX", (1 - 2 * b) * a + x);
-								trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
-								if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
+				/* only add more edges if the room is not the boss room or the village room */
+				if (trQuestVarGet("frontier") < 15 && trQuestVarGet("frontier") != trQuestVarGet("village")) {
+					for(a=1; >=0) {
+						for(b=1; >=0) {
+							trQuestVarSet("newX", (1 - 2 * b) * a + x);
+							trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
+							if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
 								trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3) {
-									continue;
+								continue;
+							}
+							n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
+							if (trQuestVarGet("tile"+n) < TILE_VISITED) {
+								trQuestVarSet("next", n);
+								yAddToDatabase("frontier", "next");
+								yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
+								yAddUpdateVar("frontier", "type", EDGE_NORMAL);
+								if (trQuestVarGet("wallEdges") > 0 && yGetDatabaseCount("visited") > 0) {
+									trQuestVarSetFromRand("rand", 1, xsMin(3, trQuestVarGet("wallEdges")), true);
+									if (trQuestVarGet("rand") == 1) {
+										yAddUpdateVar("frontier", "type", EDGE_WALL);
+									}
 								}
-								n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
-								if (trQuestVarGet("tile"+n) < TILE_VISITED) {
-									trQuestVarSet("next", n);
-									yAddToDatabase("frontier", "next");
-									yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
-									yAddUpdateVar("frontier", "type", EDGE_NORMAL);
-									if (trQuestVarGet("wallEdges") > 0 && yGetDatabaseCount("visited") > 0) {
-										trQuestVarSetFromRand("rand", 1, xsMin(3, trQuestVarGet("wallEdges")), true);
-										if (trQuestVarGet("rand") == 1) {
-											yAddUpdateVar("frontier", "type", EDGE_WALL);
-										}
-									}
-									if (trQuestVarGet("mapType") == MAP_OPEN) {
-										yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
-									}
+								if (trQuestVarGet("mapType") == MAP_OPEN) {
+									yAddUpdateVar("frontier", "type", EDGE_MOUNTAIN);
 								}
 							}
 						}
-						if (edgeIsPortal == false) {
-							trQuestVarSet("relicTransporterDepth", trQuestVarGet("relicTransporterDepth") - 1);
-							if ((trQuestVarGet("relicTransporterDepth") <= 0) &&
+					}
+					if (edgeIsPortal == false) {
+						trQuestVarSet("relicTransporterDepth", trQuestVarGet("relicTransporterDepth") - 1);
+						if ((trQuestVarGet("relicTransporterDepth") <= 0) &&
 							(trQuestVarGet("relictransporterguy") == 0) &&
 							(trQuestVarGet("frontier") != trQuestVarGet("villageEntrance")) &&
 							(trQuestVarGet("frontier") != trQuestVarGet("bossEntranceRoom"))) {
-								trQuestVarSet("relicTransporterGuy", trQuestVarGet("frontier"));
-							} else if (trQuestVarGet("mapType") == MAP_PORTALS) {
-								trQuestVarSetFromRand("rand", 1, 14, true);
-								n = trQuestVarGet("rand");
-								if (trQuestVarGet("tile"+n) < TILE_VISITED &&
+							trQuestVarSet("relicTransporterGuy", trQuestVarGet("frontier"));
+						} else if (trQuestVarGet("mapType") == MAP_PORTALS) {
+							trQuestVarSetFromRand("rand", 1, 14, true);
+							n = trQuestVarGet("rand");
+							if (trQuestVarGet("tile"+n) < TILE_VISITED &&
 								n != trQuestVarGet("villageEntrance") &&
 								n != trQuestVarGet("relicTransporterGuy") &&
 								trQuestVarGet("villageEntrance") != trQuestVarGet("frontier")) {
-									yAddToDatabase("frontier", "rand");
-									yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
-									yAddUpdateVar("frontier", "type", EDGE_PORTAL);
-								}
+								yAddToDatabase("frontier", "rand");
+								yAddUpdateVar("frontier", "edge", edgeName(1*trQuestVarGet("frontier"), n));
+								yAddUpdateVar("frontier", "type", EDGE_PORTAL);
 							}
 						}
-					}
-					
-					total = total + 1;
-					if (total == 15) {
-						break;
-					}
-				} else {
-					backtrack = backtrack + 1;
-				}
-				yRemoveFromDatabase("frontier");
-				yRemoveUpdateVar("frontier", "edge");
-				yRemoveUpdateVar("frontier", "type");
-			}
-			
-			buildRoom(0,0, ROOM_STARTER);
-			buildRoom(3,3, ROOM_BOSS);
-			
-			/* make portals more visible */
-			for(x=yGetDatabaseCount("skypassages"); >0) {
-				yDatabaseNext("skyPassages");
-				trVectorSetUnitPos("pos", "skyPassages");
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-4,0,trQuestVarGet("posZ"),0,true);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+4,0,trQuestVarGet("posZ"),0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")-4,0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")+4,0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")+3,0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")-3,0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")+3,0,false);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")-3,0,false);
-				trArmySelect("1,0");
-				trUnitConvert(0);
-				trUnitChangeProtoUnit("Garrison Flag Sky Passage");
-			}
-			
-			bool nottudSpawn = false;
-			trQuestVarSetFromRand("nottudSpawn", 0, 20, true);
-			if (trQuestVarGet("nottudSpawn") < trQuestVarGet("stage")) {
-				nottudSpawn = true;
-			}
-			
-			if (trQuestVarGet("stage") > 10) {
-				trQuestVarSet("relicTransporterGuy", -1);
-				trQuestVarSet("village", -1);
-				trQuestVarSet("bossEntranceRoom", -1);
-				chests = 0;
-				nottudSpawn = false;
-			}
-			
-			for (i=1; < 15) {
-				z = i / 4;
-				x = i - z * 4;
-				if (trQuestVarGet("room"+i) == 0) {
-					if (chests > 0) {
-						trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
-					} else {
-						trQuestVarSet("chestRand", 0);
-					}
-					if (i == 1*trQuestVarGet("bossEntranceRoom")) {
-						buildRoom(x, z, ROOM_BOSS_ENTRANCE);
-					} else if (i == 1*trQuestVarGet("relicTransporterGuy")) {
-						buildRoom(x, z, ROOM_TRANSPORTER_GUY);
-					} else if (i == 1*trQuestVarGet("village")) {
-						xsEnableRule("town_always");
-						buildRoom(x, z, ROOM_VILLAGE + trQuestVarGet("stage"));
-						/* quest givers */
-						for(x=3; >0) {
-							if (trQuestVarGet("localQuest") == x) {
-								trVectorSetUnitPos("pos", "guy"+x);
-								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-								trArmySelect("1,0");
-								trUnitChangeProtoUnit("Healing SFX");
-								trQuestVarSet("questGuy", trQuestVarGet("guy"+x));
-							} else {
-								yAddToDatabase("npcTalk", "guy"+x);
-								yAddUpdateVar("npcTalk", "dialog", 10 * x + trQuestVarGet("stage"));
-							}
-						}
-					} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
-						buildRoom(x, z, ROOM_NOTTUD);
-						nottudSpawn = false;
-					} else if (trQuestVarGet("templeRoom") == i) {
-						xsEnableRule("find_temple");
-						buildRoom(x, z, ROOM_TEMPLE + trQuestVarGet("stage"));
-					} else if (trQuestVarGet("chestRand") == 1) {
-						chests = chests - 1;
-						buildRoom(x, z, ROOM_CHEST);
-					} else {
-						trQuestVarSetFromRand("roomType", ROOM_BASIC, ROOM_AMBUSH, true);
-						trQuestVarSetFromRand("roomType2", ROOM_BASIC, ROOM_AMBUSH, true);
-						if (trQuestVarGet("roomType2") < trQuestVarGet("roomType")) {
-							trQuestVarSet("roomType", trQuestVarGet("roomType2"));
-						}
-						buildRoom(x, z, 1*trQuestVarGet("roomType"));
 					}
 				}
-			}
-			
-			/* finish making chest rooms */
-			trQuestVarSet("keyType", RELIC_KEY_GREEK);
-			for(i=yGetDatabaseCount("chests"); >0) {
-				yDatabaseNext("chests");
-				room = yGetVar("chests", "room");
-				x0 = trQuestVarGet("room"+room+"bottom1x");
-				z0 = trQuestVarGet("room"+room+"bottom1z");
-				x1 = trQuestVarGet("room"+room+"top1x");
-				z1 = trQuestVarGet("room"+room+"top1z");
-				switch(1*yGetVar("chests", "type"))
-				{
-					case CHEST_KEY:
-					{
-						ySetVar("chests", "keyType", trQuestVarGet("keyType"));
-						paintEnemies(x0, z0, x1, z1);
-						trQuestVarSetFromRand("key", 1, 14, true);
-						for(j=trQuestVarGet("key"); >0) {
-							room = yDatabaseNext("basicRooms");
-						}
-						x0 = trQuestVarGet("room"+room+"bottom1x");
-						z0 = trQuestVarGet("room"+room+"bottom1z");
-						x1 = trQuestVarGet("room"+room+"top1x");
-						z1 = trQuestVarGet("room"+room+"top1z");
-						trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
-						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-						trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-						trUnitSelectClear();
-						trUnitSelectByQV("next", true);
-						trUnitChangeProtoUnit("Relic");
-						yAddToDatabase("freeRelics", "next");
-						yAddUpdateVar("freeRelics", "type", trQuestVarGet("keyType"));
-						ySetVar("chests", "key", trQuestVarGet("next"));
-						
-						trVectorSetUnitPos("pos", "chests");
-						trQuestVarSet("posX", trQuestVarGet("posX") - 2);
-						trQuestVarSet("posZ", trQuestVarGet("posZ") - 2);
-						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),225,true);
-						trUnitSelectClear();
-						trUnitSelectByQV("next", true);
-						trUnitConvert(0);
-						trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
-						ySetVar("chests", "indicator", trQuestVarGet("next"));
-						
-						trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
-					}
-					case CHEST_STATUES:
-					{
-						trVectorSetUnitPos("pos", "chests");
-						trQuestVarSetFromRand("rand", 4, 7, true);
-						trQuestVarSet("angle", 0.785398);
-						trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
-						for(x=0; < trQuestVarGet("rand")) {
-							trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-							trQuestVarSet("statueX", trQuestVarGet("posX") - 10.0 * trQuestVarGet("dirX"));
-							trQuestVarSet("statueZ", trQuestVarGet("posZ") - 10.0 * trQuestVarGet("dirZ"));
-							
-							
-							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,1,0,1,180,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("next", true);
-							trUnitConvert(ENEMY_PLAYER);
-							trUnitTeleport(trQuestVarGet("statueX"),0,trQuestVarGet("statueZ"));
-							trMutateSelected(kbGetProtoUnitID("Monument 2"));
-							trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-							
-							trQuestVarSet("index", yAddToDatabase("statuesIn"+room, "next"));
-							yAddUpdateVar("statuesIn"+room, "angle", trQuestVarGet("angle"));
-							yAddUpdateVar("statuesIn"+room, "posX", trQuestVarGet("statueX"));
-							yAddUpdateVar("statuesIn"+room, "posZ", trQuestVarGet("statueZ"));
-							yAddToDatabase("statuesReady", "index");
-							
-							trQuestVarSetFromRand("jump", 1, 2, true);
-							for (y=trQuestVarGet("jump"); >0) {
-								yDatabaseNext("statuesReady");
-							}
-							
-							trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
-						}
-						
-						for(x=trQuestVarGet("rand"); >0) {
-							yDatabaseNext("statuesReady");
-							trQuestVarSet("start", yGetPointer("statuesReady"));
-							trQuestVarSetFromRand("jump", 1, (trQuestVarGet("rand") - 1) / 2, true);
-							for(y=trQuestVarGet("jump"); >0) {
-								yDatabaseNext("statuesReady");
-							}
-							connectStatues(yGetUnitAtIndex("statuesReady", 1*trQuestVarGet("start")), 1*trQuestVarGet("statuesReady"), room);
-							ySetPointer("statuesReady", 1*trQuestVarGet("start"));
-						}
-						trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("rand"));
-						for(x=trQuestVarGet("rand"); >1) {
-							yDatabaseNext("statuesIn"+room);
-							trQuestVarSetFromRand("amt",1,3,true);
-							for(y=trQuestVarGet("amt"); >0) {
-								turnStatue(room, 0, true, true);
-							}
-						}
-						yClearDatabase("statuesReady");
-					}
-					case CHEST_ENCOUNTER:
-					{
-						ySetVar("chests", "enemiesBegin", trGetNextUnitScenarioNameNumber());
-						pName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("enemyProtoCount"));
-						trQuestVarSetFromRand("count", 1, 6, true);
-						for(j=trQuestVarGet("count"); >0) {
-							trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
-							trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
-							trQuestVarSetFromRand("heading", 1, 360, true);
-							trQuestVarSet("posX", trQuestVarGet("x0"));
-							trQuestVarSet("posZ", trQuestVarGet("z0"));
-							vectorToGrid("pos", "pos");
-							if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
-								trArmySelect("1,0");
-								trUnitConvert(ENEMY_PLAYER);
-								yAddToDatabase("enemiesIncoming", "next");
-							}
-						}
-						x0 = trQuestVarGet("room"+room+"bottom2x");
-						z0 = trQuestVarGet("room"+room+"bottom2z");
-						x1 = trQuestVarGet("room"+room+"top2x");
-						z1 = trQuestVarGet("room"+room+"top2z");
-						trQuestVarSetFromRand("count", 1, 6, true);
-						for(j=trQuestVarGet("count"); >0) {
-							trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
-							trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
-							trQuestVarSetFromRand("heading", 1, 360, true);
-							trQuestVarSet("posX", trQuestVarGet("x0"));
-							trQuestVarSet("posZ", trQuestVarGet("z0"));
-							vectorToGrid("pos", "pos");
-							if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
-								trArmySelect("1,0");
-								trUnitConvert(ENEMY_PLAYER);
-								yAddToDatabase("enemiesIncoming", "next");
-							}
-						}
-						ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());
-					}
-				}
-			}
-			
-			if (trQuestVarGet("mapType") == MAP_OPEN) {
-				trUnitSelectClear();
-				trUnitSelectByQV("bossEntranceSymbol", true);
-				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
 				
-				i = trQuestVarGet("bossKeyRoom");
-				z = i / 4;
-				x = i - z * 4;
-				trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());
-				spawnRelicSpecific(x * 70 + 40, z * 70 + 40, 1*trQuestVarGet("keyType"));
-				trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
-			}
-			
-			if (trQuestVarGet("pestilenceStart") > 0) {
-				for(x=trQuestVarGet("pestilenceStart"); < trGetNextUnitScenarioNameNumber()) {
-					if (kbGetUnitBaseTypeID(kbGetBlockID(""+x)) == kbGetProtoUnitID("Pestilence SFX1")) {
-						trQuestVarSet("next", x);
-						trVectorSetUnitPos("pos", "next");
-						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-						trArmySelect("1,0");
-						trUnitConvert(ENEMY_PLAYER);
-						trUnitChangeProtoUnit("Victory Marker");
-					}
+				total = total + 1;
+				if (total == 15) {
+					break;
 				}
-			}
-			
-			if ((trQuestVarGet("nickQuestSpawn") == 1) &&
-			(trQuestVarGet("stage") < 6)) {
-				trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"));
-				for(x=trQuestVarGet("rand"); >0) {
-					yDatabaseNext("basicRooms");
-				}
-				trVectorQuestVarSet("pos", randomNearEdgeOfRoom(1*trQuestVarGet("basicRooms")));
-				trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
-				spawnRelicSpecific(trQuestVarGet("posx"),trQuestVarGet("posz"), RELIC_NICKONHAWK);
-				debugLog("Nickonhawk room is " + 1*trQuestVarGet("basicRooms"));
-			}
-			
-			trUnblockAllSounds();
-			if (trQuestVarGet("newPlayers") > 0) {
-				xsEnableRule("choose_stage_03");
-				trSoundPlayFN("default","1",-1,
-					"Zenophobia: Looks like we have some new faces today!", "icons\infantry g hoplite icon 64");
-			} else if (trQuestVarGet("yeebBossFight") > 0) {
-				xsEnableRule("yeeb_boss_message");
-				trQuestVarSet("yeebStep", 0);
-				trPaintTerrain(30, 5, 32, 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-				trPaintTerrain(5, 30, 30, 32, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-				trChangeTerrainHeight(31, 5, 32, 32, wallHeight, false);
-				trChangeTerrainHeight(5, 31, 32, 32, wallHeight, false);
 			} else {
-				xsEnableRule("gameplay_start");
-				trUIFadeToColor(0,0,0,1000,0,false);
-				trLetterBox(false);
+				backtrack = backtrack + 1;
 			}
-			
-			/*
-			paint tiny square at bottom of map for spawning units
-			and then cover it up
-			*/
-			trPaintTerrain(0,0,5,5,0,70,true);
-			trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+			yRemoveFromDatabase("frontier");
+			yRemoveUpdateVar("frontier", "edge");
+			yRemoveUpdateVar("frontier", "type");
 		}
-	}
-	
-	rule choose_stage_03
-	inactive
-	highFrequency
-	{
-		if (trTime() > cActivationTime + 5) {
-			trSoundPlayFN("default","1",-1,
-				"Zenophobia: I'll let you have the starter characters for free.", "icons\infantry g hoplite icon 64");
-			trUnitSelectClear();
-			trUnitSelectByQV("choice1", true);
-			trUnitSetStance("Passive");
-			trUnitHighlight(15.0, true);
-			trUnitSelectClear();
-			trUnitSelectByQV("choice2", true);
-			trUnitSetStance("Passive");
-			trUnitHighlight(15.0, true);
-			xsEnableRule("choose_stage_04");
-			xsDisableSelf();
+		
+		buildRoom(0,0, ROOM_STARTER);
+		buildRoom(3,3, ROOM_BOSS);
+		
+		/* make portals more visible */
+		for(x=yGetDatabaseCount("skypassages"); >0) {
+			yDatabaseNext("skyPassages");
+			trVectorSetUnitPos("pos", "skyPassages");
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-4,0,trQuestVarGet("posZ"),0,true);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+4,0,trQuestVarGet("posZ"),0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")-4,0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ")+4,0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")+3,0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")+3,0,trQuestVarGet("posZ")-3,0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")+3,0,false);
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-3,0,trQuestVarGet("posZ")-3,0,false);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			trUnitChangeProtoUnit("Garrison Flag Sky Passage");
 		}
-	}
-	
-	rule choose_stage_04
-	inactive
-	highFrequency
-	{
-		if (trTime() > cActivationTime + 6) {
-			trUIFadeToColor(0,0,0,1000,0,false);
-			trLetterBox(false);
-			xsEnableRule("gameplay_start");
-			xsDisableSelf();
+		
+		bool nottudSpawn = false;
+		trQuestVarSetFromRand("nottudSpawn", 0, 20, true);
+		if (trQuestVarGet("nottudSpawn") < trQuestVarGet("stage")) {
+			nottudSpawn = true;
 		}
-	}
-	
-	rule zenos_paradox_build_01
-	inactive
-	highFrequency
-	{
-		if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
-			for(x=yGetDatabaseCount("timeshiftHawks"); >0) {
-				yDatabaseNext("timeshiftHawks", true);
-				trMutateSelected(kbGetProtoUnitID("Hawk"));
-				trSetSelectedScale(0,0,0);
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("timeshiftHawks", "sfx"), true);
-				trUnitSetAnimationPath("0,1,1,0,0,0,0");
-			}
-			xsDisableSelf();
-			
-			int jump = yGetDatabaseCount("enemiesIncoming") / 20;
-			for(x=20; >0) {
-				for(i=jump; >0) {
-					yDatabaseNext("enemiesIncoming");
-				}
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-				trUnitSelectClear();
-				trUnitSelectByQV("next", true);
-				trUnitChangeProtoUnit("Relic");
-				trUnitSelectClear();
-				trUnitSelectByQV("next", true);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("enemiesIncoming"));
-				yAddToDatabase("zenoRelicsIncoming", "next");
-				yAddUpdateVar("zenoRelicsIncoming", "type", RELIC_MATH_PROBLEM + x);
-			}
+		
+		if (trQuestVarGet("stage") > 10) {
+			trQuestVarSet("relicTransporterGuy", -1);
+			trQuestVarSet("village", -1);
+			trQuestVarSet("bossEntranceRoom", -1);
+			chests = 0;
+			nottudSpawn = false;
 		}
-	}
-	
-	rule rebuild_map
-	inactive
-	highFrequency
-	{
-		xsDisableSelf();
-		trQuestVarSet("play", 0);
-		trQuestVarSet("yeebBossFight", 0);
-		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"unit", 0);
-			yClearDatabase("p"+p+"characters");
-			yClearDatabase("p"+p+"relics");
-			yClearDatabase("p"+p+"warehouse");
-		}
-		yClearDatabase("freeRelics");
-		yClearDatabase("enemies");
-		yClearDatabase("enemiesIncoming");
-		yClearDatabase("ambushRooms");
-		yClearDatabase("playerCharacters");
-		yClearDatabase("playerUnits");
-		yClearDatabase("chests");
-		yClearDatabase("frontier");
-		yClearDatabase("visited");
-		for(i = trQuestVarGet("eyecandyStart"); < trGetNextUnitScenarioNameNumber()) {
-			trUnitSelectClear();
-			trUnitSelect(""+i, true);
-			trUnitDestroy();
-		}
-		int x = 0;
-		int z = 0;
-		for(i = 0; <16) {
-			trQuestVarSet("tile"+i, 0);
-			trQuestVarSet("room"+i, 0);
+		
+		for (i=1; < 15) {
 			z = i / 4;
 			x = i - z * 4;
-			for(j=0; <4) {
-				trQuestVarSet("edge"+edgeName(i, x + trQuestVarGet("rotX"+j) + 4 * (z + trQuestVarGet("rotZ"+j))), EDGE_NOT_FOUND);
+			if (trQuestVarGet("room"+i) == 0) {
+				if (chests > 0) {
+					trQuestVarSetFromRand("chestRand", 1, 12 - trQuestVarGet("stage"), true);
+				} else {
+					trQuestVarSet("chestRand", 0);
+				}
+				if (i == 1*trQuestVarGet("bossEntranceRoom")) {
+					buildRoom(x, z, ROOM_BOSS_ENTRANCE);
+				} else if (i == 1*trQuestVarGet("relicTransporterGuy")) {
+					buildRoom(x, z, ROOM_TRANSPORTER_GUY);
+				} else if (i == 1*trQuestVarGet("village")) {
+					xsEnableRule("town_always");
+					buildRoom(x, z, ROOM_VILLAGE + trQuestVarGet("stage"));
+					/* quest givers */
+					for(x=3; >0) {
+						if (trQuestVarGet("localQuest") == x) {
+							trVectorSetUnitPos("pos", "guy"+x);
+							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Healing SFX");
+							trQuestVarSet("questGuy", trQuestVarGet("guy"+x));
+						} else {
+							yAddToDatabase("npcTalk", "guy"+x);
+							yAddUpdateVar("npcTalk", "dialog", 10 * x + trQuestVarGet("stage"));
+						}
+					}
+				} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
+					buildRoom(x, z, ROOM_NOTTUD);
+					nottudSpawn = false;
+				} else if (trQuestVarGet("templeRoom") == i) {
+					xsEnableRule("find_temple");
+					buildRoom(x, z, ROOM_TEMPLE + trQuestVarGet("stage"));
+				} else if (trQuestVarGet("chestRand") == 1) {
+					chests = chests - 1;
+					buildRoom(x, z, ROOM_CHEST);
+				} else {
+					trQuestVarSetFromRand("roomType", ROOM_BASIC, ROOM_AMBUSH, true);
+					trQuestVarSetFromRand("roomType2", ROOM_BASIC, ROOM_AMBUSH, true);
+					if (trQuestVarGet("roomType2") < trQuestVarGet("roomType")) {
+						trQuestVarSet("roomType", trQuestVarGet("roomType2"));
+					}
+					buildRoom(x, z, 1*trQuestVarGet("roomType"));
+				}
 			}
 		}
-		xsEnableRule("choose_stage_02");
+		
+		/* finish making chest rooms */
+		trQuestVarSet("keyType", RELIC_KEY_GREEK);
+		for(i=yGetDatabaseCount("chests"); >0) {
+			yDatabaseNext("chests");
+			room = yGetVar("chests", "room");
+			x0 = trQuestVarGet("room"+room+"bottom1x");
+			z0 = trQuestVarGet("room"+room+"bottom1z");
+			x1 = trQuestVarGet("room"+room+"top1x");
+			z1 = trQuestVarGet("room"+room+"top1z");
+			switch(1*yGetVar("chests", "type"))
+			{
+				case CHEST_KEY:
+				{
+					ySetVar("chests", "keyType", trQuestVarGet("keyType"));
+					paintEnemies(x0, z0, x1, z1);
+					trQuestVarSetFromRand("key", 1, 14, true);
+					for(j=trQuestVarGet("key"); >0) {
+						room = yDatabaseNext("basicRooms");
+					}
+					x0 = trQuestVarGet("room"+room+"bottom1x");
+					z0 = trQuestVarGet("room"+room+"bottom1z");
+					x1 = trQuestVarGet("room"+room+"top1x");
+					z1 = trQuestVarGet("room"+room+"top1z");
+					trVectorQuestVarSet("pos", randomNearEdge(x0, z0, x1, z1));
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Militia",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("next", true);
+					trUnitChangeProtoUnit("Relic");
+					yAddToDatabase("freeRelics", "next");
+					yAddUpdateVar("freeRelics", "type", trQuestVarGet("keyType"));
+					ySetVar("chests", "key", trQuestVarGet("next"));
+					
+					trVectorSetUnitPos("pos", "chests");
+					trQuestVarSet("posX", trQuestVarGet("posX") - 2);
+					trQuestVarSet("posZ", trQuestVarGet("posZ") - 2);
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("next", true);
+					trUnitConvert(0);
+					trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
+					ySetVar("chests", "indicator", trQuestVarGet("next"));
+					
+					trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
+				}
+				case CHEST_STATUES:
+				{
+					trVectorSetUnitPos("pos", "chests");
+					trQuestVarSetFromRand("rand", 4, 7, true);
+					trQuestVarSet("angle", 0.785398);
+					trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
+					for(x=0; < trQuestVarGet("rand")) {
+						trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+						trQuestVarSet("statueX", trQuestVarGet("posX") - 10.0 * trQuestVarGet("dirX"));
+						trQuestVarSet("statueZ", trQuestVarGet("posZ") - 10.0 * trQuestVarGet("dirZ"));
+						
+						
+						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+						trArmyDispatch("1,0","Dwarf",1,1,0,1,180,true);
+						trUnitSelectClear();
+						trUnitSelectByQV("next", true);
+						trUnitConvert(ENEMY_PLAYER);
+						trUnitTeleport(trQuestVarGet("statueX"),0,trQuestVarGet("statueZ"));
+						trMutateSelected(kbGetProtoUnitID("Monument 2"));
+						trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+						
+						trQuestVarSet("index", yAddToDatabase("statuesIn"+room, "next"));
+						yAddUpdateVar("statuesIn"+room, "angle", trQuestVarGet("angle"));
+						yAddUpdateVar("statuesIn"+room, "posX", trQuestVarGet("statueX"));
+						yAddUpdateVar("statuesIn"+room, "posZ", trQuestVarGet("statueZ"));
+						yAddToDatabase("statuesReady", "index");
+						
+						trQuestVarSetFromRand("jump", 1, 2, true);
+						for (y=trQuestVarGet("jump"); >0) {
+							yDatabaseNext("statuesReady");
+						}
+						
+						trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
+					}
+					
+					for(x=trQuestVarGet("rand"); >0) {
+						yDatabaseNext("statuesReady");
+						trQuestVarSet("start", yGetPointer("statuesReady"));
+						trQuestVarSetFromRand("jump", 1, (trQuestVarGet("rand") - 1) / 2, true);
+						for(y=trQuestVarGet("jump"); >0) {
+							yDatabaseNext("statuesReady");
+						}
+						connectStatues(yGetUnitAtIndex("statuesReady", 1*trQuestVarGet("start")), 1*trQuestVarGet("statuesReady"), room);
+						ySetPointer("statuesReady", 1*trQuestVarGet("start"));
+					}
+					trQuestVarSet("correctStatuesIn"+room, trQuestVarGet("rand"));
+					for(x=trQuestVarGet("rand"); >1) {
+						yDatabaseNext("statuesIn"+room);
+						trQuestVarSetFromRand("amt",1,3,true);
+						for(y=trQuestVarGet("amt"); >0) {
+							turnStatue(room, 0, true, true);
+						}
+					}
+					yClearDatabase("statuesReady");
+				}
+				case CHEST_ENCOUNTER:
+				{
+					ySetVar("chests", "enemiesBegin", trGetNextUnitScenarioNameNumber());
+					pName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("enemyProtoCount"));
+					trQuestVarSetFromRand("count", 1, 6, true);
+					for(j=trQuestVarGet("count"); >0) {
+						trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
+						trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
+						trQuestVarSetFromRand("heading", 1, 360, true);
+						trQuestVarSet("posX", trQuestVarGet("x0"));
+						trQuestVarSet("posZ", trQuestVarGet("z0"));
+						vectorToGrid("pos", "pos");
+						if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
+							trArmySelect("1,0");
+							trUnitConvert(ENEMY_PLAYER);
+							yAddToDatabase("enemiesIncoming", "next");
+						}
+					}
+					x0 = trQuestVarGet("room"+room+"bottom2x");
+					z0 = trQuestVarGet("room"+room+"bottom2z");
+					x1 = trQuestVarGet("room"+room+"top2x");
+					z1 = trQuestVarGet("room"+room+"top2z");
+					trQuestVarSetFromRand("count", 1, 6, true);
+					for(j=trQuestVarGet("count"); >0) {
+						trQuestVarSetFromRand("x0", 2*x0, 2*x1, true);
+						trQuestVarSetFromRand("z0", 2*z0, 2*z1, true);
+						trQuestVarSetFromRand("heading", 1, 360, true);
+						trQuestVarSet("posX", trQuestVarGet("x0"));
+						trQuestVarSet("posZ", trQuestVarGet("z0"));
+						vectorToGrid("pos", "pos");
+						if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("1,0",pName,1,trQuestVarGet("x0"),0,trQuestVarGet("z0"),trQuestVarGet("heading"),true);
+							trArmySelect("1,0");
+							trUnitConvert(ENEMY_PLAYER);
+							yAddToDatabase("enemiesIncoming", "next");
+						}
+					}
+					ySetVar("chests", "enemiesEnd", trGetNextUnitScenarioNameNumber());
+				}
+			}
+		}
+		
+		if (trQuestVarGet("mapType") == MAP_OPEN) {
+			trUnitSelectClear();
+			trUnitSelectByQV("bossEntranceSymbol", true);
+			trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
+			
+			i = trQuestVarGet("bossKeyRoom");
+			z = i / 4;
+			x = i - z * 4;
+			trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());
+			spawnRelicSpecific(x * 70 + 40, z * 70 + 40, 1*trQuestVarGet("keyType"));
+			trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
+		}
+		
+		if (trQuestVarGet("pestilenceStart") > 0) {
+			for(x=trQuestVarGet("pestilenceStart"); < trGetNextUnitScenarioNameNumber()) {
+				if (kbGetUnitBaseTypeID(kbGetBlockID(""+x)) == kbGetProtoUnitID("Pestilence SFX1")) {
+					trQuestVarSet("next", x);
+					trVectorSetUnitPos("pos", "next");
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					trArmySelect("1,0");
+					trUnitConvert(ENEMY_PLAYER);
+					trUnitChangeProtoUnit("Victory Marker");
+				}
+			}
+		}
+		
+		if ((trQuestVarGet("nickQuestSpawn") == 1) &&
+			(trQuestVarGet("stage") < 6)) {
+			trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"));
+			for(x=trQuestVarGet("rand"); >0) {
+				yDatabaseNext("basicRooms");
+			}
+			trVectorQuestVarSet("pos", randomNearEdgeOfRoom(1*trQuestVarGet("basicRooms")));
+			trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
+			spawnRelicSpecific(trQuestVarGet("posx"),trQuestVarGet("posz"), RELIC_NICKONHAWK);
+			debugLog("Nickonhawk room is " + 1*trQuestVarGet("basicRooms"));
+		}
+		
+		trUnblockAllSounds();
+		if (trQuestVarGet("newPlayers") > 0) {
+			xsEnableRule("choose_stage_03");
+			trSoundPlayFN("default","1",-1,
+				"Zenophobia: Looks like we have some new faces today!", "icons\infantry g hoplite icon 64");
+		} else if (trQuestVarGet("yeebBossFight") > 0) {
+			xsEnableRule("yeeb_boss_message");
+			trQuestVarSet("yeebStep", 0);
+			trPaintTerrain(30, 5, 32, 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trPaintTerrain(5, 30, 30, 32, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trChangeTerrainHeight(31, 5, 32, 32, wallHeight, false);
+			trChangeTerrainHeight(5, 31, 32, 32, wallHeight, false);
+		} else {
+			xsEnableRule("gameplay_start");
+			trUIFadeToColor(0,0,0,1000,0,false);
+			trLetterBox(false);
+		}
+		
+		/*
+		paint tiny square at bottom of map for spawning units
+		and then cover it up
+		*/
+		trPaintTerrain(0,0,5,5,0,70,true);
+		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 	}
+}
+
+rule choose_stage_03
+inactive
+highFrequency
+{
+	if (trTime() > cActivationTime + 5) {
+		trSoundPlayFN("default","1",-1,
+			"Zenophobia: I'll let you have the starter characters for free.", "icons\infantry g hoplite icon 64");
+		trUnitSelectClear();
+		trUnitSelectByQV("choice1", true);
+		trUnitSetStance("Passive");
+		trUnitHighlight(15.0, true);
+		trUnitSelectClear();
+		trUnitSelectByQV("choice2", true);
+		trUnitSetStance("Passive");
+		trUnitHighlight(15.0, true);
+		xsEnableRule("choose_stage_04");
+		xsDisableSelf();
+	}
+}
+
+rule choose_stage_04
+inactive
+highFrequency
+{
+	if (trTime() > cActivationTime + 6) {
+		trUIFadeToColor(0,0,0,1000,0,false);
+		trLetterBox(false);
+		xsEnableRule("gameplay_start");
+		xsDisableSelf();
+	}
+}
+
+rule zenos_paradox_build_01
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+		for(x=yGetDatabaseCount("timeshiftHawks"); >0) {
+			yDatabaseNext("timeshiftHawks", true);
+			trMutateSelected(kbGetProtoUnitID("Hawk"));
+			trSetSelectedScale(0,0,0);
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("timeshiftHawks", "sfx"), true);
+			trUnitSetAnimationPath("0,1,1,0,0,0,0");
+		}
+		xsDisableSelf();
+		
+		int jump = yGetDatabaseCount("enemiesIncoming") / 20;
+		for(x=20; >0) {
+			for(i=jump; >0) {
+				yDatabaseNext("enemiesIncoming");
+			}
+			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+			trUnitSelectClear();
+			trUnitSelectByQV("next", true);
+			trUnitChangeProtoUnit("Relic");
+			trUnitSelectClear();
+			trUnitSelectByQV("next", true);
+			trImmediateUnitGarrison(""+1*trQuestVarGet("enemiesIncoming"));
+			yAddToDatabase("zenoRelicsIncoming", "next");
+			yAddUpdateVar("zenoRelicsIncoming", "type", RELIC_MATH_PROBLEM + x);
+		}
+	}
+}
+
+rule rebuild_map
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	trQuestVarSet("play", 0);
+	trQuestVarSet("yeebBossFight", 0);
+	for(p=1; < ENEMY_PLAYER) {
+		trQuestVarSet("p"+p+"unit", 0);
+		yClearDatabase("p"+p+"characters");
+		yClearDatabase("p"+p+"relics");
+		yClearDatabase("p"+p+"warehouse");
+	}
+	yClearDatabase("freeRelics");
+	yClearDatabase("enemies");
+	yClearDatabase("enemiesIncoming");
+	yClearDatabase("ambushRooms");
+	yClearDatabase("playerCharacters");
+	yClearDatabase("playerUnits");
+	yClearDatabase("chests");
+	yClearDatabase("frontier");
+	yClearDatabase("visited");
+	for(i = trQuestVarGet("eyecandyStart"); < trGetNextUnitScenarioNameNumber()) {
+		trUnitSelectClear();
+		trUnitSelect(""+i, true);
+		trUnitDestroy();
+	}
+	int x = 0;
+	int z = 0;
+	for(i = 0; <16) {
+		trQuestVarSet("tile"+i, 0);
+		trQuestVarSet("room"+i, 0);
+		z = i / 4;
+		x = i - z * 4;
+		for(j=0; <4) {
+			trQuestVarSet("edge"+edgeName(i, x + trQuestVarGet("rotX"+j) + 4 * (z + trQuestVarGet("rotZ"+j))), EDGE_NOT_FOUND);
+		}
+	}
+	xsEnableRule("choose_stage_02");
+}

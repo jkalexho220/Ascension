@@ -591,7 +591,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") + m);
 			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) ||
-			(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
+				(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
 				/* No duplicates */
 				ySetPointer("p"+p+"relics", yGetNewestPointer("p"+p+"relics"));
 				trUnitSelectClear();
@@ -845,5 +845,5 @@ void spawnRelicClosest(float x = 0, float z = 0, int target = 0) {
 	trQuestVarSetFromRand("rand", 0, 10, true);
 	trQuestVarSetFromRand("rand",
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
-		spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
-	}
+	spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
+}

@@ -332,7 +332,7 @@ inactive
 highFrequency
 {
 	if ((trIsGadgetVisible("ShowImageBox") == false) &&
-	(trIsGadgetVisible("ingame-messagedialog") == false)) {
+		(trIsGadgetVisible("ingame-messagedialog") == false)) {
 		trDelayedRuleActivation("singleplayer_unlocks");
 		xsDisableSelf();
 	}
@@ -680,41 +680,41 @@ highFrequency
 			} else if (trQuestVarGet("class"+x+"level") > 0) {
 				gem = 1*trQuestVarGet("class"+x+"gemstone");
 				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+") [" + gemstoneName(gem) + "]",
-				"Switch to this class", 3000 + x, "View class details", 4000 + x);
+					"Switch to this class", 3000 + x, "View class details", 4000 + x);
+			}
 		}
 	}
-}
-
-trUnitSelectClear();
-trUnitSelectByQV("levelupObelisk");
-if (trUnitIsSelected()) {
-	reselectMyself();
-	class = trQuestVarGet("p1class");
-	trQuestVarSet("goldCost", 100 * trQuestVarGet("class"+class+"level"));
-	trQuestVarSet("gemstoneCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
-	string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstoneCost") + " ";
-	yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
-	if (trQuestVarGet("p1level") < 9) {
-		trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
-		yesPrompt, 7000+class, "No", -1);
-	trChatHistoryClear();
-	trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
-	for(x=0; <3) {
-		trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
+	
+	trUnitSelectClear();
+	trUnitSelectByQV("levelupObelisk");
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		class = trQuestVarGet("p1class");
+		trQuestVarSet("goldCost", 100 * trQuestVarGet("class"+class+"level"));
+		trQuestVarSet("gemstoneCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
+		string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstoneCost") + " ";
+		yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
+		if (trQuestVarGet("p1level") < 9) {
+			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
+				yesPrompt, 7000+class, "No", -1);
+			trChatHistoryClear();
+			trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
+			for(x=0; <3) {
+				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
+			}
+		} else {
+			uiMessageBox("You have reached the max level for " + className(class) + "!");
+		}
 	}
-} else {
-	uiMessageBox("You have reached the max level for " + className(class) + "!");
-}
-}
 }
 
 rule singleplayer_end
 inactive
 highFrequency
 {
-if (trTime() > 1 + cActivationTime) {
-trModeEnter("Pregame");
-}
+	if (trTime() > 1 + cActivationTime) {
+		trModeEnter("Pregame");
+	}
 }
 
 
@@ -722,71 +722,71 @@ rule singleplayer_explain_class
 inactive
 highFrequency
 {
-if (trQuestVarGet("explain") == 0 && trIsGadgetVisible("ShowImageBox") == false) {
-xsDisableSelf();
-int class = trQuestVarGet("pleaseExplain");
-switch(class)
-{
-	case THUNDERRIDER:
-	{
-		uiMessageBox("To unlock this class, kill 100 Giants. Current: " + 1*trQuestVarGet("giantKills"));
+	if (trQuestVarGet("explain") == 0 && trIsGadgetVisible("ShowImageBox") == false) {
+		xsDisableSelf();
+		int class = trQuestVarGet("pleaseExplain");
+		switch(class)
+		{
+			case THUNDERRIDER:
+			{
+				uiMessageBox("To unlock this class, kill 100 Giants. Current: " + 1*trQuestVarGet("giantKills"));
+			}
+			case FIREKNIGHT:
+			{
+				uiMessageBox("To unlock this class, host this map in multiplayer once.");
+			}
+			case THRONESHIELD:
+			{
+				uiMessageBox("To unlock this class, defeat five bosses. Current: " + 1*trQuestVarGet("bossKills"));
+			}
+			case ALCHEMIST:
+			{
+				uiMessageBox("To unlock this class, ascend a character to level 5.");
+			}
+			case BLASTMAGE:
+			{
+				uiMessageBox("To unlock this class, complete five quests. Current: " + 1*trQuestVarGet("questCount"));
+			}
+			case STARSEER:
+			{
+				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
+			}
+			case STORMCUTTER:
+			{
+				uiMessageBox("To unlock this class, clear stage 2.");
+			}
+			case SPELLSTEALER:
+			{
+				uiMessageBox("To unlock this class, open ten chests. Current: " + 1*trQuestVarGet("chestCount"));
+			}
+			case COMMANDO:
+			{
+				uiMessageBox("To unlock this class, collect 50 relics. Current: " + 1*trQuestVarGet("relicCount"));
+			}
+			case SAVIOR:
+			{
+				uiMessageBox("To unlock this class, ascend a character to level 7");
+			}
+		}
 	}
-	case FIREKNIGHT:
-	{
-		uiMessageBox("To unlock this class, host this map in multiplayer once.");
-	}
-	case THRONESHIELD:
-	{
-		uiMessageBox("To unlock this class, defeat five bosses. Current: " + 1*trQuestVarGet("bossKills"));
-	}
-	case ALCHEMIST:
-	{
-		uiMessageBox("To unlock this class, ascend a character to level 5.");
-	}
-	case BLASTMAGE:
-	{
-		uiMessageBox("To unlock this class, complete five quests. Current: " + 1*trQuestVarGet("questCount"));
-	}
-	case STARSEER:
-	{
-		uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
-	}
-	case STORMCUTTER:
-	{
-		uiMessageBox("To unlock this class, clear stage 2.");
-	}
-	case SPELLSTEALER:
-	{
-		uiMessageBox("To unlock this class, open ten chests. Current: " + 1*trQuestVarGet("chestCount"));
-	}
-	case COMMANDO:
-	{
-		uiMessageBox("To unlock this class, collect 50 relics. Current: " + 1*trQuestVarGet("relicCount"));
-	}
-	case SAVIOR:
-	{
-		uiMessageBox("To unlock this class, ascend a character to level 7");
-	}
-}
-}
 }
 
 void setupQuestion(string question = "", string first = "", string second = "", int answer = 1) {
-int count = 1 + trQuestVarGet("zenoQuestions");
-trQuestVarSet("zenoQuestions", count);
-trStringQuestVarSet("question"+count, question);
-trStringQuestVarSet("question"+count+"first", first);
-trStringQuestVarSet("question"+count+"second", second);
-trQuestVarSet("question"+count+"answer", answer);
+	int count = 1 + trQuestVarGet("zenoQuestions");
+	trQuestVarSet("zenoQuestions", count);
+	trStringQuestVarSet("question"+count, question);
+	trStringQuestVarSet("question"+count+"first", first);
+	trStringQuestVarSet("question"+count+"second", second);
+	trQuestVarSet("question"+count+"answer", answer);
 }
 
 void setupExplain(string explain = "", int question = -1) {
-if (question < 0) {
-question = 1 + trQuestVarGet("zenoQuestions");
-}
-int count = 1 + trQuestVarGet("question"+question+"explainations");
-trQuestVarSet("question"+question+"explainations", count);
-trStringQuestVarSet("question"+question+"explain"+count, explain);
+	if (question < 0) {
+		question = 1 + trQuestVarGet("zenoQuestions");
+	}
+	int count = 1 + trQuestVarGet("question"+question+"explainations");
+	trQuestVarSet("question"+question+"explainations", count);
+	trStringQuestVarSet("question"+question+"explain"+count, explain);
 }
 
 
@@ -794,426 +794,426 @@ rule zeno_quiz_start
 inactive
 highFrequency
 {
-trUnitSelectClear();
-trUnitSelectByQV("zenoUnit", true);
-if (trUnitIsSelected()) {
-xsDisableSelf();
-reselectMyself();
-trQuestVarSet("currentQuestion", 1);
-for(x=trQuestVarGet("zenoQuestions"); >0) {
-	trQuestVarSet("question"+x+"explainations", 0);
-}
-trQuestVarSet("zenoQuestions", 0);
-
-if (trQuestVarGet("zenoQuiz") == 0) {
-	trQuestVarSet("zenoReward", STARSTONE);
-	
-	setupExplain("Hey it's me, Zenophobia! I've got a fun little quiz for you!");
-	setupExplain("For each question you answer correctly, I'll give you a Starstone! Ready?");
-	setupQuestion("What buttons do you press to cast a spell?", "Q, W, and E", "Click on the god power", 1);
-	setupExplain("In this game, you can cast your spells by casting Q, W, and E on your keyboard.");
-	
-	setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
-	setupExplain("Only your ultimate costs favor! The other spells are free!");
-	setupExplain("In fact, your basic spells generate favor when they hit enemies.");
-	
-	setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
-	setupExplain("Spell Power affects the healing and damage of your spells.");
-} else {
-	int gem = 0;
-	switch(1*trQuestVarGet("zenoQuiz"))
-	{
-		case 1:
-		{
-			gem = MANASTONE;
-			
-			setupQuestion("You cannot cast spells when stunned.", "True", "False", 2);
-			setupExplain("You can still cast spells when stunned.");
-			
-			setupQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
-			setupExplain("Enemies cannot cast spells when stunned. In fact, you can interrupt an enemy's spell with a stun!");
-			
-			setupQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
-				"Reduces the duration of stuns on you by a percentage", 2);
-			setupExplain("Stun Resistance will reduce the duration of stuns on you. It stacks multiplicatively.");
+	trUnitSelectClear();
+	trUnitSelectByQV("zenoUnit", true);
+	if (trUnitIsSelected()) {
+		xsDisableSelf();
+		reselectMyself();
+		trQuestVarSet("currentQuestion", 1);
+		for(x=trQuestVarGet("zenoQuestions"); >0) {
+			trQuestVarSet("question"+x+"explainations", 0);
 		}
-		case 2:
-		{
-			gem = SOULSTONE;
-			setupQuestion("Being poisoned prevents you from healing.", "True", "False", 1);
-			setupExplain("In addition to dealing damage over time, the poison status effect prevents you from healing.");
+		trQuestVarSet("zenoQuestions", 0);
+		
+		if (trQuestVarGet("zenoQuiz") == 0) {
+			trQuestVarSet("zenoReward", STARSTONE);
 			
-			setupQuestion("Spell Duration affects the duration of Stuns and Poisons that you inflict on enemies.",
-				"True", "False", 1);
-			setupExplain("Spell Duration does increase the duration of your Stuns and Poisons.");
+			setupExplain("Hey it's me, Zenophobia! I've got a fun little quiz for you!");
+			setupExplain("For each question you answer correctly, I'll give you a Starstone! Ready?");
+			setupQuestion("What buttons do you press to cast a spell?", "Q, W, and E", "Click on the god power", 1);
+			setupExplain("In this game, you can cast your spells by casting Q, W, and E on your keyboard.");
 			
-			setupQuestion("Spell Power affects the damage of Poisons that you inflict on enemies.",
-				"True", "False", 1);
-			setupExplain("Your poison damage is increased by Spell Power.");
+			setupQuestion("Which spells cost favor to cast?", "All spells cost favor.", "Only my ultimate spell costs favor.",2);
+			setupExplain("Only your ultimate costs favor! The other spells are free!");
+			setupExplain("In fact, your basic spells generate favor when they hit enemies.");
+			
+			setupQuestion("The Spell Power stat affects both spell damage and healing.", "True", "False", 1);
+			setupExplain("Spell Power affects the healing and damage of your spells.");
+		} else {
+			int gem = 0;
+			switch(1*trQuestVarGet("zenoQuiz"))
+			{
+				case 1:
+				{
+					gem = MANASTONE;
+					
+					setupQuestion("You cannot cast spells when stunned.", "True", "False", 2);
+					setupExplain("You can still cast spells when stunned.");
+					
+					setupQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
+					setupExplain("Enemies cannot cast spells when stunned. In fact, you can interrupt an enemy's spell with a stun!");
+					
+					setupQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
+						"Reduces the duration of stuns on you by a percentage", 2);
+					setupExplain("Stun Resistance will reduce the duration of stuns on you. It stacks multiplicatively.");
+				}
+				case 2:
+				{
+					gem = SOULSTONE;
+					setupQuestion("Being poisoned prevents you from healing.", "True", "False", 1);
+					setupExplain("In addition to dealing damage over time, the poison status effect prevents you from healing.");
+					
+					setupQuestion("Spell Duration affects the duration of Stuns and Poisons that you inflict on enemies.",
+						"True", "False", 1);
+					setupExplain("Spell Duration does increase the duration of your Stuns and Poisons.");
+					
+					setupQuestion("Spell Power affects the damage of Poisons that you inflict on enemies.",
+						"True", "False", 1);
+					setupExplain("Your poison damage is increased by Spell Power.");
+				}
+				case 3:
+				{
+					gem = MANASTONE;
+					setupQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
+						"True", "False", 1);
+					setupExplain("Not only will Silence prevent an enemy's special attacks, their passive abilities are disabled!");
+					setupExplain("For example, silencing a Dryad will prevent them from bleeding poison on death!");
+					
+					setupQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
+					setupExplain("Silences will only extend the duration of a boss's cooldowns.");
+					
+					setupExplain("Next Question: Each cooldown reduction relic grants 0.15x cooldown reduction.");
+					setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
+						"Cooldowns are 0", "Cooldowns are 0.2x as long", 2);
+					setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
+				}
+				case 4:
+				{
+					gem = SOULSTONE;
+					setupQuestion("All players must be present to start the boss battle.","True","False",2);
+					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
+					
+					setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
+						"The poison damage adds up.","Only the strongest poison deals damage.",2);
+					setupExplain("Only the strongest poison deals damage. Poison damage does not stack.");
+					
+					setupQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
+					setupExplain("Some abilities will launch enemies. Launching an enemy into a wall will stun them!");
+				}
+				case 5:
+				{
+					gem = STARSTONE;
+					setupQuestion("Ultimate Cost Reduction does not work on toggled Ultimates","True","False",2);
+					setupExplain("Ultimate Cost Reduction will decrease the favor drain of toggled Ultimates.");
+					
+					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
+					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
+					
+					setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
+					setupExplain("Each of the remaining floors is extremely difficult. You will need to coordinate with your friends!");
+				}
+				case 6:
+				{
+					setupQuestion("You can press Escape to close a relic image box.","True","False",1);
+					setupExplain("I painstakingly coded this myself. It's not a default AoM feature. So use it you bastards.");
+					setupExplain("No one appreciates the work I put into this... *sniffle*");
+				}
+			}
+			trQuestVarSet("zenoReward", gem);
+			setupExplain("Hey it's me again! Here comes another quiz!", 1);
+			setupExplain("This time, I'll give you a "+gemstoneName(gem)+" for each correct answer!", 1);
 		}
-		case 3:
-		{
-			gem = MANASTONE;
-			setupQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
-				"True", "False", 1);
-			setupExplain("Not only will Silence prevent an enemy's special attacks, their passive abilities are disabled!");
-			setupExplain("For example, silencing a Dryad will prevent them from bleeding poison on death!");
-			
-			setupQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
-			setupExplain("Silences will only extend the duration of a boss's cooldowns.");
-			
-			setupExplain("Next Question: Each cooldown reduction relic grants 0.15x cooldown reduction.");
-			setupQuestion("If I have 10 cooldown reduction relics, how long are my cooldowns?",
-				"Cooldowns are 0", "Cooldowns are 0.2x as long", 2);
-			setupExplain("Cooldown reduction stacks multiplicatively, not additively. You cannot reach 0 cooldowns.");
-		}
-		case 4:
-		{
-			gem = SOULSTONE;
-			setupQuestion("All players must be present to start the boss battle.","True","False",2);
-			setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
-			
-			setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
-				"The poison damage adds up.","Only the strongest poison deals damage.",2);
-			setupExplain("Only the strongest poison deals damage. Poison damage does not stack.");
-			
-			setupQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
-			setupExplain("Some abilities will launch enemies. Launching an enemy into a wall will stun them!");
-		}
-		case 5:
-		{
-			gem = STARSTONE;
-			setupQuestion("Ultimate Cost Reduction does not work on toggled Ultimates","True","False",2);
-			setupExplain("Ultimate Cost Reduction will decrease the favor drain of toggled Ultimates.");
-			
-			setupQuestion("Only melee characters have Special Attacks.","True","False",1);
-			setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
-			
-			setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
-			setupExplain("Each of the remaining floors is extremely difficult. You will need to coordinate with your friends!");
-		}
-		case 6:
-		{
-			setupQuestion("You can press Escape to close a relic image box.","True","False",1);
-			setupExplain("I painstakingly coded this myself. It's not a default AoM feature. So use it you bastards.");
-			setupExplain("No one appreciates the work I put into this... *sniffle*");
-		}
+		startNPCDialog(NPC_ZENO_NEXT_QUESTION);
 	}
-	trQuestVarSet("zenoReward", gem);
-	setupExplain("Hey it's me again! Here comes another quiz!", 1);
-	setupExplain("This time, I'll give you a "+gemstoneName(gem)+" for each correct answer!", 1);
-}
-startNPCDialog(NPC_ZENO_NEXT_QUESTION);
-}
 }
 
 void desc(string description = "") {
-trQuestVarSet("descriptionCount", 1 + trQuestVarGet("descriptionCount"));
-trStringQuestVarSet("description"+1*trQuestVarGet("descriptionCount"), description);
+	trQuestVarSet("descriptionCount", 1 + trQuestVarGet("descriptionCount"));
+	trStringQuestVarSet("description"+1*trQuestVarGet("descriptionCount"), description);
 }
 
 rule monsterpedia_always
 inactive
 highFrequency
 {
-int id = yDatabaseNext("monsterpedia", true);
-string name = "N/A";
-if (trUnitIsSelected()) {
-name = kbGetProtoUnitName(kbGetUnitBaseTypeID(id));
-trQuestVarSet("descriptionCount", 0);
-trStringQuestVarSet("description1", "No abilities");
-switch(kbGetUnitBaseTypeID(id))
-{
-	case kbGetProtoUnitID("Sphinx"):
-	{
-		desc("Its whirlwind attack will silence nearby players.");
+	int id = yDatabaseNext("monsterpedia", true);
+	string name = "N/A";
+	if (trUnitIsSelected()) {
+		name = kbGetProtoUnitName(kbGetUnitBaseTypeID(id));
+		trQuestVarSet("descriptionCount", 0);
+		trStringQuestVarSet("description1", "No abilities");
+		switch(kbGetUnitBaseTypeID(id))
+		{
+			case kbGetProtoUnitID("Sphinx"):
+			{
+				desc("Its whirlwind attack will silence nearby players.");
+			}
+			case kbGetProtoUnitID("Dryad"):
+			{
+				desc("On death, it will spill poisonous blood and poison nearby units.");
+			}
+			case kbGetProtoUnitID("Medusa"):
+			{
+				desc("Launches a ball of light that chases a player and stuns if it hits.");
+			}
+			case kbGetProtoUnitID("Mountain Giant"):
+			{
+				desc("Slams the ground with its club, dealing high damage in a small area.");
+			}
+			case kbGetProtoUnitID("Valkyrie"):
+			{
+				desc("Immune to spell damage. (A silence will temporarily disable this effect)");
+			}
+			case kbGetProtoUnitID("Ballista"):
+			{
+				desc("Fires slow-moving rockets in a straight line with its attacks.");
+			}
+			case kbGetProtoUnitID("Frost Giant"):
+			{
+				desc("Breath attack will stun its target.");
+			}
+			case kbGetProtoUnitID("Satyr"):
+			{
+				desc("Calls down a barrage of arrows in a line.");
+			}
+			case kbGetProtoUnitID("Behemoth"):
+			{
+				desc("Immune to physical damage. Takes double damage from spells.");
+			}
+			case kbGetProtoUnitID("Avenger"):
+			{
+				desc("Has a spin attack that silences all targets hit.");
+			}
+			case kbGetProtoUnitID("Wadjet"):
+			{
+				desc("On death, spills poisonous blood and poisons nearby units.");
+			}
+			case kbGetProtoUnitID("Scorpion Man"):
+			{
+				desc("It will sting its target and poison them.");
+			}
+			case kbGetProtoUnitID("Scarab"):
+			{
+				desc("Immune to physical damage. Takes double damage from spells.");
+				desc("On death, releases a permanent cloud of miasma that poisons units in it.");
+			}
+			case kbGetProtoUnitID("Mummy"):
+			{
+				desc("Launches dark clouds that damage and silence players.");
+				desc("For its special attack, it launches a cloud of poison in a line.");
+			}
+			case kbGetProtoUnitID("Automaton SPC"):
+			{
+				name = "Automaton";
+				desc("On death, turns into a time bomb that explodes after three seconds.");
+			}
+			case kbGetProtoUnitID("Colossus"):
+			{
+				desc("Immune to spell damage. (A silence will temporarily disable this effect)");
+			}
+			case kbGetProtoUnitID("Battle Boar"):
+			{
+				desc("Its special attack will launch its target and nearby units.");
+			}
+			case kbGetProtoUnitID("Fire Siphon"):
+			{
+				desc("It fires a high-powered laser");
+			}
+			case kbGetProtoUnitID("Nemean Lion"):
+			{
+				name = "The King of Beasts";
+				desc("Drops: Starstone");
+				desc("Common Relic: " + relicName(11));
+				desc("His roar deals high damage but it can be blocked by the terrain.");
+			}
+			case kbGetProtoUnitID("Tamarisk Tree"):
+			{
+				name = "The Wraithwood";
+				desc("Drops: Soulstone");
+				desc("Common Relic: " + relicName(12));
+				desc("It summons animate trees to attack players. The trees must be destroyed to damage it.");
+				desc("It will also try to heal by absorbing lights. Players can intercept the lights to prevent this.");
+			}
+			case kbGetProtoUnitID("King Folstag"):
+			{
+				name = "The King of Ice";
+				desc("Drops: Manastone");
+				desc("Common Relic: " + relicName(13));
+				desc("His breath attack will continuously stun and deal high damage.");
+				desc("Whenever a unit is stunned near one of his icicles, it will grow in size.");
+				desc("An icicle at max size will turn into a Frost Giant.");
+			}
+			case kbGetProtoUnitID("Chimera"):
+			{
+				name = "Escaped Amalgam";
+				desc("Drops: Starstone");
+				desc("Common Relic: " + relicName(14));
+				desc("It has various breath attacks and can also spew rotating flames.");
+			}
+			case kbGetProtoUnitID("Shade of Hades"):
+			{
+				name = "The Lonely Ghost";
+				desc("Drops: Soulstone");
+				desc("Common Relic: " + relicName(15));
+				desc("It launches itself at walls, releasing projectiles in all directions.");
+				desc("The battle area will also shrink as it loses health.");
+			}
+			case kbGetProtoUnitID("Helepolis"):
+			{
+				name = "The Exterminator";
+				desc("Drops: Manastone");
+				desc("Common Relic: " + relicName(16));
+				desc("It has a large arsenal of explosive weaponry and can also run over players.");
+			}
+		}
+		uiClearSelection();
+		trChatHistoryClear();
+		trChatSend(0, "<color=1,1,1><u>"+name+"</u></color>");
+		trChatSend(0, trStringQuestVarGet("description1"));
+		for(x=2; <= trQuestVarGet("descriptionCount")) {
+			trChatSend(0, trStringQuestVarGet("description"+x));
+		}
 	}
-	case kbGetProtoUnitID("Dryad"):
-	{
-		desc("On death, it will spill poisonous blood and poison nearby units.");
-	}
-	case kbGetProtoUnitID("Medusa"):
-	{
-		desc("Launches a ball of light that chases a player and stuns if it hits.");
-	}
-	case kbGetProtoUnitID("Mountain Giant"):
-	{
-		desc("Slams the ground with its club, dealing high damage in a small area.");
-	}
-	case kbGetProtoUnitID("Valkyrie"):
-	{
-		desc("Immune to spell damage. (A silence will temporarily disable this effect)");
-	}
-	case kbGetProtoUnitID("Ballista"):
-	{
-		desc("Fires slow-moving rockets in a straight line with its attacks.");
-	}
-	case kbGetProtoUnitID("Frost Giant"):
-	{
-		desc("Breath attack will stun its target.");
-	}
-	case kbGetProtoUnitID("Satyr"):
-	{
-		desc("Calls down a barrage of arrows in a line.");
-	}
-	case kbGetProtoUnitID("Behemoth"):
-	{
-		desc("Immune to physical damage. Takes double damage from spells.");
-	}
-	case kbGetProtoUnitID("Avenger"):
-	{
-		desc("Has a spin attack that silences all targets hit.");
-	}
-	case kbGetProtoUnitID("Wadjet"):
-	{
-		desc("On death, spills poisonous blood and poisons nearby units.");
-	}
-	case kbGetProtoUnitID("Scorpion Man"):
-	{
-		desc("It will sting its target and poison them.");
-	}
-	case kbGetProtoUnitID("Scarab"):
-	{
-		desc("Immune to physical damage. Takes double damage from spells.");
-		desc("On death, releases a permanent cloud of miasma that poisons units in it.");
-	}
-	case kbGetProtoUnitID("Mummy"):
-	{
-		desc("Launches dark clouds that damage and silence players.");
-		desc("For its special attack, it launches a cloud of poison in a line.");
-	}
-	case kbGetProtoUnitID("Automaton SPC"):
-	{
-		name = "Automaton";
-		desc("On death, turns into a time bomb that explodes after three seconds.");
-	}
-	case kbGetProtoUnitID("Colossus"):
-	{
-		desc("Immune to spell damage. (A silence will temporarily disable this effect)");
-	}
-	case kbGetProtoUnitID("Battle Boar"):
-	{
-		desc("Its special attack will launch its target and nearby units.");
-	}
-	case kbGetProtoUnitID("Fire Siphon"):
-	{
-		desc("It fires a high-powered laser");
-	}
-	case kbGetProtoUnitID("Nemean Lion"):
-	{
-		name = "The King of Beasts";
-		desc("Drops: Starstone");
-		desc("Common Relic: " + relicName(11));
-		desc("His roar deals high damage but it can be blocked by the terrain.");
-	}
-	case kbGetProtoUnitID("Tamarisk Tree"):
-	{
-		name = "The Wraithwood";
-		desc("Drops: Soulstone");
-		desc("Common Relic: " + relicName(12));
-		desc("It summons animate trees to attack players. The trees must be destroyed to damage it.");
-		desc("It will also try to heal by absorbing lights. Players can intercept the lights to prevent this.");
-	}
-	case kbGetProtoUnitID("King Folstag"):
-	{
-		name = "The King of Ice";
-		desc("Drops: Manastone");
-		desc("Common Relic: " + relicName(13));
-		desc("His breath attack will continuously stun and deal high damage.");
-		desc("Whenever a unit is stunned near one of his icicles, it will grow in size.");
-		desc("An icicle at max size will turn into a Frost Giant.");
-	}
-	case kbGetProtoUnitID("Chimera"):
-	{
-		name = "Escaped Amalgam";
-		desc("Drops: Starstone");
-		desc("Common Relic: " + relicName(14));
-		desc("It has various breath attacks and can also spew rotating flames.");
-	}
-	case kbGetProtoUnitID("Shade of Hades"):
-	{
-		name = "The Lonely Ghost";
-		desc("Drops: Soulstone");
-		desc("Common Relic: " + relicName(15));
-		desc("It launches itself at walls, releasing projectiles in all directions.");
-		desc("The battle area will also shrink as it loses health.");
-	}
-	case kbGetProtoUnitID("Helepolis"):
-	{
-		name = "The Exterminator";
-		desc("Drops: Manastone");
-		desc("Common Relic: " + relicName(16));
-		desc("It has a large arsenal of explosive weaponry and can also run over players.");
-	}
-}
-uiClearSelection();
-trChatHistoryClear();
-trChatSend(0, "<color=1,1,1><u>"+name+"</u></color>");
-trChatSend(0, trStringQuestVarGet("description1"));
-for(x=2; <= trQuestVarGet("descriptionCount")) {
-	trChatSend(0, trStringQuestVarGet("description"+x));
-}
-}
 }
 
 rule choose_boon
 inactive
 highFrequency
 {
-if (trIsGadgetVisible("ShowImageBox") == false) {
-xsEnableRule("select_boon");
-xsDisableSelf();
-trShowChoiceDialog("Choose this Blessing?","Yes", 8000, "No", -1);
-}
+	if (trIsGadgetVisible("ShowImageBox") == false) {
+		xsEnableRule("select_boon");
+		xsDisableSelf();
+		trShowChoiceDialog("Choose this Blessing?","Yes", 8000, "No", -1);
+	}
 }
 
 rule select_boon
 inactive
 highFrequency
 {
-yDatabaseNext("boons", true);
-int boon = yGetVar("boons", "type");
-if (trUnitIsSelected()) {
-reselectMyself();
-trShowImageDialog(boonIcon(boon), boonName(boon));
-if (trQuestVarGet("p1godBoon") != boon) {
-	trQuestVarSet("selectedBoon", boon);
-	trQuestVarSet("selectedBoonUnit", trQuestVarGet("boons"));
-	xsEnableRule("choose_boon");
-	xsDisableSelf();
-}
-}
+	yDatabaseNext("boons", true);
+	int boon = yGetVar("boons", "type");
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		trShowImageDialog(boonIcon(boon), boonName(boon));
+		if (trQuestVarGet("p1godBoon") != boon) {
+			trQuestVarSet("selectedBoon", boon);
+			trQuestVarSet("selectedBoonUnit", trQuestVarGet("boons"));
+			xsEnableRule("choose_boon");
+			xsDisableSelf();
+		}
+	}
 }
 
 rule nick_transform
 inactive
 highFrequency
 {
-if (trTimeMS() > trQuestVarGet("cinTime")) {
-trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
-switch(1*trQuestVarGet("cinStep"))
-{
-	case 1:
-	{
-		trUnitSelectClear();
-		trUnitSelectByQV("nickonhawk", true);
-		trUnitTeleport(161,0,161);
-		trUnitChangeProtoUnit("Hero Greek Odysseus");
-		trUnitSetHeading(225);
-		trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
-		trSoundPlayFN("lightthunder.wav","1",-1,"","");
-		trQuestVarSet("cinTime", trTimeMS() + 2000);
-	}
-	case 2:
-	{
-		startNPCDialog(NPC_NICK_QUEST_COMPLETE);
-		xsDisableSelf();
-		
-		trVectorQuestVarSet("padPos", vector(161,0,165));
-		for(x=1; <= 3) {
-			trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("pad"+x, true);
-			trUnitConvert(0);
-			trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
-			trSetSelectedScale(1.5,1,1.5);
-			
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
-			trUnitConvert(0);
-			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-			yAddToDatabase("slotRelics", "next");
-			
-			trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
-			trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+	if (trTimeMS() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk", true);
+				trUnitTeleport(161,0,161);
+				trUnitChangeProtoUnit("Hero Greek Odysseus");
+				trUnitSetHeading(225);
+				trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				trSoundPlayFN("lightthunder.wav","1",-1,"","");
+				trQuestVarSet("cinTime", trTimeMS() + 2000);
+			}
+			case 2:
+			{
+				startNPCDialog(NPC_NICK_QUEST_COMPLETE);
+				xsDisableSelf();
+				
+				trVectorQuestVarSet("padPos", vector(161,0,165));
+				for(x=1; <= 3) {
+					trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("pad"+x, true);
+					trUnitConvert(0);
+					trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
+					trSetSelectedScale(1.5,1,1.5);
+					
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("next", true);
+					trUnitConvert(0);
+					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+					yAddToDatabase("slotRelics", "next");
+					
+					trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
+					trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+				}
+			}
 		}
 	}
-}
-}
 }
 
 rule quantum_slot_machine
 inactive
 highFrequency
 {
-int id = 0;
-switch(1*trQuestVarGet("quantumSlotMachine"))
-{
-case 1:
-{
-	trUnitSelectClear();
-	trUnitSelectByQV("nickonhawk", true);
-	if (trUnitIsSelected()) {
-		if (yGetDatabaseCount("slotRelics") < 3) {
-			startNPCDialog(NPC_NICK_SLOT_MACHINE);
-		} else {
-			trShowChoiceDialog("Sacrifice these relics to get a random new one?","Yes",9000,"No",-1);
+	int id = 0;
+	switch(1*trQuestVarGet("quantumSlotMachine"))
+	{
+		case 1:
+		{
+			trUnitSelectClear();
+			trUnitSelectByQV("nickonhawk", true);
+			if (trUnitIsSelected()) {
+				if (yGetDatabaseCount("slotRelics") < 3) {
+					startNPCDialog(NPC_NICK_SLOT_MACHINE);
+				} else {
+					trShowChoiceDialog("Sacrifice these relics to get a random new one?","Yes",9000,"No",-1);
+				}
+				reselectMyself();
+			}
+			if (yGetDatabaseCount("slotRelics") > 0) {
+				id = yDatabaseNext("slotRelics", true);
+				if (trUnitIsOwnedBy(1)) {
+					yAddToDatabase("freeRelics", "slotRelics");
+					yAddUpdateVar("freeRelics", "type", yGetVar("slotRelics", "type"));
+					yRemoveFromDatabase("slotRelics");
+				} else if (trUnitIsSelected()) {
+					relicDescription(1*yGetVar("slotRelics", "type"));
+					reselectMyself();
+				}
+			}
 		}
-		reselectMyself();
-	}
-	if (yGetDatabaseCount("slotRelics") > 0) {
-		id = yDatabaseNext("slotRelics", true);
-		if (trUnitIsOwnedBy(1)) {
-			yAddToDatabase("freeRelics", "slotRelics");
-			yAddUpdateVar("freeRelics", "type", yGetVar("slotRelics", "type"));
-			yRemoveFromDatabase("slotRelics");
-		} else if (trUnitIsSelected()) {
-			relicDescription(1*yGetVar("slotRelics", "type"));
-			reselectMyself();
+		case 2:
+		{
+			trQuestVarSetFromRand("type", 1, 26, true);
+			yDatabaseNext("slotRelics", true);
+			trMutateSelected(relicProto(1*trQuestVarGet("type")));
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 1000);
+				trSoundPlayFN("plentyvaultstolen.wav","1",-1,"","");
+				trSoundPlayFN("skypassagein.wav","1",-1,"","");
+				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("quantumRelic"))));
+				yAddToDatabase("slotUnits", "slotRelics");
+				yRemoveFromDatabase("slotRelics");
+				if (yGetDatabaseCount("slotRelics") == 0) {
+					trQuestVarSet("quantumSlotMachine", 3);
+				}
+			}
+		}
+		case 3:
+		{
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				trQuestVarSet("newRelic", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Cinematic Block");
+				trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Traitors effect");
+				trQuestVarSet("quantumSlotMachine", 4);
+				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 2000);
+			}
+		}
+		case 4:
+		{
+			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
+				for(x=yGetDatabaseCount("slotUnits"); >0) {
+					yDatabaseNext("slotUnits", true);
+					trUnitChangeProtoUnit("Hero Death");
+				}
+				yClearDatabase("slotUnits");
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+				trUnitSelectClear();
+				trUnitSelectByQV("newRelic", true);
+				trUnitChangeProtoUnit("Relic");
+				yAddToDatabase("freeRelics", "newRelic");
+				yAddUpdateVar("freeRelics", "type", trQuestVarGet("quantumRelic"));
+				trQuestVarSet("quantumSlotMachine", 1);
+			}
 		}
 	}
-}
-case 2:
-{
-	trQuestVarSetFromRand("type", 1, 26, true);
-	yDatabaseNext("slotRelics", true);
-	trMutateSelected(relicProto(1*trQuestVarGet("type")));
-	if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
-		trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 1000);
-		trSoundPlayFN("plentyvaultstolen.wav","1",-1,"","");
-		trSoundPlayFN("skypassagein.wav","1",-1,"","");
-		trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("quantumRelic"))));
-		yAddToDatabase("slotUnits", "slotRelics");
-		yRemoveFromDatabase("slotRelics");
-		if (yGetDatabaseCount("slotRelics") == 0) {
-			trQuestVarSet("quantumSlotMachine", 3);
-		}
-	}
-}
-case 3:
-{
-	if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
-		trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
-		trQuestVarSet("newRelic", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
-		trArmySelect("1,0");
-		trUnitChangeProtoUnit("Cinematic Block");
-		trArmyDispatch("1,0","Dwarf",1,159,0,159,225,true);
-		trArmySelect("1,0");
-		trUnitChangeProtoUnit("Traitors effect");
-		trQuestVarSet("quantumSlotMachine", 4);
-		trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 2000);
-	}
-}
-case 4:
-{
-	if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
-		for(x=yGetDatabaseCount("slotUnits"); >0) {
-			yDatabaseNext("slotUnits", true);
-			trUnitChangeProtoUnit("Hero Death");
-		}
-		yClearDatabase("slotUnits");
-		trSoundPlayFN("favordump.wav","1",-1,"","");
-		trUnitSelectClear();
-		trUnitSelectByQV("newRelic", true);
-		trUnitChangeProtoUnit("Relic");
-		yAddToDatabase("freeRelics", "newRelic");
-		yAddUpdateVar("freeRelics", "type", trQuestVarGet("quantumRelic"));
-		trQuestVarSet("quantumSlotMachine", 1);
-	}
-}
-}
 }

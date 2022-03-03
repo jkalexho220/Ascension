@@ -10,9 +10,9 @@ void processWalls() {
 			{
 				trVectorQuestVarSet("pos", kbGetBlockPosition(""+1*yGetVar("unlockWalls", "relic")));
 				if ((yGetVar("unlockWalls", "posX") - yGetVar("unlockWalls", "xMod") - 7 < trQuestVarGet("posX")) &&
-				(yGetVar("unlockWalls", "posX") + yGetVar("unlockWalls", "xMod") + 7 > trQuestVarGet("posX")) &&
-				(yGetVar("unlockWalls", "posZ") - yGetVar("unlockWalls", "zMod") - 7 < trQuestVarGet("posZ")) &&
-				(yGetVar("unlockWalls", "posZ") + yGetVar("unlockWalls", "zMod") + 7 > trQuestVarGet("posZ"))) {
+					(yGetVar("unlockWalls", "posX") + yGetVar("unlockWalls", "xMod") + 7 > trQuestVarGet("posX")) &&
+					(yGetVar("unlockWalls", "posZ") - yGetVar("unlockWalls", "zMod") - 7 < trQuestVarGet("posZ")) &&
+					(yGetVar("unlockWalls", "posZ") + yGetVar("unlockWalls", "zMod") + 7 > trQuestVarGet("posZ"))) {
 					ySetVar("unlockWalls", "state", WALL_FALLING);
 					ySetVar("unlockWalls", "timeout", trTimeMS() + 2500);
 					for(x=yGetVar("unlockWalls", "greenCirclesStart"); < yGetVar("unlockWalls", "end")) {

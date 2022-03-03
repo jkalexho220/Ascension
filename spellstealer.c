@@ -327,88 +327,88 @@ void spellstealerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"negationCloak", 1);
 		trQuestVarSet("p"+p+"negationCloakTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("negationCloakDuration") * trQuestVarGet("p"+p+"spellDuration"));
-			trSoundPlayFN("spybirth.wav","1",-1,"","");
-		}
-		
-		if (trQuestVarGet("p"+p+"negationCloak") == 1) {
-			if (trTime() > trQuestVarGet("p"+p+"negationCloakNext")) {
-				trQuestVarSet("p"+p+"negationCloakNext", trTime());
-				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-					id = yDatabaseNext("p"+p+"characters", true);
-					if (id == -1 || trUnitAlive() == false) {
-						removeSpellstealer(p);
-					} else {
-						if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "cloakSFX")) == -1) {
-							spyEffect(1*trQuestVarGet("p"+p+"characters"),
+		trSoundPlayFN("spybirth.wav","1",-1,"","");
+	}
+	
+	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
+		if (trTime() > trQuestVarGet("p"+p+"negationCloakNext")) {
+			trQuestVarSet("p"+p+"negationCloakNext", trTime());
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				id = yDatabaseNext("p"+p+"characters", true);
+				if (id == -1 || trUnitAlive() == false) {
+					removeSpellstealer(p);
+				} else {
+					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "cloakSFX")) == -1) {
+						spyEffect(1*trQuestVarGet("p"+p+"characters"),
 							kbGetProtoUnitID("Kronny Birth SFX"), yGetVarName("p"+p+"characters", "cloakSFX"));
-						} else {
-							trUnitSelectClear();
-							trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
-							trUnitChangeProtoUnit("Kronny Birth SFX");
-						}
-					}
-				}
-			}
-			if (trTimeMS() > trQuestVarGet("p"+p+"negationCloakTimeout")) {
-				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
-				trQuestVarSet("p"+p+"negationCloak", 0);
-				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-					if ((yDatabaseNext("p"+p+"characters", true) == -1) || (trUnitAlive() == false)) {
-						removeSpellstealer(p);
 					} else {
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
-						trUnitChangeProtoUnit("Cinematic Block");
+						trUnitChangeProtoUnit("Kronny Birth SFX");
 					}
 				}
 			}
 		}
-		
-		ySetPointer("enemies", index);
-		poisonKillerBonus(p);
-		xsSetContextPlayer(old);
-	}
-	
-	void chooseSpellstealer(int eventID = -1) {
-		int p = eventID - 1000 - 12 * SPELLSTEALER;
-		if (trCurrentPlayer() == p) {
-			map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
-			wellName = "(Q) Spellblades";
-			wellIsUltimate = false;
-			map("w", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-			rainName = "(W) Negation Cloak";
-			rainIsUltimate = false;
-			map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-			lureName = "(E) Blade Dance";
-			lureIsUltimate = true;
+		if (trTimeMS() > trQuestVarGet("p"+p+"negationCloakTimeout")) {
+			trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+			trQuestVarSet("p"+p+"negationCloak", 0);
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if ((yDatabaseNext("p"+p+"characters", true) == -1) || (trUnitAlive() == false)) {
+					removeSpellstealer(p);
+				} else {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
+					trUnitChangeProtoUnit("Cinematic Block");
+				}
+			}
 		}
-		trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("spellbladesCooldown"));
-		trQuestVarSet("p"+p+"wellCost", 0);
-		trQuestVarSet("p"+p+"lureCooldown", 1);
-		trQuestVarSet("p"+p+"lureCost", trQuestVarGet("bladeDanceCost"));
-		trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("negationCloakCooldown"));
-		trQuestVarSet("p"+p+"rainCost", 0);
 	}
 	
-	
-	rule spellstealer_init
-	active
-	highFrequency
-	{
-		xsDisableSelf();
-		for(p=1; < ENEMY_PLAYER) {
-			trEventSetHandler(12 * SPELLSTEALER + p, "spellstealerAlways");
-			trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");
-		}
-		trQuestVarSet("spellstealerPassiveRadius", 6);
-		
-		trQuestVarSet("bladeDanceCost", 10);
-		trQuestVarSet("bladeDanceRadius", 15);
-		
-		trQuestVarSet("negationCloakDuration", 3);
-		trQuestVarSet("negationCloakCooldown", 12);
-		
-		trQuestVarSet("spellbladesCooldown", 9);
-		trQuestVarSet("spellbladesCount", 3);
-		
+	ySetPointer("enemies", index);
+	poisonKillerBonus(p);
+	xsSetContextPlayer(old);
+}
+
+void chooseSpellstealer(int eventID = -1) {
+	int p = eventID - 1000 - 12 * SPELLSTEALER;
+	if (trCurrentPlayer() == p) {
+		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
+		wellName = "(Q) Spellblades";
+		wellIsUltimate = false;
+		map("w", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
+		rainName = "(W) Negation Cloak";
+		rainIsUltimate = false;
+		map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
+		lureName = "(E) Blade Dance";
+		lureIsUltimate = true;
 	}
+	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("spellbladesCooldown"));
+	trQuestVarSet("p"+p+"wellCost", 0);
+	trQuestVarSet("p"+p+"lureCooldown", 1);
+	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("bladeDanceCost"));
+	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("negationCloakCooldown"));
+	trQuestVarSet("p"+p+"rainCost", 0);
+}
+
+
+rule spellstealer_init
+active
+highFrequency
+{
+	xsDisableSelf();
+	for(p=1; < ENEMY_PLAYER) {
+		trEventSetHandler(12 * SPELLSTEALER + p, "spellstealerAlways");
+		trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");
+	}
+	trQuestVarSet("spellstealerPassiveRadius", 6);
+	
+	trQuestVarSet("bladeDanceCost", 10);
+	trQuestVarSet("bladeDanceRadius", 15);
+	
+	trQuestVarSet("negationCloakDuration", 3);
+	trQuestVarSet("negationCloakCooldown", 12);
+	
+	trQuestVarSet("spellbladesCooldown", 9);
+	trQuestVarSet("spellbladesCount", 3);
+	
+}

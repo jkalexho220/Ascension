@@ -1192,8 +1192,8 @@ highFrequency
 		for (p=1; < ENEMY_PLAYER) {
 			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 5) {
 				if (trQuestVarGet("p"+p+"buy"+i) < 4 &&
-				trTimeMS() > trQuestVarGet("p"+p+"buyNext") &&
-				trQuestVarGet("p"+p+"noob") == 1) {
+					trTimeMS() > trQuestVarGet("p"+p+"buyNext") &&
+					trQuestVarGet("p"+p+"noob") == 1) {
 					trQuestVarSet("p"+p+"buy"+i, trQuestVarGet("p"+p+"buy"+i) + 1);
 					trQuestVarSet("p"+p+"buyNext", trTimeMS() + 1000);
 					class = i;
@@ -1224,18 +1224,18 @@ highFrequency
 	int i = trQuestVarGet("pleaseExplain");
 	trQuestVarSet("explain",
 		displayNextTooltip(i, 1*trQuestVarGet("explain")));
-		trDelayedRuleActivation("class_shop_explain_02");
-	}
-	
-	rule class_shop_explain_02
-	inactive
-	highFrequency
-	{
-		int i = trQuestVarGet("pleaseExplain");
-		if (trIsGadgetVisible("ShowImageBox") == false) {
-			if (trQuestVarGet("explain") > 0) {
-				trDelayedRuleActivation("class_shop_explain_01");
-			}
-			xsDisableSelf();
+	trDelayedRuleActivation("class_shop_explain_02");
+}
+
+rule class_shop_explain_02
+inactive
+highFrequency
+{
+	int i = trQuestVarGet("pleaseExplain");
+	if (trIsGadgetVisible("ShowImageBox") == false) {
+		if (trQuestVarGet("explain") > 0) {
+			trDelayedRuleActivation("class_shop_explain_01");
 		}
+		xsDisableSelf();
 	}
+}

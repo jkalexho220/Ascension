@@ -71,7 +71,7 @@ vector randomNearEdgeOfRoom(int room = 0) {
 	trQuestVarSetFromRand("rand", 1, 2, true);
 	int i = trQuestVarGet("rand");
 	vector ans = randomNearEdge(1*trQuestVarGet("room"+room+"bottom"+i+"x"),1*trQuestVarGet("room"+room+"bottom"+i+"z"),
-	1*trQuestVarGet("room"+room+"top"+i+"x"),1*trQuestVarGet("room"+room+"top"+i+"z"));
+		1*trQuestVarGet("room"+room+"top"+i+"x"),1*trQuestVarGet("room"+room+"top"+i+"z"));
 	return(ans);
 }
 
@@ -103,7 +103,7 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
-				2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
+					2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
 				trUnitConvert(ENEMY_PLAYER);
@@ -121,7 +121,7 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
-				2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
+					2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
 				trUnitConvert(ENEMY_PLAYER);
@@ -145,7 +145,7 @@ void paintEyecandy(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0, string type =
 					trQuestVarSetFromRand("heading", 0, 360, true);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0",trStringQuestVarGet(type+"Proto"+1*trQuestVarGet("type")),1,
-					2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
+						2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
 					trUnitSelectClear();
 					trUnitSelectByQV("next", true);
 					trUnitConvert(0);
@@ -166,7 +166,7 @@ void paintEyecandy(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0, string type =
 					trQuestVarSetFromRand("heading", 0, 360, true);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0",trStringQuestVarGet(type+"Proto"+1*trQuestVarGet("type")),1,
-					2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
+						2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
 					trUnitSelectClear();
 					trUnitSelectByQV("next", true);
 					trUnitConvert(0);
@@ -209,7 +209,7 @@ int countRoomEntrances(int x = 0, int z = 0) {
 			trQuestVarSet("newX", (1 - 2 * b) * a + x);
 			trQuestVarSet("newZ", (1 - 2 * b) * (1 - a) + z);
 			if (trQuestVarGet("newX") < 0 || trQuestVarGet("newZ") < 0 ||
-			trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3) {
+				trQuestVarGet("newX") > 3 || trQuestVarGet("newZ") > 3) {
 				continue;
 			}
 			n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");

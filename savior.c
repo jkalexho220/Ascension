@@ -39,7 +39,7 @@ void saviorAlways(int eventID = -1) {
 			trVectorSetUnitPos("pos", "playerUnits");
 			trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos", 2.0));
 			dist = xsMin(trQuestVarGet("guardianAngelRange") * trQuestVarGet("p"+p+"spellRange"),
-			zDistanceBetweenVectors("p"+p+"wellPos", "pos")) / 2;
+				zDistanceBetweenVectors("p"+p+"wellPos", "pos")) / 2;
 			for(x=dist; >0) {
 				trQuestVarSet("tempx", trQuestVarGet("posX") + trQuestVarGet("dirX"));
 				trQuestVarSet("tempZ", trQuestVarGet("posZ") + trQuestVarGet("dirZ"));
@@ -133,244 +133,244 @@ void saviorAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"unityEnd", trGetNextUnitScenarioNameNumber());
 		trQuestVarSet("p"+p+"unityTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("unityDuration") * trQuestVarGet("p"+p+"spellDuration"));
-			trQuestVarSet("p"+p+"unityLast", trTimeMS());
-			trQuestVarSet("p"+p+"unityradius", trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"));
-			trQuestVarSet("p"+p+"unityangle", 0);
-			trQuestVarSet("p"+p+"unityposX", trQuestVarGet("posX"));
-			trQuestVarSet("p"+p+"unityposZ", trQuestVarGet("posZ"));
-			trQuestVarSet("p"+p+"unityLast", trTimeMS());
-			trQuestVarSet("p"+p+"unitySearch", p);
-		}
-		
-		if (trQuestVarGet("p"+p+"unity") == 1) {
-			if (trTimeMS() > trQuestVarGet("p"+p+"unitytimeout")) {
-				for(x=trQuestVarGet("p"+p+"unityNext"); < trQuestVarGet("p"+p+"unityend")) {
-					trUnitSelectClear();
-					trUnitSelect(""+x, true);
-					trMutateSelected(kbGetProtoUnitID("Rocket"));
-					trUnitDestroy();
+		trQuestVarSet("p"+p+"unityLast", trTimeMS());
+		trQuestVarSet("p"+p+"unityradius", trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"));
+		trQuestVarSet("p"+p+"unityangle", 0);
+		trQuestVarSet("p"+p+"unityposX", trQuestVarGet("posX"));
+		trQuestVarSet("p"+p+"unityposZ", trQuestVarGet("posZ"));
+		trQuestVarSet("p"+p+"unityLast", trTimeMS());
+		trQuestVarSet("p"+p+"unitySearch", p);
+	}
+	
+	if (trQuestVarGet("p"+p+"unity") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"unitytimeout")) {
+			for(x=trQuestVarGet("p"+p+"unityNext"); < trQuestVarGet("p"+p+"unityend")) {
+				trUnitSelectClear();
+				trUnitSelect(""+x, true);
+				trMutateSelected(kbGetProtoUnitID("Rocket"));
+				trUnitDestroy();
+			}
+			zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"baseAttack"));
+			trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack"));
+			trQuestVarSet("p"+p+"unity", 0);
+			for (x=yGetDatabaseCount("playerUnits"); >0) {
+				yDatabaseNext("playerUnits");
+				if (getBit(p, 1*yGetVar("playerUnits", "unity")) == true) {
+					ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") - xsPow(2, p));
+					ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), -1.0));
 				}
-				zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"baseAttack"));
-				trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack"));
-				trQuestVarSet("p"+p+"unity", 0);
+			}
+		} else {
+			dist = trTimeMS() - trQuestVarGet("p"+p+"unitylast");
+			amt = trQuestVarGet("p"+p+"unityangle");
+			amt = fModulo(6.283185, amt + dist * 0.001);
+			trQuestVarSet("p"+p+"unitylast", trTimeMS());
+			trQuestVarSet("p"+p+"unityangle", amt);
+			trVectorSetFromAngle("dir1", amt);
+			trQuestVarSet("dir2x", 0.707107 * (trQuestVarGet("dir1x") - trQuestVarGet("dir1z")));
+			trQuestVarSet("dir2z", 0.707107 * (trQuestVarGet("dir1x") + trQuestVarGet("dir1z")));
+			amt = trQuestVarGet("p"+p+"unityradius");
+			dist = amt * amt;
+			amt = 0.5 * amt;
+			for(x=0; <4) {
+				trUnitSelectClear();
+				trUnitSelect(""+(x+trQuestVarGet("p"+p+"unityNext")), true);
+				trSetSelectedUpVector(amt * trQuestVarGet("dir1x"),0,amt * trQuestVarGet("dir1z"));
+				trUnitSelectClear();
+				trUnitSelect(""+(4+x+trQuestVarGet("p"+p+"unityNext")), true);
+				trSetSelectedUpVector(amt * trQuestVarGet("dir2x"),0,amt * trQuestVarGet("dir2z"));
+				vectorRotate90Deg("dir1");
+				vectorRotate90Deg("dir2");
+			}
+			if (trTime() > trQuestVarGet("p"+p+"unityTime")) {
+				trQuestVarSet("p"+p+"unityTime", trTime());
+				hit = 0;
 				for (x=yGetDatabaseCount("playerUnits"); >0) {
 					yDatabaseNext("playerUnits");
-					if (getBit(p, 1*yGetVar("playerUnits", "unity")) == true) {
+					if (zDistanceToVectorSquared("playerUnits", "p"+p+"unitypos") < dist) {
+						hit = hit + 1;
+						if (getBit(p, 1*yGetVar("playerUnits", "unity")) == false) {
+							ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") + xsPow(2, p));
+							ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), 0.5));
+						}
+					} else if (getBit(p, 1*yGetVar("playerUnits", "unity")) == true) {
 						ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") - xsPow(2, p));
 						ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), -1.0));
 					}
 				}
-			} else {
-				dist = trTimeMS() - trQuestVarGet("p"+p+"unitylast");
-				amt = trQuestVarGet("p"+p+"unityangle");
-				amt = fModulo(6.283185, amt + dist * 0.001);
-				trQuestVarSet("p"+p+"unitylast", trTimeMS());
-				trQuestVarSet("p"+p+"unityangle", amt);
-				trVectorSetFromAngle("dir1", amt);
-				trQuestVarSet("dir2x", 0.707107 * (trQuestVarGet("dir1x") - trQuestVarGet("dir1z")));
-				trQuestVarSet("dir2z", 0.707107 * (trQuestVarGet("dir1x") + trQuestVarGet("dir1z")));
-				amt = trQuestVarGet("p"+p+"unityradius");
-				dist = amt * amt;
-				amt = 0.5 * amt;
-				for(x=0; <4) {
-					trUnitSelectClear();
-					trUnitSelect(""+(x+trQuestVarGet("p"+p+"unityNext")), true);
-					trSetSelectedUpVector(amt * trQuestVarGet("dir1x"),0,amt * trQuestVarGet("dir1z"));
-					trUnitSelectClear();
-					trUnitSelect(""+(4+x+trQuestVarGet("p"+p+"unityNext")), true);
-					trSetSelectedUpVector(amt * trQuestVarGet("dir2x"),0,amt * trQuestVarGet("dir2z"));
-					vectorRotate90Deg("dir1");
-					vectorRotate90Deg("dir2");
-				}
-				if (trTime() > trQuestVarGet("p"+p+"unityTime")) {
-					trQuestVarSet("p"+p+"unityTime", trTime());
-					hit = 0;
-					for (x=yGetDatabaseCount("playerUnits"); >0) {
-						yDatabaseNext("playerUnits");
-						if (zDistanceToVectorSquared("playerUnits", "p"+p+"unitypos") < dist) {
-							hit = hit + 1;
-							if (getBit(p, 1*yGetVar("playerUnits", "unity")) == false) {
-								ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") + xsPow(2, p));
-								ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), 0.5));
-							}
-						} else if (getBit(p, 1*yGetVar("playerUnits", "unity")) == true) {
-							ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") - xsPow(2, p));
-							ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), -1.0));
-						}
-					}
-					
-					trQuestVarSet("p"+p+"unityBuff", trQuestVarGet("unityBonus") * hit);
-					trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
-					zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
-				}
+				
+				trQuestVarSet("p"+p+"unityBuff", trQuestVarGet("unityBonus") * hit);
+				trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
+				zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
 			}
 		}
-		
-		if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-			trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
-			trQuestVarSet("p"+p+"intervention", 1);
-		}
-		
-		
-		if (yGetDatabaseCount("p"+p+"characters") > 0) {
-			id = yDatabaseNext("p"+p+"characters", true);
-			if (id == -1 || trUnitAlive() == false) {
-				removeSavior(p);
-			} else {
-				hit = CheckOnHit(p, id);
-				if (hit == ON_HIT_JUMP) {
-					if (yGetVar("p"+p+"characters", "jumping") == 0) {
-						ySetVar("p"+p+"characters", "jumping", 1);
-						ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
-						for(x=yGetDatabaseCount("enemies"); >0) {
-							yDatabaseNext("enemies");
-							if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
-								ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
-								trQuestVarSet("p"+p+"poisonKillerActive", yGetVar("enemies", "poisonStatus"));
-								break;
-							}
+	}
+	
+	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
+		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+		trQuestVarSet("p"+p+"intervention", 1);
+	}
+	
+	
+	if (yGetDatabaseCount("p"+p+"characters") > 0) {
+		id = yDatabaseNext("p"+p+"characters", true);
+		if (id == -1 || trUnitAlive() == false) {
+			removeSavior(p);
+		} else {
+			hit = CheckOnHit(p, id);
+			if (hit == ON_HIT_JUMP) {
+				if (yGetVar("p"+p+"characters", "jumping") == 0) {
+					ySetVar("p"+p+"characters", "jumping", 1);
+					ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
+					for(x=yGetDatabaseCount("enemies"); >0) {
+						yDatabaseNext("enemies");
+						if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
+							ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
+							trQuestVarSet("p"+p+"poisonKillerActive", yGetVar("enemies", "poisonStatus"));
+							break;
 						}
 					}
-				} else if (yGetVar("p"+p+"characters", "jumping") == 1) {
-					ySetVar("p"+p+"characters", "jumping", 0);
+				}
+			} else if (yGetVar("p"+p+"characters", "jumping") == 1) {
+				ySetVar("p"+p+"characters", "jumping", 0);
+				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+					stunUnit("enemies", 1.5, p);
+				}
+			} else if (hit >= ON_HIT_NORMAL) {
+				target = 1;
+				if (hit == ON_HIT_SPECIAL) {
 					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-						stunUnit("enemies", 1.5, p);
-					}
-				} else if (hit >= ON_HIT_NORMAL) {
-					target = 1;
-					if (hit == ON_HIT_SPECIAL) {
-						if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-							trVectorSetUnitPos("start", "p"+p+"characters");
-							trVectorSetUnitPos("end", "enemies");
-							trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("next", true);
-							trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
-							trUnitHighlight(1.0, false);
-							trSetUnitOrientation(xsVectorSet(0.0 - trQuestVarGet("dirx"),0, 0.0 - trQuestVarGet("dirz")), vector(0,1,0), true);
-							dist = 10.0 + trQuestVarGet("p"+p+"attackRange");
-							yAddToDatabase("playerLasers", "next");
-							yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
-							yAddUpdateVar("playerLasers", "range", dist * 1.3);
-							amt = trQuestVarGet("p"+p+"attack");
-							for(x=yGetDatabaseCount("enemies"); >1) {
-								if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
-									removeEnemy();
-								} else {
-									current = zDistanceToVector("enemies", "start");
-									if (current < dist) {
-										trQuestVarSet("hitboxX", trQuestVarGet("startX") + current * trQuestVarGet("dirx"));
-										trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + current * trQuestVarGet("dirz"));
-										if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
-											damageEnemy(p, amt, false);
-											target = 1 + target;
-										}
+						trVectorSetUnitPos("start", "p"+p+"characters");
+						trVectorSetUnitPos("end", "enemies");
+						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+						trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
+						trUnitSelectClear();
+						trUnitSelectByQV("next", true);
+						trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+						trUnitHighlight(1.0, false);
+						trSetUnitOrientation(xsVectorSet(0.0 - trQuestVarGet("dirx"),0, 0.0 - trQuestVarGet("dirz")), vector(0,1,0), true);
+						dist = 10.0 + trQuestVarGet("p"+p+"attackRange");
+						yAddToDatabase("playerLasers", "next");
+						yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
+						yAddUpdateVar("playerLasers", "range", dist * 1.3);
+						amt = trQuestVarGet("p"+p+"attack");
+						for(x=yGetDatabaseCount("enemies"); >1) {
+							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+								removeEnemy();
+							} else {
+								current = zDistanceToVector("enemies", "start");
+								if (current < dist) {
+									trQuestVarSet("hitboxX", trQuestVarGet("startX") + current * trQuestVarGet("dirx"));
+									trQuestVarSet("hitboxZ", trQuestVarGet("startZ") + current * trQuestVarGet("dirz"));
+									if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
+										damageEnemy(p, amt, false);
+										target = 1 + target;
 									}
 								}
 							}
 						}
 					}
-					if (trQuestVarGet("p"+p+"unity") == 1) {
-						amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("unityHeal") * target;
-						dist = xsPow(trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-						gainFavor(p, 1);
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-								removePlayerUnit();
-							} else if (zDistanceToVectorSquared("playerUnits", "p"+p+"unityPos") < dist) {
-								healUnit(p, amt);
-								if (yGetVar("playerUnits", "hero") == 1) {
-									trPlayerGrantResources(1*yGetVar("playerUnits","player"), "favor", target);
-								}
+				}
+				if (trQuestVarGet("p"+p+"unity") == 1) {
+					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("unityHeal") * target;
+					dist = xsPow(trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+					gainFavor(p, 1);
+					for(x=yGetDatabaseCount("playerUnits"); >0) {
+						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (zDistanceToVectorSquared("playerUnits", "p"+p+"unityPos") < dist) {
+							healUnit(p, amt);
+							if (yGetVar("playerUnits", "hero") == 1) {
+								trPlayerGrantResources(1*yGetVar("playerUnits","player"), "favor", target);
 							}
 						}
 					}
 				}
 			}
 		}
-		
-		if (trQuestVarGet("p"+p+"dead") > 0 &&
+	}
+	
+	if (trQuestVarGet("p"+p+"dead") > 0 &&
 		trPlayerResourceCount(p, "favor") >= trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost")) {
-			trQuestVarSet("p"+p+"intervention", 1);
-		}
-		
-		if (trQuestVarGet("p"+p+"intervention") == 1) {
-			for(x=yGetDatabaseCount("playerCharacters"); >0) {
-				if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
-					removePlayerCharacter();
-				}
+		trQuestVarSet("p"+p+"intervention", 1);
+	}
+	
+	if (trQuestVarGet("p"+p+"intervention") == 1) {
+		for(x=yGetDatabaseCount("playerCharacters"); >0) {
+			if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
+				removePlayerCharacter();
 			}
-			for(x=1; < ENEMY_PLAYER) {
-				if (trQuestVarGet("p"+x+"dead") > 0) {
-					revivePlayer(x);
-					trQuestVarSet("p"+x+"dead", 0);
-				}
+		}
+		for(x=1; < ENEMY_PLAYER) {
+			if (trQuestVarGet("p"+x+"dead") > 0) {
+				revivePlayer(x);
+				trQuestVarSet("p"+x+"dead", 0);
 			}
-			gainFavor(p, 0.0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
-			trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COOLDOWN);
-			trChatSend(0, "<color=1,1,1>Intervention!</color>");
-			trSoundPlayFN("restorationbirth.wav","1",-1,"","");
-			trSoundPlayFN("herobirth3.wav","1",-1,"","");
-			trQuestVarSet("p"+p+"intervention", 0);
 		}
-		
-		ySetPointer("enemies", index);
-		poisonKillerBonus(p);
-		xsSetContextPlayer(old);
+		gainFavor(p, 0.0 - trQuestVarGet("interventionCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COOLDOWN);
+		trChatSend(0, "<color=1,1,1>Intervention!</color>");
+		trSoundPlayFN("restorationbirth.wav","1",-1,"","");
+		trSoundPlayFN("herobirth3.wav","1",-1,"","");
+		trQuestVarSet("p"+p+"intervention", 0);
 	}
 	
-	void chooseSavior(int eventID = -1) {
-		int p = eventID - 1000 - 12 * SAVIOR;
-		if (trCurrentPlayer() == p) {
-			map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
-			wellName = "(Q) Guardian Angel";
-			wellIsUltimate = false;
-			map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-			rainName = "(E) Intervention";
-			rainIsUltimate = true;
-			map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-			lureName = "(W) Unity";
-			lureIsUltimate = false;
-		}
-		trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("guardianAngelCooldown"));
-		trQuestVarSet("p"+p+"wellCost", 0);
-		trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("unityCooldown"));
-		trQuestVarSet("p"+p+"lureCost", trQuestVarGet("unityCost"));
-		trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("interventionCooldown"));
-		trQuestVarSet("p"+p+"rainCost", trQuestVarGet("interventionCost"));
+	ySetPointer("enemies", index);
+	poisonKillerBonus(p);
+	xsSetContextPlayer(old);
+}
+
+void chooseSavior(int eventID = -1) {
+	int p = eventID - 1000 - 12 * SAVIOR;
+	if (trCurrentPlayer() == p) {
+		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
+		wellName = "(Q) Guardian Angel";
+		wellIsUltimate = false;
+		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
+		rainName = "(E) Intervention";
+		rainIsUltimate = true;
+		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
+		lureName = "(W) Unity";
+		lureIsUltimate = false;
+	}
+	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("guardianAngelCooldown"));
+	trQuestVarSet("p"+p+"wellCost", 0);
+	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("unityCooldown"));
+	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("unityCost"));
+	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("interventionCooldown"));
+	trQuestVarSet("p"+p+"rainCost", trQuestVarGet("interventionCost"));
+}
+
+void modifySavior(int eventID = -1) {
+	int p = eventID - 5000 - 12 * SAVIOR;
+	if (yGetDatabaseCount("p"+p+"unityAuras") >0) {
+		trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
+		zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
+	}
+}
+
+rule savior_init
+active
+highFrequency
+{
+	xsDisableSelf();
+	for(p=1; < ENEMY_PLAYER) {
+		trEventSetHandler(12 * SAVIOR + p, "saviorAlways");
+		trEventSetHandler(1000 + 12 * SAVIOR + p, "chooseSavior");
+		trEventSetHandler(5000 + 12 * SAVIOR + p, "modifySavior");
 	}
 	
-	void modifySavior(int eventID = -1) {
-		int p = eventID - 5000 - 12 * SAVIOR;
-		if (yGetDatabaseCount("p"+p+"unityAuras") >0) {
-			trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * (1.0 + trQuestVarGet("p"+p+"unityBuff")));
-			zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"attack"));
-		}
-	}
+	trQuestVarSet("guardianAngelCooldown", 8);
+	trQuestVarSet("guardianAngelHeal", 50);
+	trQuestVarSet("guardianAngelRange", 10);
 	
-	rule savior_init
-	active
-	highFrequency
-	{
-		xsDisableSelf();
-		for(p=1; < ENEMY_PLAYER) {
-			trEventSetHandler(12 * SAVIOR + p, "saviorAlways");
-			trEventSetHandler(1000 + 12 * SAVIOR + p, "chooseSavior");
-			trEventSetHandler(5000 + 12 * SAVIOR + p, "modifySavior");
-		}
-		
-		trQuestVarSet("guardianAngelCooldown", 8);
-		trQuestVarSet("guardianAngelHeal", 50);
-		trQuestVarSet("guardianAngelRange", 10);
-		
-		trQuestVarSet("unityCooldown", 20);
-		trQuestVarSet("unityRadius", 10);
-		trQuestVarSet("unityDuration", 8);
-		trQuestVarSet("unityBonus", 0.5);
-		trQuestVarSet("unityHeal", 0.5);
-		
-		trQuestVarSet("interventionCost", 100);
-		trQuestVarSet("interventionCooldown", 10);
-	}
+	trQuestVarSet("unityCooldown", 20);
+	trQuestVarSet("unityRadius", 10);
+	trQuestVarSet("unityDuration", 8);
+	trQuestVarSet("unityBonus", 0.5);
+	trQuestVarSet("unityHeal", 0.5);
+	
+	trQuestVarSet("interventionCost", 100);
+	trQuestVarSet("interventionCooldown", 10);
+}
