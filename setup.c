@@ -145,7 +145,7 @@ string stageName(int stage = 0) {
 		}
 		case 0:
 		{
-			name = "Dream Realm";
+			name = "Dream Stadium";
 		}
 	}
 	return(name);

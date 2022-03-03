@@ -7,6 +7,10 @@ highFrequency
 	int n = yDatabaseNext("stageChoices");
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", yGetVar("stageChoices", "stage"));
+		if (trQuestVarGet("stage") == 0) {
+			xsDisableRule("choose_stage_01");
+			xsEnableRule("pvp_build_map");
+		}
 		trUnitSelectClear();
 		trUnitSelectByQV("chooser", true);
 		trUnitChangeProtoUnit("Rocket");
