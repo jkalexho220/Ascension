@@ -706,7 +706,7 @@ highFrequency
 			trMessageSetText("Host: Choose a floor to challenge.",-1);
 			
 			int posX = 97 - 2 * trQuestVarGet("p1progress");
-			if (trQuestVarGet("p1nickQuestProgress") == 6) {
+			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (ENEMY_PLAYER > 2)) {
 				posX = posX - 2;
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);
