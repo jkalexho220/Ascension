@@ -97,6 +97,13 @@ void silenceEnemy(int p = 0, float duration = 9.0) {
 	if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
 		duration = 2.0 * duration;
 	}
+	if (PvP) {
+		int x = yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger"));
+		if (trQuestVarGet("p"+x+"unit") == trQuestVarGet("enemies")) {
+			silencePlayer(x, duration * 0.001);
+		}
+		duration = duration * trQuestVarGet("p"+x+"silenceResistance");
+	}
 	if (trTimeMS() + duration > yGetVar("enemies", "silenceTimeout")) {
 		ySetVar("enemies", "silenceTimeout", trTimeMS() + duration);
 	}
@@ -152,27 +159,29 @@ void nightriderHarvest(string pos = "") {
 }
 
 void removeEnemy() {
-	int bounty = yGetVar("enemies", "bounty");
-	yVarToVector("enemies", "pos");
-	nightriderHarvest("pos");
-	if (yGetVar("enemies", "bounty") > 0) {
-		trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
-		for(p=1; <ENEMY_PLAYER) {
-			if (Multiplayer) {
-				trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
-				trPlayerGrantResources(p, "Gold", bounty);
-				if (trQuestVarGet("p"+p+"godBoon") == BOON_MORE_GOLD) {
+	if (PvP == false) {
+		int bounty = yGetVar("enemies", "bounty");
+		yVarToVector("enemies", "pos");
+		nightriderHarvest("pos");
+		if (yGetVar("enemies", "bounty") > 0) {
+			trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
+			for(p=1; <ENEMY_PLAYER) {
+				if (Multiplayer) {
 					trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
 					trPlayerGrantResources(p, "Gold", bounty);
+					if (trQuestVarGet("p"+p+"godBoon") == BOON_MORE_GOLD) {
+						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
+						trPlayerGrantResources(p, "Gold", bounty);
+					}
 				}
+				gainFavor(p, trQuestVarGet("rand"));
 			}
-			gainFavor(p, trQuestVarGet("rand"));
 		}
+		if (yGetVar("enemies", "relic") > 0) {
+			spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+		}
+		yRemoveFromDatabase("enemies");
 	}
-	if (yGetVar("enemies", "relic") > 0) {
-		spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
-	}
-	yRemoveFromDatabase("enemies");
 }
 
 void removePlayerUnit() {
@@ -194,6 +203,11 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "hero");
 	yRemoveUpdateVar("playerUnits", "unity");
 	yRemoveUpdateVar("playerUnits", "launched");
+	if (PvP) {
+		if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
+			yRemoveFromDatabase("enemies");
+		}
+	}
 }
 
 void removePlayerCharacter() {
@@ -372,67 +386,48 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration") * xsPow(0.5, 1*trQuestVarGet("p"+p+"poisonSpeed"));
 		damage = damage * trQuestVarGet("p"+p+"spellDamage") * xsPow(2, 1*trQuestVarGet("p"+p+"poisonSpeed"));
+		if (PvP) {
+			int old = yGetPointer("playerUnits");
+			if (ySetPointer("playerUnits", 1*yGetVar("enemies", "doppelganger"))) {
+				poisonUnit("playerUnits", duration, damage, 0);
+			}
+			ySetPointer("playerUnits", old);
+		}
 	} else {
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"poisonResistance");
 	}
-	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
-		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
-			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
-			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			gainFavor(p, 5);
-			if (trCurrentPlayer() == p) {
-				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
+	if ((PvP == false) || targetPlayers) {
+		if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+			if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+				trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
+				trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+				gainFavor(p, 5);
+				if (trCurrentPlayer() == p) {
+					trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
+				}
+			}
+		} else if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
+			if (yGetVar(db, "poisonStatus") == 0) {
+				if (yGetVar(db, "poisonSFX") == 0) {
+					spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Poison SFX"), yGetVarName(db, "poisonSFX"));
+				} else {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
+					trMutateSelected(kbGetProtoUnitID("Poison SFX"));
+				}
+				ySetVar(db, "poisonStatus", 1);
+				ySetVar(db, "poisonLast", trTimeMS());
+				trQuestVarSet("poisonSound", 1);
+			}
+			ySetVar(db, "poisonTimeout", trTimeMS() + duration);
+			if ((targetPlayers == false) && (trQuestVarGet("p"+p+"godBoon") == BOON_POISON_STACKS)) {
+				ySetVar(db, "poisonDamage", damage + yGetVar(db, "poisonDamage"));
+			} else if (damage > yGetVar(db, "poisonDamage")) {
+				ySetVar(db, "poisonDamage", damage);
 			}
 		}
-	} else if (trTimeMS() + duration > yGetVar(db, "poisonTimeout")) {
-		if (yGetVar(db, "poisonStatus") == 0) {
-			if (yGetVar(db, "poisonSFX") == 0) {
-				spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Poison SFX"), yGetVarName(db, "poisonSFX"));
-			} else {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar(db, "poisonSFX"), true);
-				trMutateSelected(kbGetProtoUnitID("Poison SFX"));
-			}
-			ySetVar(db, "poisonStatus", 1);
-			ySetVar(db, "poisonLast", trTimeMS());
-			trQuestVarSet("poisonSound", 1);
-		}
-		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
-		if ((targetPlayers == false) && (trQuestVarGet("p"+p+"godBoon") == BOON_POISON_STACKS)) {
-			ySetVar(db, "poisonDamage", damage + yGetVar(db, "poisonDamage"));
-		} else if (damage > yGetVar(db, "poisonDamage")) {
-			ySetVar(db, "poisonDamage", damage);
-		}
 	}
-}
-
-
-
-/*
-Enemies have elemental resistance and weakness
-*/
-float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
-	if (spell) {
-		dmg = dmg - dmg * yGetVar("enemies", "magicResist") * (1.0 - pierce);
-	} else {
-		dmg = dmg - dmg * yGetVar("enemies", "physicalResist") * (1.0 - pierce);
-	}
-	if (yGetVar("enemies", "poisonStatus") == 1) {
-		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
-	}
-	trDamageUnit(dmg);
-	if (spell) {
-		if (trQuestVarGet("p"+p+"godBoon") == BOON_SPELL_POISON) {
-			poisonUnit("enemies", 12.0, 12.0, p);
-		}
-		trQuestVarSet("p"+p+"lifestealTotal",
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg * 0.5);
-	} else {
-		trQuestVarSet("p"+p+"lifestealTotal",
-			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg);
-	}
-	return(dmg);
 }
 
 
@@ -452,6 +447,63 @@ void growFrostGiantsIncoming(string pos = "") {
 	}
 }
 
+/*
+protection blocks all damage.
+*/
+void damagePlayerUnit(float dmg = 0, int index = -1) {
+	int old = yGetPointer("playerUnits");
+	if (index < 0) {
+		index = old;
+	}
+	if (ySetPointer("playerUnits", index)) {
+		int p = yGetVar("playerUnits", "player");
+		if (trQuestVarGet("protectionCount") == 0) {
+			dmg = dmg - dmg * yGetVar("playerUnits", "magicResist");
+			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
+				healUnit(p, dmg);
+			} else {
+				trDamageUnit(dmg);
+			}
+		}
+		ySetPointer("playerUnits", old);
+	}
+}
+
+
+/*
+Enemies have elemental resistance and weakness
+*/
+float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
+	if (PvP) {
+		dmg = dmg / (1.0 - yGetVarAtIndex("playerUnits", "magicResist", 1*yGetVar("enemies", "doppelganger")));
+	}
+	if (spell) {
+		dmg = dmg - dmg * yGetVar("enemies", "magicResist") * (1.0 - pierce);
+	} else {
+		dmg = dmg - dmg * yGetVar("enemies", "physicalResist") * (1.0 - pierce);
+	}
+	if (yGetVar("enemies", "poisonStatus") == 1) {
+		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
+	}
+	if (spell) {
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_SPELL_POISON) {
+			poisonUnit("enemies", 12.0, 12.0, p);
+		}
+		trQuestVarSet("p"+p+"lifestealTotal",
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg * 0.5);
+	} else {
+		trQuestVarSet("p"+p+"lifestealTotal",
+			trQuestVarGet("p"+p+"lifestealTotal") + trQuestVarGet("p"+p+"Lifesteal") * dmg);
+	}
+	if (PvP) {
+		damagePlayerUnit(dmg, 1*yGetVar("enemies", "doppelganger"));
+	} else {
+		trDamageUnit(dmg);
+	}
+	return(dmg);
+}
+
+
 void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
 	bool targetPlayers = (p == 0);
@@ -461,51 +513,57 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
 			duration = 2.0 * duration;
 		}
-		if (trQuestVarGet("p"+p+"class") == FROSTKNIGHT) {
-			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + 0.08 * trQuestVarGet("p"+p+"health"));
-		}
 		trUnitSelectClear();
 		trUnitSelectByQV(db, true);
 		if (trQuestVarGet("p"+p+"stunDamage") > 0) {
 			damageEnemy(p, trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"stunDamage"), true);
 		}
+		if (PvP) {
+			int old = yGetPointer("playerUnits");
+			if (ySetPointer("playerUnits", 1*yGetVar("enemies", "doppelganger"))) {
+				stunUnit("playerUnits", duration, 0, true);
+			}
+			ySetPointer("playerUnits", old);
+		}
 	} else {
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"stunResistance");
 	}
-	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
-		if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
-			trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
-			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			gainFavor(p, 5);
-			if (trCurrentPlayer() == p) {
-				trChatSend(0, "<color=1,1,1>Stun absorbed! Your next spell will inflict Stun!</color>");
-			}
-		}
-	} else {
-		if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
-			if (yGetVar(db, "stunStatus") == 0) {
-				trQuestVarSet("stunSound", 1);
-				if (trQuestVarGet("boss") == 3) {
-					trVectorSetUnitPos("stunpos", db);
-					growFrostGiantsIncoming("stunpos");
+	if ((PvP == false) || targetPlayers) {
+		if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+			if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+				trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
+				trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+				gainFavor(p, 5);
+				if (trCurrentPlayer() == p) {
+					trChatSend(0, "<color=1,1,1>Stun absorbed! Your next spell will inflict Stun!</color>");
 				}
-				index = yAddToDatabase("stunnedUnits", db);
-				yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
-				if (yGetVar(db, "stunSFX") == 0) {
-					spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect"), yGetVarName(db, "stunSFX"));
-				} else {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
-					trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
-					trUnitSelectClear();
-					trUnitSelectByQV(db, true);
-				}
-				ySetVar(db, "stunStatus", index);
-			} else if (sound) {
-				trQuestVarSet("stunSound", 1);
 			}
-			ySetVar(db, "stunTimeout", trTimeMS() + duration);
+		} else {
+			if (trTimeMS() + duration > yGetVar(db, "stunTimeout")) {
+				if (yGetVar(db, "stunStatus") == 0) {
+					trQuestVarSet("stunSound", 1);
+					if (trQuestVarGet("boss") == 3) {
+						trVectorSetUnitPos("stunpos", db);
+						growFrostGiantsIncoming("stunpos");
+					}
+					index = yAddToDatabase("stunnedUnits", db);
+					yAddUpdateVar("stunnedUnits", "proto", kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db), true)));
+					if (yGetVar(db, "stunSFX") == 0) {
+						spyEffect(1*trQuestVarGet(db), kbGetProtoUnitID("Shockwave stun effect"), yGetVarName(db, "stunSFX"));
+					} else {
+						trUnitSelectClear();
+						trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);
+						trMutateSelected(kbGetProtoUnitID("Shockwave stun effect"));
+						trUnitSelectClear();
+						trUnitSelectByQV(db, true);
+					}
+					ySetVar(db, "stunStatus", index);
+				} else if (sound) {
+					trQuestVarSet("stunSound", 1);
+				}
+				ySetVar(db, "stunTimeout", trTimeMS() + duration);
+			}
 		}
 	}
 }
@@ -557,6 +615,12 @@ void processLaunchedUnit() {
 
 void launchUnit(string db = "", string dest = "") {
 	int hitWall = 0;
+	int index = 0;
+	if (PvP && (db == "playerUnits")) {
+		index = yGetPointer("playerUnits");
+		db = "playerUnits";
+		ySetPointer("playerUnits", 1*yGetVar("enemies", "doppelganger"));
+	}
 	if (yGetVar(db, "launched") == 0) {
 		ySetVar(db, "launched", 1);
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+1*trQuestVarGet(db)));
@@ -632,27 +696,8 @@ void launchUnit(string db = "", string dest = "") {
 			}
 		}
 	}
-}
-
-/*
-protection blocks all damage.
-*/
-void damagePlayerUnit(float dmg = 0, int index = -1) {
-	int old = yGetPointer("playerUnits");
-	if (index < 0) {
-		index = old;
-	}
-	if (ySetPointer("playerUnits", index)) {
-		int p = yGetVar("playerUnits", "player");
-		if (trQuestVarGet("protectionCount") == 0) {
-			dmg = dmg - dmg * yGetVar("playerUnits", "magicResist");
-			if ((yGetVar("playerUnits", "hero") == 1) && trQuestVarGet("p"+p+"negationCloak") == 1) {
-				healUnit(p, dmg);
-			} else {
-				trDamageUnit(dmg);
-			}
-		}
-		ySetPointer("playerUnits", old);
+	if (PvP) {
+		ySetPointer("playerUnits", index);
 	}
 }
 
@@ -864,6 +909,10 @@ int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0
 int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	int index = activatePlayerUnit("next", p, proto, decay);
+	if (PvP) {
+		yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", "next"));
+		yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
+	}
 	string pName = kbGetProtoUnitName(proto);
 	trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
 	return(index);

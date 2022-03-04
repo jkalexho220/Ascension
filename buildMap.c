@@ -871,9 +871,18 @@ void buildEdge(int edge = 0, int type = 0) {
 				z1 = z1 + trQuestVarGet("rand");
 				x1 = x1 + trQuestVarGet("rand");
 			}
-			trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-			trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
-			paintSecondary(x0, z0, x1, z1);
+			/* Zeno's Paradox */
+			trQuestVarSet("rand", 0);
+			if (trQuestVarGet("stage") == 11) {
+				trQuestVarSetFromRand("rand", 1, 5, true);
+			}
+			if (trQuestVarGet("rand") == 5) {
+				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
+			} else {
+				trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+				trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
+				paintSecondary(x0, z0, x1, z1);
+			}
 			
 			if ((type == EDGE_WALL) && (trQuestVarGet("wallEdges") * yGetDatabaseCount("visited") > 0)) {
 				trQuestVarSetFromRand("rand", 1, 16, true);

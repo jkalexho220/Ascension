@@ -29,6 +29,113 @@ void fixAnimations(int p = 0) {
 	}
 }
 
+void noSpecials() {
+	if (trTime() > trQuestVarGet("noSpecialsNext")) {
+		trQuestVarSet("noSpecialsNext", trTime());
+		for(p=ENEMY_PLAYER; >0) {
+			trModifyProtounit("Frost Giant", p, 9, -99990);
+			trModifyProtounit("Frost Giant", p, 9, 99999);
+			trModifyProtounit("Medusa", p, 9, -99990);
+			trModifyProtounit("Medusa", p, 9, 99999);
+			trModifyProtounit("Mummy", p, 9, -99990);
+			trModifyProtounit("Mummy", p, 9, 99999);
+			trModifyProtounit("Scorpion Man", p, 9, -99990);
+			trModifyProtounit("Scorpion Man", p, 9, 99999);
+			trModifyProtounit("Battle Boar", p, 9, -99990);
+			trModifyProtounit("Battle Boar", p, 9, 99999);
+		}
+	}
+}
+
+void processSilence(int p = 0) {
+	if (trQuestVarGet("p"+p+"silenced") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
+			trQuestVarSet("p"+p+"silenced", 0);
+			if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
+				trTechGodPower(p, "Underworld Passage", 1);
+				if (trCurrentPlayer() == p) {
+					trCounterAbort("well");
+					trCounterAddTime("well", -1, -99999, wellName);
+				}
+			}
+			if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
+				trTechGodPower(p, "Animal magnetism", 1);
+				if (trCurrentPlayer() == p) {
+					trCounterAbort("lure");
+					trCounterAddTime("lure", -1, -99999, lureName);
+				}
+			}
+			if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
+				trTechGodPower(p, "rain", 1);
+				if (trCurrentPlayer() == p) {
+					trCounterAbort("rain");
+					trCounterAddTime("rain", -1, -99999, rainName);
+				}
+			}
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"silenceSFX");
+			trUnitChangeProtoUnit("Cinematic Block");
+			if (trCurrentPlayer() == p) {
+				trCounterAbort("silence");
+			}
+		}
+	}
+}
+
+void processLifesteal(int p = 0) {
+	int simp = 0;
+	if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
+		healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
+		/* simp benefits */
+		if (trQuestVarGet("p"+p+"simp") > 0) {
+			simp = trQuestVarGet("p"+p+"simp");
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+simp+"unit");
+			healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+simp+"index"));
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"unit");
+		}
+		trQuestVarSet("p"+p+"lifestealTotal", 0);
+	}
+}
+
+void processRegen(int p = 0) {
+	float amt = 0;
+	if (trQuestVarGet("p"+p+"favorRegen") != 0) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"regenerateFavorLast") + 1000) {
+			amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateFavorLast");
+			amt = amt * 0.001 * trQuestVarGet("p"+p+"favorRegen");
+			gainFavor(p, amt);
+			trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
+		}
+	}
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_REGENERATE_HEALTH) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"regenerateHealthLast") + 1000) {
+			amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateHealthLast");
+			amt = amt * 0.00003;
+			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
+			trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
+		}
+	}
+}
+
+void checkResourceCheating(int p = 0) {
+	if (trPlayerResourceCount(p, "gold") > trQuestVarGet("p"+p+"gold")) {
+		trPlayerGrantResources(p, "gold", trQuestVarGet("p"+p+"gold") - trPlayerResourceCount(p, "gold"));
+		if (trCurrentPlayer() == p) {
+			trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
+		}
+	} else if (trPlayerResourceCount(p, "gold") < trQuestVarGet("p"+p+"gold")) {
+		trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
+	}
+	if (trPlayerResourceCount(p, "favor") > 1 + trQuestVarGet("p"+p+"favor")) {
+		gainFavor(p, 0);
+		if (trCurrentPlayer() == p) {
+			trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
+		}
+	}
+}
+
 void checkGodPowers(int p = 0) {
 	/* well ability */
 	switch(1*trQuestVarGet("p"+p+"wellCooldownStatus"))
@@ -163,6 +270,125 @@ void checkGodPowers(int p = 0) {
 	}
 }
 
+void maintainStun() {
+	int id = 0;
+	for(x=yGetDatabaseCount("stunnedUnits"); >0) {
+		id = yDatabaseNext("stunnedUnits", true);
+		if (id == -1 || trUnitAlive() == false) {
+			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("stunnedUnits", "proto")));
+			yRemoveFromDatabase("stunnedUnits");
+			yRemoveUpdateVar("stunnedUnits", "proto");
+		} else {
+			if (trQuestVarGet("stunnedUnits") != trQuestVarGet("bossUnit") ||
+				trQuestVarGet("bossAnim") == 0) {
+				trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
+				trUnitOverrideAnimation(2, 0, false, false, -1, 0);
+			}
+		}
+	}
+}
+
+void playerLasers() {
+	for(x=xsMin(3, yGetDatabaseCount("playerLasers")); >0) {
+		yDatabaseNext("playerLasers", true);
+		if (trTimeMS() > yGetVar("playerLasers", "timeout")) {
+			trUnitDestroy();
+			yRemoveFromDatabase("playerLasers");
+			yRemoveUpdateVar("playerLasers", "timeout");
+			yRemoveUpdateVar("playerLasers", "range");
+		} else {
+			float width = 4.0 * (yGetVar("playerLasers", "timeout") - trTimeMS()) / 500;
+			trSetSelectedScale(width, width, yGetVar("playerLasers", "range"));
+		}
+	}
+}
+
+void relicTransporterGuy(int p = 0) {
+	int id = 0;
+	if (yGetDatabaseCount("p"+p+"warehouse") > 0) {
+		id = yDatabaseNext("p"+p+"warehouse", true);
+		if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
+			if (yGetVar("p"+p+"warehouse", "type") < KEY_RELICS ||
+				trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
+				if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"warehouse", "type"))) {
+					trUnitChangeProtoUnit("Relic");
+					yAddToDatabase("freeRelics", "p"+p+"warehouse");
+					yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
+				}
+			} else {
+				trSoundPlayFN("storehouse.wav","1",-1,"","");
+			}
+			yRemoveFromDatabase("p"+p+"warehouse");
+		}
+	}
+}
+
+void processFreeRelics(int count = 0) {
+	float amt = 0;
+	for (x=xsMin(count, yGetDatabaseCount("freeRelics")); > 0) {
+		amt = 0;
+		yDatabaseNext("freeRelics", true);
+		if (trUnitGetIsContained("Unit")) {
+			if (trUnitGetIsContained("Villager Atlantean Hero")) {
+				if (yGetVar("freeRelics", "type") == RELIC_NICKONHAWK) {
+					if (trUnitIsOwnedBy(trCurrentPlayer())) {
+						startNPCDialog(NPC_NICK_NO);
+					}
+					trUnitChangeProtoUnit("Relic");
+				} else {
+					for(p=1; < ENEMY_PLAYER) {
+						if (trUnitIsOwnedBy(p)) {
+							trSetSelectedScale(0,0,-1);
+							trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+							if (yGetVar("freeRelics", "type") < KEY_RELICS) {
+								trUnitSetAnimationPath("1,0,1,1,0,0,0");
+							}
+							yAddToDatabase("p"+p+"warehouse", "freeRelics");
+							yAddUpdateVar("p"+p+"warehouse", "type", yGetVar("freeRelics", "type"));
+							yRemoveFromDatabase("freeRelics");
+							yRemoveUpdateVar("freeRelics", "type");
+							break;
+						}
+					}
+				}
+			} else {
+				trVectorSetUnitPos("pos", "freeRelics");
+				for(p=1; < ENEMY_PLAYER) {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"unit");
+					if (trUnitAlive()) {
+						if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1.5) {
+							amt = 1;
+							break;
+						}
+					}
+				}
+				if (amt == 1) {
+					trUnitSelectClear();
+					trUnitSelectByQV("freeRelics", true);
+					trSetSelectedScale(0,0,-1);
+					trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
+					if (yGetVar("freeRelics", "type") < KEY_RELICS) {
+						trUnitSetAnimationPath("1,0,1,1,0,0,0");
+					}
+					if (trCurrentPlayer() == p) {
+						trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
+						trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+					}
+					yAddToDatabase("p"+p+"relics", "freeRelics");
+					yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
+					relicEffect(1*yGetVar("freeRelics", "type"), p, true);
+					yRemoveFromDatabase("freeRelics");
+					yRemoveUpdateVar("freeRelics", "type");
+				}
+			}
+		} else if (trUnitIsSelected()) {
+			trShowImageDialog(relicIcon(1*yGetVar("freeRelics", "type")), relicName(1*yGetVar("freeRelics", "type")));
+			reselectMyself();
+		}
+	}
+}
+
 rule enable_chat
 inactive
 highFrequency
@@ -254,13 +480,11 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int id = 0;
 	int p = 0;
-	int simp = 0;
 	int count = 0;
 	int relic = 0;
 	float amt = 0;
 	bool relicReturned = true;
 	
-	/* player units always */
 	if (yGetDatabaseCount("playerUnits") > 0) {
 		id = yDatabaseNext("playerUnits", true);
 		if ((id == -1) || (trUnitAlive() == false)) {
@@ -282,41 +506,11 @@ highFrequency
 		}
 	}
 	
-	/*
-	maintain stun
-	*/
-	for(x=yGetDatabaseCount("stunnedUnits"); >0) {
-		id = yDatabaseNext("stunnedUnits", true);
-		if (id == -1 || trUnitAlive() == false) {
-			trUnitChangeProtoUnit(kbGetProtoUnitName(1*yGetVar("stunnedUnits", "proto")));
-			yRemoveFromDatabase("stunnedUnits");
-			yRemoveUpdateVar("stunnedUnits", "proto");
-		} else {
-			if (trQuestVarGet("stunnedUnits") != trQuestVarGet("bossUnit") ||
-				trQuestVarGet("bossAnim") == 0) {
-				trMutateSelected(1*yGetVar("stunnedUnits", "proto"));
-				trUnitOverrideAnimation(2, 0, false, false, -1, 0);
-			}
-		}
-	}
+	maintainStun();
 	
 	enemiesAlways();
 	
-	/*
-	Player lasers
-	*/
-	for(x=xsMin(3, yGetDatabaseCount("playerLasers")); >0) {
-		yDatabaseNext("playerLasers", true);
-		if (trTimeMS() > yGetVar("playerLasers", "timeout")) {
-			trUnitDestroy();
-			yRemoveFromDatabase("playerLasers");
-			yRemoveUpdateVar("playerLasers", "timeout");
-			yRemoveUpdateVar("playerLasers", "range");
-		} else {
-			float width = 4.0 * (yGetVar("playerLasers", "timeout") - trTimeMS()) / 500;
-			trSetSelectedScale(width, width, yGetVar("playerLasers", "range"));
-		}
-	}
+	playerLasers();
 	
 	
 	/* protection */
@@ -518,22 +712,7 @@ highFrequency
 			}
 		}
 		
-		if (yGetDatabaseCount("p"+p+"warehouse") > 0) {
-			id = yDatabaseNext("p"+p+"warehouse", true);
-			if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
-				if (yGetVar("p"+p+"warehouse", "type") < KEY_RELICS ||
-					trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
-					if (kbGetUnitBaseTypeID(id) == relicProto(1*yGetVar("p"+p+"warehouse", "type"))) {
-						trUnitChangeProtoUnit("Relic");
-						yAddToDatabase("freeRelics", "p"+p+"warehouse");
-						yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"warehouse", "type"));
-					}
-				} else {
-					trSoundPlayFN("storehouse.wav","1",-1,"","");
-				}
-				yRemoveFromDatabase("p"+p+"warehouse");
-			}
-		}
+		relicTransporterGuy(p);
 	}
 	
 	/* free relics */
@@ -542,68 +721,7 @@ highFrequency
 	} else {
 		count = 30;
 	}
-	for (x=xsMin(count, yGetDatabaseCount("freeRelics")); > 0) {
-		amt = 0;
-		yDatabaseNext("freeRelics", true);
-		if (trUnitGetIsContained("Unit")) {
-			if (trUnitGetIsContained("Villager Atlantean Hero")) {
-				if (yGetVar("freeRelics", "type") == RELIC_NICKONHAWK) {
-					if (trUnitIsOwnedBy(trCurrentPlayer())) {
-						startNPCDialog(NPC_NICK_NO);
-					}
-					trUnitChangeProtoUnit("Relic");
-				} else {
-					for(p=1; < ENEMY_PLAYER) {
-						if (trUnitIsOwnedBy(p)) {
-							trSetSelectedScale(0,0,-1);
-							trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-							if (yGetVar("freeRelics", "type") < KEY_RELICS) {
-								trUnitSetAnimationPath("1,0,1,1,0,0,0");
-							}
-							yAddToDatabase("p"+p+"warehouse", "freeRelics");
-							yAddUpdateVar("p"+p+"warehouse", "type", yGetVar("freeRelics", "type"));
-							yRemoveFromDatabase("freeRelics");
-							yRemoveUpdateVar("freeRelics", "type");
-							break;
-						}
-					}
-				}
-			} else {
-				trVectorSetUnitPos("pos", "freeRelics");
-				for(p=1; < ENEMY_PLAYER) {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
-					if (trUnitAlive()) {
-						if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 1.5) {
-							amt = 1;
-							break;
-						}
-					}
-				}
-				if (amt == 1) {
-					trUnitSelectClear();
-					trUnitSelectByQV("freeRelics", true);
-					trSetSelectedScale(0,0,-1);
-					trMutateSelected(relicProto(1*yGetVar("freeRelics", "type")));
-					if (yGetVar("freeRelics", "type") < KEY_RELICS) {
-						trUnitSetAnimationPath("1,0,1,1,0,0,0");
-					}
-					if (trCurrentPlayer() == p) {
-						trChatSend(0, relicName(1*yGetVar("freeRelics", "type")) + " equipped!");
-						trSoundPlayFN("researchcomplete.wav","1",-1,"","");
-					}
-					yAddToDatabase("p"+p+"relics", "freeRelics");
-					yAddUpdateVar("p"+p+"relics", "type", yGetVar("freeRelics", "type"));
-					relicEffect(1*yGetVar("freeRelics", "type"), p, true);
-					yRemoveFromDatabase("freeRelics");
-					yRemoveUpdateVar("freeRelics", "type");
-				}
-			}
-		} else if (trUnitIsSelected()) {
-			trShowImageDialog(relicIcon(1*yGetVar("freeRelics", "type")), relicName(1*yGetVar("freeRelics", "type")));
-			reselectMyself();
-		}
-	}
+	processFreeRelics(count);
 	
 	/* sounds */
 	if (trQuestVarGet("stunSound") == 1) {
@@ -623,20 +741,7 @@ highFrequency
 		if (trQuestVarGet("p"+p+"resigned") == 0) {
 			checkGodPowers(p);
 			/* no gold cheating */
-			if (trPlayerResourceCount(p, "gold") > trQuestVarGet("p"+p+"gold")) {
-				trPlayerGrantResources(p, "gold", trQuestVarGet("p"+p+"gold") - trPlayerResourceCount(p, "gold"));
-				if (trCurrentPlayer() == p) {
-					trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
-				}
-			} else if (trPlayerResourceCount(p, "gold") < trQuestVarGet("p"+p+"gold")) {
-				trQuestVarSet("p"+p+"gold", trPlayerResourceCount(p, "gold"));
-			}
-			if (trPlayerResourceCount(p, "favor") > 1 + trQuestVarGet("p"+p+"favor")) {
-				gainFavor(p, 0);
-				if (trCurrentPlayer() == p) {
-					trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
-				}
-			}
+			checkResourceCheating(p);
 			if (trQuestVarGet("p"+p+"dead") == 0) {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"unit");
@@ -663,69 +768,9 @@ highFrequency
 						fixAnimations(p);
 					}
 				}
-				/* lifesteal */
-				if (trQuestVarGet("p"+p+"lifestealTotal") > 0) {
-					healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+p+"index"));
-					/* simp benefits */
-					if (trQuestVarGet("p"+p+"simp") > 0) {
-						simp = trQuestVarGet("p"+p+"simp");
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+simp+"unit");
-						healUnit(p, trQuestVarGet("p"+p+"lifestealTotal"), 1*trQuestVarGet("p"+simp+"index"));
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"unit");
-					}
-					trQuestVarSet("p"+p+"lifestealTotal", 0);
-				}
-				/* undo silence */
-				if (trQuestVarGet("p"+p+"silenced") == 1) {
-					if (trTimeMS() > trQuestVarGet("p"+p+"silenceTimeout")) {
-						trQuestVarSet("p"+p+"silenced", 0);
-						if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_READY) {
-							trTechGodPower(p, "Underworld Passage", 1);
-							if (trCurrentPlayer() == p) {
-								trCounterAbort("well");
-								trCounterAddTime("well", -1, -99999, wellName);
-							}
-						}
-						if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_READY) {
-							trTechGodPower(p, "Animal magnetism", 1);
-							if (trCurrentPlayer() == p) {
-								trCounterAbort("lure");
-								trCounterAddTime("lure", -1, -99999, lureName);
-							}
-						}
-						if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_READY) {
-							trTechGodPower(p, "rain", 1);
-							if (trCurrentPlayer() == p) {
-								trCounterAbort("rain");
-								trCounterAddTime("rain", -1, -99999, rainName);
-							}
-						}
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"silenceSFX");
-						trUnitChangeProtoUnit("Cinematic Block");
-						if (trCurrentPlayer() == p) {
-							trCounterAbort("silence");
-						}
-					}
-				}
-				if (trQuestVarGet("p"+p+"favorRegen") != 0) {
-					if (trTimeMS() > trQuestVarGet("p"+p+"regenerateFavorLast") + 1000) {
-						amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateFavorLast");
-						amt = amt * 0.001 * trQuestVarGet("p"+p+"favorRegen");
-						gainFavor(p, amt);
-						trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
-					}
-				}
-				if (trQuestVarGet("p"+p+"godBoon") == BOON_REGENERATE_HEALTH) {
-					if (trTimeMS() > trQuestVarGet("p"+p+"regenerateHealthLast") + 1000) {
-						amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateHealthLast");
-						amt = amt * 0.00003;
-						trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
-						trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
-					}
-				}
+				processLifesteal(p);
+				processSilence(p);
+				processRegen(p);
 			} else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
 				count = 0;
 				for(x=yGetDatabaseCount("enemies"); >0) {
@@ -890,21 +935,7 @@ highFrequency
 	}
 	
 	/* No specials */
-	if (trTime() > trQuestVarGet("noSpecialsNext")) {
-		trQuestVarSet("noSpecialsNext", trTime());
-		for(p=ENEMY_PLAYER; >0) {
-			trModifyProtounit("Frost Giant", p, 9, -99990);
-			trModifyProtounit("Frost Giant", p, 9, 99999);
-			trModifyProtounit("Medusa", p, 9, -99990);
-			trModifyProtounit("Medusa", p, 9, 99999);
-			trModifyProtounit("Mummy", p, 9, -99990);
-			trModifyProtounit("Mummy", p, 9, 99999);
-			trModifyProtounit("Scorpion Man", p, 9, -99990);
-			trModifyProtounit("Scorpion Man", p, 9, 99999);
-			trModifyProtounit("Battle Boar", p, 9, -99990);
-			trModifyProtounit("Battle Boar", p, 9, 99999);
-		}
-	}
+	noSpecials();
 }
 
 rule game_over

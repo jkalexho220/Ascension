@@ -34,6 +34,7 @@ float worldHeight = 0;
 float wallHeight = 5;
 int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
+bool PvP = false;
 
 /*
 Chasm terrain is black
@@ -145,7 +146,7 @@ string stageName(int stage = 0) {
 		}
 		case 0:
 		{
-			name = "Dream Stadium";
+			name = "Glory Stadium";
 		}
 	}
 	return(name);
@@ -197,7 +198,7 @@ string stageIcon(int stage = 0) {
 		}
 		case 0:
 		{
-			img = "ui\ui map land unknown 256x256";
+			img = "icons\god power valor icons 64";
 		}
 	}
 	return(img);
@@ -706,7 +707,7 @@ highFrequency
 			trMessageSetText("Host: Choose a floor to challenge.",-1);
 			
 			int posX = 97 - 2 * trQuestVarGet("p1progress");
-			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (ENEMY_PLAYER > 2)) {
+			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (ENEMY_PLAYER > 2 || true)) {
 				posX = posX - 2;
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);
