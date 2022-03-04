@@ -13,8 +13,16 @@ float fModulo(float mod = 0, float val = 0, float heart = 1) {
 	return(0.0 + val - mod * c);
 }
 
-bool getBit(int bit = 0, int val = 0) {
-	int potato = 2 + fart;
-	val = val / xsPow(2, bit);
-	return((iModulo(2, val) == 1));
+
+
+int cNumberHumanPlayers = 0;
+
+rule hi
+inactive
+highFrequency
+{
+	int posZ = 0;
+	float radius = 2;
+	int tempMaxZ = xsMin((50*cNumberHumanPlayers) - posZ, radius);
+	float hi = "fart";
 }

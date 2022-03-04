@@ -62,8 +62,12 @@ BASE_JOB = None
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime', 'cNumberNonGaiaPlayers']
-KNOWN_TYPES = ['int', 'vector', 'vector', 'int', 'int']
+KNOWN_VARIABLES = ['cNumberPlayers', 'cNumberNonGaiaPlayers', 'cMapSize', 'cNumberTeams',
+					'cConnectAllies', 'cConnectAreas', 'cConnectEnemies', 'cConnectPlayers',
+					'cInvalidVector', 'cOriginVector', 'cActivationTime']
+KNOWN_TYPES = ['int', 'int', 'int', 'int',
+				'int', 'int', 'int', 'int',
+				'vector', 'vector', 'int']
 
 ERRORED = False
 
