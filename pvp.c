@@ -149,8 +149,9 @@ highFrequency
 {
 	yDatabaseNext("PharaohStatues");
 	if (zDistanceToVectorSquared("PharaohStatues", "center") < 900.0) {
-		trLetterBox(false);
-		trUIFadeToColor(0,0,0,1000,0,false);
+		trQuestVarSet("cinTime", trTime());
+		trQuestVarSet("cinStep", 0);
+		xsEnableRule("pvp_cinematic");
 		xsDisableSelf();
 		
 		for(x=16; >0) {
@@ -158,5 +159,21 @@ highFrequency
 			trMutateSelected(kbGetProtoUnitID("Statue Pharaoh"));
 		}
 		yClearDatabase("PharaohStatues");
+	}
+}
+
+rule pvp_cinematic
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				
+			}
+		}
 	}
 }

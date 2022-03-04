@@ -190,7 +190,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_NICKONHAWK_GOGGLES:
 			{
-				msg = "Dream Goggles. What do they do?";
+				msg = "Golden Ticket";
 			}
 			
 			case RELIC_LITERAL_FECES:
@@ -607,11 +607,6 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_NICKONHAWK_GOGGLES:
 		{
 			trQuestVarSet("p"+p+"equippedGoggles", trQuestVarGet("p"+p+"equippedGoggles") + m);
-			if (trQuestVarGet("p"+p+"equippedGoggles") > 0) {
-				trSetLighting("eclipse", 0.1);
-			} else {
-				trSetLighting("default", 0.1);
-			}
 		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
