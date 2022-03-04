@@ -40,7 +40,7 @@ const int NORMAL_RELICS = 30;
 /* key relics */
 
 const int RELIC_NICKONHAWK = 36;
-const int RELIC_NICKONHAWK_GOGGLES = 37;
+const int RELIC_NICKONHAWK_TICKET = 37;
 
 const int RELIC_GHOST_PICTURE = 38;
 
@@ -188,7 +188,7 @@ string relicName(int relic = 0) {
 			{
 				msg = "Help! Someone help me!";
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
 				msg = "Dream Goggles. What do they do?";
 			}
@@ -389,7 +389,7 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\trade x caravan icons 64";
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
 				icon = "icons\hero g odysseus icon 64";
 			}
@@ -604,7 +604,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 1);
 			}
 		}
-		case RELIC_NICKONHAWK_GOGGLES:
+		case RELIC_NICKONHAWK_TICKET:
 		{
 			trQuestVarSet("p"+p+"equippedGoggles", trQuestVarGet("p"+p+"equippedGoggles") + m);
 			if (trQuestVarGet("p"+p+"equippedGoggles") > 0) {
@@ -795,7 +795,7 @@ int relicProto(int relic = 0) {
 			{
 				proto = kbGetProtoUnitID("Caravan Atlantean");
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
 				proto = kbGetProtoUnitID("Hero Greek Odysseus");
 			}

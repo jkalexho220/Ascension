@@ -47,7 +47,7 @@ void saveAllData() {
 		yDatabaseNext("p"+p+"relics");
 		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
-		} else if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_GOGGLES) {
+		} else if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_TICKET) {
 			trQuestVarSet("p"+p+"nickQuestProgress", 6);
 		} else {
 			trQuestVarSet("p"+p+"relic"+x, 0);

@@ -104,7 +104,7 @@ void spinQuantumSlotMachine(int eventID = -1) {
 	for(x=yGetDatabaseCount("slotRelics"); >0) {
 		yDatabaseNext("slotRelics");
 		if (trQuestVarGet("quantumRelic") == yGetVar("slotRelics", "type")) {
-			trQuestVarSet("quantumRelic", RELIC_NICKONHAWK_GOGGLES);
+			trQuestVarSet("quantumRelic", RELIC_NICKONHAWK_TICKET);
 			trQuestVarSet("dreamGogglesCount", 1 + trQuestVarGet("dreamGogglesCount"));
 		}
 	}
@@ -564,7 +564,7 @@ highFrequency
 						trUnitChangeProtoUnit("Relic");
 						for(x=trQuestVarGet("dreamGogglesCount"); >0) {
 							yAddToDatabase("freeRelics", "next");
-							yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK_GOGGLES);
+							yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK_TICKET);
 							trQuestVarSet("next", 1 + trQuestVarGet("next"));
 						}
 					}
