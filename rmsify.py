@@ -631,7 +631,9 @@ class Function(Mathable):
 		if not self.closed:
 			super().resolve()
 			self.closed = True
-			if len(self.children) > len(self.expected):
+			if self.state != 2:
+				error("Missing close parenthesis");
+			elif len(self.children) > len(self.expected):
 				error("Too many inputs for " + self.name + " expected " + str(len(self.expected)) + " but received " + str(len(self.children)))
 			else:
 				for i in range(len(self.children)):
@@ -652,6 +654,7 @@ class Function(Mathable):
 				else:
 					accepted = False
 			elif token == ')':
+				self.state = 2;
 				self.resolve()
 				accepted = True
 			elif token == ',':
@@ -945,9 +948,6 @@ try:
 									print("Line " + str(ln) + ":\n    " + line)
 								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch('):
 									print("Missing semicolon")
-									print("Line " + str(ln) + ":\n    " + line)
-								if 'return' in templine and not '(' in templine:
-									print("Needs parenthesis")
 									print("Line " + str(ln) + ":\n    " + line)
 
 								# reWrite the line
