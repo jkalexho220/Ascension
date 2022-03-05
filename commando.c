@@ -291,6 +291,7 @@ void commandoAlways(int eventID = -1) {
 		yDatabaseNext("p"+p+"echoBombs");
 		hit = 0;
 		if (trQuestVarGet("p"+p+"echoBombs") > 0) {
+			xsSetContextPlayer(ENEMY_PLAYER);
 			target = 1*yGetVar("p"+p+"echoBombs", "unit");
 			trUnitSelectClear();
 			trUnitSelect(""+target);
@@ -300,7 +301,9 @@ void commandoAlways(int eventID = -1) {
 			} else {
 				trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
 				ySetVarFromVector("p"+p+"echoBombs", "pos", "pos");
-				xsSetContextPlayer(ENEMY_PLAYER);
+				if (PvP) {
+					xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+				}
 				amt = kbUnitGetCurrentHitpoints(kbGetBlockID(""+target));
 				if (trTimeMS() > yGetVar("p"+p+"echoBombs", "timeout")) {
 					amt = yGetVar("p"+p+"echoBombs", "health") - amt;
@@ -392,7 +395,11 @@ void commandoAlways(int eventID = -1) {
 			yAddToDatabase("p"+p+"echoBombs", "next");
 			yAddUpdateVar("p"+p+"echoBombs", "unit", trQuestVarGet("enemies"));
 			spyEffect(1*trQuestVarGet("enemies"),kbGetProtoUnitID("Phoenix Egg"),yGetNewestName("p"+p+"echoBombs"));
-			xsSetContextPlayer(ENEMY_PLAYER);
+			if (PvP) {
+				xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+			} else {
+				xsSetContextPlayer(ENEMY_PLAYER);
+			}
 			amt = kbUnitGetCurrentHitpoints(hit);
 			yAddUpdateVar("p"+p+"echoBombs", "health", amt);
 			yAddUpdateVar("p"+p+"echoBombs", "currenthealth", amt);

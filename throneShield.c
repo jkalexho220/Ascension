@@ -228,6 +228,9 @@ void throneShieldAlways(int eventID = -1) {
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+					if (PvP) {
+						xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+					}
 					hit = kbUnitGetTargetUnitID(id);
 					if (hit == target) {
 						silenceEnemy(p, 6.0);

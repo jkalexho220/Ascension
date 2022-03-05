@@ -1,6 +1,8 @@
-void detachFromDatabase(string db = "", int p = 0, int start = 0) {
+int detachFromDatabase(string db = "", int p = 0, int start = 0) {
 	int end = 0;
+	int count = 0;
 	if (ySetPointer(db, start)) {
+		count = 1;
 		for(x=yGetDatabaseCount(db); >0) {
 			yDatabaseNext(db);
 			if (yGetVar(db, "player") != p) {
@@ -8,10 +10,11 @@ void detachFromDatabase(string db = "", int p = 0, int start = 0) {
 				end = yGetPointer(db);
 				trQuestVarSet(db + "DummyIndex", yAddToDatabase(db, "immortalDummy"));
 				break;
+			} else {
+				count = count + 1;
 			}
 		}
 		if (end == 0) {
-			debugLog("immortalDummy could not be inserted for player " + p);
 			trQuestVarSet("detached", 0);
 		} else {
 			/* inserting the dummy unit */
@@ -24,6 +27,7 @@ void detachFromDatabase(string db = "", int p = 0, int start = 0) {
 			ySetVarAtIndex(db, "xNextBlock", start, end);
 		}
 	}
+	return(count);
 }
 
 void reAttachToDatabase(string db = "", int p = 0, int start = 0) {
@@ -44,22 +48,28 @@ void reAttachToDatabase(string db = "", int p = 0, int start = 0) {
 		/* connect my end to the insert start */
 		ySetVarAtIndex(db, "xNextBlock", insertNext, end);
 		ySetVarAtIndex(db, "xPrevBlock", end, insertNext);
-	} else {
-		debugLog("Not found");
 	}
 }
 
 void detachPlayer(int eventID = -1) {
 	int p = eventID - 10000;
+	trQuestVarSet("playerUnitsRemainingSize", 0);
+	trQuestVarSet("enemiesDetachedSize", 0);
 	if (trQuestVarGet("p"+p+"index") > 0) {
 		trQuestVarSet("detached", 1);
-		detachFromDatabase("playerUnits", p, 1*trQuestVarGet("p"+p+"index"));
-		detachFromDatabase("enemies", p, 1*yGetVarAtIndex("playerUnits", "doppelganger", 1*trQuestVarGet("p"+p+"index")));
-		ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
-		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
+		trQuestVarSet("playerUnitsDetachedSize",
+			detachFromDatabase("playerUnits", p, 1*trQuestVarGet("p"+p+"index")));
+		trQuestVarSet("enemiesDetachedSize",
+			detachFromDatabase("enemies", p, 1*yGetVarAtIndex("playerUnits", "doppelganger", 1*trQuestVarGet("p"+p+"index"))));
+		if (trQuestVarGet("detached") == 1) {
+			trQuestVarSet("playerUnitsRemainingSize", yGetDatabaseCount("playerUnits") - trQuestVarGet("playerUnitsDetachedSize"));
+			trQuestVarSet("xdataplayerUnitscount", trQuestVarGet("playerUnitsDetachedSize"));
+			trQuestVarSet("xdataenemiescount", yGetDatabaseCount("enemies") - trQuestVarGet("enemiesDetachedSize"));
+			ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
+			ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
+		}
 	} else {
 		trQuestVarSet("detached", 0);
-		debugLog("Player " + p + " is not here.");
 	}
 	trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
 }
@@ -72,6 +82,8 @@ void reAttachPlayer(int eventID = -1) {
 		/* move pointers backwards one to maintain partitions */
 		yDatabaseNext("playerUnits", false, true);
 		yDatabaseNext("enemies", false, true);
+		trQuestVarSet("xdataplayerUnitscount", yGetDatabaseCount("playerUnits") + trQuestVarGet("playerUnitsRemainingSize"));
+		trQuestVarSet("xdataenemiescount", yGetDatabaseCount("enemies") + trQuestVarGet("enemiesDetachedSize"));
 	}
 }
 
@@ -582,6 +594,12 @@ highFrequency
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"rideLightning") == 1) {
+						trQuestVarSet("p"+p+"rideLightning", 0);
+						yClearDatabase("p"+p+"lightningBalls");
+					}
+					trQuestVarSet("p"+p+"launched", 0);
+					trPlayerKillAllGodPowers(p);
 					class = trQuestVarGet("p"+p+"class");
 					trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
@@ -709,6 +727,9 @@ highFrequency
 				yClearDatabase("playerUnits");
 				yClearDatabase("enemies");
 				trQuestVarSet("pvpStep", 0);
+				trCounterAbort("well");
+				trCounterAbort("lure");
+				trCounterAbort("rain");
 			}
 		}
 	}
@@ -794,7 +815,10 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int id = 0;
-	for (x = yGetDatabaseCount("playerUnits"); > 0) {
+	if (yGetDatabaseCount("playerUnits") > 0) {
+		if (ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsPrevPointer")) == false) {
+			debugLog("player units size is " + yGetDatabaseCount("playeRUnits"));
+		}
 		id = yDatabaseNext("playerUnits", true);
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removePlayerUnit();
@@ -809,13 +833,17 @@ highFrequency
 			ySetVarFromVector("playerUnits", "pos", "pos");
 			
 			stunsAndPoisons("playerUnits");
-			id = yGetPointer("enemies");
 			ySetPointer("enemies", yGetVar("playerUnits", "doppelganger"));
 			ySetVar("enemies", "physicalResist", yGetVar("playerUnits", "physicalResist"));
 			ySetVar("enemies", "magicResist", yGetVar("playerUnits", "magicResist"));
 			ySetVar("enemies", "stunStatus", yGetVar("playerUnits", "stunStatus"));
 			ySetVar("enemies", "poisonStatus", yGetVar("playerUnits", "poisonStatus"));
+			ySetVar("enemies", "launched", yGetVar("playerUnits", "launched"));
+			if (trCurrentPlayer() == 1) {
+				trUnitHighlight(0.1, false);
+			}
 		}
+		trQuestVarSet("playerUnitsPrevPointer", yGetPointer("playerUnits"));
 	}
 	
 	maintainStun();
@@ -861,9 +889,17 @@ highFrequency
 					relicEffect(p, 1*yGetVar("p"+p+"relics"), false);
 				}
 				yClearDatabase("p"+p+"relics");
+				yClearDatabase("p"+p+"characters");
 				yRemoveFromDatabase("participants");
 				trSoundPlayFN("townbell.wav","1",-1,"","");
 				trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been knocked out!");
+				for(y=yGetDatabaseCount("playerUnits"); >0) {
+					yDatabaseNext("playerUnits", true);
+					if (trUnitIsOwnedBy(p)) {
+						trUnitDelete(false);
+						removePlayerUnit();
+					}
+				}
 			} else {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"unit");
@@ -873,10 +909,10 @@ highFrequency
 				processLifesteal(p);
 				processSilence(p);
 				processRegen(p);
-				trEventFire(10000+p);
-				trEventFire(12*trQuestVarGet("p"+p+"class") + p);
-				trEventFire(10100+p);
 			}
+			trEventFire(10000+p);
+			trEventFire(12*trQuestVarGet("p"+p+"class") + p);
+			trEventFire(10100+p);
 		}
 	}
 	

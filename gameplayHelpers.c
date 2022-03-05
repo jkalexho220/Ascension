@@ -204,6 +204,10 @@ void removePlayerUnit() {
 		}
 		yVarToVector("playerUnits", "pos");
 		nightriderHarvest("pos");
+		if (trQuestVarGet("detached") == 1) {
+			trQuestVarSet("xdataenemiescount", 1 + trQuestVarGet("xdataenemiescount"));
+			trQuestVarSet("enemiesDetachedSize", trQuestVarGet("enemiesDetachedSize") - 1);
+		}
 	}
 	yRemoveFromDatabase("playerUnits");
 	yRemoveUpdateVar("playerUnits", "player");
@@ -241,18 +245,20 @@ void removePlayerSpecific(int p = 0) {
 		}
 		trQuestVarSet("p"+p+"dead", 10);
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"unit");
-		trUnitOverrideAnimation(6,0,false,false,-1);
-		trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
-		trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
+		if (PvP == false) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"unit");
+			trUnitOverrideAnimation(6,0,false,false,-1);
+			trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
+			trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
+			trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
+			trVectorSetUnitPos("pos", "p"+p+"unit");
+			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+			trArmySelect(""+p+",0");
+			trUnitChangeProtoUnit("Healing SFX");
+		}
 		silencePlayer(p, 0);
 		trQuestVarSet("p"+p+"silenceSFX", 0);
-		trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
-		trVectorSetUnitPos("pos", "p"+p+"unit");
-		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-		trArmySelect(""+p+",0");
-		trUnitChangeProtoUnit("Healing SFX");
 		/* NOOOO MY QUEEEEN */
 		if (trQuestVarGet("p"+p+"simp") > 0) {
 			int simp = trQuestVarGet("p"+p+"simp");
@@ -395,7 +401,6 @@ void vectorSetAsTargetVector(string target = "", string from = "", string to = "
 
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
 	bool targetPlayers = (p == 0);
-	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration") * xsPow(0.5, 1*trQuestVarGet("p"+p+"poisonSpeed"));
 		damage = damage * trQuestVarGet("p"+p+"spellDamage") * xsPow(2, 1*trQuestVarGet("p"+p+"poisonSpeed"));
@@ -411,6 +416,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"poisonResistance");
 	}
+	duration = duration * 1000;
 	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
 		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
@@ -519,7 +525,6 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
 	bool targetPlayers = (p == 0);
-	duration = duration * 1000;
 	if (p > 0) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
@@ -536,12 +541,14 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 				stunUnit("playerUnits", duration, 0, sound);
 			}
 			ySetPointer("playerUnits", old);
+			debugLog("stun database size is " + yGetDatabaseCount("stunnedUnits"));
 			return;
 		}
 	} else {
 		p = yGetVar(db, "player");
 		duration = duration * trQuestVarGet("p"+p+"stunResistance");
 	}
+	duration = duration * 1000;
 	if (targetPlayers && (yGetVar(db, "hero") == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
 		if (getBit(STATUS_STUN, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellStealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_STUN));
