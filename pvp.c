@@ -12,6 +12,7 @@ void detachFromDatabase(string db = "", int p = 0, int start = 0) {
 		}
 		if (end == 0) {
 			debugLog("immortalDummy could not be inserted for player " + p);
+			trQuestVarSet("detached", 0);
 		} else {
 			/* inserting the dummy unit */
 			ySetVarAtIndex(db, "xNextBlock",
@@ -43,23 +44,29 @@ void reAttachToDatabase(string db = "", int p = 0, int start = 0) {
 		/* connect my end to the insert start */
 		ySetVarAtIndex(db, "xNextBlock", insertNext, end);
 		ySetVarAtIndex(db, "xPrevBlock", end, insertNext);
+	} else {
+		debugLog("Not found");
 	}
 }
 
 void detachPlayer(int eventID = -1) {
 	int p = eventID - 10000;
-	if (ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"))) {
+	if (trQuestVarGet("p"+p+"index") > 0) {
+		trQuestVarSet("detached", 1);
 		detachFromDatabase("playerUnits", p, 1*trQuestVarGet("p"+p+"index"));
 		detachFromDatabase("enemies", p, 1*yGetVarAtIndex("playerUnits", "doppelganger", 1*trQuestVarGet("p"+p+"index")));
 		ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
 		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
+	} else {
+		trQuestVarSet("detached", 0);
+		debugLog("Player " + p + " is not here.");
 	}
 	trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
 }
 
 void reAttachPlayer(int eventID = -1) {
 	int p = eventID - 10100;
-	if (ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"))) {
+	if (trQuestVarGet("detached") == 1) {
 		reAttachToDatabase("playerUnits", p, 1*trQuestVarGet("p"+p+"index"));
 		reAttachToDatabase("enemies", p, 1*yGetVarAtIndex("playerUnits", "doppelganger", 1*trQuestVarGet("p"+p+"index")));
 		/* move pointers backwards one to maintain partitions */
@@ -88,19 +95,25 @@ void deployStadiumEyecandy(int index = 0) {
 }
 
 void pvpGetRelic(int p = 0, int relic = 0) {
-	trQuestVarSet("posx", trQuestVarGet("p"+p+"squareX")-12);
-	trQuestVarSet("posz", trQuestVarGet("p"+p+"squareZ")-12);
-	if (relic <= 10) {
-		trQuestVarSet("posx", trQuestVarGet("posx") + 2 * (relic - 1));
-		trQuestVarSet("posz", trQuestVarGet("posz") + 24);
-	} else {
-		trQuestVarSet("posx", trQuestVarGet("posx") + 24);
-		trQuestVarSet("posz", trQuestVarGet("posz") + 2 * (relic - 11));
-	}
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+	trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+	
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"relic"+relic+"holder");
+	trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
+	
 	trArmySelect("1,0");
+	trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"relic"+relic+"holder"));
 	trUnitChangeProtoUnit("Relic");
+	
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"relic"+relic+"holder");
+	trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+	
+	if (trCurrentPlayer() == p) {
+		trQuestVarSet("myRelics"+relic, 1 + trQuestVarGet("myRelics"+relic));
+	}
+	
 	yAddToDatabase("freeRelics", "next");
 	yAddUpdateVar("freeRelics", "type", relic);
 }
@@ -122,12 +135,13 @@ void buildPvPSquare(int x = 0, int z = 0, int p = 0) {
 	x = 1 + x * 2;
 	z = 1 + z * 2;
 	
+	zSetProtoUnitStat("Revealer To Player", p, 2, 20);
 	trVectorQuestVarSet("p"+p+"square",xsVectorSet(x+12,0,z+12));
 	trArmyDispatch(""+p+",0","Dwarf",1,x+12,0,z+12,0,true);
 	trArmySelect(""+p+",0");
 	trUnitChangeProtoUnit("Revealer To Player");
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	for(i=0; <10) {
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0","Dwarf",1,x+2*i,0,z+26,180,true);
 		trArmySelect("1,0");
 		trUnitConvert(0);
@@ -135,9 +149,19 @@ void buildPvPSquare(int x = 0, int z = 0, int p = 0) {
 		trUnitSetStance("Passive");
 		trUnitOverrideAnimation(2,0,true,false,-1);
 		trSetSelectedScale(0.5,0.5,0.5);
+		if (trCurrentPlayer() == p) {
+			yAddToDatabase("relicDescriptors", "next");
+			yAddUpdateVar("relicDescriptors", "type", i + 1);
+		}
+		trQuestVarSet("p"+p+"relic"+(i+1)+"holder", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,x+2*i,0,z+24,180,true);
+		trArmySelect("1,0");
+		trUnitConvert(0);
+		trUnitChangeProtoUnit("Cinematic Block");
 		pvpGetRelic(p, i + 1);
 	}
 	for(i=0;<10) {
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0","Dwarf",1,x+26,0,z+2*i,270,true);
 		trArmySelect("1,0");
 		trUnitConvert(0);
@@ -145,13 +169,41 @@ void buildPvPSquare(int x = 0, int z = 0, int p = 0) {
 		trUnitSetStance("Passive");
 		trUnitOverrideAnimation(2,0,true,false,-1);
 		trSetSelectedScale(0.5,0.5,0.5);
+		if (trCurrentPlayer() == p) {
+			yAddToDatabase("relicDescriptors", "next");
+			yAddUpdateVar("relicDescriptors", "type", i + 11);
+		}
+		trQuestVarSet("p"+p+"relic"+(i+11)+"holder", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,x+24,0,z+2*i,180,true);
+		trArmySelect("1,0");
+		trUnitConvert(0);
+		trUnitChangeProtoUnit("Cinematic Block");
 	}
+	for(i=21; <= 30) {
+		trQuestVarSet("p"+p+"relic"+i+"holder", trGetNextUnitScenarioNameNumber());
+	}
+	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
+	trArmySelect("1,0");
+	trUnitConvert(0);
+	trUnitChangeProtoUnit("Cinematic Block");
 	trQuestVarSet("p"+p+"passage", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Dwarf",1,x+22,0,z+22,0,true);
 	trArmySelect("1,0");
 	trUnitConvert(p);
 	trMutateSelected(kbGetProtoUnitID("Sky Passage"));
-	spawnPlayer(p, "p"+p+"square");
+	
+	int class = trQuestVarGet("p"+p+"class");
+	trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
+	trArmySelect(""+p+",0");
+	trMutateSelected(1*trQuestVarGet("class"+class+"proto"));
+	yAddToDatabase("playerCharacters", "p"+p+"unit");
+	
+	for(i=12; >0) {
+		if (trQuestVarGet("p"+p+"relic"+i) >0) {
+			pvpGetRelic(p, 1*trQuestVarGet("p"+p+"relic"+i));
+		}
+	}
 }
 
 rule pvp_build_map
@@ -176,6 +228,7 @@ highFrequency
 		int p = 1;
 		
 		for(p=1; < ENEMY_PLAYER) {
+			chooseClass(p, 1*trQuestVarGet("p"+p+"class"));
 			for(x=p+1; < ENEMY_PLAYER) {
 				trPlayerSetDiplomacy(p, x, "Enemy");
 				trPlayerSetDiplomacy(x, p, "Enemy");
@@ -262,6 +315,9 @@ highFrequency
 		xsEnableRule("pvp_cinematic");
 		xsDisableSelf();
 		
+		TERRAIN_WALL = 2;
+		TERRAIN_SUB_WALL = 2;
+		
 		trPaintTerrain(0,0,5,5,0,70,true);
 		trPaintTerrain(0,0,5,5,2,2,false);
 		
@@ -302,6 +358,7 @@ highFrequency
 					"Nickonhawk: Welcome to Glory Stadium! (I forced Zenophobia to repurpose his stadium into a PvP arena)",
 					"icons\hero g odysseus icon 64");
 				trQuestVarSet("cinTime", trTime() + 6);
+				//trQuestVarSet("cinStep", 14);
 			}
 			case 2:
 			{
@@ -313,7 +370,7 @@ highFrequency
 			case 3:
 			{
 				trSoundPlayFN("","1",-1,
-					"Nickonhawk: First, I have replaced your relics with ten basic ones here.",
+					"Nickonhawk: First, I have given you ten basic relics here.",
 					"icons\hero g odysseus icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 				uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
@@ -368,6 +425,9 @@ highFrequency
 					vector(0.483751,0.707102,0.515744), vector(0.729368,0.000000,-0.684122));
 				trackAddWaypoint();
 				trackPlay(1000, -1);
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk");
+				trUnitSetAnimation("ody_aomsp08tense",false,-1);
 				trSoundPlayFN("","1",-1,
 					"Nickonhawk: However, there's a catch! ",
 					"icons\hero g odysseus icon 64");
@@ -444,8 +504,6 @@ highFrequency
 				trSetFogAndBlackmap(true, true);
 				trPlayerResetBlackMapForAllPlayers();
 				xsDisableSelf();
-				trLetterBox(false);
-				trUIFadeToColor(0,0,0,1000,0,false);
 				
 				trQuestVarSet("immortalDummy", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
@@ -457,6 +515,200 @@ highFrequency
 					trEventSetHandler(10000 + p, "detachPlayer");
 					trEventSetHandler(10100 + p, "reAttachPlayer");
 				}
+				
+				trQuestVarSet("pvpStep", 1);
+				trQuestVarSet("pvpTime", trTime() + 1);
+				trQuestVarSet("pvpRound", 1);
+				
+				for(p=1; < ENEMY_PLAYER) {
+					yDatabaseNext("playerCharacters", true);
+					trUnitDestroy();
+				}
+				yClearDatabase("playerCharacters");
+				
+				xsEnableRule("pvp_manager");
+				trMusicPlayCurrent();
+				trPlayNextMusicTrack();
+			}
+		}
+	}
+}
+
+rule pvp_manager
+inactive
+highFrequency
+{
+	int p = 0;
+	int relic = 0;
+	int class = 0;
+	if (trTime() > trQuestVarGet("pvpTime")) {
+		switch(1*trQuestVarGet("pvpStep"))
+		{
+			case 0:
+			{
+				for(p=1; < ENEMY_PLAYER) {
+					trPlayerKillAllGodPowers(p);
+				}
+				trQuestVarSet("pvpRound", 1 + trQuestVarGet("pvpRound"));
+				trQuestVarSet("pvpStep", 1);
+				trQuestVarSet("pvpTime", trTime() + 1);
+			}
+			case 1:
+			{
+				trOverlayText("Round " + 1*trQuestVarGet("pvpRound"),3.0,-1,-1,-1);
+				trSoundPlayFN("fanfare.wav","1",-1,"","");
+				trQuestVarSet("pvpStep", 2);
+				trQuestVarSet("pvpTime", trTime() + 2);
+			}
+			case 2:
+			{
+				gadgetUnreal("ShowImageBox-CloseButton");
+				trSoundPlayFN("market.wav","1",-1,"","");
+				trQuestVarSet("pvpStep", 3);
+				trQuestVarSet("pvpTime", trTime() + 3);
+				trQuestVarSetFromRand("pvpReward",trQuestVarGet("pvpRound"),20,true);
+				trQuestVarSetFromRand("pvpCount", 2, 5, true);
+				trQuestVarSetFromRand("count2", 2, 5, true);
+				if (trQuestVarGet("count2") < trQuestVarGet("pvpCount")) {
+					trQuestVarSet("pvpCount", trQuestVarGet("count2"));
+				}
+				trShowImageDialog(relicIcon(1*trQuestVarGet("pvpReward")),
+					"("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")));
+			}
+			case 3:
+			{
+				gadgetReal("ShowImageBox-CloseButton");
+				gadgetUnreal("ShowImageBox");
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				for(p=1; < ENEMY_PLAYER) {
+					class = trQuestVarGet("p"+p+"class");
+					trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
+					trArmySelect(""+p+",0");
+					trMutateSelected(1*trQuestVarGet("class"+class+"proto"));
+					yAddToDatabase("playerCharacters", "p"+p+"unit");
+					if (trCurrentPlayer() == p) {
+						uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+					}
+					equipRelicsAgain(p);
+				}
+				trQuestVarSet("pvpStep", 4);
+				trQuestVarSet("pvpTime", trTime() + 1);
+				trCounterAddTime("countdown",31,1,"Battle begins",-1);
+				xsEnableRule("pvp_peace");
+			}
+			case 4:
+			{
+				trQuestVarSet("pvpStep", 5);
+				trQuestVarSet("pvpTime", trTime() + 29);
+				trOverlayText("("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")), 9999,20,20,1000);
+			}
+			case 5:
+			{
+				trSoundPlayFN("militarycreate.wav","1",-1,"","");
+				trLetterBox(true);
+				trUIFadeToColor(0,0,0,1000,0,true);
+				trQuestVarSet("pvpStep", 6);
+				trQuestVarSet("pvpTime", trTime() + 1);
+				xsDisableRule("pvp_peace");
+			}
+			case 6:
+			{
+				yClearDatabase("participants");
+				for(p=1; < ENEMY_PLAYER) {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"unit");
+					if (trUnitGetIsContained("Sky Passage")) {
+						trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
+						trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
+						trQuestVarSet("temp", p);
+						yAddToDatabase("participants", "temp");
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"passage");
+						trUnitEjectContained();
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"unit");
+						trUnitEjectContained();
+						for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+							yDatabaseNext("p"+p+"relics", true);
+							trUnitDestroy();
+							relic = yGetVar("p"+p+"relics", "type");
+							if (trCurrentPlayer() == p) {
+								trQuestVarSet("myRelics"+relic, trQuestVarGet("myRelics"+relic) - 1);
+							}
+						}
+						trQuestVarSet("p"+p+"dead", 0);
+					}
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"passage");
+					trUnitChangeProtoUnit("Automaton");
+					trDamageUnitPercent(-100);
+					trMutateSelected(kbGetProtoUnitID("Sky Passage"));
+					
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"unit");
+					trUnitDestroy();
+				}
+				if (yGetDatabaseCount("participants") == 0) {
+					trQuestVarSet("pvpTime", trTime() + 2);
+					trQuestVarSet("pvpStep", 0);
+					trSoundPlayFN("","1",-1,"Nickonhawk: No participants!","icons\hero g odysseus icon 64");
+				} else if (yGetDatabaseCount("participants") == 1) {
+					p = yDatabaseNext("participants");
+					trQuestVarSet("pvpTime", trTime() + 2);
+					trQuestVarSet("pvpStep", 0);
+					trSoundPlayFN("","1",-1,"Nickonhawk: "+trStringQuestVarGet("p"+p+"name")+" was the only participant! Default victory!",
+						"icons\hero g odysseus icon 64");
+					for(x=trQuestVarGet("pvpCount"); >0) {
+						pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+					}
+				} else {
+					float angle = 6.283185 / yGetDatabaseCount("participants");
+					trVectorQuestVarSet("dir", xsVectorSet(15,0,-15));
+					trQuestVarSet("cos", xsCos(angle));
+					trQuestVarSet("sin", xsSin(angle));
+					for (x=yGetDatabaseCount("participants"); >0) {
+						p = yDatabaseNext("participants");
+						trQuestVarSet("posx", 145 + trQuestVarGet("dirx"));
+						trQuestVarSet("posz", 145 + trQuestVarGet("dirz"));
+						spawnPlayer(p, "pos");
+						trVectorQuestVarSet("dir", rotationMatrix("dir", trQuestVarGet("cos"), trQuestVarGet("sin")));
+						trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
+						trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
+						trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COST);
+					}
+					trQuestVarSet("pvpStep", 7);
+					trQuestVarSet("pvpTime", trTime() + 1);
+				}
+			}
+			case 7:
+			{
+				reselectMyself();
+				uiLookAtUnitByName(""+1*trQuestVarGet("nickonhawk"));
+				xsEnableRule("pvp_battle");
+				trQuestVarSet("pvpStep", 8);
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+			}
+			case 8:
+			{
+				/*
+				burn players
+				*/
+			}
+			case 9:
+			{
+				trLetterBox(true);
+				debugLog("playerUnits count is " + 1*yGetDatabaseCount("playerUnits"));
+				for(x=yGetDatabaseCount("playerUnits"); >0) {
+					yDatabaseNext("playerUnits", true);
+					debugLog("player owner is " + 1*yGetVar("playerUnits", "player"));
+					trUnitDestroy();
+				}
+				yClearDatabase("playerUnits");
+				yClearDatabase("enemies");
+				trQuestVarSet("pvpStep", 0);
 			}
 		}
 	}
@@ -473,8 +725,6 @@ highFrequency
 	}
 	int p = trQuestVarGet("relicPlayer");
 	int id = 0;
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
 	trVectorSetUnitPos("pos", "p"+p+"unit");
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		id = yDatabaseNext("p"+p+"relics", true);
@@ -495,6 +745,46 @@ highFrequency
 			yRemoveUpdateVar("p"+p+"relics", "type");
 		}
 	}
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"unit");
+	if (trUnitGetIsContained("Sky Passage")) {
+		if (yGetDatabaseCount("p"+p+"relics") == 0) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"passage");
+			trUnitEjectContained();
+			if (trCurrentPlayer() == p) {
+				trSoundPlayFN("cantdothat.wav","1",-1,"","");
+				trChatSend(0, "<color=1,1,1>You must have at least one relic equipped to enter!</color>");
+			}
+		}
+	}
+	/* immortal sky passage */
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"passage");
+	if (trUnitAlive() == false) {
+		trUnitChangeProtoUnit("Automaton");
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"passage");
+		trDamageUnitPercent(-100);
+		trMutateSelected(kbGetProtoUnitID("Sky Passage"));
+	}
+	/* my relics */
+	trUnitSelectClear();
+	if (yGetDatabaseCount("relicDescriptors") > 0) {
+		yDatabaseNext("relicDescriptors", true);
+		if (trUnitIsSelected()) {
+			if (trQuestVarGet("selectedDescriptor") != trQuestVarGet("relicDescriptors")) {
+				trStringQuestVarSet("description", relicName(1*yGetVar("relicDescriptors","type")) + ":Count: ");
+				trSoundPlayFN("","1",-1,
+					trStringQuestVarGet("description") + 1*trQuestVarGet("myRelics"+1*yGetVar("relicDescriptors","type")),"");
+				trQuestVarSet("selectedDescriptor", trQuestVarGet("relicDescriptors"));
+			}
+		} else if (trQuestVarGet("selectedDescriptor") == trQuestVarGet("relicDescriptors")) {
+			trQuestVarSet("selectedDescriptor",0);
+			trLetterBox(false);
+		}
+	}
+	trUnitSelectClear();
 }
 
 rule pvp_battle
@@ -504,8 +794,7 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int id = 0;
-	
-	if (yGetDatabaseCount("playerUnits") > 0) {
+	for (x = yGetDatabaseCount("playerUnits"); > 0) {
 		id = yDatabaseNext("playerUnits", true);
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removePlayerUnit();
@@ -549,23 +838,45 @@ highFrequency
 	/* misc */
 	for(x=yGetDatabaseCount("participants"); > 0) {
 		p = yDatabaseNext("participants");
-		checkGodPowers(p);
-		checkResourceCheating(p);
-		if (trQuestVarGet("p"+p+"dead") > 0) {
-			yAddToDatabase("deadParticipants", "participants");
-			yRemoveFromDatabase("participants");
-		} else {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
-			if (SAVIOR != trQuestVarGet("p"+p+"class")) {
-				fixAnimations(p);
+		if (yGetDatabaseCount("participants") == 1) {
+			for(y=yGetDatabaseCount("p"+p+"relics"); >0) {
+				yDatabaseNext("p"+p+"relics");
+				relicEffect(p, 1*yGetVar("p"+p+"relics"), false);
 			}
-			processLifesteal(p);
-			processSilence(p);
-			processRegen(p);
-			trEventFire(10000+p);
-			trEventFire(12*trQuestVarGet("p"+p+"class") + p);
-			trEventFire(10100+p);
+			yClearDatabase("p"+p+"relics");
+			trSoundPlayFN("favordump.wav","1",-1,"","");
+			trUIFadeToColor(0,0,0,1000,1000,true);
+			trQuestVarSet("pvpStep", 9);
+			trQuestVarSet("pvpTime", trTime() + 2);
+			xsDisableRule("pvp_battle");
+			for(y=trQuestVarGet("pvpCount"); >0) {
+				pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+			}
+		} else {
+			checkGodPowers(p);
+			checkResourceCheating(p);
+			if (trQuestVarGet("p"+p+"dead") > 0) {
+				for(y=yGetDatabaseCount("p"+p+"relics"); >0) {
+					yDatabaseNext("p"+p+"relics");
+					relicEffect(p, 1*yGetVar("p"+p+"relics"), false);
+				}
+				yClearDatabase("p"+p+"relics");
+				yRemoveFromDatabase("participants");
+				trSoundPlayFN("townbell.wav","1",-1,"","");
+				trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been knocked out!");
+			} else {
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"unit");
+				if (SAVIOR != trQuestVarGet("p"+p+"class")) {
+					fixAnimations(p);
+				}
+				processLifesteal(p);
+				processSilence(p);
+				processRegen(p);
+				trEventFire(10000+p);
+				trEventFire(12*trQuestVarGet("p"+p+"class") + p);
+				trEventFire(10100+p);
+			}
 		}
 	}
 	
@@ -585,6 +896,9 @@ highFrequency
 	
 	/* No specials */
 	noSpecials();
+	
+	
+	
 	
 	xsSetContextPlayer(old);
 }

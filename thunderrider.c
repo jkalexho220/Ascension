@@ -15,9 +15,11 @@ void removeLightningBall(int p = 0) {
 	yRemoveUpdateVar("p"+p+"lightningBalls", "yeehaw");
 }
 
+
 void rideLightningOff(int p = 0) {
 	zSetProtoUnitStat("Attack Revealer", p, 2, 4.0);
 	int index = 0;
+	float dist = 0;
 	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 		yDatabaseNext("p"+p+"relics", true);
 		trUnitChangeProtoUnit("Relic");
@@ -28,31 +30,27 @@ void rideLightningOff(int p = 0) {
 		ySetPointer("p"+p+"lightningBalls", index);
 		yVarToVector("p"+p+"lightningBalls", "dir");
 		yVarToVector("p"+p+"lightningBalls", "prev");
-		if (trQuestVarGet("prevx") + trQuestVarGet("prevZ") < 0) {
-			debugLog("Prev is less than 0!!1");
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"characters");
-			trUnitChangeProtoUnit("Hero Greek Atalanta");
-		} else {
-			ySetVarFromVector("p"+p+"characters", "prev", "prev");
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("prevx"),0,trQuestVarGet("prevz"),0,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
-			trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-			trUnitChangeProtoUnit("Transport Ship Greek");
-			
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"characters", true);
-			trMutateSelected(kbGetProtoUnitID("Dwarf"));
-			trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
-			
-			trUnitChangeProtoUnit("Hero Greek Atalanta");
-			
-			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
-			trUnitChangeProtoUnit("Arkantos God Out");
-		}
+		vectorSetAsCurrentPosition("pos","prev","dir",
+			yGetVar("p"+p+"lightningBalls", "last"),2.0*trQuestVarGet("p"+p+"speed"));
+		ySetVarFromVector("p"+p+"characters", "prev", "pos");
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+		trUnitSelectClear();
+		trUnitSelectByQV("next", true);
+		trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+		trUnitChangeProtoUnit("Transport Ship Greek");
+		
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"characters", true);
+		trMutateSelected(kbGetProtoUnitID("Dwarf"));
+		trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
+		
+		trUnitChangeProtoUnit("Hero Greek Atalanta");
+		
+		trUnitSelectClear();
+		trUnitSelectByQV("next", true);
+		trUnitChangeProtoUnit("Arkantos God Out");
+		
 		
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lightningBalls", true);
@@ -62,6 +60,12 @@ void rideLightningOff(int p = 0) {
 		ySetVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "p"+p+"characters"));
 		yAddUpdateVar("playerUnits", "player", p);
 		yAddUpdateVar("playerUnits", "hero", 1);
+		yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
+		yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+		if (PvP) {
+			yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", "p"+p+"characters"));
+			yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
+		}
 		if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 			trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
 		}
@@ -97,16 +101,19 @@ void refreshRideLightningTargets(int p = 0) {
 	}
 }
 
-void lightningBallBounce(int p = 0) {
-	yVarToVector("p"+p+"lightningBalls", "dir");
+
+void lightningBallBounce(int p = 0, string pos = "") {
+	
 	zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 	trUnitSelectClear();
 	trUnitSelectByQV("p"+p+"lightningBalls", true);
-	trUnitChangeProtoUnit("Kronny Flying");
+	trUnitChangeProtoUnit("Lightning Sparks Ground");
 	
+	vectorSnapToGrid(pos);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch(""+p+",0","Kronny Flying",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"lightningBalls", true);
-	trDamageUnitPercent(-100);
+	trUnitSelectByQV("next");
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	trQuestVarSetFromRand("sound", 1, 3, true);
 	if (trUnitVisToPlayer()) {
@@ -115,6 +122,10 @@ void lightningBallBounce(int p = 0) {
 	trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
 	trSetSelectedScale(0,-4.7,0);
 	trDamageUnitPercent(100);
+	
+	ySetUnit("p"+p+"lightningBalls", 1*trQuestVarGet("next"));
+	ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
+	ySetVar("p"+p+"lightningBalls", "start", trTimeMS());
 	
 	ySetVar("p"+p+"lightningBalls", "yeehaw", 1);
 }
@@ -156,7 +167,6 @@ void thunderRiderAlways(int eventID = -1) {
 			id = yDatabaseNext("p"+p+"lightningBalls", true);
 			if (id == -1) {
 				rideLightningOff(p);
-				debugLog("The lightning ball died!");
 				break;
 			} else if (yGetVar("p"+p+"lightningBalls", "yeehaw") == 1) {
 				trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
@@ -166,62 +176,59 @@ void thunderRiderAlways(int eventID = -1) {
 				trSetSelectedUpVector(0,50.0,0);
 				ySetVar("p"+p+"lightningBalls", "yeehaw", 0);
 			} else {
-				trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
-				if (trQuestVarGet("posY") < 0.5 + worldHeight) {
-					lightningBallBounce(p);
-				} else {
-					hit = 0;
-					if (trUnitVisToPlayer()) {
-						hit = 1;
-					}
-					yVarToVector("p"+p+"lightningBalls", "prev");
-					yVarToVector("p"+p+"lightningBalls", "dir");
-					dist = zDistanceBetweenVectors("pos", "prev");
-					
-					trQuestVarSet("p"+p+"thunderRiderBonus",
-						trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * trQuestVarGet("p"+p+"baseAttack"));
-					
-					amt = xsPow(trQuestVarGet("p"+p+"rideLightningRange"), 2);
-					dist = dist + trQuestVarGet("p"+p+"rideLightningRange");
-					for(x=yGetDatabaseCount("p"+p+"rideLightningTargets"); >0) {
-						id = yDatabaseNext("p"+p+"rideLightningTargets", true);
-						if (id == -1 || trUnitAlive() == false) {
-							yRemoveFromDatabase("p"+p+"rideLightningTargets");
-						} else if (rayCollision("p"+p+"rideLightningTargets","prev","dir",dist,amt)) {
-							hit = hit * 2;
-							if (ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"))) {
-								trUnitHighlight(0.5, false);
-								damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
-							}
-							yRemoveFromDatabase("p"+p+"rideLightningTargets");
+				hit = 0;
+				if (trUnitVisToPlayer()) {
+					hit = 1;
+				}
+				yVarToVector("p"+p+"lightningBalls", "prev");
+				yVarToVector("p"+p+"lightningBalls", "dir");
+				
+				dist = vectorSetAsCurrentPosition("pos","prev","dir",
+					yGetVar("p"+p+"lightningBalls", "last"), 2.0*trQuestVarGet("p"+p+"speed"));
+				trQuestVarSet("p"+p+"thunderRiderBonus",
+					trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+				
+				ySetVar("p"+p+"lightningBalls", "last", trTimeMS());
+				
+				amt = xsPow(trQuestVarGet("p"+p+"rideLightningRange"), 2);
+				dist = dist + trQuestVarGet("p"+p+"rideLightningRange");
+				for(x=yGetDatabaseCount("p"+p+"rideLightningTargets"); >0) {
+					id = yDatabaseNext("p"+p+"rideLightningTargets", true);
+					if (id == -1 || trUnitAlive() == false) {
+						yRemoveFromDatabase("p"+p+"rideLightningTargets");
+					} else if (rayCollision("p"+p+"rideLightningTargets","prev","dir",dist,amt)) {
+						hit = hit * 2;
+						if (ySetPointer("enemies", 1*yGetVar("p"+p+"rideLightningTargets", "index"))) {
+							trUnitHighlight(0.5, false);
+							damageEnemy(p, yGetVar("p"+p+"lightningBalls", "damage"), true);
 						}
+						yRemoveFromDatabase("p"+p+"rideLightningTargets");
 					}
-					
-					if (hit > 1) {
-						trQuestVarSetFromRand("sound", 1, 5, true);
-						trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-					}
-					
-					trQuestVarSet("destx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-					trQuestVarSet("destz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-					vectorToGrid("dest", "loc");
-					if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-						yVarToVector("p"+p+"lightningBalls", "dir");
-						trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
-						trQuestVarSetFromRand("sound", 1, 2, true);
-						trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-						ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
-						amt = 0.5 * trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage");
-						ySetVar("p"+p+"lightningBalls", "damage", amt + yGetVar("p"+p+"lightningBalls", "damage"));
-						lightningBallBounce(p);
-						refreshRideLightningTargets(p);
-					} else if (zDistanceBetweenVectorsSquared("prev", "pos") == 0) {
-						debugLog("Why are we not moving?! WTF?!");
-						debugLog("pos: " + trQuestVarGet("posx") + ", " + trQuestVarGet("posy") + ", " + trQuestVarGet("posz"));
-						lightningBallBounce(p);
-					} else {
-						ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
-					}
+				}
+				
+				if (hit > 1) {
+					trQuestVarSetFromRand("sound", 1, 5, true);
+					trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				}
+				
+				
+				trQuestVarSet("destx", trQuestVarGet("posx") + 2.0  * trQuestVarGet("dirx"));
+				trQuestVarSet("destz", trQuestVarGet("posz") + 2.0  * trQuestVarGet("dirz"));
+				vectorToGrid("dest", "loc");
+				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+					yVarToVector("p"+p+"lightningBalls", "dir");
+					trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
+					trQuestVarSetFromRand("sound", 1, 2, true);
+					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+					ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
+					amt = 0.5 * trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage");
+					ySetVar("p"+p+"lightningBalls", "damage", amt + yGetVar("p"+p+"lightningBalls", "damage"));
+					lightningBallBounce(p, "pos");
+					refreshRideLightningTargets(p);
+				} else if (trTimeMS() - yGetVar("p"+p+"lightningBalls", "start") > 1000) {
+					lightningBallBounce(p, "pos");
+				} else {
+					ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
 				}
 			}
 		}
@@ -290,10 +297,14 @@ void thunderRiderAlways(int eventID = -1) {
 			/* ride the lightning direction change */
 			for(x=yGetDatabaseCount("p"+p+"lightningBalls"); >0) {
 				yDatabaseNext("p"+p+"lightningBalls");
-				trVectorSetUnitPos("pos", "p"+p+"lightningBalls");
+				yVarToVector("p"+p+"lightningBalls", "prev");
+				yVarToVector("p"+p+"lightningBalls", "dir");
+				dist = vectorSetAsCurrentPosition("pos","prev","dir",
+					yGetVar("p"+p+"lightningBalls","last"),2.0*trQuestVarGet("p"+p+"speed"));
+				
 				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
 				ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
-				lightningBallBounce(p);
+				lightningBallBounce(p, "pos");
 			}
 			refreshRideLightningTargets(p);
 		}
@@ -352,6 +363,8 @@ void thunderRiderAlways(int eventID = -1) {
 						yAddUpdateVar("p"+p+"lightningBalls", "dirZ", trQuestVarGet("dirZ"));
 						yAddUpdateVar("p"+p+"lightningBalls", "prevX", trQuestVarGet("startX"));
 						yAddUpdateVar("p"+p+"lightningBalls", "prevZ", trQuestVarGet("startZ"));
+						yAddUpdateVar("p"+p+"lightningBalls", "last", trTimeMS());
+						yAddUpdateVar("p"+p+"lightningBalls", "start", trTimeMS());
 						yAddUpdateVar("p"+p+"lightningBalls", "damage",
 							trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage"));
 						yAddUpdateVar("p"+p+"lightningBalls", "yeehaw", 1);
@@ -388,6 +401,7 @@ void thunderRiderAlways(int eventID = -1) {
 								}
 							}
 							removePlayerUnit();
+							trQuestVarSet("p"+p+"index", 0);
 						}
 					}
 				}
@@ -545,6 +559,6 @@ highFrequency
 	
 	trQuestVarSet("rideLightningDamage", 100);
 	trQuestVarSet("rideLightningRange", 5);
-	trQuestVarSet("rideLightningCost", 8);
+	trQuestVarSet("rideLightningCost", 8);//trQuestVarSet("rideLightningCost", 8);
 	trQuestVarSet("rideLightningDelay", 1000 / trQuestVarGet("rideLightningCost"));
 }

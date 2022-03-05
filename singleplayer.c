@@ -98,6 +98,8 @@ void spinQuantumSlotMachine(int eventID = -1) {
 	trQuestVarSet("quantumRelic", 0);
 	for(x=yGetDatabaseCount("slotRelics"); >0) {
 		yDatabaseNext("slotRelics");
+		trQuestVarSet("ownedRelics"+1*yGetVar("slotRelics", "type"),
+			trQuestVarGet("ownedRelics"+1*yGetVar("slotRelics", "type")) - 1);
 		trQuestVarSet("quantumRelic", trQuestVarGet("quantumRelic") + yGetVar("slotRelics", "type"));
 	}
 	trQuestVarSetFromRand("quantumRelic", 1, xsMin(25, trQuestVarGet("quantumRelic")), true);
@@ -108,6 +110,8 @@ void spinQuantumSlotMachine(int eventID = -1) {
 			trQuestVarSet("dreamGogglesCount", 1 + trQuestVarGet("dreamGogglesCount"));
 		}
 	}
+	trQuestVarSet("ownedRelics"+1*trQuestVarGet("quantumRelic"),
+		1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("quantumRelic")));
 	trQuestVarSet("quantumSlotMachine", 2);
 	trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 3000);
 	trSoundPlayFN("plentybirth.wav","1",-1,"","");
@@ -394,11 +398,14 @@ highFrequency
 		for(a=1; <= 10) {
 			z = 155;
 			if (trQuestVarGet("ownedRelics"+a) > 0) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,x,0,z+2,180,true);
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trMutateSelected(relicProto(a));
 				trSetSelectedScale(0.5,0.5,0.5);
+				yAddToDatabase("relicDescriptors", "next");
+				yAddUpdateVar("relicDescriptors", "type", a);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 				trArmySelect("1,0");
@@ -412,11 +419,14 @@ highFrequency
 			
 			z = 135;
 			if (trQuestVarGet("ownedRelics"+(a+10)) > 0) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,x,0,z-2,0,true);
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trMutateSelected(relicProto(a+10));
 				trSetSelectedScale(0.5,0.5,0.5);
+				yAddToDatabase("relicDescriptors", "next");
+				yAddUpdateVar("relicDescriptors", "type", a+10);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+(a+10)),x,0,z,0,true);
 				trArmySelect("1,0");
@@ -435,11 +445,14 @@ highFrequency
 		z = 153;
 		for(a=21; <= 30) {
 			if (trQuestVarGet("ownedRelics"+a) > 0) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,x-2,0,z,90,true);
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trMutateSelected(relicProto(a));
 				trSetSelectedScale(0.5,0.5,0.5);
+				yAddToDatabase("relicDescriptors", "next");
+				yAddUpdateVar("relicDescriptors", "type", a);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 				trArmySelect("1,0");
@@ -704,6 +717,21 @@ highFrequency
 			}
 		} else {
 			uiMessageBox("You have reached the max level for " + className(class) + "!");
+		}
+	}
+	
+	if (yGetDatabaseCount("relicDescriptors") > 0) {
+		yDatabaseNext("relicDescriptors", true);
+		if (trUnitIsSelected()) {
+			if (trQuestVarGet("selectedDescriptor") != trQuestVarGet("relicDescriptors")) {
+				trStringQuestVarSet("description", relicName(1*yGetVar("relicDescriptors","type")) + ":Count: ");
+				trSoundPlayFN("","1",-1,
+					trStringQuestVarGet("description") + 1*trQuestVarGet("ownedRelics"+1*yGetVar("relicDescriptors","type")),"");
+				trQuestVarSet("selectedDescriptor", trQuestVarGet("relicDescriptors"));
+			}
+		} else if (trQuestVarGet("selectedDescriptor") == trQuestVarGet("relicDescriptors")) {
+			trQuestVarSet("selectedDescriptor",0);
+			trLetterBox(false);
 		}
 	}
 }

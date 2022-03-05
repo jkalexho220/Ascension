@@ -30,7 +30,11 @@ void castDeathSentence(int p = 0) {
 	yAddUpdateVar("p"+p+"sentences", "timeout",
 		trTimeMS() + 1000 * trQuestVarGet("deathSentenceDuration") * trQuestVarGet("p"+p+"spellDuration"));
 	
-	xsSetContextPlayer(ENEMY_PLAYER);
+	if (PvP) {
+		xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+	} else {
+		xsSetContextPlayer(ENEMY_PLAYER);
+	}
 	yAddUpdateVar("p"+p+"sentences", "health", kbUnitGetCurrentHitpoints(kbGetBlockID(""+1*trQuestVarGet("enemies"))));
 	xsSetContextPlayer(p);
 	
@@ -133,6 +137,9 @@ void nightriderAlways(int eventID = -1) {
 				} else {
 					trVectorSetUnitPos("pos", "enemies");
 					ySetVarFromVector("p"+p+"sentences", "pos", "pos");
+					if (PvP) {
+						xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+					}
 					amt = kbUnitGetCurrentHitpoints(kbGetBlockID(""+1*trQuestVarGet("enemies")));
 					dist = yGetVar("p"+p+"sentences", "health") - amt;
 					if (dist > 0) {

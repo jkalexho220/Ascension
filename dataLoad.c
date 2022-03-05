@@ -47,9 +47,10 @@ void saveAllData() {
 		yDatabaseNext("p"+p+"relics");
 		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
 			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
-		} else if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_TICKET) {
-			trQuestVarSet("p"+p+"nickQuestProgress", 6);
 		} else {
+			if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_TICKET) {
+				trQuestVarSet("p"+p+"nickQuestProgress", 6);
+			}
 			trQuestVarSet("p"+p+"relic"+x, 0);
 		}
 	}
@@ -473,6 +474,7 @@ inactive
 					savedata = savedata / 13;
 				} else {
 					currentdata = 0;
+					savedata = savedata / 10;
 				}
 			} else {
 				currentdata = iModulo(10, savedata);

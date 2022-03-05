@@ -523,8 +523,6 @@ highFrequency
 {
 	if (trTime() > cActivationTime) {
 		zInitProtoUnitStat("Revealer", 1, 2, 12);
-		zInitProtoUnitStat("Revealer to Player", 1, 2, 12);
-		zSetProtoUnitStat("Revealer to Player", 1, 2, 32);
 		setupPlayerProto("Kronny Flying", 1000, 0, 0);
 		
 		/* i gotta look good */
@@ -573,6 +571,8 @@ highFrequency
 		trModifyProtounit("Uproot 2x2", 0, 8, -99);
 		
 		for(p=ENEMY_PLAYER; >0) {
+			zInitProtoUnitStat("Revealer to Player", p, 2, 12);
+			zSetProtoUnitStat("Revealer to Player", p, 2, 32);
 			trModifyProtounit("Circe", p, 9, -99);
 			trModifyProtounit("Ox Cart", p, 0, 120);
 			trModifyProtounit("Spy Eye", p, 2, -99);
@@ -699,6 +699,7 @@ highFrequency
 			trQuestVarSet("stage", 1);
 		} else {
 			trLetterBox(false);
+			uiClearSelection();
 			trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
 			trUIFadeToColor(0,0,0,1000,0,false);
 			trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
@@ -707,7 +708,7 @@ highFrequency
 			trMessageSetText("Host: Choose a floor to challenge.",-1);
 			
 			int posX = 97 - 2 * trQuestVarGet("p1progress");
-			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (ENEMY_PLAYER > 2 || true)) {
+			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && (ENEMY_PLAYER > 2 || true)) {
 				posX = posX - 2;
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);
