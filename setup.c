@@ -531,6 +531,7 @@ highFrequency
 		trTechSetStatus(ENEMY_PLAYER, 7, 4);
 		trTechSetStatus(ENEMY_PLAYER, 476, 4);
 		
+		setupPlayerProto("Hero Boar", 1000, 0, 4.2, 0);
 		setupPlayerProto("Militia", 100, 10, 4.8);
 		setupPlayerProto("Wolf", 200, 10, 5, 0.2);
 		setupPlayerProto("Minion", 240, 10, 5, 0.2);

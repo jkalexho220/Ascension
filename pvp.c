@@ -194,7 +194,7 @@ void buildPvPSquare(int x = 0, int z = 0, int p = 0) {
 	for(i=21; <= 30) {
 		trQuestVarSet("p"+p+"relic"+i+"holder", trGetNextUnitScenarioNameNumber());
 	}
-	trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
+	trArmyDispatch("1,0","Dwarf",1,x+4,0,z+4,180,true);
 	trArmySelect("1,0");
 	trUnitConvert(0);
 	trUnitChangeProtoUnit("Cinematic Block");
@@ -562,7 +562,13 @@ highFrequency
 					trPlayerKillAllGodPowers(p);
 				}
 				trQuestVarSet("pvpRound", 1 + trQuestVarGet("pvpRound"));
-				trQuestVarSet("pvpStep", 1);
+				if (trQuestVarGet("pvpRound") < 10) {
+					trQuestVarSet("pvpStep", 1);
+				} else if (trQuestVarGet("pvpRound") == 10) {
+					trQuestVarSet("pvpStep", 11);
+				} else if (trQuestVarGet("pvpRound") == 11) {
+					trQuestVarSet("pvpStep", 21);
+				}
 				trQuestVarSet("pvpTime", trTime() + 1);
 			}
 			case 1:
@@ -620,7 +626,11 @@ highFrequency
 			{
 				trQuestVarSet("pvpStep", 5);
 				trQuestVarSet("pvpTime", trTime() + 29);
-				trOverlayText("("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")), 9999,20,20,1000);
+				if (trQuestVarGet("pvpRound") < 10) {
+					trOverlayText("("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")), 9999,20,20,1000);
+				} else {
+					trOverlayText("(Blessing) +2 Relic Slots");
+				}
 			}
 			case 5:
 			{
@@ -655,6 +665,9 @@ highFrequency
 							if (trCurrentPlayer() == p) {
 								trQuestVarSet("myRelics"+relic, trQuestVarGet("myRelics"+relic) - 1);
 							}
+							if (trQuestVarGet("pvpRound") == 10) {
+								pvpGetRelic(p, 1*yGetVar("p"+p+"relics", "type"));
+							}
 						}
 						trQuestVarSet("p"+p+"dead", 0);
 					}
@@ -678,8 +691,12 @@ highFrequency
 					trQuestVarSet("pvpStep", 0);
 					trSoundPlayFN("","1",-1,"Nickonhawk: "+trStringQuestVarGet("p"+p+"name")+" was the only participant! Default victory!",
 						"icons\hero g odysseus icon 64");
-					for(x=trQuestVarGet("pvpCount"); >0) {
-						pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+					if (trQuestVarGet("pvpRound") < 10) {
+						for(x=trQuestVarGet("pvpCount"); >0) {
+							pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+						}
+					} else if (trCurrentPlayer() == p) {
+						trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
 					}
 				} else {
 					float angle = 6.283185 / yGetDatabaseCount("participants");
@@ -714,8 +731,21 @@ highFrequency
 				/*
 				burn players
 				*/
+				if (trTime() - trQuestVarGet("pvpTime") > 30) {
+					trQuestVarSet("pvpTime", trTime());
+					trQuestVarSet("pvpStep", 9);
+					trMessageSetText("Players have started burning!", -1);
+				}
 			}
 			case 9:
+			{
+				for(x=yGetDatabaseCount("playerCharacters"); >0) {
+					yDatabaseNext("playerCharacters", true);
+					trDamageUnitPercent(1);
+				}
+				trQuestVarSet("pvpTime", trTime());
+			}
+			case 10:
 			{
 				trLetterBox(true);
 				debugLog("playerUnits count is " + 1*yGetDatabaseCount("playerUnits"));
@@ -730,6 +760,94 @@ highFrequency
 				trCounterAbort("well");
 				trCounterAbort("lure");
 				trCounterAbort("rain");
+			}
+			case 11:
+			{
+				trQuestVarSet("pvpTime", trTime() + 4);
+				trQuestVarSet("pvpStep", 12);
+				trSoundPlayFN("","1",-1,"Nickonhawk:It's time for the final round!","icons\hero g odysseus icon 64");
+			}
+			case 12:
+			{
+				trQuestVarSet("pvpTime", trTime() + 7);
+				trQuestVarSet("pvpStep", 13);
+				trSoundPlayFN("","1",-1,
+					"Nickonhawk:This is a special round! You won't lose relics this round, so go all out!",
+					"icons\hero g odysseus icon 64");
+			}
+			case 13:
+			{
+				trQuestVarSet("pvpTime", trTime() + 6);
+				trQuestVarSet("pvpStep", 14);
+				trSoundPlayFN("","1",-1,
+					"Nickonhawk:And now... the reward for winning this round...",
+					"icons\hero g odysseus icon 64");
+			}
+			case 14:
+			{
+				gadgetUnreal("ShowImageBox-CloseButton");
+				trShowImageDialog(boonIcon(BOON_TWO_RELICS), boonName(BOON_TWO_RELICS));
+				trQuestVarSet("pvpTime", trTime() + 8);
+				trQuestVarSet("pvpStep", 3);
+				trSoundPlayFN("wonder.wav","1",-1,
+					"Nickonhawk:THE BLESSING OF NICKONHAWK","icons\hero g odysseus icon 64");
+			}
+			case 20:
+			{
+				trQuestVarSet("pvpTime", trTime() + 7);
+				trQuestVarSet("pvpStep", 21);
+				trSoundPlayFN("","1",-1,"Nickonhawk:Alas, the battles are over. It is time for you to collect your rewards!",
+					"icons\hero g odysseus icon 64");
+			}
+			case 21:
+			{
+				trUIFadeToColor(0,0,0,1000,0,false);
+				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"rideLightning") == 1) {
+						trQuestVarSet("p"+p+"rideLightning", 0);
+						yClearDatabase("p"+p+"lightningBalls");
+					}
+					trQuestVarSet("p"+p+"launched", 0);
+					trPlayerKillAllGodPowers(p);
+					class = trQuestVarGet("p"+p+"class");
+					trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
+					trArmySelect(""+p+",0");
+					trMutateSelected(1*trQuestVarGet("class"+class+"proto"));
+					yAddToDatabase("playerCharacters", "p"+p+"unit");
+					if (trCurrentPlayer() == p) {
+						uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+					}
+					equipRelicsAgain(p);
+					if (trQuestVarGet("p"+p+"nickQuestProgress") == 6) {
+						trQuestVarSet("p"+p+"nickQuestProgress", 5);
+						trArmyDispatch(""+p+",0","Villager Atlantean Hero",1,
+							trQuestVarGet("p"+p+"squareX"),0,trQuestVarGet("p"+p+"squareZ"),0,true);
+						trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
+						if (trCurrentPlayer() == p) {
+							trQuestVarSet("dreamGogglesCount", trQuestVarGet("dreamGogglesCount") - 1);
+						}
+					}
+				}
+				trQuestVarSet("pvpStep", 22);
+				trQuestVarSet("pvpTime", trTime() + 6);
+				trSoundPlayFN("","1",-1,
+					"Nickonhawk:You can now bring home any relics you can carry. Enter the Sky Passage to finish.",
+					"icons\hero g odysseus icon 64");
+			}
+			case 22:
+			{
+				trLetterBox(false);
+				xsDisableSelf();
+				if (trPlayerUnitCountSpecific(trCurrentPlayer(), "Villager Atlantean Hero") == 1) {
+					trMessageSetText("Your Golden Ticket has been consumed to get a Relic Transporter that can hold 5 relics.", -1);
+				}
+				for(p=1; < ENEMY_PLAYER) {
+					yAddToDatabase("playerUnits", "p"+p+"unit");
+					yAddUpdateVar("playerUnits", "player", p);
+				}
+				xsEnableRule("pvp_save");
+				xsEnableRule("pvp_peace");
 			}
 		}
 	}
@@ -874,12 +992,16 @@ highFrequency
 			yClearDatabase("p"+p+"relics");
 			trSoundPlayFN("favordump.wav","1",-1,"","");
 			trUIFadeToColor(0,0,0,1000,1000,true);
-			trQuestVarSet("pvpStep", 9);
-			trQuestVarSet("pvpTime", trTime() + 2);
 			xsDisableRule("pvp_battle");
-			for(y=trQuestVarGet("pvpCount"); >0) {
-				pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+			if (trQuestVarGet("pvpRound") < 10) {
+				for(y=trQuestVarGet("pvpCount"); >0) {
+					pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
+				}
+			} else if (trCurrentPlayer() == p) {
+				trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
 			}
+			trQuestVarSet("pvpStep", 10);
+			trQuestVarSet("pvpTime", trTime() + 2);
 		} else {
 			checkGodPowers(p);
 			checkResourceCheating(p);
@@ -937,4 +1059,35 @@ highFrequency
 	
 	
 	xsSetContextPlayer(old);
+}
+
+
+rule pvp_save
+inactive
+highFrequency
+{
+	int p = trCurrentPlayer();
+	trUnitSelectClear();
+	trUnitSelectByQV("p"+p+"unit");
+	if (trUnitGetIsContained("Sky Passage")) {
+		trUIFadeToColor(255,255,255,1000,0,true);
+		saveAllData();
+		xsEnableRule("pvp_exit");
+		xsDisableSelf();
+	}
+}
+
+rule pvp_exit
+inactive
+highFrequency
+{
+	if (trTime() > 1 + cActivationTime) {
+		subModeEnter("Simulation","Editor");
+		uiMessageBox("","leaveGame()");
+		uiCycleCurrentActivate();
+		uiCycleCurrentActivate();
+		subModeLeave("Simulation","Editor");
+		modeEnter("pregame");
+		modeEnter("Simulation");
+	}
 }
