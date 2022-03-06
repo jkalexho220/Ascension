@@ -57,15 +57,11 @@ void rideLightningOff(int p = 0) {
 		trDamageUnitPercent(100);
 		trUnitChangeProtoUnit("Implode Sphere Effect");
 		
-		ySetVar("p"+p+"characters", "index", yAddToDatabase("playerUnits", "p"+p+"characters"));
-		yAddUpdateVar("playerUnits", "player", p);
+		ySetVar("p"+p+"characters", "index",
+			activatePlayerUnit("p"+p+"characters", p, kbGetProtoUnitID("Hero Greek Atalanta")));
 		yAddUpdateVar("playerUnits", "hero", 1);
 		yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
 		yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
-		if (PvP) {
-			yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", "p"+p+"characters"));
-			yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
-		}
 		if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 			trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
 		}

@@ -107,14 +107,17 @@ void stormcutterAlways(int eventID = -1) {
 	if (yGetDatabaseCount("p"+p+"spearedUnits") > 0) {
 		yDatabaseNext("p"+p+"spearedUnits");
 		if (yGetVarAtIndex("enemies", "launched", 1*yGetVar("p"+p+"spearedUnits", "index")) == 0) {
-			if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("p"+p+"spearedUnits", "index")) > 0) {
-				if (ySetPointer("enemies", 1*yGetVar("p"+p+"spearedUnits", "index"))) {
-					trUnitSelectClear();
-					trUnitSelectByQV("enemies");
-					damageEnemy(p, 100.0 * trQuestVarGet("p"+p+"spellDamage") * (1.0 + 0.02 * yGetVar("p"+p+"spearedUnits", "dist")));
+			hit = 1*yGetVarAtIndex("enemies", "doppelganger", 1*yGetVar("p"+p+"spearedUnits", "index"));
+			if ((PvP == false) || (yGetVarAtIndex("playerUnits", "launched", hit) == 0)) {
+				if (yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("p"+p+"spearedUnits", "index")) > 0) {
+					if (ySetPointer("enemies", 1*yGetVar("p"+p+"spearedUnits", "index"))) {
+						trUnitSelectClear();
+						trUnitSelectByQV("enemies");
+						damageEnemy(p, 100.0 * trQuestVarGet("p"+p+"spellDamage") * (1.0 + 0.02 * yGetVar("p"+p+"spearedUnits", "dist")));
+					}
 				}
+				yRemoveFromDatabase("p"+p+"spearedUnits");
 			}
-			yRemoveFromDatabase("p"+p+"spearedUnits");
 		} else {
 			yVarToVector("p"+p+"spearedUnits", "prev");
 			trVectorSetUnitPos("pos", "p"+p+"spearedUnits");

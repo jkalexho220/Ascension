@@ -22,9 +22,9 @@ const int SPELLSTEALER = 12;
 const int NIGHTRIDER = 13;
 const int SPARKWITCH = 14;
 const int SAVIOR = 15;
+const int KING = 16;
 
 const int CLASS_COUNT = 16;
-const int FROSTKNIGHT = 17;
 
 const int STARSTONE = 0;
 const int SOULSTONE = 1;
@@ -441,6 +441,7 @@ runImmediately
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
+	setupClass("Regent", KING, 500, 1100, SOULSTONE);
 	
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -552,6 +553,7 @@ highFrequency
 		setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
 		setupPlayerProto("Audrey", 1000, 50, 0);
 		setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
+		setupPlayerProto("Regent", 1000, 0, 4.2, 0.5);
 		
 		
 		setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
@@ -709,7 +711,7 @@ highFrequency
 			trMessageSetText("Host: Choose a floor to challenge.",-1);
 			
 			int posX = 97 - 2 * trQuestVarGet("p1progress");
-			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && (ENEMY_PLAYER > 2 || true)) {
+			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && ENEMY_PLAYER > 2) {
 				posX = posX - 2;
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);

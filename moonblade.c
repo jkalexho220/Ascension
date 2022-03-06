@@ -14,6 +14,7 @@ void moonbladeAlways(int eventID = -1) {
 	int target = 0;
 	int index = yGetPointer("enemies");
 	float angle = 0;
+	float amt = 0;
 	float posX = 0;
 	float posZ = 0;
 	int old = xsGetContextPlayer();
@@ -80,8 +81,6 @@ void moonbladeAlways(int eventID = -1) {
 		yAddToDatabase("p"+p+"moonbeams", "next");
 		yAddUpdateVar("p"+p+"moonbeams", "radius", xsPow(trQuestVarGet("moonbeamRadius")*trQuestVarGet("p"+p+"spellRange"),2));
 		yAddUpdateVar("p"+p+"moonbeams", "damage", trQuestVarGet("moonbeamDamage") * trQuestVarGet("p"+p+"spellDamage"));
-		yAddUpdateVar("p"+p+"moonbeams", "damageBoost",
-			trQuestVarGet("moonbeamDamageBoost") * trQuestVarGet("p"+p+"spellDamage"));
 		yAddUpdateVar("p"+p+"moonbeams", "timeout",
 			trTimeMS() + 1000 * trQuestVarGet("moonbeamDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		yAddUpdateVar("p"+p+"moonbeams", "start", trGetNextUnitScenarioNameNumber());
@@ -155,6 +154,20 @@ void moonbladeAlways(int eventID = -1) {
 		}
 	}
 	
+	if (PvP && (trQuestVarGet("p"+p+"protection") == 1)) {
+		for(x=yGetDatabaseCount("playerUnits"); >0) {
+			id = yDatabaseNext("playerUnits", true);
+			trUnitHighlight(0.2, false);
+			xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
+			amt = kbUnitGetCurrentHitpoints(id);
+			if (amt > yGetVar("playerUnits", "currentHealth")) {
+				ySetVar("playerUnits", "currentHealth", amt);
+			} else {
+				trDamageUnit(amt - yGetVar("playerUnits", "currentHealth"));
+			}
+		}
+	}
+	
 	if ((trQuestVarGet("p"+p+"crescentStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
@@ -177,13 +190,7 @@ void moonbladeAlways(int eventID = -1) {
 			trQuestVarSet("centerX", yGetVar("p"+p+"moonbeams", "posX"));
 			trQuestVarSet("centerZ", yGetVar("p"+p+"moonbeams", "posZ"));
 			angle = yGetVar("p"+p+"moonbeams", "radius");
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
-				if (zDistanceToVectorSquared("playerUnits", "center") < angle) {
-					target = target + 1;
-				}
-			}
-			posX = yGetVar("p"+p+"moonbeams", "damage") + target * yGetVar("p"+p+"moonbeams", "damageBoost");
+			posX = yGetVar("p"+p+"moonbeams", "damage");
 			posX = posX * 0.5;
 			for(x=yGetDatabaseCount("enemies"); >0) {
 				id = yDatabaseNext("enemies", true);
@@ -204,7 +211,6 @@ void moonbladeAlways(int eventID = -1) {
 				yRemoveFromDatabase("p"+p+"moonbeams");
 				yRemoveUpdateVar("p"+p+"moonbeams", "radius");
 				yRemoveUpdateVar("p"+p+"moonbeams", "damage");
-				yRemoveUpdateVar("p"+p+"moonbeams", "damageBoost");
 				yRemoveUpdateVar("p"+p+"moonbeams", "timeout");
 				yRemoveUpdateVar("p"+p+"moonbeams", "posX");
 				yRemoveUpdateVar("p"+p+"moonbeams", "posZ");
@@ -279,8 +285,7 @@ highFrequency
 		trEventSetHandler(5000 + 12 * MOONBLADE + p, "moonbladeModify");
 	}
 	trQuestVarSet("moonbeamCooldown", 18);
-	trQuestVarSet("moonbeamDamage", 20);
-	trQuestVarSet("moonbeamDamageBoost", 10);
+	trQuestVarSet("moonbeamDamage", 30);
 	trQuestVarSet("moonbeamDuration", 6);
 	trQuestVarSet("moonbeamRadius", 6);
 	

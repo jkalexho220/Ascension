@@ -510,7 +510,7 @@ highFrequency
 					for(p=1; < ENEMY_PLAYER) {
 						if (trUnitIsOwnedBy(p)) {
 							trSoundPlayFN("","1",-1,
-								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + "Did you really think I wouldn't notice you stealing my relic?",
+								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + ". Did you really think I wouldn't notice you stealing my relic?",
 								"icons\special e son of osiris icon 64");
 							break;
 						}
@@ -618,8 +618,8 @@ highFrequency
 				
 				trQuestVarSet("bossRoomUpperX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
 				trQuestVarSet("bossRoomUpperz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomLowerX") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomLowerZ") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
 				
 				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
 				

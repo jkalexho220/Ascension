@@ -201,12 +201,16 @@ void removePlayerUnit() {
 			yRemoveFromDatabase("enemies");
 			yRemoveUpdateVar("enemies", "doppelganger");
 			yRemoveUpdateVar("enemies", "silenceSFX");
+			if (trQuestVarGet("detached") == 1) {
+				trQuestVarSet("xdataenemiescount", 1 + trQuestVarGet("xdataenemiescount"));
+				trQuestVarSet("enemiesDetachedSize", trQuestVarGet("enemiesDetachedSize") - 1);
+			}
 		}
+		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
 		yVarToVector("playerUnits", "pos");
 		nightriderHarvest("pos");
-		if (trQuestVarGet("detached") == 1) {
-			trQuestVarSet("xdataenemiescount", 1 + trQuestVarGet("xdataenemiescount"));
-			trQuestVarSet("enemiesDetachedSize", trQuestVarGet("enemiesDetachedSize") - 1);
+		if (trQuestVarGet("playerUnitsLeaveIndex") == yGetPointer("playerUnits")) {
+			debugLog("player units removed the wrong thing!");
 		}
 	}
 	yRemoveFromDatabase("playerUnits");
@@ -476,6 +480,9 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 	}
 	if (ySetPointer("playerUnits", index)) {
 		int p = yGetVar("playerUnits", "player");
+		if (PvP) {
+			trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
+		}
 		if (trQuestVarGet("protectionCount") == 0) {
 			if (PvP == false) {
 				dmg = dmg - dmg * yGetVar("playerUnits", "magicResist");
@@ -937,16 +944,21 @@ int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0
 	yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
 	yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
 	yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("proto"+proto+"armor"));
+	if (PvP) {
+		if (trQuestVarGet("detached") == 1) {
+			ySetPointer("enemies", 1*trQuestVarGet("enemiesLeaveIndex"));
+		}
+		yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", db));
+		yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
+		yAddUpdateVar("enemies", "player", p);
+		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
+	}
 	return(index);
 }
 
 int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	int index = activatePlayerUnit("next", p, proto, decay);
-	if (PvP) {
-		yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", "next"));
-		yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
-	}
 	string pName = kbGetProtoUnitName(proto);
 	trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
 	return(index);

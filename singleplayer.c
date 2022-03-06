@@ -75,6 +75,18 @@ void spAscendClass(int class = -1) {
 			}
 		}
 		if (trQuestVarGet("class"+class+"level") >= 7) {
+			if (trQuestVarGet("class"+STARSEER+"level") == 0) {
+				trQuestVarSet("class"+STARSEER+"level", 1);
+				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+STARSEER+"proto")),1,5,1);
+				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
+				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), STARSEER);
+				xsEnableRule("singleplayer_unlocks");
+				trVectorSetUnitPos("pos", "class"+STARSEER+"unit");
+				vectorToGrid("pos", "loc");
+				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+			}
+		}
+		if (trQuestVarGet("class"+class+"level") >= 9) {
 			if (trQuestVarGet("class"+SAVIOR+"level") == 0) {
 				trQuestVarSet("class"+SAVIOR+"level", 1);
 				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+SAVIOR+"proto")),1,5,1);
@@ -282,7 +294,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case STARSEER:
+			case SPARKWITCH:
 			{
 				if (trQuestVarGet("relicCount") >= 100) {
 					unlocked = true;
@@ -775,7 +787,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, complete five quests. Current: " + 1*trQuestVarGet("questCount"));
 			}
-			case STARSEER:
+			case SPARKWITCH:
 			{
 				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
@@ -792,6 +804,10 @@ highFrequency
 				uiMessageBox("To unlock this class, collect 50 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
 			case SAVIOR:
+			{
+				uiMessageBox("To unlock this class, ascend a character to level 9");
+			}
+			case STARSEER:
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 7");
 			}
