@@ -958,10 +958,8 @@ highFrequency
 				trQuestVarSet("dirX", 24.0 * trQuestVarGet("dirX") + trQuestVarGet("bossRoomCenterX"));
 				trQuestVarSet("dirZ", 24.0 * trQuestVarGet("dirZ") + trQuestVarGet("bossRoomCenterZ"));
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),trQuestVarGet("heading"),true);
-				trArmySelect("1,0");
-				trUnitConvert(ENEMY_PLAYER);
-				trUnitChangeProtoUnit("Sphinx");
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Sphinx",1,
+					trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),trQuestVarGet("heading"),true);
 				activateEnemy("next", 0, 0);
 				yAddToDatabase("Sphinxes", "next");
 			}
