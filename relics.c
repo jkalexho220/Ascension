@@ -513,9 +513,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ALL:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.15 * m);
-			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.15 * m);
-			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellDamageTrue", trQuestVarGet("p"+p+"spellDamageTrue") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") + 0.15 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{

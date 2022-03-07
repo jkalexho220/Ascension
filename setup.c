@@ -513,7 +513,15 @@ runImmediately
 		trForbidProtounit(p, "Guild");
 	}
 	
-	xsEnableRule("delayed_modify");
+	trQuestVarSet("rotX0", -1);
+	trQuestVarSet("rotX1", 1);
+	trQuestVarSet("rotX2", 0);
+	trQuestVarSet("rotX3", 0);
+	trQuestVarSet("rotZ0", 0);
+	trQuestVarSet("rotZ1", 0);
+	trQuestVarSet("rotZ2", -1);
+	trQuestVarSet("rotZ3", 1);
+	
 	xsEnableRule("data_load_00");
 	xsDisableSelf();
 }
@@ -522,104 +530,103 @@ rule delayed_modify
 inactive
 highFrequency
 {
-	if (trTime() > cActivationTime) {
-		zInitProtoUnitStat("Revealer", 1, 2, 12);
-		setupPlayerProto("Kronny Flying", 1000, 0, 0);
+	zInitProtoUnitStat("Revealer", 1, 2, 12);
+	setupPlayerProto("Kronny Flying", 1000, 0, 0);
+	
+	/* i gotta look good */
+	trTechSetStatus(0, 7, 4);
+	trTechSetStatus(0, 476, 4);
+	trTechSetStatus(ENEMY_PLAYER, 7, 4);
+	trTechSetStatus(ENEMY_PLAYER, 476, 4);
+	
+	setupPlayerProto("Hero Boar", 1000, 0, 4.2, 0);
+	setupPlayerProto("Militia", 100, 10, 4.8);
+	setupPlayerProto("Wolf", 200, 10, 5, 0.2);
+	setupPlayerProto("Minion", 240, 10, 5, 0.2);
+	setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
+	setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
+	setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
+	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
+	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
+	setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
+	setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
+	setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
+	setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
+	setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
+	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
+	setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
+	setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
+	setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
+	setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
+	setupPlayerProto("Audrey", 1000, 50, 0);
+	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
+	setupPlayerProto("Regent", 1000, 0, 4.2, 0.5);
+	
+	
+	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
+	
+	trModifyProtounit("Sky Passage", 0, 5, 999);
+	
+	trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
+	
+	trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, -1);
+	trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, -1);
+	trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, -1);
+	trModifyProtounit("Monument 2", 0, 24, -1);
+	trModifyProtounit("Monument 2", 0, 25, -1);
+	trModifyProtounit("Monument 2", 0, 26, -1);
+	trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, 1000);
+	trModifyProtounit("Monument 2", 0, 0, 1000);
+	
+	trModifyProtounit("Uproot 2x2", 0, 8, -99);
+	
+	for(p=ENEMY_PLAYER; >0) {
+		zInitProtoUnitStat("Revealer to Player", p, 2, 12);
+		zSetProtoUnitStat("Revealer to Player", p, 2, 32);
+		trModifyProtounit("Circe", p, 9, -99);
+		trModifyProtounit("Ox Cart", p, 0, 120);
+		trModifyProtounit("Spy Eye", p, 2, -99);
+		trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
+		trModifyProtounit("Pharaoh", p, 15, -999);
+		trModifyProtounit("Pharaoh", p, 14, -999);
+		trModifyProtounit("Priest", p, 15, -999);
+		trModifyProtounit("Priest", p, 14, -999);
+		trModifyProtounit("Wadjet Spit", p, 1, -15);
+		trModifyProtounit("Ajax", p, 5, 999);
+		trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);
+		trModifyProtounit("Ball of Fire Impact", p, 8, -9999999999999999999.0);
+		trModifyProtounit("Ball of Fire Impact", p, 8, 4.0);
+		zInitProtoUnitStat("Ball of Fire Impact", p, 8, 4.0);
+		trModifyProtounit("Kronny Flying", p, 1, 9999999999999999999.0);
+		trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
+		zInitProtoUnitStat("Kronny Flying", p, 1, 0);
+		zInitProtoUnitStat("Meteorite",p,1,100);
+		trModifyProtounit("Minion", p, 8, -999);
+		trModifyProtounit("Arkantos God Out", p, 8, 1);
+		zInitProtoUnitStat("Cinematic Block", p, 0, 300);
+		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
 		
-		/* i gotta look good */
-		trTechSetStatus(0, 7, 4);
-		trTechSetStatus(0, 476, 4);
-		trTechSetStatus(ENEMY_PLAYER, 7, 4);
-		trTechSetStatus(ENEMY_PLAYER, 476, 4);
+		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
 		
-		setupPlayerProto("Hero Boar", 1000, 0, 4.2, 0);
-		setupPlayerProto("Militia", 100, 10, 4.8);
-		setupPlayerProto("Wolf", 200, 10, 5, 0.2);
-		setupPlayerProto("Minion", 240, 10, 5, 0.2);
-		setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
-		setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
-		setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
-		setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
-		setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
-		setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
-		setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
-		setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
-		setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
-		setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
-		setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
-		setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
-		setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
-		setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
-		setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
-		setupPlayerProto("Audrey", 1000, 50, 0);
-		setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
-		setupPlayerProto("Regent", 1000, 0, 4.2, 0.5);
-		
-		
-		setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
-		
-		trModifyProtounit("Sky Passage", 0, 5, 999);
-		
-		trModifyProtounit("Walking Woods Marsh", ENEMY_PLAYER, 6, 1);
-		
-		trModifyProtounit("Monument 2", ENEMY_PLAYER, 24, -1);
-		trModifyProtounit("Monument 2", ENEMY_PLAYER, 25, -1);
-		trModifyProtounit("Monument 2", ENEMY_PLAYER, 26, -1);
-		trModifyProtounit("Monument 2", 0, 24, -1);
-		trModifyProtounit("Monument 2", 0, 25, -1);
-		trModifyProtounit("Monument 2", 0, 26, -1);
-		trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, 1000);
-		trModifyProtounit("Monument 2", 0, 0, 1000);
-		
-		trModifyProtounit("Uproot 2x2", 0, 8, -99);
-		
-		for(p=ENEMY_PLAYER; >0) {
-			zInitProtoUnitStat("Revealer to Player", p, 2, 12);
-			zSetProtoUnitStat("Revealer to Player", p, 2, 32);
-			trModifyProtounit("Circe", p, 9, -99);
-			trModifyProtounit("Ox Cart", p, 0, 120);
-			trModifyProtounit("Spy Eye", p, 2, -99);
-			trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
-			trModifyProtounit("Pharaoh", p, 15, -999);
-			trModifyProtounit("Pharaoh", p, 14, -999);
-			trModifyProtounit("Priest", p, 15, -999);
-			trModifyProtounit("Priest", p, 14, -999);
-			trModifyProtounit("Wadjet Spit", p, 1, -15);
-			trModifyProtounit("Ajax", p, 5, 999);
-			trModifyProtounit("Ball of Fire Impact", p, 8, 9999999999999999999.0);
-			trModifyProtounit("Ball of Fire Impact", p, 8, -9999999999999999999.0);
-			trModifyProtounit("Ball of Fire Impact", p, 8, 4.0);
-			zInitProtoUnitStat("Ball of Fire Impact", p, 8, 4.0);
-			trModifyProtounit("Kronny Flying", p, 1, 9999999999999999999.0);
-			trModifyProtounit("Kronny Flying", p, 1, -9999999999999999999.0);
-			zInitProtoUnitStat("Kronny Flying", p, 1, 0);
-			zInitProtoUnitStat("Meteorite",p,1,100);
-			trModifyProtounit("Minion", p, 8, -999);
-			trModifyProtounit("Arkantos God Out", p, 8, 1);
-			zInitProtoUnitStat("Cinematic Block", p, 0, 300);
-			zInitProtoUnitStat("Priest Projectile", p, 8, 2);
-			
-			zInitProtoUnitStat("Ballista Shot", p, 1, 30);
-			
-			trModifyProtounit("Servant", p, 55, 1);
-			trModifyProtounit("Nereid", p, 55, 1);
-			trModifyProtounit("Scylla", p, 55, 1);
-		}
-		
-		trModifyProtounit("Minion", 0, 8, -999);
-		
-		trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);
-		trModifyProtounit("Kronny Flying", 0, 1, -9999999999999999999.0);
-		zInitProtoUnitStat("Kronny Flying", 0, 1, 0);
-		
-		trModifyProtounit("Bolt Strike", 0, 27, -10000);
-		trModifyProtounit("Bolt Strike", 0, 28, -10000);
-		trModifyProtounit("Bolt Strike", 0, 29, -10000);
-		zInitProtoUnitStat("Bolt Strike", 0, 27, 0);
-		
-		xsEnableRule("setup_enemies");
-		xsDisableSelf();
+		trModifyProtounit("Servant", p, 55, 1);
+		trModifyProtounit("Nereid", p, 55, 1);
+		trModifyProtounit("Scylla", p, 55, 1);
 	}
+	
+	trModifyProtounit("Minion", 0, 8, -999);
+	
+	trModifyProtounit("Kronny Flying", 0, 1, 9999999999999999999.0);
+	trModifyProtounit("Kronny Flying", 0, 1, -9999999999999999999.0);
+	zInitProtoUnitStat("Kronny Flying", 0, 1, 0);
+	
+	trModifyProtounit("Bolt Strike", 0, 27, -10000);
+	trModifyProtounit("Bolt Strike", 0, 28, -10000);
+	trModifyProtounit("Bolt Strike", 0, 29, -10000);
+	zInitProtoUnitStat("Bolt Strike", 0, 27, 0);
+	
+	xsEnableRule("setup_enemies");
+	xsDisableSelf();
+	
 }
 
 rule no_extra_resources

@@ -8,8 +8,10 @@ highFrequency
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", yGetVar("stageChoices", "stage"));
 		if (trQuestVarGet("stage") == 0) {
-			xsDisableRule("choose_stage_01");
 			xsEnableRule("pvp_build_map");
+		} else {
+			xsEnableRule("choose_stage_02");
+			trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
 		}
 		trUnitSelectClear();
 		trUnitSelectByQV("chooser", true);
@@ -28,6 +30,19 @@ highFrequency
 		trUIFadeToColor(0,0,0,1000,0,true);
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
+		for(p=ENEMY_PLAYER; >0) {
+			for(i=trQuestVarGet("stage"); >1) {
+				/* bacchanalia 10 x stage */
+				for(j=10; >0) {
+					trTechSetStatus(p, 78, 4);
+				}
+			}
+			for(i=trQuestVarGet("stage")/2; >0) {
+				/* monstrous rage */
+				trTechSetStatus(ENEMY_PLAYER, 76, 4);
+			}
+		}
+		xsEnableRule("delayed_modify");
 	} else {
 		trUnitSelectClear();
 		trUnitSelect(""+1*yGetVar("stageChoices", "obelisk"), true);
@@ -975,36 +990,6 @@ void connectStatues(int index1 = 0, int index2 = 0, int room = 0) {
 	trUnitTeleport(x,0,z);
 	trMutateSelected(kbGetProtoUnitID("undermine ground decal long"));
 }
-
-rule choose_stage_01
-inactive
-highFrequency
-{
-	if (trQuestVarGet("stage") > 0) {
-		xsEnableRule("choose_stage_02");
-		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 10 x stage */
-			for(j=10; >0) {
-				trTechSetStatus(ENEMY_PLAYER, 78, 4);
-			}
-		}
-		for(i=trQuestVarGet("stage")/2; >0) {
-			/* monstrous rage */
-			trTechSetStatus(ENEMY_PLAYER, 76, 4);
-		}
-		trQuestVarSet("rotX0", -1);
-		trQuestVarSet("rotX1", 1);
-		trQuestVarSet("rotX2", 0);
-		trQuestVarSet("rotX3", 0);
-		trQuestVarSet("rotZ0", 0);
-		trQuestVarSet("rotZ1", 0);
-		trQuestVarSet("rotZ2", -1);
-		trQuestVarSet("rotZ3", 1);
-		trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
-		xsDisableSelf();
-	}
-}
-
 
 rule choose_stage_02
 inactive

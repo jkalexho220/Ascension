@@ -428,7 +428,7 @@ void yRemoveFromDatabase(string db = "") {
 		
 		trQuestVarSet("xdata"+db+"pointer", yGetVar(db, "xPrevBlock"));
 		trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") - 1);
-		if (trQuestVarGet("xdata"+db+"count") <= 0) {
+		if (trQuestVarGet("xdata"+db+"count") < 0) {
 			debugLog(db + " count is " + 1*trQuestVarGet("xdata"+db+"count"));
 		}
 	}

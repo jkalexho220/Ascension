@@ -368,6 +368,7 @@ void sparkWitchAlways(int eventID = -1) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "center") < dist) {
 						launchUnit("enemies", "center");
+						yAddUpdateVar("launchedUnits", "stun", 1);
 					}
 				}
 			} else {
@@ -449,9 +450,9 @@ highFrequency
 	trQuestVarSet("thunderstrikeDamage", 60);
 	
 	trQuestVarSet("hexboltCooldown", 18);
-	trQuestVarSet("hexboltDuration", 4);
+	trQuestVarSet("hexboltDuration", 5);
 	trQuestVarSet("hexboltRadius", 3);
-	trQuestVarSet("hexboltDamage", 20);
+	trQuestVarSet("hexboltDamage", 30);
 	
 	trQuestVarSet("vortexCost", 80);
 	trQuestVarSet("vortexRadius", 12);

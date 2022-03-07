@@ -58,35 +58,30 @@ void nightriderAlways(int eventID = -1) {
 			removeNightrider(p);
 		} else {
 			hit = CheckOnHit(p, id);
-			
-			if (trQuestVarGet("p"+p+"nightfall") == 1) {
-				amt = xsSqrt(trQuestVarGet("p"+p+"nightfallBonus"));
-				trSetSelectedScale(amt, amt, amt);
-				if (hit >= ON_HIT_NORMAL) {
-					if (trQuestVarGet("p"+p+"nightfall") == 1) {
-						trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + 0.03 * trQuestVarGet("p"+p+"health"));
-						trVectorSetUnitPos("pos", "p"+p+"characters");
-						trQuestVarSetFromRand("heading", 1, 360, true);
-						spawnMinion(p, "pos", trQuestVarGet("heading"));
-						trQuestVarSet("p"+p+"nightfallBonus", trQuestVarGet("p"+p+"nightfallBonus") + 0.1);
-						trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"nightfallBonus"));
-						zSetProtoUnitStat("Minion", p, 27, (0.2 + trQuestVarGet("p"+p+"nightfallBonus")) * trQuestVarGet("p"+p+"baseAttack"));
-						zSetProtoUnitStat("Hero Greek Achilles", p, 27, trQuestVarGet("p"+p+"Attack"));
+			if (hit >= ON_HIT_NORMAL) {
+				if (yGetVarAtIndex("enemies", "deathSentence", 1*yGetVar("p"+p+"characters", "attackTargetIndex")) > 0) {
+					if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_COOLDOWN) {
+						trQuestVarSet("p"+p+"rainReadyTime", trQuestVarGet("p"+p+"rainReadyTime") - 1000);
+						amt = trQuestVarGet("p"+p+"rainReadyTime") - trTimeMS();
+						if (amt > 0) {
+							if (trCurrentPlayer() == p) {
+								trCounterAbort("rain");
+								trCounterAddTime("rain", amt * 0.001, 0, rainName);
+							}
+						}
 					}
 				}
-			}
-			
-			
-			if (hit == ON_HIT_SPECIAL) {
-				target = yGetPointer("enemies");
-				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-					if (yGetVar("enemies", "deathSentence") == 0) {
-						castDeathSentence(p);
-					} else {
-						/* don't consume special attack */
-						ySetVar("p"+p+"characters", "specialAttack", 0);
+				if (hit == ON_HIT_SPECIAL) {
+					target = yGetPointer("enemies");
+					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+						if (yGetVar("enemies", "deathSentence") == 0) {
+							castDeathSentence(p);
+						} else {
+							/* don't consume special attack */
+							ySetVar("p"+p+"characters", "specialAttack", 0);
+						}
+						ySetPointer("enemies", target);
 					}
-					ySetPointer("enemies", target);
 				}
 			}
 		}
@@ -326,7 +321,7 @@ void nightriderAlways(int eventID = -1) {
 							amt = current;
 						}
 						castDeathSentence(p);
-						stunUnit("enemies", 2.5, p);
+						stunUnit("enemies", trQuestVarGet("deathSentenceDuration"), p);
 					}
 				}
 			}

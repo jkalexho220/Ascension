@@ -249,9 +249,9 @@ void removePlayerSpecific(int p = 0) {
 		}
 		trQuestVarSet("p"+p+"dead", 10);
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"unit");
 		if (PvP == false) {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
 			trUnitOverrideAnimation(6,0,false,false,-1);
 			trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
 			trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
@@ -260,6 +260,8 @@ void removePlayerSpecific(int p = 0) {
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 			trArmySelect(""+p+",0");
 			trUnitChangeProtoUnit("Healing SFX");
+		} else {
+			trUnitChangeProtoUnit(kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
 		}
 		silencePlayer(p, 0);
 		trQuestVarSet("p"+p+"silenceSFX", 0);
@@ -548,7 +550,6 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 				stunUnit("playerUnits", duration, 0, sound);
 			}
 			ySetPointer("playerUnits", old);
-			debugLog("stun database size is " + yGetDatabaseCount("stunnedUnits"));
 			return;
 		}
 	} else {
@@ -742,6 +743,8 @@ void stunsAndPoisons(string db = "") {
 	}
 	if (yGetVar(db, "stunStatus") >= 1) {
 		if (trTimeMS() > yGetVar(db, "stunTimeout")) {
+			trUnitSelectClear();
+			trUnitSelectByQV(db);
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar(db, "stunSFX"), true);

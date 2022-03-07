@@ -275,14 +275,14 @@ void saviorAlways(int eventID = -1) {
 				if (trQuestVarGet("p"+p+"unity") == 1) {
 					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("unityHeal") * target;
 					dist = xsPow(trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-					gainFavor(p, 1);
+					gainFavor(p, 2.0);
 					for(x=yGetDatabaseCount("playerUnits"); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "p"+p+"unityPos") < dist) {
 							healUnit(p, amt);
 							if (yGetVar("playerUnits", "hero") == 1) {
-								trPlayerGrantResources(1*yGetVar("playerUnits","player"), "favor", target);
+								gainFavor(1*yGetVar("playerUnits","player"), 2.0);
 							}
 						}
 					}

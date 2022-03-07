@@ -297,6 +297,7 @@ inactive
 		}
 		
 		xsEnableRule("singleplayer_init");
+		trDelayedRuleActivation("delayed_modify");
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game

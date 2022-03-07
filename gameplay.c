@@ -19,7 +19,7 @@ void fixAnimations(int p = 0) {
 			}
 		} else {
 			trQuestVarSet("p"+p+"animation", action);
-			if ((action == 11) && trQuestVarGet("p"+p+"action") != 12) {
+			if ((action == 11) && (trQuestVarGet("p"+p+"action") != 12) && (trQuestVarGet("p"+p+"action") != 30)) {
 				trUnitSetAnimationPath("0,0,0,0,0,0,0");
 			} else if (action == -1) {
 				xsSetContextPlayer(p);
@@ -506,9 +506,9 @@ highFrequency
 		}
 	}
 	
-	maintainStun();
-	
 	enemiesAlways();
+	
+	maintainStun();
 	
 	playerLasers();
 	

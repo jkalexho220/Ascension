@@ -743,7 +743,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "Each time you attack, heal allies in the aura and grant them 1 favor.";
+					msg = "Each time you attack, heal allies in the aura and grant them 2 favor.";
 				}
 				case 9:
 				{
@@ -885,19 +885,24 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power ancestors icon 64";
-					msg = "Cooldown: 16 | Decay: 5 percent health";
+					msg = "(W) Arise: When you attack an enemy with a Death Sentence, reduce the cooldown of this spell by 1";
 				}
 				case 12:
 				{
-					icon = "icons\god power meteor icon 64";
-					msg = "(E) Nightfall: Teleport to the target location and release a cloud of darkness.";
+					icon = "icons\god power ancestors icon 64";
+					msg = "Cooldown: 16 | Decay: 5 percent health";
 				}
 				case 13:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Inflict a Death Sentence on all enemies hit and stun them.";
+					msg = "(E) Nightfall: Teleport to the target location and release a cloud of darkness.";
 				}
 				case 14:
+				{
+					icon = "icons\god power meteor icon 64";
+					msg = "Inflict a Death Sentence on all enemies hit and stun them for the same duration.";
+				}
+				case 15:
 				{
 					icon = "icons\god power meteor icon 64";
 					msg = "Cost: 75 | Radius: 15";
@@ -1011,12 +1016,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\special x lampades icons 64";
-					msg = "Cooldown: 18 | Duration: 4 | Electrify Damage: 20 per second";
+					msg = "Cooldown: 18 | Duration: 5 | Electrify Damage: 30 per second";
 				}
 				case 11:
 				{
 					icon = "sfx x arkantos birth ring";
-					msg = "(E) Vortex: Create a storm that pulls in nearby enemies.";
+					msg = "(E) Vortex: Create a storm that pulls in nearby enemies and stuns them.";
 				}
 				case 12:
 				{
