@@ -947,11 +947,14 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int id = 0;
-	if (yGetDatabaseCount("playerUnits") > 0) {
+	if (yGetDatabaseCount("playerUnits") > 1) {
 		if (ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsPrevPointer")) == false) {
 			debugLog("player units size is " + yGetDatabaseCount("playeRUnits"));
 		}
 		id = yDatabaseNext("playerUnits", true);
+		if (yGetPointer("playerUnits") == trQuestVarGet("playerUnitsDummyIndex")) {
+			id = yDatabaseNext("playerUnits", true);
+		}
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removePlayerUnit();
 		} else {

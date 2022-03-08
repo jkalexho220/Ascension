@@ -41,7 +41,103 @@ highFrequency
 	}
 }
 
+rule shade_temple_always
+inactive
+highFrequency
+{
+	if (trQuestVarGet("templeChallengeActive") == 1) {
+		trMessageSetText("The Statue's challenge will begin soon! Stay in the room if you wish to participate.",-1);
+		trQuestVarSet("templeChallengeActive", 2);
+		trQuestVarSet("templeChallengeNext", trTime() + 10);
+		trCounterAddTime("countdown",10,1,"Challenge begins",-1);
+	} else if (trQuestVarGet("templeChallengeActive") == 2) {
+		if (trTime() >= trQuestVarGet("templeChallengeNext")) {
+			trModifyProtounit("Shade XP", 0, 2, 20);
+			trModifyProtounit("Shade XP", ENEMY_PLAYER, 2, 20);
+			trMessageSetText("Defeat the truth.", -1);
+			trQuestVarSetFromRand("rand", 0, 15, true);
+			trQuestVarSet("templeShadeTrue", trQuestVarGet("templeShadesStart") + trQuestVarGet("rand"));
+			for(x=0; < 16) {
+				trUnitSelectClear();
+				trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
+				if (trQuestVarGet("rand") == x) {
+					trUnitConvert(ENEMY_PLAYER);
+				}
+				trUnitChangeProtoUnit("Shade XP");
+			}
+			activateEnemy("templeShadeTrue");
+			trQuestVarSet("templeChallengeActive", 3);
+			for(p=1;<ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"dead") == 0) {
+					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 225) {
+						yAddToDatabase("applicants", "p"+p+"unit");
+						yAddUpdateVar("applicants", "player", p);
+					}
+				}
+			}
+		}
+	} else if (trQuestVarGet("templeChallengeActive") == 3) {
+		if (trTime() > trQuestVarGet("shadeNoSpecials")) {
+			trQuestVarSet("shadeNoSpecials", trTime());
+			trModifyProtounit("Shade XP", ENEMY_PLAYER, 9, -99990);
+			trModifyProtounit("Shade XP", ENEMY_PLAYER, 9, 99999);
+		}
+		if (yGetDatabaseCount("applicants") > 0) {
+			yDatabaseNext("applicants", true);
+			if (trUnitAlive() == false) {
+				yRemoveFromDatabase("applicants");
+			} else if (zDistanceToVectorSquared("applicants", "templePos") > 225) {
+				if (trCurrentPlayer() == 1*yGetVar("applicants", "player")) {
+					uiMessageBox("You have left the room and failed the challenge.");
+				}
+				yRemoveFromDatabase("applicants");
+			}
+			trUnitSelectClear();
+			trUnitSelectByQV("templeShadeTrue");
+			if (trUnitAlive() == false) {
+				for(x=yGetDatabaseCount("applicants"); >0) {
+					yDatabaseNext("applicants", true);
+					if (trUnitAlive() && trUnitIsOwnedBy(trCurrentPlayer())) {
+						startNPCDialog(NPC_TEMPLE_COMPLETE + 2);
+						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
+					}
+				}
+				for(x=0; < 16) {
+					trUnitSelectClear();
+					trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
+					trUnitDelete(false);
+				}
+				xsDisableSelf();
+			}
+		} else {
+			trQuestVarSet("templeChallengeActive", 4);
+			xsDisableSelf();
+			for(x=0; < 16) {
+				trUnitSelectClear();
+				trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
+				trUnitChangeProtoUnit("Hero Death");
+			}
+		}
+	}
+}
+
 rule yeebaagooon_temple_always
+inactive
+highFrequency
+{
+	if (trQuestVarGet("templeChallengeActive") == 1) {
+		trMessageSetText("The Statue's challenge will begin soon! Stay in the room if you wish to participate.",-1);
+		trQuestVarSet("templeChallengeActive", 2);
+		trQuestVarSet("templeChallengeNext", trTime() + 10);
+		trCounterAddTime("countdown",10,1,"Challenge begins", -1);
+	} else if (trTime() > trQuestVarGet("templeChallengeNext")) {
+		trQuestVarSet("templeChallengeActive", 1);
+		xsEnableRule("yeebaagooon_temple_active");
+		xsDisableSelf();
+	}
+}
+
+rule yeebaagooon_temple_active
 inactive
 highFrequency
 {
@@ -51,7 +147,7 @@ highFrequency
 	if (trQuestVarGet("templeChallengeActive") == 1) {
 		trSoundPlayFN("attackwarning.wav","1",-1,"","");
 		trMessageSetText("Stay in the room and survive for 47 seconds.", -1);
-		trCounterAddTime("countdown47",,48,1,"Survive",-1);
+		trCounterAddTime("countdown47",48,1,"Survive",-1);
 		trQuestVarSet("templeChallengeActive", 2);
 		trQuestVarSet("templeChallengeEnd", trTimeMS() + 47000);
 		trQuestVarSet("templeChallengeNext", trTimeMS());

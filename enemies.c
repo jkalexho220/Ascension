@@ -250,6 +250,10 @@ highFrequency
 		setupProtounitBounty("Scarab", 1, 10, 0.08);
 		setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 		
+		setupProtounitBounty("Shade XP", 0, 0, 0);
+		trModifyProtounit("Shade XP", 0, 1, -1.8);
+		trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -1.8);
+		
 		setupProtounitBounty("Hero Boar", 0, 0, 0);
 		setupProtounitBounty("Hero Boar 2", 0, 0, 0);
 		trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack

@@ -238,3 +238,22 @@ void paintSecondary(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 		}
 	}
 }
+
+/*
+x and z are the room coordinates, not world coordinates.
+*/
+void paintCircle(int x = 0, int z = 0, int size = 0, int terrainType = 0, int terrainSubType = 0, float height = 0) {
+	size = 12;
+	int z0 = size;
+	for(a=0; < size+3) {
+		for(b=size+3; >0) {
+			if (a*a + z0 * z0 <= size * size) {
+				trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, terrainType, terrainSubType, false);
+				trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, height, false);
+				break;
+			} else {
+				z0 = z0 - 1;
+			}
+		}
+	}
+}

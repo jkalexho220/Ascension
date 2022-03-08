@@ -177,7 +177,7 @@ void spellstealerAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"bladeDanceTargets");
-					damageEnemy(p, amt, false);
+					damageEnemy(p, amt, false, 1.0);
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					break;
 				}

@@ -666,18 +666,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_NOTTUD:
 		{
-			z0 = 10;
-			for(a=0; < 10) {
-				for(b=8; >0) {
-					if (a*a + z0 * z0 <= 100) {
-						trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-						trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
-						break;
-					} else {
-						z0 = z0 - 1;
-					}
-				}
-			}
+			paintCircle(x, z, 10, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 			trQuestVarSet("nottud", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0", "Victory Marker", 1, 70*x+40, 0, 70*z+40,225,true);
 			trUnitSelectClear();
@@ -721,11 +710,42 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_TEMPLE + 2:
 		{
-
+			debugLog("temple room is " + room);
+			trQuestVarSet("templeSize", 15);
+			trVectorQuestVarSet("templePos", xsVectorSet(70*x+39,0,70*z+39));
+			trQuestVarSet("templeRoomUpperX", 70*x+55);
+			trQuestVarSet("templeRoomUpperZ", 70*z+55);
+			trQuestVarSet("templeRoomLowerX", 70*x+25);
+			trQuestVarSet("templeRoomLowerZ", 70*z+25);
+			paintCircle(x, z, 7, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
+			trUnitSelectClear();
+			trUnitSelectByQV("templeRevealer", true);
+			trUnitChangeProtoUnit("Cinematic Block");
+			trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,225,true);
+			trUnitSelectClear();
+			trUnitSelectByQV("temple", true);
+			trUnitConvert(0);
+			trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+			trSetSelectedScale(2,2,2);
+			trUnitOverrideAnimation(2,0,true,false,-1);
+			trQuestVarSet("templeLOS", 16);
+			trVectorQuestVarSet("dir", vector(1,0,0));
+			trQuestVarSet("templeShadesStart", trGetNextUnitScenarioNameNumber());
+			for(i=0; < 16) {
+				trArmyDispatch("1,0","Dwarf",1,70*x+39-trQuestVarGet("dirx")*10.0,0,70*z+39-trQuestVarGet("dirz")*10.0,0,true);
+				trArmySelect("1,0");
+				trUnitConvert(0);
+				trUnitChangeProtoUnit("Columns");
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.923879, 0.382683));
+			}
+			xsEnableRule("shade_temple_always");
 		}
 		case ROOM_TEMPLE + 6:
 		{
-			debugLog("temple room is " + room);
 			trQuestVarSet("templeSize", 16);
 			trQuestVarSet("templePosX", 70 * x + 40);
 			trQuestVarSet("templePosZ", 70 * z + 40);
@@ -754,18 +774,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		case ROOM_TEMPLE + 11:
 		{
 			size = 12;
-			z0 = size;
-			for(a=0; < size+3) {
-				for(b=size+3; >0) {
-					if (a*a + z0 * z0 <= size * size) {
-						trPaintTerrain(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, 0, 53, false);
-						trChangeTerrainHeight(x*35+20-a, z*35+20-z0, x*35+20+a, z*35+20+z0, worldHeight, false);
-						break;
-					} else {
-						z0 = z0 - 1;
-					}
-				}
-			}
+			paintCircle(x, z, size, 0, 53, worldHeight);
 			trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
 			trUnitSelectClear();
@@ -1017,7 +1026,7 @@ highFrequency
 		int x1 = 0;
 		int z1 = 0;
 		string pName = "";
-
+		
 		trQuestVarSetFromRand("village", 1, 14, true);
 		
 		/* minecraft time! */

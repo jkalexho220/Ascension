@@ -432,7 +432,6 @@ highFrequency
 				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100</color>", -1);
 				
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 0, 6391);
-				trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -2.8);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 27, 656);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 28, 566);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 29, 656);

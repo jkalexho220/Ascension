@@ -179,6 +179,18 @@ float zDistanceBetweenVectorsSquared(string start = "", string end = "") {
 	return(dist);
 }
 
+float zManhattanDistance(string start = "", string end = "") {
+	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
+	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
+	if (xdiff < 0) {
+		xdiff = 0.0 - xdiff;
+	}
+	if (zdiff < 0) {
+		zdiff = 0.0 - zdiff;
+	}
+	return(xdiff + zdiff);
+}
+
 bool vectorInRectangle(string pos = "", string bottom = "", string top = "") {
 	if (trQuestVarGet(pos+"x") < trQuestVarGet(bottom+"x")) {
 		return(false);

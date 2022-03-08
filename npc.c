@@ -1592,6 +1592,50 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 		
+		case NPC_TEMPLE + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Which is the lie? Which is the truth?");
+				}
+				case 2:
+				{
+					uiMessageBox("Pierce the darkness and be rewarded with power!");
+				}
+				case 3:
+				{
+					uiMessageBox("To begin the trial, drop a relic at my feet.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The wheel of time turns ever infinitely.");
+				}
+				case 2:
+				{
+					uiMessageBox("But for now, I grant you this power.");
+				}
+				case 3:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 4:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
 		case NPC_TEMPLE + 6:
 		{
 			switch(dialog)
@@ -1602,7 +1646,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("If you can survive 47 seconds, within this room, my power is yours.");
+					uiMessageBox("If you can survive 47 seconds within this room, my power is yours.");
 				}
 				case 3:
 				{
