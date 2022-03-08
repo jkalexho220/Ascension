@@ -626,6 +626,7 @@ class Function(Mathable):
 		self.datatype = FUNCTIONS[name].datatype
 		self.expected = FUNCTIONS[name].parameters
 		self.state = 0
+		self.count = 0
 
 	def resolve(self):
 		if not self.closed:
@@ -656,10 +657,13 @@ class Function(Mathable):
 			elif token == ')':
 				self.state = 2;
 				self.resolve()
-				accepted = True
 			elif token == ',':
-				self.children[0].resolve()
-				accepted = True
+				if len(self.children) == self.count:
+					error("Unused comma")
+					accepted = False
+				else:
+					self.children[-1].resolve()
+					self.count = len(self.children)
 			else:
 				accepted = self.parseGeneric(token)
 		return accepted
