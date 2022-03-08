@@ -1602,9 +1602,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("If you can survive 47 seconds, my power is yours.");
+					uiMessageBox("If you can survive 47 seconds, within this room, my power is yours.");
 				}
 				case 3:
+				{
+					uiMessageBox("But step one foot outside, and you will be deemed unworthy.");
+				}
+				case 4:
 				{
 					uiMessageBox("To begin the trial, drop a relic at my feet.");
 					dialog = 0;
@@ -1622,7 +1626,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					trShowImageDialog(boonIcon(BOON_SPELL_ATTACK), boonName(BOON_SPELL_ATTACK));
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
 				{
@@ -1642,7 +1646,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Show thy mettle, and be rewarded with glorious treasure.");
+					uiMessageBox("Show thy mettle, and be rewarded with glorious power.");
 				}
 				case 3:
 				{

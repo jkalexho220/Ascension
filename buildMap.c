@@ -719,6 +719,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
 			}
 		}
+		case ROOM_TEMPLE + 2:
+		{
+
+		}
 		case ROOM_TEMPLE + 6:
 		{
 			debugLog("temple room is " + room);
@@ -893,6 +897,7 @@ void buildEdge(int edge = 0, int type = 0) {
 			}
 			if (trQuestVarGet("rand") == 5) {
 				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
+				paintEyecandy(x0, z0, x1, z1, "sparkles");
 			} else {
 				trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 				trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
@@ -1012,6 +1017,8 @@ highFrequency
 		int x1 = 0;
 		int z1 = 0;
 		string pName = "";
+
+		trQuestVarSetFromRand("village", 1, 14, true);
 		
 		/* minecraft time! */
 		switch(1*trQuestVarGet("stage"))
@@ -1070,7 +1077,7 @@ highFrequency
 			}
 			case 2:
 			{
-				trQuestVarSet("templeRoom", -1);
+				trQuestVarSet("stageTemple", BOON_DECAY_HALVED);
 				trSetCivAndCulture(0, 8, 2);
 				trQuestVarSet("bossRoomSize", 12);
 				trSetLighting("Fimbulwinter", 0.1);
@@ -1272,7 +1279,7 @@ highFrequency
 			}
 			case 6:
 			{
-				trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
+				trQuestVarSet("stageTemple", BOON_MORE_GOLD);
 				xsEnableRule("laser_rooms_always");
 				/* engineers */
 				trTechSetStatus(ENEMY_PLAYER, 59, 4);
@@ -1380,7 +1387,8 @@ highFrequency
 			}
 			case 11:
 			{
-				trQuestVarSet("stageTemple", BOON_MORE_GOLD);
+				trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
+				trQuestVarSet("village", 15);
 				trStringQuestVarSet("advice", "And then there were none...");
 				xsEnableRule("laser_rooms_always");
 				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
@@ -1414,6 +1422,10 @@ highFrequency
 				trStringQuestVarSet("rockProto1", "Ruins");
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Cinematic Dead Bodies");
+				trQuestVarSet("sparklesDensity", 0.5);
+				trStringQuestVarSet("sparklesProto1", "Armor Glow Small");
+				trStringQuestVarSet("sparklesProto2", "Armor Glow Small");
+				trStringQuestVarSet("sparklesProto3", "Armor Glow Small");
 				
 				trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
 				
@@ -1441,41 +1453,6 @@ highFrequency
 				trUnitConvert(0);
 				trUnitChangeProtoUnit("Oracle Scout");
 			}
-			case 0:
-			{
-				trQuestVarSet("stageTemple", BOON_TWO_RELICS);
-				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
-				worldHeight = 0;
-				wallHeight = 0;
-				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
-				trQuestVarSet("bossRoomSize", 11);
-				TERRAIN_WALL = 2;
-				TERRAIN_SUB_WALL = 7;
-				
-				TERRAIN_PRIMARY = 4;
-				TERRAIN_SUB_PRIMARY = 15;
-				
-				TERRAIN_SECONDARY = 0;
-				TERRAIN_SUB_SECONDARY = 73;
-				
-				trQuestVarSet("mapType", MAP_STANDARD);
-				trQuestVarSet("treeDensity", 0.1);
-				trStringQuestVarSet("treeProto1", "Oak Tree Burning");
-				trStringQuestVarSet("treeProto2", "Marsh Tree");
-				trStringQuestVarSet("treeProto3", "Pine Snow");
-				trQuestVarSet("spriteDensity", 0.3);
-				trStringQuestVarSet("spriteProto1", "Imperial Examination");
-				trStringQuestVarSet("spriteProto2", "Healing SFX");
-				trStringQuestVarSet("spriteProto3", "Mist");
-				trQuestVarSet("rockDensity", 0.2);
-				trStringQuestVarSet("rockProto1", "Ruins");
-				trStringQuestVarSet("rockProto2", "Columns Broken");
-				trStringQuestVarSet("rockProto3", "Columns");
-				
-				trQuestVarSet("enemyDensity", 0);
-				
-				trQuestVarSet("templeRoom", 1);
-			}
 		}
 		
 		/* paint entire map cliff and raise it */
@@ -1496,7 +1473,6 @@ highFrequency
 		trQuestVarSet("tile1", TILE_FOUND);
 		trQuestVarSet("tile4", TILE_FOUND);
 		
-		trQuestVarSetFromRand("village", 1, 14, true);
 		if (trQuestVarGet("mapType") == MAP_PORTALS) {
 			trQuestVarSet("portalsActive", 1);
 			total = 1;

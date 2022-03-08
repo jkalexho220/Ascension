@@ -412,7 +412,7 @@ highFrequency
 					yDatabaseNext("applicants", true);
 					if (trUnitAlive() && trUnitIsOwnedBy(trCurrentPlayer())) {
 						startNPCDialog(NPC_TEMPLE_COMPLETE + 6);
-						trQuestVarSet("boonUnlocked"+BOON_SPELL_ATTACK, 1);
+						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 					}
 				}
 			}
@@ -458,7 +458,7 @@ highFrequency
 			trSoundPlayFN("xpack\xcinematics\8_in\pyramidscrape.mp3","1",-1,"","");
 			uiLookAtUnitByName(""+1*trQuestVarGet("temple"));
 			trUIFadeToColor(0,0,0,3000,0,true);
-			trQuestVarSet("boonUnlocked"+BOON_MORE_GOLD, 1);
+			trQuestVarSet("boonUnlocked"+BOON_SPELL_ATTACK, 1);
 		}
 		if (yGetDatabaseCount("zenoRelics") > 0) {
 			yDatabaseNext("zenoRelics");
@@ -538,7 +538,7 @@ highFrequency
 						"Zenophobia:Here is your reward. The Blessing of Zenophobia.",
 						"icons\infantry g hoplite icon 64");
 					trQuestVarSet("templeNext", trTime() + 5);
-					trShowImageDialog(boonIcon(BOON_MORE_GOLD), boonName(BOON_MORE_GOLD));
+					trShowImageDialog(boonIcon(BOON_SPELL_ATTACK), boonName(BOON_SPELL_ATTACK));
 					gadgetUnreal("ShowImageBox-CloseButton");
 				}
 				case 4:

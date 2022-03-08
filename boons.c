@@ -1,11 +1,11 @@
 /* greek boons */
 const int BOON_DOUBLE_FAVOR = 1; // zeus
 const int BOON_POISON_STACKS = 2; // poseidon
-const int BOON_MORE_GOLD = 3; // hades
+const int BOON_SPELL_ATTACK = 3; // hades
 
 /* egyptian boons */
 const int BOON_SPELL_POISON = 4; // isis
-const int BOON_SPELL_ATTACK = 5; // ra
+const int BOON_MORE_GOLD = 5; // ra
 const int BOON_REGENERATE_HEALTH = 6; // set
 
 /* norse boons */

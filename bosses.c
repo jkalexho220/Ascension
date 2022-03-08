@@ -463,7 +463,7 @@ highFrequency
 			{
 				trOverlayText("King of Ice", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
-				trRenderSnow(0.2);
+				//trRenderSnow(0.2);
 			}
 			case 1:
 			{

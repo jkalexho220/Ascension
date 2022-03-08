@@ -706,6 +706,8 @@ highFrequency
 					trChatSend(0, "<color=1,1,1><u>Challengers</u></color>");
 					trQuestVarSet("playerUnitsDummyIndex", yAddToDatabase("playerUnits", "immortalDummy"));
 					trQuestVarSet("enemiesDummyIndex", yAddToDatabase("enemies", "immortalDummy"));
+					yAddUpdateVar("playerUnits", "doppelganger", trQuestVarGet("enemiesDummyIndex"));
+					yAddUpdateVar("enemies", "doppelganger", trQuestVarGet("playerUnitsDummyIndex"));
 					for (x=yGetDatabaseCount("participants"); >0) {
 						p = yDatabaseNext("participants");
 						trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")} - "+1*yGetDatabaseCount("p"+p+"relics")+" relics");

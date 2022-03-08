@@ -582,6 +582,13 @@ inactive
 {
 	if (trTime() > cActivationTime + 7) {
 		xsDisableSelf();
-		trModeEnter("Pregame");
+		trLetterBox(false);
+		subModeEnter("Simulation","Editor");
+		uiMessageBox("","leaveGame()");
+		uiCycleCurrentActivate();
+		uiCycleCurrentActivate();
+		subModeLeave("Simulation","Editor");
+		modeEnter("pregame");
+		modeEnter("Simulation");
 	}
 }
