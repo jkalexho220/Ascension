@@ -210,7 +210,9 @@ void removePlayerUnit() {
 		yVarToVector("playerUnits", "pos");
 		nightriderHarvest("pos");
 		if (trQuestVarGet("playerUnitsLeaveIndex") == yGetPointer("playerUnits")) {
-			debugLog("player units removed the wrong thing!");
+			debugLog("player units removed the wrong thing! Removed playerunitsLeaveIndex!");
+		} else if (trQuestVarGet("playerUnitsDummyIndex") == yGetPointer("playerUnits")) {
+			debugLog("player units removed the wrong thing! Removed playerUnitsDummyIndex");
 		}
 	}
 	yRemoveFromDatabase("playerUnits");
@@ -927,12 +929,11 @@ int addGenericProj(string db = "",string start="",string dir="",
 	yAddUpdateVar(db, "dirZ", trQuestVarGet(dir+"z"));
 	yAddUpdateVar(db, "yeehaw", 2);
 	
-	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
+	trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
 	trUnitSelectClear();
 	trUnitSelectByQV("next", true);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	zSetProtoUnitStat("Kronny Flying", p, 1, speed);
-	trUnitConvert(p);
 	trSetUnitOrientation(trVectorQuestVarGet(dir), vector(0,1,0), true);
 	trSetSelectedScale(0, 0.0 - height, 0);
 	trDamageUnitPercent(100);

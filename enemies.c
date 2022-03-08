@@ -12,8 +12,7 @@ void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, fl
 	trModifyProtounit(proto, ENEMY_PLAYER, 25, armor);
 	trModifyProtounit(proto, ENEMY_PLAYER, 26, armor);
 	/* LOS */
-	trModifyProtounit(proto, ENEMY_PLAYER, 6, 10);
-	trModifyProtounit(proto, 1, 6, 10);
+	trModifyProtounit(proto, ENEMY_PLAYER, 2, 12);
 	
 	/* damage bonus vs myth */
 	trModifyProtounit(proto, ENEMY_PLAYER, 33, 9999999999999999999.0);
