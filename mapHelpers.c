@@ -243,7 +243,6 @@ void paintSecondary(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 x and z are the room coordinates, not world coordinates.
 */
 void paintCircle(int x = 0, int z = 0, int size = 0, int terrainType = 0, int terrainSubType = 0, float height = 0) {
-	size = 12;
 	int z0 = size;
 	for(a=0; < size+3) {
 		for(b=size+3; >0) {
@@ -256,4 +255,21 @@ void paintCircle(int x = 0, int z = 0, int size = 0, int terrainType = 0, int te
 			}
 		}
 	}
+}
+
+void placeTemple(int x = 0, int z = 0, float los = 0) {
+	trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,0,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("templeRevealer", true);
+	trUnitChangeProtoUnit("Cinematic Block");
+	trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,225,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("temple", true);
+	trUnitConvert(0);
+	trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+	trSetSelectedScale(2,2,2);
+	trUnitOverrideAnimation(2,0,true,false,-1);
+	trQuestVarSet("templeLOS", los);
 }

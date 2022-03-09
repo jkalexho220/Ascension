@@ -55,12 +55,10 @@ highFrequency
 			trModifyProtounit("Shade XP", 0, 2, 20);
 			trModifyProtounit("Shade XP", ENEMY_PLAYER, 2, 20);
 			trMessageSetText("Defeat the truth.", -1);
-			trQuestVarSetFromRand("rand", 0, 15, true);
-			trQuestVarSet("templeShadeTrue", trQuestVarGet("templeShadesStart") + trQuestVarGet("rand"));
-			for(x=0; < 16) {
+			for(x=trQuestVarGet("templeShadesStart"); < trQuestVarGet("templeShadesEnd")) {
 				trUnitSelectClear();
-				trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
-				if (trQuestVarGet("rand") == x) {
+				trUnitSelect(""+x);
+				if (trQuestVarGet("templeShadeTrue") == x) {
 					trUnitConvert(ENEMY_PLAYER);
 				}
 				trUnitChangeProtoUnit("Shade XP");
@@ -69,7 +67,7 @@ highFrequency
 			trQuestVarSet("templeChallengeActive", 3);
 			for(p=1;<ENEMY_PLAYER) {
 				if (trQuestVarGet("p"+p+"dead") == 0) {
-					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 225) {
+					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 400) {
 						yAddToDatabase("applicants", "p"+p+"unit");
 						yAddUpdateVar("applicants", "player", p);
 					}
@@ -86,7 +84,7 @@ highFrequency
 			yDatabaseNext("applicants", true);
 			if (trUnitAlive() == false) {
 				yRemoveFromDatabase("applicants");
-			} else if (zDistanceToVectorSquared("applicants", "templePos") > 225) {
+			} else if (zDistanceToVectorSquared("applicants", "templePos") > 400) {
 				if (trCurrentPlayer() == 1*yGetVar("applicants", "player")) {
 					uiMessageBox("You have left the room and failed the challenge.");
 				}
@@ -102,9 +100,9 @@ highFrequency
 						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 					}
 				}
-				for(x=0; < 16) {
+				for(x=trQuestVarGet("templeShadesStart"); < trQuestVarGet("templeShadesEnd")) {
 					trUnitSelectClear();
-					trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
+					trUnitSelect(""+x);
 					trUnitDelete(false);
 				}
 				xsDisableSelf();
@@ -112,12 +110,86 @@ highFrequency
 		} else {
 			trQuestVarSet("templeChallengeActive", 4);
 			xsDisableSelf();
-			for(x=0; < 16) {
+			for(x=trQuestVarGet("templeShadesStart"); < trQuestVarGet("templeShadesEnd")) {
 				trUnitSelectClear();
-				trUnitSelect(""+(x+trQuestVarGet("templeShadesStart")));
+				trUnitSelect(""+x);
 				trUnitChangeProtoUnit("Hero Death");
 			}
 		}
+	}
+}
+
+rule snow_temple_always
+inactive
+highFrequency
+{
+	int p = 0;
+	if (trQuestVarGet("templeChallengeActive") == 1) {
+		trMessageSetText("The Statue's challenge will begin soon! Stay in the room if you wish to participate.",-1);
+		trQuestVarSet("templeChallengeActive", 2);
+		trQuestVarSet("templeChallengeNext", trTime() + 10);
+		trCounterAddTime("countdown",10,1,"Challenge begins", -1);
+	} else if (trQuestVarGet("templeChallengeActive") == 2) {
+		if (trTime() > trQuestVarGet("templeChallengeNext")) {
+			trRenderSnow(0.2);
+			trSoundPlayFN("wind.wav","1",-1,"","");
+			for(p=1; < ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"dead") == 0) {
+					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 256) {
+						trQuestVarSet("player", p);
+						yAddToDatabase("applicants", "player");
+						if (trCurrentPlayer() == p) {
+							trMessageSetText("Complete the rest of the stage without dying.",-1);
+						}
+					}
+				}
+			}
+			trQuestVarSet("templeChallengeActive", 3);
+		}
+	} else if (trQuestVarGet("templeChallengeActive") == 3) {
+		if (trQuestVarGet("playersWon") == 1) {
+			trQuestVarSet("templeChallengeActive", 4);
+		}
+		if (yGetDatabaseCount("applicants") > 0) {
+			if (trTime() > trQuestVarGet("templeChallengeNext")) {
+				trQuestVarSet("templeChallengeNext", trTime());
+				for(x=yGetDatabaseCount("applicants"); >0) {
+					p = yDatabaseNext("applicants");
+					if (trQuestVarGet("p"+p+"dead") > 0) {
+						yRemoveFromDatabase("applicants");
+						if (trCurrentPlayer() == p) {
+							uiMessageBox("You have died and failed the Statue's challenge.");
+						}
+					} else {
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"unit");
+						trDamageUnitPercent(1);
+					}
+				}
+			}
+		} else {
+			xsDisableSelf();
+		}
+	} else if (trQuestVarGet("templeChallengeActive") == 4) {
+		for(x=yGetDatabaseCount("applicants"); >0) {
+			p = yDatabaseNext("applicants");
+			if (trCurrentPlayer() == p) {
+				trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
+			}
+		}
+		xsDisableSelf();
+	}
+}
+
+rule greedy_temple_always
+inactive
+highFrequency
+{
+	int p = trCurrentPlayer();
+	if (trQuestVarGet("p"+p+"relicsSacrificed") == 10) {
+		startNPCDialog(NPC_TEMPLE_COMPLETE + 4);
+		xsDisableSelf();
 	}
 }
 

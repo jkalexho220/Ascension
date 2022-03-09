@@ -1636,6 +1636,73 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 		
+		case NPC_TEMPLE + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Those who endure the harshest winters shall be rewarded.");
+				}
+				case 2:
+				{
+					uiMessageBox("To begin the trial, drop a relic at my feet.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Wealth is power! Power absolute!");
+				}
+				case 2:
+				{
+					uiMessageBox("Sacrifice your wealth to me, and be rewarded with ever greater power!");
+				}
+				case 3:
+				{
+					uiMessageBox("Relics sacrificed: ("+1*trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed")+"/10)");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("A most expensive sacrifice. You have proven yourself. I grant you this reward.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("");
+				}
+			}
+		}
+		
 		case NPC_TEMPLE + 6:
 		{
 			switch(dialog)

@@ -677,7 +677,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Minotaur"));
 			xsEnableRule("nottud_always");
 			for(i=0; <5) {
-				trQuestVarSet("choice"+i, 21 + i);
+				trQuestVarSet("choice"+i, RELIC_CURSED_RANGE + i);
 			}
 			trQuestVarSet("obeliskx0", 70*x+46);
 			trQuestVarSet("obeliskz0", 70*z+46);
@@ -710,39 +710,54 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_TEMPLE + 2:
 		{
-			debugLog("temple room is " + room);
-			trQuestVarSet("templeSize", 15);
+			trQuestVarSet("templeSize", 20);
 			trVectorQuestVarSet("templePos", xsVectorSet(70*x+39,0,70*z+39));
-			trQuestVarSet("templeRoomUpperX", 70*x+55);
-			trQuestVarSet("templeRoomUpperZ", 70*z+55);
-			trQuestVarSet("templeRoomLowerX", 70*x+25);
-			trQuestVarSet("templeRoomLowerZ", 70*z+25);
-			paintCircle(x, z, 7, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
-			trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("templeRevealer", true);
-			trUnitChangeProtoUnit("Cinematic Block");
-			trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("temple", true);
-			trUnitConvert(0);
-			trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
-			trSetSelectedScale(2,2,2);
-			trUnitOverrideAnimation(2,0,true,false,-1);
-			trQuestVarSet("templeLOS", 16);
+			paintCircle(x, z, 10, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			placeTemple(x, z, 16);
 			trVectorQuestVarSet("dir", vector(1,0,0));
+			trQuestVarSetFromRand("templeShadeTrue", 0, 15, true);
 			trQuestVarSet("templeShadesStart", trGetNextUnitScenarioNameNumber());
 			for(i=0; < 16) {
-				trArmyDispatch("1,0","Dwarf",1,70*x+39-trQuestVarGet("dirx")*10.0,0,70*z+39-trQuestVarGet("dirz")*10.0,0,true);
+				if (trQuestVarGet("templeShadeTrue") == i) {
+					trQuestVarSet("templeShadeTrue", trGetNextUnitScenarioNameNumber());
+				}
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 				trArmySelect("1,0");
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 				trUnitConvert(0);
 				trUnitChangeProtoUnit("Columns");
-				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trUnitSelectClear();
+				trUnitSelectByQV("next");
+				trUnitTeleport(70*x+40-trQuestVarGet("dirx")*12.0,0,70*z+40-trQuestVarGet("dirx")*12.0);
 				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.923879, 0.382683));
 			}
+			trQuestVarSet("templeShadesEnd", trGetNextUnitScenarioNameNumber());
 			xsEnableRule("shade_temple_always");
+		}
+		case ROOM_TEMPLE + 3:
+		{
+			trVectorQuestVarSet("templePos", xsVectorSet(70*x+39,0,70*z+39));
+			paintCircle(x,z,8,5,0,worldHeight);
+			placeTemple(x, z, 16);
+			xsEnableRule("snow_temple_always");
+		}
+		case ROOM_TEMPLE + 4:
+		{
+			trQuestVarSet("templeChallengeActive", 1);
+			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
+			placeTemple(x, z, 10);
+			if (trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed") < 10) {
+				xsEnableRule("greedy_temple_always");
+			}
+		}
+		case ROOM_TEMPLE + 5:
+		{
+			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
+			placeTemple(x, z, 10);
+			xsEnableRule("poison_temple_always");
 		}
 		case ROOM_TEMPLE + 6:
 		{
@@ -755,40 +770,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("templeRoomLowerZ", 70*z+24);
 			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
-			trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("templeRevealer", true);
-			trUnitChangeProtoUnit("Cinematic Block");
-			trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("temple", true);
-			trUnitConvert(0);
-			trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
-			trSetSelectedScale(2,2,2);
-			trUnitOverrideAnimation(2,0,true,false,-1);
-			trQuestVarSet("templeLOS", 20);
+			placeTemple(x, z, 20);
 			xsEnableRule("yeebaagooon_temple_always");
 		}
 		case ROOM_TEMPLE + 11:
 		{
 			size = 12;
 			paintCircle(x, z, size, 0, 53, worldHeight);
-			trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,0,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("templeRevealer", true);
-			trUnitChangeProtoUnit("Cinematic Block");
-			trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0","Dwarf",1,70*x+40,0,70*z+40,225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("temple", true);
-			trUnitConvert(0);
-			trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
-			trSetSelectedScale(2,2,2);
-			trUnitOverrideAnimation(2,0,true,false,-1);
-			trQuestVarSet("templeLOS", 20);
+			placeTemple(x, z, 20);
 			trQuestVarSet("templePosX", 70 * x + 40);
 			trQuestVarSet("templePosY", worldHeight + 15.0);
 			trQuestVarSet("templePosZ", 70 * z + 40);
@@ -1129,7 +1118,7 @@ highFrequency
 			}
 			case 3:
 			{
-				trQuestVarSet("templeRoom", -1);
+				trQuestVarSet("stageTemple", BOON_REGENERATE_HEALTH);
 				trSetCivAndCulture(0, 7, 2);
 				trQuestVarSet("bossRoomSize", 14);
 				trQuestVarSet("extraEdges", 0);
@@ -1184,10 +1173,9 @@ highFrequency
 			case 4:
 			{
 				trQuestVarSet("stageTemple", BOON_MORE_GOLD);
-				trQuestVarSet("templeRoom", -1);
+				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
 				trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 				wallHeight = worldHeight + 6;
-				trSetCivAndCulture(0, 2, 0);
 				trQuestVarSet("bossRoomSize", 14);
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 1;
@@ -1234,7 +1222,7 @@ highFrequency
 			}
 			case 5:
 			{
-				trQuestVarSet("templeRoom", -1);
+				trQuestVarSet("stageTemple", BOON_SPELL_POISON);
 				trSetCivAndCulture(0, 3, 1);
 				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
 				trQuestVarSet("bossRoomSize", 11);
@@ -1288,7 +1276,7 @@ highFrequency
 			}
 			case 6:
 			{
-				trQuestVarSet("stageTemple", BOON_MORE_GOLD);
+				trQuestVarSet("stageTemple", BOON_STATUS_COOLDOWNS);
 				xsEnableRule("laser_rooms_always");
 				/* engineers */
 				trTechSetStatus(ENEMY_PLAYER, 59, 4);
@@ -1346,6 +1334,7 @@ highFrequency
 			}
 			case 7:
 			{
+				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
 				trQuestVarSet("templeRoom", -1);
 				wallHeight = worldHeight + 6;
 				trSetCivAndCulture(0, 11, 3);

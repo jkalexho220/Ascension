@@ -591,6 +591,16 @@ highFrequency
 							if (trQuestVarGet("templeChallengeActive") == 0) {
 								trQuestVarSet("templeChallengeActive", 1);
 								relicReturned = true;
+							} else if (trQuestVarGet("stageTemple") == BOON_MORE_GOLD) {
+								relicReturned = false;
+								if ((trQuestVarGet("p"+p+"relicsSacrificed") < 10) && (yGetVar("p"+p+"relics","type") <= NORMAL_RELICS)) {
+									trUnitChangeProtoUnit("Conversion SFX");
+									trQuestVarSet("p"+p+"relicsSacrificed", 1 + trQuestVarGet("p"+p+"relicsSacrificed"));
+									if (trCurrentPlayer() == p) {
+										trSoundPlayFN("favordump.wav","1",-1,"","");
+										trChatSend(0, "<color=1,1,1>Relic sacrificed! ("+1*trQuestVarGet("p"+p+"relicsSacrificed")+"/10)</color>");
+									}
+								}
 							}
 						} else if (1*trQuestVarGet("nottud") > 0) {
 							for(i=3; >0) {

@@ -30,6 +30,33 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
+void advanceCooldowns(int p = 0, float seconds = 0) {
+	int diff = 0;
+	if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_COOLDOWN) {
+		trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("p"+p+"wellCooldown") - 1000 * seconds);
+		diff = (trQuestVarGet("p"+p+"wellCooldown") - trTimeMS()) / 1000;
+		if (diff > 0 && trCurrentPlayer() == p) {
+			trCounterAbort("well");
+			trCounterAddTime("well",diff,0,wellName, -1);
+		}
+	}
+	if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_COOLDOWN) {
+		trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("p"+p+"rainCooldown") - 1000 * seconds);
+		diff = (trQuestVarGet("p"+p+"rainCooldown") - trTimeMS()) / 1000;
+		if (diff > 0 && trCurrentPlayer() == p) {
+			trCounterAbort("rain");
+			trCounterAddTime("rain",diff,0,rainName, -1);
+		}
+	}
+	if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_COOLDOWN) {
+		trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("p"+p+"lureCooldown") - 1000 * seconds);
+		diff = (trQuestVarGet("p"+p+"lureCooldown") - trTimeMS()) / 1000;
+		if (diff > 0 && trCurrentPlayer() == p) {
+			trCounterAbort("lure");
+			trCounterAddTime("lure",diff,0,lureName, -1);
+		}
+	}
+}
 
 void gainFavor(int p = 0, float amt = 0) {
 	trQuestVarSet("p"+p+"favor", xsMin(100, xsMax(0, trQuestVarGet("p"+p+"favor") + amt)));
@@ -103,8 +130,8 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 
 void silenceEnemy(int p = 0, float duration = 9.0) {
 	duration = 1000 * duration * trQuestVarGet("p"+p+"spellDuration");
-	if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
-		duration = 2.0 * duration;
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
+		advanceCooldowns(p, 1);
 	}
 	if (PvP) {
 		int x = yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger"));
@@ -410,6 +437,9 @@ void vectorSetAsTargetVector(string target = "", string from = "", string to = "
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
 	bool targetPlayers = (p == 0);
 	if (p > 0) {
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
+			advanceCooldowns(p, 1);
+		}
 		duration = duration * trQuestVarGet("p"+p+"spellDuration") * xsPow(0.5, 1*trQuestVarGet("p"+p+"poisonSpeed"));
 		damage = damage * trQuestVarGet("p"+p+"spellDamage") * xsPow(2, 1*trQuestVarGet("p"+p+"poisonSpeed"));
 		if (PvP) {
@@ -448,9 +478,7 @@ void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0)
 			trQuestVarSet("poisonSound", 1);
 		}
 		ySetVar(db, "poisonTimeout", trTimeMS() + duration);
-		if ((targetPlayers == false) && (trQuestVarGet("p"+p+"godBoon") == BOON_POISON_STACKS)) {
-			ySetVar(db, "poisonDamage", damage + yGetVar(db, "poisonDamage"));
-		} else if (damage > yGetVar(db, "poisonDamage")) {
+		if (damage > yGetVar(db, "poisonDamage")) {
 			ySetVar(db, "poisonDamage", damage);
 		}
 	}
@@ -537,10 +565,10 @@ void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) 
 	int index = 0;
 	bool targetPlayers = (p == 0);
 	if (p > 0) {
-		duration = duration * trQuestVarGet("p"+p+"spellDuration");
-		if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_STUN) {
-			duration = 2.0 * duration;
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
+			advanceCooldowns(p, 1);
 		}
+		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		trUnitSelectClear();
 		trUnitSelectByQV(db, true);
 		if (trQuestVarGet("p"+p+"stunDamage") > 0) {

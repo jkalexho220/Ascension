@@ -13,6 +13,7 @@ int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
 const int VERSION_NUMBER = 6;
+const int TOTAL_LOAD = 21;
 
 void saveAllData() {
 	trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
@@ -120,6 +121,8 @@ void saveAllData() {
 	
 	/* Quest data */
 	savedata = 0;
+	currentdata = trQuestVarGet("p"+p+"relicsSacrificed");
+	savedata = savedata * 11 + currentdata;
 	for(x=5; >0) {
 		currentdata = trQuestVarGet("p"+p+"runestone"+x);
 		savedata = savedata * 2 + currentdata;
@@ -134,7 +137,7 @@ void saveAllData() {
 }
 
 void showLoadProgress() {
-	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / 20,"icons\god power reverse time icons 64");
+	trSoundPlayFN("default","1",-1,"Loading Data:"+100 * loadProgress / TOTAL_LOAD,"icons\god power reverse time icons 64");
 }
 
 rule data_load_00
@@ -295,6 +298,8 @@ inactive
 			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
+		trQuestVarSet("p1relicsSacrificed", iModulo(11, savedata));
+		savedata = savedata / 11;
 		
 		xsEnableRule("singleplayer_init");
 		trDelayedRuleActivation("delayed_modify");
@@ -407,6 +412,10 @@ inactive
 							trQuestVarSet("p"+p+"runestone"+i, iModulo(2, currentdata));
 							currentdata = currentdata / 2;
 						}
+					} else if (loadProgress == 20) {
+						currentdata = x;
+						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(11, currentdata));
+						currentdata = currentdata / 11;
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x + swordsmen);
@@ -417,7 +426,7 @@ inactive
 		}
 		loadProgress = loadProgress + 1;
 		showLoadProgress();
-		if (loadProgress == 20) {
+		if (loadProgress == TOTAL_LOAD) {
 			xsDisableSelf();
 			xsEnableRule("data_load_03_done");
 		} else {
