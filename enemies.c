@@ -4,34 +4,40 @@ void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, fl
 	trQuestVarSet("proto"+p+"relicChance", relicChance);
 	trQuestVarSet("proto"+p+"relic", relic);
 	trQuestVarSet("proto"+p+"armor", armor);
-	/* armor */
-	trModifyProtounit(proto, ENEMY_PLAYER, 24, -1);
-	trModifyProtounit(proto, ENEMY_PLAYER, 25, -1);
-	trModifyProtounit(proto, ENEMY_PLAYER, 26, -1);
-	trModifyProtounit(proto, ENEMY_PLAYER, 24, armor);
-	trModifyProtounit(proto, ENEMY_PLAYER, 25, armor);
-	trModifyProtounit(proto, ENEMY_PLAYER, 26, armor);
 	/* LOS */
 	trModifyProtounit(proto, ENEMY_PLAYER, 2, 12);
+	for(p=ENEMY_PLAYER; >0) {
+		/* armor */
+		trModifyProtounit(proto, p, 24, -1);
+		trModifyProtounit(proto, p, 25, -1);
+		trModifyProtounit(proto, p, 26, -1);
+		trModifyProtounit(proto, p, 24, armor);
+		trModifyProtounit(proto, p, 25, armor);
+		trModifyProtounit(proto, p, 26, armor);
+		/* damage bonus vs myth */
+		trModifyProtounit(proto, p, 33, 9999999999999999999.0);
+		trModifyProtounit(proto, p, 33, -9999999999999999999.0);
+		trModifyProtounit(proto, p, 33, 1.0);
+		trModifyProtounit(proto, p, 44, 9999999999999999999.0);
+		trModifyProtounit(proto, p, 44, -9999999999999999999.0);
+		trModifyProtounit(proto, p, 44, 1.0);
+		/* damage bonus vs hero */
+		trModifyProtounit(proto, p, 34, 9999999999999999999.0);
+		trModifyProtounit(proto, p, 34, -9999999999999999999.0);
+		trModifyProtounit(proto, p, 34, 1.0);
+		trModifyProtounit(proto, p, 45, 9999999999999999999.0);
+		trModifyProtounit(proto, p, 45, -9999999999999999999.0);
+		trModifyProtounit(proto, p, 45, 1.0);
+	}
 	
-	/* damage bonus vs myth */
-	trModifyProtounit(proto, ENEMY_PLAYER, 33, 9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 33, -9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 33, 1.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 44, 9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 44, -9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 44, 1.0);
-	/* damage bonus vs hero */
-	trModifyProtounit(proto, ENEMY_PLAYER, 34, 9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 34, -9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 34, 1.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 45, 9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 45, -9999999999999999999.0);
-	trModifyProtounit(proto, ENEMY_PLAYER, 45, 1.0);
 }
 
 bool checkEnemyDeactivated(string db = "") {
 	int index = 1*yGetVar(db, "index");
+	/* this only matters for enemies */
+	if (yGetVar(db, "player") < ENEMY_PLAYER) {
+		return(false);
+	}
 	if ((yGetVarAtIndex("enemies", "xActive", index) == 0) ||
 		yGetUnitAtIndex("enemies", index) != trQuestVarGet(db)) {
 		return(true);
@@ -587,7 +593,8 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("sphinxes") > 0) {
 		id = yDatabaseNext("sphinxes", true);
-		pName = databaseName(1*yGetVar("sphinxes", "player"));
+		p = yGetVar("sphinxes","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("sphinxes")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -608,15 +615,19 @@ void specialUnitsAlways() {
 						ySetVar("sphinxes", "step", 1);
 						trUnitOverrideAnimation(39,0,false,false,-1);
 						trVectorSetUnitPos("pos", "sphinxes");
-						for(p=1; < ENEMY_PLAYER) {
-							if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 16) {
-								silencePlayer(p, 5);
-								if ((trQuestVarGet("p"+p+"nickQuestProgress") == 1) &&
-									trQuestVarGet("p"+p+"nickEquipped") == 1) {
-									trQuestVarSet("p"+p+"nickQuestProgress", 2);
-									if (trCurrentPlayer() == p) {
-										xsEnableRule("nick_next_dialog");
-									}
+						pName = opponentDatabaseName(p);
+						for(x=yGetDatabaseCount(pName); >0) {
+							if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+								removeOpponentUnit(p);
+							} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+								silenceUnit(pName,5,p);
+							}
+						}
+						if (p == ENEMY_PLAYER) {
+							if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 1) {
+								if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+									trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 2);
+									xsEnableRule("nick_next_dialog");
 								}
 							}
 						}
@@ -634,6 +645,8 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("MountainGiants") > 0) {
 		id = yDatabaseNext("MountainGiants", true);
+		p = yGetVar("MountainGiants", "player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			trUnitChangeProtoUnit("Mountain Giant");
@@ -642,7 +655,7 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated("MountainGiants")) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			yRemoveFromDatabase("MountainGiants");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("MountainGiants", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("MountainGiants", "index")) == 1) {
 			ySetVar("MountainGiants", "step", 2);
 		} else if (trTimeMS() > yGetVar("MountainGiants", "next")) {
 			switch(1*yGetVar("MountainGiants", "step"))
@@ -663,13 +676,14 @@ void specialUnitsAlways() {
 				{
 					trVectorSetUnitPos("pos", "MountainGiants");
 					yVarToVector("MountainGiants", "end");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
-						id = yDatabaseNext("playerUnits", true);
+					pName = opponentDatabaseName(p);
+					for(x=yGetDatabaseCount(pName); >0) {
+						id = yDatabaseNext(pName, true);
 						if (id == -1 || trUnitAlive() == false) {
-							removePlayerUnit();
-						} else if (zDistanceToVectorSquared("playerUnits", "end") < 4) {
-							damagePlayerUnit(100 + 100 * trQuestVarGet("stage"));
-							if (yGetVar("playerUnits", "hero") == 1 && trCurrentPlayer() == yGetVar("playerUnits", "player")) {
+							removeOpponentUnit(p);
+						} else if (zDistanceToVectorSquared(pName, "end") < 4) {
+							damageOpponentUnit(p, 100 + 100 * trQuestVarGet("stage"));
+							if (yGetVar(pName, "hero") == 1 && trCurrentPlayer() == yGetVar(pName, "player")) {
 								trCameraShake(0.7, 0.7);
 							}
 						}
@@ -690,8 +704,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("MountainGiants", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("MountainGiants", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("MountainGiants", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("MountainGiants", "index"));
 			if (action > 0 && yGetVar("MountainGiants", "step") == 1) {
 				ySetVar("MountainGiants", "step", 0);
 				ySetVar("MountainGiants", "next", trTimeMS() + 15000);
@@ -701,14 +715,16 @@ void specialUnitsAlways() {
 	
 	for(x=xsMin(4, yGetDatabaseCount("MedusaBalls")); >0) {
 		action = processGenericProj("MedusaBalls");
+		p = yGetVar("MedusaBalls", "player");
+		pName = opponentDatabaseName(p);
 		trVectorSetUnitPos("pos", "MedusaBalls");
 		vectorToGrid("pos", "loc");
-		for(y=yGetDatabaseCount("playerUnits"); >0) {
-			id = yDatabaseNext("playerUnits", true);
+		for(y=yGetDatabaseCount(pName); >0) {
+			id = yDatabaseNext(pName, true);
 			if (id == -1 || trUnitAlive() == false) {
-				removePlayerUnit();
-			} else if (zDistanceToVectorSquared("playerUnits", "pos") < 2.0) {
-				stunUnit("playerUnits", 3.0);
+				removeOpponentUnit(p);
+			} else if (zDistanceToVectorSquared(pName, "pos") < 2.0) {
+				stunUnit(pName, 3.0, p);
 				action = PROJ_REMOVE;
 				break;
 			}
@@ -735,11 +751,13 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("Medusas") >0) {
 		id = yDatabaseNext("Medusas", true);
+		p = yGetVar("Medusas", "player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Medusas")) {
 			trUnitChangeProtoUnit("Medusa");
 			yRemoveFromDatabase("Medusas");
 			yRemoveUpdateVar("Medusas", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			ySetVar("Medusas", "step", 2);
 		} else if (trTimeMS() > yGetVar("Medusas", "next")) {
@@ -764,6 +782,7 @@ void specialUnitsAlways() {
 					addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
 					yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
 					yAddUpdateVar("MedusaBalls", "bounces", 10);
+					yAddUpdateVar("MedusaBalls", "player", p);
 					ySetVar("Medusas", "step", 2);
 					ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
 				}
@@ -775,8 +794,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Medusas", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Medusas", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Medusas", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Medusas", "index"));
 			if (action > 0 && yGetVar("Medusas", "step") == 1) {
 				ySetVar("Medusas", "step", 0);
 				ySetVar("Medusas", "next", trTimeMS() + 18000);
@@ -786,50 +805,56 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("Valkyries") > 0) {
 		id = yDatabaseNext("Valkyries", true);
+		p = yGetVar("Valkyries","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Valkyries")) {
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
 			trUnitDestroy();
 			yRemoveFromDatabase("Valkyries");
 		} else {
-			id = yGetPointer("enemies");
-			if (ySetPointer("enemies", 1*yGetVar("Valkyries", "index"))) {
-				ySetVar("enemies", "magicResist", 1 - yGetVar("enemies", "silenceStatus"));
-				if (yGetVar("enemies", "silenceStatus") != yGetVar("Valkyries", "silenced")) {
-					ySetVar("Valkyries", "silenced", yGetVar("enemies", "silenceStatus"));
+			id = yGetPointer(pName);
+			if (ySetPointer(pName, 1*yGetVar("Valkyries", "index"))) {
+				ySetVar(pName, "magicResist", 1 - yGetVar(pName, "silenceStatus"));
+				if (yGetVar(pName, "silenceStatus") != yGetVar("Valkyries", "silenced")) {
+					ySetVar("Valkyries", "silenced", yGetVar(pName, "silenceStatus"));
 					trUnitSelectClear();
 					trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
-					if (yGetVar("enemies", "silenceStatus") == 1) {
+					if (yGetVar(pName, "silenceStatus") == 1) {
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 					} else {
 						trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
 					}
 				}
-				ySetPointer("enemies", id);
+				ySetPointer(pName, id);
 			}
 		}
 	}
 	
 	if (yGetDatabaseCount("Dryads") > 0) {
 		id = yDatabaseNext("Dryads", true);
+		p = yGetVar("Dryads", "player");
 		if (id == -1 || trUnitAlive() == false) {
 			if (yGetVar("dryads", "silenceStatus") == 0) {
+				pName = opponentDatabaseName(p);
 				yVarToVector("Dryads", "pos");
 				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Lampades Blood");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
-					id = yDatabaseNext("playerUnits", true);
+				for(x=yGetDatabaseCount(pName); >0) {
+					id = yDatabaseNext(pName, true);
 					if (id == -1 || trUnitAlive() == false) {
-						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-						poisonUnit("playerUnits", 10.0, 5.0 * trQuestVarGet("stage"));
+						removeOpponentUnit(p);
+					} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+						poisonUnit(pName, 10.0, 5.0 * trQuestVarGet("stage"), p);
 					}
 				}
-				if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
-					if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
-						trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
-						xsEnableRule("nick_next_dialog");
+				if (p == ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
+						if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
+							xsEnableRule("nick_next_dialog");
+						}
 					}
 				}
 			}
@@ -837,9 +862,10 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated("Dryads")) {
 			yRemoveFromDatabase("Dryads");
 		} else {
+			pName = databaseName(p);
 			trVectorSetUnitPos("pos", "Dryads");
 			ySetVarFromVector("Dryads", "pos", "pos");
-			ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Dryads", "index")));
+			ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Dryads", "index")));
 		}
 	}
 	
@@ -860,9 +886,10 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated("scarabs")) {
 			yRemoveFromDatabase("scarabs");
 		} else {
+			pName = databaseName(1*yGetVar("scarabs","player"));
 			trVectorSetUnitPos("pos", "scarabs");
 			ySetVarFromVector("scarabs", "pos", "pos");
-			ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("scarabs", "index")));
+			ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("scarabs", "index")));
 		}
 	}
 	

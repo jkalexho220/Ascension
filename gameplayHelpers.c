@@ -115,7 +115,7 @@ void silencePlayer(int p = 0, float duration = 0) {
 }
 
 void silenceUnit(string db = "", float duration = 9.0, int p = 0) {
-	if (p > 0) {
+	if (p > 0 && p < ENEMY_PLAYER) {
 		duration = duration * trQuestVarGet("p"+p+"spellDuration");
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
@@ -135,6 +135,7 @@ void silenceUnit(string db = "", float duration = 9.0, int p = 0) {
 			silencePlayer(p, duration);
 		}
 	}
+	duration = duration * 1000;
 	if (trTimeMS() + duration > yGetVar(db, "silenceTimeout")) {
 		ySetVar(db, "silenceTimeout", trTimeMS() + duration);
 	}
@@ -431,8 +432,8 @@ void vectorSetAsTargetVector(string target = "", string from = "", string to = "
 }
 
 void poisonUnit(string db = "", float duration = 0, float damage = 0, int p = 0) {
-	bool targetPlayers = (p == 0);
-	if (p > 0) {
+	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
+	if (p > 0 && p < ENEMY_PLAYER) {
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}
@@ -559,8 +560,8 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 
 void stunUnit(string db = "", float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
-	bool targetPlayers = (p == 0);
-	if (p > 0) {
+	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
+	if (p > 0 && p < ENEMY_PLAYER) {
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}

@@ -22,10 +22,13 @@ const int RELIC_COOLDOWN_REDUCTION = 18;
 const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
-const int RELIC_NOTTUD = 23;
-const int RELIC_ZENOPHOBIA = 24;
-
-const int RELIC_YEEBAAGOOON = 25;
+/*
+auras
+pet companion?
+*/
+const int RELIC_NOTTUD = 23; // +0.3x area damage on attacks. (Radius: 4)
+const int RELIC_ZENOPHOBIA = 24; // 0.15 magic penetration
+const int RELIC_YEEBAAGOOON = 25; // Regen 0.3 favor per second
 
 
 /* nottud's shop */
