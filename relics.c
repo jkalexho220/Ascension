@@ -22,19 +22,20 @@ const int RELIC_COOLDOWN_REDUCTION = 18;
 const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
+const int RELIC_NOTTUD = 23;
+const int RELIC_ZENOPHOBIA = 24;
+
+const int RELIC_YEEBAAGOOON = 25;
+
+
 /* nottud's shop */
-const int RELIC_CURSED_RANGE = 21;
-const int RELIC_CURSED_DURATION = 22;
-const int RELIC_CURSED_POWER = 23;
-const int RELIC_FAVOR_FROM_ATTACKS = 24;
-const int RELIC_POISON_FASTER = 25;
+const int RELIC_CURSED_RANGE = 26;
+const int RELIC_CURSED_DURATION = 27;
+const int RELIC_CURSED_POWER = 28;
+const int RELIC_FAVOR_FROM_ATTACKS = 29;
+const int RELIC_POISON_FASTER = 30;
 
-const int RELIC_YEEBAAGOOON = 26;
 
-const int RELIC_NOTTUD = 28;
-
-const int RELIC_CURSED_COOLDOWNS = 29;
-const int RELIC_ZENOPHOBIA = 30;
 
 const int NORMAL_RELICS = 30;
 /* key relics */

@@ -738,6 +738,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		case ROOM_TEMPLE + 3:
 		{
 			trVectorQuestVarSet("templePos", xsVectorSet(70*x+39,0,70*z+39));
+			trQuestVarSet("frostDriftSFX", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("templePosX"),0,trQuestVarGet("templePosZ"),0,true);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			trUnitChangeProtoUnit("Cinematic Block");
 			paintCircle(x,z,8,5,0,worldHeight);
 			placeTemple(x, z, 16);
 			xsEnableRule("snow_temple_always");

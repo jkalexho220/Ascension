@@ -3,6 +3,11 @@ import sys
 
 # The syntax validator will stop after encountering the first error.
 # After fixing that error, additional ones may be reported.
+# In files[], the very first file contains all the rms code in void main() that EXCLUDES trigger code.
+# The other files after the first file are parsed as raw trigger code.
+# If you wish to inject RMS code between the lines of trigger code, use the % character to escape trigger code and another % to return to trigger code.
+# The % characters must be placed on their own lines.
+# Syntax validator does not check RMS code or code between the % signs. Use at your own risk.
 
 ###############################
 ####### CUSTOMIZE THESE #######
@@ -11,7 +16,6 @@ FILENAME = 'Ascension MMORPG.xs'
 files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
-
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -150,6 +154,8 @@ class Job:
 					accepted = False
 			else:
 				accepted = False
+		elif token == 'vector':
+			self.children.append(Literal(token, self, 'vector'))
 		elif '.' in token:
 			isFloat = True
 			for c in token[:token.find('.')]:
@@ -612,9 +618,13 @@ class Literal(Mathable):
 					if token == ')':
 						self.resolve()
 					elif token == ',':
-						accepted = False
+						if len(self.children) == 3:
+							error("Vector only accepts three parameters")
+							accepted = False
 					elif self.parseGeneric(token):
 						accepted = self.children[-1].type == 'LITERAL' and self.children[-1].datatype in ['int', 'float']
+						if not accepted:
+							error("Vector literals can only contain literal integers or floats. Variables are not allowed.")
 		return accepted
 
 
@@ -978,8 +988,6 @@ try:
 			elif bcount > 0:
 				print("ERROR: Missing close brackets detected!\n")
 			if first:
-				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
-				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowasherefirstagain inactive {if(true){xsDisableSelf();//");\n')
 				file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("zenowashere"));\n')
 				file_data_2.write('rmSetTriggerPriority(4);\n')
 				file_data_2.write('rmSetTriggerActive(false);\n')

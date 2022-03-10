@@ -190,7 +190,7 @@ void sparkWitchAlways(int eventID = -1) {
 									trMutateSelected(kbGetProtoUnitID("Hero Boar"));
 								}
 								ySetVar("enemies", "silenceStatus", 1); // do this to prevent UI Range Indicator from appearing
-								silenceEnemy(p, trQuestVarGet("hexboltDuration"));
+								silenceUnit("enemies",trQuestVarGet("hexboltDuration"),p);
 								trUnitSelectClear();
 								trUnitSelectByQV("next");
 								trUnitChangeProtoUnit("Curse SFX");

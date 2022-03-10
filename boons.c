@@ -184,7 +184,7 @@ string boonName(int boon = 0) {
 		}
 		case BOON_MONSTER_COMPANION:
 		{
-			name = "Choose a monster from the Monsterpedia to be your pet. Revive it whenever you use your Ultimate.";
+			name = "Choose a monster from the Monsterpedia to be your pet companion. (Cannot choose bosses)";
 		}
 		case BOON_STATUS_COOLDOWNS:
 		{

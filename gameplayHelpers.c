@@ -84,8 +84,8 @@ float vectorSetAsCurrentPosition(string v = "", string prev = "", string dir = "
 	return(dist);
 }
 
-void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
-	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
+void silencePlayer(int p = 0, float duration = 0) {
+	if ((trQuestVarGet("p"+p+"negationCloak") == 1) && (trQuestVarGet("p"+p+"dead") == 0)) {
 		if (getBit(STATUS_SILENCE, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_SILENCE));
 			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
@@ -95,7 +95,7 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 			}
 		}
 	} else {
-		float timeout = duration * 1000 * trQuestVarGet("p"+p+"silenceResistance") + trTimeMS();
+		float timeout = duration * 1000 + trTimeMS();
 		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
 			trQuestVarSet("p"+p+"silenceTimeout", timeout);
 		}
@@ -104,20 +104,6 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 			trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
 			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
 			trPlayerKillAllGodPowers(p);
-			if (sfx) {
-				if (trQuestVarGet("p"+p+"silenceSFX") > 0) {
-					int id = kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX"));
-					if (id == -1) {
-						spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
-					} else {
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"silenceSFX");
-						trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
-					}
-				} else {
-					spyEffect(1*trQuestVarGet("p"+p+"unit"), kbGetProtoUnitID("UI Range Indicator Egypt SFX"), "p"+p+"silenceSFX");
-				}
-			}
 			if (trCurrentPlayer() == p) {
 				trCounterAbort("lure");
 				trCounterAbort("well");
@@ -128,37 +114,45 @@ void silencePlayer(int p = 0, float duration = 0, bool sfx = true) {
 	}
 }
 
-void silenceEnemy(int p = 0, float duration = 9.0) {
-	duration = 1000 * duration * trQuestVarGet("p"+p+"spellDuration");
-	if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
-		advanceCooldowns(p, 1);
-	}
-	if (PvP) {
-		int x = yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger"));
-		if (trQuestVarGet("p"+x+"unit") == trQuestVarGet("enemies")) {
-			silencePlayer(x, duration * 0.001);
+void silenceUnit(string db = "", float duration = 9.0, int p = 0) {
+	if (p > 0) {
+		duration = duration * trQuestVarGet("p"+p+"spellDuration");
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
+			advanceCooldowns(p, 1);
+		}
+		if (PvP) {
+			int old = yGetPointer("playerUnits");
+			if (ySetPointer("playerUnits", 1*yGetVar("enemies", "doppelganger"))) {
+				silenceUnit("playerUnits", duration);
+			}
+			ySetPointer("playerUnits", old);
+			return;
 		}
 	} else {
-		if (trTimeMS() + duration > yGetVar("enemies", "silenceTimeout")) {
-			ySetVar("enemies", "silenceTimeout", trTimeMS() + duration);
+		p = yGetVar(db, "player");
+		duration = duration * trQuestVarGet("p"+p+"silenceResistance");
+		if (trQuestVarGet("p"+p+"unit") == trQuestVarGet(db)) {
+			silencePlayer(p, duration);
 		}
-		if (trQuestVarGet("enemies") == trQuestVarGet("bossUnit")) {
-			if (trTimeMS() + duration > trQuestVarGet("bossCooldownTime")) {
-				trQuestVarSet("bossCooldownTime", trTimeMS() + duration);
-			}
+	}
+	if (trTimeMS() + duration > yGetVar(db, "silenceTimeout")) {
+		ySetVar(db, "silenceTimeout", trTimeMS() + duration);
+	}
+	if (trQuestVarGet(db) == trQuestVarGet("bossUnit")) {
+		if (trTimeMS() + duration > trQuestVarGet("bossCooldownTime")) {
+			trQuestVarSet("bossCooldownTime", trTimeMS() + duration);
 		}
-		if (yGetVar("enemies", "silenceStatus") == 0) {
-			ySetVar("enemies", "silenceStatus", 1);
-			if (kbGetBlockID(""+1*yGetVar("enemies", "silenceSFX")) == -1) {
-				spyEffect(1*trQuestVarGet("enemies"),
-					kbGetProtoUnitID("UI Range Indicator Egypt SFX"), yGetVarName("enemies", "silenceSFX"));
-			} else {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("enemies", "silenceSFX"), true);
-				trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
-				trUnitSelectClear();
-				trUnitSelectByQV("enemies");
-			}
+	}
+	if (yGetVar(db, "silenceStatus") == 0) {
+		ySetVar(db, "silenceStatus", 1);
+		if (kbGetBlockID(""+1*yGetVar(db, "silenceSFX")) == -1) {
+			spyEffect(1*trQuestVarGet(db),kbGetProtoUnitID("UI Range Indicator Egypt SFX"), yGetVarName(db, "silenceSFX"));
+		} else {
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar(db, "silenceSFX"), true);
+			trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
+			trUnitSelectClear();
+			trUnitSelectByQV(db);
 		}
 	}
 }
@@ -258,6 +252,8 @@ void removePlayerUnit() {
 	yRemoveUpdateVar("playerUnits", "hero");
 	yRemoveUpdateVar("playerUnits", "unity");
 	yRemoveUpdateVar("playerUnits", "launched");
+	yRemoveUpdateVar("playerUnits", "silenceStatus");
+	yRemoveUpdateVar("playerUnits", "silenceSFX");
 }
 
 void removePlayerCharacter() {
@@ -1038,7 +1034,7 @@ void revivePlayer(int p = 0) {
 	}
 }
 
-void shootLaser(string start = "", string dir = "", float dist = -1) {
+void shootLaser(string start = "", string dir = "", float dist = -1, int p = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
 	trUnitSelectClear();
@@ -1057,6 +1053,7 @@ void shootLaser(string start = "", string dir = "", float dist = -1) {
 	yAddUpdateVar("delayLasers", "next", trTimeMS() + 2000);
 	yAddUpdateVar("delayLasers", "phase", 0);
 	yAddUpdateVar("delayLasers", "dist", dist);
+	yAddUpdateVar("delayLasers", "player", p);
 }
 
 rule spy_find
@@ -1093,5 +1090,37 @@ highFrequency
 		}
 	} else {
 		trQuestVarSet("spyreset", 0);
+	}
+}
+
+string databaseName(int p = 0) {
+	if (p == ENEMY_PLAYER) {
+		return("enemies");
+	} else {
+		return("playerUnits");
+	}
+}
+
+string opponentDatabaseName(int p = 0) {
+	if (p == ENEMY_PLAYER) {
+		return("playerUnits");
+	} else {
+		return("enemies");
+	}
+}
+
+void removeOpponentUnit(int p = 0) {
+	if (p == ENEMY_PLAYER) {
+		removePlayerUnit();
+	} else {
+		removeEnemy();
+	}
+}
+
+void damageOpponentUnit(int p = 0, float amt = 0) {
+	if (p == ENEMY_PLAYER) {
+		damagePlayerUnit(amt);
+	} else {
+		damageEnemy(p, amt);
 	}
 }

@@ -39,6 +39,137 @@ bool checkEnemyDeactivated(string db = "") {
 	return(false);
 }
 
+void activateSpecialUnit(string db = "", string vname = "", int proto = 0, int p = 0) {
+	switch(proto)
+	{
+		case kbGetProtoUnitID("Sphinx"):
+		{
+			yAddToDatabase("Sphinxes", db);
+			yAddUpdateVar("Sphinxes", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Sphinxes", "step", 0);
+			yAddUpdateVar("Sphinxes", "player", p);
+		}
+		case kbGetProtoUnitID("Dryad"):
+		{
+			yAddToDatabase("Dryads", db);
+			yAddUpdateVar("dryads", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("dryads", "player", p);
+		}
+		case kbGetProtoUnitID("Wadjet"):
+		{
+			yAddToDatabase("Dryads", db);
+			yAddUpdateVar("dryads", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("dryads", "player", p);
+		}
+		case kbGetProtoUnitID("Medusa"):
+		{
+			yAddToDatabase("Medusas", db);
+			yAddUpdateVar("Medusas", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Medusas", "step", 0);
+			yAddUpdateVar("Medusas", "player", p);
+		}
+		case kbGetProtoUnitID("Mountain Giant"):
+		{
+			yAddToDatabase("MountainGiants", db);
+			yAddUpdateVar("MountainGiants", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("MountainGiants", "step", 0);
+			yAddUpdateVar("MountainGiants", "player", p);
+		}
+		case kbGetProtoUnitID("Frost Giant"):
+		{
+			yAddToDatabase("FrostGiants", db);
+			yAddUpdateVar("FrostGiants", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("FrostGiants", "step", 0);
+			yAddUpdateVar("FrostGiants", "player", p);
+		}
+		case kbGetProtoUnitID("Valkyrie"):
+		{
+			yAddUpdateVar(vname, "magicResist", 1);
+			yAddToDatabase("Valkyries", db);
+			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Valkyries", "silenced", 0);
+			spyEffect(1*trQuestVarGet(db),
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+			yAddUpdateVar("Valkyries", "player", p);
+		}
+		case kbGetProtoUnitID("Ballista"):
+		{
+			yAddToDatabase("ballistas", db);
+			yAddUpdateVar("ballistas", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("ballistas", "player", p);
+		}
+		case kbGetProtoUnitID("Colossus"):
+		{
+			yAddUpdateVar(vname, "magicResist", 1);
+			yAddToDatabase("Valkyries", db);
+			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(vname));
+			spyEffect(1*trQuestVarGet(db),
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+			yAddUpdateVar("Valkyries", "player", p);
+		}
+		case kbGetProtoUnitID("Fire Siphon"):
+		{
+			yAddToDatabase("siphons", db);
+			yAddUpdateVar("siphons", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("siphons", "player", p);
+		}
+		case kbGetProtoUnitID("Battle Boar"):
+		{
+			yAddToDatabase("battleBoars", db);
+			yAddUpdateVar("battleBoars", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("battleBoars", "step", 0);
+			yAddUpdateVar("battleBoars", "player", p);
+		}
+		case kbGetProtoUnitID("Automaton SPC"):
+		{
+			yAddToDatabase("automatons", db);
+			yAddUpdateVar("automatons", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("automatons", "player", p);
+		}
+		case kbGetProtoUnitID("Behemoth"):
+		{
+			yAddUpdateVar(vname, "physicalResist", 1);
+			yAddUpdateVar(vname, "magicResist", -1);
+		}
+		case kbGetProtoUnitID("Scarab"):
+		{
+			yAddUpdateVar(vname, "physicalResist", 1);
+			yAddUpdateVar(vname, "magicResist", -1);
+			yAddToDatabase("scarabs", db);
+			yAddUpdateVar("scarabs", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("scarabs", "player", p);
+		}
+		case kbGetProtoUnitID("Satyr"):
+		{
+			yAddToDatabase("Satyrs", db);
+			yAddUpdateVar("Satyrs", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Satyrs", "step", 0);
+			yAddUpdateVar("Satyrs", "player", p);
+		}
+		case kbGetProtoUnitID("Avenger"):
+		{
+			yAddToDatabase("Avengers", db);
+			yAddUpdateVar("Avengers", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Avengers", "step", 0);
+			yAddUpdateVar("Avengers", "player", p);
+		}
+		case kbGetProtoUnitID("Scorpion Man"):
+		{
+			yAddToDatabase("ScorpionMen", db);
+			yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("ScorpionMen", "step", 0);
+			yAddUpdateVar("ScorpionMen", "player", p);
+		}
+		case kbGetProtoUnitID("Mummy"):
+		{
+			yAddToDatabase("Mummies", db);
+			yAddUpdateVar("Mummies", "index", yGetNewestPointer(vname));
+			yAddUpdateVar("Mummies", "step", 0);
+			yAddUpdateVar("Mummies", "player", p);
+		}
+	}
+}
+
 void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 	int id = kbGetBlockID(""+1*trQuestVarGet(db));
 	int proto = kbGetUnitBaseTypeID(id);
@@ -85,118 +216,7 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 			yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
 		}
 	}
-	
-	switch(proto)
-	{
-		case kbGetProtoUnitID("Sphinx"):
-		{
-			yAddToDatabase("Sphinxes", db);
-			yAddUpdateVar("Sphinxes", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Sphinxes", "step", 0);
-		}
-		case kbGetProtoUnitID("Dryad"):
-		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Wadjet"):
-		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Medusa"):
-		{
-			yAddToDatabase("Medusas", db);
-			yAddUpdateVar("Medusas", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Medusas", "step", 0);
-		}
-		case kbGetProtoUnitID("Mountain Giant"):
-		{
-			yAddToDatabase("MountainGiants", db);
-			yAddUpdateVar("MountainGiants", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("MountainGiants", "step", 0);
-		}
-		case kbGetProtoUnitID("Frost Giant"):
-		{
-			yAddToDatabase("FrostGiants", db);
-			yAddUpdateVar("FrostGiants", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("FrostGiants", "step", 0);
-		}
-		case kbGetProtoUnitID("Valkyrie"):
-		{
-			yAddUpdateVar("enemies", "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Valkyries", "silenced", 0);
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-		}
-		case kbGetProtoUnitID("Ballista"):
-		{
-			yAddToDatabase("ballistas", db);
-			yAddUpdateVar("ballistas", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Colossus"):
-		{
-			yAddUpdateVar("enemies", "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer("enemies"));
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-		}
-		case kbGetProtoUnitID("Fire Siphon"):
-		{
-			yAddToDatabase("siphons", db);
-			yAddUpdateVar("siphons", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Battle Boar"):
-		{
-			yAddToDatabase("battleBoars", db);
-			yAddUpdateVar("battleBoars", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("battleBoars", "step", 0);
-		}
-		case kbGetProtoUnitID("Automaton SPC"):
-		{
-			yAddToDatabase("automatons", db);
-			yAddUpdateVar("automatons", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Behemoth"):
-		{
-			yAddUpdateVar("enemies", "physicalResist", 1);
-			yAddUpdateVar("enemies", "magicResist", -1);
-		}
-		case kbGetProtoUnitID("Scarab"):
-		{
-			yAddUpdateVar("enemies", "physicalResist", 1);
-			yAddUpdateVar("enemies", "magicResist", -1);
-			yAddToDatabase("scarabs", db);
-			yAddUpdateVar("scarabs", "index", yGetNewestPointer("enemies"));
-		}
-		case kbGetProtoUnitID("Satyr"):
-		{
-			yAddToDatabase("Satyrs", db);
-			yAddUpdateVar("Satyrs", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Satyrs", "step", 0);
-		}
-		case kbGetProtoUnitID("Avenger"):
-		{
-			yAddToDatabase("Avengers", db);
-			yAddUpdateVar("Avengers", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Avengers", "step", 0);
-		}
-		case kbGetProtoUnitID("Scorpion Man"):
-		{
-			yAddToDatabase("ScorpionMen", db);
-			yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("ScorpionMen", "step", 0);
-		}
-		case kbGetProtoUnitID("Mummy"):
-		{
-			yAddToDatabase("Mummies", db);
-			yAddUpdateVar("Mummies", "index", yGetNewestPointer("enemies"));
-			yAddUpdateVar("Mummies", "step", 0);
-		}
-	}
+	activateSpecialUnit(db, "enemies", proto, ENEMY_PLAYER);
 }
 
 
@@ -270,7 +290,6 @@ highFrequency
 		trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
 		trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
 		trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
-		trModifyProtounit("Lancer Hero", ENEMY_PLAYER, 5, 99);
 		trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
 		trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
 		trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
@@ -298,14 +317,17 @@ highFrequency
 
 void ballistaShotPop() {
 	int id = 0;
-	for(x=yGetDatabaseCount("playerUnits"); >0) {
-		id = yDatabaseNext("playerUnits", true);
+	int p = yGetVar("ballistaShots","player");
+	string pName = opponentDatabaseName(p);
+	for(x=yGetDatabaseCount(pName); >0) {
+		id = yDatabaseNext(pName, true);
 		if (id == -1 || trUnitAlive() == false) {
-			removePlayerUnit();
-		} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-			damagePlayerUnit(200);
+			removeOpponentUnit(p);
+		} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+			damageOpponentUnit(p, 200);
 		}
 	}
+	
 	trUnitSelectClear();
 	trUnitSelect(""+1*yGetVar("ballistaShots", "next1"), true);
 	trUnitSelect(""+1*yGetVar("ballistaShots", "next2"), true);
@@ -318,8 +340,7 @@ void ballistaShotPop() {
 	yRemoveFromDatabase("ballistaShots");
 }
 
-void enemiesAlways() {
-	int old = xsGetContextPlayer();
+void specialUnitsAlways() {
 	int p = 0;
 	int proto = 0;
 	int id = 0;
@@ -329,48 +350,6 @@ void enemiesAlways() {
 	float dist = 0;
 	float angle = 0;
 	string pName = "";
-	/*
-	Enemies incoming
-	*/
-	for (x=xsMin(5, yGetDatabaseCount("enemiesIncoming")); > 0) {
-		yDatabaseNext("enemiesIncoming", true);
-		for(p=1; < ENEMY_PLAYER) {
-			if (trUnitHasLOS(p)) {
-				activateEnemy("enemiesIncoming");
-				yRemoveFromDatabase("enemiesIncoming");
-				break;
-			}
-		}
-	}
-	
-	if (yGetDatabaseCount("enemies") > 0) {
-		id = yDatabaseNext("enemies", true);
-		if ((id == -1) || (trUnitAlive() == false)) {
-			removeEnemy();
-		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
-			(yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
-			/* if idle and out of LOS, we remove it */
-			ySetVar("enemies", "missing", 1 + yGetVar("enemies", "missing"));
-			if (yGetVar("enemies", "missing") >= 10) {
-				for(p=1; < ENEMY_PLAYER) {
-					if (trUnitHasLOS(p)) {
-						ySetVar("enemies", "missing", 0);
-						break;
-					}
-				}
-				if (yGetVar("enemies", "missing") >= 10) {
-					yAddToDatabase("enemiesIncoming", "enemies");
-					yRemoveFromDatabase("enemies");
-				}
-			}
-		} else {
-			stunsAndPoisons("enemies");
-			trVectorSetUnitPos("pos", "enemies");
-			ySetVar("enemies", "posX", trQuestVarGet("posX"));
-			ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
-		}
-	}
-	
 	
 	for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
 		yDatabaseNext("ballistaShots", true);
@@ -378,7 +357,7 @@ void enemiesAlways() {
 		vectorToGrid("pos", "loc");
 		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > yGetVar("ballistaShots", "timeout")) {
 			ballistaShotPop();
-		} else {
+		} else if (yGetVar("ballistaShots", "player") == ENEMY_PLAYER) {
 			action = 0;
 			for(p=1; < ENEMY_PLAYER) {
 				action = action + trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),p,"Unit",2);
@@ -386,6 +365,8 @@ void enemiesAlways() {
 			if (action > 0) {
 				ballistaShotPop();
 			}
+		} else if (trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),ENEMY_PLAYER,"Unit",2) > 0) {
+			ballistaShotPop();
 		}
 	}
 	
@@ -402,17 +383,19 @@ void enemiesAlways() {
 				trUnitHighlight(3.0,false);
 				trQuestVarSet("sound", 1);
 				trVectorSetUnitPos("start", "delayLasers");
-				for(y=yGetDatabaseCount("playerUnits"); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-						removePlayerUnit();
+				p = yGetVar("delayLasers", "player");
+				pName = opponentDatabaseName(p);
+				for(y=yGetDatabaseCount(pName); >0) {
+					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+						removeOpponentUnit(p);
 					} else {
-						trVectorSetUnitPos("pos", "playerUnits");
+						trVectorSetUnitPos("pos", pName);
 						amt = zDistanceBetweenVectors("pos", "start");
 						if (amt < yGetVar("delayLasers", "dist")) {
 							trQuestVarSet("intersectX", yGetVar("delayLasers", "dirX") * amt + trQuestVarGet("startX"));
 							trQuestVarSet("intersectZ", yGetVar("delayLasers", "dirZ") * amt + trQuestVarGet("startZ"));
 							if (zDistanceBetweenVectorsSquared("pos", "intersect") < 1.0) {
-								damagePlayerUnit(300);
+								damageOpponentUnit(p, 300);
 							}
 						}
 					}
@@ -438,11 +421,10 @@ void enemiesAlways() {
 	/*
 	Projectiles from attacks
 	*/
-	xsSetContextPlayer(ENEMY_PLAYER);
 	while(trQuestVarGet("nextProj") < trGetNextUnitScenarioNameNumber()) {
 		trUnitSelectClear();
 		trUnitSelectByQV("nextProj", true);
-		if (trUnitIsOwnedBy(ENEMY_PLAYER)) {
+		if (trUnitIsOwnedBy(0) == false) {
 			id = kbGetBlockID(""+1*trQuestVarGet("nextProj"), true);
 			proto = kbGetUnitBaseTypeID(id);
 			if (proto == kbGetProtoUnitID("Ballista Shot")) {
@@ -455,66 +437,75 @@ void enemiesAlways() {
 					if (trUnitAlive() == false) {
 						yRemoveFromDatabase("ballistas");
 					} else if (kbUnitGetAnimationActionType(id) == 12) {
-						trQuestVarSet("currentDistance", zDistanceToVectorSquared("ballistas", "pos"));
-						if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-							trQuestVarCopy("closestDistance", "currentDistance");
-							trQuestVarSet("closest", id);
-							trQuestVarCopy("closestName", "ballistas");
+						trUnitSelectClear();
+						trUnitSelectByQV("nextProj");
+						if (trUnitIsOwnedBy(1*yGetVar("ballistas","player"))) {
+							trQuestVarSet("currentDistance", zDistanceToVectorSquared("ballistas", "pos"));
+							if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
+								trQuestVarCopy("closestDistance", "currentDistance");
+								trQuestVarSet("closest", id);
+								trQuestVarCopy("closestName", "ballistas");
+								trQuestVarSet("closestPlayer", yGetVar("ballistas","player"));
+							}
 						}
 					}
 				}
-				trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
-				trVectorSetUnitPos("start", "closestName");
-				trVectorSetUnitPos("end", "target");
-				vectorSetAsTargetVector("target", "start", "end", 100.0);
-				
-				trUnitSelectClear();
-				trUnitSelectByQV("nextProj", true);
-				trUnitConvert(ENEMY_PLAYER);
-				trUnitChangeProtoUnit("Transport Ship Greek");
-				
-				trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,true);
-				trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,false);
-				trArmySelect("1,0");
-				trUnitConvert(ENEMY_PLAYER);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("nextProj"));
-				trUnitChangeProtoUnit("Dwarf");
-				
-				yAddToDatabase("ballistaShots", "next2");
-				yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
-				yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
-				yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 5000);
-				
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next1"), true);
-				trUnitSelect(""+1*trQuestVarGet("nextProj"), true);
-				trUnitChangeProtoUnit("Relic");
-				
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next2"), true);
-				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
-				
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next1"), true);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
-				
-				trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
-				trUnitSelectClear();
-				trUnitSelectByQV("nextProj", true);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
-				trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
-				trUnitConvert(0);
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next2"), true);
-				trMutateSelected(kbGetProtoUnitID("Priest Projectile"));
-				trSetSelectedScale(0,50,0);
-				trSetUnitOrientation(zGetUnitVector("start", "end"), xsVectorSet(0,1,0), true);
-				trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next1"), true);
-				trUnitConvert(0);
+				if (trQuestVarGet("closest") > 0) {
+					xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
+					trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
+					trVectorSetUnitPos("start", "closestName");
+					trVectorSetUnitPos("end", "target");
+					vectorSetAsTargetVector("target", "start", "end", 100.0);
+					
+					trUnitSelectClear();
+					trUnitSelectByQV("nextProj", true);
+					trUnitConvert(ENEMY_PLAYER);
+					trUnitChangeProtoUnit("Transport Ship Greek");
+					
+					trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,true);
+					trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,false);
+					trArmySelect("1,0");
+					trUnitConvert(ENEMY_PLAYER);
+					trImmediateUnitGarrison(""+1*trQuestVarGet("nextProj"));
+					trUnitChangeProtoUnit("Dwarf");
+					
+					yAddToDatabase("ballistaShots", "next2");
+					yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
+					yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
+					yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 5000);
+					yAddUpdateVar("ballistaShots", "player", trQuestVarGet("closestPlayer"));
+					
+					trUnitSelectClear();
+					trUnitSelect(""+1*trQuestVarGet("next1"), true);
+					trUnitSelect(""+1*trQuestVarGet("nextProj"), true);
+					trUnitChangeProtoUnit("Relic");
+					
+					trUnitSelectClear();
+					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+					
+					trUnitSelectClear();
+					trUnitSelect(""+1*trQuestVarGet("next1"), true);
+					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					
+					trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
+					trUnitSelectClear();
+					trUnitSelectByQV("nextProj", true);
+					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
+					trUnitConvert(0);
+					trUnitSelectClear();
+					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					trMutateSelected(kbGetProtoUnitID("Priest Projectile"));
+					trSetSelectedScale(0,50,0);
+					trSetUnitOrientation(zGetUnitVector("start", "end"), xsVectorSet(0,1,0), true);
+					trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
+					trUnitSelectClear();
+					trUnitSelect(""+1*trQuestVarGet("next1"), true);
+					trUnitConvert(0);
+				}
 			} else if (proto == kbGetProtoUnitID("Fire Siphon Fire")) {
 				if (yGetDatabaseCount("siphons") > 0) {
 					trVectorSetUnitPos("pos", "nextProj");
@@ -527,21 +518,27 @@ void enemiesAlways() {
 						if (id == -1 || trUnitAlive() == false) {
 							yRemoveFromDatabase("siphons");
 						} else if (kbUnitGetAnimationActionType(id) == 12) {
-							trQuestVarSet("currentDistance", zDistanceToVectorSquared("siphons", "pos"));
-							if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-								trQuestVarCopy("closestDistance", "currentDistance");
-								trQuestVarSet("closest", id);
-								trQuestVarCopy("closestName", "siphons");
+							trUnitSelectClear();
+							trUnitSelectByQV("nextProj");
+							if (trUnitIsOwnedBy(1*yGetVar("siphons","player"))) {
+								trQuestVarSet("currentDistance", zDistanceToVectorSquared("siphons", "pos"));
+								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
+									trQuestVarCopy("closestDistance", "currentDistance");
+									trQuestVarSet("closest", id);
+									trQuestVarCopy("closestName", "siphons");
+									trQuestVarSet("closestPlayer", yGetVar("siphons","player"));
+								}
 							}
 						}
 					}
 					if (trQuestVarGet("closest") >= 0) {
+						xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
 						trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
 						trSoundPlayFN("skypassagein.wav","1",-1,"","");
 						trVectorSetUnitPos("start", "closestName");
 						trVectorSetUnitPos("pos", "target");
 						trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-						shootLaser("start", "dir");
+						shootLaser("start", "dir", 60.0, 1*trQuestVarGet("closestPlayer"));
 					}
 				}
 			} else if (proto == kbGetProtoUnitID("Mummy Flies")) {
@@ -556,15 +553,21 @@ void enemiesAlways() {
 						if (id == -1 || trUnitAlive() == false) {
 							yRemoveFromDatabase("Mummies");
 						} else if (kbUnitGetAnimationActionType(id) == 12) {
-							trQuestVarSet("currentDistance", zDistanceToVectorSquared("Mummies", "pos"));
-							if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-								trQuestVarCopy("closestDistance", "currentDistance");
-								trQuestVarSet("closest", id);
-								trQuestVarCopy("closestName", "Mummies");
+							trUnitSelectClear();
+							trUnitSelectByQV("nextProj");
+							if (trUnitIsOwnedBy(1*yGetVar("Mummies","player"))) {
+								trQuestVarSet("currentDistance", zDistanceToVectorSquared("Mummies", "pos"));
+								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
+									trQuestVarCopy("closestDistance", "currentDistance");
+									trQuestVarSet("closest", id);
+									trQuestVarCopy("closestName", "Mummies");
+									trQuestVarSet("closestPlayer", 1*yGetVar("Mummies","player"));
+								}
 							}
 						}
 					}
 					if (trQuestVarGet("closest") >= 0) {
+						xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
 						trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
 						trVectorSetUnitPos("start", "closestName");
 						trVectorSetUnitPos("pos", "target");
@@ -574,6 +577,7 @@ void enemiesAlways() {
 						yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
 						yAddUpdateVar("MummyBalls", "dist", 4.0);
 						yAddUpdateVar("MummyBalls", "type", STATUS_SILENCE);
+						yAddUpdateVar("MummyBalls", "player", 1*trQuestVarGet("closestPlayer"));
 					}
 				}
 			}
@@ -581,46 +585,9 @@ void enemiesAlways() {
 		trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
 	}
 	
-	/* ambush rooms */
-	if (yGetDatabaseCount("ambushRooms") > 0) {
-		yDatabaseNext("ambushRooms");
-		trQuestVarSet("posX", yGetVar("ambushRooms", "posX"));
-		trQuestVarSet("posZ", yGetVar("ambushRooms", "posZ"));
-		for(p=1; < ENEMY_PLAYER) {
-			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 100) {
-				pName = trStringQuestVarGet("enemyProto"+1*yGetVar("ambushRooms", "type"));
-				trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
-				angle = 6.283185 / trQuestVarGet("count");
-				amt = 0;
-				trQuestVarSet("angle",0);
-				for(x=trQuestVarGet("count"); >0) {
-					trQuestVarSetFromRand("dist", 6, 18, true);
-					trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-					trVectorScale("dir", trQuestVarGet("dist"));
-					trQuestVarSet("dirX", trQuestVarGet("posX") + trQuestVarGet("dirX"));
-					trQuestVarSet("dirZ", trQuestVarGet("posZ") + trQuestVarGet("dirZ"));
-					amt = fModulo(360.0, trQuestVarGet("angle") * 180.0 / 3.141592 - 180.0);
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0",pName,1,trQuestVarGet("dirX"),0,trQuestVarGet("dirZ"),amt,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("next", true);
-					trUnitConvert(ENEMY_PLAYER);
-					activateEnemy("next");
-					trQuestVarSet("angle", trQuestVarGet("angle") + angle);
-				}
-				trSoundPlayFN("attackwarning.wav","1",-1,"","");
-				trSoundPlayFN("wild.wav","1",-1,"","");
-				yRemoveFromDatabase("ambushRooms");
-				yRemoveUpdateVar("ambushRooms", "posX");
-				yRemoveUpdateVar("ambushRooms", "posZ");
-				yRemoveUpdateVar("ambushRooms", "type");
-				break;
-			}
-		}
-	}
-	
 	if (yGetDatabaseCount("sphinxes") > 0) {
 		id = yDatabaseNext("sphinxes", true);
+		pName = databaseName(1*yGetVar("sphinxes", "player"));
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("sphinxes")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -629,7 +596,7 @@ void enemiesAlways() {
 			}
 			yRemoveFromDatabase("sphinxes");
 			yRemoveUpdateVar("sphinxes", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("sphinxes", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("sphinxes", "index")) == 1) {
 			ySetVar("sphinxes", "step", 1);
 		} else if (trTimeMS() > yGetVar("sphinxes", "next")) {
 			switch(1*yGetVar("sphinxes", "step"))
@@ -1424,7 +1391,92 @@ void enemiesAlways() {
 			}
 		}
 	}
+}
+
+void enemiesAlways() {
+	int p = 0;
+	int id = 0;
+	float angle = 0;
+	float amt = 0;
+	string pName = "";
+	/*
+	Enemies incoming
+	*/
+	for (x=xsMin(5, yGetDatabaseCount("enemiesIncoming")); > 0) {
+		yDatabaseNext("enemiesIncoming", true);
+		for(p=1; < ENEMY_PLAYER) {
+			if (trUnitHasLOS(p)) {
+				activateEnemy("enemiesIncoming");
+				yRemoveFromDatabase("enemiesIncoming");
+				break;
+			}
+		}
+	}
 	
-	xsSetContextPlayer(old);
+	if (yGetDatabaseCount("enemies") > 0) {
+		id = yDatabaseNext("enemies", true);
+		if ((id == -1) || (trUnitAlive() == false)) {
+			removeEnemy();
+		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
+			(yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
+			/* if idle and out of LOS, we remove it */
+			ySetVar("enemies", "missing", 1 + yGetVar("enemies", "missing"));
+			if (yGetVar("enemies", "missing") >= 10) {
+				for(p=1; < ENEMY_PLAYER) {
+					if (trUnitHasLOS(p)) {
+						ySetVar("enemies", "missing", 0);
+						break;
+					}
+				}
+				if (yGetVar("enemies", "missing") >= 10) {
+					yAddToDatabase("enemiesIncoming", "enemies");
+					yRemoveFromDatabase("enemies");
+				}
+			}
+		} else {
+			stunsAndPoisons("enemies");
+			trVectorSetUnitPos("pos", "enemies");
+			ySetVar("enemies", "posX", trQuestVarGet("posX"));
+			ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
+		}
+	}
+	
+	/* ambush rooms */
+	if (yGetDatabaseCount("ambushRooms") > 0) {
+		yDatabaseNext("ambushRooms");
+		trQuestVarSet("posX", yGetVar("ambushRooms", "posX"));
+		trQuestVarSet("posZ", yGetVar("ambushRooms", "posZ"));
+		for(p=1; < ENEMY_PLAYER) {
+			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 100) {
+				pName = trStringQuestVarGet("enemyProto"+1*yGetVar("ambushRooms", "type"));
+				trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
+				angle = 6.283185 / trQuestVarGet("count");
+				amt = 0;
+				trQuestVarSet("angle",0);
+				for(x=trQuestVarGet("count"); >0) {
+					trQuestVarSetFromRand("dist", 6, 18, true);
+					trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+					trVectorScale("dir", trQuestVarGet("dist"));
+					trQuestVarSet("dirX", trQuestVarGet("posX") + trQuestVarGet("dirX"));
+					trQuestVarSet("dirZ", trQuestVarGet("posZ") + trQuestVarGet("dirZ"));
+					amt = fModulo(360.0, trQuestVarGet("angle") * 180.0 / 3.141592 - 180.0);
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0",pName,1,trQuestVarGet("dirX"),0,trQuestVarGet("dirZ"),amt,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("next", true);
+					trUnitConvert(ENEMY_PLAYER);
+					activateEnemy("next");
+					trQuestVarSet("angle", trQuestVarGet("angle") + angle);
+				}
+				trSoundPlayFN("attackwarning.wav","1",-1,"","");
+				trSoundPlayFN("wild.wav","1",-1,"","");
+				yRemoveFromDatabase("ambushRooms");
+				yRemoveUpdateVar("ambushRooms", "posX");
+				yRemoveUpdateVar("ambushRooms", "posZ");
+				yRemoveUpdateVar("ambushRooms", "type");
+				break;
+			}
+		}
+	}
 }
 

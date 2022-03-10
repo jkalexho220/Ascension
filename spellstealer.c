@@ -152,7 +152,7 @@ void spellstealerAlways(int eventID = -1) {
 					amt = 1;
 					if (hit >= xsPow(2, STATUS_SILENCE)) {
 						hit = hit - xsPow(2, STATUS_SILENCE);
-						silenceEnemy(p, 9.0);
+						silenceUnit("enemies", 9.0, p);
 					}
 					if (hit >= xsPow(2, STATUS_POISON)) {
 						hit = hit - xsPow(2, STATUS_POISON);
@@ -227,7 +227,7 @@ void spellstealerAlways(int eventID = -1) {
 						hit = yGetVar("p"+p+"spellblades", "status");
 						if (hit >= xsPow(2, STATUS_SILENCE)) {
 							hit = hit - xsPow(2, STATUS_SILENCE);
-							silenceEnemy(p, 9.0);
+							silenceUnit("enemies", 9.0, p);
 						}
 						if (hit >= xsPow(2, STATUS_POISON)) {
 							hit = hit - xsPow(2, STATUS_POISON);

@@ -233,7 +233,7 @@ void throneShieldAlways(int eventID = -1) {
 					}
 					hit = kbUnitGetTargetUnitID(id);
 					if (hit == target) {
-						silenceEnemy(p, 6.0);
+						silenceUnit("enemies",6.0, p);
 					} else {
 						stunUnit("enemies", 2.0, p);
 					}

@@ -20,7 +20,7 @@ void castDeathSentence(int p = 0) {
 	
 	ySetVar("enemies", "deathSentence", 1);
 	poisonUnit("enemies", trQuestVarGet("deathSentenceDuration"), trQuestVarGet("deathSentenceDamage"), p);
-	silenceEnemy(p, trQuestVarGet("deathSentenceDuration"));
+	silenceUnit("enemies",trQuestVarGet("deathSentenceDuration"),p);
 	trQuestVarSet("poisonSound", 0);
 	yAddToDatabase("p"+p+"Sentences", "enemies");
 	yAddUpdateVar("p"+p+"Sentences", "index", yGetPointer("enemies"));

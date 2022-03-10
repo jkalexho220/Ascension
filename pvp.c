@@ -991,6 +991,8 @@ highFrequency
 		trQuestVarSet("playerUnitsPrevPointer", yGetPointer("playerUnits"));
 	}
 	
+	specialUnitsAlways();
+	
 	maintainStun();
 	
 	playerLasers();

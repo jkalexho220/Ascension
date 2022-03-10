@@ -197,8 +197,7 @@ void moonbladeAlways(int eventID = -1) {
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "center") < angle) {
-					/* FIX ME */
-					silenceEnemy(p, 1.0);
+					silenceUnit("enemies",1.0,p);
 					damageEnemy(p, posX);
 				}
 			}

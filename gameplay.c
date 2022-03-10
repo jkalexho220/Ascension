@@ -507,6 +507,7 @@ highFrequency
 	}
 	
 	enemiesAlways();
+	specialUnitsAlways();
 	
 	maintainStun();
 	

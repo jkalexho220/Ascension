@@ -131,6 +131,9 @@ highFrequency
 		trCounterAddTime("countdown",10,1,"Challenge begins", -1);
 	} else if (trQuestVarGet("templeChallengeActive") == 2) {
 		if (trTime() > trQuestVarGet("templeChallengeNext")) {
+			trUnitSelectClear();
+			trUnitSelectByQV("frostDriftSFX");
+			trMutateSelected(kbGetProtoUnitID("Ice Sheet"));
 			trRenderSnow(0.2);
 			trSoundPlayFN("wind.wav","1",-1,"","");
 			for(p=1; < ENEMY_PLAYER) {
