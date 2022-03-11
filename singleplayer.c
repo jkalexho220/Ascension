@@ -319,6 +319,12 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
+			case GAMBLER:
+			{
+				if (trPlayerResourceCount(1, "Gold") >= 3000) {
+					unlocked = true;
+				}
+			}
 		}
 	}
 	if (unlocked) {
@@ -810,6 +816,10 @@ highFrequency
 			case STARSEER:
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 7");
+			}
+			case GAMBLER:
+			{
+				uiMessageBox("To unlock this class, acquire 3000 gold.");
 			}
 		}
 	}

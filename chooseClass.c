@@ -62,6 +62,10 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\special g circe icon 64";
 		}
+		case GAMBLER:
+		{
+			icon = "icons\infantry g hypaspist icon 64";
+		}
 	}
 	return(icon);
 }
@@ -1099,6 +1103,10 @@ string className(int class = 0) {
 		case SPARKWITCH:
 		{
 			name = "Spark Witch";
+		}
+		case GAMBLER:
+		{
+			name = "Gambler";
 		}
 	}
 	return(name);

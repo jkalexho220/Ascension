@@ -337,6 +337,10 @@ vector wallNormalVector(string loc = "") {
 	return(retVal);
 }
 
+/*
+dist is the actual value
+width is the squared value
+*/
 bool rayCollision(string db = "", string start = "", string dir = "", float dist = 0, float width = 0) {
 	trVectorSetUnitPos("collidePos", db);
 	float current = zDistanceBetweenVectors("collidePos", start);
@@ -965,6 +969,138 @@ int addGenericProj(string db = "",string start="",string dir="",
 	return(index);
 }
 
+
+void activateSpecialUnit(string db = "", string pName = "", int proto = 0, int p = 0) {
+	switch(proto)
+	{
+		case kbGetProtoUnitID("Sphinx"):
+		{
+			yAddToDatabase("Sphinxes", db);
+			yAddUpdateVar("Sphinxes", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Sphinxes", "step", 0);
+			yAddUpdateVar("Sphinxes", "player", p);
+		}
+		case kbGetProtoUnitID("Dryad"):
+		{
+			yAddToDatabase("Dryads", db);
+			yAddUpdateVar("dryads", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("dryads", "player", p);
+		}
+		case kbGetProtoUnitID("Wadjet"):
+		{
+			yAddToDatabase("Dryads", db);
+			yAddUpdateVar("dryads", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("dryads", "player", p);
+		}
+		case kbGetProtoUnitID("Medusa"):
+		{
+			yAddToDatabase("Medusas", db);
+			yAddUpdateVar("Medusas", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Medusas", "step", 0);
+			yAddUpdateVar("Medusas", "player", p);
+		}
+		case kbGetProtoUnitID("Mountain Giant"):
+		{
+			yAddToDatabase("MountainGiants", db);
+			yAddUpdateVar("MountainGiants", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("MountainGiants", "step", 0);
+			yAddUpdateVar("MountainGiants", "player", p);
+		}
+		case kbGetProtoUnitID("Frost Giant"):
+		{
+			yAddToDatabase("FrostGiants", db);
+			yAddUpdateVar("FrostGiants", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("FrostGiants", "step", 0);
+			yAddUpdateVar("FrostGiants", "player", p);
+		}
+		case kbGetProtoUnitID("Valkyrie"):
+		{
+			yAddUpdateVar(pName, "magicResist", 1);
+			yAddToDatabase("Valkyries", db);
+			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Valkyries", "silenced", 0);
+			spyEffect(1*trQuestVarGet(db),
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+			yAddUpdateVar("Valkyries", "player", p);
+		}
+		case kbGetProtoUnitID("Ballista"):
+		{
+			yAddToDatabase("ballistas", db);
+			yAddUpdateVar("ballistas", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("ballistas", "player", p);
+		}
+		case kbGetProtoUnitID("Colossus"):
+		{
+			yAddUpdateVar(pName, "magicResist", 1);
+			yAddToDatabase("Valkyries", db);
+			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(pName));
+			spyEffect(1*trQuestVarGet(db),
+				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
+			yAddUpdateVar("Valkyries", "player", p);
+		}
+		case kbGetProtoUnitID("Fire Siphon"):
+		{
+			yAddToDatabase("siphons", db);
+			yAddUpdateVar("siphons", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("siphons", "player", p);
+		}
+		case kbGetProtoUnitID("Battle Boar"):
+		{
+			yAddToDatabase("battleBoars", db);
+			yAddUpdateVar("battleBoars", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("battleBoars", "step", 0);
+			yAddUpdateVar("battleBoars", "player", p);
+		}
+		case kbGetProtoUnitID("Automaton SPC"):
+		{
+			yAddToDatabase("automatons", db);
+			yAddUpdateVar("automatons", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("automatons", "player", p);
+		}
+		case kbGetProtoUnitID("Behemoth"):
+		{
+			yAddUpdateVar(pName, "physicalResist", 1);
+			yAddUpdateVar(pName, "magicResist", -1);
+		}
+		case kbGetProtoUnitID("Scarab"):
+		{
+			yAddUpdateVar(pName, "physicalResist", 1);
+			yAddUpdateVar(pName, "magicResist", -1);
+			yAddToDatabase("scarabs", db);
+			yAddUpdateVar("scarabs", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("scarabs", "player", p);
+		}
+		case kbGetProtoUnitID("Satyr"):
+		{
+			yAddToDatabase("Satyrs", db);
+			yAddUpdateVar("Satyrs", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Satyrs", "step", 0);
+			yAddUpdateVar("Satyrs", "player", p);
+		}
+		case kbGetProtoUnitID("Avenger"):
+		{
+			yAddToDatabase("Avengers", db);
+			yAddUpdateVar("Avengers", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Avengers", "step", 0);
+			yAddUpdateVar("Avengers", "player", p);
+		}
+		case kbGetProtoUnitID("Scorpion Man"):
+		{
+			yAddToDatabase("ScorpionMen", db);
+			yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("ScorpionMen", "step", 0);
+			yAddUpdateVar("ScorpionMen", "player", p);
+		}
+		case kbGetProtoUnitID("Mummy"):
+		{
+			yAddToDatabase("Mummies", db);
+			yAddUpdateVar("Mummies", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Mummies", "step", 0);
+			yAddUpdateVar("Mummies", "player", p);
+		}
+	}
+}
+
 int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0) {
 	int index = yAddToDatabase("playerUnits", db);
 	yAddUpdateVar("playerUnits", "player", p);
@@ -982,6 +1118,7 @@ int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0
 		yAddUpdateVar("enemies", "player", p);
 		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
 	}
+	activateSpecialUnit(db, "playerUnits", proto, p);
 	return(index);
 }
 

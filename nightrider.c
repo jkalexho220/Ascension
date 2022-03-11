@@ -152,8 +152,7 @@ void nightriderAlways(int eventID = -1) {
 			yVarToVector("p"+p+"abducts", "dir");
 			yVarToVector("p"+p+"abducts", "dest");
 			dist = zDistanceBetweenVectors("pos", "prev") + 3.0;
-			if (zDistanceBetweenVectorsSquared("pos", "dest") < dist &&
-				zDistanceBetweenVectorsSquared("prev", "dest") < dist) {
+			if (trTimeMS() > yGetVar("p"+p+"abducts", "timeout")) {
 				trUnitChangeProtoUnit("Kronny Birth SFX");
 				yRemoveFromDatabase("p"+p+"abducts");
 			} else {
@@ -201,6 +200,7 @@ void nightriderAlways(int eventID = -1) {
 				yAddUpdateVar("p"+p+"abducts", "prevz", trQuestVarGet("startz"));
 				yAddUpdateVar("p"+p+"abducts", "destx", trQuestVarGet("posx"));
 				yAddUpdateVar("p"+p+"abducts", "destz", trQuestVarGet("posz"));
+				yAddUpdateVar("p"+p+"abducts", "timeout", trTimeMS() + dist / 0.015);
 				yAddUpdateVar("p"+p+"abducts", "curse", 1);
 			}
 		}
@@ -362,51 +362,6 @@ void nightriderAlways(int eventID = -1) {
 		}
 	}
 	
-	
-	/*
-	if (trQuestVarGet("p"+p+"nightfall") == 1) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"nightfallTimeout")) {
-			trQuestVarSet("p"+p+"nightfall", 0);
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				yDatabaseNext("p"+p+"characters", true);
-				trSetSelectedScale(1,1,1);
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "nightfallSFX"));
-				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-			}
-			trModifyProtounit("Minion", p, 27, 4.25);
-			trModifyProtounit("Minion", p, 1, 1);
-			trTechSetStatus(p, 377, 0);
-			zSetProtoUnitStat("Minion", p, 27, 0.2 * trQuestVarGet("p"+p+"baseAttack"));
-			zSetProtoUnitStat("Hero Greek Achilles", p, 27, trQuestVarGet("p"+p+"baseAttack"));
-			trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack"));
-			trQuestVarSet("p"+p+"nightfallBonus", 0);
-			trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
-		}
-	}
-	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		gainFavor(p, 0.0 - trQuestVarGet("nightfallCost") * trQuestVarGet("p"+p+"ultimateCost"));
-		trQuestVarSet("p"+p+"nightfall", 1);
-		trQuestVarSet("p"+p+"nightfallBonus", 1);
-		trQuestVarSet("p"+p+"nightfallTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("nightfallDuration") * trQuestVarGet("p"+p+"spellDuration"));
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters");
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("p"+p+"characters", "nightfallSFX"));
-			trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
-			trSetSelectedScale(0,0,0);
-			trUnitOverrideAnimation(6,0,false,true,-1);
-		}
-		trModifyProtounit("Minion", p, 27, -4.25);
-		trModifyProtounit("Minion", p, 1, -1);
-		trTechSetStatus(p, 377, 4);
-		trSoundPlayFN("tartariangateselect.wav","1",-1,"","");
-	}
-	*/
-	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -462,5 +417,5 @@ highFrequency
 	trQuestVarSet("ariseCooldown", 16);
 	
 	trQuestVarSet("nightfallCost", 75);
-	trQuestVarSet("nightfallRadius", 15);//trQuestVarSet("nightfallDuration", 12);
+	trQuestVarSet("nightfallRadius", 15);
 }

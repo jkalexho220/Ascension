@@ -45,137 +45,6 @@ bool checkEnemyDeactivated(string db = "") {
 	return(false);
 }
 
-void activateSpecialUnit(string db = "", string vname = "", int proto = 0, int p = 0) {
-	switch(proto)
-	{
-		case kbGetProtoUnitID("Sphinx"):
-		{
-			yAddToDatabase("Sphinxes", db);
-			yAddUpdateVar("Sphinxes", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Sphinxes", "step", 0);
-			yAddUpdateVar("Sphinxes", "player", p);
-		}
-		case kbGetProtoUnitID("Dryad"):
-		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("dryads", "player", p);
-		}
-		case kbGetProtoUnitID("Wadjet"):
-		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("dryads", "player", p);
-		}
-		case kbGetProtoUnitID("Medusa"):
-		{
-			yAddToDatabase("Medusas", db);
-			yAddUpdateVar("Medusas", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Medusas", "step", 0);
-			yAddUpdateVar("Medusas", "player", p);
-		}
-		case kbGetProtoUnitID("Mountain Giant"):
-		{
-			yAddToDatabase("MountainGiants", db);
-			yAddUpdateVar("MountainGiants", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("MountainGiants", "step", 0);
-			yAddUpdateVar("MountainGiants", "player", p);
-		}
-		case kbGetProtoUnitID("Frost Giant"):
-		{
-			yAddToDatabase("FrostGiants", db);
-			yAddUpdateVar("FrostGiants", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("FrostGiants", "step", 0);
-			yAddUpdateVar("FrostGiants", "player", p);
-		}
-		case kbGetProtoUnitID("Valkyrie"):
-		{
-			yAddUpdateVar(vname, "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Valkyries", "silenced", 0);
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-			yAddUpdateVar("Valkyries", "player", p);
-		}
-		case kbGetProtoUnitID("Ballista"):
-		{
-			yAddToDatabase("ballistas", db);
-			yAddUpdateVar("ballistas", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("ballistas", "player", p);
-		}
-		case kbGetProtoUnitID("Colossus"):
-		{
-			yAddUpdateVar(vname, "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(vname));
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-			yAddUpdateVar("Valkyries", "player", p);
-		}
-		case kbGetProtoUnitID("Fire Siphon"):
-		{
-			yAddToDatabase("siphons", db);
-			yAddUpdateVar("siphons", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("siphons", "player", p);
-		}
-		case kbGetProtoUnitID("Battle Boar"):
-		{
-			yAddToDatabase("battleBoars", db);
-			yAddUpdateVar("battleBoars", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("battleBoars", "step", 0);
-			yAddUpdateVar("battleBoars", "player", p);
-		}
-		case kbGetProtoUnitID("Automaton SPC"):
-		{
-			yAddToDatabase("automatons", db);
-			yAddUpdateVar("automatons", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("automatons", "player", p);
-		}
-		case kbGetProtoUnitID("Behemoth"):
-		{
-			yAddUpdateVar(vname, "physicalResist", 1);
-			yAddUpdateVar(vname, "magicResist", -1);
-		}
-		case kbGetProtoUnitID("Scarab"):
-		{
-			yAddUpdateVar(vname, "physicalResist", 1);
-			yAddUpdateVar(vname, "magicResist", -1);
-			yAddToDatabase("scarabs", db);
-			yAddUpdateVar("scarabs", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("scarabs", "player", p);
-		}
-		case kbGetProtoUnitID("Satyr"):
-		{
-			yAddToDatabase("Satyrs", db);
-			yAddUpdateVar("Satyrs", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Satyrs", "step", 0);
-			yAddUpdateVar("Satyrs", "player", p);
-		}
-		case kbGetProtoUnitID("Avenger"):
-		{
-			yAddToDatabase("Avengers", db);
-			yAddUpdateVar("Avengers", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Avengers", "step", 0);
-			yAddUpdateVar("Avengers", "player", p);
-		}
-		case kbGetProtoUnitID("Scorpion Man"):
-		{
-			yAddToDatabase("ScorpionMen", db);
-			yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("ScorpionMen", "step", 0);
-			yAddUpdateVar("ScorpionMen", "player", p);
-		}
-		case kbGetProtoUnitID("Mummy"):
-		{
-			yAddToDatabase("Mummies", db);
-			yAddUpdateVar("Mummies", "index", yGetNewestPointer(vname));
-			yAddUpdateVar("Mummies", "step", 0);
-			yAddUpdateVar("Mummies", "player", p);
-		}
-	}
-}
-
 void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 	int id = kbGetBlockID(""+1*trQuestVarGet(db));
 	int proto = kbGetUnitBaseTypeID(id);
@@ -230,95 +99,92 @@ rule setup_enemies
 inactive
 highFrequency
 {
-	if (trTime() > cActivationTime) {
-		trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
-		trModifyProtounit("Minion", 1, 8, -99);
-		
-		setupProtounitBounty("Nemean Lion", 0, 0, 0);
-		setupProtounitBounty("King Folstag", 0, 0, 0);
-		setupProtounitBounty("Chimera", 0.25, 0, 0);
-		setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
-		setupProtounitBounty("Helepolis", 0.25, 0, 0);
-		setupProtounitBounty("Scylla", 0.5, 0, 0);
-		setupProtounitBounty("Theris", 0.5, 0, 0);
-		setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
-		
-		setupProtounitBounty("Golden Lion", 0.3, 3);
-		setupProtounitBounty("Anubite", 0.3, 4, 0.03);
-		setupProtounitBounty("Terracotta Soldier", 0.3, 4, 0.03);
-		setupProtounitBounty("Sphinx", 0.3, 5, 0.05);
-		setupProtounitBounty("Petsuchos", 0.1, 6, 0.1, RELIC_ATTACK_RANGE);
-		
-		setupProtounitBounty("Minion", 0.1, 2);
-		setupProtounitBounty("Walking Woods Marsh", 0.2, 3);
-		setupProtounitBounty("Dryad", 0.2, 4, 0.03);
-		setupProtounitBounty("Centaur", 0.1, 4, 0.03);
-		setupProtounitBounty("Medusa", 0.1, 8, 0.15, RELIC_SPELL_DURATION);
-		setupProtounitBounty("Mountain Giant", 0.3, 10, 0.1);
-		
-		setupProtounitBounty("Fenris Wolf", 0.2, 4, 0.03);
-		setupProtounitBounty("Valkyrie", 0, 5, 0.05);
-		setupProtounitBounty("Ballista", 0, 4, 0.03);
-		setupProtounitBounty("Frost Giant", 0.3, 10, 0.1);
-		
-		setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
-		setupProtounitBounty("Colossus", 0.2, 10, 0.1);
-		setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
-		setupProtounitBounty("Fire Siphon", 0, 8, 0.1);
-		
-		setupProtounitBounty("Cyclops", 0.2, 6, 0.05);
-		setupProtounitBounty("Satyr", 0.1, 4, 0.03);
-		setupProtounitBounty("Behemoth", 1, 10, 0.08);
-		setupProtounitBounty("Avenger", 0.2, 12, 0.1);
-		
-		setupProtounitBounty("Wadjet", 0.2, 4, 0.03);
-		setupProtounitBounty("Scorpion Man", 0.3, 6, 0.05);
-		setupProtounitBounty("Scarab", 1, 10, 0.08);
-		setupProtounitBounty("Mummy", 0.6, 12, 0.1);
-		
-		setupProtounitBounty("Shade XP", 0, 0, 0);
-		trModifyProtounit("Shade XP", 0, 1, -1.8);
-		trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -1.8);
-		
-		setupProtounitBounty("Hero Boar", 0, 0, 0);
-		setupProtounitBounty("Hero Boar 2", 0, 0, 0);
-		trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack
-		trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
-		
-		for(class = 1; <= 16) {
-			setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),
-				trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
-		}
-		
-		/* ballista projectiles */
-		trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
-		trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
-		trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
-		trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
-		trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
-		trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
-		trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
-		trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
-		trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
-		trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
-		trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
-		
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 47);
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
-		trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);
-		
-		trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
-		trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
-		trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 47000);
-		trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 2, 20);
-		
-		trModifyProtounit("Stymphalian Bird", 0, 1, 2);
-		
-		xsDisableSelf();
+	trModifyProtounit("Minion", ENEMY_PLAYER, 8, -99);
+	trModifyProtounit("Minion", 1, 8, -99);
+	
+	setupProtounitBounty("Nemean Lion", 0, 0, 0);
+	setupProtounitBounty("King Folstag", 0, 0, 0);
+	setupProtounitBounty("Chimera", 0.25, 0, 0);
+	setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
+	setupProtounitBounty("Helepolis", 0.25, 0, 0);
+	setupProtounitBounty("Scylla", 0.5, 0, 0);
+	setupProtounitBounty("Theris", 0.5, 0, 0);
+	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
+	
+	setupProtounitBounty("Golden Lion", 0.3, 3);
+	setupProtounitBounty("Anubite", 0.3, 4, 0.03);
+	setupProtounitBounty("Terracotta Soldier", 0.3, 4, 0.03);
+	setupProtounitBounty("Sphinx", 0.3, 5, 0.05);
+	setupProtounitBounty("Petsuchos", 0.1, 6, 0.1, RELIC_ATTACK_RANGE);
+	
+	setupProtounitBounty("Walking Woods Marsh", 0.2, 3);
+	setupProtounitBounty("Dryad", 0.2, 4, 0.03);
+	setupProtounitBounty("Centaur", 0.1, 4, 0.03);
+	setupProtounitBounty("Medusa", 0.1, 8, 0.15, RELIC_SPELL_DURATION);
+	setupProtounitBounty("Mountain Giant", 0.3, 10, 0.1);
+	
+	setupProtounitBounty("Fenris Wolf", 0.2, 4, 0.03);
+	setupProtounitBounty("Valkyrie", 0, 5, 0.05);
+	setupProtounitBounty("Ballista", 0, 4, 0.03);
+	setupProtounitBounty("Frost Giant", 0.3, 10, 0.1);
+	
+	setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
+	setupProtounitBounty("Colossus", 0.2, 10, 0.1);
+	setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
+	setupProtounitBounty("Fire Siphon", 0, 8, 0.1);
+	
+	setupProtounitBounty("Cyclops", 0.2, 6, 0.05);
+	setupProtounitBounty("Satyr", 0.1, 4, 0.03);
+	setupProtounitBounty("Behemoth", 1, 10, 0.08);
+	setupProtounitBounty("Avenger", 0.2, 12, 0.1);
+	
+	setupProtounitBounty("Wadjet", 0.2, 4, 0.03);
+	setupProtounitBounty("Scorpion Man", 0.3, 6, 0.05);
+	setupProtounitBounty("Scarab", 1, 10, 0.08);
+	setupProtounitBounty("Mummy", 0.6, 12, 0.1);
+	
+	setupProtounitBounty("Shade XP", 0, 0, 0);
+	trModifyProtounit("Shade XP", 0, 1, -1.8);
+	trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -1.8);
+	
+	setupProtounitBounty("Hero Boar", 0, 0, 0);
+	setupProtounitBounty("Hero Boar 2", 0, 0, 0);
+	trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack
+	trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
+	
+	for(class = 1; <= 16) {
+		setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),
+			trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
 	}
+	
+	/* ballista projectiles */
+	trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
+	trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
+	trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
+	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
+	trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
+	trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
+	trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
+	
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 47);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);
+	
+	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 47000);
+	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 2, 20);
+	
+	trModifyProtounit("Stymphalian Bird", 0, 1, 2);
+	
+	xsDisableSelf();
 }
 
 void ballistaShotPop() {

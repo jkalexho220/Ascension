@@ -22,7 +22,7 @@ const int SPELLSTEALER = 12;
 const int NIGHTRIDER = 13;
 const int SPARKWITCH = 14;
 const int SAVIOR = 15;
-const int KING = 16;
+const int GAMBLER = 16;
 
 const int CLASS_COUNT = 16;
 
@@ -441,7 +441,7 @@ runImmediately
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
-	setupClass("Regent", KING, 500, 1100, SOULSTONE);
+	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -560,7 +560,7 @@ highFrequency
 	setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
-	setupPlayerProto("Regent", 1000, 0, 4.2, 0.5);
+	setupPlayerProto("Regent", 1000, 0, 4.2, 0.3);
 	
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
@@ -611,6 +611,8 @@ highFrequency
 		trModifyProtounit("Servant", p, 55, 1);
 		trModifyProtounit("Nereid", p, 55, 1);
 		trModifyProtounit("Scylla", p, 55, 1);
+		
+		trModifyProtounit("Axe",p,1,-20);
 	}
 	
 	trModifyProtounit("Minion", 0, 8, -999);

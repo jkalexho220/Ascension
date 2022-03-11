@@ -1228,6 +1228,7 @@ highFrequency
 			case 5:
 			{
 				trQuestVarSet("stageTemple", BOON_SPELL_POISON);
+				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 3, 1);
 				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
 				trQuestVarSet("bossRoomSize", 11);
