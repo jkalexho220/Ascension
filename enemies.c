@@ -663,6 +663,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
 						ySetVarFromVector("MountainGiants", "end", "end");
@@ -766,6 +767,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 12) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						ySetVar("Medusas", "target", trGetUnitScenarioNameNumber(target));
 						
@@ -779,7 +781,7 @@ void specialUnitsAlways() {
 					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
 					trVectorSetUnitPos("start", "Medusas");
 					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5);
+					addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5,0,p);
 					yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
 					yAddUpdateVar("MedusaBalls", "bounces", 10);
 					yAddUpdateVar("MedusaBalls", "player", p);
@@ -896,6 +898,8 @@ void specialUnitsAlways() {
 	if (yGetDatabaseCount("automatonBombs") > 0) {
 		yDatabaseNext("automatonBombs");
 		if (trTimeMS() > yGetVar("automatonBombs", "timeout")) {
+			p = yGetVar("automatonBombs","player");
+			pName = opponentDatabaseName(p);
 			yVarToVector("automatonBombs", "pos");
 			trUnitSelectClear();
 			trUnitSelectByQV("automatonBombs", true);
@@ -906,11 +910,11 @@ void specialUnitsAlways() {
 			trDamageUnitPercent(-100);
 			trSetSelectedScale(1.0,1.0,0.4);
 			yRemoveFromDatabase("automatonBombs");
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+			for(x=yGetDatabaseCount(pName); >0) {
+				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
 					removePlayerUnit();
-				} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16) {
-					damagePlayerUnit(200);
+				} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+					damageOpponentUnit(p, 200);
 				}
 			}
 		}
@@ -925,19 +929,23 @@ void specialUnitsAlways() {
 				yAddUpdateVar("automatonBombs", "timeout", trTimeMS() + 3000);
 				yAddUpdateVar("automatonBombs", "posx", yGetVar("automatons", "posx"));
 				yAddUpdateVar("automatonBombs", "posz", yGetVar("automatons", "posz"));
+				yAddUpdateVar("automatonBombs", "player", yGetVar("automatons","player"));
 			}
 			yRemoveFromDatabase("automatons");
 		} else if (checkEnemyDeactivated("automatons")) {
 			yRemoveFromDatabase("automatons");
 		} else {
+			pName = databaseName(1*yGetVar("automatons","player"));
 			trVectorSetUnitPos("pos", "automatons");
 			ySetVarFromVector("automatons", "pos", "pos");
-			ySetVar("automatons", "silenceStatus", 1*yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("automatons", "index")));
+			ySetVar("automatons", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("automatons", "index")));
 		}
 	}
 	
 	if(yGetDatabaseCount("frostGiants") >0) {
 		id = yDatabaseNext("frostGiants", true);
+		p = yGetVar("frostGiants","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			if (trQuestVarGet("frostGiantHunt") == 1) {
@@ -949,7 +957,7 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated("frostGiants")) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			yRemoveFromDatabase("frostGiants");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
 			ySetVar("frostGiants", "step", 2);
 		} else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
 			switch(1*yGetVar("frostGiants", "step"))
@@ -957,6 +965,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						ySetVar("frostGiants", "target", trGetUnitScenarioNameNumber(target));
 						ySetVar("frostGiants", "step", 1);
@@ -967,11 +976,12 @@ void specialUnitsAlways() {
 				case 1:
 				{
 					action = 0;
-					for (x=yGetDatabaseCount("playerUnits"); >0) {
-						if (yGetVar("frostGiants", "target") == yDatabaseNext("playerUnits")) {
+					pName = opponentDatabaseName(p);
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yGetVar("frostGiants", "target") == yDatabaseNext(pName)) {
 							trUnitSelectClear();
-							trUnitSelectByQV("playerUnits");
-							stunUnit("playerUnits", 3.0);
+							trUnitSelectByQV(pName);
+							stunUnit(pName, 3.0, p);
 							action = 1;
 							break;
 						}
@@ -999,8 +1009,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("frostGiants", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("frostGiants", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("frostGiants", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("frostGiants", "index"));
 			if (action > 0 && yGetVar("frostGiants", "step") == 1) {
 				ySetVar("frostGiants", "step", 0);
 				ySetVar("frostGiants", "next", trTimeMS() + 18000);
@@ -1011,16 +1021,18 @@ void specialUnitsAlways() {
 	if (yGetDatabaseCount("barrages") > 0) {
 		yDatabaseNext("barrages");
 		if (trTimeMS() > yGetVar("barrages", "next")) {
+			p = yGetVar("barrages","player");
+			pName = opponentDatabaseName(p);
 			ySetVar("barrages", "next", 300 + yGetVar("barrages", "next"));
 			/* do the damage */
 			yVarToVector("barrages", "pos");
 			yVarToVector("barrages", "dir");
 			if (yGetVar("barrages", "count") <= 3) {
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 9.0) {
-						damagePlayerUnit(100);
+				for(x=yGetDatabaseCount(pName); >0) {
+					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+						removeOpponentUnit(p);
+					} else if (zDistanceToVectorSquared(pName, "pos") < 9.0) {
+						damageOpponentUnit(p,100);
 					}
 				}
 			}
@@ -1051,13 +1063,16 @@ void specialUnitsAlways() {
 	
 	if(yGetDatabaseCount("Satyrs") >0) {
 		id = yDatabaseNext("Satyrs", true);
+		p = yGetVar("satyrs","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Satyrs")) {
 			yRemoveFromDatabase("Satyrs");
 			yRemoveUpdateVar("Satyrs", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
 			ySetVar("Satyrs", "specialnext", trTimeMS() + 10000);
 		} else if (trTimeMS() > yGetVar("Satyrs", "specialnext")) {
 			if (kbUnitGetAnimationActionType(id) == 12) {
+				xsSetContextPlayer(p);
 				target = kbUnitGetTargetUnitID(id);
 				ySetVar("Satyrs", "specialnext", trTimeMS() + 20000);
 				trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
@@ -1074,12 +1089,15 @@ void specialUnitsAlways() {
 				yAddUpdateVar("barrages", "posz", trQuestVarGet("endz") - 8.0 * trQuestVarGet("dirZ"));
 				yAddUpdateVar("barrages", "next", trTimeMS());
 				yAddUpdateVar("barrages", "count", 5);
+				yAddUpdateVar("barrages", "player", p);
 			}
 		}
 	}
 	
 	if(yGetDatabaseCount("battleBoars") >0) {
 		id = yDatabaseNext("battleBoars", true);
+		p = yGetVar("battleBoars","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("battleBoars")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -1088,7 +1106,7 @@ void specialUnitsAlways() {
 			}
 			yRemoveFromDatabase("battleBoars");
 			yRemoveUpdateVar("battleBoars", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
 			ySetVar("battleBoars", "step", 2);
 		} else if (trTimeMS() > yGetVar("battleBoars", "specialnext")) {
 			switch(1*yGetVar("battleBoars", "step"))
@@ -1096,6 +1114,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						ySetVar("battleBoars", "target", trGetUnitScenarioNameNumber(target));
 						ySetVar("battleBoars", "step", 1);
@@ -1107,13 +1126,14 @@ void specialUnitsAlways() {
 				{
 					trVectorSetUnitPos("start", "battleBoars");
 					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("battleBoars", "target")));
-					for (x=yGetDatabaseCount("playerUnits"); >0) {
-						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-							removePlayerUnit();
-						} else if (zDistanceToVectorSquared("playerUnits", "end") < 9.0) {
-							trVectorSetUnitPos("pos", "playerUnits");
+					pName = opponentDatabaseName(p);
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (zDistanceToVectorSquared(pName, "end") < 9.0) {
+							trVectorSetUnitPos("pos", pName);
 							vectorSetAsTargetVector("target", "start", "pos", 20.0);
-							launchUnit("playerUnits", "target");
+							launchUnit(pName, "target");
 						}
 					}
 					ySetVar("battleBoars", "step", 2);
@@ -1131,8 +1151,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("battleBoars", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("battleBoars", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("battleBoars", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("battleBoars", "index"));
 			if (action > 0 && yGetVar("battleBoars", "step") == 1) {
 				ySetVar("battleBoars", "step", 0);
 				ySetVar("battleBoars", "next", trTimeMS() + 18000);
@@ -1142,6 +1162,8 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("AvengerProj") > 0) {
 		if (processGenericProj("AvengerProj") == PROJ_FALLING) {
+			p = yGetVar("AvengerProj","player");
+			pName = opponentDatabaseName(p);
 			yVarToVector("AvengerProj", "prev");
 			yVarToVector("AvengerProj", "dir");
 			trVectorSetUnitPos("pos", "AvengerProj");
@@ -1149,22 +1171,17 @@ void specialUnitsAlways() {
 			if (amt > 2.0) {
 				yVarToVector("AvengerProj", "dir");
 				ySetVar("AvengerProj", "currentDist", yGetVar("AvengerProj", "currentDist") + amt);
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-						removePlayerUnit();
+				for(x=yGetDatabaseCount(pName); >0) {
+					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+						removeOpponentUnit(p);
 					} else {
-						dist = zDistanceToVector("playerUnits", "prev");
+						dist = zDistanceToVector(pName, "prev");
 						if (dist < amt + 1.0) {
 							trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
 							trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-							if (zDistanceToVectorSquared("playerUnits", "hitbox") < 9.0) {
-								damagePlayerUnit(amt * 20.0);
-								for(p=1; < ENEMY_PLAYER) {
-									if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+p+"unit")) {
-										silencePlayer(p, 5.0);
-										break;
-									}
-								}
+							if (zDistanceToVectorSquared(pName, "hitbox") < 9.0) {
+								damageOpponentUnit(p, amt * 20.0);
+								silenceUnit(pName,5.0,p);
 							}
 						}
 					}
@@ -1176,16 +1193,25 @@ void specialUnitsAlways() {
 			vectorToGrid("next", "loc");
 			if (yGetVar("AvengerProj", "currentDist") >= yGetVar("AvengerProj", "distance") ||
 				terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				pName = databaseName(p);
 				trUnitSelectClear();
 				trUnitSelectByQV("AvengerProj", true);
 				trDamageUnitPercent(-100);
-				trUnitChangeProtoUnit("Avenger");
+				trUnitChangeProtoUnit("Transport Ship Greek");
 				trUnitSelectClear();
 				trUnitSelectByQV("AvengerProj", true);
 				trDamageUnitPercent(-100);
-				trDamageUnitPercent(yGetVar("AvengerProj", "damaged"));
-				activateEnemy("avengerProj");
-				yAddUpdateVar("Avengers", "specialnext", trTimeMS() + 10000);
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("AvengerProj","unit"),true);
+				if (trUnitAlive()) {
+					trImmediateUnitGarrison(""+1*trQuestVarGet("AvengerProj"));
+					trUnitChangeProtoUnit("Avenger");
+					ySetVarAtIndex("Avengers","step",0,1*yGetVar("AvengerProj","index"));
+				}
+				trUnitSelectClear();
+				trUnitSelectByQV("AvengerProj");
+				trUnitChangeProtoUnit("Dust Small");
+				
 				yRemoveFromDatabase("AvengerProj");
 			}
 		}
@@ -1193,6 +1219,8 @@ void specialUnitsAlways() {
 	
 	if(yGetDatabaseCount("Avengers") >0) {
 		id = yDatabaseNext("Avengers", true);
+		p = yGetVar("Avengers","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Avengers")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -1201,36 +1229,40 @@ void specialUnitsAlways() {
 			}
 			yRemoveFromDatabase("Avengers");
 			yRemoveUpdateVar("Avengers", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
 			ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
 		} else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
-			if (kbUnitGetActionType(id) == 6) {
-				target = kbUnitGetTargetUnitID(id);
-				trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-				trVectorSetUnitPos("start", "Avengers");
-				if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
-					trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
-					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					amt = trUnitPercentDamaged();
-					trUnitChangeProtoUnit("Dust Large");
-					addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0);
-					yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
-					yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
-					yAddUpdateVar("avengerProj", "damaged", amt);
-					yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
-					yAddUpdateVar("avengerProj", "currentDist", 0);
-					if (ySetPointer("enemies", 1*yGetVar("Avengers", "index"))) {
-						yRemoveFromDatabase("enemies");
+			switch(1*yGetVar("Avengers","step"))
+			{
+				case 0:
+				{
+					xsSetContextPlayer(p);
+					if (kbUnitGetActionType(id) == 6) {
+						target = kbUnitGetTargetUnitID(id);
+						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+						trVectorSetUnitPos("start", "Avengers");
+						if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
+							trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
+							trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+							trSetSelectedScale(0,0,0);
+							addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0,p);
+							yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
+							yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
+							yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
+							yAddUpdateVar("avengerProj", "currentDist", 0);
+							yAddUpdateVar("avengerProj", "unit", trQuestVarGet("Avengers"));
+							yAddUpdateVar("avengerProj", "index", yGetPointer("Avengers"));
+							yAddUpdateVar("avengerProj", "player",p);
+							ySetVar("Avengers","step", 1);
+							ySetVar("Avengers","proj",yGetNewestPointer("avengerProj"));
+						}
 					}
-					yRemoveFromDatabase("Avengers");
 				}
-			}
-		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Avengers", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Avengers", "index"));
-			if (action > 0 && yGetVar("Avengers", "step") == 1) {
-				ySetVar("Avengers", "step", 0);
-				ySetVar("Avengers", "next", trTimeMS() + 10000);
+				case 2:
+				{
+					ySetVar("Avengers","step",0);
+					ySetVar("Avengers","specialNext", trTimeMS() + 10000);
+				}
 			}
 		}
 	}
@@ -1246,7 +1278,7 @@ void specialUnitsAlways() {
 		id = yDatabaseNext("siphons", true);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("siphons")) {
 			yRemoveFromDatabase("siphons");
-		} else if (kbUnitGetAnimationActionType(id) == 9) {
+		} else if ((kbUnitGetAnimationActionType(id) == 9) && (yGetVar("siphons","player") == ENEMY_PLAYER)) {
 			if (trTimeMS() > yGetVar("siphons", "next")) {
 				ySetVar("siphons", "next", trTimeMS() + 3000);
 				yDatabaseNext("playerUnits");
@@ -1258,32 +1290,31 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("MummyBalls") > 0) {
 		if (processGenericProj("MummyBalls") == PROJ_FALLING) {
+			p = yGetVar("MummyBalls","player");
+			pName = opponentDatabaseName(p);
 			yVarToVector("MummyBalls", "prev");
 			yVarToVector("MummyBalls", "dir");
 			amt = zDistanceBetweenVectors("pos", "prev");
 			ySetVarFromVector("MummyBalls", "prev", "pos");
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-					removePlayerUnit();
+			for(x=yGetDatabaseCount(pName); >0) {
+				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					removeOpponentUnit(p);
 				} else {
-					dist = zDistanceToVector("playerUnits", "prev");
+					dist = zDistanceToVector(pName, "prev");
 					if (dist < amt + 4.0) {
 						trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
 						trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-						if (zDistanceToVectorSquared("playerUnits", "hitbox") < yGetVar("MummyBalls", "dist")) {
-							damagePlayerUnit(xsMin(100.0, amt * 10));
+						if (zDistanceToVectorSquared(pName, "hitbox") < yGetVar("MummyBalls", "dist")) {
+							damageOpponentUnit(p, xsMin(100.0, amt * 10));
 							switch(1*yGetVar("MummyBalls", "type"))
 							{
 								case STATUS_SILENCE:
 								{
-									target = yGetVar("playerUnits", "player");
-									if (trQuestVarGet("p"+target+"unit") == trQuestVarGet("playerUnits")) {
-										silencePlayer(target, 3.0);
-									}
+									silenceUnit(pName, 5.0, p);
 								}
 								case STATUS_POISON:
 								{
-									poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
+									poisonUnit(pName, 10, 5.0 * trQuestVarGet("stage"), p);
 								}
 							}
 						}
@@ -1299,6 +1330,8 @@ void specialUnitsAlways() {
 	
 	if (yGetDatabaseCount("Mummies") >0) {
 		id = yDatabaseNext("Mummies", true);
+		p = yGetVar("Mummies", "player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Mummies")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -1307,7 +1340,7 @@ void specialUnitsAlways() {
 			}
 			yRemoveFromDatabase("Mummies");
 			yRemoveUpdateVar("Mummies", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
 			ySetVar("Mummies", "step", 2);
 		} else if (trTimeMS() > yGetVar("Mummies", "next")) {
 			switch(1*yGetVar("Mummies", "step"))
@@ -1315,6 +1348,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 12) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
 						trVectorSetUnitPos("start", "Mummies");
@@ -1335,6 +1369,7 @@ void specialUnitsAlways() {
 					yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
 					yAddUpdateVar("MummyBalls", "dist", 16);
 					yAddUpdateVar("MummyBalls", "type", STATUS_POISON);
+					yAddUpdateVar("MummyBalls","player",p);
 					ySetVar("Mummies", "step", 2);
 					ySetVar("Mummies", "next", yGetVar("Mummies", "next") + 3000);
 				}
@@ -1346,8 +1381,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("Mummies", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("Mummies", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Mummies", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Mummies", "index"));
 			if (action > 0 && yGetVar("Mummies", "step") == 1) {
 				ySetVar("Mummies", "step", 0);
 				ySetVar("Mummies", "next", trTimeMS() + 18000);
@@ -1357,6 +1392,8 @@ void specialUnitsAlways() {
 	
 	if(yGetDatabaseCount("ScorpionMen") >0) {
 		id = yDatabaseNext("ScorpionMen", true);
+		p = yGetVar("ScorpionMen","player");
+		pName = databaseName(p);
 		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ScorpionMen")) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -1365,7 +1402,7 @@ void specialUnitsAlways() {
 			}
 			yRemoveFromDatabase("ScorpionMen");
 			yRemoveUpdateVar("ScorpionMen", "step");
-		} else if (yGetVarAtIndex("enemies", "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
 			ySetVar("ScorpionMen", "step", 2);
 		} else if (trTimeMS() > yGetVar("ScorpionMen", "specialnext")) {
 			switch(1*yGetVar("ScorpionMen", "step"))
@@ -1373,6 +1410,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
 						ySetVar("ScorpionMen", "target", trGetUnitScenarioNameNumber(target));
 						ySetVar("ScorpionMen", "step", 1);
@@ -1383,11 +1421,12 @@ void specialUnitsAlways() {
 				case 1:
 				{
 					action = 0;
-					for (x=yGetDatabaseCount("playerUnits"); >0) {
-						if (yGetVar("ScorpionMen", "target") == yDatabaseNext("playerUnits")) {
+					pName = opponentDatabaseName(p);
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yGetVar("ScorpionMen", "target") == yDatabaseNext(pName)) {
 							trUnitSelectClear();
-							trUnitSelectByQV("playerUnits");
-							poisonUnit("playerUnits", 10, 5.0 * trQuestVarGet("stage"));
+							trUnitSelectByQV(pName);
+							poisonUnit(pName, 10, 5.0 * trQuestVarGet("stage"), p);
 							action = 1;
 							break;
 						}
@@ -1410,8 +1449,8 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			action = yGetVarAtIndex("enemies", "stunStatus", 1*yGetVar("ScorpionMen", "index"));
-			action = action + yGetVarAtIndex("enemies", "launched", 1*yGetVar("ScorpionMen", "index"));
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("ScorpionMen", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("ScorpionMen", "index"));
 			if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
 				ySetVar("ScorpionMen", "step", 0);
 				ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
