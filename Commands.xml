@@ -6294,17 +6294,6 @@ Unfortunately it does not say which side, so the result is always in the [0-180]
         <parameters type="bool" name="flash"/>
         <javadoc>Flashes a UI element (maybe).</javadoc>
     </method>
-    <method return="vector" name="vector">
-        <parameters type="float" name="x"/>
-        <parameters type="float" name="y"/>
-        <parameters type="float" name="z"/>
-        <javadoc>&#xD;
-Creates a simple vector where all three coordinates are &lt;b&gt;literal numbers&lt;/b&gt; [like {@code vector(1,2,3)}, but not {@code vector(x,0,z)}].&#xD;
-Use {@link Vector#xsVectorSet(float, float, float) xsVectorSet} to create a vector from any kind of values,&#xD;
-including literals, variables, function calls, etc.&#xD;
-&#xD;
-@see #xsVectorSet(float, float, float)</javadoc>
-    </method>
     <method return="float" name="xsVectorGetX">
         <parameters type="vector" name="v"/>
         <javadoc>Returns the x component of the given vector.</javadoc>
