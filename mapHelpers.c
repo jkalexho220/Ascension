@@ -102,8 +102,10 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 			if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
-					2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
+				trUnitSelectClear();
+				trUnitSelectByQV("next");
+				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
 				yAddToDatabase("enemiesIncoming", "next");
 			}
 		}
@@ -117,11 +119,10 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 			if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0",trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))),1,
-					2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
 				trUnitSelectClear();
-				trUnitSelectByQV("next", true);
-				trUnitConvert(ENEMY_PLAYER);
+				trUnitSelectByQV("next");
+				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
 				yAddToDatabase("enemiesIncoming", "next");
 			}
 		}

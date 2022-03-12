@@ -39,7 +39,7 @@ highFrequency
 			}
 			for(i=trQuestVarGet("stage")/2; >0) {
 				/* monstrous rage */
-				trTechSetStatus(ENEMY_PLAYER, 76, 4);
+				trTechSetStatus(p, 76, 4);
 			}
 		}
 		xsEnableRule("delayed_modify");
@@ -1341,18 +1341,17 @@ highFrequency
 			case 7:
 			{
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
-				trQuestVarSet("templeRoom", -1);
 				wallHeight = worldHeight + 6;
 				trSetCivAndCulture(0, 11, 3);
 				trQuestVarSet("bossRoomSize", 12);
 				TERRAIN_WALL = 2;
-				TERRAIN_SUB_WALL = 1;
+				TERRAIN_SUB_WALL = 11;
 				
-				TERRAIN_PRIMARY = 0;
-				TERRAIN_SUB_PRIMARY = 25;
+				TERRAIN_PRIMARY = 3;
+				TERRAIN_SUB_PRIMARY = 8;
 				
-				TERRAIN_SECONDARY = 0;
-				TERRAIN_SUB_SECONDARY = 3;
+				TERRAIN_SECONDARY = 3;
+				TERRAIN_SUB_SECONDARY = 0;
 				
 				trQuestVarSet("mapType", MAP_OPEN);
 				trQuestVarSet("treeDensity", 0.3);
@@ -1368,7 +1367,7 @@ highFrequency
 				trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
 				trStringQuestVarSet("rockProto3", "Shipwreck");
 				
-				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
+				trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
 				
 				trQuestVarSet("enemyProtoCount", 6);
 				trStringQuestVarSet("enemyProto1", "Servant");
@@ -1388,6 +1387,15 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+				
+				for(x=1; < 20) {
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trQuestVarSetFromRand("rand",1,360,true);
+					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
+					yAddToDatabase("fishHawks", "next");
+					spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("fishHawks", "sfx"));
+				}
+				xsEnableRule("the_deep_build_01");
 			}
 			case 11:
 			{
@@ -1973,6 +1981,26 @@ highFrequency
 		}
 	}
 }
+
+
+rule the_deep_build_01
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+		for(x=yGetDatabaseCount("fishHawks"); >0) {
+			yDatabaseNext("fishHawks", true);
+			trMutateSelected(kbGetProtoUnitID("Hawk"));
+			trSetSelectedScale(0,0,0);
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("fishHawks", "sfx"),true);
+			trUnitChangeProtoUnit("Fish - Salmon");
+		}
+		xsDisableSelf();
+	}
+}
+
+
 
 rule rebuild_map
 inactive
