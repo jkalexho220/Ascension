@@ -1035,6 +1035,90 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
+		case GAMBLER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Gambler: A luck-based caster with a wide variety of spells.";
+				}
+				case 1:
+				{
+					msg = "Passive: You cannot attack. Your basic spells have three variations.";
+				}
+				case 2:
+				{
+					msg = "After you cast a basic spell, it will randomly switch to one of its other variations.";
+				}
+				case 3:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "(Q) Loaded Dice: Throw a dice at your cursor with a special effect.";
+				}
+				case 4:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: COPY: Summon a copy of the first enemy hit by the dice. (excluding bosses)";
+				}
+				case 5:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: EXPLODE: The dice explodes and deals damage in an area.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: HEAL: The dice heals allies that it passes through and grants them favor.";
+				}
+				case 7:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Cooldown: 6 | Decay: 4 | Radius: 6 | Damage: 100 | Heal: 100 | Favor: 4";
+				}
+				case 8:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "(W) Gimmick Deck: Play a card with a special effect.";
+				}
+				case 9:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: BURN: Create a circle of fire that damages enemies each second.";
+				}
+				case 10:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: BURN: Damage is increased by the number of allies in the circle.";
+				}
+				case 11:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: FREEZE: Stun enemies at the target location.";
+				}
+				case 12:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: RELICS: Give an allied player bonuses from all your relics.";
+				}
+				case 13:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Cooldown: 12 | Radius: 6 | Duration: 6 | Damage: 20 + 10 per ally";
+				}
+				case 14:
+				{
+					icon = "icons\god power plenty icon 64";
+					msg = "(E) Gamble: Get a random number from 1-6. Your next spell is multiplied by that amount.";
+				}
+				case 15:
+				{
+					icon = "icons\god power plenty icon 64";
+					msg = "Cost: 30";
+					next = 0;
+				}
+			}
+		}
 	}
 	trShowImageDialog(icon, msg);
 	return(next);

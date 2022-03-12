@@ -128,27 +128,30 @@ void gamblerAlways(int eventID = -1) {
 			
 			vectorToGrid("pos", "loc");
 			if (hit == 1) {
+				gainFavor(p, 3.0);
 				switch(1*yGetVar("p"+p+"dice", "type"))
 				{
 					case DICE_COPY:
 					{
-						id = kbGetUnitBaseTypeID(id);
-						trSoundPlayFN("favordump.wav","1",-1,"","");
-						trSoundPlayFN("changeunit.wav","1",-1,"","");
-						for(x=yGetVar("p"+p+"dice","count"); >0) {
-							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch(""+p+",0",kbGetProtoUnitName(id),1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-							activatePlayerUnit("next", p, id, calculateDecay(p, 4.0));
+						if (trQuestVarGet("bossUnit") != trQuestVarGet("enemies")) {
+							id = kbGetUnitBaseTypeID(id);
+							trSoundPlayFN("favordump.wav","1",-1,"","");
+							trSoundPlayFN("changeunit.wav","1",-1,"","");
+							for(x=yGetVar("p"+p+"dice","count"); >0) {
+								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+								trArmyDispatch(""+p+",0",kbGetProtoUnitName(id),1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+								activatePlayerUnit("next", p, id, calculateDecay(p, 4.0));
+							}
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("p"+p+"dice", "dice"), true);
+							trUnitChangeProtoUnit("Osiris Box Glow");
+							trUnitSelectClear();
+							trUnitSelect(""+1*yGetVar("p"+p+"dice", "sfx"), true);
+							trUnitChangeProtoUnit("Tremor");
+							trUnitSelectClear();
+							trUnitSelectByQV("p"+p+"dice");
+							trUnitChangeProtoUnit("Dust Large");
 						}
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"dice", "dice"), true);
-						trUnitChangeProtoUnit("Osiris Box Glow");
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"dice", "sfx"), true);
-						trUnitChangeProtoUnit("Tremor");
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"dice");
-						trUnitChangeProtoUnit("Dust Large");
 					}
 					case DICE_EXPLODE:
 					{
@@ -336,6 +339,7 @@ void gamblerAlways(int eventID = -1) {
 	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+		gainFavor(p, 0.0 - trQuestVarGet("gambleCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("plentybirth.wav","1",-1,"","");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"unit");
@@ -510,6 +514,7 @@ void gamblerAlways(int eventID = -1) {
 		}
 		
 		if (hit > 0) {
+			gainFavor(p, 5.0);
 			trSoundPlayFN("ui\scroll.wav","1",-1,"","");
 			trSoundPlayFN("skypassagein.wav","1",-1,"","");
 			
@@ -562,7 +567,7 @@ void gamblerAlways(int eventID = -1) {
 					}
 					case DECK_STUN:
 					{
-						lureName = "(W) Gimmick Deck: STUN";
+						lureName = "(W) Gimmick Deck: FREEZE";
 					}
 					case DECK_RELICS:
 					{
@@ -663,5 +668,5 @@ highFrequency
 	trQuestVarSet("deckDuration", 6);
 	trQuestVarSet("deckDamage", 20);
 	
-	trQuestVarSet("gambleCost", 0);
+	trQuestVarSet("gambleCost", 30);
 }
