@@ -604,7 +604,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				yAddToDatabase("freeRelics", "p"+p+"relics");
 				yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK);
 				yRemoveFromDatabase("p"+p+"relics");
-				trQuestVarSet("p"+p+"nickEquipped", 1);
+				trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") - 1);
 			} else if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 1);
 			}

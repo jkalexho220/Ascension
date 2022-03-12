@@ -285,7 +285,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Please help me! I accidentally spilled a quantum potion on myself!");
+					uiMessageBox("Please help me! I've fallen victim to a bug and turned into a relic!");
 				}
 				case 3:
 				{
@@ -298,7 +298,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					trMessageSetText("Touch a Sphinx's sandstorm while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -382,7 +382,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Absorb Dryad's Blood while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -411,7 +411,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					trMessageSetText("Absorb a Frost Giant's breath attack while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -966,7 +966,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Find three pigs and bring them to the enclosure.", -1);
 					dialog = 0;
 				}
@@ -1017,7 +1017,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("bountyTargetPos"), true);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Defeat the Mummy.", -1);
 					dialog = 0;
 				}
@@ -1059,7 +1059,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Bring back the ghost's picture.", -1);
 					dialog = 0;
 				}
@@ -1117,7 +1117,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Run!", -1);
 					dialog = 0;
 				}
@@ -1164,7 +1164,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("fetchTargetPos"), true);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Escort the goods to the axeman.", -1);
 					dialog = 0;
 				}
@@ -1214,7 +1214,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 5:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Kill five Frost Giants.", -1);
 					dialog = 0;
 				}
@@ -1256,7 +1256,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText(""+1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = ?", -1);
 					dialog = 0;
 				}
@@ -1298,7 +1298,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Defeat the monsters.", -1);
 					dialog = 0;
 				}
@@ -1366,7 +1366,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Find something edible for the adventurer.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -1457,7 +1457,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Equip the Bucket and collect some Poison.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -1514,7 +1514,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 6:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Use the Magic Detector to find Yeebaagooon's missing relic and return it to him.", -1);
 					dialog = 0;
 				}
@@ -1565,7 +1565,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Move the Worthless Junk out of Yeebaagooon's storage room.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}

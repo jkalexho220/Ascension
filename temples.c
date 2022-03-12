@@ -206,6 +206,7 @@ highFrequency
 	int p = trCurrentPlayer();
 	if (trQuestVarGet("p"+p+"relicsSacrificed") == 10) {
 		startNPCDialog(NPC_TEMPLE_COMPLETE + 4);
+		trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 		xsDisableSelf();
 	}
 }
@@ -219,7 +220,7 @@ highFrequency
 		trQuestVarSet("templeChallengeActive", 2);
 		trQuestVarSet("templeChallengeNext", trTime() + 10);
 		trCounterAddTime("countdown",10,1,"Challenge begins", -1);
-	} else if (trTime() > trQuestVarGet("templeChallengeNext")) {
+	} else if ((trQuestVarGet("templeChallengeActive") == 2) && (trTime() > trQuestVarGet("templeChallengeNext"))) {
 		trQuestVarSet("templeChallengeActive", 1);
 		xsEnableRule("yeebaagooon_temple_active");
 		xsDisableSelf();

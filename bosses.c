@@ -3972,7 +3972,7 @@ highFrequency
 				}
 				trQuestVarSet("yeebLatestFeather", trGetNextUnitScenarioNameNumber() - 1);
 				trMinimapFlare(trCurrentPlayer(), 60, trVectorQuestVarGet("yeebDestination"), true);
-				trSoundPlayFN("new_objective.wav","1",-1,"","");
+				trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 				xsEnableRule("yeebaagooon_battle_2");
 				xsDisableSelf();
 			}
