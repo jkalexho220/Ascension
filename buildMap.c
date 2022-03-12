@@ -722,18 +722,16 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					trQuestVarSet("templeShadeTrue", trGetNextUnitScenarioNameNumber());
 				}
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-				trArmySelect("1,0");
-				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-				trUnitConvert(0);
-				trUnitChangeProtoUnit("Columns");
+				trArmyDispatch("0,0","Hoplite",1,1,0,1,0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
-				trUnitTeleport(70*x+40-trQuestVarGet("dirx")*12.0,0,70*z+40-trQuestVarGet("dirx")*12.0);
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trUnitTeleport(70.0*x+40.0-trQuestVarGet("dirx")*12.0,0,70.0*z+40.0-trQuestVarGet("dirz")*12.0);
 				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.923879, 0.382683));
 			}
 			trQuestVarSet("templeShadesEnd", trGetNextUnitScenarioNameNumber());
 			xsEnableRule("shade_temple_always");
+			xsEnableRule("shade_temple_init");
 		}
 		case ROOM_TEMPLE + 3:
 		{

@@ -72,6 +72,7 @@ void rideLightningOff(int p = 0) {
 	if (trCurrentPlayer() == p) {
 		reselectMyself();
 	}
+	trUnitSelectClear();
 	trQuestVarSet("p"+p+"launched", 0);
 }
 

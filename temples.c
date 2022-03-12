@@ -41,6 +41,20 @@ highFrequency
 	}
 }
 
+rule shade_temple_init
+inactive
+highFrequency
+{
+	if (trTime() > cActivationTime) {
+		xsDisableSelf();
+		for(x=trQuestVarGet("templeShadesStart"); < trQuestVarGet("templeShadesEnd")) {
+			trUnitSelectClear();
+			trUnitSelect(""+x);
+			trMutateSelected(kbGetProtoUnitID("Columns"));
+		}
+	}
+}
+
 rule shade_temple_always
 inactive
 highFrequency

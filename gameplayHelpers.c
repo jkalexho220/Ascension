@@ -541,7 +541,7 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 		dmg = dmg - dmg * yGetVar("enemies", "physicalResist") * (1.0 - pierce);
 	}
 	if (yGetVar("enemies", "poisonStatus") == 1) {
-		dmg = dmg * trQuestVarGet("p"+p+"poisonKiller");
+		dmg = dmg * (1.0 + trQuestVarGet("p"+p+"poisonKiller"));
 	}
 	if (spell) {
 		if (trQuestVarGet("p"+p+"godBoon") == BOON_SPELL_POISON) {
