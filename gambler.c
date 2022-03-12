@@ -138,8 +138,12 @@ void gamblerAlways(int eventID = -1) {
 							trSoundPlayFN("favordump.wav","1",-1,"","");
 							trSoundPlayFN("changeunit.wav","1",-1,"","");
 							for(x=yGetVar("p"+p+"dice","count"); >0) {
+								trQuestVarSetFromRand("heading",1,360,true);
 								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch(""+p+",0",kbGetProtoUnitName(id),1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+								trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+								trUnitSelectClear();
+								trUnitSelectByQV("next");
+								trMutateSelected(id);
 								activatePlayerUnit("next", p, id, calculateDecay(p, 4.0));
 							}
 							trUnitSelectClear();
@@ -209,6 +213,7 @@ void gamblerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("swing"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		amt = xsSqrt(trQuestVarGet("p"+p+"gamble")) * 0.5;
 		trModifyProtounit("Hero Greek Achilles", p, 5, 2);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
@@ -242,6 +247,7 @@ void gamblerAlways(int eventID = -1) {
 				trMutateSelected(kbGetProtoUnitID("Relic"));
 				trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 				trMutateSelected(kbGetProtoUnitID("Revealer"));
+				trSetSelectedScale(amt,amt,amt);
 				trUnitSelectClear();
 				trUnitSelectByQV("sfx");
 				trMutateSelected(kbGetProtoUnitID("Relic"));
@@ -429,8 +435,8 @@ void gamblerAlways(int eventID = -1) {
 					yAddToDatabase("p"+p+"deckBurns","next");
 					yAddUpdateVar("p"+p+"deckBurns","end",trGetNextUnitScenarioNameNumber());
 					yAddUpdateVar("p"+p+"deckBurns","radius", xsPow(dist, 2));
-					yAddUpdateVar("p"+p+"deckBurns", "posx", trQuestVarGet("posx"));
-					yAddUpdateVar("p"+p+"deckBurns", "posz", trQuestVarGet("posz"));
+					yAddUpdateVar("p"+p+"deckBurns", "posx", trQuestVarGet("targetx"));
+					yAddUpdateVar("p"+p+"deckBurns", "posz", trQuestVarGet("targetz"));
 					yAddUpdateVar("p"+p+"deckBurns", "damage",
 						trQuestVarGet("deckDamage") * trQuestVarGet("p"+p+"spellDamage") * yGetVar("p"+p+"cards","count"));
 					yAddUpdateVar("p"+p+"deckBurns", "next", trTimeMS());

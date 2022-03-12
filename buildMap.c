@@ -1343,7 +1343,7 @@ highFrequency
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
 				wallHeight = worldHeight + 6;
 				trSetCivAndCulture(0, 11, 3);
-				trQuestVarSet("bossRoomSize", 12);
+				trQuestVarSet("bossRoomSize", 15);
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 11;
 				
@@ -1366,6 +1366,8 @@ highFrequency
 				trStringQuestVarSet("rockProto1", "Rock Granite Big");
 				trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
 				trStringQuestVarSet("rockProto3", "Shipwreck");
+				
+				trModifyProtounit("Seaweed",1,55,1);
 				
 				trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
 				

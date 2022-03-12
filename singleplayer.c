@@ -573,6 +573,8 @@ highFrequency
 					trUnitConvert(0);
 					if (trQuestVarGet("p1nickQuestProgress") < 5) {
 						trUnitChangeProtoUnit("Relic");
+						yAddToDatabase("freeRelics", "nickonhawk");
+						yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK);
 					} else {
 						xsEnableRule("quantum_slot_machine");
 						trQuestVarSet("quantumSlotMachine", 1);

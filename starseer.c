@@ -77,48 +77,46 @@ void starseerAlways(int eventID = -1) {
 						spyEffect(1*trQuestVarGet("p"+p+"characters"),
 							kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "Meteorite"+x));
 					}
-				}
-				id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "star"+x));
-				if (id == -1 || yGetVar("p"+p+"characters", "star"+x) == 0) {
-					if (trQuestVarGet("spyFound") == trQuestVarGet("spyFind")) {
+					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "star"+x));
+					if (id == -1 || yGetVar("p"+p+"characters", "star"+x) == 0) {
 						spyEffect(1*trQuestVarGet("p"+p+"characters"),
 							kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "star"+x));
 					}
-				} else {
-					trVectorSetFromAngle("dir", current);
-					if (x == hit) {
-						/* this is the hitbox for this iteration */
-						trQuestVarSet("currentAngle", current);
-						trQuestVarSet("curPosx", trQuestVarGet("dirx"));
-						trQuestVarSet("curPosz", trQuestVarGet("dirz"));
+				}
+				trVectorSetFromAngle("dir", current);
+				if (x == hit) {
+					/* this is the hitbox for this iteration */
+					trQuestVarSet("currentAngle", current);
+					trQuestVarSet("curPosx", trQuestVarGet("dirx"));
+					trQuestVarSet("curPosz", trQuestVarGet("dirz"));
+					trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
+					trQuestVarSet("angleDiff", dotProduct("curPos", "prevPos"));
+					/*
+					cos(20) is 0.939692
+					if the previous hitbox is too far back, we reel it back in
+					*/
+					amt = xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.2);
+					if (trQuestVarGet("angleDiff") < amt) {
+						ySetVar("p"+p+"characters", "last"+x, fModulo(6.283185, current + trQuestVarGet("p"+p+"starAngularVelocity") * 0.2));
 						trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
-						trQuestVarSet("angleDiff", dotProduct("curPos", "prevPos"));
-						/*
-						cos(20) is 0.939692
-						if the previous hitbox is too far back, we reel it back in
-						*/
-						amt = xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.2);
-						if (trQuestVarGet("angleDiff") < amt) {
-							ySetVar("p"+p+"characters", "last"+x, fModulo(6.283185, current + trQuestVarGet("p"+p+"starAngularVelocity") * 0.2));
-							trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
-							trQuestVarSet("angleDiff", amt);
-						}
-					}
-					trVectorScale("dir", yGetVar("p"+p+"characters", "currentRadius"));
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x));
-					if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Cinematic Block")) {
-						trMutateSelected(kbGetProtoUnitID("Outpost"));
-						trSetSelectedScale(0,0,0);
-					}
-					trSetSelectedUpVector(3.33 * trQuestVarGet("dirX"),0.2,3.33 * trQuestVarGet("dirZ"));
-					if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
-						//trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
-						trSetSelectedUpVector(1.0 * trQuestVarGet("dirX"),0,1.0 * trQuestVarGet("dirZ"));
+						trQuestVarSet("angleDiff", amt);
 					}
 				}
+				trVectorScale("dir", yGetVar("p"+p+"characters", "currentRadius"));
+				trUnitSelectClear();
+				trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x));
+				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Cinematic Block")) {
+					trMutateSelected(kbGetProtoUnitID("Outpost"));
+					trSetSelectedScale(0,0,0);
+				}
+				trSetSelectedUpVector(3.33 * trQuestVarGet("dirX"),0.2,3.33 * trQuestVarGet("dirZ"));
+				if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
+					trUnitSelectClear();
+					trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+					//trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
+					trSetSelectedUpVector(1.0 * trQuestVarGet("dirX"),0,1.0 * trQuestVarGet("dirZ"));
+				}
+				
 				current = fModulo(6.283185, current + 2.094395);
 			}
 			

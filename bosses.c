@@ -1602,6 +1602,7 @@ highFrequency
 							addGenericProj("MedusaBalls","pos","dir",kbGetProtoUnitID("Lampades"),37,4,4.7);
 							yAddUpdateVar("MedusaBalls", "target", trQuestVarGet("playerCharacters"));
 							yAddUpdateVar("MedusaBalls", "bounces", 10);
+							yAddUpdateVar("MedusaBalls","player",ENEMY_PLAYER);
 						}
 					}
 					if (trTimeMS() > trQuestVarGet("bossTimeout")) {

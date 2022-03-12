@@ -32,6 +32,8 @@ void rideLightningOff(int p = 0) {
 		yVarToVector("p"+p+"lightningBalls", "prev");
 		vectorSetAsCurrentPosition("pos","prev","dir",
 			yGetVar("p"+p+"lightningBalls", "last"),2.0*trQuestVarGet("p"+p+"speed"));
+		vectorSnapToGrid("pos");
+		trChatSend(0, "<color=1,0,0>"+trVectorQuestVarGet("pos"));
 		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
@@ -46,17 +48,13 @@ void rideLightningOff(int p = 0) {
 		trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 		
 		trUnitChangeProtoUnit("Hero Greek Atalanta");
-		
 		trUnitSelectClear();
 		trUnitSelectByQV("next", true);
 		trUnitChangeProtoUnit("Arkantos God Out");
 		
-		
 		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"lightningBalls", true);
-		trDamageUnitPercent(100);
-		trUnitChangeProtoUnit("Implode Sphere Effect");
-		
+		trUnitSelectByQV("p"+p+"lightningBalls");
+		trUnitDestroy();
 		ySetVar("p"+p+"characters", "index",
 			activatePlayerUnit("p"+p+"characters", p, kbGetProtoUnitID("Hero Greek Atalanta")));
 		yAddUpdateVar("playerUnits", "hero", 1);
@@ -71,19 +69,8 @@ void rideLightningOff(int p = 0) {
 	yClearDatabase("p"+p+"lightningBalls");
 	yClearDatabase("p"+p+"rideLightningTargets");
 	
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
 	if (trCurrentPlayer() == p) {
-		trBlockAllSounds();
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (trUnitIsSelected() == false) {
-				uiFindType("Hero Greek Atalanta");
-			} else {
-				break;
-			}
-		}
-		uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
-		trUnblockAllSounds();
+		reselectMyself();
 	}
 	trQuestVarSet("p"+p+"launched", 0);
 }
@@ -103,9 +90,10 @@ void lightningBallBounce(int p = 0, string pos = "") {
 	zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 	trUnitSelectClear();
 	trUnitSelectByQV("p"+p+"lightningBalls", true);
-	trUnitChangeProtoUnit("Lightning Sparks Ground");
+	trUnitDestroy();
 	
 	vectorSnapToGrid(pos);
+	
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch(""+p+",0","Kronny Flying",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
 	trUnitSelectClear();
@@ -115,12 +103,13 @@ void lightningBallBounce(int p = 0, string pos = "") {
 	if (trUnitVisToPlayer()) {
 		trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 	}
+	yVarToVector("p"+p+"lightningBalls", "dir");
 	trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
 	trSetSelectedScale(0,-4.7,0);
 	trDamageUnitPercent(100);
 	
 	ySetUnit("p"+p+"lightningBalls", 1*trQuestVarGet("next"));
-	ySetVarFromVector("p"+p+"lightningBalls", "prev", "pos");
+	ySetVarFromVector("p"+p+"lightningBalls", "prev", pos);
 	ySetVar("p"+p+"lightningBalls", "start", trTimeMS());
 	
 	ySetVar("p"+p+"lightningBalls", "yeehaw", 1);
@@ -160,11 +149,10 @@ void thunderRiderAlways(int eventID = -1) {
 	
 	if (trQuestVarGet("p"+p+"rideLightning") == 1) {
 		for (i=yGetDatabaseCount("p"+p+"lightningBalls"); > 0) {
-			id = yDatabaseNext("p"+p+"lightningBalls", true);
-			if (id == -1) {
-				rideLightningOff(p);
-				break;
-			} else if (yGetVar("p"+p+"lightningBalls", "yeehaw") == 1) {
+			yDatabaseNext("p"+p+"lightningBalls", true);
+			if (yGetVar("p"+p+"lightningBalls", "yeehaw") == 1) {
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"lightningBalls");
 				trMutateSelected(kbGetProtoUnitID("Implode Sphere Effect"));
 				trUnitSetAnimationPath("0,1,1,0,0,0,0");
 				trUnitOverrideAnimation(2,0,true,false,-1);
@@ -202,17 +190,15 @@ void thunderRiderAlways(int eventID = -1) {
 					}
 				}
 				
+				trQuestVarSetFromRand("sound", 1, 5, true);
 				if (hit > 1) {
-					trQuestVarSetFromRand("sound", 1, 5, true);
 					trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				}
-				
 				
 				trQuestVarSet("destx", trQuestVarGet("posx") + 2.0  * trQuestVarGet("dirx"));
 				trQuestVarSet("destz", trQuestVarGet("posz") + 2.0  * trQuestVarGet("dirz"));
 				vectorToGrid("dest", "loc");
 				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-					yVarToVector("p"+p+"lightningBalls", "dir");
 					trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
 					trQuestVarSetFromRand("sound", 1, 2, true);
 					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
