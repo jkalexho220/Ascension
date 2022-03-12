@@ -392,7 +392,7 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"cards") > 0) {
+	for (y=xsMin(3, yGetDatabaseCount("p"+p+"cards")); > 0) {
 		action = processGenericProj("p"+p+"cards");
 		if (action == PROJ_BOUNCE) {
 			trSetSelectedScale(0.5,0.1,0.8);
@@ -401,6 +401,9 @@ void gamblerAlways(int eventID = -1) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"cards");
 			trUnitChangeProtoUnit("Fimbulwinter SFX");
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"cards");
+			trDamageUnitPercent(-100);
 			switch(1*yGetVar("p"+p+"cards","type"))
 			{
 				case DECK_BURN:
@@ -448,10 +451,8 @@ void gamblerAlways(int eventID = -1) {
 					for(x=yGetDatabaseCount("enemies"); >0) {
 						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
-						} else if (zDistanceToVectorSquared("enemies","target") < dist) {
-							for(y=yGetVar("p"+p+"cards","count"); >0) {
-								stunUnit("enemies",2.5,p,false);
-							}
+						} else if (zDistanceToVectorSquared("enemies","p"+p+"decktarget") < dist) {
+							stunUnit("enemies",2.5,p,false);
 						}
 					}
 				}
@@ -459,12 +460,12 @@ void gamblerAlways(int eventID = -1) {
 				{
 					trSoundPlayFN("researchcomplete.wav","1",-1,"","");
 					trSoundPlayFN("ageadvance.wav","1",-1,"","");
-					target = yGetVar("p"+p+"cards","target");
+					target = yGetVar("p"+p+"cards","p"+p+"decktarget");
 					trQuestVarSet("player", target);
 					hit = trTimeMS() + trQuestVarGet("deckDuration") * trQuestVarGet("p"+p+"spellDuration");
 					for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 						if (yGetVar("p"+p+"relics","type") <= NORMAL_RELICS) {
-							yAddToDatabase("p"+p+"tempRelics", "target");
+							yAddToDatabase("p"+p+"tempRelics", "player");
 							yAddUpdateVar("p"+p+"tempRelics", "type", yGetVar("p"+p+"relics","type"));
 							yAddUpdateVar("p"+p+"tempRelics", "timeout", hit);
 							relicEffect(1*yGetVar("p"+p+"relics","type"),target,true);
@@ -481,7 +482,7 @@ void gamblerAlways(int eventID = -1) {
 	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
-		trVectorSetUnitPos("target", "p"+p+"lureObject");
+		trVectorSetUnitPos("p"+p+"decktarget", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject");
 		trUnitDestroy();
@@ -492,7 +493,7 @@ void gamblerAlways(int eventID = -1) {
 				if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
 					removePlayerCharacter();
 				} else if (yGetVar("playerCharacters", "player") != p) {
-					current = zDistanceToVectorSquared("playerCharacters", "target");
+					current = zDistanceToVectorSquared("playerCharacters", "p"+p+"decktarget");
 					if (current < dist) {
 						hit = trQuestVarGet("playerCharacters");
 						target = yGetVar("playerCharacters", "player");
@@ -501,39 +502,36 @@ void gamblerAlways(int eventID = -1) {
 				}
 			}
 			if (hit > 0) {
-				trVectorQuestVarSet("target", kbGetBlockPosition(""+hit, true));
+				trVectorQuestVarSet("p"+p+"decktarget", kbGetBlockPosition(""+hit, true));
 			}
 		} else {
 			hit = 1;
-			vectorSnapToGrid("target");
+			vectorSnapToGrid("p"+p+"decktarget");
 		}
 		
 		if (hit > 0) {
 			trSoundPlayFN("ui\scroll.wav","1",-1,"","");
 			trSoundPlayFN("skypassagein.wav","1",-1,"","");
+			
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
 					removeGambler(p);
 				} else {
 					trVectorSetUnitPos("start", "p"+p+"characters");
-					trVectorQuestVarSet("dir", zGetUnitVector("start","target"));
+					trVectorQuestVarSet("dir", zGetUnitVector("start","p"+p+"decktarget"));
 					trMutateSelected(kbGetProtoUnitID("Regent"));
 					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 					trUnitOverrideAnimation(1,0,false,false,-1);
 					ySetVar("p"+p+"characters", "animating", 1);
 					ySetVar("p"+p+"characters", "timeout", trTimeMS() + 1100);
-					addGenericProj("p"+p+"cards","start","dir",kbGetProtoUnitID("Statue of Automaton Base"),2,30.0,4,0,p);
-					dist = xsMin(1000, zDistanceBetweenVectors("start","target") / 0.03);
-					yAddUpdateVar("p"+p+"cards", "timeout", trTimeMS() + dist);
-					yAddUpdateVar("p"+p+"cards", "type", trQuestVarGet("p"+p+"deckType"));
-					yAddUpdateVar("p"+p+"cards", "count", trQuestVarGet("p"+p+"gamble"));
-					yAddUpdateVar("p"+p+"cards", "targetx", trQuestVarGet("targetx"));
-					yAddUpdateVar("p"+p+"cards", "targetz", trQuestVarGet("targetz"));
-					if (trQuestVarGet("p"+p+"deckType") == DECK_RELICS) {
-						yAddUpdateVar("p"+p+"cards", "target", target);
-					}
 				}
 			}
+			
+			trQuestVarSet("p"+p+"deckNext", trTimeMS());
+			trQuestVarSet("p"+p+"cardsLoaded", trQuestVarGet("p"+p+"gamble"));
+			trQuestVarSet("p"+p+"cardsType", trQuestVarGet("p"+p+"deckType"));
+			trQuestVarSet("p"+p+"firstCard", 1);
+			
 			trQuestVarSet("p"+p+"gamble", 1);
 			if (trQuestVarGet("p"+p+"gambleStep") == 0) {
 				trUnitSelectClear();
@@ -541,10 +539,19 @@ void gamblerAlways(int eventID = -1) {
 				trUnitSetAnimationPath("0,0,0,0,0,0,0");
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 			}
-			trQuestVarSetFromRand("rand", 1, 2, true);
-			trQuestVarSet("p"+p+"deckType", trQuestVarGet("p"+p+"deckType") + trQuestVarGet("rand"));
-			if (trQuestVarGet("p"+p+"deckType") > 3) {
-				trQuestVarSet("p"+p+"deckType", trQuestVarGet("p"+p+"deckType") - 3);
+			
+			/* can't give buffs to allies */
+			if ((ENEMY_PLAYER == 2) || (Multiplayer == false) || PvP) {
+				trQuestVarSet("p"+p+"deckType", 1 + trQuestVarGet("p"+p+"deckType"));
+				if (trQuestVarGet("p"+p+"deckType") >= 3) {
+					trQuestVarSet("p"+p+"deckType", 1);
+				}
+			} else {
+				trQuestVarSetFromRand("rand", 1, 2, true);
+				trQuestVarSet("p"+p+"deckType", trQuestVarGet("p"+p+"deckType") + trQuestVarGet("rand"));
+				if (trQuestVarGet("p"+p+"deckType") > 3) {
+					trQuestVarSet("p"+p+"deckType", trQuestVarGet("p"+p+"deckType") - 3);
+				}
 			}
 			if (trCurrentPlayer() == p) {
 				switch(1*trQuestVarGet("p"+p+"deckType"))
@@ -573,6 +580,37 @@ void gamblerAlways(int eventID = -1) {
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
 				trChatSend(0, "You must target an allied player!");
 			}
+		}
+	}
+	
+	if (trQuestVarGet("p"+p+"cardsLoaded") > 0) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"deckNext")) {
+			trQuestVarSet("p"+p+"deckNext", 200 + trQuestVarGet("p"+p+"deckNext"));
+			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
+				if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
+					removeGambler(p);
+				} else {
+					trVectorSetUnitPos("start", "p"+p+"characters");
+					trVectorQuestVarSet("dir", zGetUnitVector("start","p"+p+"decktarget"));
+					addGenericProj("p"+p+"cards","start","dir",kbGetProtoUnitID("Statue of Automaton Base"),2,30.0,4,0,p);
+					dist = xsMin(1000, zDistanceBetweenVectors("start","p"+p+"decktarget") / 0.03);
+					yAddUpdateVar("p"+p+"cards", "timeout", trTimeMS() + dist);
+					yAddUpdateVar("p"+p+"cards", "type", trQuestVarGet("p"+p+"cardsType"));
+					yAddUpdateVar("p"+p+"cards", "targetx", trQuestVarGet("p"+p+"decktargetx"));
+					yAddUpdateVar("p"+p+"cards", "targetz", trQuestVarGet("p"+p+"decktargetz"));
+					if (trQuestVarGet("p"+p+"cardsType") == DECK_RELICS) {
+						yAddUpdateVar("p"+p+"cards", "target", target);
+					} else if (trQuestVarGet("p"+p+"cardsType") == DECK_BURN) {
+						if (trQuestVarGet("p"+p+"firstCard") == 0) {
+							yAddUpdateVar("p"+p+"cards","type",0);
+						} else {
+							yAddUpdateVar("p"+p+"cards","count",trQuestVarGet("p"+p+"deckCount"));
+							trQuestVarSet("p"+p+"firstCard",0);
+						}
+					}
+				}
+			}
+			trQuestVarSet("p"+p+"cardsLoaded", trQuestVarGet("p"+p+"cardsLoaded") - 1);
 		}
 	}
 	

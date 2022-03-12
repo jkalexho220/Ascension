@@ -6137,7 +6137,6 @@ Only works in scenarios, not in RMS.</javadoc>
         <parameters type="string" name="Proto"/>
         <javadoc>Returns true if unit is garrisoned in a unit of type Proto</javadoc>
     </method>
-    </method>
     <method return="int" name="trUnitGetHeading">
         <parameters type="string" name="scenarioName"/>
         <javadoc>Returns the units heading. The angle returned is the angle the unit's face makes with the z-axis of the map.&#xD;
