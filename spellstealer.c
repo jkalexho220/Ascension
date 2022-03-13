@@ -146,7 +146,6 @@ void spellstealerAlways(int eventID = -1) {
 				if (trUnitAlive() == false) {
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 				} else if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
-					gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
 					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
 					amt = 1;
@@ -178,6 +177,7 @@ void spellstealerAlways(int eventID = -1) {
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"bladeDanceTargets");
 					damageEnemy(p, amt, false, 1.0);
+					OnHit(p, 1*yGetVar("p"+p+"bladeDanceTargets", "index"), false);
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					break;
 				}

@@ -70,6 +70,7 @@ void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 		int x = modularCounterNext("spyFind");
 		trQuestVarSet("spyEye"+x, proto);
 		trQuestVarSet("spyEye"+x+"unit", unit);
+		trQuestVarSet("spyEye"+x+"active", 1);
 		trStringQuestVarSet("spyName"+x, qv);
 		trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
 	}
@@ -796,7 +797,31 @@ void stunsAndPoisons(string db = "") {
 	}
 }
 
-int CheckOnHit(int p = 0, int id = 0) {
+void OnHit(int p = 0, int index = 0, bool magic = false) {
+	gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
+	if (trQuestVarGet("p"+p+"cleave") > 0) {
+		int prev = yGetPointer("enemies");
+		if (index != prev) {
+			ySetPointer("enemies", index);
+		}
+		trVectorSetUnitPos("onHitPos", "enemies");
+		for(x=yGetDatabaseCount("enemies"); >1) {
+			yDatabaseNext("enemies");
+			if (zDistanceToVectorSquared("enemies", "onHitPos") < 16.0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("enemies");
+				damageEnemy(p, trQuestVarGet("p"+p+"cleave") * trQuestVarGet("p"+p+"attack"), magic);
+			}
+		}
+		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("onHitPosx"),0,trQuestVarGet("onHitPosz"),0,true);
+		trArmySelect("1,0");
+		trDamageUnitPercent(100);
+		trUnitChangeProtoUnit("Meteorite");
+		ySetPointer("enemies", prev);
+	}
+}
+
+int CheckOnHit(int p = 0, int id = 0, bool onhit = true) {
 	int action = kbUnitGetAnimationActionType(id);
 	int status = ON_HIT_NONE;
 	int class = trQuestVarGet("p"+p+"class");
@@ -814,7 +839,7 @@ int CheckOnHit(int p = 0, int id = 0) {
 	} else {
 		if ((action == 12) || (action == 6)) {
 			if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
-				gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
+				
 				status = ON_HIT_NORMAL;
 				ySetVar("p"+p+"characters", "attackNext",
 					yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"nextDelay"));
@@ -854,6 +879,9 @@ int CheckOnHit(int p = 0, int id = 0) {
 					amt = amt * (1.0 + trQuestVarGet("p"+p+"poisonKiller"));
 				}
 				trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
+				if (onhit) {
+					OnHit(p, 1*yGetVar("p"+p+"characters", "attackTargetIndex"));
+				}
 			} else {
 				int target = kbUnitGetTargetUnitID(id);
 				if (yGetVar("p"+p+"characters", "attackTarget") != target) {
@@ -1204,15 +1232,18 @@ highFrequency
 		id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
 		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
 			x = modularCounterNext("spyfound");
-			trUnitSelectClear();
-			trUnitSelectByQV("spyEye"+x+"unit");
-			if (trUnitAlive() == false) {
-				trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
-			} else {
+			if (trQuestVarGet("spyEye"+x+"active") == 1) {
+				trQuestVarSet("spyEye"+x+"active", 0);
 				trUnitSelectClear();
-				trUnitSelectByID(id);
-				trMutateSelected(1*trQuestVarGet("spyEye"+x));
-				trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
+				trUnitSelectByQV("spyEye"+x+"unit");
+				if (trUnitAlive() == false) {
+					trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+				} else {
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					trMutateSelected(1*trQuestVarGet("spyEye"+x));
+					trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
+				}
 			}
 		}
 		trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
@@ -1222,7 +1253,10 @@ highFrequency
 		if (trQuestVarGet("spyreset") >= 3) {
 			while (trQuestVarGet("spyfind") != trQuestVarGet("spyfound")) {
 				x = modularCounterNext("spyFound");
-				trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+				if (trQuestVarGet("spyEye"+x+"active") == 1) {
+					trQuestVarSet("spyEye"+x+"active", 0);
+					trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+				}
 			}
 			debugLog("resetting spyfound");
 		}

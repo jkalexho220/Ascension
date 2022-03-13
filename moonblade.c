@@ -53,7 +53,7 @@ void moonbladeAlways(int eventID = -1) {
 					}
 					trVectorSetUnitPos("pos", "p"+p+"characters");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					yAddToDatabase("p"+p+"wolves", "next");
+					yAddToDatabase("playerwolves", "next");
 					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), "pos", calculateDecay(p, 5.0));
 				}
 			}
@@ -217,15 +217,6 @@ void moonbladeAlways(int eventID = -1) {
 				yRemoveUpdateVar("p"+p+"moonbeams", "start");
 				yRemoveUpdateVar("p"+p+"moonbeams", "end");
 			}
-		}
-	}
-	
-	if (yGetDatabaseCount("p"+p+"wolves") > 0) {
-		yDatabaseNext("p"+p+"wolves", true);
-		if (trUnitAlive() == false) {
-			yAddToDatabase("decayingWolves", "p"+p+"wolves");
-			yAddUpdateVar("decayingWolves", "timeout", 3000 + trTimeMS());
-			yRemoveFromDatabase("p"+p+"wolves");
 		}
 	}
 	

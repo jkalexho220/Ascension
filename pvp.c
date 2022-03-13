@@ -997,6 +997,8 @@ highFrequency
 	
 	playerLasers();
 	
+	processWolves();
+	
 	/* sounds */
 	if (trQuestVarGet("stunSound") == 1) {
 		trQuestVarSet("stunSound", 0);
@@ -1061,6 +1063,7 @@ highFrequency
 			processLifesteal(p);
 			processSilence(p);
 			processRegen(p);
+			petDogs(p);
 			trEventFire(10000 + p);
 			trEventFire(12 * trQuestVarGet("p"+p+"class") + p);
 			trEventFire(10100 + p);

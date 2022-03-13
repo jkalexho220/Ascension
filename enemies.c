@@ -1072,7 +1072,7 @@ void specialUnitsAlways() {
 				if (trUnitAlive()) {
 					trImmediateUnitGarrison(""+1*trQuestVarGet("AvengerProj"));
 					trUnitChangeProtoUnit("Avenger");
-					ySetVarAtIndex("Avengers","step",0,1*yGetVar("AvengerProj","index"));
+					ySetVarAtIndex("Avengers","step",2,1*yGetVar("AvengerProj","index"));
 				}
 				trUnitSelectClear();
 				trUnitSelectByQV("AvengerProj");
@@ -1120,6 +1120,7 @@ void specialUnitsAlways() {
 							yAddUpdateVar("avengerProj", "index", yGetPointer("Avengers"));
 							yAddUpdateVar("avengerProj", "player",p);
 							ySetVar("Avengers","step", 1);
+							ySetVar("Avengers", "specialnext", trTimeMS() + 3000);
 							ySetVar("Avengers","proj",yGetNewestPointer("avengerProj"));
 						}
 					}

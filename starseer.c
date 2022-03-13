@@ -12,13 +12,13 @@ void removeStarseer(int p = 0) {
 	for(x=3; >0) {
 		yRemoveUpdateVar("p"+p+"characters", "star"+x);
 		yRemoveUpdateVar("p"+p+"characters", "Meteorite"+x);
-		yRemoveUpdateVar("p"+p+"characters", "last"+x);
 	}
 	yRemoveUpdateVar("p"+p+"characters", "targetRadius");
 	yRemoveUpdateVar("p"+p+"characters", "currentRadius");
 	yRemoveUpdateVar("p"+p+"characters", "angle");
 	yRemoveUpdateVar("p"+p+"characters", "hitbox");
 	yRemoveUpdateVar("p"+p+"characters", "last");
+	yRemoveUpdateVar("p"+p+"characters", "hitNext");
 }
 
 void starseerAlways(int eventID = -1) {
@@ -63,13 +63,22 @@ void starseerAlways(int eventID = -1) {
 				zSetProtoUnitStat("Oracle Hero", p, 1, trQuestVarGet("p"+p+"speed") * (0.5 + amt));
 			}
 			
-			hit = 1 + yGetVar("p"+p+"characters", "hitbox");
-			if (hit > 3) {
-				hit = 1;
+			hit = 0;
+			if (trTimeMS() > yGetVar("p"+p+"characters", "hitNext")) {
+				if (trTimeMS() > yGetVar("p"+p+"characters", "hitNext") + 1000) {
+					ySetVar("p"+p+"characters", "hitNext", trTimeMS());
+				} else {
+					ySetVar("p"+p+"characters", "hitNext", yGetVar("p"+p+"characters","hitNext") + 20 * ENEMY_PLAYER);
+				}
+				hit = 1 + yGetVar("p"+p+"characters", "hitbox");
+				if (hit > 3) {
+					hit = 1;
+				}
+				ySetVar("p"+p+"characters", "hitbox", hit);
 			}
-			ySetVar("p"+p+"characters", "hitbox", hit);
 			
 			current = yGetVar("p"+p+"characters", "angle");
+			trVectorSetFromAngle("dir", current);
 			for(x=1; <=3) {
 				if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
 					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "Meteorite"+x));
@@ -83,88 +92,77 @@ void starseerAlways(int eventID = -1) {
 							kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "star"+x));
 					}
 				}
-				trVectorSetFromAngle("dir", current);
 				if (x == hit) {
 					/* this is the hitbox for this iteration */
-					trQuestVarSet("currentAngle", current);
 					trQuestVarSet("curPosx", trQuestVarGet("dirx"));
 					trQuestVarSet("curPosz", trQuestVarGet("dirz"));
-					trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
+					trQuestVarSet("prevPosx", yGetVar("p"+p+"characters", "last"+x+"x"));
+					trQuestVarSet("prevPosz", yGetVar("p"+p+"characters", "last"+x+"z"));
 					trQuestVarSet("angleDiff", dotProduct("curPos", "prevPos"));
-					/*
-					cos(20) is 0.939692
-					if the previous hitbox is too far back, we reel it back in
-					*/
-					amt = xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.2);
-					if (trQuestVarGet("angleDiff") < amt) {
-						ySetVar("p"+p+"characters", "last"+x, fModulo(6.283185, current + trQuestVarGet("p"+p+"starAngularVelocity") * 0.2));
-						trVectorSetFromAngle("prevPos", yGetVar("p"+p+"characters", "last"+x));
-						trQuestVarSet("angleDiff", amt);
-					}
 				}
-				trVectorScale("dir", yGetVar("p"+p+"characters", "currentRadius"));
+				trQuestVarSet("tempx", trQuestVarGet("dirx") * yGetVar("p"+p+"characters", "currentRadius"));
+				trQuestVarSet("tempz", trQuestVarGet("dirz") * yGetVar("p"+p+"characters", "currentRadius"));
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x));
 				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Cinematic Block")) {
 					trMutateSelected(kbGetProtoUnitID("Outpost"));
 					trSetSelectedScale(0,0,0);
 				}
-				trSetSelectedUpVector(3.33 * trQuestVarGet("dirX"),0.2,3.33 * trQuestVarGet("dirZ"));
+				trSetSelectedUpVector(3.33 * trQuestVarGet("tempx"),0.2,3.33 * trQuestVarGet("tempz"));
 				if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 					trUnitSelectClear();
 					trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
-					//trSetSelectedUpVector(0.2 * trQuestVarGet("dirX"), 0, 0.2 * trQuestVarGet("dirZ"));
-					trSetSelectedUpVector(1.0 * trQuestVarGet("dirX"),0,1.0 * trQuestVarGet("dirZ"));
+					trSetSelectedUpVector(1.0 * trQuestVarGet("tempx"),0,1.0 * trQuestVarGet("tempz"));
 				}
 				
-				current = fModulo(6.283185, current + 2.094395);
+				trVectorQuestVarSet("dir", rotationMatrix("dir", -0.5, -0.866025));
 			}
 			
-			/* collision detection for one star */
-			
-			trQuestVarSet("outer", xsPow(yGetVar("p"+p+"characters", "currentRadius") + 1.5, 2));
-			trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
-			trVectorSetUnitPos("center", "p"+p+"characters");
-			
-			amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
-			target = 0;
-			for(x=yGetDatabaseCount("enemies"); >0) {
-				id = yDatabaseNext("enemies", true);
-				if (id == -1 || trUnitAlive() == false) {
-					removeEnemy();
-				} else {
-					dist = zDistanceToVectorSquared("enemies", "center");
-					if (dist < trQuestVarGet("outer") && dist > trQuestVarGet("inner")) {
-						/* enemy is within the donut */
+			if (hit > 0) {
+				ySetVarFromVector("p"+p+"characters", "last"+hit, "curPos");
+				/* collision detection for one star */
+				
+				trQuestVarSet("outer", xsPow(yGetVar("p"+p+"characters", "currentRadius") + 1.5, 2));
+				trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
+				trVectorSetUnitPos("center", "p"+p+"characters");
+				
+				amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
+				target = 0;
+				for(x=yGetDatabaseCount("enemies"); >0) {
+					id = yDatabaseNext("enemies", true);
+					if (id == -1 || trUnitAlive() == false) {
+						removeEnemy();
+					} else {
 						trVectorSetUnitPos("pos", "enemies");
-						trVectorQuestVarSet("dir", zGetUnitVector("center", "pos"));
-						/* if enemy is in between the old and new positions, that's a hit */
-						trQuestVarSet("curDiff", dotProduct("dir", "curPos"));
-						if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
-							if (dotProduct("dir", "prevPos") > trQuestVarGet("angleDiff")) {
-								/* HIT */
-								if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
-									stunUnit("enemies", 1.5, p);
-								}
-								if (trQuestVarGet("p"+p+"eventHorizon") == 0) {
-									gainFavor(p, 1);
-								}
-								trUnitHighlight(0.2, false);
-								damageEnemy(p, amt, true);
-								if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
+						dist = zDistanceBetweenVectorsSquared("pos", "center");
+						if (dist < trQuestVarGet("outer") && dist > trQuestVarGet("inner")) {
+							/* enemy is within the donut */
+							trVectorQuestVarSet("dir", zGetUnitVector("center", "pos"));
+							/* if enemy is in between the old and new positions, that's a hit */
+							trQuestVarSet("curDiff", dotProduct("dir", "curPos"));
+							if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
+								if (dotProduct("dir", "prevPos") > trQuestVarGet("angleDiff")) {
+									/* HIT */
+									if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
+										stunUnit("enemies", 1.5, p);
+									} else {
+										gainFavor(p, 1);
+									}
+									trUnitHighlight(0.2, false);
+									damageEnemy(p, amt, true);
 									target = 1;
 								}
 							}
 						}
 					}
 				}
-			}
-			
-			/* the star hit something so we update the prev position to be the current position */
-			if (target == 1) {
-				ySetVar("p"+p+"characters", "last"+hit, trQuestVarGet("currentAngle"));
-				trQuestVarSetFromRand("sound", 1, 3, true);
-				trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				
+				/* the star hit something so we update the prev position to be the current position */
+				if (target == 1) {
+					trQuestVarSetFromRand("sound", 1, 3, true);
+					trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+					
+				}
 			}
 		}
 	}
@@ -258,6 +256,7 @@ void starseerAlways(int eventID = -1) {
 			}
 			trQuestVarSet("p"+p+"starAngularVelocity",
 				trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+			trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 		}
 	}
 	
@@ -269,6 +268,7 @@ void starseerAlways(int eventID = -1) {
 			trTimeMS() + 1000 * trQuestVarGet("eventHorizonDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trQuestVarSet("p"+p+"starAngularVelocity",
 			2.0 * trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+		trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			for(x=3; >0) {
@@ -316,6 +316,7 @@ void starseerModify(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 		trQuestVarSet("p"+p+"starAngularVelocity", 2.0 * trQuestVarGet("p"+p+"starAngularVelocity"));
 	}
+	trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 }
 
 rule starseer_init
@@ -329,9 +330,10 @@ highFrequency
 		trEventSetHandler(1000 + 12 * STARSEER + p, "chooseStarseer");
 		trEventSetHandler(5000 + 12 * STARSEER + p, "starseerModify");
 		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
+		trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 	}
 	
-	trQuestVarSet("starBaseDamage", 50);
+	trQuestVarSet("starBaseDamage", 60);
 	
 	
 	trQuestVarSet("realignCooldown", 5);

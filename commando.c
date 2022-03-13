@@ -88,11 +88,13 @@ void commandoAlways(int eventID = -1) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (rayCollision("enemies", "prev", "dir", current + 2.0, 4.0)) {
-					hit = 1;
+					hit = yGetPointer("enemies");
 					damageEnemy(p, trQuestVarGet("p"+p+"attack"), false);
 				}
 			}
-			if (hit == 1) {
+			if (hit > 0) {
+				gainFavor(p, 0.0 - trQuestVarGet("p"+p+"favorFromAttacks"));// don't get favor from minigun
+				OnHit(p, hit, false);
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"pellets", true);
 				trUnitChangeProtoUnit("Lightning Sparks Ground");
@@ -172,6 +174,7 @@ void commandoAlways(int eventID = -1) {
 							damageEnemy(p, (30.0 - current) / 30.0 * amt, false);
 							target = 1;
 							gainFavor(p, 1);
+							OnHit(p, yGetPointer("enemies"));
 						}
 					}
 				}
@@ -195,7 +198,7 @@ void commandoAlways(int eventID = -1) {
 		if (id == -1 || trUnitAlive() == false) {
 			removeCommando(p);
 		} else {
-			hit = CheckOnHit(p, id);
+			hit = CheckOnHit(p, id, false);
 			trVectorSetUnitPos("start", "p"+p+"characters");
 			if (hit == ON_HIT_NORMAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {

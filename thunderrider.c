@@ -33,7 +33,6 @@ void rideLightningOff(int p = 0) {
 		vectorSetAsCurrentPosition("pos","prev","dir",
 			yGetVar("p"+p+"lightningBalls", "last"),2.0*trQuestVarGet("p"+p+"speed"));
 		vectorSnapToGrid("pos");
-		trChatSend(0, "<color=1,0,0>"+trVectorQuestVarGet("pos"));
 		ySetVarFromVector("p"+p+"characters", "prev", "pos");
 		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
@@ -487,6 +486,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trUnitSelectByQV("enemies");
 					trUnitHighlight(0.2, false);
 					damageEnemy(p, yGetVar("p"+p+"thunderShocks", "damage"), false);
+					OnHit(p, 1*yGetVar("p"+p+"thunderShockTargets", "index"));
 					trVectorSetUnitPos("pos", "enemies");
 				}
 				yRemoveFromDatabase("p"+p+"thunderShockTargets");

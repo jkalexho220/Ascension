@@ -260,12 +260,12 @@ void paintCircle(int x = 0, int z = 0, int size = 0, int terrainType = 0, int te
 
 void placeTemple(int x = 0, int z = 0, float los = 0) {
 	trQuestVarSet("templeRevealer", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,0,true);
+	trArmyDispatch("1,0","Dwarf",1,70*x+41,0,70*z+41,0,true);
 	trUnitSelectClear();
 	trUnitSelectByQV("templeRevealer", true);
 	trUnitChangeProtoUnit("Cinematic Block");
 	trQuestVarSet("temple", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,70*x+39,0,70*z+39,225,true);
+	trArmyDispatch("1,0","Dwarf",1,70*x+41,0,70*z+41,225,true);
 	trUnitSelectClear();
 	trUnitSelectByQV("temple", true);
 	trUnitConvert(0);

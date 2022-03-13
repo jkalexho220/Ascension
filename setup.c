@@ -315,6 +315,9 @@ void chooseClass(int p = 0, int class = 0) {
 	trQuestVarSet("p"+p+"favorRegen", 0);
 	trQuestVarSet("p"+p+"physicalResist", trQuestVarGet("proto"+proto+"armor"));
 	trQuestVarSet("p"+p+"magicResist", trQuestVarGet("proto"+proto+"armor"));
+	trQuestVarSet("p"+p+"petDogs", 0);
+	trQuestVarSet("p"+p+"magicPen", 0);
+	trQuestVarSet("p"+p+"cleave", 0);
 	
 	trQuestVarSet("p"+p+"ultimateCost", 1);
 	trQuestVarSet("p"+p+"cooldownReduction", 1);
@@ -542,6 +545,7 @@ highFrequency
 	setupPlayerProto("Hero Boar", 1000, 0, 4.2, 0);
 	setupPlayerProto("Militia", 100, 10, 4.8);
 	setupPlayerProto("Wolf", 200, 10, 5, 0.2);
+	setupPlayerProto("Dog", 300, 15, 5, 0.2);
 	setupPlayerProto("Minion", 240, 10, 5, 0.2);
 	setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
 	setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
@@ -557,7 +561,7 @@ highFrequency
 	setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
 	setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
 	setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
-	setupPlayerProto("Circe", 1000, 0, 3.7, 0, 15);
+	setupPlayerProto("Circe", 1000, 100, 3.7, 0, 15);
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
 	setupPlayerProto("Regent", 1000, 0, 4.2, 0.3);

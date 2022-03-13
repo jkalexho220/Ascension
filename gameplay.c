@@ -391,6 +391,55 @@ void processFreeRelics(int count = 0) {
 	}
 }
 
+void processWolves() {
+	if (yGetDatabaseCount("playerwolves") > 0) {
+		yDatabaseNext("playerwolves", true);
+		if (trUnitAlive() == false) {
+			yAddToDatabase("decayingWolves", "playerwolves");
+			yAddUpdateVar("decayingWolves", "timeout", 3000 + trTimeMS());
+			yRemoveFromDatabase("playerwolves");
+		}
+	}
+	if (yGetDatabaseCount("decayingWolves") > 0) {
+		yDatabaseNext("decayingWolves");
+		if (trTimeMS() > yGetVar("decayingWolves", "timeout")) {
+			trUnitSelectClear();
+			trUnitSelectByQV("decayingWolves", true);
+			trUnitChangeProtoUnit("Dust Small");
+			yRemoveFromDatabase("decayingWolves");
+		}
+	}
+}
+
+void petDogs(int p = 0) {
+	switch(1*trQuestVarGet("p"+p+"petDogsStep"))
+	{
+		case 0:
+		{
+			if (2 * trQuestVarGet("p"+p+"petDogs") > trPlayerUnitCountSpecific(p, "Dog")) {
+				trQuestVarSet("p"+p+"petDogNext", trTime() + 30);
+				trQuestVarSet("p"+p+"petDogsStep", 1);
+				if (trCurrentPlayer() == p) {
+					trCounterAddTime("petDogs",30,1,"Pet Dog respawn",-1);
+				}
+			}
+		}
+		case 1:
+		{
+			if (trTime() > trQuestVarGet("p"+p+"petDogNext")) {
+				trVectorSetUnitPos("pos","p"+p+"unit");
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				yAddToDatabase("playerwolves","next");
+				spawnPlayerUnit(p, kbGetProtoUnitID("Dog"), "pos");
+				if (trCurrentPlayer() == p) {
+					trSoundPlayFN("bellaselect1.wav","1",-1,"","");
+				}
+				trQuestVarSet("p"+p+"petDogsStep", 0);
+			}
+		}
+	}
+}
+
 rule enable_chat
 inactive
 highFrequency
@@ -514,6 +563,8 @@ highFrequency
 	maintainStun();
 	
 	playerLasers();
+	
+	processWolves();
 	
 	
 	/* protection */
@@ -784,6 +835,7 @@ highFrequency
 				processLifesteal(p);
 				processSilence(p);
 				processRegen(p);
+				petDogs(p);
 			} else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
 				count = 0;
 				for(x=yGetDatabaseCount("enemies"); >0) {
@@ -915,16 +967,6 @@ highFrequency
 	
 	for(x=xsMin(5, yGetDatabaseCount("launchedUnits")); >0) {
 		processLaunchedUnit();
-	}
-	
-	if (yGetDatabaseCount("decayingWolves") > 0) {
-		yDatabaseNext("decayingWolves");
-		if (trTimeMS() > yGetVar("decayingWolves", "timeout")) {
-			trUnitSelectClear();
-			trUnitSelectByQV("decayingWolves", true);
-			trUnitChangeProtoUnit("Dust Small");
-			yRemoveFromDatabase("decayingWolves");
-		}
 	}
 	
 	processChests();

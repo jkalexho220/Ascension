@@ -547,7 +547,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Damage ignores their armor.";
+					msg = "(E) Blade Dance: Teleport to an enemy and attack them, ignoring their armor.";
 				}
 				case 11:
 				{
@@ -928,7 +928,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Damage: 50 | Rotation speed + 0.33x projectiles";
+					msg = "Damage: 60 | Rotation speed + 0.33x projectiles";
 				}
 				case 3:
 				{

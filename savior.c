@@ -266,6 +266,7 @@ void saviorAlways(int eventID = -1) {
 									if (zDistanceToVectorSquared("enemies", "hitbox") < 9) {
 										damageEnemy(p, amt, false);
 										target = 1 + target;
+										OnHit(p, yGetPointer("enemies"));
 									}
 								}
 							}

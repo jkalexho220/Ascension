@@ -211,6 +211,7 @@ void sparkWitchAlways(int eventID = -1) {
 								yAddUpdateVar("p"+p+"hexOrbs", "posz", trQuestVarGet("posz"));
 							}
 						}
+						OnHit(p, 1*yGetVar("p"+p+"zaps", "index"), true);
 					}
 				}
 				ySetVar("p"+p+"zaps", "bounces", yGetVar("p"+p+"zaps", "bounces") - 1);
@@ -435,6 +436,12 @@ void chooseSparkWitch(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
+void sparkwitchModify(int eventID = -1) {
+	int p = eventID - 5000 - 12 * SPARKWITCH;
+	trQuestVarSet("p"+p+"baseAttack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+	trQuestVarSet("p"+p+"Attack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+}
+
 rule sparkWitch_init
 active
 highFrequency
@@ -443,6 +450,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * SPARKWITCH + p, "sparkWitchAlways");
 		trEventSetHandler(1000 + 12 * SPARKWITCH + p, "chooseSparkWitch");
+		trEventSetHandler(5000 + 12 * SPARKWITCH + p, "sparkwitchModify");
 	}
 	
 	trQuestVarSet("thunderstrikeCooldown", 12);

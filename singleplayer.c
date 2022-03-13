@@ -411,15 +411,14 @@ highFrequency
 		trMutateSelected(kbGetProtoUnitID("Outpost"));
 		
 		/* relic warehouse */
-		trPaintTerrain(46,66, 57,78, 0,70, false);
+		trPaintTerrain(46,65, 57,78, 0,70, false);
 		x = 115;
 		for(a=1; <= 10) {
 			z = 155;
 			if (trQuestVarGet("ownedRelics"+a) > 0) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,x,0,z+2,180,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
+				trArmyDispatch("0,0","Dwarf",1,x,0,z+2,180,true);
+				trArmySelect("0,0");
 				trMutateSelected(relicProto(a));
 				trSetSelectedScale(0.5,0.5,0.5);
 				yAddToDatabase("relicDescriptors", "next");
@@ -435,12 +434,11 @@ highFrequency
 				}
 			}
 			
-			z = 135;
+			z = 133;
 			if (trQuestVarGet("ownedRelics"+(a+10)) > 0) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,x,0,z-2,0,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
+				trArmyDispatch("0,0","Dwarf",1,x,0,z-2,0,true);
+				trArmySelect("0,0");
 				trMutateSelected(relicProto(a+10));
 				trSetSelectedScale(0.5,0.5,0.5);
 				yAddToDatabase("relicDescriptors", "next");
@@ -464,10 +462,9 @@ highFrequency
 		for(a=21; <= 30) {
 			if (trQuestVarGet("ownedRelics"+a) > 0) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,x-2,0,z,90,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
-				trMutateSelected(relicProto(a));
+				trArmyDispatch("0,0","Dwarf",1,x-2,0,z,90,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a)));
 				trSetSelectedScale(0.5,0.5,0.5);
 				yAddToDatabase("relicDescriptors", "next");
 				yAddUpdateVar("relicDescriptors", "type", a);
