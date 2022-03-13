@@ -62,7 +62,7 @@ highFrequency
 				zSetProtoUnitStat("Revealer", 1, 2, 30);
 				trArmySelect("1,0");
 				trUnitConvert(0);
-
+				
 				trQuestVarSet("yeebaagooon", trGetNextUnitScenarioNameNumber());
 				trQuestVarSet("bossUnit", trQuestVarGet("yeebaagooon"));
 				trArmyDispatch("1,0","Dwarf",1,55,0,55,225,true);
@@ -70,45 +70,45 @@ highFrequency
 				trUnitSelectByQV("yeebaagooon", true);
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Pharaoh of Osiris XP");
-
+				
 				spyEffect(1*trQuestVarGet("yeebaagooon"), kbGetProtoUnitID("Cinematic Block"), "yeebShieldSFX");
-
+				
 				activateEnemy("bossUnit");
 				yAddUpdateVar("enemies", "launched", 1);
 				trQuestVarSet("bossPointer", yGetNewestPointer("enemies"));
-
+				
 				trVectorQuestVarSet("bossRoomUpper", xsVectorSet(60,0,60));
 				if (trQuestVarGet("mapType") == MAP_OPEN) {
 					trVectorQuestVarSet("bossRoomLower", xsVectorSet(10, 0, 20));
 				} else {
 					trVectorQuestVarSet("bossRoomLower", xsVectorSet(20, 0, 10));
 				}
-
+				
 				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
-
+				
 				xsEnableRule("yeebaagooon_battle");
 				xsEnableRule("boss_stun_recovery");
-
+				
 				trOverlayText("Yeebaagooon",3.0,-1,-1,-1);
-
+				
 				trQuestVarSet("lightningBolts", trGetNextUnitScenarioNameNumber());
-
+				
 				bossCooldown(10, 12);
-
+				
 				xsEnableRule("gameplay_start");
-	            trUIFadeToColor(0,0,0,1000,0,false);
-	            trLetterBox(false);
-	            trQuestVarSet("yeebNext", trTime() + 3);
-	            xsEnableRule("boss_music");
-	            trQuestVarSet("boss", 1);
-	            trQuestVarSet("yeebPosx", trQuestVarGet("startPositionx"));
-	            trQuestVarSet("yeebPosz", trQuestVarGet("startPositionz"));
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trLetterBox(false);
+				trQuestVarSet("yeebNext", trTime() + 3);
+				xsEnableRule("boss_music");
+				trQuestVarSet("boss", 1);
+				trQuestVarSet("yeebPosx", trQuestVarGet("startPositionx"));
+				trQuestVarSet("yeebPosz", trQuestVarGet("startPositionz"));
 			}
 			case 5:
 			{
 				trMessageSetText("Yeebaagooon's spells will drain your favor if they hit you!", -1);
 				xsDisableSelf();
-
+				
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 						found = false;
@@ -146,20 +146,20 @@ highFrequency
 	trVectorSetUnitPos("pos", "bossKey");
 	if (zDistanceToVectorSquared("bossEntranceStatue", "pos") < 25) {
 		trUnitSelectClear();
-    	trUnitSelect(""+1*trQuestVarGet("bossKey"));
-    	trUnitChangeProtoUnit("Osiris Box Glow");
-    	trUnitSelectClear();
-    	trUnitSelect(""+1*trQuestVarGet("bossEntranceSymbol"));
-    	trUnitChangeProtoUnit("Rocket");
-    	trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
-    	trMessageSetText("The boss room entrance has opened!", -1);
-    	trVectorSetUnitPos("pos", "bossEntranceStatue");
-    	trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-8,0,trQuestVarGet("posZ")-8,0,true);
-    	trArmySelect("1,0");
-    	trUnitChangeProtoUnit("Vortex Landing");
-    	trQuestVarSet("bossRoomEntranceX", trQuestVarGet("posX") - 8);
-    	trQuestVarSet("bossRoomEntranceZ", trQuestVarGet("posZ") - 8);
-    	xsDisableSelf();
+		trUnitSelect(""+1*trQuestVarGet("bossKey"));
+		trUnitChangeProtoUnit("Osiris Box Glow");
+		trUnitSelectClear();
+		trUnitSelect(""+1*trQuestVarGet("bossEntranceSymbol"));
+		trUnitChangeProtoUnit("Rocket");
+		trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+		trMessageSetText("The boss room entrance has opened!", -1);
+		trVectorSetUnitPos("pos", "bossEntranceStatue");
+		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX")-8,0,trQuestVarGet("posZ")-8,0,true);
+		trArmySelect("1,0");
+		trUnitChangeProtoUnit("Vortex Landing");
+		trQuestVarSet("bossRoomEntranceX", trQuestVarGet("posX") - 8);
+		trQuestVarSet("bossRoomEntranceZ", trQuestVarGet("posZ") - 8);
+		xsDisableSelf();
 	}
 }
 
@@ -181,7 +181,7 @@ highFrequency
 			trQuestVarSet("playersInBossRoom", trQuestVarGet("playersInBossRoom") - 1);
 		}
 	}
-
+	
 	if (trQuestVarGet("playersInBossRoom") == trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount") &&
 		trQuestVarGet("playersInBossRoom") > 0) {
 		xsDisableSelf();
@@ -204,7 +204,7 @@ inactive
 		} else {
 			trQuestVarSet("musicTime", trTime() + 50);
 			trQuestVarSetFromRand("music", 1, 6, true);
-			switch(trQuestVarGet("music"))
+			switch(1*trQuestVarGet("music"))
 			{
 				case 1:
 				{
@@ -212,15 +212,15 @@ inactive
 				}
 				case 2:
 				{
-					trMusicPlay("music\fight\li'l drips.mp3","1",3.0);	
+					trMusicPlay("music\fight\li'l drips.mp3","1",3.0);
 				}
 				case 3:
 				{
-					trMusicPlay("music\fight\meatier shower.mp3","1",3.0);	
+					trMusicPlay("music\fight\meatier shower.mp3","1",3.0);
 				}
 				case 4:
 				{
-					trMusicPlay("music\fight\oi, that pops!!!.mp3","1",3.0);	
+					trMusicPlay("music\fight\oi, that pops!!!.mp3","1",3.0);
 				}
 				case 5:
 				{
@@ -228,7 +228,7 @@ inactive
 				}
 				case 6:
 				{
-					trMusicPlay("music\fight\the fire brigade.mp3","1",3.0);	
+					trMusicPlay("music\fight\the fire brigade.mp3","1",3.0);
 				}
 			}
 		}
@@ -267,27 +267,27 @@ highFrequency
 			TERRAIN_WALL, TERRAIN_SUB_WALL);
 		trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX") - 3, trQuestVarGet("bossRoomEntranceZ"),
 			trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,wallHeight,false);
-
+		
 		trPaintTerrain(0,0,5,5,0,70,true);
-        trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-
+		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+		
 		trQuestVarSet("bossUnit", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0",trStringQuestVarGet("bossProto"),1,
 			trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit", true);
 		trUnitConvert(0);
-
+		
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
 		
 		xsEnableRule("boss"+1*trQuestVarGet("stage")+"_init");
-
+		
 		trQuestVarSet("boss", trQuestVarGet("stage"));
-
+		
 		trQuestVarSet("bossRoomPlayersX", trQuestVarGet("bossRoomCenterX") - 12);
 		trQuestVarSet("bossRoomPlayersZ", trQuestVarGet("bossRoomCenterZ") - 12);
-
+		
 		yClearDatabase("playerCharacters");
 		for(p=1; < ENEMY_PLAYER) {
 			if (trQuestVarGet("p"+p+"resigned") == 0) {
@@ -306,7 +306,7 @@ highFrequency
 				trQuestVarSet("p"+p+"silenceTimeout", 0);
 			}
 		}
-
+		
 		for(x=yGetDatabaseCount("enemies"); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id >= 0 && trUnitAlive()) {
@@ -315,18 +315,18 @@ highFrequency
 		}
 		yClearDatabase("enemies");
 		yClearDatabase("enemiesIncoming");
-
+		
 		activateEnemy("bossUnit", 0, 0);
 		trQuestVarSet("bossPointer", yGetNewestPointer("enemies"));
-
+		
 		zSetProtoUnitStat("Revealer", 1, 2, 32);
 		trArmyDispatch("1,0","Revealer",1,trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
 		trArmySelect("1,0");
 		trUnitConvert(0);
 		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
-
+		
 		yClearDatabase("freeRelics");
-
+		
 		if (trQuestVarGet("stage") > 3) {
 			xsEnableRule("boss_stun_recovery");
 		}
@@ -430,9 +430,8 @@ highFrequency
 				yRemoveFromDatabase("enemies");
 				trQuestVarSet("bossHealth", 100);
 				trCounterAddTime("bosshealth",-1,-9999,"<color={Playercolor(2)}>Wraithwood: 100</color>", -1);
-
+				
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 0, 6391);
-				trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -2.8);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 27, 656);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 28, 566);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 29, 656);
@@ -444,7 +443,7 @@ highFrequency
 				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
 				xsEnableRule("boss_music");
 				trMessageSetText("Defeat the spawned enemies to damage the Wraithwood!", -1);
-				trStringQuestVarSet("advice", 
+				trStringQuestVarSet("advice",
 					"The Wraithwood only summons new enemies once the old ones are gone. Make sure to kill the spawns!");
 			}
 		}
@@ -463,7 +462,7 @@ highFrequency
 			{
 				trOverlayText("King of Ice", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
-				trRenderSnow(0.2);
+				//trRenderSnow(0.2);
 			}
 			case 1:
 			{
@@ -480,12 +479,12 @@ highFrequency
 				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
 				xsEnableRule("boss_music");
-
+				
 				bossCooldown(10, 15);
-
+				
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 27, 20);
-
-				trStringQuestVarSet("advice", 
+				
+				trStringQuestVarSet("advice",
 					"If anything is stunned near an icicle, it will grow. Big icicles will turn into Frost Giants!");
 			}
 		}
@@ -510,7 +509,7 @@ highFrequency
 					for(p=1; < ENEMY_PLAYER) {
 						if (trUnitIsOwnedBy(p)) {
 							trSoundPlayFN("","1",-1,
-								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + "Did you really think I wouldn't notice you stealing my relic?",
+								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + ". Did you really think I wouldn't notice you stealing my relic?",
 								"icons\special e son of osiris icon 64");
 							break;
 						}
@@ -526,17 +525,17 @@ highFrequency
 					spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Helepolis"), "biggerHelepolis");
 					spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Barracks Atlantean"), "biggerBallista");
 					ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
-
+					
 					trQuestVarSet("bossTurretObject", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 					trQuestVarSet("bossTurret", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-
+					
 					trQuestVarSet("bossBarrelObject", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 					trQuestVarSet("bossBarrel", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossBarrel", true);
 					trUnitConvert(ENEMY_PLAYER);
@@ -545,14 +544,14 @@ highFrequency
 					trUnitSelectByQV("bossTurret", true);
 					trUnitConvert(ENEMY_PLAYER);
 					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossTurretObject", true);
 					trUnitConvert(ENEMY_PLAYER);
 					trMutateSelected(kbGetProtoUnitID("Relic"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("bossTurret"));
 					trMutateSelected(kbGetProtoUnitID("Fire Siphon"));
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossBarrelObject", true);
 					trUnitConvert(ENEMY_PLAYER);
@@ -562,14 +561,14 @@ highFrequency
 					trUnitSetAnimationPath("1,0,0,0,0,0,0");
 					trSetSelectedScale(1.5, 1.0, 1.5);
 					
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossBarrel", true);
 					trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
 					trUnitSelectClear();
 					trUnitSelectByQV("bossTurret", true);
 					trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
-
+					
 					trQuestVarSet("volcano1", trGetNextUnitScenarioNameNumber());
 					trQuestVarSet("volcano2", 1 + trQuestVarGet("volcano1"));
 					trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("bossRoomCenterx"),0,trQuestVarGet("bossRoomCenterZ"),0,true);
@@ -597,7 +596,7 @@ highFrequency
 				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
-
+				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 27, 20);
 			}
 			case 2:
@@ -613,21 +612,21 @@ highFrequency
 				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossPointer"));
 				ySetVarAtIndex("enemies", "physicalResist", 0.47, 1*trQuestVarGet("bossPointer"));
 				ySetVarAtIndex("enemies", "magicResist", 0.47, 1*trQuestVarGet("bossPointer"));
-
+				
 				spyEffect(1*trQuestVarGet("yeebaagooon"), kbGetProtoUnitID("Cinematic Block"), "yeebShieldSFX");
-
+				
 				trQuestVarSet("bossRoomUpperX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
 				trQuestVarSet("bossRoomUpperz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomLowerX") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomLowerZ") + trQuestVarGet("bossRoomSize"));
-
+				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
+				
 				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
-
+				
 				trQuestVarSet("yeebPosx", trQuestVarGet("bossRoomCenterX"));
 				trQuestVarSet("yeebPosz", trQuestVarGet("bossRoomCenterZ"));
-
+				
 				trOverlayText("Yeebaagooon",3.0,-1,-1,-1);
-
+				
 				trQuestVarSet("lightningBolts", trGetNextUnitScenarioNameNumber());
 			}
 			case 3:
@@ -638,11 +637,11 @@ highFrequency
 				xsEnableRule("yeebaagooon_battle");
 				xsEnableRule("boss_stun_recovery");
 				bossCooldown(10, 12);
-
-	            trUIFadeToColor(0,0,0,1000,0,false);
-	            trLetterBox(false);
-	            xsEnableRule("boss_music");
-	            trQuestVarSet("cinTime", trTime() + 3);
+				
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trLetterBox(false);
+				xsEnableRule("boss_music");
+				trQuestVarSet("cinTime", trTime() + 3);
 			}
 			case 4:
 			{
@@ -680,13 +679,13 @@ highFrequency
 				trQuestVarSet("bossGem", STARSTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
-
+				
 				bossCooldown(10, 15);
-
+				
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 27, 20);
-
+				
 				zSetProtoUnitStat("Meteorite", ENEMY_PLAYER, 1, 6);
-
+				
 				trStringQuestVarSet("advice", "Try bringing poison and silence resistance!");
 			}
 		}
@@ -720,32 +719,32 @@ highFrequency
 				trQuestVarSet("bossGem", SOULSTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
-
+				
 				trQuestVarSet("bossWarn1", trGetNextUnitScenarioNameNumber());
 				trQuestVarSet("bossWarn2", 1 + trQuestVarGet("bossWarn1"));
 				trArmyDispatch("1,0","Dwarf",2,1,0,1,0,true);
 				trArmySelect("1,0");
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Cinematic Block");
-
+				
 				trQuestVarSet("bossScreamStart", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",7,1,0,1,0,true);
 				trArmySelect("1,0");
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Cinematic Block");
 				trQuestVarSet("bossScreamEnd", trGetNextUnitScenarioNameNumber());
-
+				
 				trQuestVarSet("bossEscape", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 				trArmySelect("1,0");
 				trUnitConvert(ENEMY_PLAYER);
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
-
+				
 				bossCooldown(10, 15);
-
+				
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 27, 20);
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 55, 4);
-
+				
 				trStringQuestVarSet("advice", "Try bringing poison resistance!");
 			}
 		}
@@ -958,10 +957,8 @@ highFrequency
 				trQuestVarSet("dirX", 24.0 * trQuestVarGet("dirX") + trQuestVarGet("bossRoomCenterX"));
 				trQuestVarSet("dirZ", 24.0 * trQuestVarGet("dirZ") + trQuestVarGet("bossRoomCenterZ"));
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),trQuestVarGet("heading"),true);
-				trArmySelect("1,0");
-				trUnitConvert(ENEMY_PLAYER);
-				trUnitChangeProtoUnit("Sphinx");
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Sphinx",1,
+					trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),trQuestVarGet("heading"),true);
 				activateEnemy("next", 0, 0);
 				yAddToDatabase("Sphinxes", "next");
 			}
@@ -1128,7 +1125,7 @@ highFrequency
 				yRemoveFromDatabase("bossRainingTrees");
 			}
 		}
-
+		
 		if (yGetDatabaseCount("bossHeals") > 0) {
 			processGenericProj("bossHeals");
 			trVectorSetUnitPos("pos", "bossHeals");
@@ -1162,7 +1159,7 @@ highFrequency
 				}
 			}
 		}
-
+		
 		if (yGetDatabaseCount("bossRoots") > 0) {
 			yDatabaseNext("bossRoots");
 			if (trTimeMS() > yGetVar("bossRoots", "timeout")) {
@@ -1201,7 +1198,7 @@ highFrequency
 				}
 			}
 		}
-
+		
 		for(y=xsMin(9, yGetDatabaseCount("treeStabs")); >0) {
 			yDatabaseNext("treeStabs");
 			dist = trTimeMS() - yGetVar("treeStabs", "next");
@@ -1216,7 +1213,7 @@ highFrequency
 						trMutateSelected(kbGetProtoUnitID("Pine Dead"));
 						trSetSelectedScale(0.9,dist/750,0.9);
 						trSetSelectedUpVector(2.5*trQuestVarGet("dirx"),0,2.5*trQuestVarGet("dirz"));
-
+						
 						trUnitSelectClear();
 						trUnitSelect(""+1*yGetVar("treeStabs","sfx"),true);
 						trUnitChangeProtoUnit("Tartarian Gate flame");
@@ -1401,7 +1398,7 @@ highFrequency
 					trQuestVarSet("startz", trQuestVarGet("startz") * 25.0 + trQuestVarGet("bossRoomCenterZ"));
 					vectorSnapToGrid("start");
 					addGenericProj("bossHeals","start","dir",kbGetProtoUnitID("Curse SFX"),2,1.5,5);
-
+					
 					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 					if (trQuestVarGet("bossCount") == 0) {
 						bossCooldown(10, 15);
@@ -1451,13 +1448,13 @@ highFrequency
 				}
 			}
 		}
-
+		
 		if (trQuestVarGet("treeStabSound") == 1) {
 			trQuestVarSet("treeStabSound", 0);
 			trQuestVarSetFromRand("sound", 2, 4, true);
 			trSoundPlayFN("minionbirth"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
-
+		
 		if (trQuestVarGet("treeHitSound") == 1) {
 			trQuestVarSet("treeHitSound", 0);
 			trQuestVarSetFromRand("sound", 1, 2, true);
@@ -1568,7 +1565,7 @@ highFrequency
 				trSetSelectedScale(amt * 0.5, amt, amt * 0.5);
 			}
 		}
-
+		
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		
@@ -1603,8 +1600,9 @@ highFrequency
 							trVectorSetUnitPos("target", "playerCharacters");
 							trVectorQuestVarSet("dir", zGetUnitVector("pos", "target"));
 							addGenericProj("MedusaBalls","pos","dir",kbGetProtoUnitID("Lampades"),37,4,4.7);
-		                    yAddUpdateVar("MedusaBalls", "target", trQuestVarGet("playerCharacters"));
-		                    yAddUpdateVar("MedusaBalls", "bounces", 10);
+							yAddUpdateVar("MedusaBalls", "target", trQuestVarGet("playerCharacters"));
+							yAddUpdateVar("MedusaBalls", "bounces", 10);
+							yAddUpdateVar("MedusaBalls","player",ENEMY_PLAYER);
 						}
 					}
 					if (trTimeMS() > trQuestVarGet("bossTimeout")) {
@@ -1830,7 +1828,7 @@ highFrequency
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
 		}
-
+		
 		if (trQuestVarGet("frostGiantIncomingSound") == 1) {
 			trQuestVarSet("frostGiantIncomingSound", 0);
 			trSoundPlayFN("icemono.wav","1",-1,"","");
@@ -1954,7 +1952,7 @@ highFrequency
 				trQuestVarSet("bossCount", 10);
 				trVectorSetUnitPos("bossPos", "bossUnit");
 				trVectorSetFromAngle("bossdir", trQuestVarGet("bossangle"));
-
+				
 				trUnitSelectClear();
 				trUnitSelectByQV("bossTurret", true);
 				trUnitSetStance("Aggressive");
@@ -2008,7 +2006,7 @@ highFrequency
 						trQuestVarSet("bossNext", trTimeMS() + 3000);
 						trQuestVarSet("bossLast", trTimeMS());
 						trQuestVarSet("bossSpell", 34);
-						trSoundPlayFN("automatonspcbirth.wav","1",-1,"","");	
+						trSoundPlayFN("automatonspcbirth.wav","1",-1,"","");
 					} else {
 						bossCooldown(10, 20);
 						trQuestVarSet("bossUltimate", 3);
@@ -2232,7 +2230,7 @@ highFrequency
 					trMutateSelected(kbGetProtoUnitID("Relic"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("bossCar"));
 					trMutateSelected(kbGetProtoUnitID("Meteorite"));
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossCar", true);
 					trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
@@ -2268,7 +2266,7 @@ highFrequency
 					}
 					trSoundPlayFN("meteorbighit.wav","1",-1,"","");
 					trCameraShake(0.5,0.5);
-
+					
 					trUnitSelectClear();
 					trUnitSelectByQV("bossUnit");
 					trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
@@ -2383,71 +2381,71 @@ highFrequency
 	float angle = 0;
 	bool hit = false;
 	if (trUnitAlive() == true) {
-	    for (i=xsMin(3,yGetDatabaseCount("bossClouds")); > 0) {
-	    	action = processGenericProj("bossClouds");
-	        if ((action == PROJ_FALLING) && yGetVar("bossClouds", "type") < 99) {
-	            yVarToVector("bossClouds", "prev");
-	            yVarToVector("bossClouds", "dir");
-	            amt = zDistanceBetweenVectors("pos", "prev");
-	            if (amt > 4.0) {
-	                yVarToVector("bossClouds", "dir");
-	                ySetVar("bossClouds", "currentDist", yGetVar("bossClouds", "currentDist") + amt);
-	                for(x=yGetDatabaseCount("playerUnits"); >0) {
-	                    if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-	                        removePlayerUnit();
-	                    } else {
-	                        dist = zDistanceToVector("playerUnits", "prev");
-	                        if (dist < amt + 1.0) {
-	                            trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
-	                            trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-	                            if (zDistanceToVectorSquared("playerUnits", "hitbox") < 4.0) {
-	                                poisonUnit("playerUnits", 10, 30);
-	                            }
-	                        }
-	                    }
-	                }
-	                ySetVarFromVector("bossClouds", "prev", "pos");
-	            }
-	            trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-	            trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-	            vectorToGrid("next", "loc");
-	            if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-	                yRemoveFromDatabase("bossClouds");
-	            }
-	        } else if ((action == PROJ_GROUND) && yGetVar("bossClouds", "type") == 99) {
-	        	trDamageUnitPercent(-100);
-	        	trQuestVarSetFromRand("rand", 1, 5, true);
-	        	switch(1*trQuestVarGet("rand"))
-	        	{
-	        		case 1:
-	        		{
-	        			trUnitChangeProtoUnit("Sphinx");
-	        		}
-	        		case 2:
-	        		{
-	        			trUnitChangeProtoUnit("Cyclops");
-	        		}
-	        		case 3:
-	        		{
-	        			trUnitChangeProtoUnit("Avenger");
-	        		}
-	        		case 4:
-	        		{
-	        			trUnitChangeProtoUnit("Dryad");
-	        		}
-	        		case 5:
-	        		{
-	        			trUnitChangeProtoUnit("Walking Woods Marsh");
-	        		}
-	        	}
-	        	trUnitSelectClear();
-	        	trUnitSelectByQV("bossClouds", true);
-	        	trDamageUnitPercent(-100);
-	        	activateEnemy("bossClouds",-1,0);
-	        	yRemoveFromDatabase("bossClouds");
-	        }
-	    }
-
+		for (i=xsMin(3,yGetDatabaseCount("bossClouds")); > 0) {
+			action = processGenericProj("bossClouds");
+			if ((action == PROJ_FALLING) && yGetVar("bossClouds", "type") < 99) {
+				yVarToVector("bossClouds", "prev");
+				yVarToVector("bossClouds", "dir");
+				amt = zDistanceBetweenVectors("pos", "prev");
+				if (amt > 4.0) {
+					yVarToVector("bossClouds", "dir");
+					ySetVar("bossClouds", "currentDist", yGetVar("bossClouds", "currentDist") + amt);
+					for(x=yGetDatabaseCount("playerUnits"); >0) {
+						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+							removePlayerUnit();
+						} else {
+							dist = zDistanceToVector("playerUnits", "prev");
+							if (dist < amt + 1.0) {
+								trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
+								trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
+								if (zDistanceToVectorSquared("playerUnits", "hitbox") < 4.0) {
+									poisonUnit("playerUnits", 10, 30);
+								}
+							}
+						}
+					}
+					ySetVarFromVector("bossClouds", "prev", "pos");
+				}
+				trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
+				trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+				vectorToGrid("next", "loc");
+				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+					yRemoveFromDatabase("bossClouds");
+				}
+			} else if ((action == PROJ_GROUND) && yGetVar("bossClouds", "type") == 99) {
+				trDamageUnitPercent(-100);
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				switch(1*trQuestVarGet("rand"))
+				{
+					case 1:
+					{
+						trUnitChangeProtoUnit("Sphinx");
+					}
+					case 2:
+					{
+						trUnitChangeProtoUnit("Cyclops");
+					}
+					case 3:
+					{
+						trUnitChangeProtoUnit("Avenger");
+					}
+					case 4:
+					{
+						trUnitChangeProtoUnit("Dryad");
+					}
+					case 5:
+					{
+						trUnitChangeProtoUnit("Walking Woods Marsh");
+					}
+				}
+				trUnitSelectClear();
+				trUnitSelectByQV("bossClouds", true);
+				trDamageUnitPercent(-100);
+				activateEnemy("bossClouds",-1,0);
+				yRemoveFromDatabase("bossClouds");
+			}
+		}
+		
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
@@ -2776,122 +2774,122 @@ highFrequency
 	float angle = 0;
 	bool hit = false;
 	if (trUnitAlive() == true) {
-	    switch(1*trQuestVarGet("bossChokeStep"))
-	    {
-	    	case 0:
-	    	{
-	    		if (trUnitPercentDamaged() > trQuestVarGet("bossChoke")) {
-	    			trQuestVarSet("bossChoke", trQuestVarGet("bossChoke") + 20);
-	    			trQuestVarSet("bossChokeNext", trTimeMS());
-	    			trQuestVarSet("bossChokeStep", 1);
-	    			trQuestVarSet("bossChokeCount", 3);
-	    			trSoundPlayFN("attackwarning.wav","1",-1,"","");
-	    			trMessageSetText("The arena is getting smaller!", -1);
-	    		}
-	    	}
-	    	case 1:
-	    	{
-	    		if (trTimeMS() > trQuestVarGet("bossChokeNext")) {
-	    			action = trQuestVarGet("bossRoomSize");
-	    			x = trQuestVarGet("bossRoomLocX");
-	    			z = trQuestVarGet("bossRoomLocZ");
-	    			if (trQuestVarGet("bossChokeCount") <= 0) {
-	    				trQuestVarSet("bossChokeStep", 0);
-	    				trPaintTerrain(x - action, z - action, x + action, z + action, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-	    				trChangeTerrainHeight(x - action-1, z - action-1, x + action+1, z + action+1, wallHeight, false);
-
-	    				trPaintTerrain(x - action+1, z - action+1, x + action-2, z + action-2, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-	    				trChangeTerrainHeight(x - action+1, z - action+1, x + action-1, z + action-1, worldHeight, false);
-
-	    				trPaintTerrain(0,0,5,5,0,70,true);
-        				trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-        				trSoundPlayFN("wall.wav","1",-1,"","");
-        				trQuestVarSet("bossRoomSize", action - 1);
-
-        				if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-        					trQuestVarSet("bossSpell", 1);
-        				}
-        				trQuestVarSet("bottomX", trQuestVarGet("bossRoomCenterX") - 2 * trQuestVarGet("bossRoomSize"));
-        				trQuestVarSet("bottomZ", trQuestVarGet("bossRoomCenterZ") - 2 * trQuestVarGet("bossRoomSize"));
-        				trQuestVarSet("topX", trQuestVarGet("bossRoomCenterX") + 2 * trQuestVarGet("bossRoomSize"));
-        				trQuestVarSet("topZ", trQuestVarGet("bossRoomCenterZ") + 2 * trQuestVarGet("bossRoomSize"));
-        				for(x=yGetDatabaseCount("playerUnits"); >0) {
-        					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-        						removePlayerUnit();
-        					} else {
-        						trVectorSetUnitPos("pos", "playerUnits");
-        						if (vectorInRectangle("pos", "bottom", "top") == false) {
-        							trUnitDelete(false);
-        							removePlayerUnit();
-        						}
-        					}
-        				}
-	    			} else {
-		    			trPaintTerrain(x - action, z - action, x + action, z + action, 2, 10, false);
-		    			trPaintTerrain(x - action+1, z - action+1, x + action-1, z + action-1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-		    			trQuestVarSet("bossChokeNext", trQuestVarGet("bossChokeNext") + 500);
-		    			trQuestVarSet("bossChokeStep", 2);
-	    			}
-	    		}
-	    	}
-	    	case 2:
-	    	{
-	    		if (trTimeMS() > trQuestVarGet("bossChokeNext")) {
-	    			action = trQuestVarGet("bossRoomSize");
-	    			x = trQuestVarGet("bossRoomLocX");
-	    			z = trQuestVarGet("bossRoomLocZ");
-	    			trPaintTerrain(x - action, z - action, x + action, z + action, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-	    			trQuestVarSet("bossChokeNext", trQuestVarGet("bossChokeNext") + 500);
-	    			trQuestVarSet("bossChokeStep", 1);
-	    			trQuestVarSet("bossChokeCount", trQuestVarGet("bossChokeCount") - 1);
-	    		}
-	    	}
-	    }
-	    for (i=xsMin(5, yGetDatabaseCount("bossBolts")); > 0) {
-	    	action = processGenericProj("bossBolts");
-	    	if (action == PROJ_FALLING) {
-	    		vectorToGrid("pos", "loc");
-    			hit = false;
-    			yVarToVector("bossBolts", "prev");
-    			yVarToVector("bossBolts", "dir");
-    			amt = zDistanceBetweenVectors("pos", "prev") + 1.0;
-    			for(x=yGetDatabaseCount("playerUnits"); >0) {
-    				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-    					removePlayerUnit();
-    				} else if (rayCollision("playerUnits","prev","dir",amt,2.0)) {
-    					damagePlayerUnit(100);
-    					poisonUnit("playerUnits", 10, 5 * trQuestVarGet("stage"));
-    					hit = true;
-    				}
-    			}
-	    		if (hit || terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-	    			trUnitSelectClear();
-	    			trUnitSelectByQV("bossBolts", true);
-	    			trDamageUnitPercent(-100);
-	    			trUnitChangeProtoUnit("Lightning sparks");
-	    			trUnitSelectClear();
-	    			trUnitSelectByQV("bossBolts", true);
-	    			trDamageUnitPercent(-100);
-	    			if (hit) {
-	    				trQuestVarSet("boltsound", 1);
-	    			} else {
-	    				trQuestVarSet("boltsound", 2);
-	    			}
-	    			yRemoveFromDatabase("bossBolts");
-	    		} else {
-	    			ySetVarFromVector("bossBolts", "prev", "pos");
-	    		}
-	    	}
-	    }
-	    if (trQuestVarGet("boltsound") == 1) {
-    		trQuestVarSetFromRand("sound", 1, 4, true);
-    		trSoundPlayFN("swordonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-    	} else if (trQuestVarGet("boltsound") == 2) {
-    		trQuestVarSetFromRand("sound", 1, 3, true);
-    		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-    	}
-    	trQuestVarSet("boltsound", 0);
-
+		switch(1*trQuestVarGet("bossChokeStep"))
+		{
+			case 0:
+			{
+				if (trUnitPercentDamaged() > trQuestVarGet("bossChoke")) {
+					trQuestVarSet("bossChoke", trQuestVarGet("bossChoke") + 20);
+					trQuestVarSet("bossChokeNext", trTimeMS());
+					trQuestVarSet("bossChokeStep", 1);
+					trQuestVarSet("bossChokeCount", 3);
+					trSoundPlayFN("attackwarning.wav","1",-1,"","");
+					trMessageSetText("The arena is getting smaller!", -1);
+				}
+			}
+			case 1:
+			{
+				if (trTimeMS() > trQuestVarGet("bossChokeNext")) {
+					action = trQuestVarGet("bossRoomSize");
+					x = trQuestVarGet("bossRoomLocX");
+					z = trQuestVarGet("bossRoomLocZ");
+					if (trQuestVarGet("bossChokeCount") <= 0) {
+						trQuestVarSet("bossChokeStep", 0);
+						trPaintTerrain(x - action, z - action, x + action, z + action, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+						trChangeTerrainHeight(x - action-1, z - action-1, x + action+1, z + action+1, wallHeight, false);
+						
+						trPaintTerrain(x - action+1, z - action+1, x + action-2, z + action-2, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+						trChangeTerrainHeight(x - action+1, z - action+1, x + action-1, z + action-1, worldHeight, false);
+						
+						trPaintTerrain(0,0,5,5,0,70,true);
+						trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+						trSoundPlayFN("wall.wav","1",-1,"","");
+						trQuestVarSet("bossRoomSize", action - 1);
+						
+						if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
+							trQuestVarSet("bossSpell", 1);
+						}
+						trQuestVarSet("bottomX", trQuestVarGet("bossRoomCenterX") - 2 * trQuestVarGet("bossRoomSize"));
+						trQuestVarSet("bottomZ", trQuestVarGet("bossRoomCenterZ") - 2 * trQuestVarGet("bossRoomSize"));
+						trQuestVarSet("topX", trQuestVarGet("bossRoomCenterX") + 2 * trQuestVarGet("bossRoomSize"));
+						trQuestVarSet("topZ", trQuestVarGet("bossRoomCenterZ") + 2 * trQuestVarGet("bossRoomSize"));
+						for(x=yGetDatabaseCount("playerUnits"); >0) {
+							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+								removePlayerUnit();
+							} else {
+								trVectorSetUnitPos("pos", "playerUnits");
+								if (vectorInRectangle("pos", "bottom", "top") == false) {
+									trUnitDelete(false);
+									removePlayerUnit();
+								}
+							}
+						}
+					} else {
+						trPaintTerrain(x - action, z - action, x + action, z + action, 2, 10, false);
+						trPaintTerrain(x - action+1, z - action+1, x + action-1, z + action-1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+						trQuestVarSet("bossChokeNext", trQuestVarGet("bossChokeNext") + 500);
+						trQuestVarSet("bossChokeStep", 2);
+					}
+				}
+			}
+			case 2:
+			{
+				if (trTimeMS() > trQuestVarGet("bossChokeNext")) {
+					action = trQuestVarGet("bossRoomSize");
+					x = trQuestVarGet("bossRoomLocX");
+					z = trQuestVarGet("bossRoomLocZ");
+					trPaintTerrain(x - action, z - action, x + action, z + action, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+					trQuestVarSet("bossChokeNext", trQuestVarGet("bossChokeNext") + 500);
+					trQuestVarSet("bossChokeStep", 1);
+					trQuestVarSet("bossChokeCount", trQuestVarGet("bossChokeCount") - 1);
+				}
+			}
+		}
+		for (i=xsMin(5, yGetDatabaseCount("bossBolts")); > 0) {
+			action = processGenericProj("bossBolts");
+			if (action == PROJ_FALLING) {
+				vectorToGrid("pos", "loc");
+				hit = false;
+				yVarToVector("bossBolts", "prev");
+				yVarToVector("bossBolts", "dir");
+				amt = zDistanceBetweenVectors("pos", "prev") + 1.0;
+				for(x=yGetDatabaseCount("playerUnits"); >0) {
+					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (rayCollision("playerUnits","prev","dir",amt,2.0)) {
+						damagePlayerUnit(100);
+						poisonUnit("playerUnits", 10, 5 * trQuestVarGet("stage"));
+						hit = true;
+					}
+				}
+				if (hit || terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+					trUnitSelectClear();
+					trUnitSelectByQV("bossBolts", true);
+					trDamageUnitPercent(-100);
+					trUnitChangeProtoUnit("Lightning sparks");
+					trUnitSelectClear();
+					trUnitSelectByQV("bossBolts", true);
+					trDamageUnitPercent(-100);
+					if (hit) {
+						trQuestVarSet("boltsound", 1);
+					} else {
+						trQuestVarSet("boltsound", 2);
+					}
+					yRemoveFromDatabase("bossBolts");
+				} else {
+					ySetVarFromVector("bossBolts", "prev", "pos");
+				}
+			}
+		}
+		if (trQuestVarGet("boltsound") == 1) {
+			trQuestVarSetFromRand("sound", 1, 4, true);
+			trSoundPlayFN("swordonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		} else if (trQuestVarGet("boltsound") == 2) {
+			trQuestVarSetFromRand("sound", 1, 3, true);
+			trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		}
+		trQuestVarSet("boltsound", 0);
+		
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
@@ -3030,7 +3028,7 @@ highFrequency
 							trVectorSetUnitPos("pos", "playerUnits");
 							trVectorQuestVarSet("dir", zGetUnitVector("bossPos", "pos"));
 							if ((dotProduct("dir", "bossDir1") > amt &&
-								dotProduct("dir", "bossDir2") > amt) ||
+									dotProduct("dir", "bossDir2") > amt) ||
 								zDistanceBetweenVectorsSquared("bossPos", "pos") < 9.0) {
 								damagePlayerUnit(200);
 								p = 1*yGetVar("playerUnits","player");
@@ -3224,7 +3222,7 @@ highFrequency
 							yAddUpdateVar("bossBolts", "prevZ", trQuestVarGet("prevZ"));
 							trVectorQuestVarSet("dir", rotationMatrix("dir", 0.866025, 0.5));
 						}
-
+						
 						yClearDatabase("splatterUnits");
 						for(x=yGetDatabaseCount("playerUnits"); >0) {
 							yDatabaseNext("playerUnits");
@@ -3234,7 +3232,7 @@ highFrequency
 						
 						trSoundPlayFN("buildingdeath.wav","1",-1,"","");
 						trCameraShake(0.5, 0.3);
-
+						
 						vectorToGrid("pos", "loc");
 						if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 							trQuestVarSet("bossNext", trTimeMS());
@@ -3352,7 +3350,7 @@ highFrequency
 	float angle = 0;
 	bool hit = false;
 	if (trUnitAlive() == true) {
-
+		
 		if (yGetDatabaseCount("yeebLightningEnd") > 0) {
 			trQuestVarSetFromRand("sound", 1, 5, true);
 			hit = false;
@@ -3389,7 +3387,7 @@ highFrequency
 				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 			}
 		}
-			
+		
 		for(x=xsMin(10, yGetDatabaseCount("yeebLightning")); >0) {
 			yDatabaseNext("yeebLightning");
 			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
@@ -3407,7 +3405,7 @@ highFrequency
 				yRemoveFromDatabase("yeebLightning");
 			}
 		}
-
+		
 		for(y=xsMin(4, yGetDatabaseCount("yeebLightningBalls")); >0) {
 			action = processGenericProj("yeebLightningBalls");
 			if (action == PROJ_FALLING) {
@@ -3442,7 +3440,7 @@ highFrequency
 				}
 			}
 		}
-	    
+		
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
@@ -3475,13 +3473,13 @@ highFrequency
 					trSetSelectedScale(2,2,2);
 					trQuestVarSet("bossSpell", 53);
 				}
-
+				
 				ySetVarAtIndex("enemies", "physicalResist", 1, 1*trQuestVarGet("bossPointer"));
 				ySetVarAtIndex("enemies", "magicResist", 1, 1*trQuestVarGet("bossPointer"));
 				trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 24, 1);
 				trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 25, 1);
 				trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 26, 1);
-
+				
 				trQuestVarSetFromRand("bossDirection", 0, 1, true);
 				trQuestVarSet("bossCount", 9);
 				trQuestVarSet("bossNext", trTimeMS());
@@ -3663,7 +3661,7 @@ highFrequency
 							damagePlayerUnit(999);
 						}
 					}
-
+					
 					if (trQuestVarGet("boss") > 999) {
 						for(x=yGetDatabaseCount("enemies"); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
@@ -3674,7 +3672,7 @@ highFrequency
 							}
 						}
 					}
-
+					
 					if (trQuestVarGet("bossCount") == 4) {
 						trSetLighting("anatolia", 1.0);
 						bossCooldown(12, 16);
@@ -3846,13 +3844,13 @@ highFrequency
 		xsDisableSelf();
 		xsDisableRule("boss_music");
 		xsEnableRule("yeebaagooon_ded");
-
+		
 		trMusicStop();
 		trSetLighting("anatolia", 1.0);
 		
 		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
 	}
-
+	
 	if (trQuestVarGet("gameOverStep") > 0) {
 		trQuestVarSet("gameOverStep", 7);
 		trQuestVarSet("yeebhit", 0);
@@ -3892,9 +3890,9 @@ highFrequency
 			{
 				if (trQuestVarGet("boss") == 1) {
 					trPaintTerrain(30, 10, 32, 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-		            trPaintTerrain(10, 30, 30, 32, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-		            trChangeTerrainHeight(31, 10, 32, 32, worldHeight, false);
-		            trChangeTerrainHeight(10, 31, 32, 32, worldHeight, false);
+					trPaintTerrain(10, 30, 30, 32, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+					trChangeTerrainHeight(31, 10, 32, 32, worldHeight, false);
+					trChangeTerrainHeight(10, 31, 32, 32, worldHeight, false);
 				} else {
 					trPaintTerrain(trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") - 3,
 						trQuestVarGet("bossRoomEntranceX") + 35, trQuestVarGet("bossRoomEntranceZ"),
@@ -3907,14 +3905,14 @@ highFrequency
 					trChangeTerrainHeight(trQuestVarGet("bossRoomEntranceX") - 3, trQuestVarGet("bossRoomEntranceZ"),
 						trQuestVarGet("bossRoomEntranceX"), trQuestVarGet("bossRoomEntranceZ") + 35,worldHeight,false);
 				}
-	            trPaintTerrain(0,0,5,5,0,70,true);
-        		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-	            trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Enemy");
-	            trSoundPlayFN("","1",-1,"Yeebaagooon: Blargh, I am dead.","icons\special e son of osiris icon 64");
-	            trQuestVarSet("yeebOverNext", trTime() + 4);
-	            trUnitSelectClear();
-	            trUnitSelectByQV("yeebaagooon", true);
-	            trUnitDestroy();
+				trPaintTerrain(0,0,5,5,0,70,true);
+				trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+				trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Enemy");
+				trSoundPlayFN("","1",-1,"Yeebaagooon: Blargh, I am dead.","icons\special e son of osiris icon 64");
+				trQuestVarSet("yeebOverNext", trTime() + 4);
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebaagooon", true);
+				trUnitDestroy();
 			}
 			case 3:
 			{
@@ -3974,7 +3972,7 @@ highFrequency
 				}
 				trQuestVarSet("yeebLatestFeather", trGetNextUnitScenarioNameNumber() - 1);
 				trMinimapFlare(trCurrentPlayer(), 60, trVectorQuestVarGet("yeebDestination"), true);
-				trSoundPlayFN("new_objective.wav","1",-1,"","");
+				trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 				xsEnableRule("yeebaagooon_battle_2");
 				xsDisableSelf();
 			}
@@ -3998,7 +3996,7 @@ highFrequency
 			trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
 		}
 	}
-
+	
 	if (yGetDatabaseCount("yeebFeathers") > 0) {
 		hit = false;
 		id = yDatabaseNext("yeebFeathers", true);
@@ -4013,13 +4011,13 @@ highFrequency
 				ySetVarFromVector("yeebFeathers", "pos", "pos");
 			}
 		}
-
+		
 		if (hit) {
 			spawnLightning("pos");
 			yRemoveFromDatabase("yeebFeathers");
 		}
 	}
-
+	
 	while (yFindLatest("yeebLatestFeather", "Stymph Bird Feather", 0) > 0) {
 		trVectorSetUnitPos("pos", "yeebLatestFeather");
 		yAddToDatabase("yeebFeathers", "yeebLatestFeather");
@@ -4027,10 +4025,10 @@ highFrequency
 		yAddUpdateVar("yeebFeathers", "posz", trQuestVarGet("posz"));
 		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
 	}
-
+	
 	if (trTimeMS() > trQuestVarGet("yeebLightningNext")) {
 		trVectorSetUnitPos("pos", "yeebaagooon");
-		trQuestVarSet("yeebLightningNext", 
+		trQuestVarSet("yeebLightningNext",
 			trQuestVarGet("yeebLightningNext") + 2.0 * zDistanceBetweenVectors("pos", "yeebDestination"));
 		trQuestVarSetFromRand("dist", 4, 20, false);
 		trVectorQuestVarSet("yeebDir", rotationMatrix("yeebDir", -0.757323, 0.653041));
@@ -4039,7 +4037,7 @@ highFrequency
 		vectorSnapToGrid("pos");
 		spawnLightning("pos");
 	}
-
+	
 	/* all dead */
 	if (trQuestVarGet("gameOverStep") > 0) {
 		xsDisableSelf();
@@ -4060,14 +4058,14 @@ highFrequency
 			xsDisableRule("yeebaagooon_battle");
 			xsDisableSelf();
 			trQuestVarSet("yeebhit", 0);
-			trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, 
+			trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON,
 				trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) + trQuestVarGet("yeebRelicRetrieved"));
 		}
 	} else if (trQuestVarGet("boss") < 1000) {
 		xsDisableRule("yeebaagooon_battle");
 		xsDisableSelf();
 		trQuestVarSet("yeebhit", 0);
-		trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, 
+		trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON,
 			trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) + trQuestVarGet("yeebRelicRetrieved"));
 		trUnitSelectClear();
 		trUnitSelectByQV("yeebBird");

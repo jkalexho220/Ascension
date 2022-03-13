@@ -42,7 +42,7 @@ RESERVED TO 300
 */
 
 const int NPC_TEMPLE_COMPLETE = 300;
-/* 
+/*
 RESERVED TO 400
 */
 
@@ -220,7 +220,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
 			}
 		}
-
+		
 		case NPC_ZENO_QUIZ_END:
 		{
 			if (dialog > trQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explainations")) {
@@ -234,7 +234,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				uiMessageBox(trStringQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explain"+dialog));
 			}
 		}
-
+		
 		case NPC_NOTTUD:
 		{
 			switch(dialog)
@@ -258,7 +258,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NO:
 		{
 			switch(dialog)
@@ -274,7 +274,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START:
 		{
 			switch(dialog)
@@ -285,7 +285,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Please help me! I accidentally spilled a quantum potion on myself!");
+					uiMessageBox("Please help me! I've fallen victim to a bug and turned into a relic!");
 				}
 				case 3:
 				{
@@ -298,12 +298,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					trMessageSetText("Touch a Sphinx's sandstorm while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 1:
 		{
 			switch(dialog)
@@ -319,7 +319,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 2:
 		{
 			switch(dialog)
@@ -335,7 +335,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 3:
 		{
 			switch(dialog)
@@ -351,7 +351,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_START + 4:
 		{
 			if (Multiplayer == false) {
@@ -362,7 +362,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 			dialog = 0;
 		}
-
+		
 		case NPC_NICK_NEXT:
 		{
 			switch(dialog)
@@ -382,12 +382,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Absorb Dryad's Blood while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NEXT + 1:
 		{
 			switch(dialog)
@@ -411,12 +411,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					trMessageSetText("Absorb a Frost Giant's breath attack while holding the talking relic.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_NICK_NEXT + 2:
 		{
 			switch(dialog)
@@ -432,7 +432,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_DROP:
 		{
 			switch(dialog)
@@ -448,7 +448,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_QUEST_COMPLETE:
 		{
 			switch(dialog)
@@ -486,7 +486,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_NICK_SLOT_MACHINE:
 		{
 			switch(dialog)
@@ -502,7 +502,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -522,7 +522,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -538,7 +538,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -558,7 +558,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -578,7 +578,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -598,7 +598,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 2:
 		{
 			switch(dialog)
@@ -618,7 +618,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -638,7 +638,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -658,7 +658,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 3:
 		{
 			switch(dialog)
@@ -678,7 +678,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -694,7 +694,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -710,7 +710,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 4:
 		{
 			switch(dialog)
@@ -726,7 +726,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 5:
 		{
 			switch(dialog)
@@ -742,7 +742,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 5:
 		{
 			switch(dialog)
@@ -762,7 +762,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -782,7 +782,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -811,7 +811,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -827,7 +827,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case SHOP_NPC + 6:
 		{
 			switch(dialog)
@@ -847,7 +847,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_KASTOR:
 		{
 			switch(dialog)
@@ -871,7 +871,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 1:
 		{
 			switch(dialog)
@@ -895,7 +895,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 2:
 		{
 			switch(dialog)
@@ -915,7 +915,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + SHOP_NPC + 3:
 		{
 			switch(dialog)
@@ -935,7 +935,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + SHOP_NPC:
 		{
 			switch(dialog)
@@ -951,7 +951,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -966,13 +966,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Find three pigs and bring them to the enclosure.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 1:
 		{
 			switch(dialog)
@@ -997,7 +997,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -1017,13 +1017,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("bountyTargetPos"), true);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Defeat the Mummy.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 1:
 		{
 			switch(dialog)
@@ -1044,7 +1044,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -1059,13 +1059,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Bring back the ghost's picture.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 2:
 		{
 			switch(dialog)
@@ -1098,7 +1098,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -1117,13 +1117,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Run!", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 2:
 		{
 			switch(dialog)
@@ -1144,7 +1144,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -1164,13 +1164,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMinimapFlare(trCurrentPlayer(), 10, trVectorQuestVarGet("fetchTargetPos"), true);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Escort the goods to the axeman.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 3:
 		{
 			switch(dialog)
@@ -1191,7 +1191,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -1214,13 +1214,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 5:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Kill five Frost Giants.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 3:
 		{
 			switch(dialog)
@@ -1241,7 +1241,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -1256,13 +1256,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText(""+1*trQuestVarGet("operand1") + " + " + 1*trQuestVarGet("operand2") + " = ?", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 4:
 		{
 			switch(dialog)
@@ -1283,7 +1283,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -1298,13 +1298,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Defeat the monsters.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 4:
 		{
 			switch(dialog)
@@ -1325,7 +1325,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_ZENOS_PARADOX:
 		{
 			switch(dialog)
@@ -1346,7 +1346,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 5:
 		{
 			switch(dialog)
@@ -1366,12 +1366,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Find something edible for the adventurer.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_ATE_CORPSE:
 		{
 			switch(dialog)
@@ -1391,7 +1391,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_ATE_BERRIES:
 		{
 			switch(dialog)
@@ -1411,7 +1411,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		/*
 		literal feces
 		mysterious berry
@@ -1437,7 +1437,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -1457,12 +1457,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Equip the Bucket and collect some Poison.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 5:
 		{
 			switch(dialog)
@@ -1487,7 +1487,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -1514,13 +1514,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 6:
 				{
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trMessageSetText("Use the Magic Detector to find Yeebaagooon's missing relic and return it to him.", -1);
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + FETCH_NPC + 6:
 		{
 			switch(dialog)
@@ -1545,7 +1545,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_QUEST + BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -1565,12 +1565,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					trMessageSetText("Move the Worthless Junk out of Yeebaagooon's storage room.", -1);
-					trSoundPlayFN("new_objective.wav","1",-1,"","");
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_QUEST_COMPLETE + BOUNTY_NPC + 6:
 		{
 			switch(dialog)
@@ -1591,7 +1591,118 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
+		case NPC_TEMPLE + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Which is the lie? Which is the truth?");
+				}
+				case 2:
+				{
+					uiMessageBox("Pierce the darkness and be rewarded with power!");
+				}
+				case 3:
+				{
+					uiMessageBox("To begin the trial, drop a relic at my feet.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The wheel of time turns ever infinitely.");
+				}
+				case 2:
+				{
+					uiMessageBox("But for now, I grant you this power.");
+				}
+				case 3:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 4:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Those who endure the harshest winters shall be rewarded.");
+				}
+				case 2:
+				{
+					uiMessageBox("To begin the trial, drop a relic at my feet.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Wealth is power! Power absolute!");
+				}
+				case 2:
+				{
+					uiMessageBox("Sacrifice your wealth to me, and be rewarded with ever greater power!");
+				}
+				case 3:
+				{
+					uiMessageBox("Relics sacrificed: ("+1*trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed")+"/10)");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("A most expensive sacrifice. You have proven yourself. I grant you this reward.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("");
+				}
+			}
+		}
+		
 		case NPC_TEMPLE + 6:
 		{
 			switch(dialog)
@@ -1602,16 +1713,20 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("If you can survive 47 seconds, my power is yours.");
+					uiMessageBox("If you can survive 47 seconds within this room, my power is yours.");
 				}
 				case 3:
+				{
+					uiMessageBox("But step one foot outside, and you will be deemed unworthy.");
+				}
+				case 4:
 				{
 					uiMessageBox("To begin the trial, drop a relic at my feet.");
 					dialog = 0;
 				}
 			}
 		}
-
+		
 		case NPC_TEMPLE_COMPLETE + 6:
 		{
 			switch(dialog)
@@ -1622,7 +1737,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					trShowImageDialog(boonIcon(BOON_SPELL_ATTACK), boonName(BOON_SPELL_ATTACK));
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
 				{
@@ -1631,7 +1746,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
+		
 		case NPC_TEMPLE + 11:
 		{
 			switch(dialog)
@@ -1642,7 +1757,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Show thy mettle, and be rewarded with glorious treasure.");
+					uiMessageBox("Show thy mettle, and be rewarded with glorious power.");
 				}
 				case 3:
 				{
@@ -1725,7 +1840,7 @@ inactive
 highFrequency
 {
 	xsDisableSelf();
-	trQuestVarSet("currentNPCProgress", 
+	trQuestVarSet("currentNPCProgress",
 		npcDiag(1*trQuestVarGet("currentNPC"), 1*trQuestVarGet("currentNPCProgress")));
 	if (trQuestVarGet("currentNPCProgress") > 0) {
 		trDelayedRuleActivation("npc_talk_02");
@@ -1736,7 +1851,7 @@ rule npc_talk_02
 inactive
 highFrequency
 {
-	if ((trQuestVarGet("currentNPCProgress") > 0) && 
+	if ((trQuestVarGet("currentNPCProgress") > 0) &&
 		(trIsGadgetVisible("ingame-messagedialog") == false) &&
 		(trIsGadgetVisible("ShowImageBox") == false)) {
 		trDelayedRuleActivation("npc_talk_01");
@@ -2556,7 +2671,7 @@ highFrequency
 									trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
 									trCameraShake(1.0, 0.5);
 								}
-							}							
+							}
 						}
 					}
 				}
@@ -2590,8 +2705,8 @@ highFrequency
 				}
 			}
 		}
-
-
+		
+		
 		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
 			trQuestVarSet("townHealNext", trTime());
 			for(p=1; < ENEMY_PLAYER) {

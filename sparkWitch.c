@@ -31,9 +31,9 @@ void sparkWitchAlways(int eventID = -1) {
 				{
 					if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
 						ySetVar("p"+p+"characters", "attacking", 2);
-						ySetVar("p"+p+"characters", "attackNext", 
+						ySetVar("p"+p+"characters", "attackNext",
 							yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"firstDelay"));
-
+						
 						trVectorSetUnitPos("pos", "p"+p+"characters");
 						trQuestVarSet("next", yGetVar("p"+p+"characters", "attackTarget"));
 						trUnitSelectClear();
@@ -82,10 +82,10 @@ void sparkWitchAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"witchPigs") > 0) {
 		id = yDatabaseNext("p"+p+"witchPigs", true);
-		if ((yGetVar("p"+p+"witchPigs", "proto") == kbGetProtoUnitID("Hero Boar")) || 
+		if ((yGetVar("p"+p+"witchPigs", "proto") == kbGetProtoUnitID("Hero Boar")) ||
 			(yGetVar("p"+p+"witchPigs", "proto") == kbGetProtoUnitID("Hero Boar 2"))) {
 			yRemoveFromDatabase("p"+p+"witchPigs");
 		} else if (id == -1 || trUnitAlive() == false) {
@@ -100,7 +100,7 @@ void sparkWitchAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"witchPigs");
 		}
 	}
-
+	
 	if(yGetDatabaseCount("p"+p+"hexOrbs") >0) {
 		yDatabaseNext("p"+p+"hexOrbs");
 		amt = trTimeMS() - yGetVar("p"+p+"hexOrbs", "next");
@@ -126,7 +126,7 @@ void sparkWitchAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"zaps") > 0) {
 		yDatabaseNext("p"+p+"zaps");
 		current = trTimeMS() - yGetVar("p"+p+"zaps", "startTime");
@@ -180,7 +180,7 @@ void sparkWitchAlways(int eventID = -1) {
 								yAddUpdateVar("p"+p+"witchPigs", "physicalResist", yGetVar("enemies","physicalResist"));
 								yAddUpdateVar("p"+p+"witchPigs", "magicResist", yGetVar("enemies","magicResist"));
 								yAddUpdateVar("p"+p+"witchPigs", "index", yGetVar("p"+p+"zaps", "index"));
-								yAddUpdateVar("p"+p+"witchPigs", "timeout", 
+								yAddUpdateVar("p"+p+"witchPigs", "timeout",
 									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * trQuestVarGet("p"+p+"spellDuration"));
 								ySetVar("enemies", "physicalResist", 0);
 								ySetVar("enemies", "magicResist", 0);
@@ -190,7 +190,7 @@ void sparkWitchAlways(int eventID = -1) {
 									trMutateSelected(kbGetProtoUnitID("Hero Boar"));
 								}
 								ySetVar("enemies", "silenceStatus", 1); // do this to prevent UI Range Indicator from appearing
-								silenceEnemy(p, trQuestVarGet("hexboltDuration"));
+								silenceUnit("enemies",trQuestVarGet("hexboltDuration"),p);
 								trUnitSelectClear();
 								trUnitSelectByQV("next");
 								trUnitChangeProtoUnit("Curse SFX");
@@ -204,13 +204,14 @@ void sparkWitchAlways(int eventID = -1) {
 								trSetSelectedScale(0,0,0);
 								trUnitOverrideAnimation(26,0,true,false,-1);
 								yAddToDatabase("p"+p+"hexOrbs", "next");
-								yAddUpdateVar("p"+p+"hexOrbs", "timeout", 
+								yAddUpdateVar("p"+p+"hexOrbs", "timeout",
 									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * trQuestVarGet("p"+p+"spellDuration"));
 								yAddUpdateVar("p"+p+"hexOrbs", "next", trTimeMS());
 								yAddUpdateVar("p"+p+"hexOrbs", "posx", trQuestVarGet("posx"));
 								yAddUpdateVar("p"+p+"hexOrbs", "posz", trQuestVarGet("posz"));
 							}
 						}
+						OnHit(p, 1*yGetVar("p"+p+"zaps", "index"), true);
 					}
 				}
 				ySetVar("p"+p+"zaps", "bounces", yGetVar("p"+p+"zaps", "bounces") - 1);
@@ -252,13 +253,13 @@ void sparkWitchAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"thunderstrikes") >0) {
 		yDatabaseNext("p"+p+"thunderstrikes", true);
 		trUnitChangeProtoUnit("Tremor");
 		yRemoveFromDatabase("p"+p+"thunderstrikes");
 	}
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
@@ -296,12 +297,12 @@ void sparkWitchAlways(int eventID = -1) {
 			}
 			if (trCurrentPlayer() == p) {
 				trCounterAbort("well");
-				trCounterAddTime("well", 
-                        xsMax(trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction") - hit, 1), 0, wellName);
+				trCounterAddTime("well",
+					xsMax(trQuestVarGet("p"+p+"wellCooldown") * trQuestVarGet("p"+p+"cooldownReduction") - hit, 1), 0, wellName);
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
@@ -331,7 +332,7 @@ void sparkWitchAlways(int eventID = -1) {
 		yAddUpdateVar("p"+p+"vortexObjects", "timeout", trTimeMS() + 1000);
 		trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"vortexObjects") > 0) {
 		yDatabaseNext("p"+p+"vortexObjects");
 		if (yGetVar("p"+p+"vortexObjects", "step") == 1) {
@@ -357,7 +358,7 @@ void sparkWitchAlways(int eventID = -1) {
 		if (trTimeMS() > yGetVar("p"+p+"vortexObjects", "timeout")) {
 			if (yGetVar("p"+p+"vortexObjects", "step") == 0) {
 				ySetVar("p"+p+"vortexObjects", "step", 1);
-				ySetVar("p"+p+"vortexObjects", "timeout", 
+				ySetVar("p"+p+"vortexObjects", "timeout",
 					trTimeMS() + trQuestVarGet("vortexMoveTime") * trQuestVarGet("p"+p+"spellRange"));
 				trSoundPlayFN("suckup1.wav","1",-1,"","");
 				trSoundPlayFN("vortexstart.wav","1",-1,"","");
@@ -368,6 +369,7 @@ void sparkWitchAlways(int eventID = -1) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "center") < dist) {
 						launchUnit("enemies", "center");
+						yAddUpdateVar("launchedUnits", "stun", 1);
 					}
 				}
 			} else {
@@ -380,8 +382,8 @@ void sparkWitchAlways(int eventID = -1) {
 			}
 		}
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trQuestVarSet("p"+p+"hex", 1 - trQuestVarGet("p"+p+"hex"));
@@ -407,7 +409,7 @@ void sparkWitchAlways(int eventID = -1) {
 			ySetVar("p"+p+"characters", "hex", 1 + trQuestVarGet("p"+p+"hex"));
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -434,6 +436,12 @@ void chooseSparkWitch(int eventID = -1) {
 	trQuestVarSet("p"+p+"rainCost", 0);
 }
 
+void sparkwitchModify(int eventID = -1) {
+	int p = eventID - 5000 - 12 * SPARKWITCH;
+	trQuestVarSet("p"+p+"baseAttack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+	trQuestVarSet("p"+p+"Attack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+}
+
 rule sparkWitch_init
 active
 highFrequency
@@ -442,17 +450,18 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * SPARKWITCH + p, "sparkWitchAlways");
 		trEventSetHandler(1000 + 12 * SPARKWITCH + p, "chooseSparkWitch");
+		trEventSetHandler(5000 + 12 * SPARKWITCH + p, "sparkwitchModify");
 	}
-
+	
 	trQuestVarSet("thunderstrikeCooldown", 12);
 	trQuestVarSet("thunderstrikeRadius", 6);
 	trQuestVarSet("thunderstrikeDamage", 60);
-
+	
 	trQuestVarSet("hexboltCooldown", 18);
-	trQuestVarSet("hexboltDuration", 4);
+	trQuestVarSet("hexboltDuration", 5);
 	trQuestVarSet("hexboltRadius", 3);
-	trQuestVarSet("hexboltDamage", 20);
-
+	trQuestVarSet("hexboltDamage", 30);
+	
 	trQuestVarSet("vortexCost", 80);
 	trQuestVarSet("vortexRadius", 12);
 	trQuestVarSet("vortexMoveTime", 1000 * trQuestVarGet("vortexRadius") / 15);

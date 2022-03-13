@@ -29,7 +29,7 @@ void spawnStar(int p = 0, string pos = "") {
 	yAddToDatabase("p"+p+"stars", "next");
 	yAddUpdateVar("p"+p+"stars", "posx", trQuestVarGet(pos+"x"));
 	yAddUpdateVar("p"+p+"stars", "posz", trQuestVarGet(pos+"z"));
-	yAddUpdateVar("p"+p+"stars", "timeout", 
+	yAddUpdateVar("p"+p+"stars", "timeout",
 		trTimeMS() + 1000 * trQuestVarGet("starDuration") * trQuestVarGet("p"+p+"spellDuration"));
 	yAddUpdateVar("p"+p+"stars", "last", trTimeMS());
 }
@@ -53,11 +53,11 @@ void blastmageAlways(int eventID = -1) {
 			hit = CheckOnHit(p, id);
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"stars") > 0) {
 		yDatabaseNext("p"+p+"stars");
 		amt = 0.001 * (trTimeMS() - yGetVar("p"+p+"stars", "last"));
-
+		
 		if (amt >= 1) {
 			amt = amt * trQuestVarGet("starDamage") * trQuestVarGet("p"+p+"spellDamage");
 			ySetVar("p"+p+"stars", "last", trTimeMS());
@@ -71,7 +71,7 @@ void blastmageAlways(int eventID = -1) {
 				}
 			}
 		}
-
+		
 		if (trTimeMS() > yGetVar("p"+p+"stars", "timeout")) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"stars", true);
@@ -82,7 +82,7 @@ void blastmageAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"stars");
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"starProj") >0) {
 		if (trTimeMS() > yDatabaseNext("p"+p+"starProj")) {
 			yVarToVector("p"+p+"starProj", "pos");
@@ -111,7 +111,7 @@ void blastmageAlways(int eventID = -1) {
 			trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
 	}
-
+	
 	if (yFindLatest("p"+p+"latestProj", "Priest Projectile", p) > 0) {
 		trVectorSetUnitPos("center", "p"+p+"latestProj");
 		dist = 25;
@@ -150,7 +150,7 @@ void blastmageAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"starfalls") > 0) {
 		yDatabaseNext("p"+p+"starfalls", true);
 		if (yGetVar("p"+p+"starfalls", "yeehaw") == 1) {
@@ -184,7 +184,7 @@ void blastmageAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"starfalls");
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
@@ -204,7 +204,7 @@ void blastmageAlways(int eventID = -1) {
 		yAddUpdateVar("p"+p+"starfalls", "posX", trQuestVarGet("p"+p+"wellposX"));
 		yAddUpdateVar("p"+p+"starfalls", "posZ", trQuestVarGet("p"+p+"wellposZ"));
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trVectorSetUnitPos("end", "p"+p+"lureObject");
@@ -222,7 +222,7 @@ void blastmageAlways(int eventID = -1) {
 			} else {
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				spawnStar(p, "pos");
-				target = 1 + xsMin(trQuestVarGet("warpRange") * trQuestVarGet("p"+p+"spellRange"), 
+				target = 1 + xsMin(trQuestVarGet("warpRange") * trQuestVarGet("p"+p+"spellRange"),
 					zDistanceBetweenVectors("pos", "end")) / 2;
 				trVectorQuestVarSet("step", zGetUnitVector("pos", "end"));
 				for(i=target; >0) {
@@ -252,7 +252,7 @@ void blastmageAlways(int eventID = -1) {
 		/* reload relics */
 		equipRelicsAgain(p);
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"solarFlare") > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"solarFlareNext")) {
 			/*
@@ -294,8 +294,8 @@ void blastmageAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"solarFlare");
 		}
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
@@ -310,9 +310,9 @@ void blastmageAlways(int eventID = -1) {
 			yAddUpdateVar("p"+p+"solarFlare", "posz", trQuestVarGet("posz"));
 		}
 	}
-
 	
-
+	
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -356,23 +356,23 @@ highFrequency
 		trEventSetHandler(1000 + 12 * BLASTMAGE + p, "chooseBlastmage");
 		trEventSetHandler(5000 + 12 * BLASTMAGE + p, "modifyBlastmage");
 	}
-
+	
 	trQuestVarSet("empoweredDamage", 60);
 	trQuestVarSet("empoweredRadius", 4);
-
+	
 	trQuestVarSet("starDuration", 10);
 	trQuestVarSet("starRadius", 4);
 	trQuestVarSet("starDamage", 10);
-
+	
 	trQuestVarSet("starfallCooldown", 8);
 	trQuestVarSet("starfallRadius", 5);
 	trQuestVarSet("starfallDamage", 120);
-
+	
 	trQuestVarSet("solarFlareCooldown", 20);
 	trQuestVarSet("solarFlareDamage", 90);
 	trQuestVarSet("solarFlareRange", 40);
 	trQuestVarSet("solarFlareCost", 40);
-
+	
 	trQuestVarSet("warpCost", 0);
 	trQuestVarSet("warpRange", 8);
 	trQuestVarSet("warpCooldown", 6);

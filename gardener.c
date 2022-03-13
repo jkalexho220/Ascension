@@ -8,7 +8,7 @@ void plantSeed(string next = "", int p = 0) {
 	trUnitChangeProtoUnit("Rock Granite Small");
 	yAddToDatabase("p"+p+"seeds", next);
 	yAddUpdateVar("p"+p+"seeds", "ready", trTimeMS() + 2000);
-	yAddUpdateVar("p"+p+"seeds", "timeout", 
+	yAddUpdateVar("p"+p+"seeds", "timeout",
 		trTimeMS() + 1000 * trQuestVarGet("seedDuration") * trQuestVarGet("p"+p+"spellDuration"));
 	yAddUpdateVar("p"+p+"seeds", "type", trQuestVarGet("p"+p+"natureBounty"));
 	trUnitSelectClear();
@@ -44,7 +44,7 @@ void gardenerAlways(int eventID = -1) {
 			hit = CheckOnHit(p, id);
 		}
 	}
-
+	
 	current = trQuestVarGet("seedDuration") * trQuestVarGet("p"+p+"spellDuration");
 	amt = trQuestVarGet("seedHeal");
 	target = trQuestVarGet("p"+p+"seedHealPlayer") + 1;
@@ -88,14 +88,14 @@ void gardenerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	trQuestVarSet("p"+p+"seedHealPlayer", target);
-
+	
 	if (trQuestVarGet("eatSound") == 1) {
 		trQuestVarSet("eatSound", 0);
 		trSoundPlayFN("colossuseat.wav","1",-1,"","");
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"lifeArrows") > 0) {
 		id = yDatabaseNext("p"+p+"lifeArrows", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -109,22 +109,22 @@ void gardenerAlways(int eventID = -1) {
 			if (trQuestVarGet("posy") < worldHeight + 0.3) {
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,true);
+				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
 				trUnitSelectClear();
 				trUnitSelect(""+1*trQuestVarGet("next"), true);
 				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"lifeArrows"));
 				trUnitChangeProtoUnit("Rock Granite Small");
-
+				
 				trUnitSelectClear();
 				trUnitSelect(""+1*trQuestVarGet("p"+p+"lifeArrows"), true);
 				trMutateSelected(kbGetProtoUnitID("Arrow Flaming"));
 				yRemoveFromDatabase("p"+p+"lifeArrows");
-
+				
 				plantSeed("next", p);
 			}
 		}
 	}
-
+	
 	for(y=trQuestVarGet("p"+p+"projectiles"); >0) {
 		if (yFindLatest("p"+p+"latestProj", "Arrow Flaming", p) > 0) {
 			trVectorSetUnitPos("start", "p"+p+"latestProj");
@@ -156,7 +156,7 @@ void gardenerAlways(int eventID = -1) {
 			break;
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"bloodblooms") > 0) {
 		id = yDatabaseNext("p"+p+"bloodblooms", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -188,7 +188,7 @@ void gardenerAlways(int eventID = -1) {
 			ySetVar("p"+p+"bloodblooms", "attacking", 0);
 		}
 	}
-
+	
 	hit = yGetDatabaseCount("p"+p+"stranglethorns");
 	if (hit > 0) {
 		current = 1000.0 / hit;
@@ -215,8 +215,8 @@ void gardenerAlways(int eventID = -1) {
 	} else {
 		trQuestVarSet("p"+p+"stranglethornsNext", trTimeMS());
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		
@@ -259,7 +259,7 @@ void gardenerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
@@ -278,24 +278,24 @@ void gardenerAlways(int eventID = -1) {
 		activatePlayerUnit("next", p, kbGetProtoUnitID("Audrey"), calculateDecay(p, 8.0));
 		yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 2000);
 	}
-
+	
 	if (trQuestVarGet("p"+p+"natureBounty") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"natureBountyTimeout")) {
 			trQuestVarSet("p"+p+"natureBounty", 0);
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trSoundPlayFN("walkingwoods1.wav", "1", -1, "", "");
 		trSoundPlayFN("gaiaforest.wav", "1", -1, "", "");
 		gainFavor(p, 0.0 - trQuestVarGet("natureBountyCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"natureBounty", 1);
-		trQuestVarSet("p"+p+"natureBountyTimeout", 
+		trQuestVarSet("p"+p+"natureBountyTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("natureBountyDuration") * trQuestVarGet("p"+p+"spellDuration"));
 	}
-
-
+	
+	
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }
@@ -341,18 +341,18 @@ highFrequency
 		trEventSetHandler(1000 + 12 * GARDENER + p, "chooseGardener");
 		trEventSetHandler(5000 + 12 * GARDENER + p, "modifyGardener");
 	}
-
+	
 	trQuestVarSet("seedHeal", 30);
 	trQuestVarSet("seedDuration", 15);
-
+	
 	trQuestVarSet("bloodbloomCooldown", 15);
-
+	
 	trQuestVarSet("stranglethornsCooldown", 12);
 	trQuestVarSet("stranglethornsRange", 6);
 	trQuestVarSet("stranglethornsRadius", 3);
 	trQuestVarSet("stranglethornsDuration", 3);
 	trQuestVarSet("stranglethornsDamage", 20);
-
+	
 	trQuestVarSet("natureBountyCost", 60);
 	trQuestVarSet("natureBountyDuration", 12);
 }

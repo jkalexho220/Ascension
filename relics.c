@@ -22,30 +22,34 @@ const int RELIC_COOLDOWN_REDUCTION = 18;
 const int RELIC_WEIGHTED_BLOWS = 19;
 const int RELIC_ALL = 20;
 
+/*
+auras
+pet companion?
+*/
+const int RELIC_PLACEHOLDER = 21; // wtf idk bbq lbtq
+const int RELIC_PET_DOG = 22; // Bella fights for you
+const int RELIC_NOTTUD = 23; // +0.3x area damage on attacks. (Radius: 4)
+const int RELIC_ZENOPHOBIA = 24; // +0.2 magic penetration
+const int RELIC_YEEBAAGOOON = 25; // Regen 0.3 favor per second
+
+
 /* nottud's shop */
-const int RELIC_CURSED_RANGE = 21;
-const int RELIC_CURSED_DURATION = 22;
-const int RELIC_CURSED_POWER = 23;
-const int RELIC_FAVOR_FROM_ATTACKS = 24;
-const int RELIC_POISON_FASTER = 25;
-
-const int RELIC_YEEBAAGOOON = 26;
-
-const int RELIC_NOTTUD = 28;
-
-const int RELIC_CURSED_COOLDOWNS = 29;
-const int RELIC_ZENOPHOBIA = 30;
+const int RELIC_CURSED_RANGE = 26;
+const int RELIC_CURSED_DURATION = 27;
+const int RELIC_CURSED_POWER = 28;
+const int RELIC_FAVOR_FROM_ATTACKS = 29;
+const int RELIC_POISON_FASTER = 30;
 
 const int NORMAL_RELICS = 30;
 /* key relics */
 
 const int RELIC_NICKONHAWK = 36;
-const int RELIC_NICKONHAWK_GOGGLES = 37;
+const int RELIC_NICKONHAWK_TICKET = 37;
 
 const int RELIC_GHOST_PICTURE = 38;
 
 const int RELIC_MATH_PROBLEM = 40;
-/* 
+/*
 reserved to 60
 */
 const int RELIC_MATH_PROBLEM_END = 60;
@@ -179,7 +183,19 @@ string relicName(int relic = 0) {
 			{
 				msg = "Regenerate 0.3 favor per second";
 			}
-
+			case RELIC_ZENOPHOBIA:
+			{
+				msg = "+0.2x ignore enemy magic resist";
+			}
+			case RELIC_NOTTUD:
+			{
+				msg = "+0.2x area damage on attacks. (Radius 4)";
+			}
+			case RELIC_PET_DOG:
+			{
+				msg = "A pet dog fights for you. (Respawn - 30 seconds)";
+			}
+			
 			case RELIC_GHOST_PICTURE:
 			{
 				msg = "A picture of a young man.";
@@ -188,31 +204,31 @@ string relicName(int relic = 0) {
 			{
 				msg = "Help! Someone help me!";
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
-				msg = "Dream Goggles. What do they do?";
+				msg = "Golden Ticket";
 			}
-
+			
 			case RELIC_LITERAL_FECES:
 			{
 				msg = "Literal feces";
 			}
-
+			
 			case RELIC_A_FUCKING_CORPSE:
 			{
 				msg = "A fucking corpse";
 			}
-
+			
 			case RELIC_BERRY_BUSH:
 			{
 				msg = "A berry bush";
 			}
-
+			
 			case RELIC_POISON_BUCKET:
 			{
 				msg = "A bucket for holding a liquid";
 			}
-
+			
 			case RELIC_WORTHLESS_JUNK:
 			{
 				msg = "Worthless junk";
@@ -389,9 +405,17 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\trade x caravan icons 64";
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
 				icon = "icons\hero g odysseus icon 64";
+			}
+			case RELIC_PET_DOG:
+			{
+				icon = "icons\Animal Wolf icon 64";
+			}
+			case RELIC_NOTTUD:
+			{
+				icon = "icons\special g minotaur icon 64";
 			}
 		}
 	}
@@ -513,9 +537,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ALL:
 		{
-			trQuestVarSet("p"+p+"spellDamage", trQuestVarGet("p"+p+"spellDamage") + 0.15 * m);
-			trQuestVarSet("p"+p+"spellDuration", trQuestVarGet("p"+p+"spellDuration") + 0.15 * m);
-			trQuestVarSet("p"+p+"spellRange", trQuestVarGet("p"+p+"spellRange") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellDamageTrue", trQuestVarGet("p"+p+"spellDamageTrue") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.15 * m);
+			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") + 0.15 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -590,7 +614,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_NICKONHAWK:
 		{
 			trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") + m);
-			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) || 
+			if ((trQuestVarGet("p"+p+"nickEquipped") > 1) ||
 				(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
 				/* No duplicates */
 				ySetPointer("p"+p+"relics", yGetNewestPointer("p"+p+"relics"));
@@ -600,18 +624,26 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				yAddToDatabase("freeRelics", "p"+p+"relics");
 				yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK);
 				yRemoveFromDatabase("p"+p+"relics");
+				trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") - 1);
 			} else if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 1);
 			}
 		}
-		case RELIC_NICKONHAWK_GOGGLES:
+		case RELIC_NICKONHAWK_TICKET:
 		{
 			trQuestVarSet("p"+p+"equippedGoggles", trQuestVarGet("p"+p+"equippedGoggles") + m);
-			if (trQuestVarGet("p"+p+"equippedGoggles") > 0) {
-				trSetLighting("eclipse", 0.1);
-			} else {
-				trSetLighting("default", 0.1);
-			}
+		}
+		case RELIC_PET_DOG:
+		{
+			trQuestVarSet("p"+p+"petDogs", trQuestVarGet("p"+p+"petDogs") + m);
+		}
+		case RELIC_ZENOPHOBIA:
+		{
+			trQuestVarSet("p"+p+"magicPen", trQuestVarGet("p"+p+"magicPen") + 0.2 * m);
+		}
+		case RELIC_NOTTUD:
+		{
+			trQuestVarSet("p"+p+"cleave", trQuestVarGet("p"+p+"cleave") + 0.2 * m);
 		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
@@ -795,9 +827,17 @@ int relicProto(int relic = 0) {
 			{
 				proto = kbGetProtoUnitID("Caravan Atlantean");
 			}
-			case RELIC_NICKONHAWK_GOGGLES:
+			case RELIC_NICKONHAWK_TICKET:
 			{
 				proto = kbGetProtoUnitID("Hero Greek Odysseus");
+			}
+			case RELIC_PET_DOG:
+			{
+				proto = kbGetProtoUnitID("Dog");
+			}
+			case RELIC_NOTTUD:
+			{
+				proto = kbGetProtoUnitID("Minotaur");
 			}
 		}
 	}
@@ -843,7 +883,7 @@ void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
 
 void spawnRelicClosest(float x = 0, float z = 0, int target = 0) {
 	trQuestVarSetFromRand("rand", 0, 10, true);
-	trQuestVarSetFromRand("rand", 
+	trQuestVarSetFromRand("rand",
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
 	spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
 }

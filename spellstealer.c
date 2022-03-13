@@ -17,7 +17,7 @@ void spellstealerAlways(int eventID = -1) {
 	float current = 0;
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
-
+	
 	if (yGetDatabaseCount("p"+p+"characters") > 0) {
 		id = yDatabaseNext("p"+p+"characters", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -59,7 +59,7 @@ void spellstealerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
@@ -96,9 +96,9 @@ void spellstealerAlways(int eventID = -1) {
 				}
 			}
 			trQuestVarSet("p"+p+"launched", 1);
-
+			
 			amt = trQuestVarGet("bladeDanceCost") * trQuestVarGet("p"+p+"ultimateCost");
-		
+			
 			ySetPointer("p"+p+"bladeDanceTargets", target);
 			ySetVar("p"+p+"bladeDanceTargets", "status", trQuestVarGet("p"+p+"spellstealStatus"));
 			if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
@@ -106,7 +106,7 @@ void spellstealerAlways(int eventID = -1) {
 				poisoned = yGetVar("enemies", "poisonStatus");
 				silenced = yGetVar("enemies", "silenceStatus");
 			}
-
+			
 			for(x=yGetDatabaseCount("p"+p+"bladeDanceTargets"); >0) {
 				yDatabaseNext("p"+p+"bladeDanceTargets");
 				if (target != yGetPointer("p"+p+"bladeDanceTargets")) {
@@ -137,7 +137,7 @@ void spellstealerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"bladeDanceNext")) {
 			trQuestVarSet("p"+p+"bladeDanceNext", trQuestVarGet("p"+p+"bladeDanceNext") + 300);
@@ -146,13 +146,12 @@ void spellstealerAlways(int eventID = -1) {
 				if (trUnitAlive() == false) {
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 				} else if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
-					gainFavor(p, trQuestVarGet("p"+p+"favorFromAttacks"));
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
 					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
 					amt = 1;
 					if (hit >= xsPow(2, STATUS_SILENCE)) {
 						hit = hit - xsPow(2, STATUS_SILENCE);
-						silenceEnemy(p, 9.0);
+						silenceUnit("enemies", 9.0, p);
 					}
 					if (hit >= xsPow(2, STATUS_POISON)) {
 						hit = hit - xsPow(2, STATUS_POISON);
@@ -177,7 +176,8 @@ void spellstealerAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"bladeDanceTargets");
-					damageEnemy(p, amt, false);
+					damageEnemy(p, amt, false, 1.0);
+					OnHit(p, 1*yGetVar("p"+p+"bladeDanceTargets", "index"), false);
 					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					break;
 				}
@@ -205,7 +205,7 @@ void spellstealerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	for(y=xsMin(2, yGetDatabaseCount("p"+p+"spellblades")); >0) {
 		hit = 0;
 		yDatabaseNext("p"+p+"spellblades");
@@ -227,7 +227,7 @@ void spellstealerAlways(int eventID = -1) {
 						hit = yGetVar("p"+p+"spellblades", "status");
 						if (hit >= xsPow(2, STATUS_SILENCE)) {
 							hit = hit - xsPow(2, STATUS_SILENCE);
-							silenceEnemy(p, 9.0);
+							silenceUnit("enemies", 9.0, p);
 						}
 						if (hit >= xsPow(2, STATUS_POISON)) {
 							hit = hit - xsPow(2, STATUS_POISON);
@@ -263,7 +263,7 @@ void spellstealerAlways(int eventID = -1) {
 				ySetVarFromVector("p"+p+"spellblades", "prev", "pos");
 			}
 		}
-
+		
 		if (hit == 1) {
 			gainFavor(p, 1);
 			trUnitSelectClear();
@@ -275,7 +275,7 @@ void spellstealerAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"spellblades");
 		}
 	}
-
+	
 	if (trQuestVarGet("spellsound") == 1) {
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
@@ -284,7 +284,7 @@ void spellstealerAlways(int eventID = -1) {
 		trSoundPlayFN("arrowonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 	}
 	trQuestVarSet("spellsound", 0);
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		trSoundPlayFN("manticorespecialattack.wav","1",-1,"","");
@@ -321,15 +321,15 @@ void spellstealerAlways(int eventID = -1) {
 		}
 		trQuestVarSet("p"+p+"spellstealStatus", 0);
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trQuestVarSet("p"+p+"negationCloak", 1);
-		trQuestVarSet("p"+p+"negationCloakTimeout", 
+		trQuestVarSet("p"+p+"negationCloakTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("negationCloakDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trSoundPlayFN("spybirth.wav","1",-1,"","");
 	}
-
+	
 	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
 		if (trTime() > trQuestVarGet("p"+p+"negationCloakNext")) {
 			trQuestVarSet("p"+p+"negationCloakNext", trTime());
@@ -339,7 +339,7 @@ void spellstealerAlways(int eventID = -1) {
 					removeSpellstealer(p);
 				} else {
 					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "cloakSFX")) == -1) {
-						spyEffect(1*trQuestVarGet("p"+p+"characters"), 
+						spyEffect(1*trQuestVarGet("p"+p+"characters"),
 							kbGetProtoUnitID("Kronny Birth SFX"), yGetVarName("p"+p+"characters", "cloakSFX"));
 					} else {
 						trUnitSelectClear();
@@ -363,7 +363,7 @@ void spellstealerAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -401,14 +401,14 @@ highFrequency
 		trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");
 	}
 	trQuestVarSet("spellstealerPassiveRadius", 6);
-
+	
 	trQuestVarSet("bladeDanceCost", 10);
 	trQuestVarSet("bladeDanceRadius", 15);
-
+	
 	trQuestVarSet("negationCloakDuration", 3);
 	trQuestVarSet("negationCloakCooldown", 12);
-
+	
 	trQuestVarSet("spellbladesCooldown", 9);
 	trQuestVarSet("spellbladesCount", 3);
-
+	
 }

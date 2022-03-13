@@ -15,17 +15,17 @@ void fireknightAlways(int eventID = -1) {
 	float current = 0;
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
-
+	
 	trUnitSelectClear();
 	trUnitSelectByQV("p"+p+"unit");
 	if (trUnitAlive()) {
 		amt = 0.01 * trUnitPercentDamaged();
 	}
-
-	trQuestVarSet("p"+p+"Lifesteal", 
+	
+	trQuestVarSet("p"+p+"Lifesteal",
 		trQuestVarGet("p"+p+"Lifesteal") + amt - trQuestVarGet("p"+p+"fireknightBonus"));
 	trQuestVarSet("p"+p+"fireknightBonus", amt);
-
+	
 	if (yGetDatabaseCount("p"+p+"fireharpies") > 0) {
 		for (x=yGetDatabaseCount("p"+p+"fireharpies"); >0) {
 			yDatabaseNext("p"+p+"fireharpies", true);
@@ -34,7 +34,7 @@ void fireknightAlways(int eventID = -1) {
 		}
 		yClearDatabase("p"+p+"fireharpies");
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"fireCharges") > 0) {
 		yDatabaseNext("p"+p+"fireCharges");
 		trVectorSetUnitPos("pos", "p"+p+"fireCharges");
@@ -48,11 +48,11 @@ void fireknightAlways(int eventID = -1) {
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"characters");
 				trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
-
+				
 				if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
 					equipRelicsAgain(p);
 				}
-
+				
 				zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
 				trUnitSelectClear();
 				trUnitSelect(""+1*yGetVar("p"+p+"fireCharges", "sfx"), true);
@@ -64,7 +64,7 @@ void fireknightAlways(int eventID = -1) {
 				trDamageUnitPercent(100);
 				trQuestVarSet("next", yGetVar("p"+p+"fireCharges", "sfx"));
 				yAddToDatabase("p"+p+"fireHarpies", "next");
-
+				
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"fireCharges");
 				trDamageUnitPercent(100);
@@ -99,7 +99,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		trSoundPlayFN("nidhoggflame1.wav","1",-1,"","");
@@ -112,20 +112,20 @@ void fireknightAlways(int eventID = -1) {
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				trVectorQuestVarSet("dir", zGetUnitVector("pos", "p"+p+"wellPos"));
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
-
+				
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
 				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"characters"));
 				trUnitChangeProtoUnit("Dwarf");
-
+				
 				trModifyProtounit("Hero Greek Achilles",p,5,2);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
 				trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-
+				
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"characters", true);
 				trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
@@ -133,7 +133,7 @@ void fireknightAlways(int eventID = -1) {
 				trMutateSelected(kbGetProtoUnitID("Relic"));
 				trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 				trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
-
+				
 				trQuestVarSet("sfx", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
 				trUnitSelectClear();
@@ -143,9 +143,9 @@ void fireknightAlways(int eventID = -1) {
 				trMutateSelected(kbGetProtoUnitID("Relic"));
 				trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 				trMutateSelected(kbGetProtoUnitID("Meteorite"));
-
+				
 				ySetVarAtIndex("playerUnits", "launched", 1, 1*yGetVar("p"+p+"characters", "index"));
-
+				
 				dist = zDistanceBetweenVectors("pos", "p"+p+"wellpos");
 				for(y=0; < dist / 2) {
 					trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
@@ -158,13 +158,13 @@ void fireknightAlways(int eventID = -1) {
 						trQuestVarSet("posz", trQuestVarGet("nextz"));
 					}
 				}
-
+				
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
 				trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
 				trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,false);
 				trModifyProtounit("Hero Greek Achilles",p,5,-2);
-
+				
 				yAddToDatabase("p"+p+"fireCharges", "next");
 				yAddUpdateVar("p"+p+"fireCharges", "index", yGetPointer("p"+p+"characters"));
 				yAddUpdateVar("p"+p+"fireCharges", "timeout", trTimeMS() + 2000 * trQuestVarGet("p"+p+"spellDuration"));
@@ -174,12 +174,12 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trSoundPlayFN("firegiantdie.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"overheat", 1);
-		trQuestVarSet("p"+p+"overheatTimeout", 
+		trQuestVarSet("p"+p+"overheatTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("overheatDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
@@ -187,7 +187,7 @@ void fireknightAlways(int eventID = -1) {
 				removeFireKnight();
 			} else {
 				if (yGetVar("p"+p+"characters", "phoenix") == 0) {
-					spyEffect(1*trQuestVarGet("p"+p+"characters"), 
+					spyEffect(1*trQuestVarGet("p"+p+"characters"),
 						kbGetProtoUnitID("Phoenix"), yGetVarName("p"+p+"characters", "phoenix"));
 				} else {
 					trUnitSelectClear();
@@ -198,7 +198,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		gainFavor(p, 0.0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
@@ -226,7 +226,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"overheat") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"overheatTimeout")) {
 			trQuestVarSet("p"+p+"overheat", 0);
@@ -242,7 +242,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"characters") > 0) {
 		id = yDatabaseNext("p"+p+"characters", true);
 		if (id == -1 || trUnitAlive() == false) {
@@ -269,7 +269,7 @@ void fireknightAlways(int eventID = -1) {
 					ySetVar("p"+p+"characters", "overheatNext", yGetVar("p"+p+"characters", "overheatNext") + 500);
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
-					damagePlayerUnit(trQuestVarGet("overheatDamage") * trQuestVarGet("p"+p+"spellDamage") * 0.5, 
+					damagePlayerUnit(trQuestVarGet("overheatDamage") * trQuestVarGet("p"+p+"spellDamage") * 0.5,
 						1*yGetVar("p"+p+"characters","index"));
 					current = kbUnitGetCurrentHitpoints(id);
 				}
@@ -287,7 +287,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"inferno") >0) {
 		yDatabaseNext("p"+p+"inferno");
 		if (trTimeMS() > yGetVar("p"+p+"inferno", "next")) {
@@ -331,7 +331,7 @@ void fireknightAlways(int eventID = -1) {
 			yRemoveFromDatabase("p"+p+"inferno");
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -367,16 +367,16 @@ highFrequency
 		trEventSetHandler(12 * FIREKNIGHT + p, "fireknightAlways");
 		trEventSetHandler(1000 + 12 * FIREKNIGHT + p, "chooseFireKnight");
 	}
-
+	
 	trQuestVarSet("flamingImpactCooldown", 12);
 	trQuestVarSet("flamingImpactDamage", 90);
 	trQuestVarSet("flamingImpactRange", 4);
-
+	
 	trQuestVarSet("overheatCooldown", 18);
 	trQuestVarSet("overheatDuration", 5);
 	trQuestVarSet("overheatDamage", 40);
 	trQuestVarSet("overheatRadius", 4);
-
+	
 	trQuestVarSet("infernoDuration", 8);
 	trQuestVarSet("infernoRange", 12);
 	trQuestVarSet("infernoDamage", 120);

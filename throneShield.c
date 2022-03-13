@@ -24,7 +24,7 @@ void throneShieldAlways(int eventID = -1) {
 	float current = 0;
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		target = 0;
@@ -69,7 +69,7 @@ void throneShieldAlways(int eventID = -1) {
 					trChatSend(0, "<color=1,1,1>" + trStringQuestVarGet("p"+p+"name") + " has given you a Knight's Vow!");
 				}
 				xsSetContextPlayer(target);
-				trQuestVarSet("p"+target+"currentHitpoints", 
+				trQuestVarSet("p"+target+"currentHitpoints",
 					kbUnitGetCurrentHitpoints(kbGetBlockID(""+1*trQuestVarGet("p"+target+"unit"))));
 				xsSetContextPlayer(p);
 				trSoundPlayFN("militarycreate.wav","1",-1,"","");
@@ -106,7 +106,7 @@ void throneShieldAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
 		}
 	}
-
+	
 	/* OMG MY QUEEN HEART-EYES EMOJI */
 	if (trQuestVarGet("p"+p+"queen") > 0) {
 		target = trQuestVarGet("p"+p+"queen");
@@ -156,8 +156,8 @@ void throneShieldAlways(int eventID = -1) {
 		trQuestVarSet("p"+target+"currentHitpoints", amt);
 		xsSetContextPlayer(p);
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
@@ -168,7 +168,7 @@ void throneShieldAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"shieldOfLight", 1);
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
 		trSoundPlayFN("gaiasparkle2.wav","1",-1,"","");
-		trQuestVarSet("p"+p+"shieldOfLightTimeout", 
+		trQuestVarSet("p"+p+"shieldOfLightTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("shieldOfLightDuration") * trQuestVarGet("p"+p+"spellDuration") - 3000);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
@@ -184,7 +184,7 @@ void throneShieldAlways(int eventID = -1) {
 		gainFavor(p, 0.0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"shieldOfLight", 4);
 	}
-
+	
 	if (trQuestVarGet("p"+p+"shieldOfLight") >= 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"shieldOfLightTimeout")) {
 			hit = trQuestVarGet("p"+p+"shieldOfLight") - 1;
@@ -212,8 +212,8 @@ void throneShieldAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"shieldOfLight", hit);
 		}
 	}
-
-
+	
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		xsSetContextPlayer(ENEMY_PLAYER);
@@ -228,9 +228,12 @@ void throneShieldAlways(int eventID = -1) {
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+					if (PvP) {
+						xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
+					}
 					hit = kbUnitGetTargetUnitID(id);
 					if (hit == target) {
-						silenceEnemy(p, 6.0);
+						silenceUnit("enemies",6.0, p);
 					} else {
 						stunUnit("enemies", 2.0, p);
 					}
@@ -242,7 +245,7 @@ void throneShieldAlways(int eventID = -1) {
 			trUnitChangeProtoUnit("Olympus Temple SFX");
 		}
 	}
-
+	
 	xsSetContextPlayer(p);
 	/* for security reasons, this needs to run every loop */
 	for (y=yGetDatabaseCount("p"+p+"characters"); > 0) {
@@ -268,7 +271,7 @@ void throneShieldAlways(int eventID = -1) {
 				amt = amt + dist;
 			}
 			ySetVar("p"+p+"characters", "currentHitpoints", amt);
-
+			
 			hit = CheckOnHit(p, id);
 			if (hit >= ON_HIT_NORMAL) {
 				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
@@ -340,7 +343,7 @@ void throneShieldAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -383,12 +386,12 @@ highFrequency
 		trEventSetHandler(1000 + 12 * THRONESHIELD + p, "chooseThroneShield");
 		trEventSetHandler(5000 + 12 * THRONESHIELD + p, "modifyThroneShield");
 	}
-
+	
 	trQuestVarSet("vowCooldown", 10);
-
+	
 	trQuestVarSet("justiceCooldown", 10);
 	trQuestVarSet("justiceRadius", 8);
-
+	
 	trQuestVarSet("shieldOfLightCost", 60);
 	trQuestVarSet("shieldOfLightCooldown", 20);
 	trQuestVarSet("shieldOfLightDuration", 6);

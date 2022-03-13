@@ -18,10 +18,6 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\cavalry x lancer hero icons 64";
 		}
-		case FROSTKNIGHT:
-		{
-			icon = "icons\hero g achilles icon 64";
-		}
 		case BLASTMAGE:
 		{
 			icon = "icons\special e priest icon 64";
@@ -64,7 +60,11 @@ string classIcon(int class = 0) {
 		}
 		case SPARKWITCH:
 		{
-			icon = "icons\hero g circe icon 64";
+			icon = "icons\special g circe icon 64";
+		}
+		case GAMBLER:
+		{
+			icon = "icons\infantry g hypaspist icon 64";
 		}
 	}
 	return(icon);
@@ -126,12 +126,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power eclipse icon 64";
-					msg = "Damage increases for each ally in the circle.";
-				}
-				case 7:
-				{
-					icon = "icons\god power eclipse icon 64";
-					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 20 + 10 per ally";
+					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Damage: 30";
 					next = 4;
 				}
 				case 8:
@@ -308,60 +303,6 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power firestorm icon 64";
 					msg = "Cost: 70 | Radius: 12 | Duration: 8 | Damage: 120 per second | Heal: 60 per second";
-					next = 0;
-				}
-			}
-		}
-		case FROSTKNIGHT:
-		{
-			switch(tooltip)
-			{
-				case 0:
-				{
-					msg = "Frost Knight: A sturdy fighter that brings a lot of crowd control.";
-				}
-				case 1:
-				{
-					msg = "Passive: Each time you stun an enemy, restore 8 pecent of your health.";
-				}
-				case 2:
-				{
-					msg = "Special Attack (5 attacks): Summon an icicle on your target, damaging and stunning it.";
-				}
-				case 3:
-				{
-					icon = "icons\improvement bite of the shark icons 64";
-					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage in a small area.";
-				}
-				case 4:
-				{
-					icon = "icons\improvement bite of the shark icons 64";
-					msg = "Stuns the enemy closest to the center of the icicle.";
-				}
-				case 5:
-				{
-					icon = "icons\improvement bite of the shark icons 64";
-					msg = "Cooldown: 4 | Radius: 1.5 | Duration: 6 | Damage: 80";
-				}
-				case 6:
-				{
-					icon = "icons\god power frost icon 64";
-					msg = "(W) Blizzard: For a short duration, you and your summoned allies release frost, dealing damage.";
-				}
-				case 7:
-				{
-					icon = "icons\god power frost icon 64";
-					msg = "Cooldown: 16 | Duration: 8 | Radius: 5 | Damage: 30 per second";
-				}
-				case 8:
-				{
-					icon = "icons\special n frost giant icon 64";
-					msg = "(E) Frost Giant: Summon a Frost Giant familiar to fight for you. It copies your attack and health.";
-				}
-				case 9:
-				{
-					icon = "icons\special n frost giant icon 64";
-					msg = "Cost: 60 | Decay: 3 percent health per second.";
 					next = 0;
 				}
 			}
@@ -606,7 +547,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "(E) Blade Dance: Teleport to an enemy and attack them. Applies on-attack effects and lifesteal";
+					msg = "(E) Blade Dance: Teleport to an enemy and attack them, ignoring their armor.";
 				}
 				case 11:
 				{
@@ -806,7 +747,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "Each time you attack, heal allies in the aura and grant them 1 favor.";
+					msg = "Each time you attack, heal allies in the aura and grant them 2 favor.";
 				}
 				case 9:
 				{
@@ -948,22 +889,27 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power ancestors icon 64";
-					msg = "Cooldown: 16 | Decay: 5 percent health";
+					msg = "(W) Arise: When you attack an enemy with a Death Sentence, reduce the cooldown of this spell by 1";
 				}
 				case 12:
 				{
-					icon = "icons\god power chaos icons 64";
-					msg = "(E) Doomsday: For a short duration, your attacks have the following effects:";
+					icon = "icons\god power ancestors icon 64";
+					msg = "Cooldown: 16 | Decay: 5 percent health";
 				}
 				case 13:
 				{
-					icon = "icons\god power chaos icons 64";
-					msg = "Heal yourself, summon a Minion, and grant yourself and your Minions bonus attack.";
+					icon = "icons\god power meteor icon 64";
+					msg = "(E) Nightfall: Teleport to the target location and release a cloud of darkness.";
 				}
 				case 14:
 				{
-					icon = "icons\god power chaos icons 64";
-					msg = "Cost: 80 | Duration: 12 | Heal: 3 percent health | Bonus: 0.1x Attack";
+					icon = "icons\god power meteor icon 64";
+					msg = "Inflict a Death Sentence on all enemies hit and stun them for the same duration.";
+				}
+				case 15:
+				{
+					icon = "icons\god power meteor icon 64";
+					msg = "Cost: 75 | Radius: 15";
 					next = 0;
 				}
 			}
@@ -982,7 +928,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Damage: 50 | Rotation speed + 0.33x projectiles";
+					msg = "Damage: 60 | Rotation speed + 0.33x projectiles";
 				}
 				case 3:
 				{
@@ -1074,17 +1020,101 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\special x lampades icons 64";
-					msg = "Cooldown: 18 | Duration: 4 | Electrify Damage: 20 per second";
+					msg = "Cooldown: 18 | Duration: 5 | Electrify Damage: 30 per second";
 				}
 				case 11:
 				{
 					icon = "sfx x arkantos birth ring";
-					msg = "(E) Vortex: Create a storm that pulls in nearby enemies.";
+					msg = "(E) Vortex: Create a storm that pulls in nearby enemies and stuns them.";
 				}
 				case 12:
 				{
 					icon = "sfx x arkantos birth ring";
 					msg = "Cost: 80 | Range: 12";
+					next = 0;
+				}
+			}
+		}
+		case GAMBLER:
+		{
+			switch(tooltip)
+			{
+				case 0:
+				{
+					msg = "Gambler: A luck-based caster with a wide variety of spells.";
+				}
+				case 1:
+				{
+					msg = "Passive: You cannot attack. Your basic spells have three variations.";
+				}
+				case 2:
+				{
+					msg = "After you cast a basic spell, it will randomly switch to one of its other variations.";
+				}
+				case 3:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "(Q) Loaded Dice: Throw a dice at your cursor with a special effect.";
+				}
+				case 4:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: COPY: Summon a copy of the first enemy hit by the dice. (excluding bosses)";
+				}
+				case 5:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: EXPLODE: The dice explodes and deals damage in an area.";
+				}
+				case 6:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Loaded Dice: HEAL: The dice heals allies that it passes through and grants them favor.";
+				}
+				case 7:
+				{
+					icon = "icons\improvement engineers icon 64";
+					msg = "Cooldown: 6 | Decay: 4 | Radius: 6 | Damage: 100 | Heal: 100 | Favor: 4";
+				}
+				case 8:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "(W) Gimmick Deck: Play a card with a special effect.";
+				}
+				case 9:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: BURN: Create a circle of fire that damages enemies each second.";
+				}
+				case 10:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: BURN: Damage is increased by the number of allies in the circle.";
+				}
+				case 11:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: FREEZE: Stun enemies at the target location.";
+				}
+				case 12:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Gimmick Deck: RELICS: Give an allied player bonuses from all your relics.";
+				}
+				case 13:
+				{
+					icon = "icons\improvement architects icon 64";
+					msg = "Cooldown: 12 | Radius: 6 | Duration: 6 | Damage: 20 + 10 per ally";
+				}
+				case 14:
+				{
+					icon = "icons\god power plenty icon 64";
+					msg = "(E) Gamble: Get a random number from 1-6. Your next spell is multiplied by that amount.";
+				}
+				case 15:
+				{
+					icon = "icons\god power plenty icon 64";
+					msg = "Cost: 30";
 					next = 0;
 				}
 			}
@@ -1113,10 +1143,6 @@ string className(int class = 0) {
 		case FIREKNIGHT:
 		{
 			name = "Fire Knight";
-		}
-		case FROSTKNIGHT:
-		{
-			name = "Frost Knight";
 		}
 		case BLASTMAGE:
 		{
@@ -1161,6 +1187,10 @@ string className(int class = 0) {
 		case SPARKWITCH:
 		{
 			name = "Spark Witch";
+		}
+		case GAMBLER:
+		{
+			name = "Gambler";
 		}
 	}
 	return(name);
@@ -1222,7 +1252,7 @@ highFrequency
 {
 	xsDisableSelf();
 	int i = trQuestVarGet("pleaseExplain");
-	trQuestVarSet("explain", 
+	trQuestVarSet("explain",
 		displayNextTooltip(i, 1*trQuestVarGet("explain")));
 	trDelayedRuleActivation("class_shop_explain_02");
 }

@@ -16,7 +16,7 @@ void trVectorQuestVarSet(string VQVname = "", vector QVv = vector(-1,-1,-1)) {
 }
 
 vector trVectorQuestVarGet(string name = "") {
-	if (name == "") { return(vector(-1,-1,-1)); }
+if (name == "") { return(vector(-1,-1,-1)); }
 	vector ret = xsVectorSet(trQuestVarGet(name+"X"),trQuestVarGet(name+"Y"),trQuestVarGet(name+"Z"));
 	return(ret);
 }
@@ -71,16 +71,16 @@ bool playerIsPlaying(int p = 0) {
 }
 
 
-void trUnitTeleportToVector(String v = "") {
+void trUnitTeleportToVector(string v = "") {
 	trUnitTeleport(trVectorQuestVarGetX(""+v), trVectorQuestVarGetY(""+v), trVectorQuestVarGetZ(""+v));
 }
 
-void trUnitSelectByQV(String s = "", bool reverse = true) {
+void trUnitSelectByQV(string s = "", bool reverse = true) {
 	trUnitSelectClear();
 	trUnitSelect(""+1*trQuestVarGet(""+s), reverse);
 }
 
-/* 
+/*
 Given a quest var that stores a unit name, store
 the unit's position in the vector.
 */
@@ -144,7 +144,7 @@ void zInitProtoUnitStat(string r = "", int p = 0, int f = 0, float v = 0.0) {
 }
 
 void zSetProtoUnitStat(string r = "", int p = 0, int f = 0, float v = 0.0) {
-	for(zsps=0; >1){}
+for(zsps=0; >1){}
 	zsps = kbGetProtoUnitID(r);
 	trModifyProtounit(r, p, f, 0.0 + v - trQuestVarGet("p"+p+"pf"+zsps+"f"+f));
 	trQuestVarSet("p"+p+"pf"+zsps+"f"+f, 0.0 + v);
@@ -177,6 +177,18 @@ float zDistanceBetweenVectorsSquared(string start = "", string end = "") {
 	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
 	float dist = xdiff * xdiff + zdiff * zdiff;
 	return(dist);
+}
+
+float zManhattanDistance(string start = "", string end = "") {
+	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
+	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
+	if (xdiff < 0) {
+		xdiff = 0.0 - xdiff;
+	}
+	if (zdiff < 0) {
+		zdiff = 0.0 - zdiff;
+	}
+	return(xdiff + zdiff);
 }
 
 bool vectorInRectangle(string pos = "", string bottom = "", string top = "") {
@@ -237,26 +249,26 @@ float angleBetweenVectors(string from = "", string to = "") {
 	a = a / (trQuestVarGet(to+"Z")-trQuestVarGet(from+"Z"));
 	a = xsAtan(a);
 	if (trVectorQuestVarGetZ(from) > trVectorQuestVarGetZ(to)) {
-	    if (trVectorQuestVarGetX(from) > trVectorQuestVarGetX(to)) {
+		if (trVectorQuestVarGetX(from) > trVectorQuestVarGetX(to)) {
 			a = a - PI;
-	    } else {
+		} else {
 			a = a + PI;
-	    }
-  	}
-  	return(a);
+		}
+	}
+	return(a);
 }
 
 float angleOfVector(string dir = "") {
 	float a = trQuestVarGet(dir+"X") / trQuestVarGet(dir+"Z");
 	a = xsAtan(a);
 	if (0.0 > trVectorQuestVarGetZ(dir)) {
-	    if (0.0 > trVectorQuestVarGetX(dir)) {
+		if (0.0 > trVectorQuestVarGetX(dir)) {
 			a = a - PI;
-	    } else {
+		} else {
 			a = a + PI;
-	    }
-  	}
-  	return(a);
+		}
+	}
+	return(a);
 }
 
 vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
@@ -297,10 +309,10 @@ bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
 	return(isType);
 }
 
-/* 
-A shitty binary search algorithm to approximate the intersection of a line with 
+/*
+A shitty binary search algorithm to approximate the intersection of a line with
 the circle specified by the center vector and radius. Behavior is undefined if start
-vector is outside the circle.  
+vector is outside the circle.
 Did this to avoid using trig as much as possible because trig is expensive.
 */
 vector intersectionWithCircle(string start = "", string end = "", string center = "", float radius = 0) {
@@ -425,9 +437,12 @@ void yRemoveFromDatabase(string db = "") {
 		ySetVar(db, "xNextBlock", trQuestVarGet("xdata"+db+"nextFree"));
 		ySetVar(db, "xActive", 0);
 		trQuestVarSet("xdata"+db+"nextFree", index);
-
+		
 		trQuestVarSet("xdata"+db+"pointer", yGetVar(db, "xPrevBlock"));
 		trQuestVarSet("xdata"+db+"count", trQuestVarGet("xdata"+db+"count") - 1);
+		if (trQuestVarGet("xdata"+db+"count") < 0) {
+			debugLog(db + " count is " + 1*trQuestVarGet("xdata"+db+"count"));
+		}
 	}
 }
 
@@ -531,7 +546,7 @@ void ySetVarFromVector(string db = "", string attr = "", string v = "") {
 	ySetVar(db, attr+"z", trQuestVarGet(v+"z"));
 }
 
-/* 
+/*
 Starting from NextUnitScenarioNameNumber and going backwards until the quest var 'qv',
 looks for the specified protounit. If none found, returns -1. Otherwise, returns the
 unit name.

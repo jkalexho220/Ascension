@@ -81,7 +81,7 @@ void sunbowAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		trSoundPlayFN("restorationbirth.wav","1",-1,"","");
@@ -91,7 +91,7 @@ void sunbowAlways(int eventID = -1) {
 		yAddToDatabase("p"+p+"sunlights", "next");
 		yAddUpdateVar("p"+p+"sunlights", "radius", xsPow(trQuestVarGet("sunlightRadius")*trQuestVarGet("p"+p+"spellRange"),2));
 		yAddUpdateVar("p"+p+"sunlights", "power", trQuestVarGet("sunlightPower") * trQuestVarGet("p"+p+"spellDamage"));
-		yAddUpdateVar("p"+p+"sunlights", "timeout", 
+		yAddUpdateVar("p"+p+"sunlights", "timeout",
 			trTimeMS() + 1000 * trQuestVarGet("sunlightDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		yAddUpdateVar("p"+p+"sunlights", "start", trGetNextUnitScenarioNameNumber());
 		yAddUpdateVar("p"+p+"sunlights", "posx", posX);
@@ -100,9 +100,9 @@ void sunbowAlways(int eventID = -1) {
 		for(x=0; <16) {
 			trVectorSetFromAngle("dir", amt);
 			amt = amt + 6.283185 / 16;
-			trQuestVarSet("dirx", 
+			trQuestVarSet("dirx",
 				trQuestVarGet("dirx") * trQuestVarGet("sunlightRadius") * trQuestVarGet("p"+p+"spellRange") + posX);
-			trQuestVarSet("dirz", 
+			trQuestVarSet("dirz",
 				trQuestVarGet("dirz") * trQuestVarGet("sunlightRadius") * trQuestVarGet("p"+p+"spellRange") + posZ);
 			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),0,true);
@@ -115,26 +115,26 @@ void sunbowAlways(int eventID = -1) {
 		}
 		yAddUpdateVar("p"+p+"sunlights", "end", trGetNextUnitScenarioNameNumber());
 	}
-
+	
 	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
 		trQuestVarSet("p"+p+"healingrays", 1);
-		trQuestVarSet("p"+p+"healingRaysTimeout", 
+		trQuestVarSet("p"+p+"healingRaysTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("healingRaysDuration") * trQuestVarGet("p"+p+"spellDuration"));
 		trSoundPlayFN("skypassagein.wav","1",-1,"","");
-		trQuestVarSet("p"+p+"nextDelay", 
+		trQuestVarSet("p"+p+"nextDelay",
 			trQuestVarGet("class"+SUNBOW+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
-
+	
 	if ((trQuestVarGet("p"+p+"healingRays") == 1) && (trTimeMS() > trQuestVarGet("p"+p+"healingRaysTimeout"))) {
 		trQuestVarSet("p"+p+"healingRays", 0);
 		trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+SUNBOW+"nextDelay"));
 	}
-
+	
 	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
 		trQuestVarSet("p"+p+"searingStarted", 1);
@@ -146,7 +146,7 @@ void sunbowAlways(int eventID = -1) {
 				}
 				trQuestVarSet("p"+p+"searing", 0);
 			} else {
-				trQuestVarSet("p"+p+"searingNext", 
+				trQuestVarSet("p"+p+"searingNext",
 					trTimeMS() + trQuestVarGet("searingDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("forestfirebirth.wav","1",-1,"","");
 				for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
@@ -155,7 +155,7 @@ void sunbowAlways(int eventID = -1) {
 						(kbGetBlockID(""+1*yGetVar("p"+p+"characters", "searingSFX")) == -1)) {
 						trUnitSelectClear();
 						trUnitSelectByQV("p"+p+"characters", true);
-						spyEffect(1*trQuestVarGet("p"+p+"Characters"), 
+						spyEffect(1*trQuestVarGet("p"+p+"Characters"),
 							kbGetProtoUnitID("Rocket"), yGetVarName("p"+p+"characters", "searingSFX"));
 					}
 				}
@@ -166,10 +166,10 @@ void sunbowAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if (trQuestVarGet("p"+p+"searing") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"searingNext")) {
-			trQuestVarSet("p"+p+"searingNext", 
+			trQuestVarSet("p"+p+"searingNext",
 				trQuestVarGet("p"+p+"searingNext") + trQuestVarGet("searingDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 			gainFavor(p, 0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
@@ -179,7 +179,7 @@ void sunbowAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	if ((trQuestVarGet("p"+p+"searingStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
@@ -193,7 +193,7 @@ void sunbowAlways(int eventID = -1) {
 		}
 		trQuestVarSet("p"+p+"searingStarted", 0);
 	}
-
+	
 	if (yGetDatabaseCount("p"+p+"sunlights") > 0) {
 		target = 0;
 		yDatabaseNext("p"+p+"sunlights");
@@ -205,7 +205,7 @@ void sunbowAlways(int eventID = -1) {
 			amt = yGetVar("p"+p+"sunlights", "radius");
 			posX = yGetVar("p"+p+"sunlights", "power");
 			posX = posX * 0.5;
-
+			
 			for (x=yGetDatabaseCount("playerUnits"); >0) {
 				id = yDatabaseNext("playerUnits", true);
 				if (id == -1 || trUnitAlive() == false) {
@@ -214,7 +214,7 @@ void sunbowAlways(int eventID = -1) {
 					healUnit(p, posX);
 				}
 			}
-
+			
 			if (trQuestVarGet("p"+p+"searing") == 1) {
 				for(x=yGetDatabaseCount("enemies"); >0) {
 					id = yDatabaseNext("enemies", true);
@@ -245,7 +245,7 @@ void sunbowAlways(int eventID = -1) {
 			}
 		}
 	}
-
+	
 	ySetPointer("enemies", index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
@@ -275,7 +275,7 @@ void chooseSunbow(int eventID = -1) {
 void modifySunbow(int eventID = -1) {
 	int p = eventID - 5000 - 12 * SUNBOW;
 	if (trQuestVarGet("p"+p+"healingRays") == 1) {
-		trQuestVarSet("p"+p+"nextDelay", 
+		trQuestVarSet("p"+p+"nextDelay",
 			trQuestVarGet("class"+SUNBOW+"nextDelay") * 2.0 / (1.0 + trQuestVarGet("p"+p+"projectiles")));
 	}
 }
@@ -290,16 +290,16 @@ highFrequency
 		trEventSetHandler(1000 + 12 * SUNBOW + p, "chooseSunbow");
 		trEventSetHandler(5000 + 12 * SUNBOW + p, "modifySunbow");
 	}
-
+	
 	trQuestVarSet("sunlightCooldown", 18);
 	trQuestVarSet("sunlightRadius", 6);
 	trQuestVarSet("sunlightDuration", 6);
 	trQuestVarSet("sunlightPower", 60);
-
+	
 	trQuestVarSet("healingRaysCooldown", 12);
 	trQuestVarSet("healingRaysPower", 100);
 	trQuestVarSet("healingRaysDuration", 6);
-
+	
 	trQuestVarSet("searingCost", 5);
 	trQuestVarSet("searingDelay", 1000.0 / trQuestVarGet("searingCost"));
 }

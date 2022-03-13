@@ -1,16 +1,16 @@
 /* greek boons */
 const int BOON_DOUBLE_FAVOR = 1; // zeus
-const int BOON_POISON_STACKS = 2; // poseidon
-const int BOON_MORE_GOLD = 3; // hades
+const int BOON_MORE_GOLD = 2; // poseidon
+const int BOON_SPELL_ATTACK = 3; // hades
 
 /* egyptian boons */
 const int BOON_SPELL_POISON = 4; // isis
-const int BOON_SPELL_ATTACK = 5; // ra
-const int BOON_REGENERATE_HEALTH = 6; // set
+const int BOON_STATUS_COOLDOWNS = 5; // ra
+const int BOON_IMMUNE_TO_STATUS = 6; // set
 
 /* norse boons */
 const int BOON_FROSTY_SPELLS = 7; // odin
-const int BOON_DOUBLE_STUN = 8; // thor
+const int BOON_REGENERATE_HEALTH = 8; // thor
 const int BOON_DECAY_HALVED = 9; // loki
 
 /* atlantean boons */
@@ -150,10 +150,6 @@ string boonName(int boon = 0) {
 		{
 			name = "Gain double gold from enemy kills.";
 		}
-		case BOON_DOUBLE_STUN:
-		{
-			name = "Double the duration of your stuns and silences.";
-		}
 		case BOON_DECAY_HALVED:
 		{
 			name = "The decay rate of your summoned allies is halved.";
@@ -166,9 +162,9 @@ string boonName(int boon = 0) {
 		{
 			name = "Your maximum favor is doubled.";
 		}
-		case BOON_POISON_STACKS:
+		case BOON_IMMUNE_TO_STATUS:
 		{
-			name = "Your poison damage stacks.";
+			name = "You are immune to status effects.";
 		}
 		case BOON_SPELL_ATTACK:
 		{
@@ -188,7 +184,11 @@ string boonName(int boon = 0) {
 		}
 		case BOON_MONSTER_COMPANION:
 		{
-			name = "Choose a monster from the Monsterpedia to be your pet. Revive it whenever you use your Ultimate.";
+			name = "Choose a monster from the Monsterpedia to be your pet companion. (Cannot choose bosses)";
+		}
+		case BOON_STATUS_COOLDOWNS:
+		{
+			name = "When you inflict a status effect, advance your spell cooldowns by 1 second.";
 		}
 	}
 	return(name);
