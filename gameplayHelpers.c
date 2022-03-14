@@ -64,15 +64,19 @@ void gainFavor(int p = 0, float amt = 0) {
 }
 
 void spyEffect(int unit = 0, int proto = 0, string qv = "") {
-	trUnitSelectClear();
-	trUnitSelect(""+unit, true);
-	if (trUnitAlive()) {
-		int x = modularCounterNext("spyFind");
-		trQuestVarSet("spyEye"+x, proto);
-		trQuestVarSet("spyEye"+x+"unit", unit);
-		trQuestVarSet("spyEye"+x+"active", 1);
-		trStringQuestVarSet("spyName"+x, qv);
-		trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+	if (peekModularCounterNext("spyFind") != trQuestVarGet("spyFound")) {
+		trUnitSelectClear();
+		trUnitSelect(""+unit, true);
+		if (trUnitAlive()) {
+			int x = modularCounterNext("spyFind");
+			trQuestVarSet("spyEye"+x, proto);
+			trQuestVarSet("spyEye"+x+"unit", unit);
+			trQuestVarSet("spyEye"+x+"active", 1);
+			trStringQuestVarSet("spyName"+x, qv);
+			trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+		}
+	} else {
+		debugLog("Spy buffer overflow");
 	}
 }
 

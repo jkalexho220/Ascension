@@ -752,6 +752,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
 			placeTemple(x, z, 10);
 			if (trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed") < 10) {
+				/* this doesn't desync don't worry */
 				xsEnableRule("greedy_temple_always");
 			}
 		}
@@ -794,6 +795,30 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
 			placeTemple(x, z, 20);
 			xsEnableRule("yeebaagooon_temple_always");
+		}
+		case ROOM_TEMPLE + 7:
+		{
+			trPaintTerrain(x*35+10, z*35+10, x*35+30, z*35+30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x*35+10, z*35+10, x*35+30, z*35+30, worldHeight, false);
+			paintSecondary(x*35+10, z*35+10, x*35+30, z*35+30);
+			paintEyecandy(x*35+10, z*35+10, x*35+30, z*35+30);
+			placeTemple(x, z, 10);
+			trQuestVarSet("templePosX", 70 * x + 40);
+			trQuestVarSet("templePosZ", 70 * z + 40);
+			trVectorQuestVarSet("dir", vector(1,0,0));
+			trQuestVarSet("columnsStart", trGetNextUnitScenarioNameNumber());
+			for(i=0; < 8) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Hoplite",1,1,0,1,0,true);
+				trUnitSelectClear();
+				trUnitSelectByQV("next");
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trUnitTeleport(70.0*x+40.0-trQuestVarGet("dirx")*16.0,0,70.0*z+40.0-trQuestVarGet("dirz")*16.0);
+				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
+			}
+			trQuestVarSet("columnsEnd", trGetNextUnitScenarioNameNumber());
+			xsEnableRule("monster_temple_init");
+			xsEnableRule("monster_temple_always");
 		}
 		case ROOM_TEMPLE + 11:
 		{
@@ -1372,18 +1397,19 @@ highFrequency
 				trQuestVarSet("mapType", MAP_OPEN);
 				trQuestVarSet("treeDensity", 0.3);
 				trStringQuestVarSet("treeProto1", "Columns");
-				trStringQuestVarSet("treeProto2", "Broken Columns");
-				trStringQuestVarSet("treeProto3", "Fallen Columns");
+				trStringQuestVarSet("treeProto2", "Columns Broken");
+				trStringQuestVarSet("treeProto3", "Columns Fallen");
 				trQuestVarSet("spriteDensity", 0.7);
 				trStringQuestVarSet("spriteProto1", "Seaweed");
 				trStringQuestVarSet("spriteProto2", "Water Reeds");
 				trStringQuestVarSet("spriteProto3", "Rock Granite Small");
-				trQuestVarSet("rockDensity", 0.6);
+				trQuestVarSet("rockDensity", 0.4);
 				trStringQuestVarSet("rockProto1", "Rock Granite Big");
 				trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
 				trStringQuestVarSet("rockProto3", "Shipwreck");
 				
 				trModifyProtounit("Seaweed",1,55,1);
+				trModifyProtounit("Shipwreck",1,55,1);
 				
 				trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
 				
@@ -2012,7 +2038,27 @@ highFrequency
 			trSetSelectedScale(0,0,0);
 			trUnitSelectClear();
 			trUnitSelect(""+1*yGetVar("fishHawks", "sfx"),true);
-			trUnitChangeProtoUnit("Fish - Salmon");
+			trQuestVarSetFromRand("rand", 1, 3, true);
+			switch(1*trQuestVarGet("rand"))
+			{
+				case 1:
+				{
+					trUnitChangeProtoUnit("Fish - Salmon");
+				}
+				case 2:
+				{
+					trUnitChangeProtoUnit("Fish - Mahi");
+				}
+				case 3:
+				{
+					trUnitChangeProtoUnit("Fish - Perch");
+				}
+			}
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("fishHawks", "sfx"),true);
+			trSetSelectedUpVector(0,-10,0);
+			trQuestVarSetFromRand("scale", 1, 2, false);
+			trSetSelectedScale(trQuestVarGet("scale"),0.1 * trQuestVarGet("scale"),trQuestVarGet("scale"));
 		}
 		xsDisableSelf();
 	}

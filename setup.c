@@ -411,8 +411,8 @@ runImmediately
 	trLetterBox(true);
 	trUIFadeToColor(0,0,0,0,0,true);
 	
-	modularCounterInit("spyFind", 32);
-	modularCounterInit("spyFound", 32);
+	modularCounterInit("spyFind", 64);
+	modularCounterInit("spyFound", 64);
 	
 	/*
 	player 0 omniscience

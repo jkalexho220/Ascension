@@ -1784,6 +1784,46 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			}
 		}
 		
+		case NPC_TEMPLE + 7:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The tides cannot be stopped, but they can be weathered.");
+				}
+				case 2:
+				{
+					uiMessageBox("Defeat these hordes and be granted their strength.");
+				}
+				case 3:
+				{
+					uiMessageBox("Drop a relic at my feet to begin the trial.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 7:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Your strength has been acknowledged. Accept this power as your reward.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
 		case NPC_TEMPLE + 11:
 		{
 			switch(dialog)

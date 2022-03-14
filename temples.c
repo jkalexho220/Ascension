@@ -661,6 +661,73 @@ highFrequency
 	}
 }
 
+
+rule monster_temple_init
+inactive
+highFrequency
+{
+	if (trTime() > cActivationTime) {
+		xsDisableSelf();
+		for(x=trQuestVarGet("columnsStart"); < trQuestVarGet("columnsEnd")) {
+			trUnitSelectClear();
+			trUnitSelect(""+x);
+			trUnitChangeProtoUnit("Atlantis Wall Connector");
+		}
+	}
+}
+
+rule monster_temple_always
+inactive
+highFrequency
+{
+	int x = 0;
+	int z = 0;
+	if (trQuestVarGet("templeChallengeActive") == 1) {
+		trMessageSetText("The Statue's challenge will begin soon! Stay in the room if you wish to participate.",-1);
+		trQuestVarSet("templeChallengeActive", 2);
+		trQuestVarSet("templeChallengeNext", trTime() + 10);
+		trCounterAddTime("countdown",10,1,"Challenge begins", -1);
+	} else if (trQuestVarGet("templeChallengeActive") == 2) {
+		if (trTime() > trQuestVarGet("templeChallengeNext")) {
+			trQuestVarSet("templeChallengeActive", 3);
+		}
+	} else if (trQuestVarGet("templeChallengeActive") > 2) {
+		bool done = true;
+		for(y=trQuestVarGet("monsterChallengeStart"); < trQuestVarGet("monsterChallengeEnd")) {
+			trUnitSelectClear();
+			trUnitSelect(""+y,true);
+			if (trUnitAlive()) {
+				done = false;
+				break; // no need to check the rest
+			}
+		}
+		if (done) {
+			trQuestVarSet("templeChallengeActive", 1 + trQuestVarGet("templeChallengeActive"));
+			if (trQuestVarGet("templeChallengeActive") == 9) {
+				trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				xsDisableSelf();
+				startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
+				trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
+			} else {
+				trQuestVarSet("monsterChallengeStart", trGetNextUnitScenarioNameNumber());
+				trVectorQuestVarSet("dir", vector(1,0,0));
+				for(y=8; >0) {
+					x = trQuestVarGet("templePosx") - trQuestVarGet("dirx") * 14;
+					z = trQuestVarGet("templePosz") - trQuestVarGet("dirz") * 14;
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x,0,z,0,true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+(1*trQuestVarGet("templeChallengeActive")-2)));
+					activateEnemy("next");
+					trVectorQuestVarSet("dir", rotationMatrix("dir",0.707107,0.707107));
+				}
+				trQuestVarSet("monsterChallengeEnd", trGetNextUnitScenarioNameNumber());
+			}
+		}
+	}
+}
+
 rule zeno_temple_always
 inactive
 highFrequency
