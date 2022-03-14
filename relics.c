@@ -26,9 +26,9 @@ const int RELIC_ALL = 20;
 auras
 pet companion?
 */
-const int RELIC_PLACEHOLDER = 21; // wtf idk bbq lbtq
+const int RELIC_REGENERATE = 21;
 const int RELIC_PET_DOG = 22; // Bella fights for you
-const int RELIC_NOTTUD = 23; // +0.3x area damage on attacks. (Radius: 4)
+const int RELIC_NOTTUD = 23; // +0.2x area damage on attacks. (Radius 4)
 const int RELIC_ZENOPHOBIA = 24; // +0.2 magic penetration
 const int RELIC_YEEBAAGOOON = 25; // Regen 0.3 favor per second
 
@@ -193,7 +193,11 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_PET_DOG:
 			{
-				msg = "A pet dog fights for you. (Respawn - 30 seconds)";
+				msg = "A pet dog fights for you. (Respawn = 30 seconds)";
+			}
+			case RELIC_REGENERATE:
+			{
+				msg = "Regenerate 1 health per second for each visible enemy.";
 			}
 			
 			case RELIC_GHOST_PICTURE:
@@ -416,6 +420,10 @@ string relicIcon(int relic = 0) {
 			case RELIC_NOTTUD:
 			{
 				icon = "icons\special g minotaur icon 64";
+			}
+			case RELIC_REGENERATE:
+			{
+				icon = "icons\special g hydra icon 64";
 			}
 		}
 	}
@@ -645,6 +653,10 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"cleave", trQuestVarGet("p"+p+"cleave") + 0.2 * m);
 		}
+		case RELIC_REGENERATE:
+		{
+			trQuestVarSet("p"+p+"defiance", trQuestVarGet("p"+p+"defiance") + m);
+		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
 		trChatSend(0, "You have picked up a key. <icon=(20)("+relicIcon(relic)+")>");
@@ -838,6 +850,10 @@ int relicProto(int relic = 0) {
 			case RELIC_NOTTUD:
 			{
 				proto = kbGetProtoUnitID("Minotaur");
+			}
+			case RELIC_REGENERATE:
+			{
+				proto = kbGetProtoUnitID("Hydra");
 			}
 		}
 	}

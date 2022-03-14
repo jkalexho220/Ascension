@@ -318,6 +318,7 @@ void chooseClass(int p = 0, int class = 0) {
 	trQuestVarSet("p"+p+"petDogs", 0);
 	trQuestVarSet("p"+p+"magicPen", 0);
 	trQuestVarSet("p"+p+"cleave", 0);
+	trQuestVarSet("p"+p+"defiance", 0);
 	
 	trQuestVarSet("p"+p+"ultimateCost", 1);
 	trQuestVarSet("p"+p+"cooldownReduction", 1);

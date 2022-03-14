@@ -537,7 +537,7 @@ Enemies have elemental resistance and weakness
 */
 float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
 	if (spell) {
-		dmg = dmg - dmg * yGetVar("enemies", "magicResist") * (1.0 - pierce);
+		dmg = dmg - dmg * yGetVar("enemies", "magicResist") * (1.0 - pierce - trQuestVarGet("p"+p+"magicPen"));
 	} else {
 		dmg = dmg - dmg * yGetVar("enemies", "physicalResist") * (1.0 - pierce);
 	}

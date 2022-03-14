@@ -120,18 +120,18 @@ highFrequency
 	setupProtounitBounty("Walking Woods Marsh", 0.2, 3);
 	setupProtounitBounty("Dryad", 0.2, 4, 0.03);
 	setupProtounitBounty("Centaur", 0.1, 4, 0.03);
-	setupProtounitBounty("Medusa", 0.1, 8, 0.15, RELIC_SPELL_DURATION);
+	setupProtounitBounty("Medusa", 0.2, 8, 0.15, RELIC_SPELL_DURATION);
 	setupProtounitBounty("Mountain Giant", 0.3, 10, 0.1);
 	
 	setupProtounitBounty("Fenris Wolf", 0.2, 4, 0.03);
 	setupProtounitBounty("Valkyrie", 0, 5, 0.05);
-	setupProtounitBounty("Ballista", 0, 4, 0.03);
+	setupProtounitBounty("Ballista", 0.1, 4, 0.03);
 	setupProtounitBounty("Frost Giant", 0.3, 10, 0.1);
 	
 	setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
 	setupProtounitBounty("Colossus", 0.2, 10, 0.1);
 	setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
-	setupProtounitBounty("Fire Siphon", 0, 8, 0.1);
+	setupProtounitBounty("Fire Siphon", 0.1, 8, 0.1);
 	
 	setupProtounitBounty("Cyclops", 0.2, 6, 0.05);
 	setupProtounitBounty("Satyr", 0.1, 4, 0.03);

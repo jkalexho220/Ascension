@@ -103,6 +103,7 @@ void processLifesteal(int p = 0) {
 
 void processRegen(int p = 0) {
 	float amt = 0;
+	float diff = 0;
 	if (trQuestVarGet("p"+p+"favorRegen") != 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"regenerateFavorLast") + 1000) {
 			amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateFavorLast");
@@ -111,13 +112,17 @@ void processRegen(int p = 0) {
 			trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
 		}
 	}
-	if (trQuestVarGet("p"+p+"godBoon") == BOON_REGENERATE_HEALTH) {
-		if (trTimeMS() > trQuestVarGet("p"+p+"regenerateHealthLast") + 1000) {
-			amt = trTimeMS() - trQuestVarGet("p"+p+"regenerateHealthLast");
-			amt = amt * 0.00003 * trQuestVarGet("p"+p+"health");
-			trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
-			trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
+	if (trTimeMS() > trQuestVarGet("p"+p+"regenerateHealthLast") + 1000) {
+		amt = 0;
+		diff = trTimeMS() - trQuestVarGet("p"+p+"regenerateHealthLast");
+		if (trQuestVarGet("p"+p+"godBoon") == BOON_REGENERATE_HEALTH) {
+			amt = diff * 0.00003 * trQuestVarGet("p"+p+"health");
 		}
+		if (trQuestVarGet("p"+p+"defiance") > 0) {
+			amt = amt + diff * trQuestVarGet("p"+p+"defiance") * yGetDatabaseCount("enemies");
+		}
+		trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
+		trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
 	}
 }
 
