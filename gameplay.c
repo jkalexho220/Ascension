@@ -119,7 +119,7 @@ void processRegen(int p = 0) {
 			amt = diff * 0.00003 * trQuestVarGet("p"+p+"health");
 		}
 		if (trQuestVarGet("p"+p+"defiance") > 0) {
-			amt = amt + diff * trQuestVarGet("p"+p+"defiance") * yGetDatabaseCount("enemies");
+			amt = amt + 0.001 * diff * trQuestVarGet("p"+p+"defiance") * yGetDatabaseCount("enemies");
 		}
 		trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
 		trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());

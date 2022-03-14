@@ -760,6 +760,25 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
 			placeTemple(x, z, 10);
+			x0 = x * 70 + 31;
+			z0 = z * 70 + 47;
+			trQuestVarSetFromRand("rand",0,8,true);
+			for(i=0; < 9) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dwarf",1,x0,0,z0,225,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Relic");
+				if (i == trQuestVarGet("rand")) {
+					trQuestVarSet("correctGoblet", trQuestVarGet("next"));
+				}
+				yAddToDatabase("poisonRelics","next");
+				yAddUpdateVar("poisonRelics","index",yAddToDatabase("freeRelics", "next"));
+				yAddUpdateVar("freeRelics","type",RELIC_BINARY_POISON);
+				x0 = x0 + 2;
+				z0 = z0 - 2;
+			}
+			trQuestVarSet("poisonGuesses", 3);
+			trQuestVarSet("templeChallengeActive", 1);
 			xsEnableRule("poison_temple_always");
 		}
 		case ROOM_TEMPLE + 6:
@@ -1226,7 +1245,6 @@ highFrequency
 			case 5:
 			{
 				trQuestVarSet("stageTemple", BOON_SPELL_POISON);
-				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 3, 1);
 				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
 				trQuestVarSet("bossRoomSize", 11);

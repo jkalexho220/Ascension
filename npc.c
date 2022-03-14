@@ -1698,7 +1698,44 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("");
+					uiMessageBox("Do you have the courage to face death?");
+				}
+				case 2:
+				{
+					uiMessageBox("In each of these cups, there is a deadly poison. Drink too much of it, and you die.");
+				}
+				case 3:
+				{
+					uiMessageBox("But one cup contains a most powerful lifeblood. Drink it to attain my power.");
+				}
+				case 4:
+				{
+					uiMessageBox("You have at most three guesses. Find the lifeblood or perish. Do you dare to take the gamble?");
+				}
+				case 5:
+				{
+					trMessageSetText("Find the correct goblet in three guesses. (Guesses are shared for the whole party)",-1);
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Fate has smiled upon you today. And for that, I grant you this power.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer/");
+					dialog = 0;
 				}
 			}
 		}

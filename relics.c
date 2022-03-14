@@ -26,7 +26,7 @@ const int RELIC_ALL = 20;
 auras
 pet companion?
 */
-const int RELIC_REGENERATE = 21;
+const int RELIC_DEFIANCE = 21; // regenerate 1 health per second for each visible enemy
 const int RELIC_PET_DOG = 22; // Bella fights for you
 const int RELIC_NOTTUD = 23; // +0.2x area damage on attacks. (Radius 4)
 const int RELIC_ZENOPHOBIA = 24; // +0.2 magic penetration
@@ -62,6 +62,8 @@ const int RELIC_POISON_BUCKET = 64;
 
 const int RELIC_WORTHLESS_JUNK = 65;
 const int RELIC_MAGIC_DETECTOR = 66;
+
+const int RELIC_BINARY_POISON = 67;
 
 const int KEY_RELICS = 100;
 const int RELIC_KEY_GREEK = 101;
@@ -195,7 +197,7 @@ string relicName(int relic = 0) {
 			{
 				msg = "A pet dog fights for you. (Respawn = 30 seconds)";
 			}
-			case RELIC_REGENERATE:
+			case RELIC_DEFIANCE:
 			{
 				msg = "Regenerate 1 health per second for each visible enemy.";
 			}
@@ -240,6 +242,10 @@ string relicName(int relic = 0) {
 			case RELIC_MAGIC_DETECTOR:
 			{
 				msg = "Magic Detector";
+			}
+			case RELIC_BINARY_POISON:
+			{
+				msg = "Mysterious goblet";
 			}
 		}
 	}
@@ -421,9 +427,13 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\special g minotaur icon 64";
 			}
-			case RELIC_REGENERATE:
+			case RELIC_DEFIANCE:
 			{
 				icon = "icons\special g hydra icon 64";
+			}
+			case RELIC_BINARY_POISON:
+			{
+				icon = "icons\improvement life drain icon";
 			}
 		}
 	}
@@ -653,9 +663,16 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"cleave", trQuestVarGet("p"+p+"cleave") + 0.2 * m);
 		}
-		case RELIC_REGENERATE:
+		case RELIC_DEFIANCE:
 		{
 			trQuestVarSet("p"+p+"defiance", trQuestVarGet("p"+p+"defiance") + m);
+		}
+		case RELIC_BINARY_POISON:
+		{
+			if (equip) {
+				trQuestVarSet("me", p);
+				yAddToDatabase("doomedPlayers", "me");
+			}
 		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {
@@ -851,9 +868,13 @@ int relicProto(int relic = 0) {
 			{
 				proto = kbGetProtoUnitID("Minotaur");
 			}
-			case RELIC_REGENERATE:
+			case RELIC_DEFIANCE:
 			{
 				proto = kbGetProtoUnitID("Hydra");
+			}
+			case RELIC_BINARY_POISON:
+			{
+				proto = kbGetProtoUnitID("Jiangshi");
 			}
 		}
 	}

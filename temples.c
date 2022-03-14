@@ -156,7 +156,8 @@ highFrequency
 						trQuestVarSet("player", p);
 						yAddToDatabase("applicants", "player");
 						if (trCurrentPlayer() == p) {
-							trMessageSetText("Complete the rest of the stage without dying.",-1);
+							trMessageSetText("You may now exit the room. Complete the rest of the stage without dying.",-1);
+							trChatSend(0, "<color=1,0,0>You are losing 1 percent of your health each second!</color>");
 						}
 					}
 				}
@@ -196,6 +197,60 @@ highFrequency
 			}
 		}
 		xsDisableSelf();
+	}
+}
+
+rule poison_temple_always
+inactive
+highFrequency
+{
+	int id = yDatabaseNext("poisonRelics", true);
+	if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Jiangshi")) {
+		if (trQuestVarGet("poisonRelics") == trQuestVarGet("correctGoblet")) {
+			trUnitChangeProtoUnit("Recreation");
+			trSoundPlayFN("recreation.wav","1",-1,"","");
+			xsDisableSelf();
+			for(x=yGetDatabaseCount("poisonRelics"); >1) {
+				yDatabaseNext("poisonRelics", true);
+				trUnitChangeProtoUnit("Hero Death");
+				ySetPointer("freeRelics", 1*yGetVar("poisonRelics","pointer"));
+				yRemoveFromDatabase("freeRelics");
+			}
+			startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
+			trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
+		} else {
+			trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
+			trSoundPlayFN("spybirth.wav","1",-1,"","");
+			trQuestVarSet("poisonGuesses", trQuestVarGet("poisonGuesses") - 1);
+			if (trQuestVarGet("poisonGuesses") > 0) {
+				trChatSend(0,"<color=0.8,0.2,0.8>Incorrect! Remaining guesses: " + 1*trQuestVarGet("poisonGuesses"));
+				if (trUnitIsOwnedBy(trCurrentPlayer())) {
+					if (trQuestVarGet("poisonRelics") < trQuestVarGet("correctGoblet")) {
+						uiMessageBox("Incorrect. The lifeblood is somewhere to the right of this goblet.");
+					} else {
+						uiMessageBox("Incorrect. The lifeblood is somewhere to the left of this goblet.");
+					}
+				}
+				yRemoveFromDatabase("poisonRelics");
+				trUnitChangeProtoUnit("Lampades Blood");
+			} else {
+				trSoundPlayFN("tartariangateselect.wav","1",-1,"","");
+				trMessageSetText("The death knell tolls. Thus, you have failed the challenge.",-1);
+				for(x=yGetDatabaseCount("poisonRelics"); >1) {
+					yDatabaseNext("poisonRelics", true);
+					trUnitChangeProtoUnit("Lampades Blood");
+					if (ySetPointer("freeRelics", 1*yGetVar("poisonRelics","pointer"))) {
+						yRemoveFromDatabase("freeRelics");
+					}
+				}
+				for(x=yGetDatabaseCount("doomedPlayers"); >0) {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+1*yDatabaseNext("doomedPlayers")+"unit");
+					trUnitDelete(false);
+				}
+				xsDisableSelf();
+			}
+		}
 	}
 }
 
