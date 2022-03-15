@@ -40,6 +40,9 @@ highFrequency
 			for(i=trQuestVarGet("stage")/2; >0) {
 				/* monstrous rage */
 				trTechSetStatus(p, 76, 4);
+				if (trQuestVarGet("stage") > 6) {
+					trTechSetStatus(p, 76, 4);
+				}
 			}
 		}
 		xsEnableRule("delayed_modify");
@@ -1417,9 +1420,9 @@ highFrequency
 				trStringQuestVarSet("enemyProto1", "Servant");
 				trStringQuestVarSet("enemyProto2", "Nereid");
 				trStringQuestVarSet("enemyProto3", "Wadjet");
-				trStringQuestVarSet("enemyProto4", "Hydra");
+				trStringQuestVarSet("enemyProto4", "Kraken");
 				trStringQuestVarSet("enemyProto5", "Medusa");
-				trStringQuestVarSet("enemyProto6", "Lampades");
+				trStringQuestVarSet("enemyProto6", "Hydra");
 				
 				trStringQuestVarSet("bossProto", "Scylla");
 				trQuestVarSet("bossScale", 1.5);

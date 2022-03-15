@@ -614,6 +614,7 @@ highFrequency
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
 		
 		trModifyProtounit("Servant", p, 55, 1);
+		trModifyProtounit("Kraken", p, 55, 1);
 		trModifyProtounit("Nereid", p, 55, 1);
 		trModifyProtounit("Scylla", p, 55, 1);
 		

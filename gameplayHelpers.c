@@ -1130,6 +1130,34 @@ void activateSpecialUnit(string db = "", string pName = "", int proto = 0, int p
 			yAddUpdateVar("Mummies", "step", 0);
 			yAddUpdateVar("Mummies", "player", p);
 		}
+		case kbGetProtoUnitID("Nereid"):
+		{
+			yAddToDatabase("Nereids", db);
+			yAddUpdateVar("Nereids", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Nereids", "step", 0);
+			yAddUpdateVar("Nereids", "player", p);
+		}
+		case kbGetProtoUnitID("Hydra"):
+		{
+			yAddToDatabase("Hydras", db);
+			yAddUpdateVar("Hydras", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Hydras", "last", trTime());
+			yAddUpdateVar("Hydras", "player", p);
+		}
+		case kbGetProtoUnitID("Kraken"):
+		{
+			yAddToDatabase("Krakens", db);
+			yAddUpdateVar("Krakens", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Krakens", "step", 0);
+			yAddUpdateVar("Krakens", "player", p);
+		}
+		case kbGetProtoUnitID("Lampades"):
+		{
+			yAddToDatabase("SkyWitches", db);
+			yAddUpdateVar("SkyWitches", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("SkyWitches", "step", 0);
+			yAddUpdateVar("SkyWitches", "player", p);
+		}
 	}
 }
 

@@ -143,6 +143,13 @@ highFrequency
 	setupProtounitBounty("Scarab", 1, 10, 0.08);
 	setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 	
+	setupProtounitBounty("Servant", 0.5, 5, 0.03);
+	setupProtounitBounty("Nereid", 0.5, 7, 0.05);
+	setupProtounitBounty("Kraken", 0.5, 9, 0.08);
+	setupProtounitBounty("Hydra", 0.5, 10, 0.1);
+	
+	setupProtounitBounty("Lampades", 0.7, 12, 0.1);
+	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);
 	trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -1.8);
@@ -1321,6 +1328,140 @@ void specialUnitsAlways() {
 			if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
 				ySetVar("ScorpionMen", "step", 0);
 				ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
+			}
+		}
+	}
+	
+	
+	if(yGetDatabaseCount("Nereids") >0) {
+		id = yDatabaseNext("Nereids", true);
+		p = yGetVar("Nereids","player");
+		pName = databaseName(p);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Nereids")) {
+			if (trUnitAlive()) {
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else {
+				trUnitChangeProtoUnit("Nereid");
+			}
+			yRemoveFromDatabase("Nereids");
+			yRemoveUpdateVar("Nereids", "step");
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Nereids", "index")) == 1) {
+			ySetVar("Nereids", "step", 2);
+		} else if (trTimeMS() > yGetVar("Nereids", "specialnext")) {
+			switch(1*yGetVar("Nereids", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("Nereids", "target", trGetUnitScenarioNameNumber(target));
+						ySetVar("Nereids", "step", 1);
+						ySetVar("Nereids", "specialnext", trTimeMS() + 1400);
+						trUnitOverrideAnimation(39,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					trVectorSetUnitPos("start", "Nereids");
+					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Nereids", "target")));
+					pName = opponentDatabaseName(p);
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (zDistanceToVectorSquared(pName, "end") < 9.0) {
+							trVectorSetUnitPos("pos", pName);
+							vectorSetAsTargetVector("target", "start", "pos", 40.0);
+							damageOpponentUnit(p, 200.0);
+							if (trUnitAlive()) {
+								launchUnit(pName, "target");
+							}
+						}
+					}
+					ySetVar("Nereids", "step", 2);
+					ySetVar("Nereids", "specialnext", yGetVar("Nereids", "specialnext") + 1600);
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					ySetVar("Nereids", "step", 0);
+					if (yGetVar("Nereids", "target") == -1) {
+						ySetVar("Nereids", "specialnext", trTimeMS());
+					} else {
+						ySetVar("Nereids", "specialnext", trTimeMS() + 15000);
+					}
+				}
+			}
+		} else {
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Nereids", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Nereids", "index"));
+			if (action > 0 && yGetVar("Nereids", "step") == 1) {
+				ySetVar("Nereids", "step", 0);
+				ySetVar("Nereids", "next", trTimeMS() + 18000);
+			}
+		}
+	}
+	
+	if(yGetDatabaseCount("krakens") >0) {
+		id = yDatabaseNext("krakens", true);
+		p = yGetVar("krakens","player");
+		pName = databaseName(p);
+		if (id == -1 || trUnitAlive() == false) {
+			trUnitChangeProtoUnit("Kraken");
+			yRemoveFromDatabase("krakens");
+			yRemoveUpdateVar("krakens", "step");
+		} else if (checkEnemyDeactivated("krakens")) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			yRemoveFromDatabase("krakens");
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("krakens", "index")) == 1) {
+			ySetVar("krakens", "step", 0);
+		} else if (trTimeMS() > yGetVar("krakens", "specialnext")) {
+			switch(1*yGetVar("krakens", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
+						target = kbUnitGetTargetUnitID(id);
+						trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+						trVectorSetUnitPos("start", "krakens");
+						trVectorQuestVarSet("dir", zGetUnitVector("start", "target"));
+						ySetVar("krakens", "dirx", trQuestVarGet("dirx"));
+						ySetVar("krakens", "dirz", trQuestVarGet("dirz"));
+						ySetVar("krakens", "step", 1);
+						ySetVar("krakens", "specialnext", trTimeMS() + 2100);
+						trUnitOverrideAnimation(1,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					pName = opponentDatabaseName(p);
+					yVarToVector("krakens", "dir");
+					trVectorSetUnitPos("start", "krakens");
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (rayCollision(pName, "start","dir", 6.0, 3.0)) {
+							damageOpponentUnit(p, 300.0);
+							stunUnit(pName, 2.0);
+						}
+					}
+					ySetVar("krakens", "step", 2);
+					ySetVar("krakens", "specialnext", yGetVar("krakens", "specialnext") + 1500);
+				}
+				case 2:
+				{
+					ySetVar("krakens", "step", 0);
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+				}
+			}
+		} else if (yGetVar("krakens", "step") != 0) {
+			trSetUnitOrientation(xsVectorSet(yGetVar("krakens","dirx"),0,yGetVar("krakens","dirz")),vector(0,1,0),true);
+		} else {
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("krakens", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("krakens", "index"));
+			if (action > 0 && yGetVar("krakens", "step") == 1) {
+				ySetVar("krakens", "step", 0);
 			}
 		}
 	}

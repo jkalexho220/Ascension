@@ -43,6 +43,10 @@ void noSpecials() {
 			trModifyProtounit("Scorpion Man", p, 9, 99999);
 			trModifyProtounit("Battle Boar", p, 9, -99990);
 			trModifyProtounit("Battle Boar", p, 9, 99999);
+			trModifyProtounit("Nereid", p, 9, -99990);
+			trModifyProtounit("Nereid", p, 9, 99999);
+			trModifyProtounit("Lampades", p, 9, -99990);
+			trModifyProtounit("Lampades", p, 9, 99999);
 		}
 	}
 }
