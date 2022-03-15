@@ -762,3 +762,103 @@ highFrequency
 		xsEnableRule("choose_stage_01");
 	}
 }
+
+int monsterPetProto(int i = 0) {
+	int proto = kbGetProtoUnitID("Golden Lion");
+	switch(i)
+	{
+		case 1:
+		{
+			proto = kbGetProtoUnitID("Anubite");
+		}
+		case 2:
+		{
+			proto = kbGetProtoUnitID("Sphinx");
+		}
+		case 3:
+		{
+			proto = kbGetProtoUnitID("Petsuchos");
+		}
+		case 4:
+		{
+			proto = kbGetProtoUnitID("Centaur");
+		}
+		case 5:
+		{
+			proto = kbGetProtoUnitID("Dryad");
+		}
+		case 6:
+		{
+			proto = kbGetProtoUnitID("Medusa");
+		}
+		case 7:
+		{
+			proto = kbGetProtoUnitID("Mountain Giant");
+		}
+		case 8:
+		{
+			proto = kbGetProtoUnitID("Fenris Wolf");
+		}
+		case 9:
+		{
+			proto = kbGetProtoUnitID("Valkyrie");
+		}
+		case 10:
+		{
+			proto = kbGetProtoUnitID("Ballista");
+		}
+		case 11:
+		{
+			proto = kbGetProtoUnitID("Frost Giant");
+		}
+		case 12:
+		{
+			proto = kbGetProtoUnitID("Cyclops");
+		}
+		case 13:
+		{
+			proto = kbGetProtoUnitID("Satyr");
+		}
+		case 14:
+		{
+			proto = kbGetProtoUnitID("Behemoth");
+		}
+		case 15:
+		{
+			proto = kbGetProtoUnitID("Avenger");
+		}
+		case 16:
+		{
+			proto = kbGetProtoUnitID("Wadjet");
+		}
+		case 17:
+		{
+			proto = kbGetProtoUnitID("Scorpion Man");
+		}
+		case 18:
+		{
+			proto = kbGetProtoUnitID("Scarab");
+		}
+		case 19:
+		{
+			proto = kbGetProtoUnitID("Mummy");
+		}
+		case 20:
+		{
+			proto = kbGetProtoUnitID("Automaton SPC");
+		}
+		case 21:
+		{
+			proto = kbGetProtoUnitID("Fire Siphon");
+		}
+		case 22:
+		{
+			proto = kbGetProtoUnitID("Battle Boar");
+		}
+		case 23:
+		{
+			proto = kbGetProtoUnitID("Colossus");
+		}
+	}
+	return(proto);
+}

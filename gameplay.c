@@ -447,6 +447,35 @@ void petDogs(int p = 0) {
 			}
 		}
 	}
+	if (trQuestVarGet("p"+p+"godBoon") == BOON_MONSTER_COMPANION) {
+		switch(1*trQuestVarGet("p"+p+"petMonsterStep"))
+		{
+			case 0:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("p"+p+"monsterPet");
+				if (trUnitAlive() == false) {
+					trQuestVarSet("p"+p+"petMonsterNext", trTime() + 30);
+					trQuestVarSet("p"+p+"petMonsterStep", 1);
+					if (trCurrentPlayer() == p) {
+						trCounterAddTime("petMonsters",30,1,"Pet Monster respawn",-1);
+					}
+				}
+			}
+			case 1:
+			{
+				if (trTime() > trQuestVarGet("p"+p+"petMonsterNext")) {
+					trVectorSetUnitPos("pos","p"+p+"unit");
+					trQuestVarSet("p"+p+"monsterPet", trGetNextUnitScenarioNameNumber());
+					spawnPlayerUnit(p, 1*trQuestVarGet("p"+p+"monsterProto"), "pos");
+					if (trCurrentPlayer() == p) {
+						trSoundPlayFN("mythcreate.wav","1",-1,"","");
+					}
+					trQuestVarSet("p"+p+"petMonsterStep", 0);
+				}
+			}
+		}
+	}
 }
 
 rule enable_chat

@@ -92,7 +92,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: Each time you attack, restore health to all allies. Heal = 1 percent of your max health";
+					msg = "Passive: Each time you attack, restore health to all allies. Heal = 3 percent of your max health";
 				}
 				case 2:
 				{

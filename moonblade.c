@@ -42,7 +42,7 @@ void moonbladeAlways(int eventID = -1) {
 						gainFavor(p, 3);
 					}
 				}
-				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.01;
+				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.03;
 				for(x=yGetDatabaseCount("playerUnits"); >0) {
 					yDatabaseNext("playerUnits", true);
 					healUnit(p, angle);

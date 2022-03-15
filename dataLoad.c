@@ -13,10 +13,10 @@ int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
 const int VERSION_NUMBER = 6;
-const int TOTAL_LOAD = 21;
+const int TOTAL_LOAD = 24;
 
 void saveAllData() {
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 0);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
@@ -33,8 +33,19 @@ void saveAllData() {
 	}
 	
 	/* slot 0 */
-	savedata = 1*trQuestVarGet("p"+p+"progress") + 10 * trQuestVarGet("p"+p+"level");
-	savedata = savedata + 100 * trQuestVarGet("p"+p+"godBoon") + 1300 * trQuestVarGet("p"+p+"class");
+	savedata = 0;
+	currentdata = trQuestVarGet("p"+p+"monsterIndex");
+	savedata = savedata * 40 + currentdata;
+	currentdata = trQuestVarGet("p"+p+"relicTransporterLevel");
+	savedata = savedata * 10 + currentdata;
+	currentdata = trQuestVarGet("p"+p+"class");
+	savedata = savedata * 31 + trQuestVarGet("p"+p+"class");
+	currentdata = trQuestVarGet("p"+p+"godBoon");
+	savedata = savedata * 13 + currentdata;
+	currentdata = trQuestVarGet("p"+p+"level");
+	savedata = savedata * 10 + trQuestVarGet("p"+p+"level");
+	currentdata = trQuestVarGet("p"+p+"progress");
+	savedata = savedata * 10 + trQuestVarGet("p"+p+"progress");
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
 	savedata = trQuestVarGet("p"+p+"gold") - trQuestVarGet("p"+p+"startingGold");
@@ -147,29 +158,17 @@ inactive
 	int proto = 0;
 	/* only the local client needs this info */
 	/* owned relics */
-	if (trGetScenarioUserData(VERSION_NUMBER) == 0) {
-		for(y=0; < 4) {
-			savedata = trGetScenarioUserData(12 + y);
-			if (savedata < 0) {
-				savedata = 0;
-			}
-			for(x=1; < 9) {
-				trQuestVarSet("ownedRelics"+(x+8*y), iModulo(11, savedata));
-				savedata = savedata / 11;
-			}
+	for(y=0; < 4) {
+		savedata = trGetScenarioUserData(12 + y);
+		if (savedata < 0) {
+			savedata = 0;
 		}
-	} else {
-		for(y=0; < 4) {
-			savedata = trGetScenarioUserData(12 + y);
-			if (savedata < 0) {
-				savedata = 0;
-			}
-			for(x=1; < 9) {
-				trQuestVarSet("ownedRelics"+(x+8*y), iModulo(13, savedata));
-				savedata = savedata / 13;
-			}
+		for(x=1; < 9) {
+			trQuestVarSet("ownedRelics"+(x+8*y), iModulo(13, savedata));
+			savedata = savedata / 13;
 		}
 	}
+	
 	
 	/* gemstones */
 	savedata = trGetScenarioUserData(9);
@@ -248,7 +247,13 @@ inactive
 		savedata = savedata / 10;
 		trQuestVarSet("p1godBoon", iModulo(13, savedata));
 		savedata = savedata / 13;
-		trQuestVarSet("p1class", iModulo(100, savedata));
+		trQuestVarSet("p1class", iModulo(31, savedata));
+		savedata = savedata / 31;
+		trQuestVarSet("p1relicTransporterLevel", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1monsterIndex", iModulo(40, savedata));
+		savedata = savedata / 40;
+		trQuestVarSet("p1monsterProto", monsterPetProto(1*trQuestVarGet("p1monsterIndex")));
 		
 		/* gold */
 		savedata = trGetScenarioUserData(1);
@@ -394,25 +399,32 @@ inactive
 					} else if (loadProgress == 3) {
 						trQuestVarSet("p"+p+"class", x);
 					} else if (loadProgress == 4) {
-						trQuestVarSet("p"+p+"gold", x);
+						trQuestVarSet("p"+p+"relicTransporterLevel", x);
 					} else if (loadProgress == 5) {
+						trQuestVarSet("p"+p+"monsterIndex", x * 4);
+					} else if (loadProgress == 6) {
+						trQuestVarSet("p"+p+"monsterIndex", trQuestVarGet("p"+p+"monsterIndex") + x);
+						trQuestVarSet("p"+p+"monsterProto", monsterPetProto(1*trQuestVarGet("p"+p+"monsterIndex")));
+					} else if (loadProgress == 7) {
+						trQuestVarSet("p"+p+"gold", x);
+					} else if (loadProgress == 8) {
 						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
-					} else if (loadProgress < 18) {
+					} else if (loadProgress < 21) {
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 5), x);
-					} else if (loadProgress == 18) {
+					} else if (loadProgress == 21) {
 						currentdata = x;
 						trQuestVarSet("p"+p+"nickQuestProgress", iModulo(7, currentdata));
 						currentdata = currentdata / 7;
 						trQuestVarSet("p"+p+"nickEquipped", iModulo(2, currentdata));
 						currentdata = currentdata / 2;
 						trQuestVarSet("p"+p+"yeebHit", iModulo(2, currentdata));
-					} else if (loadProgress == 19) {
+					} else if (loadProgress == 22) {
 						currentdata = x;
 						for(i=5; >0) {
 							trQuestVarSet("p"+p+"runestone"+i, iModulo(2, currentdata));
 							currentdata = currentdata / 2;
 						}
-					} else if (loadProgress == 20) {
+					} else if (loadProgress == 23) {
 						currentdata = x;
 						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(11, currentdata));
 						currentdata = currentdata / 11;
@@ -434,7 +446,7 @@ inactive
 			xsEnableRule("data_load_01_load_data");
 			switch(loadProgress)
 			{
-				case 4:
+				case 7: // gold
 				{
 					savedata = trGetScenarioUserData(1);
 					if (savedata < 0) {
@@ -443,21 +455,21 @@ inactive
 						savedata = 1000;
 					}
 				}
-				case 6:
+				case 9: // relics part 1
 				{
 					savedata = trGetScenarioUserData(2);
 					if (savedata < 0) {
 						savedata = 0;
 					}
 				}
-				case 12:
+				case 15: // relics part 2
 				{
 					savedata = trGetScenarioUserData(3);
 					if (savedata < 0) {
 						savedata = 0;
 					}
 				}
-				case 18:
+				case 21: // quest data
 				{
 					savedata = trGetScenarioUserData(4);
 					if (savedata < 0) {
@@ -465,30 +477,32 @@ inactive
 					}
 				}
 			}
-			if (loadProgress == 18) {
-				currentdata = iModulo(28, savedata);
-				savedata = savedata / 28;
-			} else if (loadProgress >= 6 && trGetScenarioUserData(VERSION_NUMBER) > 0) {
-				currentdata = iModulo(31, savedata);
-				savedata = savedata / 31;
-			} else if (loadProgress >=3) {
-				if ((trGetScenarioUserData(VERSION_NUMBER) == 0) && (loadProgress == 3)) {
-					currentdata = savedata;
-				} else {
-					currentdata = iModulo(32, savedata);
-					savedata = savedata / 32;
-				}
-			} else if (loadProgress == 2) {
-				if (trGetScenarioUserData(VERSION_NUMBER) > 0) {
-					currentdata = iModulo(13, savedata);
-					savedata = savedata / 13;
-				} else {
-					currentdata = 0;
-					savedata = savedata / 10;
-				}
-			} else {
+			if (loadProgress < 2) { // progress and level
 				currentdata = iModulo(10, savedata);
 				savedata = savedata / 10;
+			} else if (loadProgress == 21) {
+				currentdata = iModulo(28, savedata);
+				savedata = savedata / 28;
+			} else if (loadProgress >= 9 && loadProgress <= 20) { // relics
+				currentdata = iModulo(31, savedata);
+				savedata = savedata / 31;
+			} else if (loadProgress == 6) { // monster pet proto
+				currentdata = iModulo(4, savedata);
+				savedata = savedata / 40;
+			} else if (loadProgress == 5) { // monster pet stage
+				currentdata = iModulo(40, savedata) / 4;
+			} else if (loadProgress == 4) { // relic transporter level
+				currentdata = iModulo(10, savedata);
+				savedata = savedata / 10;
+			} else if (loadProgress == 3) { // class
+				currentdata = iModulo(31, savedata);
+				savedata = savedata / 31;
+			} else if (loadProgress == 2) { // godBoon
+				currentdata = iModulo(13, savedata);
+				savedata = savedata / 13;
+			} else {
+				currentdata = iModulo(32, savedata);
+				savedata = savedata / 32;
 			}
 		}
 	}

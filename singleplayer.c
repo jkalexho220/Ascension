@@ -30,6 +30,8 @@ void spChooseBoon(int eventID = -1) {
 		}
 	} else if (trQuestVarGet("p1godBoon") == BOON_DOUBLE_FAVOR) {
 		trSetCivAndCulture(1, 0, 0);
+	} else if (trQuestVarGet("p1godboon") == BOON_MONSTER_COMPANION) {
+		uiMessageBox("Select a monster in the Monsterpedia to be your pet.");
 	}
 }
 
@@ -230,6 +232,11 @@ void monsterpedia(int stage = 0, int x = 0) {
 		trUnitConvert(0);
 		trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
 		yAddToDatabase("monsterpedia", "next");
+		if (i < 5) {
+			yAddUpdateVar("monsterpedia", "index", 4 * (stage - 1) + i - 1);
+		} else {
+			yAddUpdateVar("monsterpedia", "index", -1);
+		}
 	}
 	trUnitSelectClear();
 	trUnitSelectByQV("next");
@@ -488,6 +495,23 @@ highFrequency
 				monsterpedia(x+1, 57 + 3 * x);
 			}
 			trPaintTerrain(71,71,73,87,0,53,false);
+			trQuestVarSet("monsterpediaSpotlight", -1);
+			if (trQuestVarGet("p1godBoon") == BOON_MONSTER_COMPANION) {
+				trQuestVarSet("monsterpediaSpotlight", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+				for(x=yGetDatabaseCount("monsterpedia"); >0) {
+					yDatabaseNext("monsterpedia");
+					if (yGetVar("monsterpedia", "index") == trQuestVarGet("p1monsterIndex")) {
+						trVectorSetUnitPos("pos", "monsterpedia");
+						trUnitSelectClear();
+						trUnitSelectByQV("monsterpediaSpotlight");
+						trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+						break;
+					}
+				}
+			}
 			xsEnableRule("monsterpedia_always");
 		}
 		
@@ -1105,6 +1129,22 @@ highFrequency
 		trChatSend(0, trStringQuestVarGet("description1"));
 		for(x=2; <= trQuestVarGet("descriptionCount")) {
 			trChatSend(0, trStringQuestVarGet("description"+x));
+		}
+		if (trQuestVarGet("p1godBoon") == BOON_MONSTER_COMPANION) {
+			if (yGetVar("monsterpedia","index") > 0) {
+				trQuestVarSet("p1monsterIndex", yGetVar("monsterpedia","index"));
+				trQuestVarSet("p1monsterProto", kbGetUnitBaseTypeID(id));
+				trVectorSetUnitPos("pos", "monsterpedia");
+				trUnitSelectClear();
+				trUnitSelectByQV("monsterpediaSpotlight");
+				if (trUnitAlive() == false) {
+					trQuestVarSet("monsterpediaSpotlight", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+				}
+				trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+			}
 		}
 	}
 }

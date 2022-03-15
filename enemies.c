@@ -165,17 +165,20 @@ highFrequency
 	}
 	
 	/* ballista projectiles */
-	trModifyProtounit("Ballista", ENEMY_PLAYER, 13, -3);
-	trModifyProtounit("Ballista", ENEMY_PLAYER, 11, -12);
+	for(p=ENEMY_PLAYER; >0) {
+		trModifyProtounit("Ballista", p, 13, -3);
+		trModifyProtounit("Ballista", p, 11, -12);
+		trModifyProtounit("Behemoth", p, 24, 1);
+		trModifyProtounit("Behemoth", p, 25, 1);
+		trModifyProtounit("Behemoth", p, 26, 1);
+		trModifyProtounit("Scarab", p, 24, 1);
+		trModifyProtounit("Scarab", p, 25, 1);
+		trModifyProtounit("Scarab", p, 26, 1);
+	}
 	trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
 	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
 	trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
-	trModifyProtounit("Behemoth", ENEMY_PLAYER, 24, 1);
-	trModifyProtounit("Behemoth", ENEMY_PLAYER, 25, 1);
-	trModifyProtounit("Behemoth", ENEMY_PLAYER, 26, 1);
-	trModifyProtounit("Scarab", ENEMY_PLAYER, 24, 1);
-	trModifyProtounit("Scarab", ENEMY_PLAYER, 25, 1);
-	trModifyProtounit("Scarab", ENEMY_PLAYER, 26, 1);
+	
 	
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
