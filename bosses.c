@@ -12,8 +12,11 @@ void processBossCooldown(int ultimate = 31) {
 	trQuestVarSet("bossCooldownLastCheck", trTimeMS());
 	if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 		trQuestVarSet("bossSpell", 0);
-		trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
-	} else if (trUnitPercentDamaged() > 70 && trQuestVarGet("bossUltimate") < 0) {// boss hasn't used ultimate yet
+		if (trQuestVarGet("bossUltimate") > 0) {
+			trQuestVarSet("bossUsedUltimate", 1);
+			trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+		}
+	} else if (trUnitPercentDamaged() > 70 && trQuestVarGet("bossUsedUltimate") == 0) {// boss hasn't used ultimate yet
 		trQuestVarSet("bossSpell", ultimate);
 	} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
 		trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
@@ -777,19 +780,17 @@ highFrequency
 				trUnitSelectByQV("bossUnit", true);
 				trUnitConvert(ENEMY_PLAYER);
 				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
-				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Cinematic Block"), "auroraSFX");
-				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Cinematic Block"), "iceAgeSFX");
-				xsEnableRule("boss3_battle");
-				trQuestVarSet("bossGem", MANASTONE);
-				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				xsEnableRule("boss7_battle");
+				trQuestVarSet("bossGem", SOULSTONE);
+				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
 				xsEnableRule("boss_music");
 				
 				bossCooldown(10, 15);
 				
-				trModifyProtounit("King Folstag", ENEMY_PLAYER, 27, 20);
+				trModifyProtounit("Scylla", ENEMY_PLAYER, 27, 50);
 				
 				trStringQuestVarSet("advice",
-					"If anything is stunned near an icicle, it will grow. Big icicles will turn into Frost Giants!");
+					"Watch out when she tries to eat you. She will spawn allies if she eats someone!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
