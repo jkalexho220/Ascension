@@ -1015,6 +1015,7 @@ highFrequency
 	/* GAME OVER */
 	if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount") && Multiplayer &&
 		trQuestVarGet("activePlayerCount") > 0) {
+		trQuestVarSet("play", 0);
 		xsDisableSelf();
 		xsDisableRule("boss"+1*trQuestVarGet("stage")+"_battle");
 		trSoundPlayFN("lose.wav","1",-1,"","");
@@ -1104,6 +1105,40 @@ highFrequency
 				}
 				trQuestVarSet("gameOverStep", 4);
 				trQuestVarSet("gameOverNext", trTime() + 5);
+			}
+		}
+	}
+}
+
+rule deep_village_always
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("deepDeployNext")) {
+		if (trQuestVarGet("play") == 0) {
+			xsDisableSelf();
+		} else if (yGetDatabaseCount("playerUnits") > 0) {
+			int x = 0;
+			int z = 0;
+			trQuestVarSet("deepDeployNext", trTime() + 30);
+			trVectorQuestVarSet("dir",vector(-13,0,-13));
+			int heading = 45;
+			for(i=4; >0) {
+				yDatabaseNext("playerUnits");
+				trVectorSetUnitPos("dest", "playerUnits");
+				x = trQuestVarGet("deepDeployCenterX") + trQuestVarGet("dirX");
+				z = trQuestVarGet("deepDeployCenterZ") + trQuestVarGet("dirZ");
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x,0,z,heading,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trUnitChangeProtoUnit("Nereid");
+				trUnitSelectClear();
+				trUnitSelectByQV("next");
+				trUnitMoveToPoint(trQuestVarGet("destx"),0,trQuestVarGet("destz"),-1,true);
+				activateEnemy("next");
+				
+				trVectorQuestVarSet("dir", rotationMatrix("dir", 0, -1));
+				heading = heading + 90;
 			}
 		}
 	}

@@ -108,7 +108,7 @@ highFrequency
 	setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
 	setupProtounitBounty("Helepolis", 0.25, 0, 0);
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
-	setupProtounitBounty("Theris", 0.5, 0, 0);
+	setupProtounitBounty("Guardian", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);
@@ -128,25 +128,25 @@ highFrequency
 	setupProtounitBounty("Ballista", 0.1, 4, 0.03);
 	setupProtounitBounty("Frost Giant", 0.3, 10, 0.1);
 	
-	setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
-	setupProtounitBounty("Colossus", 0.2, 10, 0.1);
-	setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
-	setupProtounitBounty("Fire Siphon", 0.1, 8, 0.1);
+	setupProtounitBounty("Wadjet", 0.2, 4, 0.03);
+	setupProtounitBounty("Scorpion Man", 0.3, 6, 0.05);
+	setupProtounitBounty("Scarab", 0.9, 10, 0.08);
+	setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 	
 	setupProtounitBounty("Cyclops", 0.2, 6, 0.05);
 	setupProtounitBounty("Satyr", 0.1, 4, 0.03);
-	setupProtounitBounty("Behemoth", 1, 10, 0.08);
+	setupProtounitBounty("Behemoth", 0.9, 10, 0.08);
 	setupProtounitBounty("Avenger", 0.2, 12, 0.1);
-	
-	setupProtounitBounty("Wadjet", 0.2, 4, 0.03);
-	setupProtounitBounty("Scorpion Man", 0.3, 6, 0.05);
-	setupProtounitBounty("Scarab", 1, 10, 0.08);
-	setupProtounitBounty("Mummy", 0.6, 12, 0.1);
 	
 	setupProtounitBounty("Servant", 0.5, 5, 0.03);
 	setupProtounitBounty("Nereid", 0.5, 7, 0.05);
 	setupProtounitBounty("Kraken", 0.5, 9, 0.08);
 	setupProtounitBounty("Hydra", 0.5, 10, 0.1);
+	
+	setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
+	setupProtounitBounty("Colossus", 0.2, 10, 0.1);
+	setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
+	setupProtounitBounty("Fire Siphon", 0.1, 8, 0.1);
 	
 	setupProtounitBounty("Lampades", 0.7, 12, 0.1);
 	
@@ -168,12 +168,6 @@ highFrequency
 	for(p=ENEMY_PLAYER; >0) {
 		trModifyProtounit("Ballista", p, 13, -3);
 		trModifyProtounit("Ballista", p, 11, -12);
-		trModifyProtounit("Behemoth", p, 24, 1);
-		trModifyProtounit("Behemoth", p, 25, 1);
-		trModifyProtounit("Behemoth", p, 26, 1);
-		trModifyProtounit("Scarab", p, 24, 1);
-		trModifyProtounit("Scarab", p, 25, 1);
-		trModifyProtounit("Scarab", p, 26, 1);
 	}
 	trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
 	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);

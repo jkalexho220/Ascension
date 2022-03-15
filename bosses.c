@@ -7,12 +7,14 @@ void bossCooldown(int minVal = 0, int maxVal = 0) {
 	trQuestVarSet("bossOriginalCooldownTime", trQuestVarGet("bossCooldownTime"));
 }
 
-void processBossCooldown() {
+void processBossCooldown(int ultimate = 31) {
 	float diff = trTimeMS() - trQuestVarGet("bossCooldownLastCheck");
 	trQuestVarSet("bossCooldownLastCheck", trTimeMS());
 	if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 		trQuestVarSet("bossSpell", 0);
 		trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
+	} else if (trUnitPercentDamaged() > 70 && trQuestVarGet("bossUltimate") < 0) {// boss hasn't used ultimate yet
+		trQuestVarSet("bossSpell", ultimate);
 	} else if (trUnitPercentDamaged() > trQuestVarGet("bossDamaged")) {
 		trQuestVarSet("bossDamaged", trQuestVarGet("bossDamaged") + 3);
 		trQuestVarSet("bossCooldownTime", trQuestVarGet("bossCooldownTime") - 1000);
@@ -746,6 +748,48 @@ highFrequency
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 55, 4);
 				
 				trStringQuestVarSet("advice", "Try bringing poison resistance!");
+			}
+		}
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+	}
+}
+
+
+rule boss7_init
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 0:
+			{
+				trOverlayText("Mother of the Depths", 3.0, -1, -1, -1);
+				trQuestVarSet("cinTime", trTime() + 2);
+				xsDisableRule("deep_village_always");
+			}
+			case 1:
+			{
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsDisableSelf();
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit", true);
+				trUnitConvert(ENEMY_PLAYER);
+				trSetSelectedScale(trQuestVarGet("bossScale"), trQuestVarGet("bossScale"), trQuestVarGet("bossScale"));
+				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Cinematic Block"), "auroraSFX");
+				spyEffect(1*trQuestVarGet("bossUnit"), kbGetProtoUnitID("Cinematic Block"), "iceAgeSFX");
+				xsEnableRule("boss3_battle");
+				trQuestVarSet("bossGem", MANASTONE);
+				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				xsEnableRule("boss_music");
+				
+				bossCooldown(10, 15);
+				
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 27, 20);
+				
+				trStringQuestVarSet("advice",
+					"If anything is stunned near an icicle, it will grow. Big icicles will turn into Frost Giants!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -2893,7 +2937,7 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-			processBossCooldown();
+			processBossCooldown(21);
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");

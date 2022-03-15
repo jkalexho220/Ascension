@@ -42,6 +42,7 @@ void fireknightAlways(int eventID = -1) {
 		if (zDistanceBetweenVectorsSquared("pos", "dest") < 4 || trTimeMS() > yGetVar("p"+p+"fireCharges", "timeout")) {
 			if (ySetPointer("p"+p+"characters", 1*yGetVar("p"+p+"fireCharges", "index"))) {
 				ySetVar("p"+p+"characters", "charging", 0);
+				ySetVar("p"+p+"characters", "launched", 0);
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"characters");
 				trUnitChangeProtoUnit("Lancer Hero");

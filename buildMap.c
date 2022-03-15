@@ -572,6 +572,59 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				xsEnableRule("yeeb_hit_list");
 			}
 		}
+		case ROOM_VILLAGE + 7:
+		{
+			trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, worldHeight, false);
+			paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+			trQuestVarSet("villageX", 70 * x + 20);
+			trQuestVarSet("villageZ", 70 * z + 20);
+			trUnitSelectClear();
+			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 21, 21, 180), true);
+			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
+			
+			deployTownEyecandy("Atlantis Wall Connector", 3, 3);
+			deployTownEyecandy("Atlantis Wall Connector", 3, 15);
+			deployTownEyecandy("Atlantis Wall Connector", 15, 3);
+			deployTownEyecandy("Atlantis Wall Long", 9, 3);
+			deployTownEyecandy("Atlantis Wall Long", 3, 9, 90);
+			
+			deployTownEyecandy("Atlantis Wall Connector", 39, 39);
+			deployTownEyecandy("Atlantis Wall Connector", 39, 27);
+			deployTownEyecandy("Atlantis Wall Connector", 27, 39);
+			deployTownEyecandy("Atlantis Wall Long", 33, 39);
+			deployTownEyecandy("Atlantis Wall Long", 39, 33, 90);
+			
+			deployTownEyecandy("Atlantis Wall Connector", 39, 3);
+			deployTownEyecandy("Atlantis Wall Connector", 27, 3);
+			deployTownEyecandy("Atlantis Wall Connector", 39, 15);
+			deployTownEyecandy("Atlantis Wall Long", 33, 3);
+			deployTownEyecandy("Atlantis Wall Long", 39, 9, 90);
+			
+			deployTownEyecandy("Atlantis Wall Connector", 3, 39);
+			deployTownEyecandy("Atlantis Wall Connector", 3, 27);
+			deployTownEyecandy("Atlantis Wall Connector", 15, 39);
+			deployTownEyecandy("Atlantis Wall Long", 3, 33, 90);
+			deployTownEyecandy("Atlantis Wall Long", 9, 39);
+			
+			trQuestVarSet("deepDeployCenterX", 70 * x + 40);
+			trQuestVarSet("deepDeployCenterZ", 70 * z + 40);
+			
+			trPaintTerrain(x * 35 + 11, z * 35 + 11, x * 35 + 17, z * 35 + 11, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trPaintTerrain(x * 35 + 11, z * 35 + 11, x * 35 + 11, z * 35 + 17, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			
+			trPaintTerrain(x * 35 + 29, z * 35 + 29, x * 35 + 23, z * 35 + 29, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trPaintTerrain(x * 35 + 29, z * 35 + 29, x * 35 + 29, z * 35 + 23, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			
+			trPaintTerrain(x * 35 + 29, z * 35 + 11, x * 35 + 23, z * 35 + 11, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trPaintTerrain(x * 35 + 29, z * 35 + 11, x * 35 + 29, z * 35 + 17, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			
+			trPaintTerrain(x * 35 + 11, z * 35 + 29, x * 35 + 11, z * 35 + 23, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			trPaintTerrain(x * 35 + 11, z * 35 + 29, x * 35 + 17, z * 35 + 29, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			
+			xsEnableRule("deep_village_always");
+			trQuestVarSet("deepDeployNext", trTime() + 30);
+		}
 		case ROOM_VILLAGE + 11:
 		{
 			// another runestone
@@ -1385,7 +1438,8 @@ highFrequency
 			case 7:
 			{
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
-				wallHeight = worldHeight + 6;
+				trSetLighting("fimbulwinter", 0.01);
+				wallHeight = worldHeight + 3;
 				trSetCivAndCulture(0, 11, 3);
 				trQuestVarSet("bossRoomSize", 15);
 				TERRAIN_WALL = 2;
@@ -1395,7 +1449,7 @@ highFrequency
 				TERRAIN_SUB_PRIMARY = 8;
 				
 				TERRAIN_SECONDARY = 3;
-				TERRAIN_SUB_SECONDARY = 0;
+				TERRAIN_SUB_SECONDARY = 9;
 				
 				trQuestVarSet("mapType", MAP_OPEN);
 				trQuestVarSet("treeDensity", 0.3);
@@ -1425,7 +1479,7 @@ highFrequency
 				trStringQuestVarSet("enemyProto6", "Hydra");
 				
 				trStringQuestVarSet("bossProto", "Scylla");
-				trQuestVarSet("bossScale", 1.5);
+				trQuestVarSet("bossScale", 1.3);
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1447,7 +1501,6 @@ highFrequency
 			case 11:
 			{
 				trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
-				trQuestVarSet("village", 15);
 				trStringQuestVarSet("advice", "And then there were none...");
 				xsEnableRule("laser_rooms_always");
 				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
@@ -1697,7 +1750,6 @@ highFrequency
 		
 		if (trQuestVarGet("stage") > 10) {
 			trQuestVarSet("relicTransporterGuy", -1);
-			trQuestVarSet("village", -1);
 			trQuestVarSet("bossEntranceRoom", -1);
 			chests = 0;
 			nottudSpawn = false;

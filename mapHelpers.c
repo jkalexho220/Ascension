@@ -31,13 +31,13 @@ const int ROOM_SQUARE = 1;
 const int TRAP_LASERS = 1;
 const int TRAP_CAROUSEL = 2;
 
-void deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
+int deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
 	int n = trGetNextUnitScenarioNameNumber();
-	trArmyDispatch("1,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
+	trArmyDispatch("0,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
 	trUnitSelectClear();
 	trUnitSelect(""+n, true);
-	trUnitConvert(0);
 	trUnitChangeProtoUnit(proto);
+	return(n);
 }
 
 

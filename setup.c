@@ -451,6 +451,9 @@ runImmediately
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
 	trQuestVarSet("p0stunResistance", 1);
 	trQuestVarSet("p0poisonResistance", 1);
+	
+	trModifyProtounit("Dwarf", 0, 55, 4);
+	trModifyProtounit("Dwarf", 0, 2, -99);
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
 		trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");
