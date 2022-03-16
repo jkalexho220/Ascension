@@ -804,6 +804,8 @@ highFrequency
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 27, 50);
 				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossIndex"));
+
+				spyEffect(1*trQuestVarGet("bossUnit"),kbGetProtoUnitID("Kronny Birth"), "bossWhirlpoolSFX");
 				
 				trQuestVarSet("secondPhase", 1);
 				
@@ -4173,6 +4175,99 @@ highFrequency
 				trSoundPlayFN("godpower.wav","1",-1,"","");
 				trSetLighting("night", 1.0);
 				trOverlayText("Drowning Whirlpool",3.0,-1,-1,-1);
+				trQuestVarSet("bossSpell", 32);
+				trQuestVarSet("bossNext", trTimeMS());
+				trQuestVarSet("bossTimeout", trTimeMS() + 3000);
+				trQuestVarSet("bossAngle", 0);
+				trQuestVarSet("bossAngularVelocity", 0.1);
+				if (kbGetBlockID(""+1*trQuestVarGet("bossWhirlpoolSFX")) == -1) {
+					spyEffect(1*trQuestVarGet("bossUnit"),kbGetProtoUnitID("Kronny Birth"), "bossWhirlpoolSFX");
+				} else {
+					trUnitSelectClear();
+					trUnitSelectByQV("bossWhirlpoolSFX");
+					trMutateSelected(kbGetProtoUnitID("Kronny Birth"));
+				}
+				trVectorSetUnitPos("bossPos", "bossUnit");
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit");
+				trMutateSelected(kbGetProtoUnitID("Scylla"));
+			} else if ((trQuestVarGet("bossSpell") >= 32) && (trQuestVarGet("bossSpell") <= 33)) {
+				trMutateSelected(kbGetProtoUnitID("Scylla"));
+				amt = trTimeMS() - trQuestVarGet("bossNext");
+				if (trQuestVarGet("bossSpell") == 32) {
+					trQuestVarSet("bossAngularVelocity", trQuestVarGet("bossAngularVelocity") + 0.005 * amt);
+				} else {
+					trQuestVarSet("bossScale", trQuestVarGet("bossScale") - amt * 0.001);
+					trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+				}
+				trQuestVarSet("bossAngle", 
+					fModulo(6.283185, trQuestVarGet("bossAngle") + 0.001 * amt * trQuestVarGet("bossAngularVelocity")));
+				trVectorSetFromAngle("dir", trQuestVarGet("bossAngle"));
+				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				if (trTimeMS() > trQuestVarGet("bossTimeout")) {
+					if (trQuestVarGet("bossSpell") == 32) {
+						trQuestVarSet("bossSpell", 33);
+						trQuestVarSet("bossTimeout", trQuestVarGet("bossTimeout") + 1300);
+					} else {
+						trQuestVarSet("bossSpell", 34);
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+						ySetPointer("enemies", 1*trQuestVarGet("bossPointer"));
+						if (yGetVar("enemies", "stunStatus") > 0) {
+							ySetPointer("stunnedUnits", 1*yGetVar("enemies", "stunStatus"));
+							yRemoveFromDatabase("stunnedUnits");
+						}
+						yRemoveFromDatabase("enemies");
+						trQuestVarSet("bossTimeout", trTimeMS() + 15000);
+						trQuestVarSet("bossNext", trTimeMS());
+						trVectorQuestVarSet("bossDir", vector(1,0,0));
+					}
+				}
+			} else if (trQuestVarGet("bossSpell") == 34) {
+				for(i=xsMin(5, yGetDatabaseCount("bossBalls")); >0) {
+					action = processGenericProj("bossBalls");
+					if (action == PROJ_FALLING) {
+						hit = false;
+						trVectorSetUnitPos("pos", "bossBalls");
+						yVarToVector("bossBalls", "prev");
+						yVarToVector("bossBalls", "dir");
+						dist = zDistanceBetweenVectors("pos", "prev");
+						for(j=yGetDatabaseCount("playerUnits"); >0) {
+							if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
+								removePlayerUnit();
+							} else if (rayCollision("playerUnits","prev","dir",dist,4.0)) {
+								damagePlayerUnit(200);
+								hit = true;
+							}
+						}
+						if (hit) {
+							trQuestVarSetFromRand("sound", 1, 3, true);
+							trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+							yRemoveFromDatabase("bossBalls");
+						} else if (zDistanceToVectorSquared("bossBalls", "bossPos") < 4.0) {
+							yRemoveFromDatabase("bossBalls");
+						} else {
+							amt = (trTimeMS() - yGetVar("bossBalls", "last")) * 0.001;
+							ySetVar("bossBalls", "last", trTimeMS());
+							ySetVarFromVector("bossBalls","prev","pos");
+							trVectorQuestVarSet("newDir", zGetUnitVector("pos","bossPos"));
+							trQuestVarSet("newDirX", trQuestVarGet("newDirX") * amt + trQuestVarGet("dirX"));
+							trQuestVarSet("newDirZ", trQuestVarGet("newDirZ") * amt + trQuestVarGet("dirZ"));
+							trVectorQuestVarSet("newDir", xsVectorNormalize(trVectorQuestVarGet("newDir")));
+							ySetVarFromVector("bossBalls","dir","newDir");
+						}
+					}
+				}
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trVectorQuestVarSet("bossDir", rotationMatrix("bossDir", -0.757323, 0.653041));
+					trVectorQuestVarSet("dir", rotationMatrix("bossDir", 0, 1.0));
+					trQuestVarSet("startx", trQuestVarGet("bossRoomCenterx")+2.0*trQuestVarGet("bossRoomSize")*trQuestVarGet("bossDirx"));
+					trQuestVarSet("startz", trQuestVarGet("bossRoomCenterz")+2.0*trQuestVarGet("bossRoomSize")*trQuestVarGet("bossDirz"));
+					addGenericProj("bossBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,6.0,4.5);
+					yAddUpdateVar("bossBalls", "prevx", trQuestVarGet("startx"));
+					yAddUpdateVar("bossBalls", "prevz", trQuestVarGet("startz"));
+					yAddUpdateVar("bossBalls", "last", trTimeMS());
+					trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 100);
+				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
