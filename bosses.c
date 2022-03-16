@@ -277,11 +277,12 @@ highFrequency
 		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 		
 		trQuestVarSet("bossUnit", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0",trStringQuestVarGet("bossProto"),1,
+		trArmyDispatch("0,0","Dwarf",1,
 			trQuestVarGet("bossRoomCenterX"),0,trQuestVarGet("bossRoomCenterZ"),225,true);
-		trUnitSelectClear();
-		trUnitSelectByQV("bossUnit", true);
-		trUnitConvert(0);
+		trArmySelect("0,0");
+		trUnitChangeProtoUnit(trStringQuestVarGet("bossProto"));
+		
+		trQuestVarSet("bossID", kbGetBlockID(""+1*trQuestVarGet("bossUnit")));
 		
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
@@ -788,6 +789,9 @@ highFrequency
 				bossCooldown(10, 15);
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 27, 50);
+				ySetVarAtIndex("enemies", "launched", 1, 1*trQuestVarGet("bossIndex"));
+				
+				trQuestVarSet("secondPhase", 1);
 				
 				trStringQuestVarSet("advice",
 					"Watch out when she tries to eat you. She will spawn allies if she eats someone!");
@@ -4119,6 +4123,240 @@ highFrequency
 		trUnitSelectByQV("yeebaagooon");
 		trUnitChangeProtoUnit("Cinematic Block");
 	}
+}
+
+
+rule boss7_battle
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("bossUnit");
+	int old = xsGetContextPlayer();
+	int p = 0;
+	int x = 0;
+	int z = 0;
+	int action = 0;
+	int id = 0;
+	float amt = 0;
+	float angle = 0;
+	float sVal = 0;
+	float cVal = 0;
+	bool hit = false;
+	if (trUnitAlive() == true) {
+		
+		
+		trUnitSelectClear();
+		trUnitSelectByQV("bossUnit");
+		
+		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
+			processBossCooldown();
+		} else if (trQuestVarGet("bossSpell") > 30) {
+			
+		} else if (trQuestVarGet("bossSpell") > 20) {
+			
+		} else if (trQuestVarGet("bossSpell") > 10) {
+			
+		} else if (trQuestVarGet("bossSpell") > 0) {
+			if (trQuestVarGet("bossSpell") == 1) {
+				xsSetContextPlayer(ENEMY_PLAYER);
+				id = kbUnitGetTargetUnitID(1*trQuestVarGet("bossID"));
+				if (id >= 0) {
+					trQuestVarSetFromRand("rand", 1, 5, true);
+					if (trQuestVarGet("rand") == 1) {
+						trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: Begone!");
+					} else if (trQuestVarGet("rand") == 2) {
+						trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: Impact!");
+					} else if (trQuestVarGet("rand") == 3) {
+						trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: Perish!");
+					}
+					trSoundPlayFN("shipmove2.wav","1",-1,"","");
+					trMutateSelected(kbGetProtoUnitID("Scylla"));
+					trUnitSetStance("Passive");
+					trVectorSetUnitPos("bossPos", "bossUnit");
+					vectorSnapToGrid("bossPos");
+					trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(id)));
+					trVectorQuestVarSet("bossDir", zGetUnitVector("target", "bossPos"));
+					trVectorQuestVarSet("bossSplashDir", trVectorQuestVarGet("bossDir"));
+					trQuestVarSet("bossStartDirx", 0.0 - trQuestVarGet("bossDirx"));
+					trQuestVarSet("bossStartDirz", 0.0 - trQuestVarGet("bossDirz"));
+					trQuestVarSet("bossAngle", angleBetweenVectors("target", "bossPos"));
+					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
+					trVectorQuestVarSet("dir", vector(0,0,-12));
+					trQuestVarSet("heading", 360);
+					for(i=8; >0) {
+						x = trQuestVarGet("bossPosx") + trQuestVarGet("dirx");
+						z = trQuestVarGet("bossPosz") + trQuestVarGet("dirz");
+						trArmyDispatch("0,0","Dwarf",1,x,0,z,trQuestVarGet("heading"),true);
+						trArmySelect("0,0");
+						trUnitChangeProtoUnit("UI Range Indicator Greek SFX");
+						trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
+						trQuestVarSet("heading", trQuestVarGet("heading") - 45);
+					}
+					trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
+					
+					trQuestVarSet("bossSpell", 2);
+					trQuestVarSet("bossNext", trTimeMS() + 1000);
+					action = 1500;
+					if (trQuestVarGet("secondPhase") == 1) {
+						action = 500;
+					}
+					trQuestVarSet("bossTimeout", trQuestVarGet("bossNext") + action);
+					trQuestVarSet("bossAngularVelocity", 6.283185 / action);
+				}
+			} else if (trQuestVarGet("bossSpell") == 2) {
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					for(i=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
+						trUnitSelectClear();
+						trUnitSelect(""+i, true);
+						trUnitDestroy();
+					}
+					trQuestVarSet("bossLast", trQuestVarGet("bossNext"));
+					trQuestVarSet("bossSpell", 3);
+					trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("bossPosX"),0,trQuestVarGet("bossPosZ"),0,true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Tremor");
+					trSoundPlayFN("shockwave.wav","1",-1,"","");
+				}
+			} else if (trQuestVarGet("bossSpell") == 3) {
+				amt = trTimeMS() - trQuestVarGet("bossLast");
+				trQuestVarSet("bossLast", trTimeMS());
+				trQuestVarSet("bossAngle", trQuestVarGet("bossAngle") + amt * trQuestVarGet("bossAngularVelocity"));
+				trVectorSetFromAngle("newDir", trQuestVarGet("bossangle"));
+				angle = dotProduct("newDir", "bossDir");
+				for(i=yGetDatabaseCount("playerUnits"); >0) {
+					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (yGetVar("playerUnits", "launched") == 0) {
+						trVectorSetUnitPos("pos", "playerUnits");
+						if (zDistanceBetweenVectorsSquared("pos", "bossPos") < 144.0) {
+							trVectorQuestVarSet("dir", zGetUnitVector("bossPos", "pos"));
+							if (dotProduct("dir", "newDir") > angle) {
+								if (dotProduct("dir", "bossDir") > angle) {
+									damagePlayerUnit(500);
+									if (trUnitAlive()) {
+										trQuestVarSet("destx", 50.0 * trQuestVarGet("dirx") + trQuestVarGet("bossPosx"));
+										trQuestVarSet("destz", 50.0 * trQuestVarGet("dirz") + trQuestVarGet("bossPosz"));
+										launchUnit("playerUnits", "dest");
+									}
+								}
+							}
+						}
+					}
+				}
+				if (dotProduct("bossSplashDir", "bossDir") > dotProduct("bossSplashDir", "newDir")) {
+					trQuestVarSet("posx", trQuestVarGet("bossPosx") + 12.0 * trQuestVarGet("bossSplashDirx"));
+					trQuestVarSet("posz", trQuestVarGet("bossPosz") + 12.0 * trQuestVarGet("bossSplashDirz"));
+					trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Meteor Impact Water");
+					trVectorQuestVarSet("bossSplashDir", rotationMatrix("bossSplashDir", 0.866025, -0.5));
+				}
+				trQuestVarSet("bossDirx", trQuestVarGet("newDirx"));
+				trQuestVarSet("bossDirz", trQuestVarGet("newDirz"));
+				trQuestVarSet("dirx", 0.0 - trQuestVarGet("bossDirx"));
+				trQuestVarSet("dirz", 0.0 - trQuestVarGet("bossDirz"));
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit");
+				if (trTimeMS() > trQuestVarGet("bossTimeout")) {
+					trSetUnitOrientation(trVectorQuestVarGet("bossStartDir"),vector(0,1,0),true);
+					if (trQuestVarGet("secondPhase") == 1) {
+						trQuestVarSet("bossSpell", 4);
+						trQuestVarSet("bossTimeout", trTimeMS() + 500);
+						trQuestVarSet("bossAngle", 0);
+						trQuestVarSet("bossAngularVelocity", 3.141592 / 500);
+					} else {
+						trUnitSetStance("Aggressive");
+						bossCooldown(10, 15);
+					}
+				} else {
+					/*
+					sin(30) = 0.5
+					cos(30) = 0.866025
+					the model is angled downwards so that the tail can be above the water surface
+					*/
+					trSetUnitOrientation(xsVectorSet(trQuestVarGet("DirX")*0.866025,-0.5,trQuestVarGet("DirZ")*0.866025),
+						xsVectorSet(trQuestVarGet("DirX")*0.5,0.866025,trQuestVarGet("DirZ")*0.5), true);
+				}
+			} else {
+				amt = trTimeMS() - trQuestVarGet("bossLast");
+				trQuestVarSet("bossLast", trTimeMS());
+				if (trQuestVarGet("bossSpell") == 4) {
+					trQuestVarSet("bossScale", trQuestVarGet("bossScale") + 0.001 * amt);
+				} else {
+					trQuestVarSet("bossScale", trQuestVarGet("bossScale") - 0.001 * amt);
+				}
+				trQuestVarSet("bossAngle", trQuestVarGet("bossAngle") + amt * trQuestVarGet("bossAngularVelocity"));
+				sVal = xsSin(trQuestVarGet("bossAngle"));
+				cVal = xsCos(trQuestVarGet("bossAngle"));
+				
+				trUnitSelectClear();
+				trUnitSelectByQV("bossUnit");
+				trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+				trSetUnitOrientation(xsVectorSet(trQuestVarGet("bossStartDirX")*cVal,0.0-sVal,trQuestVarGet("bossStartDirZ")*cVal),
+					xsVectorSet(trQuestVarGet("bossStartDirX")*sVal,cVal,trQuestVarGet("bossStartDirZ")*sVal), true);
+				if (trTimeMS() > trQuestVarGet("bossTimeout")) {
+					trQuestVarSet("bossSpell", 1 + trQuestVarGet("bossSpell"));
+					if (trQuestVarGet("bossSpell") == 5) {
+						trSoundPlayFN("shockwave.wav","1",-1,"","");
+						trSoundPlayFN("meteorsplash.wav","1",-1,"","");
+						trQuestVarSet("bossDistance", 0);
+						trQuestVarSet("bossNext", trTimeMS() - 1);
+						trQuestVarSet("bossTimeout", trQuestVarGet("bossTimeout") + 500);
+					} else if (trQuestVarGet("bossSpell") == 6) {
+						trQuestVarSet("bossScale", 1.3);
+						trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+						trSetUnitOrientation(trVectorQuestVarGet("bossStartDir"),vector(0,1,0),true);
+						trUnitSetStance("Aggressive");
+						bossCooldown(10, 15);
+					}
+				}
+				if (trQuestVarGet("bossSpell") == 5) {
+					if (trTimeMS() > trQuestVarGet("bossNext")) {
+						trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 100);
+						trQuestVarSet("bossDistance", 4 + trQuestVarGet("bossDistance"));
+						trQuestVarSet("posx", trQuestVarGet("bossPosx") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirx"));
+						trQuestVarSet("posz", trQuestVarGet("bossPosz") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirz"));
+						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+						trArmySelect("0,0");
+						trUnitChangeProtoUnit("Meteor Impact Water");
+						for(x=yGetDatabaseCount("playerUnits"); >0) {
+							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+								removePlayerUnit();
+							} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16.0) {
+								damagePlayerUnit(500);
+								if (trUnitAlive()) {
+									stunUnit("playerUnits", 2.0);
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if (yGetVarAtIndex("enemies", "stunStatus", 1*trQuestVarGet("bossPointer")) == 0) {
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, 1 * (trUnitPercentDamaged() * 0.05)), true);
+			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
+			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
+				trQuestVarSetFromRand("bossSpell", 0, 2, true);
+				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+			}
+		}
+	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
+		xsDisableSelf();
+		trMusicStop();
+		trQuestVarSet("boss", 0);
+		trSetLighting("default", 1.0);
+		trSoundPlayFN("win.wav","1",-1,"","");
+		for(x=yGetDatabaseCount("enemies"); >0) {
+			yDatabaseNext("enemies", true);
+			trDamageUnitPercent(100);
+		}
+		uiLookAtUnitByName(""+1*trQuestVarGet("bossUnit"));
+		xsEnableRule("boss_ded");
+		xsDisableRule("gameplay_always");
+	}
+	xsSetContextPlayer(old);
 }
 
 /**/

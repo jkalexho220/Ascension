@@ -454,6 +454,9 @@ runImmediately
 	
 	trModifyProtounit("Dwarf", 0, 55, 4);
 	trModifyProtounit("Dwarf", 0, 2, -99);
+	trModifyProtounit("Scylla", 0, 55, 1);
+	trModifyProtounit("Scylla", 1, 55, 1);
+	trModifyProtounit("Scylla", ENEMY_PLAYER, 55, 1);
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
 		trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");
