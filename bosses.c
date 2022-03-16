@@ -786,6 +786,19 @@ highFrequency
 				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
 				xsEnableRule("boss_music");
 				
+				for(i=0; < 50) {
+					trQuestVarSet("jumpPath"+i, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,1,0,1,0,true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trUnitChangeProtoUnit("Cinematic Block");
+				}
+				
+				trQuestVarSet("bossEscape", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,1,0,1,0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trUnitChangeProtoUnit("Transport Ship Greek");
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetSelectedScale(0,0,0);
 				bossCooldown(10, 15);
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 27, 50);
@@ -4142,6 +4155,8 @@ highFrequency
 	float angle = 0;
 	float sVal = 0;
 	float cVal = 0;
+	float m = 0;
+	float dist = 0;
 	bool hit = false;
 	if (trUnitAlive() == true) {
 		
@@ -4156,7 +4171,58 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			
 		} else if (trQuestVarGet("bossSpell") > 10) {
-			
+			/* do you know what a derivative is? */
+			if (trQuestVarGet("bossSpell") == 11) {
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: I will drag you to the depths!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: A dance of death!");
+				} else if (trQuestVarGet("rand") == 3) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: Your death will be swift!");
+				}
+				trQuestVarSet("bossCount", 3);
+				if (trQuestVarGet("secondPhase") == 1) {
+					trQuestVarSet("bossCount", 5);
+				}
+				trQuestVarSet("bossSpell", 12);
+				trVectorSetUnitPos("bossPos", "bossUnit");
+				trMutateSelected(kbGetProtoUnitID("Dwarf"));
+				trImmediateUnitGarrison(""+1*trQuestVarGet("bossEscape"));
+				trUnitChangeProtoUnit("Scylla");
+				trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("bossPosx"),0,trQuestVarGet("bossPosz"),0,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Meteor Impact Water");
+				trSoundPlayFN("shipmove1.wav","1",-1,"","");
+				trModifyProtounit("Wadjet Spit",ENEMY_PLAYER,55,2);//make them water so they don't run off
+			} else if (trQuestVarGet("bossSpell") == 12) {
+				yDatabaseNext("playerCharacters");
+				trVectorSetUnitPos("bossTargetPos", "playerCharacters");
+				trVectorQuestVarSet("dir", zGetUnitVector("bossPos", "bossTargetPos"));
+				dist = 0.5 * zDistanceBetweenVectors("bossPos", "bossTargetPos");
+				amt = dist * 0.04;
+				m = 15.0 / xsPow(dist, 2);
+				for(i=0; < 50) {
+					angle = 0.0 - 2.0 * m * (amt * i - dist); // the derivative of the line getting us the slope at the point
+					cVal = xsSqrt(xsPow(angle, 2) + 1);
+					sVal = angle / cVal;
+					cVal = 1.0 / cVal;
+					trUnitSelectClear();
+					trUnitSelectByQV("jumpPath"+i);
+					trSetUnitOrientation(xsVectorSet(trQuestVarGet("dirX")*cVal,sVal,trQuestVarGet("dirZ")*cVal),
+						xsVectorSet(0.0-trQuestVarGet("dirX")*sVal,cVal,0.0-trQuestVarGet("dirZ")*sVal),true);
+					trUnitTeleport(trQuestVarGet("bossPosX") + trQuestVarGet("dirX") * amt * i,
+						worldHeight + 15.0 - m * xsPow(amt * i - dist, 2),
+						trQuestVarGet("bossPosZ") + trQuestVarGet("dirZ") * amt * i);
+				}
+				trQuestVarSet("bossSpell", 13);
+				trQuestVarSet("bossNext", trTimeMS() + 1000);
+			} else if (trQuestVarGet("bossSpell") == 13) {
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trSoundPlayFN("geyserhit1.wav","1",-1,"","");
+					trQuestVarSet("bossSpell", 14);
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 0) {
 			if (trQuestVarGet("bossSpell") == 1) {
 				xsSetContextPlayer(ENEMY_PLAYER);
@@ -4314,7 +4380,7 @@ highFrequency
 				if (trQuestVarGet("bossSpell") == 5) {
 					if (trTimeMS() > trQuestVarGet("bossNext")) {
 						trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 100);
-						trQuestVarSet("bossDistance", 4 + trQuestVarGet("bossDistance"));
+						trQuestVarSet("bossDistance", 6 + trQuestVarGet("bossDistance"));
 						trQuestVarSet("posx", trQuestVarGet("bossPosx") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirx"));
 						trQuestVarSet("posz", trQuestVarGet("bossPosz") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirz"));
 						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
@@ -4340,6 +4406,7 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			trQuestVarSet("bossSpell", 11);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
