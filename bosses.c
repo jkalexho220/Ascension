@@ -4168,7 +4168,12 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
-			
+			if (trQuestVarGet("bossSpell") == 31) {
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trSetLighting("night", 1.0);
+				trOverlayText("Drowning Whirlpool",3.0,-1,-1,-1);
+			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
 				trQuestVarSetFromRand("rand", 1, 5, true);
@@ -4265,6 +4270,13 @@ highFrequency
 						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 						trArmySelect("0,0");
 						trUnitChangeProtoUnit("Regeneration SFX");
+						if (trQuestVarGet("secondPhase") == 1) {
+							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+							trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),180,true);
+							trArmySelect(""+ENEMY_PLAYER+",0");
+							trUnitChangeProtoUnit("Wadjet");
+							activateEnemy("next");
+						}
 					}
 					trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 1000);
 					trQuestVarSet("bossDamage", trQuestVarGet("bossDamage") + 150);
@@ -4608,7 +4620,7 @@ highFrequency
 		xsDisableSelf();
 		trMusicStop();
 		trQuestVarSet("boss", 0);
-		trSetLighting("default", 1.0);
+		trSetLighting("Fimbulwinter", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("enemies"); >0) {
 			yDatabaseNext("enemies", true);
