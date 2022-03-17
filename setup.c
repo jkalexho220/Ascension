@@ -452,6 +452,11 @@ runImmediately
 	trQuestVarSet("p0stunResistance", 1);
 	trQuestVarSet("p0poisonResistance", 1);
 	
+	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 26, 1);
+	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 0, -9899);
+	
 	trModifyProtounit("Dwarf", 0, 55, 4);
 	trModifyProtounit("Dwarf", 0, 2, -99);
 	trModifyProtounit("Scylla", 0, 55, 1);
@@ -713,6 +718,67 @@ highFrequency
 	}
 }
 
+void paintTowerSegment(int stage = 0) {
+	int tPrimary = 0;
+	int tSubPrimary = 0;
+	switch(stage)
+	{
+		case 1:
+		{
+			tPrimary = 0;
+			tSubPrimary = 34;
+		}
+		case 2:
+		{
+			tPrimary = 0;
+			tSubPrimary = 58;
+		}
+		case 3:
+		{
+			tPrimary = 0;
+			tSubPrimary = 41;
+		}
+		case 4:
+		{
+			tPrimary = 0;
+			tSubPrimary = 25;
+		}
+		case 5:
+		{
+			tPrimary = 5;
+			tSubPrimary = 5;
+		}
+		case 6:
+		{
+			tPrimary = 0;
+			tSubPrimary = 70;
+		}
+		case 7:
+		{
+			tPrimary = 3;
+			tSubPrimary = 9;
+		}
+		case 8:
+		{
+			tPrimary = 0;
+			tSubPrimary = 50;
+		}
+	}
+	trPaintTerrain(68,43 + 3 * stage,76,46 + 3 * stage, tPrimary, tSubPrimary, false);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int x = 139;
+	int z = 89 + 6 * stage;
+	if (iModulo(2, stage) == 0) {
+		x = 151;
+	}
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,x,0,z,180,true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Outpost");
+	yAddToDatabase("stageChoices", "next");
+	yAddUpdateVar("stageChoices", "stage", stage);
+}
+
 rule Z_cin_02
 inactive
 highFrequency
@@ -726,40 +792,44 @@ highFrequency
 			uiClearSelection();
 			trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
 			trUIFadeToColor(0,0,0,1000,0,false);
-			trCameraCut(vector(96,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
+			trCameraCut(vector(145,70,26), vector(0,-0.7071,0.7071), vector(0,0.7071,0.7071), vector(1,0,0));
 			trQuestVarSet("chooser", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("1,0", "Athena",1,96,0,90,0,true);
+			trArmyDispatch("1,0", "Athena",1,145,0,89,0,true);
 			trMessageSetText("Host: Choose a floor to challenge.",-1);
 			
-			int posX = 97 - 2 * trQuestVarGet("p1progress");
+			trPaintTerrain(0,45,195,195,4,15,false); // shoreline atlantic B
+			trPaintTerrain(0,0,195,45,0,34,false); // sand A
+			
 			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && ENEMY_PLAYER > 2) {
-				posX = posX - 2;
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,posX,0,101,180,true);
+				trArmyDispatch("1,0","Dwarf",1,129,0,93,180,true);
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
 				yAddToDatabase("stageChoices", "next");
 				yAddUpdateVar("stageChoices", "stage", 0);
-				yAddUpdateVar("stageChoices", "obelisk", trQuestVarGet("next"));
-				posX = posX + 4;
+				trPaintTerrain(65,47,65,47,0,80);
+				trPaintTerrain(65,46,65,46,0,74);
+				trPaintTerrain(65,45,65,45,0,81);
+				trPaintTerrain(64,45,64,45,0,75);
+				trPaintTerrain(63,45,63,45,0,82);
+				trPaintTerrain(63,46,63,46,0,74);
+				trPaintTerrain(63,47,63,47,0,83);
+				trPaintTerrain(64,47,64,47,0,75);
+				trPaintTerrain(64,46,64,46,0,34);
 			}
 			
-			for(x=0; <= trQuestVarGet("p1progress")) {
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Flag Numbered",1,posX,0,101,0,true);
-				trUnitSelectClear();
-				trUnitSelectByQV("next", true);
-				trUnitSetAnimationPath(""+x+",0,0,0,0,0,0");
-				yAddToDatabase("stageChoices", "next");
-				yAddUpdateVar("stageChoices", "stage", x + 1);
-				yAddUpdateVar("stageChoices", "obelisk", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,posX,0,103,0,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
-				trMutateSelected(kbGetProtoUnitID("Outpost"));
-				posX = posX + 4;
+			trPaintTerrain(68,46,76,76,5,4,false); // black
+			for(i=0; <= trQuestVarGet("p1progress")) {
+				paintTowerSegment(i+1);
 			}
+			trPaintTerrain(67,46,67,76,0,74,false); // left wall
+			trPaintTerrain(77,46,77,76,0,74,false); // right wall
+			trPaintTerrain(67,77,77,77,0,75,false); // ceiling
+			trPaintTerrain(67,77,67,77,0,83,false); // corner
+			trPaintTerrain(77,77,77,77,0,80,false); // corner
+			trPaintTerrain(67,45,67,45,0,81,false);
+			trPaintTerrain(77,45,77,45,0,82,false);
 			
 			xsEnableRule("choose_stage_00");
 		}
@@ -864,6 +934,22 @@ int monsterPetProto(int i = 0) {
 		case 23:
 		{
 			proto = kbGetProtoUnitID("Colossus");
+		}
+		case 24:
+		{
+			proto = kbGetProtoUnitID("Servant");
+		}
+		case 25:
+		{
+			proto = kbGetProtoUnitID("Nereid");
+		}
+		case 26:
+		{
+			proto = kbGetProtoUnitID("Kraken");
+		}
+		case 27:
+		{
+			proto = kbGetProtoUnitID("Hydra");
 		}
 	}
 	return(proto);

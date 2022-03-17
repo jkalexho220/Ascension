@@ -551,7 +551,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*/
+	*
 	
 	if (Multiplayer) {
 		trUnitSelectClear();
@@ -1115,7 +1115,9 @@ inactive
 highFrequency
 {
 	if (trTime() > trQuestVarGet("deepDeployNext")) {
-		if (trQuestVarGet("play") == 0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("stageWonder");
+		if ((trUnitAlive() == false) || (trQuestVarGet("play") == 0)) {
 			xsDisableSelf();
 		} else if (yGetDatabaseCount("playerUnits") > 0) {
 			int x = 0;

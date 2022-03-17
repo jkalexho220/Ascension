@@ -5,6 +5,8 @@ inactive
 highFrequency
 {
 	int n = yDatabaseNext("stageChoices");
+	trUnitSelectClear();
+	trUnitSelectByQV("stageChoices");
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", yGetVar("stageChoices", "stage"));
 		if (trQuestVarGet("stage") == 0) {
@@ -18,9 +20,6 @@ highFrequency
 		trUnitChangeProtoUnit("Rocket");
 		for(x=yGetDatabaseCount("stageChoices"); >0) {
 			yDatabaseNext("stageChoices", true);
-			trUnitDestroy();
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("stageChoices", "obelisk"), true);
 			trUnitDestroy();
 		}
 		yClearDatabase("stageChoices");
@@ -46,14 +45,10 @@ highFrequency
 			}
 		}
 		xsEnableRule("delayed_modify");
-	} else {
-		trUnitSelectClear();
-		trUnitSelect(""+1*yGetVar("stageChoices", "obelisk"), true);
-		if (trUnitIsSelected()) {
-			uiClearSelection();
-			trShowImageDialog(stageIcon(1*yGetVar("stageChoices", "stage")),
-				"Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
-		}
+	} else if (trUnitIsSelected()) {
+		uiClearSelection();
+		trShowImageDialog(stageIcon(1*yGetVar("stageChoices", "stage")),
+			"Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
 	}
 }
 
@@ -579,9 +574,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
 			trQuestVarSet("villageX", 70 * x + 20);
 			trQuestVarSet("villageZ", 70 * z + 20);
+			trQuestVarSet("stageWonder", trGetNextUnitScenarioNameNumber());
 			trUnitSelectClear();
 			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 21, 21, 180), true);
+			trUnitConvert(ENEMY_PLAYER);
 			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
+			trUnitSetAnimationPath("3,1,0,0,0,0,0");
 			
 			deployTownEyecandy("Atlantis Wall Connector", 3, 3);
 			deployTownEyecandy("Atlantis Wall Connector", 3, 15);
@@ -1497,6 +1495,50 @@ highFrequency
 					spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("fishHawks", "sfx"));
 				}
 				xsEnableRule("the_deep_build_01");
+			}
+			case 8:
+			{
+				wallHeight = -5;
+				trQuestVarSet("stageTemple", BOON_DOUBLE_FAVOR);
+				trSetCivAndCulture(0, 0, 0);
+				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
+				trQuestVarSet("bossRoomSize", 12);
+				TERRAIN_WALL = 2;
+				TERRAIN_SUB_WALL = 1;
+				
+				TERRAIN_PRIMARY = 0;
+				TERRAIN_SUB_PRIMARY = 50;
+				
+				TERRAIN_SECONDARY = 4;
+				TERRAIN_SUB_SECONDARY = 3;
+				
+				trQuestVarSet("mapType", MAP_PORTALS);
+				trQuestVarSet("treeDensity", 0.1);
+				trStringQuestVarSet("treeProto1", "Ruins");
+				trStringQuestVarSet("treeProto2", "Rock Granite Big");
+				trStringQuestVarSet("treeProto3", "Mist");
+				trQuestVarSet("spriteDensity", 0.3);
+				trStringQuestVarSet("spriteProto1", "Rock Granite Sprite");
+				trStringQuestVarSet("spriteProto2", "Rock Granite Small");
+				trStringQuestVarSet("spriteProto3", "Rock Limestone Small");
+				trQuestVarSet("rockDensity", 0.2);
+				trStringQuestVarSet("rockProto1", "Columns");
+				trStringQuestVarSet("rockProto2", "Columns Broken");
+				trStringQuestVarSet("rockProto3", "Columns Fallen");
+				
+				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
+				
+				trQuestVarSet("enemyProtoCount", 6);
+				trStringQuestVarSet("enemyProto1", "Griffon");
+				trStringQuestVarSet("enemyProto2", "Satyr");
+				trStringQuestVarSet("enemyProto3", "Einheriar");
+				trStringQuestVarSet("enemyProto4", "Avenger");
+				trStringQuestVarSet("enemyProto5", "Statue of Lightning");
+				trStringQuestVarSet("enemyProto6", "Lampades");
+				
+				
+				trStringQuestVarSet("bossProto", "Nidhogg");
+				trQuestVarSet("bossScale", 1.0);
 			}
 			case 11:
 			{

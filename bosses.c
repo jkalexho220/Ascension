@@ -589,6 +589,7 @@ highFrequency
 				trSetLighting("anatolia",0.1);
 				yAddToDatabase("ballistas", "bossUnit");
 				yAddUpdateVar("ballistas", "index", trQuestVarGet("bossPointer"));
+				yAddUpdateVar("ballistas", "player", ENEMY_PLAYER);
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				xsDisableSelf();

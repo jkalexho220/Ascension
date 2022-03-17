@@ -183,8 +183,8 @@ void monsterpedia(int stage = 0, int x = 0) {
 		}
 		case 5:
 		{
-			tPrimary = 0;
-			tSubPrimary = 32;
+			tPrimary = 5;
+			tSubPrimary = 5;
 			trStringQuestVarSet("enemyProto1", "Wadjet");
 			trStringQuestVarSet("enemyProto2", "Scorpion Man");
 			trStringQuestVarSet("enemyProto3", "Scarab");
@@ -217,6 +217,17 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trUnitConvert(0);
 			trMutateSelected(kbGetProtoUnitID("Barracks Atlantean"));
 			trSetSelectedScale(0.7,0.5,0.5);
+		}
+		case 7:
+		{
+			tPrimary = 3;
+			tSubPrimary = 9;
+			trStringQuestVarSet("enemyProto1", "Servant");
+			trStringQuestVarSet("enemyProto2", "Nereid");
+			trStringQuestVarSet("enemyProto3", "Kraken");
+			trStringQuestVarSet("enemyProto4", "Hydra");
+			trStringQuestVarSet("enemyProto5", "Scylla");
+			trQuestVarSet("bossScale", 1.3);
 		}
 	}
 	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
@@ -1076,6 +1087,18 @@ highFrequency
 			{
 				desc("It fires a high-powered laser");
 			}
+			case kbGetProtoUnitID("Nereid"):
+			{
+				desc("Its special attack will launch players a great distance and deal damage.");
+			}
+			case kbGetProtoUnitID("Kraken"):
+			{
+				desc("Its tentacle attack will stun and damage all units in a line.");
+			}
+			case kbGetProtoUnitID("Hydra"):
+			{
+				desc("Regenerates health each second.");
+			}
 			case kbGetProtoUnitID("Nemean Lion"):
 			{
 				name = "The King of Beasts";
@@ -1121,6 +1144,16 @@ highFrequency
 				desc("Drops: Manastone");
 				desc("Common Relic: " + relicName(16));
 				desc("It has a large arsenal of explosive weaponry and can also run over players.");
+			}
+			case kbGetProtoUnitID("Scylla"):
+			{
+				name = "Mother of the Depths";
+				desc("Drops: Soulstone");
+				desc("Common Relic: " + relicName(17));
+				desc("She has powerful area attacks using her massive body.");
+				desc("She can also eat a player, incapacitating them for ten seconds.");
+				desc("During this time, she heals for 1 percent of her health each second.");
+				desc("If she is poisoned, the eating time is halved and her healing is prevented.");
 			}
 		}
 		uiClearSelection();
