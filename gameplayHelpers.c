@@ -1158,6 +1158,20 @@ void activateSpecialUnit(string db = "", string pName = "", int proto = 0, int p
 			yAddUpdateVar("SkyWitches", "step", 0);
 			yAddUpdateVar("SkyWitches", "player", p);
 		}
+		case kbGetProtoUnitID("Einheriar"):
+		{
+			yAddToDatabase("Einherjars", db);
+			yAddUpdateVar("Einherjars", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("Einherjars", "step", 0);
+			yAddUpdateVar("Einherjars", "player", p);
+		}
+		case kbGetProtoUnitID("Statue of Lightning"):
+		{
+			yAddToDatabase("lightningStatues", db);
+			yAddUpdateVar("lightningStatues", "index", yGetNewestPointer(pName));
+			yAddUpdateVar("lightningStatues", "step", 0);
+			yAddUpdateVar("lightningStatues", "player", p);
+		}
 	}
 }
 
@@ -1184,10 +1198,9 @@ int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0
 
 int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	int index = activatePlayerUnit("next", p, proto, decay);
 	string pName = kbGetProtoUnitName(proto);
 	trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
-	return(index);
+	return(activatePlayerUnit("next", p, proto, decay));
 }
 
 void spawnPlayerClone(int p = 0, string vdb = "") {
@@ -1310,6 +1323,14 @@ string opponentDatabaseName(int p = 0) {
 		return("playerUnits");
 	} else {
 		return("enemies");
+	}
+}
+
+void removeAllyUnit(int p = 0) {
+	if (p == ENEMY_PLAYER) {
+		removeEnemy();
+	} else {
+		removePlayerUnit();
 	}
 }
 

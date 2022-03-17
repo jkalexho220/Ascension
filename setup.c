@@ -459,6 +459,7 @@ runImmediately
 	
 	trModifyProtounit("Dwarf", 0, 55, 4);
 	trModifyProtounit("Dwarf", 0, 2, -99);
+	trModifyProtounit("Dwarf", ENEMY_PLAYER, 55, 4);
 	trModifyProtounit("Scylla", 0, 55, 1);
 	trModifyProtounit("Scylla", 1, 55, 1);
 	trModifyProtounit("Scylla", ENEMY_PLAYER, 55, 1);
@@ -490,6 +491,8 @@ runImmediately
 		trModifyProtounit("Pegasus", p, 55, 1);
 		trModifyProtounit("Flying Medic", p, 55, 1);
 		trModifyProtounit("Junk", p, 55, 1);
+		
+		trModifyProtounit("Statue of Lightning", p, 1, 3.5);
 		
 		trPlayerKillAllGodPowers(p);
 		trPlayerTechTreeEnabledGodPowers(p, false);

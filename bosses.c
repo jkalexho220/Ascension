@@ -3380,23 +3380,6 @@ highFrequency
 	xsSetContextPlayer(old);
 }
 
-bool spawnLightning(string pos = "") {
-	vectorToGrid(pos, "loc");
-	if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
-		trUnitSelectClear();
-		trUnitSelectByQV("next", true);
-		trUnitConvert(ENEMY_PLAYER);
-		trUnitSetStance("Passive");
-		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
-		yAddToDatabase("yeebLightning", "next");
-		yAddUpdateVar("yeebLightning", "timeout", trTimeMS() + 2000);
-		return(true);
-	}
-	return(false);
-}
-
 rule yeebaagooon_battle
 inactive
 highFrequency
@@ -3414,99 +3397,6 @@ highFrequency
 	float angle = 0;
 	bool hit = false;
 	if (trUnitAlive() == true) {
-		
-		if (yGetDatabaseCount("yeebLightningEnd") > 0) {
-			trQuestVarSetFromRand("sound", 1, 5, true);
-			hit = false;
-			for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
-				yDatabaseNext("yeebLightningEnd", true);
-				if (trUnitVisToPlayer()) {
-					hit = true;
-				}
-				trVectorSetUnitPos("pos", "yeebLightningEnd");
-				trUnitChangeProtoUnit("Lightning sparks");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 1.0) {
-						damagePlayerUnit(470);
-						if (yGetVar("playerUnits", "hero") == 1) {
-							gainFavor(1*yGetVar("playerUnits", "player"), -5.0);
-						}
-					}
-				}
-				if (trQuestVarGet("boss") > 999) {
-					for(x=yGetDatabaseCount("enemies"); >0) {
-						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
-							removeEnemy();
-						} else if (zDistanceToVectorSquared("enemies", "pos") < 1.0) {
-							damageEnemy(0, 470, true);
-							damageEnemy(0, 470, false);
-						}
-					}
-				}
-			}
-			yClearDatabase("yeebLightningEnd");
-			if (hit) {
-				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-			}
-		}
-		
-		for(x=xsMin(10, yGetDatabaseCount("yeebLightning")); >0) {
-			yDatabaseNext("yeebLightning");
-			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
-				hit = true;
-				trChatSetStatus(false);
-				trDelayedRuleActivation("enable_chat");
-				yAddToDatabase("yeebLightningEnd", "yeebLightning");
-				trUnitSelectClear();
-				trUnitSelectByQV("yeebLightning", true);
-				trUnitChangeProtoUnit("Militia");
-				trUnitSelectClear();
-				trUnitSelectByQV("yeebLightning", true);
-				trSetSelectedScale(0,0,0);
-				trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
-				yRemoveFromDatabase("yeebLightning");
-			}
-		}
-		
-		for(y=xsMin(4, yGetDatabaseCount("yeebLightningBalls")); >0) {
-			action = processGenericProj("yeebLightningBalls");
-			if (action == PROJ_FALLING) {
-				yVarToVector("yeebLightningBalls", "dir");
-				yVarToVector("yeebLightningBalls", "prev");
-				trQuestVarSet("destx", trQuestVarGet("dirx") * 3.0 + trQuestVarGet("posx"));
-				trQuestVarSet("destz", trQuestVarGet("dirz") * 3.0 + trQuestVarGet("posz"));
-				vectorToGrid("dest", "loc");
-				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-					trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
-					ySetVar("yeebLightningBalls", "yeehaw", 99);
-					ySetVarFromVector("yeebLightningBalls", "dir", "dir");
-					trQuestVarSetFromRand("sound", 1, 2, true);
-					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-				} else {
-					dist = zDistanceBetweenVectorsSquared("pos", "prev");
-					if (dist > 4.0) {
-						dist = xsSqrt(dist) + 3.0;
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
-							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
-								removePlayerUnit();
-							} else if (rayCollision("playerUnits", "prev", "dir", dist, 9.0)) {
-								damagePlayerUnit(120);
-								stunUnit("playerUnits", 3.0, 0, false);
-								if (yGetVar("playerUnits", "hero") == 1) {
-									gainFavor(1*yGetVar("playerUnits","player"), -1.0);
-								}
-							}
-						}
-						ySetVarFromVector("yeebLightningBalls", "prev", "pos");
-					}
-				}
-			}
-		}
-		
-		trUnitSelectClear();
-		trUnitSelectByQV("bossUnit");
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			processBossCooldown();
 			if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
@@ -3762,6 +3652,7 @@ highFrequency
 					yAddUpdateVar("yeebLightningBalls", "prevx", trQuestVarGet("startx"));
 					yAddUpdateVar("yeebLightningBalls", "prevz", trQuestVarGet("startz"));
 					yAddUpdateVar("yeebLightningBalls", "bounces", 3);
+					yAddUpdateVar("yeebLightningBalls","player",ENEMY_PLAYER);
 					trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
 				}
 				bossCooldown(6, 12);

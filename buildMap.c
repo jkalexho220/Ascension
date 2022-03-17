@@ -1498,19 +1498,22 @@ highFrequency
 			}
 			case 8:
 			{
-				wallHeight = -5;
+				xsEnableRule("the_clouds_build_01");
+				worldHeight = 5;
+				wallHeight = -3;
 				trQuestVarSet("stageTemple", BOON_DOUBLE_FAVOR);
 				trSetCivAndCulture(0, 0, 0);
+				trSetCivAndCulture(ENEMY_PLAYER, 0, 0);
 				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
 				trQuestVarSet("bossRoomSize", 12);
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 1;
 				
 				TERRAIN_PRIMARY = 0;
-				TERRAIN_SUB_PRIMARY = 50;
+				TERRAIN_SUB_PRIMARY = 53;
 				
-				TERRAIN_SECONDARY = 4;
-				TERRAIN_SUB_SECONDARY = 3;
+				TERRAIN_SECONDARY = 0;
+				TERRAIN_SUB_SECONDARY = 50;
 				
 				trQuestVarSet("mapType", MAP_PORTALS);
 				trQuestVarSet("treeDensity", 0.1);
@@ -1536,6 +1539,7 @@ highFrequency
 				trStringQuestVarSet("enemyProto5", "Statue of Lightning");
 				trStringQuestVarSet("enemyProto6", "Lampades");
 				
+				trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.0);
 				
 				trStringQuestVarSet("bossProto", "Nidhogg");
 				trQuestVarSet("bossScale", 1.0);
@@ -2156,6 +2160,35 @@ highFrequency
 			trSetSelectedUpVector(0,-10,0);
 			trQuestVarSetFromRand("scale", 1, 2, false);
 			trSetSelectedScale(trQuestVarGet("scale"),0.1 * trQuestVarGet("scale"),trQuestVarGet("scale"));
+		}
+		xsDisableSelf();
+	}
+}
+
+rule the_clouds_build_01
+inactive
+highFrequency
+{
+	for(x=0; < 146) {
+		for(z=0; < 146) {
+			if (trGetTerrainHeight(x,z) < -2.0) {
+				if (trGetTerrainHeight(x+1,z+1) < -2.0) {
+					trPaintTerrain(x,z,x,z,4,14,false);
+				}
+			}
+		}
+	}
+	xsEnableRule("the_clouds_build_02");
+	xsDisableSelf();
+}
+
+rule the_clouds_build_02
+inactive
+highFrequency
+{
+	if (trQuestVarGet("play") == 1) {
+		for(p=1; < ENEMY_PLAYER) {
+			trQuestVarSet("p"+p+"favorRegen", trQuestVarGet("p"+p+"favorRegen") - 0.5);
 		}
 		xsDisableSelf();
 	}

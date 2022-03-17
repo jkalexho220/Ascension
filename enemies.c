@@ -138,17 +138,20 @@ highFrequency
 	setupProtounitBounty("Behemoth", 0.9, 10, 0.08);
 	setupProtounitBounty("Avenger", 0.2, 12, 0.1);
 	
-	setupProtounitBounty("Servant", 0.5, 5, 0.03);
-	setupProtounitBounty("Nereid", 0.5, 7, 0.05);
-	setupProtounitBounty("Kraken", 0.5, 9, 0.08);
-	setupProtounitBounty("Hydra", 0.5, 10, 0.1);
-	
-	setupProtounitBounty("Automaton SPC", 0.5, 4, 0);
+	setupProtounitBounty("Automaton SPC", 0.4, 4, 0);
 	setupProtounitBounty("Colossus", 0.2, 10, 0.1);
-	setupProtounitBounty("Battle Boar", 0.3, 8, 0.08);
+	setupProtounitBounty("Battle Boar", 0.4, 8, 0.08);
 	setupProtounitBounty("Fire Siphon", 0.1, 8, 0.1);
 	
-	setupProtounitBounty("Lampades", 0.7, 12, 0.1);
+	setupProtounitBounty("Servant", 0.5, 5, 0.03);
+	setupProtounitBounty("Nereid", 0.5, 7, 0.05);
+	setupProtounitBounty("Kraken", 0.4, 9, 0.08);
+	setupProtounitBounty("Hydra", 0.4, 10, 0.1);
+	
+	setupProtounitBounty("Griffon", 0.6, 6, 0.03);
+	setupProtounitBounty("Einheriar", 0.6, 7, 0.03);
+	setupProtounitBounty("Statue of Lightning", 0.8, 8, 0.05);
+	setupProtounitBounty("Lampades", 0.8, 12, 0.1);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);
@@ -216,6 +219,25 @@ void ballistaShotPop() {
 	yRemoveFromDatabase("ballistaShots");
 }
 
+bool spawnLightning(string pos = "") {
+	vectorToGrid(pos, "loc");
+	if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+		trArmyDispatch("0,0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+		trArmySelect("0,0");
+		trUnitChangeProtoUnit("Arkantos Boost SFX");
+		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+		trUnitSelectClear();
+		trUnitSelectByQV("next", true);
+		trUnitSetStance("Passive");
+		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
+		yAddToDatabase("yeebLightning", "next");
+		yAddUpdateVar("yeebLightning", "timeout", trTimeMS() + 2000);
+		return(true);
+	}
+	return(false);
+}
+
 void specialUnitsAlways() {
 	int p = 0;
 	int proto = 0;
@@ -225,6 +247,7 @@ void specialUnitsAlways() {
 	float amt = 0;
 	float dist = 0;
 	float angle = 0;
+	bool hit = false;
 	string pName = "";
 	
 	for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
@@ -1107,7 +1130,7 @@ void specialUnitsAlways() {
 				case 0:
 				{
 					xsSetContextPlayer(p);
-					if (kbUnitGetActionType(id) == 6) {
+					if ((kbUnitGetActionType(id) == 6) || (kbUnitGetActionType(id) == 48)) {
 						target = kbUnitGetTargetUnitID(id);
 						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
 						trVectorSetUnitPos("start", "Avengers");
@@ -1352,7 +1375,8 @@ void specialUnitsAlways() {
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
-						ySetVar("Nereids", "target", trGetUnitScenarioNameNumber(target));
+						trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
+						ySetVarFromVector("Nereids", "end", "pos");
 						ySetVar("Nereids", "step", 1);
 						ySetVar("Nereids", "specialnext", trTimeMS() + 1400);
 						trUnitOverrideAnimation(39,0,false,false,-1);
@@ -1361,12 +1385,12 @@ void specialUnitsAlways() {
 				case 1:
 				{
 					trVectorSetUnitPos("start", "Nereids");
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Nereids", "target")));
+					yVarToVector("Nereids", "end");
 					pName = opponentDatabaseName(p);
 					for (x=yGetDatabaseCount(pName); >0) {
 						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (zDistanceToVectorSquared(pName, "end") < 9.0) {
+						} else if (zDistanceToVectorSquared(pName, "end") < 16.0) {
 							trVectorSetUnitPos("pos", pName);
 							vectorSetAsTargetVector("target", "start", "pos", 40.0);
 							damageOpponentUnit(p, 200.0);
@@ -1459,6 +1483,246 @@ void specialUnitsAlways() {
 			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("krakens", "index"));
 			if (action > 0 && yGetVar("krakens", "step") == 1) {
 				ySetVar("krakens", "step", 0);
+			}
+		}
+	}
+	
+	if(yGetDatabaseCount("Einherjars") >0) {
+		id = yDatabaseNext("Einherjars", true);
+		p = yGetVar("Einherjars","player");
+		pName = databaseName(p);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Einherjars")) {
+			if (trUnitAlive()) {
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else {
+				trUnitChangeProtoUnit("Einheriar");
+			}
+			yRemoveFromDatabase("Einherjars");
+			yRemoveUpdateVar("Einherjars", "step");
+		} else if (trTimeMS() > yGetVar("Einherjars", "specialnext")) {
+			switch(1*yGetVar("Einherjars", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						ySetVar("Einherjars", "step", 1);
+						ySetVar("Einherjars", "specialnext", trTimeMS() + 1400);
+						trUnitOverrideAnimation(39,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					trVectorSetUnitPos("start", "Einherjars");
+					for (x=yGetDatabaseCount(pName); >0) {
+						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+							removeAllyUnit(p);
+						} else if (yGetVar(pName, "poisonStatus") == 0) {
+							trVectorSetUnitPos("pos", pName);
+							if (zDistanceBetweenVectorsSquared("pos", "start") < 9.0) {
+								trDamageUnit(-100);
+								trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+								trArmySelect("0,0");
+								trUnitChangeProtoUnit("Regeneration SFX");
+							}
+						}
+					}
+					ySetVar("Einherjars", "step", 2);
+					ySetVar("Einherjars", "specialnext", yGetVar("Einherjars", "specialnext") + 2600);
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					ySetVar("Einherjars", "step", 0);
+					if (yGetVar("Einherjars", "target") == -1) {
+						ySetVar("Einherjars", "specialnext", trTimeMS());
+					} else {
+						ySetVar("Einherjars", "specialnext", trTimeMS() + 15000);
+					}
+				}
+			}
+		} else {
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Einherjars", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Einherjars", "index"));
+			if (action > 0 && yGetVar("Einherjars", "step") == 1) {
+				ySetVar("Einherjars", "step", 0);
+				ySetVar("Einherjars", "next", trTimeMS() + 15000);
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("yeebLightningEnd") > 0) {
+		trQuestVarSetFromRand("sound", 1, 5, true);
+		hit = false;
+		for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
+			yDatabaseNext("yeebLightningEnd", true);
+			p = yGetVar("yeebLightningEnd","player");
+			pName = opponentDatabaseName(p);
+			if (trUnitVisToPlayer()) {
+				hit = true;
+			}
+			trVectorSetUnitPos("pos", "yeebLightningEnd");
+			trUnitChangeProtoUnit("Lightning sparks");
+			for(x=yGetDatabaseCount(pName); >0) {
+				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					removeOpponentUnit(p);
+				} else if (zDistanceToVectorSquared(pName, "pos") < 1.0) {
+					damageOpponentUnit(p, 470);
+					if (trQuestVarGet("boss") > 0) {
+						if (yGetVar(pName, "hero") == 1) {
+							gainFavor(1*yGetVar(pName, "player"), -5.0);
+						}
+					}
+				}
+			}
+			if (trQuestVarGet("boss") > 999) {
+				for(x=yGetDatabaseCount("enemies"); >0) {
+					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+						removeEnemy();
+					} else if (zDistanceToVectorSquared("enemies", "pos") < 1.0) {
+						damageEnemy(0, 470, true);
+						damageEnemy(0, 470, false);
+					}
+				}
+			}
+		}
+		yClearDatabase("yeebLightningEnd");
+		if (hit) {
+			trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		}
+	}
+	
+	for(x=xsMin(10, yGetDatabaseCount("yeebLightning")); >0) {
+		yDatabaseNext("yeebLightning");
+		if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
+			hit = true;
+			trChatSetStatus(false);
+			trDelayedRuleActivation("enable_chat");
+			yAddToDatabase("yeebLightningEnd", "yeebLightning");
+			yAddUpdateVar("yeebLightningEnd","player",yGetVar("yeebLightning","player"));
+			trUnitSelectClear();
+			trUnitSelectByQV("yeebLightning", true);
+			trUnitChangeProtoUnit("Militia");
+			trUnitSelectClear();
+			trUnitSelectByQV("yeebLightning", true);
+			trSetSelectedScale(0,0,0);
+			trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
+			yRemoveFromDatabase("yeebLightning");
+		}
+	}
+	
+	for(y=xsMin(4, yGetDatabaseCount("yeebLightningBalls")); >0) {
+		action = processGenericProj("yeebLightningBalls");
+		p = yGetVar("yeebLightningBalls","player");
+		pName = opponentDatabaseName(p);
+		if (action == PROJ_FALLING) {
+			yVarToVector("yeebLightningBalls", "dir");
+			yVarToVector("yeebLightningBalls", "prev");
+			trQuestVarSet("destx", trQuestVarGet("dirx") * 3.0 + trQuestVarGet("posx"));
+			trQuestVarSet("destz", trQuestVarGet("dirz") * 3.0 + trQuestVarGet("posz"));
+			vectorToGrid("dest", "loc");
+			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
+				ySetVar("yeebLightningBalls", "yeehaw", 99);
+				ySetVarFromVector("yeebLightningBalls", "dir", "dir");
+				trQuestVarSetFromRand("sound", 1, 2, true);
+				trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			} else {
+				dist = zDistanceBetweenVectorsSquared("pos", "prev");
+				if (dist > 4.0) {
+					dist = xsSqrt(dist) + 3.0;
+					for(x=yGetDatabaseCount(pName); >0) {
+						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (rayCollision(pName, "prev", "dir", dist, 9.0)) {
+							damageOpponentUnit(p, 120);
+							stunUnit(pName, 3.0, p, false);
+							if (trQuestVarGet("boss") > 0) {
+								if (yGetVar(pName, "hero") == 1) {
+									gainFavor(1*yGetVar(pName,"player"), -1.0);
+								}
+							}
+						}
+					}
+					ySetVarFromVector("yeebLightningBalls", "prev", "pos");
+				}
+			}
+		}
+	}
+	
+	if(yGetDatabaseCount("lightningStatues") >0) {
+		id = yDatabaseNext("lightningStatues", true);
+		p = yGetVar("lightningStatues","player");
+		pName = databaseName(p);
+		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("lightningStatues")) {
+			yRemoveFromDatabase("lightningStatues");
+		} else if (trTimeMS() > yGetVar("lightningStatues", "specialnext")) {
+			if (kbUnitGetAnimationActionType(id) == 59) {
+				xsSetContextPlayer(p);
+				target = kbUnitGetTargetUnitID(id);
+				trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
+				vectorSnapToGrid("target");
+				trUnitOverrideAnimation(2,0,false,true,-1);
+				ySetVar("lightningStatues","specialNext",trTimeMS() + 1000);
+				spawnLightning("target");
+				trSoundPlayFN("mirrortowerfire.wav","1",-1,"","");
+			}
+		}
+	}
+	
+	if (yGetDatabaseCount("SkyWitches") >0) {
+		id = yDatabaseNext("SkyWitches", true);
+		p = yGetVar("SkyWitches", "player");
+		pName = databaseName(p);
+		if (id == -1 || trUnitAlive() == false) {
+			trUnitChangeProtoUnit("Lampades");
+			yRemoveFromDatabase("SkyWitches");
+		} else if (checkEnemyDeactivated("SkyWitches")) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			yRemoveFromDatabase("SkyWitches");
+		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("SkyWitches", "index")) == 1) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			ySetVar("SkyWitches", "step", 2);
+		} else if (trTimeMS() > yGetVar("SkyWitches", "next")) {
+			switch(1*yGetVar("SkyWitches", "step"))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 12) {
+						xsSetContextPlayer(p);
+						target = kbUnitGetTargetUnitID(id);
+						ySetVar("SkyWitches", "target", trGetUnitScenarioNameNumber(target));
+						
+						ySetVar("SkyWitches", "step", 1);
+						ySetVar("SkyWitches", "next", trTimeMS() + 500);
+						trUnitOverrideAnimation(37,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("SkyWitches", "target")));
+					trVectorSetUnitPos("start", "SkyWitches");
+					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+					addGenericProj("yeebLightningBalls","start","dir",kbGetProtoUnitID("Arkantos God"),26,10,5);
+					yAddUpdateVar("yeebLightningBalls", "prevx", trQuestVarGet("startx"));
+					yAddUpdateVar("yeebLightningBalls", "prevz", trQuestVarGet("startz"));
+					yAddUpdateVar("yeebLightningBalls", "bounces", 3);
+					yAddUpdateVar("yeebLightningBalls","player",p);
+					ySetVar("SkyWitches", "step", 2);
+					ySetVar("SkyWitches", "next", yGetVar("SkyWitches", "next") + 500);
+				}
+				case 2:
+				{
+					ySetVar("SkyWitches", "step", 0);
+					ySetVar("SkyWitches", "next", trTimeMS() + 18000);
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+				}
+			}
+		} else {
+			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("SkyWitches", "index"));
+			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("SkyWitches", "index"));
+			if (action > 0 && yGetVar("SkyWitches", "step") == 1) {
+				ySetVar("SkyWitches", "step", 0);
+				ySetVar("SkyWitches", "next", trTimeMS() + 18000);
 			}
 		}
 	}
