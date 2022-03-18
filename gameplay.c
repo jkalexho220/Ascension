@@ -1200,4 +1200,75 @@ highFrequency
 		yClearDatabase("cloudTornados");
 		xsDisableSelf();
 	}
+	for (i=yGetDatabaseCount("cloudDeployStars"); >0) {
+		if (PROJ_GROUND == processGenericProj("cloudDeployStars")) {
+			trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+1*trQuestVarGet("cloudDeployProto")));
+			trUnitSelectClear();
+			trUnitSelectByQV("cloudDeployStars");
+			trDamageUnitPercent(-100);
+			activateEnemy("cloudDeployStars");
+			yRemoveFromDatabase("cloudDeployStars");
+			trQuestVarSetFromRand("sound", 1, 2, true);
+			trSoundPlayFN("vortexland"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+		}
+	}
+	switch(1*trQuestVarGet("cloudDeployStep"))
+	{
+		case 0:
+		{
+			if (trTime() > trQuestVarGet("cloudDeployNext")) {
+				for(i=yGetDatabaseCount("playerCharacters"); >0) {
+					if (yDatabaseNext("playerCharacters",true) == -1 || trUnitAlive() == false) {
+						removePlayerCharacter();
+					} else {
+						trVectorSetUnitPos("cloudDeploycenter", "playerCharacters");
+						break;
+					}
+				}
+				trQuestVarSet("cloudDeployStep", 1);
+				trQuestVarSet("cloudDeployLanding", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("cloudDeploycenterx"),0,trQuestVarGet("cloudDeploycenterz"),0,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Vortex Landing");
+				trQuestVarSet("cloudDeployNext", trTimeMS() + 1500);
+			}
+		}
+		case 1:
+		{
+			if (trTimeMS() > trQuestVarGet("cloudDeployNext")) {
+				trQuestVarSetFromRand("cloudDeployCount", 3, 6, true);
+				trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
+				trQuestVarSet("cloudDeployStep", 2);
+			}
+		}
+		case 2:
+		{
+			if (trTimeMS() > trQuestVarGet("cloudDeployNext")) {
+				trQuestVarSetFromRand("sound", 1, 3, true);
+				trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				trVectorQuestVarSet("cloudDeployDir", rotationMatrix("cloudDeployDir", -0.757323, 0.653041));
+				trQuestVarSetFromRand("dist", 1.0, 7.0, false);
+				trQuestVarSet("posx", trQuestVarGet("cloudDeployCenterx") - trQuestVarGet("dist") * trQuestVarGet("cloudDeployDirx"));
+				trQuestVarSet("posz", trQuestVarGet("cloudDeployCenterz") - trQuestVarGet("dist") * trQuestVarGet("cloudDeployDirz"));
+				addGenericProj("cloudDeployStars","pos","cloudDeployDir",kbGetProtoUnitID("Lampades"),18,0.01,1.0,0,ENEMY_PLAYER);
+				trQuestVarSet("cloudDeployCount",trQuestVarGet("cloudDeployCount") - 1);
+				if (trQuestVarGet("cloudDeployCount") == 0) {
+					trQuestVarSet("cloudDeployStep", 3);
+				} else {
+					trQuestVarSet("cloudDeployNext", trQuestVarGet("cloudDeployNext") + 500);
+				}
+			}
+		}
+		case 3:
+		{
+			if (yGetDatabaseCount("cloudDeployStars") == 0) {
+				trQuestVarSet("cloudDeployStep", 0);
+				trUnitSelectClear();
+				trUnitSelectByQV("cloudDeployLanding");
+				trUnitDestroy();
+				trQuestVarSetFromRand("rand", 30, 90, true);
+				trQuestVarSet("cloudDeployNext", trTime() + trQuestVarGet("rand"));
+			}
+		}
+	}
 }

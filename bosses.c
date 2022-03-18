@@ -3486,7 +3486,7 @@ highFrequency
 							} else {
 								trVectorSetUnitPos("pos", "playerCharacters");
 								vectorSnapToGrid("pos");
-								spawnLightning("pos");
+								spawnLightning("pos", ENEMY_PLAYER);
 							}
 						}
 						trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
@@ -3514,7 +3514,7 @@ highFrequency
 							trQuestVarSet("posx", trQuestVarGet("lightningLineStartx"));
 							trQuestVarSet("posz", trQuestVarGet("lightningLineStartz"));
 							for(x=trQuestVarGet("lightningLineCount"); >0) {
-								spawnLightning("pos");
+								spawnLightning("pos", ENEMY_PLAYER);
 								trQuestVarSet("posx", trQuestVarGet("posx") + trQuestVarGet("linedirx"));
 								trQuestVarSet("posz", trQuestVarGet("posz") + trQuestVarGet("linedirz"));
 							}
@@ -3691,7 +3691,7 @@ highFrequency
 					for(x=4; >0) {
 						trQuestVarSet("posx", trQuestVarGet("dirx") + trQuestVarGet("cageCenterx"));
 						trQuestVarSet("posz", trQuestVarGet("dirz") + trQuestVarGet("cageCenterz"));
-						spawnLightning("pos");
+						spawnLightning("pos", ENEMY_PLAYER);
 						vectorRotate90Deg("dir");
 					}
 					trQuestVarSet("cageCount", trQuestVarGet("cageCount") - 1);
@@ -3974,7 +3974,7 @@ highFrequency
 		}
 		
 		if (hit) {
-			spawnLightning("pos");
+			spawnLightning("pos", ENEMY_PLAYER);
 			yRemoveFromDatabase("yeebFeathers");
 		}
 	}
@@ -3996,7 +3996,7 @@ highFrequency
 		trQuestVarSet("posx", trQuestVarGet("posx") + trQuestVarGet("yeebDirx") * trQuestVarGet("dist"));
 		trQuestVarSet("posz", trQuestVarGet("posz") + trQuestVarGet("yeebDirz") * trQuestVarGet("dist"));
 		vectorSnapToGrid("pos");
-		spawnLightning("pos");
+		spawnLightning("pos", ENEMY_PLAYER);
 	}
 	
 	/* all dead */

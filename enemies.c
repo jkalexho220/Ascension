@@ -219,7 +219,7 @@ void ballistaShotPop() {
 	yRemoveFromDatabase("ballistaShots");
 }
 
-bool spawnLightning(string pos = "") {
+bool spawnLightning(string pos = "", int p = 0) {
 	vectorToGrid(pos, "loc");
 	if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 		trArmyDispatch("0,0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
@@ -233,6 +233,7 @@ bool spawnLightning(string pos = "") {
 		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
 		yAddToDatabase("yeebLightning", "next");
 		yAddUpdateVar("yeebLightning", "timeout", trTimeMS() + 2000);
+		yAddUpdateVar("yeebLightning", "player", p);
 		return(true);
 	}
 	return(false);
@@ -1668,7 +1669,7 @@ void specialUnitsAlways() {
 				vectorSnapToGrid("target");
 				trUnitOverrideAnimation(2,0,false,true,-1);
 				ySetVar("lightningStatues","specialNext",trTimeMS() + 1000);
-				spawnLightning("target");
+				spawnLightning("target", p);
 				trSoundPlayFN("mirrortowerfire.wav","1",-1,"","");
 			}
 		}

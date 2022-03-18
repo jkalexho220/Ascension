@@ -1199,7 +1199,9 @@ int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0
 int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	string pName = kbGetProtoUnitName(proto);
-	trArmyDispatch(""+p+",0",pName,1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+	trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+	trArmySelect(""+p+",0");
+	trUnitChangeProtoUnit(pName);
 	return(activatePlayerUnit("next", p, proto, decay));
 }
 

@@ -31,17 +31,23 @@ highFrequency
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 10 x stage */
-				for(j=10; >0) {
+				/* bacchanalia 5 x stage */
+				for(j=5; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
 			}
 			for(i=trQuestVarGet("stage")/2; >0) {
 				/* monstrous rage */
 				trTechSetStatus(p, 76, 4);
-				if (trQuestVarGet("stage") > 6) {
+				if ((trQuestVarGet("stage") > 6) && (p == ENEMY_PLAYER)) {
 					trTechSetStatus(p, 76, 4);
 				}
+			}
+		}
+		for(i=trQuestVarGet("stage"); >1) {
+			/* bacchanalia 5 x stage */
+			for(j=5; >0) {
+				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
 		}
 		xsEnableRule("delayed_modify");
@@ -2312,6 +2318,8 @@ highFrequency
 		}
 		startNPCDialog(NPC_EXPLAIN_CLOUDS);
 		xsEnableRule("the_cloud_damage");
+		trQuestVarSet("cloudDeployNext", trTime() + 90);
+		trVectorQuestVarSet("cloudDeployDir", vector(0,0,1));
 		xsDisableSelf();
 	}
 }
