@@ -4925,7 +4925,10 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			
 		} else if (trQuestVarGet("bossSpell") > 20) {
-			
+			if (trQuestVarGet("bossSpell") == 21) {
+				trQuestVarSet("bossPosx", trQuestVarGet("bossRoomCenterx") - trQuestVarGet("bossDirx") * 24.0);
+				trQuestVarSet("bossPosz", trQuestVarGet("bossRoomCenterz") - trQuestVarGet("bossDirz") * 24.0);
+			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
 				trSoundPlayFN("nidhoggflame1.wav","1",-1,"","");
