@@ -31,8 +31,8 @@ highFrequency
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 5 x stage */
-				for(j=5; >0) {
+				/* bacchanalia 4 x stage */
+				for(j=4; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
 			}
@@ -45,7 +45,7 @@ highFrequency
 			}
 		}
 		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 5 x stage */
+			/* bacchanalia 6 x stage */
 			for(j=5; >0) {
 				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
@@ -649,7 +649,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					70.0 * x + 41.0 + trQuestVarGet("dirx"),0,70.0 * z + 41.0 + trQuestVarGet("dirz"),0,true);
 				trArmySelect(""+ENEMY_PLAYER+",0");
 				trSetUnitOrientation(trVectorQuestVarGet("heading"),vector(0,1,0),true);
-				activateEnemy("next");
+				yAddToDatabase("enemiesIncoming", "next");
 				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
 				trVectorQuestVarSet("heading", rotationMatrix("heading", 0.707107, 0.707107));
 			}
@@ -1547,7 +1547,7 @@ highFrequency
 				trSetCivAndCulture(0, 0, 0);
 				trSetCivAndCulture(ENEMY_PLAYER, 0, 0);
 				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
-				trQuestVarSet("bossRoomSize", 12);
+				trQuestVarSet("bossRoomSize", 10);
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 1;
 				
@@ -1582,6 +1582,13 @@ highFrequency
 				trStringQuestVarSet("enemyProto6", "Lampades");
 				
 				trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.0);
+				
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 28000 * ENEMY_PLAYER);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 24, 1);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 25, 1);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 26, 1);
 				
 				trStringQuestVarSet("bossProto", "Nidhogg");
 				trQuestVarSet("bossScale", 1.0);

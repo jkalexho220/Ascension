@@ -1353,6 +1353,15 @@ void specialUnitsAlways() {
 		}
 	}
 	
+	if (yGetDatabaseCount("hydras") > 0) {
+		if (yDatabaseNext("hydras", true) == -1 || trUnitAlive() == false || checkEnemyDeactivated("Hydras")) {
+			yRemoveFromDatabase("hydras");
+		} else if (trTime() > yGetVar("hydras","last")) {
+			amt = trTime() - yGetVar("hydras", "last");
+			ySetVar("hydras","last", trTime());
+			trDamageUnitPercent(0 - amt);
+		}
+	}
 	
 	if(yGetDatabaseCount("Nereids") >0) {
 		id = yDatabaseNext("Nereids", true);

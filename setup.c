@@ -954,6 +954,22 @@ int monsterPetProto(int i = 0) {
 		{
 			proto = kbGetProtoUnitID("Hydra");
 		}
+		case 28:
+		{
+			proto = kbGetProtoUnitID("Griffon");
+		}
+		case 29:
+		{
+			proto = kbGetProtoUnitID("Einheriar");
+		}
+		case 30:
+		{
+			proto = kbGetProtoUnitID("Statue of Lightning");
+		}
+		case 31:
+		{
+			proto = kbGetProtoUnitID("Lampades");
+		}
 	}
 	return(proto);
 }

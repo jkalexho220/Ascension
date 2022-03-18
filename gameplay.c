@@ -553,7 +553,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*
+	*/
 	
 	if (Multiplayer) {
 		trUnitSelectClear();
@@ -742,6 +742,14 @@ highFrequency
 										trSoundPlayFN("cantdothat.wav","1",-1,"","");
 									}
 								}
+							}
+						} else if (yGetVar("p"+p+"relics","type") == RELIC_SPARK) {
+							if (zDistanceBetweenVectorsSquared("pos", "bossRoomCenter") < 16.0) {
+								relicReturned = false;
+								trUnitSelectClear();
+								trUnitSelectByQV("p"+p+"relics");
+								trUnitChangeProtoUnit("Lightning Sparks Ground");
+								trQuestVarSet("bossSmite", 1 + trQuestVarGet("bossSmite"));
 							}
 						}
 						if (relicReturned == false) {
@@ -1231,6 +1239,7 @@ highFrequency
 				trArmySelect("0,0");
 				trUnitChangeProtoUnit("Vortex Landing");
 				trQuestVarSet("cloudDeployNext", trTimeMS() + 1500);
+				trSoundPlayFN("vortexstart.wav","1",-1,"","");
 			}
 		}
 		case 1:
@@ -1247,10 +1256,10 @@ highFrequency
 				trQuestVarSetFromRand("sound", 1, 3, true);
 				trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				trVectorQuestVarSet("cloudDeployDir", rotationMatrix("cloudDeployDir", -0.757323, 0.653041));
-				trQuestVarSetFromRand("dist", 1.0, 7.0, false);
+				trQuestVarSetFromRand("dist", 2.0, 10.0, false);
 				trQuestVarSet("posx", trQuestVarGet("cloudDeployCenterx") - trQuestVarGet("dist") * trQuestVarGet("cloudDeployDirx"));
 				trQuestVarSet("posz", trQuestVarGet("cloudDeployCenterz") - trQuestVarGet("dist") * trQuestVarGet("cloudDeployDirz"));
-				addGenericProj("cloudDeployStars","pos","cloudDeployDir",kbGetProtoUnitID("Lampades"),18,0.01,1.0,0,ENEMY_PLAYER);
+				addGenericProj("cloudDeployStars","pos","cloudDeployDir",kbGetProtoUnitID("Lampades"),18,0.01,2.5,0,ENEMY_PLAYER);
 				trQuestVarSet("cloudDeployCount",trQuestVarGet("cloudDeployCount") - 1);
 				if (trQuestVarGet("cloudDeployCount") == 0) {
 					trQuestVarSet("cloudDeployStep", 3);

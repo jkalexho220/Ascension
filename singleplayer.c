@@ -229,6 +229,17 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto5", "Scylla");
 			trQuestVarSet("bossScale", 1.3);
 		}
+		case 8:
+		{
+			tPrimary = 0;
+			tSubPrimary = 50;
+			trStringQuestVarSet("enemyProto1", "Griffon");
+			trStringQuestVarSet("enemyProto2", "Einheriar");
+			trStringQuestVarSet("enemyProto3", "Statue of Lightning");
+			trStringQuestVarSet("enemyProto4", "Lampades");
+			trStringQuestVarSet("enemyProto5", "Nidhogg");
+			trQuestVarSet("bossScale", 1.0);
+		}
 	}
 	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());

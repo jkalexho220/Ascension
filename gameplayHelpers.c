@@ -214,7 +214,11 @@ void removeEnemy() {
 			}
 		}
 		if (yGetVar("enemies", "relic") > 0) {
-			spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+			if (yGetVar("enemies", "relic") <= 10) {
+				spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+			} else {
+				spawnRelicSpecific(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+			}
 		}
 		yRemoveFromDatabase("enemies");
 	}
