@@ -144,7 +144,7 @@ highFrequency
 	setupProtounitBounty("Fire Siphon", 0.1, 8, 0.1);
 	
 	setupProtounitBounty("Servant", 0.5, 5, 0.03);
-	setupProtounitBounty("Nereid", 0.5, 7, 0.05);
+	setupProtounitBounty("Nereid", 0.3, 7, 0.05);
 	setupProtounitBounty("Kraken", 0.4, 9, 0.08);
 	setupProtounitBounty("Hydra", 0.4, 10, 0.1);
 	
@@ -1375,7 +1375,7 @@ void specialUnitsAlways() {
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
 						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
+						trVectorQuestVarSet("pos", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
 						ySetVarFromVector("Nereids", "end", "pos");
 						ySetVar("Nereids", "step", 1);
 						ySetVar("Nereids", "specialnext", trTimeMS() + 1400);
@@ -1621,11 +1621,16 @@ void specialUnitsAlways() {
 			trQuestVarSet("destz", trQuestVarGet("dirz") * 3.0 + trQuestVarGet("posz"));
 			vectorToGrid("dest", "loc");
 			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
-				ySetVar("yeebLightningBalls", "yeehaw", 99);
-				ySetVarFromVector("yeebLightningBalls", "dir", "dir");
-				trQuestVarSetFromRand("sound", 1, 2, true);
-				trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				if (yGetVar("yeebLightningBalls", "bounces") > 0) {
+					ySetVar("yeebLightningBalls", "bounces", yGetVar("yeebLightningBalls","bounces") - 1);
+					trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
+					ySetVar("yeebLightningBalls", "yeehaw", 99);
+					ySetVarFromVector("yeebLightningBalls", "dir", "dir");
+					trQuestVarSetFromRand("sound", 1, 2, true);
+					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				} else {
+					yRemoveFromDatabase("yeebLightningBalls");
+				}
 			} else {
 				dist = zDistanceBetweenVectorsSquared("pos", "prev");
 				if (dist > 4.0) {

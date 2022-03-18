@@ -58,6 +58,11 @@ const int NPC_NICK_NEXT = 410;
 const int NPC_NICK_QUEST_COMPLETE = 414;
 const int NPC_NICK_SLOT_MACHINE = 415;
 
+const int NPC_EXPLAIN_DEEP = 416;
+const int NPC_EXPLAIN_CLOUDS = 417;
+const int NPC_EXPLAIN_PIT = 418;
+const int NPC_EXPLAIN_SPACE = 419;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -498,6 +503,86 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("You will get a new random relic that is guaranteed to not be one of the ones you dropped.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_EXPLAIN_DEEP:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Here in the ocean depths, the pressure of water will crush you into a pancake.");
+				}
+				case 2:
+				{
+					uiMessageBox("However, you are protected in a bubble created by your Caladria.");
+				}
+				case 3:
+				{
+					uiMessageBox("If you exit the bubble, you will take massive damage! (The bubble is the Line of Sight of the Caladria)");
+				}
+				case 4:
+				{
+					uiMessageBox("You only get one Caladria, so keep her safe!");
+				}
+				case 5:
+				{
+					uiMessageBox("In addition, the Palace of the Deep will constantly spawn hunters to attack you.");
+				}
+				case 6:
+				{
+					uiMessageBox("Find and destroy the Palace to make the attacks stop.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_EXPLAIN_CLOUDS:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The thin atmosphere gives you limited resources.");
+				}
+				case 2:
+				{
+					uiMessageBox("All players lose 0.5 favor per second on this floor.");
+				}
+				case 3:
+				{
+					uiMessageBox("In addition, dangerous tornados wander the skies, dealing high damage.");
+				}
+				case 4:
+				{
+					uiMessageBox("If you find and destroy the Sky Palace, the tornados will stop.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_EXPLAIN_PIT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The flames of the Pits are hostile to the living.");
+				}
+				case 2:
+				{
+					uiMessageBox("All allies take 10 damage per second on this floor.");
+				}
+				case 3:
+				{
+					uiMessageBox("In addition, the Flame Palace will occasionally rain fireballs upon you.");
+				}
+				case 4:
+				{
+					uiMessageBox("Destroy the Flame Palace to make the attacks stop.");
 					dialog = 0;
 				}
 			}
@@ -1811,6 +1896,46 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 1:
 				{
 					uiMessageBox("Your strength has been acknowledged. Accept this power as your reward.");
+				}
+				case 2:
+				{
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE + 8:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("LONG HAVE PLAYERS IGNORED THE DREADED STATUE PUZZLE.");
+				}
+				case 2:
+				{
+					uiMessageBox("BUT YOUR TIME IS NIGH. COMPLETE THIS PUZZLE TO RECEIVE MY BLESSING.");
+				}
+				case 3:
+				{
+					uiMessageBox("IT'S A REALLY GOOD BLESSING I PROMISE.");
+					dialog = 0;
+				}
+			}
+		}
+		
+		case NPC_TEMPLE_COMPLETE + 8:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Wow you actually did it. Touch some grass y'all.");
 				}
 				case 2:
 				{

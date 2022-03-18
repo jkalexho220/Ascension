@@ -180,7 +180,13 @@ void processChests() {
 						}
 						if ((trQuestVarGet("correctStatuesIn"+room) == yGetDatabaseCount("statuesIn"+room)) &&
 							trQuestVarGet("movingStatuesIn"+room) == 0) {
-							ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
+							if (yGetVar("chests","temple") == 0) {
+								ySetVar("chests", "state", CHEST_STATE_UNLOCKED);
+							} else {
+								trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"),1);
+								startNPCDialog(NPC_TEMPLE_COMPLETE + 8);
+								removeChest();
+							}
 							trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 							for(x=yGetDatabaseCount("statuesIn"+room); >0) {
 								yDatabaseNext("statuesIn"+room, true);

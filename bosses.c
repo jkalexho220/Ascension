@@ -769,9 +769,15 @@ highFrequency
 		{
 			case 0:
 			{
+				xsDisableRule("the_deep_damage");
 				trOverlayText("Mother of the Depths", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
 				xsDisableRule("deep_village_always");
+				for(p=1; < ENEMY_PLAYER) {
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+p+"medic");
+					trUnitDestroy();
+				}
 			}
 			case 1:
 			{

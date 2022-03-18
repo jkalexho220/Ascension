@@ -1147,3 +1147,57 @@ highFrequency
 		}
 	}
 }
+
+rule the_deep_damage
+inactive
+highFrequency
+{
+	bool found = false;
+	float amt = trTimeMS() - yGetVar("playerUnits", "deepLast");
+	if (amt > 500) {
+		ySetVar("playerUnits","deepLast", trTimeMS() + 500);
+		trUnitSelectClear();
+		trUnitSelectByQV("playerUnits");
+		for(p=1; < ENEMY_PLAYER) {
+			if (trCountUnitsInArea(""+1*trQuestVarGet("playerUnits"),p,"Flying Medic", 25) > 0) {
+				found = true;
+				break;
+			}
+		}
+		if (found == false) {
+			trQuestVarSetFromRand("sound", 1, 2, true);
+			trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			trDamageUnit(0.2 * amt);
+		}
+	}
+}
+
+rule the_cloud_damage
+inactive
+highFrequency
+{
+	int hit = 0;
+	float amt = trTimeMS() - yGetVar("playerUnits", "deepLast");
+	if (amt > 500) {
+		ySetVar("playerUnits","deepLast",trTimeMS() + 500);
+		hit = trCountUnitsInArea(""+1*trQuestVarGet("playerUnits"),0,"Invisible Target",6);
+		
+		if (hit > 0) {
+			trQuestVarSetFromRand("sound", 1, 4, true);
+			trSoundPlayFN("swordonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			trUnitSelectClear();
+			trUnitSelectByQV("playerUnits");
+			damagePlayerUnit(amt * hit * 0.5);
+		}
+	}
+	trUnitSelectClear();
+	trUnitSelectByQV("stageWonder");
+	if (trUnitAlive() == false) {
+		for(i=yGetDatabaseCount("cloudTornados"); >0) {
+			yDatabaseNext("cloudTornados",true);
+			trUnitDestroy();
+		}
+		yClearDatabase("cloudTornados");
+		xsDisableSelf();
+	}
+}

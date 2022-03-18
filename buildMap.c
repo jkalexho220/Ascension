@@ -571,7 +571,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		{
 			trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, worldHeight, false);
-			paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+			paintSecondary(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
 			trQuestVarSet("villageX", 70 * x + 20);
 			trQuestVarSet("villageZ", 70 * z + 20);
 			trQuestVarSet("stageWonder", trGetNextUnitScenarioNameNumber());
@@ -620,8 +620,33 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trPaintTerrain(x * 35 + 11, z * 35 + 29, x * 35 + 11, z * 35 + 23, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 			trPaintTerrain(x * 35 + 11, z * 35 + 29, x * 35 + 17, z * 35 + 29, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 			
+			paintEnemies(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35);
+			
 			xsEnableRule("deep_village_always");
 			trQuestVarSet("deepDeployNext", trTime() + 30);
+		}
+		case ROOM_VILLAGE + 8:
+		{
+			paintCircle(x, z, 12, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			trQuestVarSet("villageX", 70 * x + 16);
+			trQuestVarSet("villageZ", 70 * z + 16);
+			trQuestVarSet("stageWonder", trGetNextUnitScenarioNameNumber());
+			trUnitSelectClear();
+			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 34, 34, 225), true);
+			trUnitConvert(ENEMY_PLAYER);
+			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
+			trVectorQuestVarSet("dir", vector(0,0,16));
+			trVectorQuestVarSet("heading", vector(0,0,-1));
+			for(i=0; < 7) {
+				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Statue of Lightning",1,
+					70.0 * x + 41.0 + trQuestVarGet("dirx"),0,70.0 * z + 41.0 + trQuestVarGet("dirz"),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetUnitOrientation(trVectorQuestVarGet("heading"),vector(0,1,0),true);
+				activateEnemy("next");
+				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
+				trVectorQuestVarSet("heading", rotationMatrix("heading", 0.707107, 0.707107));
+			}
 		}
 		case ROOM_VILLAGE + 11:
 		{
@@ -873,6 +898,16 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("columnsEnd", trGetNextUnitScenarioNameNumber());
 			xsEnableRule("monster_temple_init");
 			xsEnableRule("monster_temple_always");
+		}
+		case ROOM_TEMPLE + 8:
+		{
+			size = 12;
+			paintCircle(x, z, size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			placeTemple(x, z, 24);
+			yAddToDatabase("chests", "temple");
+			yAddUpdateVar("chests", "type", CHEST_STATUES);
+			yAddUpdateVar("chests", "room", room);
+			yAddUpdateVar("chests", "temple", 1);
 		}
 		case ROOM_TEMPLE + 11:
 		{
@@ -1487,7 +1522,7 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
 				
-				for(x=1; < 20) {
+				for(x=1; < 30) {
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trQuestVarSetFromRand("rand",1,360,true);
 					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
@@ -1499,6 +1534,7 @@ highFrequency
 			case 8:
 			{
 				xsEnableRule("the_clouds_build_01");
+				xsEnableRule("the_clouds_build_02");
 				worldHeight = 5;
 				wallHeight = -3;
 				trQuestVarSet("stageTemple", BOON_DOUBLE_FAVOR);
@@ -1543,6 +1579,16 @@ highFrequency
 				
 				trStringQuestVarSet("bossProto", "Nidhogg");
 				trQuestVarSet("bossScale", 1.0);
+				
+				for(x=10; >0) {
+					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					trQuestVarSetFromRand("heading", 1, 360, true);
+					yAddToDatabase("cloudTornados", "next");
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,145,0,145,trQuestVarGet("heading"),true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("cloudTornados", "sfx"));
+					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Invisible Target"), yGetNewVarName("cloudTornados", "block"));
+				}
 			}
 			case 11:
 			{
@@ -1900,13 +1946,20 @@ highFrequency
 				{
 					trVectorSetUnitPos("pos", "chests");
 					trQuestVarSetFromRand("rand", 4, 7, true);
+					if (yGetVar("chests", "temple") == 1) {
+						trQuestVarSet("rand", 9);
+					}
 					trQuestVarSet("angle", 0.785398);
 					trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
 					for(x=0; < trQuestVarGet("rand")) {
 						trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-						trQuestVarSet("statueX", trQuestVarGet("posX") - 10.0 * trQuestVarGet("dirX"));
-						trQuestVarSet("statueZ", trQuestVarGet("posZ") - 10.0 * trQuestVarGet("dirZ"));
-						
+						if (yGetVar("chests","temple") == 0) {
+							trQuestVarSet("statueX", trQuestVarGet("posX") - 10.0 * trQuestVarGet("dirX"));
+							trQuestVarSet("statueZ", trQuestVarGet("posZ") - 10.0 * trQuestVarGet("dirZ"));
+						} else {
+							trQuestVarSet("statueX", trQuestVarGet("posX") - 15.0 * trQuestVarGet("dirX"));
+							trQuestVarSet("statueZ", trQuestVarGet("posZ") - 15.0 * trQuestVarGet("dirZ"));
+						}
 						
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 						trArmyDispatch("1,0","Dwarf",1,1,0,1,180,true);
@@ -2161,6 +2214,43 @@ highFrequency
 			trQuestVarSetFromRand("scale", 1, 2, false);
 			trSetSelectedScale(trQuestVarGet("scale"),0.1 * trQuestVarGet("scale"),trQuestVarGet("scale"));
 		}
+		xsEnableRule("the_deep_build_02");
+		xsDisableSelf();
+	}
+}
+
+rule the_deep_build_02
+inactive
+highFrequency
+{
+	int class = 0;
+	string proto = "";
+	if (trQuestVarGet("play") == 1) {
+		/* no LOS for you */
+		for(p=1; < ENEMY_PLAYER) {
+			class = trQuestVarGet("p"+p+"class");
+			proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+			trModifyProtounit(proto, p, 2, -999);
+			trModifyProtounit("Dog", p, 2, -999);
+			trModifyProtounit("Wolf", p, 2, -999);
+			trModifyProtounit("Minion", p, 2, -999);
+			trModifyProtounit("Audrey", p, 2, -999);
+			trModifyProtounit("Walking Berry Bush", p, 2, -999);
+			
+			trModifyProtounit("Flying Medic", p, 55, 1);
+			zSetProtoUnitStat("Flying Medic", p, 2, 25.0);
+			
+			trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch(""+p+",0","Flying Medic",1,trQuestVarGet("startPositionx"),0,trQuestVarGet("startPositionz"),0,true);
+		}
+		for (i=1; < 40) {
+			proto = kbGetProtoUnitName(monsterPetProto(i));
+			for(p=1; < ENEMY_PLAYER) {
+				trModifyProtounit(proto, p, 2, -999);
+			}
+		}
+		xsEnableRule("the_deep_damage");
+		startNPCDialog(NPC_EXPLAIN_DEEP);
 		xsDisableSelf();
 	}
 }
@@ -2169,16 +2259,26 @@ rule the_clouds_build_01
 inactive
 highFrequency
 {
+	bool paint = true;
 	for(x=0; < 146) {
 		for(z=0; < 146) {
-			if (trGetTerrainHeight(x,z) < -2.0) {
-				if (trGetTerrainHeight(x+1,z+1) < -2.0) {
-					trPaintTerrain(x,z,x,z,4,14,false);
+			paint = true;
+			for(i=2;>= -1) {
+				for(j=2;>= -1) {
+					if (trGetTerrainHeight(x+i,z+j) > -2.0) {
+						paint = false;
+						break;
+					}
 				}
+				if (paint == false) {
+					break;
+				}
+			}
+			if (paint) {
+				trPaintTerrain(x,z,x,z,4,15,false);
 			}
 		}
 	}
-	xsEnableRule("the_clouds_build_02");
 	xsDisableSelf();
 }
 
@@ -2187,9 +2287,31 @@ inactive
 highFrequency
 {
 	if (trQuestVarGet("play") == 1) {
+		
+		trModifyProtounit("Hawk", ENEMY_PLAYER, 1, -2);
+		trModifyProtounit("Tornado", 0, 2, -999);
+		
+		for(i=yGetDatabaseCount("cloudTornados"); >0) {
+			yDatabaseNext("cloudTornados", true);
+			trMutateSelected(kbGetProtoUnitID("Hawk"));
+			trSetSelectedScale(0,0,0);
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("cloudTornados", "sfx"), true);
+			trUnitChangeProtoUnit("Tornado");
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("cloudTornados", "sfx"), true);
+			trUnitOverrideAnimation(1,0,true,true,-1);
+			trUnitSelectClear();
+			trUnitSelect(""+1*yGetVar("cloudTornados", "block"), true);
+			trUnitChangeProtoUnit("Invisible Target");
+		}
+		
+		
 		for(p=1; < ENEMY_PLAYER) {
 			trQuestVarSet("p"+p+"favorRegen", trQuestVarGet("p"+p+"favorRegen") - 0.5);
 		}
+		startNPCDialog(NPC_EXPLAIN_CLOUDS);
+		xsEnableRule("the_cloud_damage");
 		xsDisableSelf();
 	}
 }

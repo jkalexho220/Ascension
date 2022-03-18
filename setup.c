@@ -580,7 +580,7 @@ highFrequency
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
 	setupPlayerProto("Regent", 1000, 0, 4.2, 0.3);
-	
+	setupPlayerProto("Flying Medic", 1000, 0, 6.0, 0.25);
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
 	
