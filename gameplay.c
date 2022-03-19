@@ -553,7 +553,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*/
+	*
 	
 	if (Multiplayer) {
 		trUnitSelectClear();
@@ -622,23 +622,9 @@ highFrequency
 		}
 		if (trQuestVarGet("protectionWas") == 0) {
 			trQuestVarSet("protectionWas", 1);
-			for(p=1; < ENEMY_PLAYER) {
-				id = trQuestVarGet("p"+p+"class");
-				id = trQuestVarGet("class"+id+"proto");
-				trModifyProtounit(kbGetProtoUnitName(id),p,24,1);
-				trModifyProtounit(kbGetProtoUnitName(id),p,25,1);
-				trModifyProtounit(kbGetProtoUnitName(id),p,26,1);
-			}
 		}
 	} else if (trQuestVarGet("protectionWas") == 1) {
 		trQuestVarSet("protectionWas", 0);
-		for(p=1; < ENEMY_PLAYER) {
-			id = trQuestVarGet("p"+p+"class");
-			id = trQuestVarGet("class"+id+"proto");
-			trModifyProtounit(kbGetProtoUnitName(id),p,24,-1);
-			trModifyProtounit(kbGetProtoUnitName(id),p,25,-1);
-			trModifyProtounit(kbGetProtoUnitName(id),p,26,-1);
-		}
 	}
 	
 	/* relics dropped */
@@ -1129,10 +1115,12 @@ highFrequency
 		trUnitSelectByQV("stageWonder");
 		if ((trUnitAlive() == false) || (trQuestVarGet("play") == 0)) {
 			xsDisableSelf();
+			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
+			trUnitOverrideAnimation(-1,0,true,true,-1);
 		} else if (yGetDatabaseCount("playerUnits") > 0) {
 			int x = 0;
 			int z = 0;
-			trQuestVarSet("deepDeployNext", trTime() + 30);
+			trQuestVarSet("deepDeployNext", trTime() + 60);
 			trVectorQuestVarSet("dir",vector(-13,0,-13));
 			int heading = 45;
 			for(i=4; >0) {
@@ -1205,6 +1193,7 @@ highFrequency
 			yDatabaseNext("cloudTornados",true);
 			trUnitDestroy();
 		}
+		trMessageSetText("The Sky Palace has been destroyed! Tornados dispelled!", -1);
 		yClearDatabase("cloudTornados");
 		xsDisableSelf();
 	}

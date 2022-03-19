@@ -10,10 +10,12 @@ void bossCooldown(int minVal = 0, int maxVal = 0) {
 void processBossCooldown(int ultimate = 31) {
 	float diff = trTimeMS() - trQuestVarGet("bossCooldownLastCheck");
 	trQuestVarSet("bossCooldownLastCheck", trTimeMS());
+	if (trQuestVarGet("bossUltimate") > 0) {
+		trQuestVarSet("bossUsedUltimate", 1);
+	}
 	if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 		trQuestVarSet("bossSpell", 0);
 		if (trQuestVarGet("bossUltimate") > 0) {
-			trQuestVarSet("bossUsedUltimate", 1);
 			trQuestVarSet("bossUltimate", trQuestVarGet("bossUltimate") - 1);
 		}
 	} else if (trUnitPercentDamaged() > 70 && trQuestVarGet("bossUsedUltimate") == 0) {// boss hasn't used ultimate yet
@@ -624,8 +626,8 @@ highFrequency
 				
 				trQuestVarSet("bossRoomUpperX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
 				trQuestVarSet("bossRoomUpperz", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomCenterX") + trQuestVarGet("bossRoomSize"));
-				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerX", trQuestVarGet("bossRoomCenterX") - trQuestVarGet("bossRoomSize"));
+				trQuestVarSet("bossRoomLowerZ", trQuestVarGet("bossRoomCenterZ") - trQuestVarGet("bossRoomSize"));
 				
 				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
 				
@@ -3965,7 +3967,6 @@ highFrequency
 				trArmyDispatch("1,0","Stymphalian Bird",1,trQuestVarGet("yeebPosx"),0,trQuestVarGet("yeebPosz"),0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("yeebBird", true);
-				trUnitConvert(0);
 				trTechGodPower(ENEMY_PLAYER, "spy", 1);
 				trTechInvokeGodPower(ENEMY_PLAYER,"spy",vector(1,1,1),vector(1,1,1));
 				x = modularCounterNext("spyFind");
@@ -3981,6 +3982,7 @@ highFrequency
 				trUnitOverrideAnimation(33,0,true,false,-1);
 				trUnitSelectClear();
 				trUnitSelectByQV("yeebBird", true);
+				trUnitConvert(0);
 				trSetSelectedScale(0,0,0);
 				trSetUnitIdleProcessing(true);
 				trLetterBox(false);
@@ -4083,11 +4085,11 @@ highFrequency
 	/* all dead */
 	if (trQuestVarGet("gameOverStep") > 0) {
 		xsDisableSelf();
-	} else if ((trQuestVarGet("boss") == 1000) && (trQuestVarGet("deadPlayerCount") < trQuestVarGet("activePlayerCount"))) {
+	} else if ((trQuestVarGet("boss") == 1001) && (trQuestVarGet("deadPlayerCount") < trQuestVarGet("activePlayerCount"))) {
 		/* successful escape */
 		int escape = 0;
 		for(p=1; < ENEMY_PLAYER) {
-			if (zDistanceToVectorSquared("p"+p+"unit", "yeebDestination") < 300) {
+			if (zDistanceToVectorSquared("p"+p+"unit", "yeebDestination") < 400) {
 				escape = escape + 1;
 			}
 		}
@@ -4783,7 +4785,7 @@ highFrequency
 				trQuestVarSet("boss", 1);
 				activateEnemy("bossUnit");
 				yAddUpdateVar("enemies", "launched", 1);
-				trQuestVarSet("bossIndex", yGetNewestPointer());
+				trQuestVarSet("bossIndex", yGetNewestPointer("enemies"));
 				bossCooldown(10, 15);
 				xsEnableRule("boss_music");
 				trLetterBox(false);
@@ -5055,6 +5057,7 @@ highFrequency
 					trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 					if (trQuestVarGet("bossCount") == 0) {
 						trQuestVarSet("bossSpell", 34);
+						trQuestVarSet("bossNext", trTimeMS() + 2000);
 						trQuestVarSet("bossCount", trQuestVarGet("bossBarrageCount"));
 						trQuestVarSet("bossBarrageCount", 1 + trQuestVarGet("bossBarrageCount"));
 					} else {
@@ -5062,20 +5065,21 @@ highFrequency
 					}
 				}
 			} else if (trQuestVarGet("bossSpell") == 34) {
-				trQuestVarSet("bossSpell", 35);
-				trQuestVarSet("bossNext", trTimeMS() + 2000);
-				trVectorQuestVarSet("bossDir", rotationMatrix("bossDir", -0.757323, 0.653041));
-				trQuestVarSet("bossPosx", trQuestVarGet("bossRoomCenterx") + trQuestVarGet("bossDirx") * 20.0);
-				trQuestVarSet("bossPosz", trQuestVarGet("bossRoomCenterz") + trQuestVarGet("bossDirz") * 20.0);
-				for(i=yGetDatabaseCount("playerCharacters"); >0) {
-					if (yDatabaseNext("playerCharacters",true) == -1 || trUnitAlive() == false) {
-						removePlayerCharacter();
-					} else {
-						trVectorSetUnitPos("bossTarget", "playerCharacters");
-						break;
+				if (trTimeMS() > trQuestVarGet("bossNext")) {
+					trQuestVarSet("bossSpell", 35);
+					trVectorQuestVarSet("bossDir", rotationMatrix("bossDir", -0.757323, 0.653041));
+					trQuestVarSet("bossPosx", trQuestVarGet("bossRoomCenterx") + trQuestVarGet("bossDirx") * 20.0);
+					trQuestVarSet("bossPosz", trQuestVarGet("bossRoomCenterz") + trQuestVarGet("bossDirz") * 20.0);
+					for(i=yGetDatabaseCount("playerCharacters"); >0) {
+						if (yDatabaseNext("playerCharacters",true) == -1 || trUnitAlive() == false) {
+							removePlayerCharacter();
+						} else {
+							trVectorSetUnitPos("bossTarget", "playerCharacters");
+							break;
+						}
 					}
+					trVectorQuestVarSet("bossDir", zGetUnitVector("bossPos", "bossTarget"));
 				}
-				trVectorQuestVarSet("bossDir", zGetUnitVector("bossPos", "bossTarget"));
 			} else if (trQuestVarGet("bossSpell") == 35) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
 					trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 200);
@@ -5090,6 +5094,7 @@ highFrequency
 					if (zDistanceBetweenVectorsSquared("bossPos","bossRoomCenter") > 441.0) {
 						trQuestVarSet("bossCount", trQuestVarGet("bossCount") - 1);
 						if (trQuestVarGet("bossCount") > 0) {
+							trQuestVarSet("bossNext", trTimeMS() + 2000);
 							trQuestVarSet("bossSpell", 34);
 						} else {
 							trQuestVarSet("bossSpell", 32);
@@ -5098,7 +5103,7 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 36) {
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
-					trQuestVarSet("bossNext", trTimeMS() + 200);
+					trQuestVarSet("bossNext", trTimeMS() + 100);
 					trQuestVarSet("posx", trQuestVarGet("bossRoomCenterx") + trQuestVarGet("bossDirx") * trQuestVarGet("bossDist"));
 					trQuestVarSet("posz", trQuestVarGet("bossRoomCenterz") + trQuestVarGet("bossDirz") * trQuestVarGet("bossDist"));
 					vectorSnapToGrid("pos");

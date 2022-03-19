@@ -2840,6 +2840,7 @@ highFrequency
 								questComplete(-1, 300);
 								xsDisableRule("yeeb_hit_list");
 								trQuestVarSet("yeebHit", 0);
+								trQuestVarSet("yeebBossFight", 0);
 							} else if (p > 0) {
 								if (trTime() > trQuestVarGet("magicDetectorNext")) {
 									trQuestVarSet("magicDetectorNext", trTime());
@@ -2900,6 +2901,9 @@ highFrequency
 									yRemoveFromDatabase("worthlessJunk");
 								}
 							} else {
+								xsDisableRule("yeeb_hit_list");
+								trQuestVarSet("yeebHit", 0);
+								trQuestVarSet("yeebBossFight", 0);
 								questComplete(MANASTONE, -1);
 							}
 						}

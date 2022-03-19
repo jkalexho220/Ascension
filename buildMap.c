@@ -31,7 +31,7 @@ highFrequency
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 4 x stage */
+				/* bacchanalia 3 x stage */
 				for(j=3; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
@@ -45,7 +45,7 @@ highFrequency
 			}
 		}
 		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 6 x stage */
+			/* bacchanalia 7 x stage */
 			for(j=7; >0) {
 				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
@@ -1342,7 +1342,7 @@ highFrequency
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Rock Granite Small");
 				
-				trQuestVarSet("enemyDensity", 0.045 + 0.045 * ENEMY_PLAYER);
+				trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
 				
 				trQuestVarSet("enemyProtoCount", 5);
 				trStringQuestVarSet("enemyProto1", "Cyclops");
@@ -1507,7 +1507,7 @@ highFrequency
 				trModifyProtounit("Seaweed",1,55,1);
 				trModifyProtounit("Shipwreck",1,55,1);
 				
-				trQuestVarSet("enemyDensity", 0.06 + 0.06 * ENEMY_PLAYER);
+				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
 				
 				trQuestVarSet("enemyProtoCount", 6);
 				trStringQuestVarSet("enemyProto1", "Servant");
@@ -1585,7 +1585,7 @@ highFrequency
 				
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 28000 * ENEMY_PLAYER);
+				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 24, 1);
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 25, 1);
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 26, 1);
@@ -1602,6 +1602,59 @@ highFrequency
 					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("cloudTornados", "sfx"));
 					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Invisible Target"), yGetNewVarName("cloudTornados", "block"));
 				}
+			}
+			case 9:
+			{
+				worldHeight = 5;
+				wallHeight = -3;
+				trQuestVarSet("stageTemple", -1);
+				trQuestVarSet("templeRoom", -1);
+				trSetCivAndCulture(0, 9, 3);
+				trSetCivAndCulture(ENEMY_PLAYER, 9, 3);
+				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
+				trQuestVarSet("bossRoomSize", 12);
+				trQuestVarSet("wallEdges", 5);
+				trQuestVarSet("trapRooms", 3);
+				trQuestVarSet("trapType", TRAP_CAROUSEL);
+				TERRAIN_WALL = 2;
+				TERRAIN_SUB_WALL = 11;
+				
+				TERRAIN_PRIMARY = 0;
+				TERRAIN_SUB_PRIMARY = 84;
+				
+				TERRAIN_SECONDARY = 0;
+				TERRAIN_SUB_SECONDARY = 85;
+				
+				trQuestVarSet("mapType", MAP_STANDARD);
+				trQuestVarSet("treeDensity", 0.1);
+				trStringQuestVarSet("treeProto1", "Ruins");
+				trStringQuestVarSet("treeProto2", "Rock Granite Big");
+				trStringQuestVarSet("treeProto3", "Smoke");
+				trQuestVarSet("spriteDensity", 0.3);
+				trStringQuestVarSet("spriteProto1", "Skeleton");
+				trStringQuestVarSet("spriteProto2", "Rock Granite Small");
+				trStringQuestVarSet("spriteProto3", "Rock Limestone Small");
+				trQuestVarSet("rockDensity", 0.2);
+				trStringQuestVarSet("rockProto1", "Stalagmite");
+				trStringQuestVarSet("rockProto2", "Rock Granite Big");
+				trStringQuestVarSet("rockProto3", "Stalagmite");
+				
+				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
+				
+				trQuestVarSet("enemyProtoCount", 6);
+				trStringQuestVarSet("enemyProto1", "Tartarian Spawn");
+				trStringQuestVarSet("enemyProto2", "Troll");
+				trStringQuestVarSet("enemyProto3", "Manticore");
+				trStringQuestVarSet("enemyProto4", "Mountain Giant");
+				trStringQuestVarSet("enemyProto5", "Frost Giant");
+				trStringQuestVarSet("enemyProto6", "Fire Giant");
+				
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				
+				trStringQuestVarSet("bossProto", "Guardian");
+				trQuestVarSet("bossScale", 1.2);
 			}
 			case 11:
 			{

@@ -276,6 +276,13 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
+						ySetVar("p"+p+"characters", "index", activatePlayerUnit("p"+p+"characters"));
+						yAddUpdateVar("playerUnits", "hero", 1);
+						yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+						yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
+						if (trQuestVarGet("p"+p+"unit") == trQuestVarGet("p"+p+"characters")) {
+							trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
+						}
 					}
 				}
 				equipRelicsAgain(p);
@@ -344,6 +351,8 @@ void nightriderAlways(int eventID = -1) {
 					if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 						removeNightrider(p);
 					} else {
+						ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"));
+						yRemoveFromDatabase("playerUnits");
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 					}
 				}

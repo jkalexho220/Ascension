@@ -1176,6 +1176,10 @@ void activateSpecialUnit(string db = "", string pName = "", int proto = 0, int p
 			yAddUpdateVar("lightningStatues", "step", 0);
 			yAddUpdateVar("lightningStatues", "player", p);
 		}
+		case kbGetProtoUnitID("Manticore"):
+		{
+			yAddToDatabase("Manticores", db);
+		}
 	}
 }
 
