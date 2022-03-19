@@ -1624,7 +1624,7 @@ void specialUnitsAlways() {
 		action = processGenericProj("yeebLightningBalls");
 		p = yGetVar("yeebLightningBalls","player");
 		pName = opponentDatabaseName(p);
-		if (action == PROJ_FALLING) {
+		if ((action == PROJ_FALLING) || (action == PROJ_GROUND)) {
 			yVarToVector("yeebLightningBalls", "dir");
 			yVarToVector("yeebLightningBalls", "prev");
 			trQuestVarSet("destx", trQuestVarGet("dirx") * 3.0 + trQuestVarGet("posx"));

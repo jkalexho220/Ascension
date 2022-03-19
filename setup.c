@@ -777,7 +777,7 @@ void paintTowerSegment(int stage = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("0,0","Dwarf",1,x,0,z,180,true);
 	trArmySelect("0,0");
-	trUnitChangeProtoUnit("Outpost");
+	trMutateSelected(kbGetProtoUnitID("Outpost"));
 	yAddToDatabase("stageChoices", "next");
 	yAddUpdateVar("stageChoices", "stage", stage);
 }

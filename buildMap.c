@@ -32,7 +32,7 @@ highFrequency
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
 				/* bacchanalia 4 x stage */
-				for(j=4; >0) {
+				for(j=3; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
 			}
@@ -46,7 +46,7 @@ highFrequency
 		}
 		for(i=trQuestVarGet("stage"); >1) {
 			/* bacchanalia 6 x stage */
-			for(j=5; >0) {
+			for(j=7; >0) {
 				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
 		}
