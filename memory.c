@@ -54,7 +54,7 @@ int malloc(int type = -1) {
 		if no free buffers, create a new one
 		*/
 		next = aiPlanGetNumberUserVariableValues(MALLOC,type * 3 + xNextBlock - 1);
-		for(i=type * 3 - 1; < type * 3 + 2) {
+		for(i=type * 3; < type * 3 + 3) {
 			aiPlanSetNumberUserVariableValues(MALLOC,i,next + 1, false); // resizing seems to be a little expensive?
 		}
 		aiPlanSetUserVariableInt(MALLOC,type * 3 + xNextBlock - 1, next, 0); // next free block is 0 for a newly created block
@@ -396,14 +396,14 @@ highFrequency
 	xsSetContextPlayer(0);
 	MALLOC = aiPlanCreate("memory",0);
 	for(i=0; < 5) {
-		aiPlanAddUserVariableBool(MALLOC,i * 3 + xDirtyBit,"DirtyBit"+i,1);
-		aiPlanAddUserVariableInt(MALLOC,i * 3 + xNextBlock,"NextBlock"+i,1);
-		aiPlanSetUserVariableBool(MALLOC,i * 3 + xDirtyBit, NEXTFREE, true);
-		aiPlanSetUserVariableInt(MALLOC,i * 3 + xNextBlock, NEXTFREE, 0);
+		aiPlanAddUserVariableBool(MALLOC,i * 3 + xDirtyBit - 1,"DirtyBit"+i,1);
+		aiPlanAddUserVariableInt(MALLOC,i * 3 + xNextBlock - 1,"NextBlock"+i,1);
+		aiPlanSetUserVariableBool(MALLOC,i * 3 + xDirtyBit - 1, NEXTFREE, true);
+		aiPlanSetUserVariableInt(MALLOC,i * 3 + xNextBlock - 1, NEXTFREE, 0);
 	}
-	aiPlanAddUserVariableInt(MALLOC,mInt * 3 + xData, "intData",1);
-	aiPlanAddUserVariableFloat(MALLOC,mFloat * 3 + xData, "floatData",1);
-	aiPlanAddUserVariableString(MALLOC,mString * 3 + xData, "stringData",1);
-	aiPlanAddUserVariableVector(MALLOC,mVector * 3 + xData, "vectorData",1);
-	aiPlanAddUserVariableBool(MALLOC,mBool * 3 + xData, "boolData",1);
+	aiPlanAddUserVariableInt(MALLOC,mInt * 3 + xData - 1, "intData",1);
+	aiPlanAddUserVariableFloat(MALLOC,mFloat * 3 + xData - 1, "floatData",1);
+	aiPlanAddUserVariableString(MALLOC,mString * 3 + xData - 1, "stringData",1);
+	aiPlanAddUserVariableVector(MALLOC,mVector * 3 + xData - 1, "vectorData",1);
+	aiPlanAddUserVariableBool(MALLOC,mBool * 3 + xData - 1, "boolData",1);
 }
