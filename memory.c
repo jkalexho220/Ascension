@@ -1,4 +1,4 @@
-const int mInteger = 0;
+const int mInt = 0;
 const int mFloat = 1;
 const int mString = 2;
 const int mVector = 3;
@@ -9,12 +9,12 @@ const int xNextBlock = 1;
 const int xData = 2;
 const int xPrevBlock = 2; // for databases, xData is unused and xPrevBlock takes its place
 
-const int NEXTFREE = 0;
+const int NEXTFREE = 0; // the very first block contains the next free pointer and nothing else
 
 int MALLOC = 0;
 
 /*
-NOTE: YOU MUST SET xsSetContextPlayer(0); BEFORE CALLING THIS!
+NOTE: player context must be 0 when calling this! (use xsSetContextPlayer(0))
 */
 bool free(int type = -1, int index = -1) {
 	bool success = false;
@@ -31,7 +31,7 @@ bool free(int type = -1, int index = -1) {
 }
 
 /*
-NOTE: YOU MUST SET xsSetContextPlayer(0); BEFORE CALLING THIS!
+NOTE: player context must be 0 when calling this! (use xsSetContextPlayer(0))
 */
 int malloc(int type = -1) {
 	if (type < 0 || type > 5) {
@@ -47,7 +47,7 @@ int malloc(int type = -1) {
 		*/
 		next = aiPlanGetNumberUserVariableValues(MALLOC,type * 3 + xNextBlock);
 		for(i=type * 3; < type * 3 + 3) {
-			aiPlanSetNumberUserVariableValues(MALLOC,i,next+1);
+			aiPlanSetNumberUserVariableValues(MALLOC,i,next + 1, false);
 		}
 		aiPlanSetUserVariableInt(MALLOC,type * 3 + xNextBlock, next, 0); // next free block is 0 for a newly created block
 	} else {
@@ -60,9 +60,9 @@ int malloc(int type = -1) {
 	aiPlanSetUserVariableBool(MALLOC,type * 3 + xDirtyBit, next, true); // set dirty bit
 	switch(type) // initialize data
 	{
-		case mInteger:
+		case mInt:
 		{
-			aiPlanSetUserVariableInt(MALLOC, mInteger * 3 + xData, next, 0);
+			aiPlanSetUserVariableInt(MALLOC, mInt * 3 + xData, next, 0);
 		}
 		case mFloat:
 		{
@@ -119,16 +119,16 @@ bool mSetString(int index = 0, string val = "") {
 
 int mGetInt(int index = 0) {
 	int val = -1;
-	if (aiPlanGetUserVariableBool(MALLOC, mInteger * 3 + xDirtyBit, index)) {
-		val = aiPlanGetUserVariableInt(MALLOC, mInteger * 3 + xData, index);
+	if (aiPlanGetUserVariableBool(MALLOC, mInt * 3 + xDirtyBit, index)) {
+		val = aiPlanGetUserVariableInt(MALLOC, mInt * 3 + xData, index);
 	}
 	return(val);
 }
 
 bool mSetInt(int index = 0, int val = 0) {
 	bool success = false;
-	if (aiPlanGetUserVariableBool(MALLOC, mInteger * 3 + xDirtyBit, index)) {
-		success = aiPlanSetUserVariableInt(MALLOC, mInteger * 3 + xData, index, val);
+	if (aiPlanGetUserVariableBool(MALLOC, mInt * 3 + xDirtyBit, index)) {
+		success = aiPlanSetUserVariableInt(MALLOC, mInt * 3 + xData, index, val);
 	}
 	return(success);
 }
@@ -179,7 +179,7 @@ highFrequency
 		aiPlanSetUserVariableBool(MALLOC,i * 3 + xDirtyBit, NEXTFREE, true);
 		aiPlanSetUserVariableInt(MALLOC,i * 3 + xNextBlock, NEXTFREE, 0);
 	}
-	aiPlanAddUserVariableInt(MALLOC,mInteger * 3 + xData, "intData",1);
+	aiPlanAddUserVariableInt(MALLOC,mInt * 3 + xData, "intData",1);
 	aiPlanAddUserVariableFloat(MALLOC,mFloat * 3 + xData, "floatData",1);
 	aiPlanAddUserVariableString(MALLOC,mString * 3 + xData, "stringData",1);
 	aiPlanAddUserVariableVector(MALLOC,mVector * 3 + xData, "vectorData",1);
