@@ -362,7 +362,7 @@ int peekModularCounterNext(string name = "") {
 	return(0 + trQuestVarGet("counter" + name + "fake"));
 }
 
-
+/*
 float yGetVarAtIndex(string db = "", string var = "", int index = 0) {
 	return(trQuestVarGet("xdata"+db+index+var));
 }
@@ -430,7 +430,7 @@ int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
 void yRemoveFromDatabase(string db = "") {
 	int index = trQuestVarGet("xdata"+db+"pointer");
 	if (yGetVar(db, "xActive") == 1) {
-		/* connect next with prev */
+		
 		ySetVarAtIndex(db, "xNextBlock", yGetVar(db, "xNextBlock"), 1*yGetVar(db, "xPrevBlock"));
 		ySetVarAtIndex(db, "xPrevBlock", yGetVar(db, "xPrevBlock"), 1*yGetVar(db, "xNextBlock"));
 		
@@ -545,7 +545,7 @@ void ySetVarFromVector(string db = "", string attr = "", string v = "") {
 	ySetVar(db, attr+"x", trQuestVarGet(v+"x"));
 	ySetVar(db, attr+"z", trQuestVarGet(v+"z"));
 }
-
+*/
 /*
 Starting from NextUnitScenarioNameNumber and going backwards until the quest var 'qv',
 looks for the specified protounit. If none found, returns -1. Otherwise, returns the

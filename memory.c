@@ -66,35 +66,8 @@ int malloc(int type = -1) {
 			aiPlanGetUserVariableInt(MALLOC,type * 3 + xNextBlock - 1,next));
 	}
 	aiPlanSetUserVariableBool(MALLOC,type * 3 + xDirtyBit - 1, next, true); // set dirty bit
-	switch(type) // initialize data
-	{
-		case mInt:
-		{
-			aiPlanSetUserVariableInt(MALLOC, mInt * 3 + xData - 1, next, 0);
-		}
-		case mFloat:
-		{
-			aiPlanSetUserVariableFloat(MALLOC, mFloat * 3 + xData - 1, next, 0);
-		}
-		case mString:
-		{
-			aiPlanSetUserVariableString(MALLOC, mString * 3 + xData - 1, next, "");
-		}
-		case mVector:
-		{
-			aiPlanSetUserVariableVector(MALLOC, mVector * 3 + xData - 1, next, vector(0,0,0));
-		}
-		case mBool:
-		{
-			aiPlanSetUserVariableBool(MALLOC, mVector * 2 + xData - 1, next, false);
-		}
-	}
 	
 	return(next);
-}
-
-int mNewBool() {
-	return(malloc(mBool));
 }
 
 bool mGetBool(int index = 0) {
@@ -113,13 +86,16 @@ bool mSetBool(int index = 0, bool val = false) {
 	return(success);
 }
 
+int mNewBool(bool val = false) {
+	int index = malloc(mBool);
+	mSetBool(index, val);
+	return(index);
+}
+
 bool mFreeBool(int index = 0) {
 	return(free(mBool, index));
 }
 
-int mNewString() {
-	return(malloc(mString));
-}
 
 string mGetString(int index = 0) {
 	string val = "";
@@ -137,12 +113,14 @@ bool mSetString(int index = 0, string val = "") {
 	return(success);
 }
 
-bool mFreeString(int index = 0) {
-	return(free(mString, index));
+int mNewString(string val = "") {
+	int index = malloc(mString);
+	mSetString(index, val);
+	return(index);
 }
 
-int mNewInt() {
-	return(malloc(mInt));
+bool mFreeString(int index = 0) {
+	return(free(mString, index));
 }
 
 int mGetInt(int index = 0) {
@@ -161,12 +139,14 @@ bool mSetInt(int index = 0, int val = 0) {
 	return(success);
 }
 
-bool mFreeInt(int index = 0) {
-	return(free(mInt, index));
+int mNewInt(int val = 0) {
+	int index = malloc(mInt);
+	mSetInt(index, val);
+	return(index);
 }
 
-int mNewFloat() {
-	return(malloc(mFloat));
+bool mFreeInt(int index = 0) {
+	return(free(mInt, index));
 }
 
 float mGetFloat(int index = 0) {
@@ -185,12 +165,14 @@ bool mSetFloat(int index = 0, float val = 0) {
 	return(success);
 }
 
-bool mFreeFloat(int index = 0) {
-	return(free(mFloat, index));
+int mNewFloat(float val = 0) {
+	int index = malloc(mFloat);
+	mSetFloat(index, val);
+	return(index);
 }
 
-int mNewVector() {
-	return(malloc(mVector));
+bool mFreeFloat(int index = 0) {
+	return(free(mFloat, index));
 }
 
 vector mGetVector(int index = 0) {
@@ -207,6 +189,12 @@ bool mSetVector(int index = 0, vector val = vector(0,0,0)) {
 		success = aiPlanSetUserVariableVector(MALLOC, mVector * 3 + xData - 1, index, val);
 	}
 	return(success);
+}
+
+int mNewVector(vector val = vector(0,0,0)) {
+	int index = malloc(mVector);
+	mSetVector(index, val);
+	return(index);
 }
 
 bool mFreeVector(int index = 0) {
@@ -249,7 +237,7 @@ int xInitAddVar(int id = 0, string name = "", int type = 0) {
 	first, add the type to our list of types in this struct
 	*/
 	int index = aiPlanGetNumberUserVariableValues(id,xMetadata);
-	aiPlanSetNumberUserVariableValues(id,xMetadata,index + 1);
+	aiPlanSetNumberUserVariableValues(id,xMetadata,index + 1,false);
 	aiPlanSetUserVariableInt(id,xMetadata,index,type);
 	
 	/*
@@ -321,12 +309,12 @@ int xInitAddBool(int id = 0, string name = "", bool defVal = false) {
 int xAddDatabaseBlock(int id = 0) {
 	int next = aiPlanGetUserVariableInt(id,xMetadata,mNextFree);
 	if (next == 0) {
-		next = aiPlanGetNumberUserVariableValues(id,0);
 		/*
 		if no available buffers, we extend the total sizes of the arrays
 		*/
-		for(i=aiPlanGetUserVariableInt(id,xMetadata,mNumVariables + xMetadata); > xMetadata) {
-			aiPlanSetNumberUserVariableValues(id,i,next+1);
+		next = aiPlanGetNumberUserVariableValues(id,xDirtyBit);
+		for(i=aiPlanGetUserVariableInt(id,xMetadata,mNumVariables) + xData; > xMetadata) {
+			aiPlanSetNumberUserVariableValues(id,i,next+1,false);
 		}
 	} else {
 		/*
@@ -338,7 +326,7 @@ int xAddDatabaseBlock(int id = 0) {
 	
 	if (aiPlanGetUserVariableInt(id,xMetadata,mCount) == 0) {
 		/*
-		If it's the only thing in the db, point it to itself and also set the pointer to the new thing
+		If it's the only thing in the db, point it to itself and also set the database pointer to the new thing
 		*/
 		aiPlanSetUserVariableInt(id,xNextBlock,next,next);
 		aiPlanSetUserVariableInt(id,xPrevBlock,next,next);
@@ -385,6 +373,176 @@ int xAddDatabaseBlock(int id = 0) {
 		}
 	}
 	return(next);
+}
+
+
+bool xFreeDatabaseBlock(int id = 0, int index = -1) {
+	bool success = false;
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	if (aiPlanGetUserVariableBool(id,xDirtyBit,index)) {
+		/* connect next with prev */
+		int after = aiPlanGetUserVariableInt(id,xNextBlock,index);
+		int before = aiPlanGetUserVariableInt(id,xPrevBlock,index);
+		aiPlanSetUserVariableInt(id,xNextBlock,before,after); // next block of before is after
+		aiPlanSetUserVariableInt(id,xPrevBlock,after,before); // prev block of after is before
+		
+		/* add myself to the top of the free stack */
+		aiPlanSetUserVariableInt(id,xNextBlock,index,aiPlanGetUserVariableInt(id,xMetadata,mNextFree));
+		aiPlanSetUserVariableInt(id,xMetadata,mNextFree,index);
+		aiPlanSetUserVariableBool(id,xDirtyBit,index,false);
+		
+		/* set mPointer to my previous block and decrement count */
+		if (index == aiPlanGetUserVariableInt(id,xMetadata,mPointer)) {
+			aiPlanSetUserVariableInt(id,xMetadata,mPointer,aiPlanGetUserVariableInt(id,xPrevBlock,index));
+		}
+		aiPlanSetUserVariableInt(id,xMetadata,mCount, aiPlanGetUserVariableInt(id,xMetadata,mCount) - 1);
+		success = true;
+	}
+	return(success);
+}
+
+int xDatabaseNext(int id = 0) {
+	int pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	pointer = aiPlanGetUserVariableInt(id,xNextBlock,pointer);
+	if (aiPlanGetUserVariableBool(id,xDirtyBit,pointer)) {
+		aiPlanSetUserVariableInt(id,xMetadata,mPointer,pointer);
+	} else {
+		pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(pointer);
+}
+
+void xClearDatabase(int id = 0) {
+	int next = aiPlanGetUserVariableInt(id,xMetadata,mNextFree);
+	int pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	aiPlanSetUserVariableInt(id,xMetadata,mNextFree,aiPlanGetUserVariableInt(id,xNextBlock,pointer));
+	aiPlanSetUserVariableInt(id,xNextBlock,pointer,next);
+	
+	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
+	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
+}
+
+int xGetInt(int id = 0, int data = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mInt) {
+		return(-1); // if we are trying to get an int from the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanGetUserVariableInt(id,data,index));
+}
+
+bool xSetInt(int id = 0, int data = 0, int val = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mInt) {
+		return(false); // if we are trying to set the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanSetUserVariableInt(id,data,index,val));
+}
+
+
+float xGetFloat(int id = 0, int data = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mFloat) {
+		return(-1.0); // if we are trying to get an int from the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanGetUserVariableFloat(id,data,index));
+}
+
+bool xSetFloat(int id = 0, int data = 0, float val = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mFloat) {
+		return(false); // if we are trying to set the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanSetUserVariableFloat(id,data,index,val));
+}
+
+
+string xGetString(int id = 0, int data = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mString) {
+		return(""); // if we are trying to get an int from the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanGetUserVariableString(id,data,index));
+}
+
+bool xSetString(int id = 0, int data = 0, string val = "", int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mString) {
+		return(false); // if we are trying to set the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanSetUserVariableString(id,data,index,val));
+}
+
+
+vector xGetVector(int id = 0, int data = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mVector) {
+		return(vector(0,0,0)); // if we are trying to get an int from the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanGetUserVariableVector(id,data,index));
+}
+
+bool xSetVector(int id = 0, int data = 0, vector val = vector(0,0,0), int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mVector) {
+		return(false); // if we are trying to set the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanSetUserVariableVector(id,data,index,val));
+}
+
+
+bool xGetBool(int id = 0, int data = 0, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mBool) {
+		return(false); // if we are trying to get an int from the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanGetUserVariableBool(id,data,index));
+}
+
+bool xSetBool(int id = 0, int data = 0, bool val = false, int index = -1) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mBool) {
+		return(false); // if we are trying to set the wrong datatype, stop
+	}
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	return(aiPlanSetUserVariableBool(id,data,index,val));
+}
+
+bool xSetPointer(int id = 0, int index = 0) {
+	bool success = false;
+	if (aiPlanGetUserVariableBool(id,xDirtyBit,index)) {
+		aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
+		success = true;
+	}
+	return(success);
+}
+
+int xGetDatabaseCount(int id = 0) {
+	return(aiPlanGetUserVariableInt(id,xMetadata,mCount));
+}
+
+int xGetPointer(int id = 0) {
+	return(aiPlanGetUserVariableInt(id,xMetadata,mPointer));
 }
 
 rule mInitializeMemory
