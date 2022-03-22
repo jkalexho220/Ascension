@@ -55,12 +55,16 @@ int xPlayerSilenceResistanceCount = 0;
 
 int xPlayerStunDamage = 0;
 int xPlayerPoisonKiller = 0;
+
 int xPlayerWellCooldownStatus = 0;
 int xPlayerLureCooldownStatus = 0;
 int xPlayerRainCooldownStatus = 0;
 
+int xPlayerRegenerateFavorLast = 0;
+
 int xPlayerUnit = 0;
 int xPlayerLevel = 0;
+int xPlayerGodBoon = 0;
 
 int dClass = 0;
 int xClassProto = 0;
@@ -72,12 +76,12 @@ int xClassLevel = 0;
 
 int setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
 	int p = kbGetProtoUnitID(proto);
-	int id = xAddDatabaseBlock(dClass);
-	xSetInt(dClass,xClassProto,p,id);
-	xSetInt(dClass,xClassFirstDelay,firstDelay,id);
-	xSetInt(dClass,xClassNextDelay,nextDelay,id);
-	xSetInt(dClass,xClassSpecialAttackCooldown,specialCD,id);
-	xSetInt(dClass,xClassGemstone,gem,id);
+	xSetPointer(dClass,class);
+	xSetInt(dClass,xClassProto,p);
+	xSetInt(dClass,xClassFirstDelay,firstDelay);
+	xSetInt(dClass,xClassNextDelay,nextDelay);
+	xSetInt(dClass,xClassSpecialAttackCooldown,specialCD);
+	xSetInt(dClass,xClassGemstone,gem);
 	trQuestVarSet("proto"+p+"class", class);
 }
 
@@ -155,8 +159,11 @@ highFrequency
 	xPlayerLureCooldownStatus = xInitAddInt(dPlayerData,"lureCooldownStatus");
 	xPlayerRainCooldownStatus = xInitAddInt(dPlayerData,"rainCooldownStatus");
 	
+	xPlayerRegenerateFavorLast = xInitAddInt(dPlayerData,"regenerateFavorLast");
+	
 	xPlayerUnit = xInitAddInt(dPlayerData,"playerUnit");
 	xPlayerLevel = xInitAddInt(dPlayerData,"level");
+	xPlayerGodBoon = xInitAddInt(dPlayerData,"blessing");
 	
 	dClass = xInitDatabase("classData", 16);
 	xClassProto = xInitAddInt(dClass,"proto");
@@ -166,9 +173,14 @@ highFrequency
 	xClassGemstone = xInitAddInt(dClass,"gemstone");
 	xClassLevel = xInitAddInt(dClass,"level");
 	
-	for(p=1; < cNumberPlayers - 2) {
+	for(i=0; < 16) {
+		xAddDatabaseBlock(dClass);
+	}
+	
+	for(p=1; < cNumberPlayers - 1) {
 		trQuestVarSet("p"+p+"relics",xInitDatabase("p"+p+"relics"));
 		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"name");
 		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"type");
+		xAddDatabaseBlock(dPlayerData);
 	}
 }

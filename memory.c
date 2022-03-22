@@ -10,6 +10,7 @@ const int xNextBlock = 2;
 const int xPrevBlock = 3; // for databases, xData is unused and xPrevBlock takes its place
 const int xData = 3;
 const int xVarNames = 4; // list of variable names
+const int xVariables = 5;
 
 /*
 Metadata information
@@ -17,7 +18,8 @@ Metadata information
 const int mPointer = 0;
 const int mCount = 1;
 const int mNextFree = 2;
-const int mVariableTypes = 2;
+const int mNewestBlock = 3;
+const int mVariableTypes = 3;
 /*
 subsequent items in the metadata will determine the datatypes of extra variables for the database
 */
@@ -226,7 +228,7 @@ int xInitDatabase(string name = "", int size = 0) {
 	aiPlanAddUserVariableBool(id,xDirtyBit,"DirtyBit",size+1);
 	aiPlanAddUserVariableInt(id,xNextBlock,"NextBlock",size+1);
 	aiPlanAddUserVariableInt(id,xPrevBlock,"PrevBlock",size+1);
-	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",3);
+	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",4);
 	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
 	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
 	
@@ -394,6 +396,7 @@ int xAddDatabaseBlock(int id = 0) {
 		aiPlanSetUserVariableInt(id,xNextBlock,before,next); // next of before is me
 		aiPlanSetUserVariableInt(id,xPrevBlock,after,next); // prev of after is me
 	}
+	aiPlanSetUserVariableInt(id,xMetadata,mNewestBlock,next);
 	aiPlanSetUserVariableInt(id,xMetadata,mCount, 1 + aiPlanGetUserVariableInt(id,xMetadata,mCount));
 	/*
 	finally, initialize all the variables of the struct to their default values (whatever's in index 0 of the array)
@@ -428,6 +431,10 @@ bool xFreeDatabaseBlock(int id = 0, int index = -1) {
 		success = true;
 	}
 	return(success);
+}
+
+int xGetNewestPointer(int id = 0) {
+	return(aiPlanGetUserVariableInt(id,xMetadata,mNewestBlock));
 }
 
 int xDatabaseNext(int id = 0) {
