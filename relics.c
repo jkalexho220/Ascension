@@ -463,64 +463,67 @@ float calculateArmor(float start = 0, float armor = 0) {
 }
 
 void relicEffect(int relic = 0, int p = 0, bool equip = true) {
+	int old = xsGetContextPlayer();
 	float m = 1.0;
 	if (equip == false) {
 		m = -1.0;
 	}
-	int class = trQuestVarGet("p"+p+"class");
-	string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+	xsSetContextPlayer(0);
+	xSetPointer(dPlayerData,p);
+	int class = xGetInt(dPlayerData,xPlayerClass);
+	string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
 	switch(relic)
 	{
 		case RELIC_HEALTH:
 		{
-			trQuestVarSet("p"+p+"health", trQuestVarGet("p"+p+"health") + 300.0 * m);
-			zSetProtoUnitStat(proto, p, 0, trQuestVarGet("p"+p+"health"));
+			xSetFloat(dPlayerData,xPlayerHealth,xGetFloat(dPlayerData,xPlayerHealth) + 300.0 * m);
+			zSetProtoUnitStat(proto, p, 0, xGetFloat(dPlayerData,xPlayerHealth));
 		}
 		case RELIC_SPEED:
 		{
-			trQuestVarSet("p"+p+"speed", trQuestVarGet("p"+p+"speed") + 1.0 * m);
-			zSetProtoUnitStat(proto, p, 1, trQuestVarGet("p"+p+"speed"));
+			xSetFloat(dPlayerData,xPlayerSpeed,xGetFloat(dPlayerData,xPlayerSpeed) + 1.0 * m);
+			zSetProtoUnitStat(proto, p, 1, xGetFloat(dPlayerData,xPlayerSpeed));
 		}
 		case RELIC_ATTACK_RANGE:
 		{
-			trQuestVarSet("p"+p+"range", trQuestVarGet("p"+p+"range") + 5.0 * m);
+			xSetFloat(dPlayerData,xPlayerRange,xGetFloat(dPlayerData,xPlayerRange) + 5.0 * m);
+			xSetFloat(dPlayerData,xPlayerLos,xGetFloat(dPlayerData,xPlayerLos) + 5.0 * m);
 			zSetProtoUnitStat(proto, p, 11, trQuestVarGet("p"+p+"range"));
-			trQuestVarSet("p"+p+"los", trQuestVarGet("p"+p+"los") + 5.0 * m);
 			zSetProtoUnitStat(proto, p, 2, trQuestVarGet("p"+p+"los"));
-			zSetProtoUnitStat("Revealer to Player", p, 2, trQuestVarGet("p"+p+"los"));
+			zSetProtoUnitStat("Revealer to Player", p, 2, xGetFloat(dPlayerData,xPlayerLos));
 		}
 		case RELIC_SPELL_RANGE:
 		{
-			trQuestVarSet("p"+p+"spellRangeTrue", trQuestVarGet("p"+p+"spellRangeTrue") + 0.3 * m);
+			xSetFloat(dPlayerData,xPlayerSpellRangeTrue,xGetFloat(dPlayerData,xPlayerSpellRangeTrue) + 0.3 * m);
 		}
 		case RELIC_SPELL_DURATION:
 		{
-			trQuestVarSet("p"+p+"spellDurationTrue", trQuestVarGet("p"+p+"spellDurationTrue") + 0.3 * m);
+			xSetFloat(dPlayerData,xPlayerSpellDurationTrue,xGetFloat(dPlayerData,xPlayerSpellDurationTrue) + 0.3 * m);
 		}
 		case RELIC_LIFESTEAL:
 		{
-			trQuestVarSet("p"+p+"Lifesteal", trQuestVarGet("p"+p+"Lifesteal") + 0.2 * m);
+			xSetFloat(dPlayerData,xPlayerLifesteal,xGetFloat(dPlayerData,xPlayerLifesteal) + 0.2 * m);
 		}
 		case RELIC_ARMOR:
 		{
 			if (m == 1) {
-				trQuestVarSet("p"+p+"magicResist", calculateArmor(trQuestVarGet("p"+p+"magicResist"), 0.2));
-				trQuestVarSet("p"+p+"physicalResist", calculateArmor(trQuestVarGet("p"+p+"physicalResist"), 0.2));
+				xSetFloat(dPlayerData,xPlayerMagicResist,calculateArmor(xGetFloat(dPlayerData,xPlayerMagicResist),0.2));
+				xSetFloat(dPlayerData,xPlayerPhysicalResist,calculateArmor(xGetFloat(dPlayerData,xPlayerPhysicalResist),0.2));
 			} else {
-				trQuestVarSet("p"+p+"magicResist", calculateArmor(trQuestVarGet("p"+p+"magicResist"), -0.25));
-				trQuestVarSet("p"+p+"physicalResist", calculateArmor(trQuestVarGet("p"+p+"physicalResist"), -0.25));
+				xSetFloat(dPlayerData,xPlayerMagicResist,calculateArmor(xGetFloat(dPlayerData,xPlayerMagicResist),-0.25));
+				xSetFloat(dPlayerData,xPlayerPhysicalResist,calculateArmor(xGetFloat(dPlayerData,xPlayerPhysicalResist),-0.25));
 			}
 			trModifyProtounit(proto, p, 24, -1);
 			trModifyProtounit(proto, p, 25, -1);
 			trModifyProtounit(proto, p, 26, -1);
-			trModifyProtounit(proto, p, 24, trQuestVarGet("p"+p+"physicalResist"));
-			trModifyProtounit(proto, p, 25, trQuestVarGet("p"+p+"physicalResist"));
-			trModifyProtounit(proto, p, 26, trQuestVarGet("p"+p+"physicalResist"));
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
-				if ((yGetVar("playerUnits", "player") == p) && (yGetVar("playerUnits", "hero") == 1)) {
-					ySetVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
-					ySetVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+			trModifyProtounit(proto, p, 24, xGetFloat(dPlayerData,xPlayerPhysicalResist));
+			trModifyProtounit(proto, p, 25, xGetFloat(dPlayerData,xPlayerPhysicalResist));
+			trModifyProtounit(proto, p, 26, xGetFloat(dPlayerData,xPlayerPhysicalResist));
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
+				if ((xGetInt(dPlayerUnits,xPlayerOwner) == p) && xGetBool(dPlayerUnits,xIsHero)) {
+					xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
+					xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
 				}
 			}
 		}
@@ -701,6 +704,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		zSetProtoUnitStat(proto, p, 27, trQuestVarGet("p"+p+"baseAttack"));
 		zSetProtoUnitStat(proto, p, 31, trQuestVarGet("p"+p+"baseAttack"));
 	}
+	xsSetContextPlayer(old);
 }
 
 int relicProto(int relic = 0) {

@@ -9,15 +9,15 @@ const int xDirtyBit = 1;
 const int xNextBlock = 2;
 const int xPrevBlock = 3; // for databases, xData is unused and xPrevBlock takes its place
 const int xData = 3;
+const int xVarNames = 4; // list of variable names
 
 /*
 Metadata information
 */
 const int mPointer = 0;
 const int mCount = 1;
-const int mNumVariables = 2;
-const int mNextFree = 3;
-const int mVariableTypes = 3;
+const int mNextFree = 2;
+const int mVariableTypes = 2;
 /*
 subsequent items in the metadata will determine the datatypes of extra variables for the database
 */
@@ -25,6 +25,17 @@ subsequent items in the metadata will determine the datatypes of extra variables
 const int NEXTFREE = 0; // the very first block contains the next free pointer and nothing else
 
 int MALLOC = 0;
+
+void debugLog(string msg = "") {
+	if (trCurrentPlayer() == 1) {
+		trChatSend(0, "<color=1,0,0>" + msg);
+	}
+}
+
+
+string datatypeName(int data = 0) {
+	return(aiPlanGetUserVariableString(MALLOC,15,data));
+}
 
 /*
 NOTE: player context must be 0 when calling this! (use xsSetContextPlayer(0))
@@ -215,10 +226,9 @@ int xInitDatabase(string name = "", int size = 0) {
 	aiPlanAddUserVariableBool(id,xDirtyBit,"DirtyBit",size+1);
 	aiPlanAddUserVariableInt(id,xNextBlock,"NextBlock",size+1);
 	aiPlanAddUserVariableInt(id,xPrevBlock,"PrevBlock",size+1);
-	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",4);
+	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",3);
 	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
 	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
-	aiPlanSetUserVariableInt(id,xMetadata,mNumVariables,0);
 	
 	aiPlanSetUserVariableInt(id,xMetadata,mNextFree,size);
 	aiPlanSetUserVariableInt(id,xNextBlock,0,0);
@@ -226,12 +236,15 @@ int xInitDatabase(string name = "", int size = 0) {
 		aiPlanSetUserVariableBool(id,xDirtyBit,i,false);
 		aiPlanSetUserVariableInt(id,xNextBlock,i,i-1);
 	}
+	aiPlanAddUserVariableString(id,xVarNames,"VarNames",1);
+	aiPlanSetUserVariableString(id,xVarNames,0,"none");
+	return(id);
 }
 
 /*
 returns the index of the newly added variable
 */
-int xInitAddVar(int id = 0, string name = "", int type = 0) {
+int  xInitAddVar(int id = 0, string name = "", int type = 0) {
 	int count = aiPlanGetNumberUserVariableValues(id,xDirtyBit);
 	/*
 	first, add the type to our list of types in this struct
@@ -240,11 +253,13 @@ int xInitAddVar(int id = 0, string name = "", int type = 0) {
 	aiPlanSetNumberUserVariableValues(id,xMetadata,index + 1,false);
 	aiPlanSetUserVariableInt(id,xMetadata,index,type);
 	
+	index = aiPlanGetNumberUserVariableValues(id,xVarNames);
+	aiPlanSetNumberUserVariableValues(id,xVarNames,index+1,false);
+	aiPlanSetUserVariableString(id,xVarNames,index,name);
 	/*
 	next, add a new array of the specified datatype to hold values
 	*/
-	aiPlanSetUserVariableInt(id,xMetadata,mNumVariables, 1 + aiPlanGetUserVariableInt(id,xMetadata,mNumVariables));
-	index = aiPlanGetUserVariableInt(id,xMetadata,mNumVariables) + xData;
+	index = xVarNames + index;
 	switch(type)
 	{
 		case mInt:
@@ -306,6 +321,37 @@ int xInitAddBool(int id = 0, string name = "", bool defVal = false) {
 	return(index);
 }
 
+void xResetValues(int id = 0, int index = -1) {
+	if (index == -1) {
+		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	for(i = 1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
+		switch(aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i))
+		{
+			case mInt:
+			{
+				aiPlanSetUserVariableInt(id,xVarNames + i,index,aiPlanGetUserVariableInt(id,xVarNames + i,0));
+			}
+			case mFloat:
+			{
+				aiPlanSetUserVariableFloat(id,xVarNames + i,index,aiPlanGetUserVariableFloat(id,xVarNames + i,0));
+			}
+			case mString:
+			{
+				aiPlanSetUserVariableString(id,xVarNames + i,index,aiPlanGetUserVariableString(id,xVarNames + i,0));
+			}
+			case mVector:
+			{
+				aiPlanSetUserVariableVector(id,xVarNames + i,index,aiPlanGetUserVariableVector(id,xVarNames + i,0));
+			}
+			case mBool:
+			{
+				aiPlanSetUserVariableBool(id,xVarNames + i,index,aiPlanGetUserVariableBool(id,xVarNames + i,0));
+			}
+		}
+	}
+}
+
 int xAddDatabaseBlock(int id = 0) {
 	int next = aiPlanGetUserVariableInt(id,xMetadata,mNextFree);
 	if (next == 0) {
@@ -313,7 +359,12 @@ int xAddDatabaseBlock(int id = 0) {
 		if no available buffers, we extend the total sizes of the arrays
 		*/
 		next = aiPlanGetNumberUserVariableValues(id,xDirtyBit);
-		for(i=aiPlanGetUserVariableInt(id,xMetadata,mNumVariables) + xData; > xMetadata) {
+		/* increase lengths of variable arrays */
+		for(i=aiPlanGetNumberUserVariableValues(id,xVarNames) - 1; > 0) {
+			aiPlanSetNumberUserVariableValues(id,i + xVarNames,next+1,false);
+		}
+		/* increase lengths of metadata arrays */
+		for(i=xPrevBlock; > xMetadata) {
 			aiPlanSetNumberUserVariableValues(id,i,next+1,false);
 		}
 	} else {
@@ -347,31 +398,7 @@ int xAddDatabaseBlock(int id = 0) {
 	/*
 	finally, initialize all the variables of the struct to their default values (whatever's in index 0 of the array)
 	*/
-	for(i = 1; <= aiPlanGetUserVariableInt(id,xMetadata,mNumVariables)) {
-		switch(aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i))
-		{
-			case mInt:
-			{
-				aiPlanSetUserVariableInt(id,xData + i,next,aiPlanGetUserVariableInt(id,xData + i,0));
-			}
-			case mFloat:
-			{
-				aiPlanSetUserVariableFloat(id,xData + i,next,aiPlanGetUserVariableFloat(id,xData + i,0));
-			}
-			case mString:
-			{
-				aiPlanSetUserVariableString(id,xData + i,next,aiPlanGetUserVariableString(id,xData + i,0));
-			}
-			case mVector:
-			{
-				aiPlanSetUserVariableVector(id,xData + i,next,aiPlanGetUserVariableVector(id,xData + i,0));
-			}
-			case mBool:
-			{
-				aiPlanSetUserVariableBool(id,xData + i,next,aiPlanGetUserVariableBool(id,xData + i,0));
-			}
-		}
-	}
+	xResetValues(id,next);
 	return(next);
 }
 
@@ -410,6 +437,7 @@ int xDatabaseNext(int id = 0) {
 		aiPlanSetUserVariableInt(id,xMetadata,mPointer,pointer);
 	} else {
 		pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+		debugLog("xDatabaseNext: " + aiPlanGetName(id) + " pointer is incorrect!");
 	}
 	return(pointer);
 }
@@ -425,7 +453,10 @@ void xClearDatabase(int id = 0) {
 }
 
 int xGetInt(int id = 0, int data = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mInt) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mInt) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetInt: " + aiPlanGetName(id) + " variable " + name + " is not an int! Type: " + type);
 		return(-1); // if we are trying to get an int from the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -435,7 +466,10 @@ int xGetInt(int id = 0, int data = 0, int index = -1) {
 }
 
 bool xSetInt(int id = 0, int data = 0, int val = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mInt) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mInt) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xSetInt: " + aiPlanGetName(id) + " variable " + name + " is not an int! Type: " + type);
 		return(false); // if we are trying to set the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -446,7 +480,10 @@ bool xSetInt(int id = 0, int data = 0, int val = 0, int index = -1) {
 
 
 float xGetFloat(int id = 0, int data = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mFloat) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mFloat) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetFloat: " + aiPlanGetName(id) + " variable " + name + " is not a float! Type: " + type);
 		return(-1.0); // if we are trying to get an int from the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -456,7 +493,10 @@ float xGetFloat(int id = 0, int data = 0, int index = -1) {
 }
 
 bool xSetFloat(int id = 0, int data = 0, float val = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mFloat) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mFloat) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xSetFloat: " + aiPlanGetName(id) + " variable " + name + " is not a float! Type: " + type);
 		return(false); // if we are trying to set the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -467,7 +507,10 @@ bool xSetFloat(int id = 0, int data = 0, float val = 0, int index = -1) {
 
 
 string xGetString(int id = 0, int data = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mString) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mString) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetString: " + aiPlanGetName(id) + " variable " + name + " is not a string! Type: " + type);
 		return(""); // if we are trying to get an int from the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -477,7 +520,10 @@ string xGetString(int id = 0, int data = 0, int index = -1) {
 }
 
 bool xSetString(int id = 0, int data = 0, string val = "", int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mString) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mString) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xSetString: " + aiPlanGetName(id) + " variable " + name + " is not a string! Type: " + type);
 		return(false); // if we are trying to set the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -488,7 +534,10 @@ bool xSetString(int id = 0, int data = 0, string val = "", int index = -1) {
 
 
 vector xGetVector(int id = 0, int data = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mVector) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mVector) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetVector: " + aiPlanGetName(id) + " variable " + name + " is not a vector! Type: " + type);
 		return(vector(0,0,0)); // if we are trying to get an int from the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -498,7 +547,10 @@ vector xGetVector(int id = 0, int data = 0, int index = -1) {
 }
 
 bool xSetVector(int id = 0, int data = 0, vector val = vector(0,0,0), int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mVector) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mVector) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xSetVector: " + aiPlanGetName(id) + " variable " + name + " is not a vector! Type: " + type);
 		return(false); // if we are trying to set the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -509,7 +561,10 @@ bool xSetVector(int id = 0, int data = 0, vector val = vector(0,0,0), int index 
 
 
 bool xGetBool(int id = 0, int data = 0, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mBool) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mBool) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetBool: " + aiPlanGetName(id) + " variable " + name + " is not a bool! Type: " + type);
 		return(false); // if we are trying to get an int from the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -519,7 +574,10 @@ bool xGetBool(int id = 0, int data = 0, int index = -1) {
 }
 
 bool xSetBool(int id = 0, int data = 0, bool val = false, int index = -1) {
-	if (aiPlanGetUserVariableInt(id,xMetadata,data - xData + mNumVariables) != mBool) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes) != mBool) {
+		string type = datatypeName(aiPlanGetUserVariableInt(id,xMetadata,data - xVarNames + mVariableTypes));
+		string name = aiPlanGetUserVariableString(id,xVarNames,data - xVarNames);
+		debugLog("xGetBool: " + aiPlanGetName(id) + " variable " + name + " is not a bool! Type: " + type);
 		return(false); // if we are trying to set the wrong datatype, stop
 	}
 	if (index == -1) {
@@ -564,4 +622,11 @@ highFrequency
 	aiPlanAddUserVariableString(MALLOC,mString * 3 + xData - 1, "stringData",1);
 	aiPlanAddUserVariableVector(MALLOC,mVector * 3 + xData - 1, "vectorData",1);
 	aiPlanAddUserVariableBool(MALLOC,mBool * 3 + xData - 1, "boolData",1);
+	
+	aiPlanAddUserVariableString(MALLOC,15,"datatypes",5);
+	aiPlanSetUserVariableString(MALLOC,15,mInt,"Integer");
+	aiPlanSetUserVariableString(MALLOC,15,mFloat,"Float");
+	aiPlanSetUserVariableString(MALLOC,15,mString,"String");
+	aiPlanSetUserVariableString(MALLOC,15,mVector,"Vector");
+	aiPlanSetUserVariableString(MALLOC,15,mBool,"Bool");
 }

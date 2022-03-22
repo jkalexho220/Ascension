@@ -276,68 +276,29 @@ void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=
 	trModifyProtounit(proto, 0, 2, -20);
 }
 
-void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
-	int p = kbGetProtoUnitID(proto);
-	trQuestVarSet("class"+class+"proto", p);
-	trQuestVarSet("proto"+p+"class", class);
-	trQuestVarSet("class"+class+"firstDelay", firstDelay);
-	trQuestVarSet("class"+class+"nextDelay", nextDelay);
-	trQuestVarSet("class"+class+"specialAttackCooldown", specialCD);
-	trQuestVarSet("class"+class+"gemstone", gem);
-}
 
 void chooseClass(int p = 0, int class = 0) {
 	trQuestVarSet("p"+p+"class", class);
 	trEventFire(1000 + 12 * class + p);
-	int proto = trQuestVarGet("class"+class+"proto");
-	trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"baseAttackTrue", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
-	trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
-	trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
-	trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+class+"nextDelay"));
-	trQuestVarSet("p"+p+"specialAttackCooldown", trQuestVarGet("class"+class+"specialAttackCooldown"));
-	trQuestVarSet("p"+p+"los", 20);
-	trQuestVarSet("p"+p+"projectiles", 1);
-	trQuestVarSet("p"+p+"spellRange", 1);
-	trQuestVarSet("p"+p+"spellDamage", 1);
-	trQuestVarSet("p"+p+"spellDuration", 1);
-	trQuestVarSet("p"+p+"spellRangeTrue", 1);
-	trQuestVarSet("p"+p+"spellDamageTrue", 1);
-	trQuestVarSet("p"+p+"spellDurationTrue", 1);
-	trQuestVarSet("p"+p+"healBoost", 1);
-	trQuestVarSet("p"+p+"favorFromAttacks", 0);
-	trQuestVarSet("p"+p+"poisonSpeed", 0);
-	trQuestVarSet("p"+p+"lifesteal", 0);
-	trQuestVarSet("p"+p+"favorRegen", 0);
-	trQuestVarSet("p"+p+"physicalResist", trQuestVarGet("proto"+proto+"armor"));
-	trQuestVarSet("p"+p+"magicResist", trQuestVarGet("proto"+proto+"armor"));
-	trQuestVarSet("p"+p+"petDogs", 0);
-	trQuestVarSet("p"+p+"magicPen", 0);
-	trQuestVarSet("p"+p+"cleave", 0);
-	trQuestVarSet("p"+p+"defiance", 0);
+	int proto = xGetInt(dClass,xClassProto,class);
+	xResetValues(dPlayerData,p);
+	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"),p);
+	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"),p);
+	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"),p);
+	xSetFloat(dPlayerData,xPlayerAttack,trQuestVarGet("proto"+proto+"attack"),p);
+	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"),p);
+	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"),p);
 	
-	trQuestVarSet("p"+p+"ultimateCost", 1);
-	trQuestVarSet("p"+p+"cooldownReduction", 1);
-	trQuestVarSet("p"+p+"stunResistance", 1);
-	trQuestVarSet("p"+p+"poisonResistance", 1);
-	trQuestVarSet("p"+p+"silenceResistance", 1);
+	xSetInt(dPlayerData,xPlayerFirstDelay,trQuestVarGet("proto"+proto+"firstDelay"),p);
+	xSetInt(dPlayerData,xPlayerNextDelay,trQuestVarGet("proto"+proto+"nextDelay"),p);
+	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,trQuestVarGet("proto"+proto+"specialAttackCooldown"),p);
 	
-	trQuestVarSet("p"+p+"ultimateCostCount", 0);
-	trQuestVarSet("p"+p+"cooldownReductionCount", 0);
-	trQuestVarSet("p"+p+"stunResistanceCount", 0);
-	trQuestVarSet("p"+p+"poisonResistanceCount", 0);
-	trQuestVarSet("p"+p+"silenceResistanceCount", 0);
-	
-	trQuestVarSet("p"+p+"stunDamage", 0);
-	trQuestVarSet("p"+p+"poisonKiller", 0);
+	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"),p);
+	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"),p);
 	
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
-	if (trUnitAlive() && trQuestVarGet("p"+p+"unit") > 0) {
+	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
+	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit,p) > 0) {
 		trMutateSelected(proto);
 	}
 	trPlayerKillAllGodPowers(p);
@@ -347,27 +308,29 @@ void chooseClass(int p = 0, int class = 0) {
 		trCounterAbort("rain");
 	}
 	if (class > 0) {
-		trQuestVarSet("p"+p+"wellCooldownStatus", 1);
-		trQuestVarSet("p"+p+"lureCooldownStatus", 1);
-		trQuestVarSet("p"+p+"rainCooldownStatus", 1);
+		xSetInt(dPlayerData,xPlayerWellCooldownStatus,1,p);
+		xSetInt(dPlayerData,xPlayerLureCooldownStatus,1,p);
+		xSetInt(dPlayerData,xPlayerRainCooldownStatus,1,p);
 	}
 	
 	if (Multiplayer == false) {
-		trQuestVarSet("p"+p+"level", trQuestVarGet("class"+class+"level") - 1);
-		trSetCivilizationNameOverride(p, "Level " + (1+trQuestVarGet("p"+p+"level")));
+		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class),p);
+		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel,p)));
 	}
 	
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics");
-		if (x > trQuestVarGet("p"+p+"level")+1) {
-			yAddToDatabase("freeRelics", "p"+p+"relics");
-			yAddUpdateVar("freeRelics", "type", 1*yGetVar("p"+p+"relics", "type"));
-			yRemoveFromDatabase("p"+p+"relics");
+	int relics = trQuestVarGet("p"+p+"relics");
+	for(x=xGetDatabaseCount(relics); >0) {
+		xDatabaseNext(relics);
+		if (x > xGetInt(dPlayerData,xPlayerLevel,p)+1) {
+			int index = xAddDatabaseBlock(dFreeRelics);
+			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
+			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
+			xFreeBlock(relics);
 			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"relics");
+			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
 		} else {
-			relicEffect(1*yGetVar("p"+p+"relics", "type"), p, true);
+			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
 	}
 }
@@ -423,6 +386,8 @@ runImmediately
 	aiSet("NoAI", ENEMY_PLAYER);
 	xsSetContextPlayer(ENEMY_PLAYER);
 	aiSetAttackResponseDistance(0.0);
+
+	xsSetContextPlayer(0);
 	
 	setupClass("Militia", 0, 500, 1000);
 	setupClass("Militia", 13, 500, 1000);
@@ -548,6 +513,7 @@ rule delayed_modify
 inactive
 highFrequency
 {
+	xsSetContextPlayer(0);
 	zInitProtoUnitStat("Revealer", 1, 2, 12);
 	setupPlayerProto("Kronny Flying", 1000, 0, 0);
 	

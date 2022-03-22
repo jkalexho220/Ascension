@@ -16,7 +16,7 @@ FILENAME = 'Ascension MMORPG.xs'
 files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
-files = ['main.c', 'memory.c']
+files = ['main.c', 'memory.c', 'shared.c', 'initdb.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -67,10 +67,10 @@ BASE_JOB = None
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = ['cNumberPlayers', 'cNumberNonGaiaPlayers', 'cMapSize', 'cNumberTeams',
+KNOWN_VARIABLES = ['cNumberPlayers', 'cMapSize', 'cNumberTeams',
 					'cConnectAllies', 'cConnectAreas', 'cConnectEnemies', 'cConnectPlayers',
 					'cInvalidVector', 'cOriginVector', 'cActivationTime']
-KNOWN_TYPES = ['int', 'int', 'int', 'int',
+KNOWN_TYPES = ['int', 'int', 'int',
 				'int', 'int', 'int', 'int',
 				'vector', 'vector', 'int']
 
