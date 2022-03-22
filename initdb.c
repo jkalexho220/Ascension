@@ -1,15 +1,45 @@
 int dPlayerUnits = 0;
 int dEnemies = 0;
+int xUnitName = 0;
+int xPlayerOwner = 0;
 int xPhysicalResist = 0;
 int xMagicResist = 0;
-int xPlayerOwner = 0;
 int xIsHero = 0;
 int xUnitPos = 0;
+int xDoppelganger = 0;
 
+int xCurrentHealth = 0;
+int xStunStatus = 0;
+int xStunTimeout = 0;
+int xStunSFX = 0;
+int xPoisonStatus = 0;
+int xPoisonTimeout = 0;
+int xPoisonLast = 0;
+int xPoisonDamage = 0;
+int xPoisonSFX = 0;
+int xSilenceStatus = 0;
+int xSilenceTimeout = 0;
+int xSilenceSFX = 0;
+int xLaunched = 0;
+
+/* playerUnits specific */
+int xDecay = 0;
+int xDecayNext = 0;
+int xUnity = 0;
+
+/* enemies specific */
+int xDeathSentence = 0;
+
+/* playerCharacters */
+int dPlayerCharacters = 0;
+int xIndex = 0;
+
+/* relics */
 int dFreeRelics = 0;
 int xRelicName = 0;
 int xRelicType = 0;
 
+/* player data */
 int dPlayerData = 0;
 int xPlayerClass = 0;
 int xPlayerHealth = 0; //float
@@ -59,12 +89,23 @@ int xPlayerPoisonKiller = 0;
 int xPlayerWellCooldownStatus = 0;
 int xPlayerLureCooldownStatus = 0;
 int xPlayerRainCooldownStatus = 0;
+int xPlayerWellCooldown = 0;
+int xPlayerLureCooldown = 0;
+int xPlayerRainCooldown = 0;
 
 int xPlayerRegenerateFavorLast = 0;
 
 int xPlayerUnit = 0;
 int xPlayerLevel = 0;
+int xPlayerProgress = 0;
 int xPlayerGodBoon = 0;
+int xPlayerIndex = 0;
+
+int xPlayerMonsterIndex = 0;
+int xPlayerRelicTransporterLevel = 0;
+int xPlayerGold = 0;
+int xPlayerFavor = 0;
+int xPlayerDead = 0;
 
 int dClass = 0;
 int xClassProto = 0;
@@ -92,18 +133,35 @@ highFrequency
 	xsDisableSelf();
 	xsSetContextPlayer(0);
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
-	xPhysicalResist = xInitAddFloat(dPlayerUnits,"physicalResist");
-	xMagicResist = xInitAddFloat(dPlayerUnits,"magicResist");
-	xPlayerOwner = xInitAddInt(dPlayerUnits,"player");
-	xIsHero = xInitAddBool(dPlayerUnits,"isHero");
-	xUnitPos = xInitAddVector(dPlayerUnits,"UnitPos");
-	
 	dEnemies = xInitDatabase("enemies", 30);
-	xInitAddFloat(dEnemies,"physicalResist");
-	xInitAddFloat(dEnemies,"magicResist");
-	xInitAddInt(dEnemies,"player");
-	xInitAddBool(dEnemies,"isHero");
-	xInitAddVector(dEnemies,"UnitPos");
+	for(db=dEnemies; >= dPlayerUnits) {
+		xUnitName = xInitAddInt(db);
+		xPhysicalResist = xInitAddFloat(db,"physicalResist");
+		xMagicResist = xInitAddFloat(db,"magicResist");
+		xPlayerOwner = xInitAddInt(db,"player");
+		xIsHero = xInitAddBool(db,"isHero");
+		xUnitPos = xInitAddVector(db,"UnitPos");
+		xDoppelganger = xInitAddInt(db,"doppelganger");
+		xCurrentHealth = xInitAddFloat(db,"currentHP");
+		xStunStatus = xInitAddInt(db,"stunStatus");
+		xStunTimeout = xInitAddInt(db,"stunTimeout");
+		xStunSFX = xInitAddInt(db,"stunSFX");
+		xPoisonStatus = xInitAddInt(db,"poisonStatus");
+		xPoisonTimeout = xInitAddInt(db,"poisonTimeout");
+		xPoisonLast = xInitAddInt(db,"poisonLast");
+		xPoisonDamage = xInitAddInt(db,"poisonDamage");
+		xPoisonSFX = xInitAddInt(db,"poisonSFX");
+		xSilenceStatus = xInitAddInt(db,"silenceStatus");
+		xSilenceTimeout = xInitAddInt(db,"silenceTimeout");
+		xSilenceSFX = xInitAddInt(db,"silenceSFX");
+		xLaunched = xInitAddInt(db,"launched");
+	}
+	xDecay = xInitAddInt(dPlayerUnits,"decay");
+	xDecayNext = xInitAddInt(dPlayerUnits,"decayNext");
+	xUnity = xInitAddInt(dPlayerUnits,"unity");
+	
+	xDeathSentence = xInitAddInt(dEnemies,"deathSentence");
+	
 	
 	dFreeRelics = xInitDatabase("freeRelics", 10);
 	xRelicName = xInitAddInt(dFreeRelics,"name");
@@ -158,12 +216,23 @@ highFrequency
 	xPlayerWellCooldownStatus = xInitAddInt(dPlayerData,"wellCooldownStatus");
 	xPlayerLureCooldownStatus = xInitAddInt(dPlayerData,"lureCooldownStatus");
 	xPlayerRainCooldownStatus = xInitAddInt(dPlayerData,"rainCooldownStatus");
+	xPlayerWellCooldown = xInitAddInt(dPlayerData,"wellCooldown");
+	xPlayerLureCooldown = xInitAddInt(dPlayerData,"lureCooldown");
+	xPlayerRainCooldown = xInitAddInt(dPlayerData,"rainCooldown");
 	
 	xPlayerRegenerateFavorLast = xInitAddInt(dPlayerData,"regenerateFavorLast");
 	
 	xPlayerUnit = xInitAddInt(dPlayerData,"playerUnit");
 	xPlayerLevel = xInitAddInt(dPlayerData,"level");
+	xPlayerProgress = xInitAddInt(dPlayerData,"progress");
 	xPlayerGodBoon = xInitAddInt(dPlayerData,"blessing");
+	xPlayerGold = xInitAddInt(dPlayerData,"gold");
+	xPlayerFavor = xInitAddFloat(dPlayerData,"favor");
+	xPlayerDead = xInitAddInt(dPlayerData,"dead");
+	xPlayerIndex = xInitAddInt(dPlayerData,xPlayerIndex);
+	
+	xPlayerMonsterIndex = xInitAddInt(dPlayerData,"monsterIndex");
+	xPlayerRelicTransporterLevel = xInitAddInt(dPlayerData,"relicTransporterLevel");
 	
 	dClass = xInitDatabase("classData", 16);
 	xClassProto = xInitAddInt(dClass,"proto");
@@ -177,10 +246,25 @@ highFrequency
 		xAddDatabaseBlock(dClass);
 	}
 	
+	dPlayerCharacters = xInitDatabase("playerCharacters", cNumberPlayers - 2);
+	xInitAddInt(dPlayerCharacters,"name");
+	xInitAddInt(dPlayerCharacters,"player");
+	xIndex = xInitAddInt(dPlayerCharacters,"index");
+	
 	for(p=1; < cNumberPlayers - 1) {
 		trQuestVarSet("p"+p+"relics",xInitDatabase("p"+p+"relics"));
 		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"name");
 		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"type");
+		
+		trQuestVarSet("p"+p+"warehouse",xInitDatabase("p"+p+"warehouse"));
+		xInitAddInt(1*trQuestVarGet("p"+p+"warehouse"),"name");
+		xInitAddInt(1*trQuestVarGet("p"+p+"warehouse"),"type");
+		
+		trQuestVarSet("p"+p+"characters",xInitDatabase("p"+p+"characters"));
+		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"name");
+		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"player");
+		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
+		
 		xAddDatabaseBlock(dPlayerData);
 	}
 }

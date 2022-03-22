@@ -1208,6 +1208,7 @@ inactive
 highFrequency
 {
 	int class = 0;
+	xsSetContextPlayer(0);
 	for(i=2; >0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("choice"+i+"unit");
@@ -1218,9 +1219,10 @@ highFrequency
 			trDelayedRuleActivation("class_shop_explain_01");
 			reselectMyself();
 		}
-		trVectorSetUnitPos("pos", "choice"+i+"unit");
+		vector pos = kbGetBlockPosition(""+1*trQuestVarGet("choice"+i+"unit"));
 		for (p=1; < ENEMY_PLAYER) {
-			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 5) {
+			vector playerpos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
+			if (distanceBetweenVectors(playerpos,pos) < 5) {
 				if (trQuestVarGet("p"+p+"buy"+i) < 4 &&
 					trTimeMS() > trQuestVarGet("p"+p+"buyNext") &&
 					trQuestVarGet("p"+p+"noob") == 1) {

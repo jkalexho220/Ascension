@@ -281,24 +281,25 @@ void chooseClass(int p = 0, int class = 0) {
 	trQuestVarSet("p"+p+"class", class);
 	trEventFire(1000 + 12 * class + p);
 	int proto = xGetInt(dClass,xClassProto,class);
-	xResetValues(dPlayerData,p);
-	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"),p);
-	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"),p);
-	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"),p);
-	xSetFloat(dPlayerData,xPlayerAttack,trQuestVarGet("proto"+proto+"attack"),p);
-	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"),p);
-	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"),p);
+	xSetPointer(dPlayerData,p);
+	xResetValues(dPlayerData);
+	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"));
+	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerAttack,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"));
+	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"));
 	
-	xSetInt(dPlayerData,xPlayerFirstDelay,trQuestVarGet("proto"+proto+"firstDelay"),p);
-	xSetInt(dPlayerData,xPlayerNextDelay,trQuestVarGet("proto"+proto+"nextDelay"),p);
-	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,trQuestVarGet("proto"+proto+"specialAttackCooldown"),p);
+	xSetInt(dPlayerData,xPlayerFirstDelay,trQuestVarGet("proto"+proto+"firstDelay"));
+	xSetInt(dPlayerData,xPlayerNextDelay,trQuestVarGet("proto"+proto+"nextDelay"));
+	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,trQuestVarGet("proto"+proto+"specialAttackCooldown"));
 	
-	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"),p);
-	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"),p);
+	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
+	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	
 	trUnitSelectClear();
-	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
-	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit,p) > 0) {
+	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
+	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit) > 0) {
 		trMutateSelected(proto);
 	}
 	trPlayerKillAllGodPowers(p);
@@ -308,14 +309,14 @@ void chooseClass(int p = 0, int class = 0) {
 		trCounterAbort("rain");
 	}
 	if (class > 0) {
-		xSetInt(dPlayerData,xPlayerWellCooldownStatus,1,p);
-		xSetInt(dPlayerData,xPlayerLureCooldownStatus,1,p);
-		xSetInt(dPlayerData,xPlayerRainCooldownStatus,1,p);
+		xSetInt(dPlayerData,xPlayerWellCooldownStatus,1);
+		xSetInt(dPlayerData,xPlayerLureCooldownStatus,1);
+		xSetInt(dPlayerData,xPlayerRainCooldownStatus,1);
 	}
 	
 	if (Multiplayer == false) {
-		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class),p);
-		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel,p)));
+		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class));
+		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel)));
 	}
 	
 	int relics = trQuestVarGet("p"+p+"relics");
@@ -325,7 +326,7 @@ void chooseClass(int p = 0, int class = 0) {
 			int index = xAddDatabaseBlock(dFreeRelics);
 			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
 			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
-			xFreeBlock(relics);
+			xFreeDatabaseBlock(relics);
 			trUnitSelectClear();
 			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
@@ -374,9 +375,6 @@ runImmediately
 	trLetterBox(true);
 	trUIFadeToColor(0,0,0,0,0,true);
 	
-	modularCounterInit("spyFind", 64);
-	modularCounterInit("spyFound", 64);
-	
 	/*
 	player 0 omniscience
 	*/
@@ -386,14 +384,10 @@ runImmediately
 	aiSet("NoAI", ENEMY_PLAYER);
 	xsSetContextPlayer(ENEMY_PLAYER);
 	aiSetAttackResponseDistance(0.0);
-
+	
 	xsSetContextPlayer(0);
 	
 	setupClass("Militia", 0, 500, 1000);
-	setupClass("Militia", 13, 500, 1000);
-	setupClass("Militia", 14, 500, 1000);
-	setupClass("Militia", 15, 500, 1000);
-	setupClass("Militia", 16, 500, 1000);
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
 	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
 	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
@@ -411,12 +405,12 @@ runImmediately
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
 	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
-	
+	/*
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
 	trQuestVarSet("p0stunResistance", 1);
 	trQuestVarSet("p0poisonResistance", 1);
-	
+	*/
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 26, 1);
@@ -687,6 +681,10 @@ highFrequency
 	}
 }
 
+int dStageChoices = 0;
+int xStageChoicesName = 0;
+int xStageChoicesStage = 0;
+
 void paintTowerSegment(int stage = 0) {
 	int tPrimary = 0;
 	int tSubPrimary = 0;
@@ -740,12 +738,13 @@ void paintTowerSegment(int stage = 0) {
 	if (iModulo(2, stage) == 0) {
 		x = 151;
 	}
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int next = trGetNextUnitScenarioNameNumber();
 	trArmyDispatch("0,0","Dwarf",1,x,0,z,180,true);
 	trArmySelect("0,0");
 	trMutateSelected(kbGetProtoUnitID("Outpost"));
-	yAddToDatabase("stageChoices", "next");
-	yAddUpdateVar("stageChoices", "stage", stage);
+	xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+	xSetInt(dStageChoices,xStageChoicesName,next);
+	xSetInt(dStageChoices,xStageChoicesStage,stage);
 }
 
 rule Z_cin_02
@@ -754,9 +753,13 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 5) {
 		trModifyProtounit("Curse SFX", 1, 8, -8);
-		if (trQuestVarGet("p1progress") == 0) {
+		if (xGetInt(dPlayerData,xPlayerProgress,1) == 0) {
 			trQuestVarSet("stage", 1);
 		} else {
+			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
+			xStageChoicesName = xInitAddInt(dStageChoices,"name");
+			xStageChoicesStage = xInitAddInt(dStageChoices,"stage");
+			
 			trLetterBox(false);
 			uiClearSelection();
 			trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
@@ -770,13 +773,13 @@ highFrequency
 			trPaintTerrain(0,0,195,45,0,34,false); // sand A
 			
 			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && ENEMY_PLAYER > 2) {
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,129,0,93,180,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
+				int next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Dwarf",1,129,0,93,180,true);
+				trArmySelect("0,0");
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
-				yAddToDatabase("stageChoices", "next");
-				yAddUpdateVar("stageChoices", "stage", 0);
+				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+				xSetInt(dStageChoices,xStageChoicesName,next);
+				xSetInt(dStageChoices,xStageChoicesStage,0);
 				trPaintTerrain(65,47,65,47,0,80);
 				trPaintTerrain(65,46,65,46,0,74);
 				trPaintTerrain(65,45,65,45,0,81);

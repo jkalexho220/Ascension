@@ -36,7 +36,11 @@ void debugLog(string msg = "") {
 
 
 string datatypeName(int data = 0) {
-	return(aiPlanGetUserVariableString(MALLOC,15,data));
+	string name = "void";
+	if (data >= 0 && data < 5) {
+		aiPlanGetUserVariableString(MALLOC,15,data);
+	}
+	return(name);
 }
 
 /*

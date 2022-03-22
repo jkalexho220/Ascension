@@ -30,27 +30,52 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
+int spyDB = 0;
+const int spyProto = 0;
+const int spyUnit = 1;
+const int spyDest = 2;
+const int spyActive = 3;
+
+int bossUnit = 0;
+int bossCooldownTime = 0;
+
+rule initialize_spy_database
+active
+highFrequency
+{
+	xsDisableSelf();
+	modularCounterInit("spyFind", 64);
+	modularCounterInit("spyFound", 64);
+	spyDB = aiPlanCreate("spyDB");
+	aiPlanAddUserVariableInt(spyDB,spyProto,"proto",64);
+	aiPlanAddUserVariableInt(spyDB,spyUnit,"unit",64);
+	aiPlanAddUserVariableVector(spyDB,spyDest,"destination",64);
+	aiPlanAddUserVariableBool(spyDB,spyActive,"active",64);
+}
+
 void advanceCooldowns(int p = 0, float seconds = 0) {
 	int diff = 0;
-	if (trQuestVarGet("p"+p+"wellCooldownStatus") == ABILITY_COOLDOWN) {
-		trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("p"+p+"wellCooldown") - 1000 * seconds);
-		diff = (trQuestVarGet("p"+p+"wellCooldown") - trTimeMS()) / 1000;
+	xsSetContextPlayer(0);
+	xSetPointer(dPlayerData,p);
+	if (xGetInt(dPlayerData,xPlayerWellCooldownStatus) == ABILITY_COOLDOWN) {
+		xSetInt(dPlayerData,xPlayerWellCooldown, xGetInt(dPlayerData,xPlayerWellCooldown) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerWellCooldown) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("well");
 			trCounterAddTime("well",diff,0,wellName, -1);
 		}
 	}
-	if (trQuestVarGet("p"+p+"rainCooldownStatus") == ABILITY_COOLDOWN) {
-		trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("p"+p+"rainCooldown") - 1000 * seconds);
-		diff = (trQuestVarGet("p"+p+"rainCooldown") - trTimeMS()) / 1000;
+	if (xGetInt(dPlayerData,xPlayerRainCooldownStatus) == ABILITY_COOLDOWN) {
+		xSetInt(dPlayerData,xPlayerRainCooldown, xGetInt(dPlayerData,xPlayerRainCooldown) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerRainCooldown) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("rain");
 			trCounterAddTime("rain",diff,0,rainName, -1);
 		}
 	}
-	if (trQuestVarGet("p"+p+"lureCooldownStatus") == ABILITY_COOLDOWN) {
-		trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("p"+p+"lureCooldown") - 1000 * seconds);
-		diff = (trQuestVarGet("p"+p+"lureCooldown") - trTimeMS()) / 1000;
+	if (xGetInt(dPlayerData,xPlayerLureCooldownStatus) == ABILITY_COOLDOWN) {
+		xSetInt(dPlayerData,xPlayerLureCooldown, xGetInt(dPlayerData,xPlayerLureCooldown) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerLureCooldown) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("lure");
 			trCounterAddTime("lure",diff,0,lureName, -1);
@@ -59,20 +84,21 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 }
 
 void gainFavor(int p = 0, float amt = 0) {
-	trQuestVarSet("p"+p+"favor", xsMin(100, xsMax(0, trQuestVarGet("p"+p+"favor") + amt)));
-	trPlayerGrantResources(p,"favor", trQuestVarGet("p"+p+"favor") - trPlayerResourceCount(p, "favor"));
+	xsSetContextPlayer(0);
+	xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt)),p);
+	trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 }
 
-void spyEffect(int unit = 0, int proto = 0, string qv = "") {
+void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0)) {
 	if (peekModularCounterNext("spyFind") != trQuestVarGet("spyFound")) {
 		trUnitSelectClear();
 		trUnitSelect(""+unit, true);
 		if (trUnitAlive()) {
 			int x = modularCounterNext("spyFind");
-			trQuestVarSet("spyEye"+x, proto);
-			trQuestVarSet("spyEye"+x+"unit", unit);
-			trQuestVarSet("spyEye"+x+"active", 1);
-			trStringQuestVarSet("spyName"+x, qv);
+			aiPlanSetUserVariableInt(spyDB,spyProto,x,proto);
+			aiPlanSetUserVariableInt(spyDB,spyUnit,x,unit);
+			aiPlanSetUserVariableBool(spyDB,spyActive,x,true);
+			aiPlanSetUserVariableVector(spyDB,spyDest,x,dest);
 			trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
 		}
 	} else {
@@ -80,14 +106,19 @@ void spyEffect(int unit = 0, int proto = 0, string qv = "") {
 	}
 }
 
-/* also returns the distance travelled */
-float vectorSetAsCurrentPosition(string v = "", string prev = "", string dir = "", int last = 0, float speed = 0) {
+float distanceTraveled(int last = 0, float speed = 0) {
 	float dist = trTimeMS() - last;
 	dist = dist * 0.001 * speed;
-	trQuestVarSet(v+"x", trQuestVarGet(prev+"x") + dist * trQuestVarGet(dir+"x"));
-	trQuestVarSet(v+"z", trQuestVarGet(prev+"z") + dist * trQuestVarGet(dir+"z"));
 	return(dist);
 }
+
+vector vectorSetAsCurrentPosition(vector prev = vector(0,0,0),
+	vector dir = vector(0,0,0), int last = 0, float speed = 0) {
+	float dist = distanceTraveled(last, speed);
+	vector v = xsVectorSet(xsVectorGetX(prev) + dist * xsVectorGetX(dir),0,xsVectorGetZ(prev) + dist * xsVectorGetZ(dir));
+	return(v);
+}
+
 
 void silencePlayer(int p = 0, float duration = 0) {
 	if ((trQuestVarGet("p"+p+"negationCloak") == 1) && (trQuestVarGet("p"+p+"dead") == 0)) {
@@ -119,79 +150,86 @@ void silencePlayer(int p = 0, float duration = 0) {
 	}
 }
 
-void silenceUnit(string db = "", float duration = 9.0, int p = 0) {
+void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
+	xsSetContextPlayer(0);
+	xSetPointer(dPlayerData,p);
 	if (p > 0 && p < ENEMY_PLAYER) {
-		duration = duration * trQuestVarGet("p"+p+"spellDuration");
-		if (trQuestVarGet("p"+p+"godBoon") == BOON_STATUS_COOLDOWNS) {
+		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
+		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}
 		if (PvP) {
-			int old = yGetPointer("playerUnits");
-			if (ySetPointer("playerUnits", 1*yGetVar("enemies", "doppelganger"))) {
-				silenceUnit("playerUnits", duration);
+			int old = xGetPointer(dPlayerUnits);
+			if (xSetPointer(dPlayerUnits, 1*xGetInt(dEnemies, xDoppelganger))) {
+				silenceUnit(dPlayerUnits, duration);
 			}
-			ySetPointer("playerUnits", old);
+			xSetPointer(dPlayerUnits, old);
 			return;
 		}
 	} else {
-		p = yGetVar(db, "player");
-		duration = duration * trQuestVarGet("p"+p+"silenceResistance");
-		if (trQuestVarGet("p"+p+"unit") == trQuestVarGet(db)) {
+		p = xGetInt(db, xPlayerOwner);
+		xSetPointer(dPlayerData,p);
+		duration = duration * xGetFloat(dPlayerData,xPlayerSilenceResistance);
+		if (xGetInt(dPlayerData,xPlayerUnit) == xGetInt(db,xUnitName)) {
 			silencePlayer(p, duration);
 		}
 	}
 	duration = duration * 1000;
-	if (trTimeMS() + duration > yGetVar(db, "silenceTimeout")) {
-		ySetVar(db, "silenceTimeout", trTimeMS() + duration);
+	if (trTimeMS() + duration > xGetInt(db, xSilenceTimeout)) {
+		xSetInt(db, xSilenceTimeout, trTimeMS() + duration);
 	}
-	if (trQuestVarGet(db) == trQuestVarGet("bossUnit")) {
-		if (trTimeMS() + duration > trQuestVarGet("bossCooldownTime")) {
-			trQuestVarSet("bossCooldownTime", trTimeMS() + duration);
+	if (xGetInt(db,xUnitName) == bossUnit) {
+		if (trTimeMS() + duration > bossCooldownTime) {
+			bossCooldownTime = trTimeMS() + duration;
 		}
 	}
-	if (yGetVar(db, "silenceStatus") == 0) {
-		ySetVar(db, "silenceStatus", 1);
-		if (kbGetBlockID(""+1*yGetVar(db, "silenceSFX")) == -1) {
-			spyEffect(1*trQuestVarGet(db),kbGetProtoUnitID("UI Range Indicator Egypt SFX"), yGetVarName(db, "silenceSFX"));
+	if (xGetInt(db, xSilenceStatus) == 0) {
+		xSetInt(db, xSilenceStatus, 1);
+		if (kbGetBlockID(""+1*xGetInt(db, xSilenceSFX)) == -1) {
+			spyEffect(xGetInt(db,xUnitName),kbGetProtoUnitID("UI Range Indicator Egypt SFX"),
+				xsVectorSet(db,xSilenceStatus,xGetPointer(db)));
 		} else {
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar(db, "silenceSFX"), true);
+			trUnitSelect(""+xGetInt(db, xSilenceSFX), true);
 			trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
 			trUnitSelectClear();
-			trUnitSelectByQV(db);
+			trUnitSelect(""+xGetInt(db,xUnitName),true);
 		}
 	}
 }
 
 void healUnit(int p = 0, float amt = 0, int index = -1) {
-	int old = yGetPointer("playerUnits");
+	xsSetContextPlayer(0);
+	int old = xGetPointer(dPlayerUnits);
 	if (index < 0) {
 		index = old;
 	}
-	if (ySetPointer("playerUnits", index)) {
-		amt = amt * trQuestVarGet("p"+p+"healBoost");
-		if (yGetVar("playerUnits", "poisonStatus") == 0) {
+	if (xSetPointer(dPlayerUnits, index)) {
+		amt = amt * xGetFloat(dPlayerData,xPlayerHealBoost,p);
+		if (xGetInt(dPlayerUnits, xPoisonStatus) == 0) {
 			trDamageUnit(0.0 - amt);
 		}
-		ySetPointer("playerUnits", old);
+		xSetPointer(dPlayerUnits, old);
 	}
 }
 
-void nightriderHarvest(string pos = "") {
-	int index = yGetPointer("playerUnits");
+void nightriderHarvest(vector pos = vector(0,0,0)) {
+	xsSetContextPlayer(0);
+	int index = xGetPointer(dPlayerUnits);
 	for(p=1; < ENEMY_PLAYER) {
-		if ((trQuestVarGet("p"+p+"class") == NIGHTRIDER) &&
-			(trQuestVarGet("p"+p+"dead") == 0)) {
-			if (zDistanceToVectorSquared("p"+p+"unit", pos) < 144) {
+		xSetPointer(dPlayerData,p);
+		if ((xGetInt(dPlayerData,xPlayerClass) == NIGHTRIDER) &&
+			(xGetInt(dPlayerData,xPlayerDead) == 0)) {
+			if (distanceToVector(xGetInt(dPlayerData,xPlayerUnit), pos) < 144) {
 				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"unit", true);
-				ySetPointer("playerUnits", 1*trQuestVarGet("p"+p+"index"));
-				healUnit(p, 0.05 * trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage"));
+				trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
+				xSetPointer(dPlayerUnits, xGetInt(dPlayerData,xPlayerIndex));
+				healUnit(p, 0.05 * xGetFloat(dPlayerData,xPlayerHealth) * xGetFloat(dPlayerData,xPlayerSpellDamage));
 				gainFavor(p, 1);
 			}
 		}
 	}
-	ySetPointer("playerUnits", index);
+	xSetPointer(dPlayerUnits,index);
 }
 
 void removeEnemy() {
