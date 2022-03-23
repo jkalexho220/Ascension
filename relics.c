@@ -687,12 +687,11 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_BINARY_POISON:
 		{
-			/*
 			if (equip) {
-				trQuestVarSet("me", p);
-				yAddToDatabase("doomedPlayers", "me");
+				int count = aiPlanGetNumberUserVariableValues(ARRAYS,1*trQuestVarGet("doomedPlayers"));
+				aiPlanSetNumberUserVariableValues(ARRAYS,1*trQuestVarGet("doomedPlayers"),count+1);
+				aiPlanSetUserVariableInt(ARRAYS,1*trQuestVarGet("doomedPlayers"),count,p);
 			}
-			*/
 		}
 	}
 	if ((relic >= RELIC_KEY_GREEK) && (relic <= RELIC_KEY_EGYPT) && (trCurrentPlayer() == p) && equip) {

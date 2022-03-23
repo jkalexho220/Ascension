@@ -68,6 +68,7 @@ int xPlayerHealBoost = 0;
 int xPlayerFavorFromAttacks = 0;
 int xPlayerPoisonSpeed = 0;
 int xPlayerLifesteal = 0;
+int xPlayerLifestealTotal = 0;
 int xPlayerFavorRegen = 0;
 int xPlayerPhysicalResist = 0;
 int xPlayerMagicResist = 0;
@@ -107,6 +108,7 @@ int xPlayerGodBoon = 0;
 int xPlayerIndex = 0;
 int xPlayerSimp = 0;
 int xPlayerQueen = 0;
+int xPlayerLaunched = 0;
 
 int xPlayerMonsterIndex = 0;
 int xPlayerRelicTransporterLevel = 0;
@@ -121,6 +123,22 @@ int xClassNextDelay = 0;
 int xClassSpecialAttackCooldown = 0;
 int xClassGemstone = 0;
 int xClassLevel = 0;
+
+int dFrostGiantsIncoming = 0;
+int xFrostTargetSize = 0;
+int xFrostCurrentSize = 0;
+int xFrostTargetTime = 0;
+
+int dStunnedUnits = 0;
+int xStunnedProto = 0;
+
+int dLaunchedUnits = 0;
+int xLaunchedCar = 0;
+int xLaunchedDB = 0;
+int xLaunchedIndex = 0;
+int xLaunchedStun = 0;
+int xLaunchedDest = 0;
+int xLaunchedTimeout = 0;
 
 rule initialize_databases
 active
@@ -145,12 +163,12 @@ highFrequency
 		xPoisonStatus = xInitAddInt(db,"poisonStatus");
 		xPoisonTimeout = xInitAddInt(db,"poisonTimeout");
 		xPoisonLast = xInitAddInt(db,"poisonLast");
-		xPoisonDamage = xInitAddInt(db,"poisonDamage");
+		xPoisonDamage = xInitAddFloat(db,"poisonDamage");
 		xPoisonSFX = xInitAddInt(db,"poisonSFX");
 		xSilenceStatus = xInitAddInt(db,"silenceStatus");
 		xSilenceTimeout = xInitAddInt(db,"silenceTimeout");
 		xSilenceSFX = xInitAddInt(db,"silenceSFX");
-		xLaunched = xInitAddInt(db,"launched");
+		xLaunched = xInitAddBool(db,"launched");
 	}
 	xDecay = xInitAddInt(dPlayerUnits,"decay");
 	xDecayNext = xInitAddInt(dPlayerUnits,"decayNext");
@@ -188,6 +206,7 @@ highFrequency
 	xPlayerFavorFromAttacks = xInitAddInt(dPlayerData,"favorFromAttacks");
 	xPlayerPoisonSpeed = xInitAddInt(dPlayerData,"poisonSpeed");
 	xPlayerLifesteal = xInitAddFloat(dPlayerData,"lifesteal");
+	xPlayerLifestealTotal = xInitAddFloat(dPlayerData,"lifestealTotal");
 	xPlayerFavorRegen = xInitAddFloat(dPlayerData,"favorRegen");
 	xPlayerPhysicalResist = xInitAddFloat(dPlayerData,"physicalResist");
 	xPlayerMagicResist = xInitAddFloat(dPlayerData,"magicResist");
@@ -230,9 +249,27 @@ highFrequency
 	xPlayerIndex = xInitAddInt(dPlayerData,"index");
 	xPlayerSimp = xInitAddInt(dPlayerData,"simp");
 	xPlayerQueen = xInitAddInt(dPlayerData,"queen");
+	xPlayerLaunched = xInitAddBool(dPlayerData,"launched");
 	
 	xPlayerMonsterIndex = xInitAddInt(dPlayerData,"monsterIndex");
 	xPlayerRelicTransporterLevel = xInitAddInt(dPlayerData,"relicTransporterLevel");
+	
+	dStunnedUnits = xInitDatabase("stunnedUnits", 10);
+	xInitAddInt(dStunnedUnits,"name");
+	xInitAddInt(dStunnedUnits,"player");
+	xStunnedProto = xInitAddInt(dStunnedUnits,"proto");
+	
+	dLaunchedUnits = xInitDatabase("launchedUnits",10);
+	xInitAddInt(dLaunchedUnits,"name");
+	xInitAddInt(dLaunchedUnits,"player");
+	xInitAddInt(dLaunchedUnits,"proto");
+	xLaunchedCar = xInitAddInt(dLaunchedUnits,"car");
+	xLaunchedDB = xInitAddInt(dLaunchedUnits,"database");
+	xLaunchedIndex = xInitAddInt(dLaunchedUnits,"index");
+	xLaunchedStun = xInitAddBool(dLaunchedUnits,"stun");
+	xLaunchedDest = xInitAddVector(dLaunchedUnits,"dest");
+	xLaunchedTimeout = xInitAddInt(dLaunchedUnits,"timeout");
+	
 	
 	dClass = xInitDatabase("classData", 16);
 	xClassProto = xInitAddInt(dClass,"proto");

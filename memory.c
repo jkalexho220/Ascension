@@ -27,6 +27,8 @@ subsequent items in the metadata will determine the datatypes of extra variables
 const int NEXTFREE = 0; // the very first block contains the next free pointer and nothing else
 
 int MALLOC = 0;
+int ARRAYS = 0;
+int mNumArrays = 0;
 
 void debugLog(string msg = "") {
 	if (trCurrentPlayer() == 1) {
@@ -41,6 +43,35 @@ string datatypeName(int data = 0) {
 		aiPlanGetUserVariableString(MALLOC,15,data);
 	}
 	return(name);
+}
+
+int zNewArray(int type = 0, int size = 0, string name = "") {
+	int index = mNumArrays;
+	mNumArrays = mNumArrays + 1;
+	switch(type)
+	{
+		case mInt:
+		{
+			aiPlanAddUserVariableInt(ARRAYS,index,name,size);
+		}
+		case mFloat:
+		{
+			aiPlanAddUserVariableFloat(ARRAYS,index,name,size);
+		}
+		case mString:
+		{
+			aiPlanAddUserVariableString(ARRAYS,index,name,size);
+		}
+		case mVector:
+		{
+			aiPlanAddUserVariableVector(ARRAYS,index,name,size);
+		}
+		case mBool:
+		{
+			aiPlanAddUserVariableBool(ARRAYS,index,name,size);
+		}
+	}
+	return(index);
 }
 
 /*
@@ -615,7 +646,9 @@ int xGetPointer(int id = 0) {
 }
 
 void xPrintAll(int id = 0, int index = 0) {
+	trChatSend(0, "<u>" + aiPlanGetName(id) + "</u>");
 	trChatSend(0, "size: " + xGetDatabaseCount(id));
+	trChatSend(0, "index: " + index);
 	for(i=1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
 		string name = aiPlanGetUserVariableString(id,xVarNames,i);
 		int type = aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i);
@@ -649,6 +682,11 @@ void xPrintAll(int id = 0, int index = 0) {
 	}
 }
 
+void xUnitSelect(int id = 0, int index = 0, bool reverse = true) {
+	trUnitSelectClear();
+	trUnitSelect(""+xGetInt(id,index), reverse);
+}
+
 rule mInitializeMemory
 active
 highFrequency
@@ -657,6 +695,7 @@ highFrequency
 	aiSet("NoAI", 0);
 	xsSetContextPlayer(0);
 	MALLOC = aiPlanCreate("memory",0);
+	ARRAYS = aiPlanCreate("arrays",0);
 	for(i=0; < 5) {
 		aiPlanAddUserVariableBool(MALLOC,i * 3 + xDirtyBit - 1,"DirtyBit"+i,1);
 		aiPlanAddUserVariableInt(MALLOC,i * 3 + xNextBlock - 1,"NextBlock"+i,1);
