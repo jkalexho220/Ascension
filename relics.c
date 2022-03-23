@@ -928,9 +928,9 @@ int randomStageClosest(int maxval = 10) {
 	return(1*trQuestVarGet("relicrand1"));
 }
 
-void spawnRelicSpecific(float x = 0, float z = 0, int val = 1) {
+void spawnRelicSpecific(vector v = vector(0,0,0), int val = 1) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0","Dwarf",1,x,0,z,0,true);
+	trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(v),0,xsVectorGetZ(v),0,true);
 	trUnitSelectClear();
 	trUnitSelectByQV("next", true);
 	if (trUnitVisToPlayer()) {
@@ -942,13 +942,13 @@ void spawnRelicSpecific(float x = 0, float z = 0, int val = 1) {
 	xSetInt(dFreeRelics,xRelicType,val);
 }
 
-void spawnRelic(float x = 0, float z = 0, int maxval = 10) {
-	spawnRelicSpecific(x, z, randomStageClosest(maxval));
+void spawnRelic(vector v = vector(0,0,0), int maxval = 10) {
+	spawnRelicSpecific(v, randomStageClosest(maxval));
 }
 
-void spawnRelicClosest(float x = 0, float z = 0, int target = 0) {
+void spawnRelicClosest(vector v = vector(0,0,0), int target = 0) {
 	trQuestVarSetFromRand("rand", 0, 10, true);
 	trQuestVarSetFromRand("rand",
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
-	spawnRelicSpecific(x, z, 1*trQuestVarGet("rand"));
+	spawnRelicSpecific(v, 1*trQuestVarGet("rand"));
 }

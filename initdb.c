@@ -28,11 +28,16 @@ int xDecayNext = 0;
 int xUnity = 0;
 
 /* enemies specific */
+int xBounty = 0;
+int xDropRelic = 0;
 int xDeathSentence = 0;
 
 /* playerCharacters */
 int dPlayerCharacters = 0;
 int xIndex = 0;
+int xCharAttacking = 0;
+int xCharAttackNext = 0;
+int xCharSpecialAttack = 0;
 
 /* relics */
 int dFreeRelics = 0;
@@ -100,6 +105,8 @@ int xPlayerLevel = 0;
 int xPlayerProgress = 0;
 int xPlayerGodBoon = 0;
 int xPlayerIndex = 0;
+int xPlayerSimp = 0;
+int xPlayerQueen = 0;
 
 int xPlayerMonsterIndex = 0;
 int xPlayerRelicTransporterLevel = 0;
@@ -114,17 +121,6 @@ int xClassNextDelay = 0;
 int xClassSpecialAttackCooldown = 0;
 int xClassGemstone = 0;
 int xClassLevel = 0;
-
-int setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
-	int p = kbGetProtoUnitID(proto);
-	xSetPointer(dClass,class);
-	xSetInt(dClass,xClassProto,p);
-	xSetInt(dClass,xClassFirstDelay,firstDelay);
-	xSetInt(dClass,xClassNextDelay,nextDelay);
-	xSetInt(dClass,xClassSpecialAttackCooldown,specialCD);
-	xSetInt(dClass,xClassGemstone,gem);
-	trQuestVarSet("proto"+p+"class", class);
-}
 
 rule initialize_databases
 active
@@ -160,6 +156,8 @@ highFrequency
 	xDecayNext = xInitAddInt(dPlayerUnits,"decayNext");
 	xUnity = xInitAddInt(dPlayerUnits,"unity");
 	
+	xBounty = xInitAddInt(dEnemies,"bounty");
+	xDropRelic = xInitAddInt(dEnemies,"relic");
 	xDeathSentence = xInitAddInt(dEnemies,"deathSentence");
 	
 	
@@ -229,7 +227,9 @@ highFrequency
 	xPlayerGold = xInitAddInt(dPlayerData,"gold");
 	xPlayerFavor = xInitAddFloat(dPlayerData,"favor");
 	xPlayerDead = xInitAddInt(dPlayerData,"dead");
-	xPlayerIndex = xInitAddInt(dPlayerData,xPlayerIndex);
+	xPlayerIndex = xInitAddInt(dPlayerData,"index");
+	xPlayerSimp = xInitAddInt(dPlayerData,"simp");
+	xPlayerQueen = xInitAddInt(dPlayerData,"queen");
 	
 	xPlayerMonsterIndex = xInitAddInt(dPlayerData,"monsterIndex");
 	xPlayerRelicTransporterLevel = xInitAddInt(dPlayerData,"relicTransporterLevel");
@@ -261,9 +261,13 @@ highFrequency
 		xInitAddInt(1*trQuestVarGet("p"+p+"warehouse"),"type");
 		
 		trQuestVarSet("p"+p+"characters",xInitDatabase("p"+p+"characters"));
+		/* the three below are shared with playerCharacter */
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"name");
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"player");
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
+		xCharSpecialAttack = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"specialAttack");
+		xCharAttacking = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attacking");
+		xCharAttackNext = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackNext");
 		
 		xAddDatabaseBlock(dPlayerData);
 	}

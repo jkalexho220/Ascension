@@ -44,6 +44,7 @@ active
 highFrequency
 {
 	xsDisableSelf();
+	xsSetContextPlayer(0);
 	modularCounterInit("spyFind", 64);
 	modularCounterInit("spyFound", 64);
 	spyDB = aiPlanCreate("spyDB");
@@ -55,7 +56,6 @@ highFrequency
 
 void advanceCooldowns(int p = 0, float seconds = 0) {
 	int diff = 0;
-	xsSetContextPlayer(0);
 	xSetPointer(dPlayerData,p);
 	if (xGetInt(dPlayerData,xPlayerWellCooldownStatus) == ABILITY_COOLDOWN) {
 		xSetInt(dPlayerData,xPlayerWellCooldown, xGetInt(dPlayerData,xPlayerWellCooldown) - 1000 * seconds);
@@ -84,7 +84,6 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 }
 
 void gainFavor(int p = 0, float amt = 0) {
-	xsSetContextPlayer(0);
 	xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt)),p);
 	trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 }
@@ -151,7 +150,6 @@ void silencePlayer(int p = 0, float duration = 0) {
 }
 
 void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
-	xsSetContextPlayer(0);
 	xSetPointer(dPlayerData,p);
 	if (p > 0 && p < ENEMY_PLAYER) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
@@ -199,7 +197,6 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 }
 
 void healUnit(int p = 0, float amt = 0, int index = -1) {
-	xsSetContextPlayer(0);
 	int old = xGetPointer(dPlayerUnits);
 	if (index < 0) {
 		index = old;
@@ -214,13 +211,12 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 }
 
 void nightriderHarvest(vector pos = vector(0,0,0)) {
-	xsSetContextPlayer(0);
 	int index = xGetPointer(dPlayerUnits);
 	for(p=1; < ENEMY_PLAYER) {
 		xSetPointer(dPlayerData,p);
 		if ((xGetInt(dPlayerData,xPlayerClass) == NIGHTRIDER) &&
 			(xGetInt(dPlayerData,xPlayerDead) == 0)) {
-			if (distanceToVector(xGetInt(dPlayerData,xPlayerUnit), pos) < 144) {
+			if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit), pos) < 144) {
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
 				xSetPointer(dPlayerUnits, xGetInt(dPlayerData,xPlayerIndex));
@@ -234,37 +230,38 @@ void nightriderHarvest(vector pos = vector(0,0,0)) {
 
 void removeEnemy() {
 	if (PvP == false) {
-		int bounty = yGetVar("enemies", "bounty");
-		yVarToVector("enemies", "pos");
-		nightriderHarvest("pos");
-		if (yGetVar("enemies", "bounty") > 0) {
-			trQuestVarSetFromRand("rand", 1, yGetVar("enemies", "bounty"), true);
+		int bounty = xGetInt(dEnemies, xBounty);
+		vector pos = xGetVector(dEnemies,xUnitPos);
+		nightriderHarvest(pos);
+		if (bounty > 0) {
+			trQuestVarSetFromRand("rand", 1, bounty, true);
 			for(p=1; <ENEMY_PLAYER) {
 				if (Multiplayer) {
-					trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
+					xSetInt(dPlayerData,xPlayerGold,xGetInt(dPlayerData,xPlayerGold,p) + bounty, p);
 					trPlayerGrantResources(p, "Gold", bounty);
-					if (trQuestVarGet("p"+p+"godBoon") == BOON_MORE_GOLD) {
-						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + bounty);
+					if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_MORE_GOLD) {
+						xSetInt(dPlayerData,xPlayerGold,xGetInt(dPlayerData,xPlayerGold,p) + bounty, p);
 						trPlayerGrantResources(p, "Gold", bounty);
 					}
 				}
 				gainFavor(p, trQuestVarGet("rand"));
 			}
 		}
-		if (yGetVar("enemies", "relic") > 0) {
-			if (yGetVar("enemies", "relic") <= 10) {
-				spawnRelicClosest(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+		if (xGetInt(dEnemies, xDropRelic) > 0) {
+			if (xGetInt(dEnemies, xDropRelic) <= 10) {
+				spawnRelicClosest(pos, xGetInt(dEnemies, xDropRelic));
 			} else {
-				spawnRelicSpecific(trQuestVarGet("posX"), trQuestVarGet("posZ"), 1*yGetVar("enemies", "relic"));
+				spawnRelicSpecific(pos, xGetInt(dEnemies, xDropRelic));
 			}
 		}
-		yRemoveFromDatabase("enemies");
+		xFreeDatabaseBlock(dEnemies);
 	}
 }
 
 void removePlayerUnit() {
-	yVarToVector("playerUnits", "pos");
-	nightriderHarvest("pos");
+	vector pos = xGetVector(dPlayerUnits,xUnitPos);
+	nightriderHarvest(pos);
+	/*
 	if (PvP) {
 		if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
 			yRemoveFromDatabase("enemies");
@@ -284,93 +281,73 @@ void removePlayerUnit() {
 			debugLog("player units removed the wrong thing! Removed playerUnitsDummyIndex");
 		}
 	}
-	yRemoveFromDatabase("playerUnits");
-	yRemoveUpdateVar("playerUnits", "player");
-	yRemoveUpdateVar("playerUnits", "currentHealth");
-	yRemoveUpdateVar("playerUnits", "stunStatus");
-	yRemoveUpdateVar("playerUnits", "stunTimeout");
-	yRemoveUpdateVar("playerUnits", "stunSFX");
-	yRemoveUpdateVar("playerUnits", "poisonStatus");
-	yRemoveUpdateVar("playerUnits", "poisonTimeout");
-	yRemoveUpdateVar("playerUnits", "poisonLast");
-	yRemoveUpdateVar("playerUnits", "poisonDamage");
-	yRemoveUpdateVar("playerUnits", "poisonSFX");
-	yRemoveUpdateVar("playerUnits", "decay");
-	yRemoveUpdateVar("playerUnits", "decayNext");
-	yRemoveUpdateVar("playerUnits", "hero");
-	yRemoveUpdateVar("playerUnits", "unity");
-	yRemoveUpdateVar("playerUnits", "launched");
-	yRemoveUpdateVar("playerUnits", "silenceStatus");
-	yRemoveUpdateVar("playerUnits", "silenceSFX");
+	*/
+	xFreeDatabaseBlock(dPlayerUnits);
 }
 
 void removePlayerCharacter() {
-	yRemoveFromDatabase("playerCharacters");
+	xFreeDatabaseBlock(dPlayerCharacters);
 }
 
 void removePlayerSpecific(int p = 0) {
-	if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-		if (kbGetBlockID(""+1*trQuestVarGet("p"+p+"silenceSFX")) >= 0) {
+	int db = trQuestVarGet("p"+p+"characters");
+	if (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p)) {
+		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit));
+		trVectorQuestVarSet("dead"+p+"pos",pos);
+		for(x=xGetDatabaseCount(1*trQuestVarGet("p"+p+"relics")); >0) {
+			xDatabaseNext(1*trQuestVarGet("p"+p+"relics"));
 			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"silenceSFX", true);
-			trUnitChangeProtoUnit("Rocket");
-		}
-		trVectorSetUnitPos("dead"+p+"pos", "p"+p+"unit");
-		for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-			yDatabaseNext("p"+p+"relics", true);
+			trUnitSelect(""+xGetInt(1*trQuestVarGet("p"+p+"relics",xRelicName)),true);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 		}
-		trQuestVarSet("p"+p+"dead", 10);
+		xSetInt(dPlayerData,xPlayerDead,10);
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
 		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"unit");
+		trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
 		if (PvP == false) {
 			trUnitOverrideAnimation(6,0,false,false,-1);
 			trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
 			trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
 			trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
-			trVectorSetUnitPos("pos", "p"+p+"unit");
-			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+			trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect(""+p+",0");
 			trUnitChangeProtoUnit("Healing SFX");
 		} else {
-			trUnitChangeProtoUnit(kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
+			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass,xClassProto,xGetInt(dPlayerData,xPlayerClass,p))));
 		}
 		silencePlayer(p, 0);
-		trQuestVarSet("p"+p+"silenceSFX", 0);
 		/* NOOOO MY QUEEEEN */
-		if (trQuestVarGet("p"+p+"simp") > 0) {
-			int simp = trQuestVarGet("p"+p+"simp");
+		if (xGetInt(dPlayerData,xPlayerSimp,p) > 0) {
+			int simp = xGetInt(dPlayerData,xPlayerSimp,p);
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+simp+"tether");
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-			trQuestVarSet("p"+simp+"queen", 0);
-			trQuestVarSet("p"+p+"simp", 0);
+			xSetInt(dPlayerData,xPlayerQueen,0,simp);
+			xSetInt(dPlayerData,xPlayerSimp,0,p);
 		}
 	}
-	yRemoveFromDatabase("p"+p+"characters");
-	yRemoveUpdateVar("p"+p+"Characters", "specialAttack");
-	yRemoveUpdateVar("p"+p+"Characters", "attacking");
-	yRemoveUpdateVar("p"+p+"Characters", "attackNext");
-	yRemoveUpdateVar("p"+p+"characters", "index");
+	xFreeDatabaseBlock(db);
 }
 
 void equipRelicsAgain(int p = 0) {
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics", true);
+	int db = trQuestVarGet("p"+p+"relics");
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		trUnitSelectClear();
+		trUnitSelect(""+xGetInt(db,xRelicName),true);
 		trUnitChangeProtoUnit("Relic");
 		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"relics");
-		trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"unit"));
-		trMutateSelected(relicProto(1*yGetVar("p"+p+"relics", "type")));
-		if (yGetVar("p"+p+"relics", "type") < KEY_RELICS) {
+		trUnitSelect(""+xGetInt(db,xRelicName),true);
+		trImmediateUnitGarrison(""+xGetInt(dPlayerData,xPlayerUnit,p));
+		trMutateSelected(relicProto(xGetInt(db,xRelicType)));
+		if (xGetInt(db,xRelicType) < KEY_RELICS) {
 			trSetSelectedScale(0,0,-1);
 			trUnitSetAnimationPath("1,0,1,1,0,0,0");
 		}
 	}
 }
 
-vector wallNormalVector(string loc = "") {
+vector wallNormalVector(vector v = vector(0,0,0)) {
 	vector retVal = vector(1,0,0);
 	
 	for(x=0; <4) {

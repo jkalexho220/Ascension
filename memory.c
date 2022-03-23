@@ -614,6 +614,41 @@ int xGetPointer(int id = 0) {
 	return(aiPlanGetUserVariableInt(id,xMetadata,mPointer));
 }
 
+void xPrintAll(int id = 0, int index = 0) {
+	trChatSend(0, "size: " + xGetDatabaseCount(id));
+	for(i=1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
+		string name = aiPlanGetUserVariableString(id,xVarNames,i);
+		int type = aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i);
+		switch(type)
+		{
+			case mInt:
+			{
+				trChatSend(0, name + ": " + aiPlanGetUserVariableInt(id,xVarNames + i,index));
+			}
+			case mFloat:
+			{
+				trChatSend(0, name + ": " + aiPlanGetUserVariableFloat(id,xVarNames + i,index));
+			}
+			case mString:
+			{
+				trChatSend(0, name + ": " + aiPlanGetUserVariableString(id,xVarNames + i,index));
+			}
+			case mVector:
+			{
+				trChatSend(0, name + ": " + aiPlanGetUserVariableVector(id,xVarNames + i,index));
+			}
+			case mBool:
+			{
+				if (aiPlanGetUserVariableBool(id,xVarNames + i,index)) {
+					trChatSend(0, name + ": true");
+				} else {
+					trChatSend(0, name + ": false");
+				}
+			}
+		}
+	}
+}
+
 rule mInitializeMemory
 active
 highFrequency

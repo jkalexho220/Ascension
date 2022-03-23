@@ -216,6 +216,18 @@ void reselectMyself() {
 	trackPlay(1,999);
 }
 
+
+int setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
+	int p = kbGetProtoUnitID(proto);
+	xSetPointer(dClass,class);
+	xSetInt(dClass,xClassProto,p);
+	xSetInt(dClass,xClassFirstDelay,firstDelay);
+	xSetInt(dClass,xClassNextDelay,nextDelay);
+	xSetInt(dClass,xClassSpecialAttackCooldown,specialCD);
+	xSetInt(dClass,xClassGemstone,gem);
+	trQuestVarSet("proto"+p+"class", class);
+}
+
 void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=4,float armor=0,float range=0) {
 	int pNum = kbGetProtoUnitID(proto);
 	for(p=0; <ENEMY_PLAYER) {
@@ -385,26 +397,6 @@ runImmediately
 	xsSetContextPlayer(ENEMY_PLAYER);
 	aiSetAttackResponseDistance(0.0);
 	
-	xsSetContextPlayer(0);
-	
-	setupClass("Militia", 0, 500, 1000);
-	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
-	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
-	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
-	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
-	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
-	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
-	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
-	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
-	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
-	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
-	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
-	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
-	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
-	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
-	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
-	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
-	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	/*
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
@@ -500,6 +492,33 @@ runImmediately
 	trQuestVarSet("rotZ3", 1);
 	
 	xsEnableRule("data_load_00");
+	xsDisableSelf();
+}
+
+rule setup_classes
+active
+highFrequency
+{
+	xsSetContextPlayer(0);
+	
+	setupClass("Militia", 17, 500, 1000);
+	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
+	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
+	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
+	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
+	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
+	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
+	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
+	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
+	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
+	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
+	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
+	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
+	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
+	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
+	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
+	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
+	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	xsDisableSelf();
 }
 
@@ -756,6 +775,7 @@ highFrequency
 		if (xGetInt(dPlayerData,xPlayerProgress,1) == 0) {
 			trQuestVarSet("stage", 1);
 		} else {
+			xPrintAll(dPlayerData,1);
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
 			xStageChoicesName = xInitAddInt(dStageChoices,"name");
 			xStageChoicesStage = xInitAddInt(dStageChoices,"stage");
@@ -792,7 +812,7 @@ highFrequency
 			}
 			
 			trPaintTerrain(68,46,76,76,5,4,false); // black
-			for(i=0; <= trQuestVarGet("p1progress")) {
+			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
 				paintTowerSegment(i+1);
 			}
 			trPaintTerrain(67,46,67,76,0,74,false); // left wall

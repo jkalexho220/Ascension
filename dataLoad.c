@@ -313,6 +313,7 @@ inactive
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game
 	*/
+	trQuestVarSet("temp", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Victory Marker",1,1,0,1,0,true);
 	trArmySelect("1,0");
 	trUnitConvert(ENEMY_PLAYER);
@@ -519,7 +520,7 @@ inactive
 	/*
 	Destroy swordsmen
 	*/
-	for(x=0; < trQuestVarGet("enemyVictoryMarker")) {
+	for(x=0; < trQuestVarGet("temp")) {
 		trUnitSelectClear();
 		trUnitSelectByID(x);
 		trUnitDestroy();
@@ -542,6 +543,7 @@ inactive
 			trSetCivAndCulture(p, 0, 0);
 		}
 		if (xGetInt(dPlayerData,xPlayerClass,p) == 0) {
+			xSetInt(dPlayerData,xPlayerClass,17,p);
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
