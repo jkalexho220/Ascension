@@ -73,7 +73,7 @@ void fireknightAlways(int eventID = -1) {
 				yRemoveFromDatabase("p"+p+"fireCharges");
 				amt = trQuestVarGet("flamingImpactDamage") * trQuestVarGet("p"+p+"spellDamage");
 				dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange") * 2, 2);
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();
@@ -86,7 +86,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 		} else {
 			dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange"), 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -278,7 +278,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 			ySetVar("p"+p+"characters", "health", current);
 			dist = xsPow(trQuestVarGet("overheatRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -311,7 +311,7 @@ void fireknightAlways(int eventID = -1) {
 			}
 			amt = yGetVar("p"+p+"inferno", "damage") * 0.3;
 			dist = xsPow(yGetVar("p"+p+"inferno", "radius"), 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -319,7 +319,7 @@ void fireknightAlways(int eventID = -1) {
 					damageEnemy(p, amt);
 				}
 			}
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				id = yDatabaseNext("playerUnits", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removePlayerUnit();

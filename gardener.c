@@ -171,7 +171,7 @@ void gardenerAlways(int eventID = -1) {
 			} else if (trTimeMS() > yGetVar("p"+p+"bloodblooms", "attackNext")) {
 				ySetVar("p"+p+"bloodblooms", "attackNext", yGetVar("p"+p+"bloodblooms", "attackNext") + 1300);
 				target = kbUnitGetTargetUnitID(id);
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == target) {
 						gainFavor(p, 1);
 						poisonUnit("enemies", 12.0, 12.0, p);
@@ -202,7 +202,7 @@ void gardenerAlways(int eventID = -1) {
 				yVarToVector("p"+p+"stranglethorns", "pos");
 				dist = xsPow(trQuestVarGet("stranglethornsRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 				amt = trQuestVarGet("stranglethornsDamage") * trQuestVarGet("p"+p+"spellDamage");
-				for (x=yGetDatabaseCount("enemies"); >0) {
+				for (x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {

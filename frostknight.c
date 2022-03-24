@@ -55,7 +55,7 @@ void castIcicle(int p = 0, string pos = "") {
 		dist = xsPow(trQuestVarGet("p"+p+"spellRange") * trQuestVarGet("icicleRadius"), 2);
 		amt = dist;
 		hit = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else {
@@ -135,7 +135,7 @@ void castIcicle(int p = 0, string pos = "") {
 			if (trQuestVarGet("p"+p+"blizzard") == 1) {
 				if (trTimeMS() > trQuestVarGet("p"+p+"blizzardNext")) {
 					trQuestVarSet("p"+p+"blizzardNext", trQuestVarGet("p"+p+"blizzardNext") + 1000);
-					for (x=yGetDatabaseCount("enemies"); >0) {
+					for (x=xGetDatabaseCount(dEnemies); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();
@@ -285,8 +285,8 @@ void castIcicle(int p = 0, string pos = "") {
 							case 1:
 							{
 								hit = 0;
-								for (x=yGetDatabaseCount("enemies"); >0) {
-									if (yGetVar("p"+p+"frostGiants", "target") == yDatabaseNext("enemies")) {
+								for (x=xGetDatabaseCount(dEnemies); >0) {
+									if (yGetVar("p"+p+"frostGiants", "target") == xDatabaseNext(dEnemies)) {
 										trUnitSelectClear();
 										trUnitSelectByQV("enemies");
 										stunUnit("enemies", 2.0, p);

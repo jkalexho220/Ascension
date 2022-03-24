@@ -37,7 +37,7 @@ void stormcutterAlways(int eventID = -1) {
 					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 					dist = xsPow(trQuestVarGet("rainOfLightningRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("p"+p+"spellDamage");
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();
@@ -54,7 +54,7 @@ void stormcutterAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
 		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
 		dist = trQuestVarGet("disengageRadius") * trQuestVarGet("p"+p+"spellRange");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -150,7 +150,7 @@ void stormcutterAlways(int eventID = -1) {
 			if (yGetVar("p"+p+"shockArrows", "timeout") == -1) {
 				ySetVar("p"+p+"shockArrows", "timeout", trTimeMS() + 1000 * trQuestVarGet("p"+p+"spellRange"));
 			}
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (rayCollision("enemies", "prev", "dir", dist + 1.0, 2.0)) {

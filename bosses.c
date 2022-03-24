@@ -249,7 +249,7 @@ highFrequency
 	if (trTime() > cActivationTime + 1) {
 		xsDisableSelf();
 		int id = 0;
-		for(x=yGetDatabaseCount("playerUnits"); >0) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			id = yDatabaseNext("playerUnits", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removePlayerUnit();
@@ -315,7 +315,7 @@ highFrequency
 			}
 		}
 		
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id >= 0 && trUnitAlive()) {
 				trUnitDestroy();
@@ -971,7 +971,7 @@ highFrequency
 						1*trQuestVarGet("locX"),1*trQuestVarGet("locZ"),
 						TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 					ySetVar("bossMeteors", "yeehaw", 2);
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						id = yDatabaseNext("playeRUnits", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
@@ -1043,7 +1043,7 @@ highFrequency
 				trQuestVarSet("bossSpellTimeout", trTimeMS() + 12000);
 				trQuestVarSet("bossSpellNext", trTimeMS() + 2000);
 				yClearDatabase("bossShockwaveTargets");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					id = yDatabaseNext("playerUnits", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
@@ -1199,7 +1199,7 @@ highFrequency
 						addGenericProj("bossShockwaves","bossPos","dir",id,2,15,4);
 					}
 					yClearDatabase("bossShockwaveTargets");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						id = yDatabaseNext("playerUnits", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
@@ -1238,7 +1238,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -1296,7 +1296,7 @@ highFrequency
 					"<color={Playercolor(2)}>Wraithwood: "+1*trQuestVarGet("bossHealth")+"</color>", -1);
 				trUnitHighlight(0.2,false);
 			} else {
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					id = yDatabaseNext("playerUnits", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
@@ -1325,7 +1325,7 @@ highFrequency
 			} else {
 				yVarToVector("bossRoots", "pos");
 				action = 0;
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					id = yDatabaseNext("playerUnits", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
@@ -1387,7 +1387,7 @@ highFrequency
 							ySetVar("treeStabs", "next", trTimeMS() + 2000);
 							trVectorSetUnitPos("pos", "treeStabs");
 							yVarToVector("treeStabs", "dir");
-							for(x=yGetDatabaseCount("playerUnits"); >0) {
+							for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 								id = yDatabaseNext("playerUnits", true);
 								if (id == -1 || trUnitAlive() == false) {
 									removePlayerUnit();
@@ -1620,7 +1620,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -1655,7 +1655,7 @@ highFrequency
 				yRemoveFromDatabase("bossBreath");
 			} else {
 				action = 0;
-				for(y=yGetDatabaseCount("playerUnits"); >0) {
+				for(y=xGetDatabaseCount(dPlayerUnits); >0) {
 					id = yDatabaseNext("playerUnits", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
@@ -1795,7 +1795,7 @@ highFrequency
 						trVectorSetUnitPos("start", "bossUnit");
 						trQuestVarSet("bossNext", trQuestVarGet("bossNext") + 2000);
 						trQuestVarSet("target", kbUnitGetTargetUnitID(id));
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (1*trQuestVarGet("target") == yDatabaseNext("playerUnits", true)) {
 								if (trUnitAlive()) {
 									trVectorSetUnitPos("end", "playerUnits");
@@ -1993,7 +1993,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -2035,7 +2035,7 @@ highFrequency
 							trUnitHighlight(3, false);
 						}
 						yVarToVector("bossLasers", "pos");
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else {
@@ -2270,7 +2270,7 @@ highFrequency
 							break;
 						}
 					}
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -2392,7 +2392,7 @@ highFrequency
 					trQuestVarSet("bossSpell", 13);
 					trQuestVarSet("bossTimeout", trTimeMS() + 3000);
 					yClearDatabase("splatterUnits");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) > -1) {
 							yAddToDatabase("splatterUnits", "playerUnits");
 							yAddUpdateVar("splatterUnits", "index", yGetPointer("playerUnits"));
@@ -2410,7 +2410,7 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("bossCar");
 					trUnitChangeProtoUnit("Meteor Impact Ground");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "bossPos") < 16) {
@@ -2507,7 +2507,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -2543,7 +2543,7 @@ highFrequency
 				if (amt > 4.0) {
 					yVarToVector("bossClouds", "dir");
 					ySetVar("bossClouds", "currentDist", yGetVar("bossClouds", "currentDist") + amt);
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -2672,7 +2672,7 @@ highFrequency
 					amt = trTimeMS() - trQuestVarGet("bossNext"+action);
 					trQuestVarSet("bossNext"+action, 400 + trQuestVarGet("bossNext"+action));
 					trVectorSetUnitPos("bossPos", "bossUnit");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -2755,7 +2755,7 @@ highFrequency
 				trUnitSelectByQV("bossBreath");
 				trVectorSetFromAngle("dir", amt);
 				trSetSelectedUpVector(10.0 * trQuestVarGet("dirx"),0,10.0 * trQuestVarGet("dirz"));
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else {
@@ -2898,7 +2898,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -2966,7 +2966,7 @@ highFrequency
 						trQuestVarSet("bottomZ", trQuestVarGet("bossRoomCenterZ") - 2 * trQuestVarGet("bossRoomSize"));
 						trQuestVarSet("topX", trQuestVarGet("bossRoomCenterX") + 2 * trQuestVarGet("bossRoomSize"));
 						trQuestVarSet("topZ", trQuestVarGet("bossRoomCenterZ") + 2 * trQuestVarGet("bossRoomSize"));
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else {
@@ -3006,7 +3006,7 @@ highFrequency
 				yVarToVector("bossBolts", "prev");
 				yVarToVector("bossBolts", "dir");
 				amt = zDistanceBetweenVectors("pos", "prev") + 1.0;
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (rayCollision("playerUnits","prev","dir",amt,2.0)) {
@@ -3174,7 +3174,7 @@ highFrequency
 					trQuestVarSetFromRand("sound", 1, 3, true);
 					trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					amt = dotProduct("bossDir1", "bossDir2");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -3276,7 +3276,7 @@ highFrequency
 					trSetSelectedScale(1,1,2);
 					trQuestVarSet("bossTargetposX", trQuestVarGet("bossTargetposX") - 4.0 * trQuestVarGet("slashDirX"));
 					trQuestVarSet("bossTargetposZ", trQuestVarGet("bossTargetposZ") - 4.0 * trQuestVarGet("slashDirZ"));
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (rayCollision("playerUnits", "bossTargetPos", "slashDir", 8.0, 2)) {
@@ -3347,8 +3347,8 @@ highFrequency
 					trQuestVarSet("bossSpell", 3);
 					trQuestVarSet("bossNext", trTimeMS() + 7000);
 					yClearDatabase("splatterUnits");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
-						yDatabaseNext("playerUnits");
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
 						yAddToDatabase("splatterUnits", "playerUnits");
 						yAddUpdateVar("splatterUnits", "index", yGetPointer("playerUnits"));
 					}
@@ -3377,8 +3377,8 @@ highFrequency
 						}
 						
 						yClearDatabase("splatterUnits");
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
-							yDatabaseNext("playerUnits");
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+							xDatabaseNext(dPlayerUnits);
 							yAddToDatabase("splatterUnits", "playerUnits");
 							yAddUpdateVar("splatterUnits", "index", yGetPointer("playerUnits"));
 						}
@@ -3458,7 +3458,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -3697,7 +3697,7 @@ highFrequency
 					}
 					trQuestVarSet("bossRadius", trQuestVarGet("bossRadius") + 4);
 					dist = xsPow(trQuestVarGet("bossRadius"), 2);
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "hammerPos") < dist) {
@@ -3706,7 +3706,7 @@ highFrequency
 					}
 					
 					if (trQuestVarGet("boss") > 999) {
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
 							} else if (zDistanceToVectorSquared("enemies", "hammerPos") < dist) {
@@ -4033,7 +4033,7 @@ highFrequency
 	if (kbUnitGetAnimationActionType(1*trQuestVarGet("yeebBirdID")) == 9) {
 		if (trTime() > trQuestVarGet("yeebBirdMoveTime")) {
 			trQuestVarSet("yeebBirdMoveTime", trTime());
-			yDatabaseNext("playerUnits");
+			xDatabaseNext(dPlayerUnits);
 			trVectorSetUnitPos("pos", "playerUnits");
 			trUnitSelectClear();
 			trUnitSelectByQV("yeebBird", true);
@@ -4221,7 +4221,7 @@ highFrequency
 						yVarToVector("bossBalls", "prev");
 						yVarToVector("bossBalls", "dir");
 						dist = zDistanceBetweenVectors("pos", "prev") + 2.0;
-						for(j=yGetDatabaseCount("playerUnits"); >0) {
+						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else if (rayCollision("playerUnits","prev","dir",dist,4.0)) {
@@ -4512,7 +4512,7 @@ highFrequency
 						}
 						trArmySelect("0,0");
 						trUnitChangeProtoUnit("Meteor Impact Water");
-						for(i=yGetDatabaseCount("playerUnits"); >0) {
+						for(i=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else if (zDistanceToVectorSquared("playerUnits", "bossTargetPos") < 64.0) {
@@ -4610,7 +4610,7 @@ highFrequency
 				trQuestVarSet("bossAngle", trQuestVarGet("bossAngle") + amt * trQuestVarGet("bossAngularVelocity"));
 				trVectorSetFromAngle("newDir", trQuestVarGet("bossangle"));
 				angle = dotProduct("newDir", "bossDir");
-				for(i=yGetDatabaseCount("playerUnits"); >0) {
+				for(i=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (yGetVar("playerUnits", "launched") == 0) {
@@ -4706,7 +4706,7 @@ highFrequency
 						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 						trArmySelect("0,0");
 						trUnitChangeProtoUnit("Meteor Impact Water");
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else if (zDistanceToVectorSquared("playerUnits", "pos") < 16.0) {
@@ -4747,7 +4747,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("Fimbulwinter", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}
@@ -4890,7 +4890,7 @@ highFrequency
 					trDamageUnitPercent(100);
 					trQuestVarSetFromRand("sound", 1, 2, true);
 					trSoundPlayFN("fireball fall " + 1*trQuestVarGet("sound") + ".wav","1",-1,"","");
-					for (j=yGetDatabaseCount("playerUnits"); >0) {
+					for (j=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits","pos") < 9) {
@@ -4917,7 +4917,7 @@ highFrequency
 					trUnitSelectByQV("dragonMeteors");
 					trUnitChangeProtoUnit("Meteor");
 					yVarToVector("dragonMeteors", "pos");
-					for(j=yGetDatabaseCount("playerUnits"); >0) {
+					for(j=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "pos") < 25.0) {
@@ -4942,7 +4942,7 @@ highFrequency
 					if (dist > 1.0) {
 						hit = false;
 						yVarToVector("bossFireballs","dir");
-						for(j=yGetDatabaseCount("playerUnits"); >0) {
+						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
 							if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 								removePlayerUnit();
 							} else if (rayCollision("playerUnits","prev","dir", dist + 1.0, 2.0)) {
@@ -4996,8 +4996,8 @@ highFrequency
 			if (trQuestVarGet("bossSpell") == 41) {
 				trQuestVarSetFromRand("bossCount", 3, 6, true);
 				trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
-				if (trQuestVarGet("bossCount") + yGetDatabaseCount("enemies") > ENEMY_PLAYER) {
-					trQuestVarSet("bossCount", ENEMY_PLAYER - yGetDatabaseCount("enemies"));
+				if (trQuestVarGet("bossCount") + xGetDatabaseCount(dEnemies) > ENEMY_PLAYER) {
+					trQuestVarSet("bossCount", ENEMY_PLAYER - xGetDatabaseCount(dEnemies));
 				}
 				trQuestVarSet("bossSpell", 42);
 				trQuestVarSet("bossNext", trTimeMS());
@@ -5258,7 +5258,7 @@ highFrequency
 				}
 				
 				if (trTimeMS() > trQuestVarGet("bossNext")) {
-					for(i=yGetDatabaseCount("playerUnits"); >0) {
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "bossTarget") < 9.0) {
@@ -5290,7 +5290,7 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 0) {
 			if (trQuestVarGet("bossSpell") == 1) {
 				trUnitSetStance("Aggressive");
-				yDatabaseNext("playerUnits");
+				xDatabaseNext(dPlayerUnits);
 				trVectorSetUnitPos("dest", "playerUnits");
 				trUnitMoveToPoint(trQuestVarGet("destx"),0,trQuestVarGet("destz"),-1,true);
 				trQuestVarSet("bossSpell", 2);
@@ -5340,7 +5340,7 @@ highFrequency
 		trQuestVarSet("boss", 0);
 		trSetLighting("default", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			yDatabaseNext("enemies", true);
 			trDamageUnitPercent(100);
 		}

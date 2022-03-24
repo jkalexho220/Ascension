@@ -46,7 +46,7 @@ void spellstealerAlways(int eventID = -1) {
 						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("Lampades Blood");
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							id = yDatabaseNext("enemies", true);
 							if (id == -1 || trUnitAlive() == false) {
 								removeEnemy();
@@ -70,7 +70,7 @@ void spellstealerAlways(int eventID = -1) {
 		dist = xsPow(trQuestVarGet("bladeDanceRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 		amt = dist;
 		target = -1;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -212,7 +212,7 @@ void spellstealerAlways(int eventID = -1) {
 		yVarToVector("p"+p+"spellblades", "prev");
 		yVarToVector("p"+p+"spellblades", "dir");
 		dist = zDistanceToVector("p"+p+"spellblades", "prev");
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if ((yDatabaseNext("enemies", true) == -1) || trUnitAlive() == false) {
 				removeEnemy();
 			} else {

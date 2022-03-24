@@ -128,7 +128,7 @@ void starseerAlways(int eventID = -1) {
 				
 				amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
 				target = 0;
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();
@@ -195,7 +195,7 @@ void starseerAlways(int eventID = -1) {
 					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Tremor");
-					for(y=yGetDatabaseCount("enemies"); >0) {
+					for(y=xGetDatabaseCount(dEnemies); >0) {
 						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {

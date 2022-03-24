@@ -34,9 +34,11 @@ int xDeathSentence = 0;
 
 /* playerCharacters */
 int dPlayerCharacters = 0;
-int xIndex = 0;
+int xCharIndex = 0;
 int xCharAttacking = 0;
 int xCharAttackNext = 0;
+int xCharAttackTarget = 0;
+int xCharAttackTargetIndex = 0;
 int xCharSpecialAttack = 0;
 
 /* relics */
@@ -91,6 +93,7 @@ int xPlayerSilenceResistanceCount = 0;
 
 int xPlayerStunDamage = 0;
 int xPlayerPoisonKiller = 0;
+int xPlayerPoisonKillerActive = 0;
 
 int xPlayerWellCooldownStatus = 0;
 int xPlayerLureCooldownStatus = 0;
@@ -139,6 +142,15 @@ int xLaunchedIndex = 0;
 int xLaunchedStun = 0;
 int xLaunchedDest = 0;
 int xLaunchedTimeout = 0;
+
+/* generic projectiles */
+int xProjYeehaw = 0;
+int xProjScale = 0;
+int xProjProto = 0;
+int xProjAnim = 0;
+int xProjDir = 0;
+int xProjHeight = 0;
+int xProjSpeed = 0;
 
 rule initialize_databases
 active
@@ -229,6 +241,7 @@ highFrequency
 	
 	xPlayerStunDamage = xInitAddFloat(dPlayerData,"stunDamage");
 	xPlayerPoisonKiller = xInitAddFloat(dPlayerData,"poisonKiller");
+	xPlayerPoisonKillerActive = xInitAddInt(dPlayerData,"poisonKillerActive");
 	
 	xPlayerWellCooldownStatus = xInitAddInt(dPlayerData,"wellCooldownStatus");
 	xPlayerLureCooldownStatus = xInitAddInt(dPlayerData,"lureCooldownStatus");
@@ -286,7 +299,7 @@ highFrequency
 	dPlayerCharacters = xInitDatabase("playerCharacters", cNumberPlayers - 2);
 	xInitAddInt(dPlayerCharacters,"name");
 	xInitAddInt(dPlayerCharacters,"player");
-	xIndex = xInitAddInt(dPlayerCharacters,"index");
+	xCharIndex = xInitAddInt(dPlayerCharacters,"index");
 	
 	for(p=1; < cNumberPlayers - 1) {
 		trQuestVarSet("p"+p+"relics",xInitDatabase("p"+p+"relics"));
@@ -303,8 +316,10 @@ highFrequency
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"player");
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
 		xCharSpecialAttack = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"specialAttack");
-		xCharAttacking = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attacking");
+		xCharAttacking = xInitAddBool(1*trQuestVarGet("p"+p+"characters"),"attacking");
 		xCharAttackNext = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackNext");
+		xCharAttackTarget = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackTarget");
+		xCharAttackTargetIndex = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackTargetIndex");
 		
 		xAddDatabaseBlock(dPlayerData);
 	}

@@ -56,8 +56,8 @@ void sparkWitchAlways(int eventID = -1) {
 							}
 							ySetVar("p"+p+"characters", "bounces", 0);
 							ySetVar("p"+p+"characters", "hex", 0);
-							for(x=yGetDatabaseCount("enemies"); >0) {
-								if (yDatabaseNext("enemies") == trQuestVarGet("next")) {
+							for(x=xGetDatabaseCount(dEnemies); >0) {
+								if (xDatabaseNext(dEnemies) == trQuestVarGet("next")) {
 									yAddUpdateVar("p"+p+"zaps", "index", yGetPointer("enemies"));
 									break;
 								}
@@ -108,7 +108,7 @@ void sparkWitchAlways(int eventID = -1) {
 			amt = 0.001 * amt * trQuestVarGet("hexBoltDamage") * trQuestVarGet("p"+p+"spellDamage");
 			yVarToVector("p"+p+"hexOrbs", "pos");
 			dist = xsPow(trQuestVarGet("hexboltRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -218,7 +218,7 @@ void sparkWitchAlways(int eventID = -1) {
 				if (yGetVar("p"+p+"zaps", "bounces") > 0) {
 					dist = xsPow(trQuestVarGet("p"+p+"Range") - 5, 2);
 					hit = 0;
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (trQuestVarGet("p"+p+"zaps") == trQuestVarGet("enemies")) {
@@ -281,7 +281,7 @@ void sparkWitchAlways(int eventID = -1) {
 		dist = xsPow(trQuestVarGet("thunderstrikeRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 		amt = trQuestVarGet("thunderstrikeDamage") * trQuestVarGet("p"+p+"spellDamage");
 		hit = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else if (zDistanceToVectorSquared("enemies", "p"+p+"wellPos") < dist) {
@@ -364,7 +364,7 @@ void sparkWitchAlways(int eventID = -1) {
 				trSoundPlayFN("vortexstart.wav","1",-1,"","");
 				dist = xsPow(trQuestVarGet("vortexRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 				yVarToVector("p"+p+"vortexObjects", "center");
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "center") < dist) {

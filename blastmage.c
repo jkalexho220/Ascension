@@ -64,7 +64,7 @@ void blastmageAlways(int eventID = -1) {
 			yVarToVector("p"+p+"stars", "pos");
 			dist = trQuestVarGet("starRadius") * trQuestVarGet("p"+p+"spellRange");
 			dist = xsPow(dist, 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				yDatabaseNext("enemies", true);
 				if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 					damageEnemy(p, amt);
@@ -96,7 +96,7 @@ void blastmageAlways(int eventID = -1) {
 			dist = trQuestVarGet("empoweredRadius") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0;
 			dist = xsPow(dist, 2);
 			amt = trQuestVarGet("empoweredDamage") * trQuestVarGet("p"+p+"spellDamage");
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -165,7 +165,7 @@ void blastmageAlways(int eventID = -1) {
 			current = xsPow(trQuestVarGet("starfallStunRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 			amt = trQuestVarGet("starfallDamage") * trQuestVarGet("p"+p+"spellDamage");
 			hit = 0;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -269,7 +269,7 @@ void blastmageAlways(int eventID = -1) {
 				trVectorSetUnitPos("start", "p"+p+"characters");
 				vectorSnapToGrid("start");
 				trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (rayCollision("enemies", "start", "dir", dist + 2.0, 4.0)) {

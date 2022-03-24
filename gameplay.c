@@ -125,7 +125,7 @@ void processRegen(int p = 0) {
 			amt = diff * 0.00003 * trQuestVarGet("p"+p+"health");
 		}
 		if (trQuestVarGet("p"+p+"defiance") > 0) {
-			amt = amt + 0.001 * diff * trQuestVarGet("p"+p+"defiance") * yGetDatabaseCount("enemies");
+			amt = amt + 0.001 * diff * trQuestVarGet("p"+p+"defiance") * xGetDatabaseCount(dEnemies);
 		}
 		trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
 		trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
@@ -576,7 +576,7 @@ highFrequency
 	float amt = 0;
 	bool relicReturned = true;
 	
-	if (yGetDatabaseCount("playerUnits") > 0) {
+	if (xGetDatabaseCount(dPlayerUnits) > 0) {
 		id = yDatabaseNext("playerUnits", true);
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removePlayerUnit();
@@ -609,7 +609,7 @@ highFrequency
 	
 	/* protection */
 	if (trQuestVarGet("protectionCount") > 0) {
-		for(x=yGetDatabaseCount("playerUnits"); >0) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			id = yDatabaseNext("playerUnits", true);
 			trUnitHighlight(0.2, false);
 			xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
@@ -872,7 +872,7 @@ highFrequency
 				petDogs(p);
 			} else if (trTimeMS() > trQuestVarGet("p"+p+"reviveNext")) {
 				count = 0;
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();
@@ -938,7 +938,7 @@ highFrequency
 				if (trQuestVarGet("p"+p+"dead") > 0) {
 					trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
 				}
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					yDatabaseNext("playerUnits", true);
 					if (yGetVar("playerUnits", "player") == p) {
 						trUnitChangeProtoUnit("Hero Death");
@@ -959,8 +959,8 @@ highFrequency
 			yDatabaseNext("skyPassages");
 			trVectorSetUnitPos("pos", "skyPassages");
 			trQuestVarSet("sound", 0);
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
 				if (zDistanceToVectorSquared("playerUnits", "pos") < 6) {
 					yAddToDatabase("magicalJourney", "playerUnits");
 					if (yGetVar("playerUnits", "hero") == 1) {
@@ -1117,14 +1117,14 @@ highFrequency
 			xsDisableSelf();
 			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
 			trUnitOverrideAnimation(-1,0,true,true,-1);
-		} else if (yGetDatabaseCount("playerUnits") > 0) {
+		} else if (xGetDatabaseCount(dPlayerUnits) > 0) {
 			int x = 0;
 			int z = 0;
 			trQuestVarSet("deepDeployNext", trTime() + 60);
 			trVectorQuestVarSet("dir",vector(-13,0,-13));
 			int heading = 45;
 			for(i=4; >0) {
-				yDatabaseNext("playerUnits");
+				xDatabaseNext(dPlayerUnits);
 				trVectorSetUnitPos("dest", "playerUnits");
 				x = trQuestVarGet("deepDeployCenterX") + trQuestVarGet("dirX");
 				z = trQuestVarGet("deepDeployCenterZ") + trQuestVarGet("dirZ");

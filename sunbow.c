@@ -39,7 +39,7 @@ void sunbowAlways(int eventID = -1) {
 					yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
 					yAddUpdateVar("playerLasers", "range", trQuestVarGet("p"+p+"range") * 1.4);
 					amt = trQuestVarGet("healingRaysPower") * trQuestVarGet("p"+p+"spellDamage");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -58,7 +58,7 @@ void sunbowAlways(int eventID = -1) {
 					}
 					if (trQuestVarGet("p"+p+"searing") == 1) {
 						amt = amt * trQuestVarGet("p"+p+"healBoost");
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
 							} else {
@@ -206,7 +206,7 @@ void sunbowAlways(int eventID = -1) {
 			posX = yGetVar("p"+p+"sunlights", "power");
 			posX = posX * 0.5;
 			
-			for (x=yGetDatabaseCount("playerUnits"); >0) {
+			for (x=xGetDatabaseCount(dPlayerUnits); >0) {
 				id = yDatabaseNext("playerUnits", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removePlayerUnit();
@@ -216,7 +216,7 @@ void sunbowAlways(int eventID = -1) {
 			}
 			
 			if (trQuestVarGet("p"+p+"searing") == 1) {
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();

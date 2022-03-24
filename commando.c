@@ -84,7 +84,7 @@ void commandoAlways(int eventID = -1) {
 			hit = 0;
 			yVarToVector("p"+p+"pellets", "prev");
 			current = dist - yGetVar("p"+p+"pellets", "dist");
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (rayCollision("enemies", "prev", "dir", current + 2.0, 4.0)) {
@@ -153,7 +153,7 @@ void commandoAlways(int eventID = -1) {
 		trQuestVarSet("inner", xsPow(yGetVar("p"+p+"shotgunHitboxes", "dist"), 2));
 		dist = yGetVar("p"+p+"shotgunHitboxes", "dist");
 		target = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -330,7 +330,7 @@ void commandoAlways(int eventID = -1) {
 				yVarToVector("p"+p+"echoBombs", "pos");
 				amt = amt * trQuestVarGet("p"+p+"spellDamage");
 				dist = xsPow(trQuestVarGet("echoBombRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -379,7 +379,7 @@ void commandoAlways(int eventID = -1) {
 		trUnitDestroy();
 		dist = xsPow(12, 2);
 		target = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();

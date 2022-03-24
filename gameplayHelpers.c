@@ -30,10 +30,12 @@ bool wellIsUltimate = false;
 bool rainIsUltimate = false;
 bool lureIsUltimate = false;
 
-const int spyProto = 0;
-const int spyUnit = 1;
-const int spyDest = 2;
-const int spyActive = 3;
+int spysearch = 0;
+int spyreset = 0;
+int spyProto = 0;
+int spyUnit = 1;
+int spyDest = 2;
+int spyActive = 3;
 
 int bossUnit = 0;
 int bossCooldownTime = 0;
@@ -702,7 +704,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 		trUnitSelectClear();
 		trUnitSelectByQV("next");
-		trImmediateUnitGarrison(""+xGetUnit(db,xUnitName));
+		trImmediateUnitGarrison(""+xGetInt(db,xUnitName));
 		trUnitConvert(p);
 		trUnitChangeProtoUnit("Dwarf");
 		
@@ -764,7 +766,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 	}
 }
 
-void stunsAndPoisons(string db = "") {
+void stunsAndPoisons(int db = 0) {
 	if (xGetInt(db, xPoisonStatus) == 1) {
 		float amt = trTimeMS() - xGetInt(db, xPoisonLast);
 		if (trTimeMS() > xGetInt(db, xPoisonTimeout)) {
@@ -803,95 +805,100 @@ void OnHit(int p = 0, int index = 0, bool magic = false) {
 			xSetPointer(dEnemies, index);
 		}
 		trVectorSetUnitPos("onHitPos", "enemies");
-		for(x=yGetDatabaseCount("enemies"); >1) {
-			yDatabaseNext("enemies");
-			if (zDistanceToVectorSquared("enemies", "onHitPos") < 16.0) {
-				trUnitSelectClear();
-				trUnitSelectByQV("enemies");
-				damageEnemy(p, trQuestVarGet("p"+p+"cleave") * trQuestVarGet("p"+p+"attack"), magic);
+		vector pos = kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName));
+		for(x=xGetDatabaseCount(dEnemies); >1) {
+			xDatabaseNext(dEnemies);
+			if (unitDistanceToVector(xGetInt(dEnemies,xUnitName), pos) < 16.0) {
+				xUnitSelect(dEnemies,xUnitName);
+				damageEnemy(p, xGetFloat(dPlayerData,xPlayerCleave,p) * xGetFloat(dPlayerData,xPlayerAttack,p), magic);
 			}
 		}
 		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("onHitPosx"),0,trQuestVarGet("onHitPosz"),0,true);
 		trArmySelect("1,0");
 		trDamageUnitPercent(100);
 		trUnitChangeProtoUnit("Meteorite");
-		ySetPointer("enemies", prev);
+		xSetPointer(dEnemies,prev);
 	}
 }
 
 int CheckOnHit(int p = 0, int id = 0, bool onhit = true) {
 	int action = kbUnitGetAnimationActionType(id);
 	int status = ON_HIT_NONE;
-	int class = trQuestVarGet("p"+p+"class");
-	int simp = 0;
+	int class = xGetInt(dPlayerData,xPlayerClass,p);
+	int db = trQuestVarGet("p"+p+"characters");
+	int target = 0;
+	int simp = xGetInt(dPlayerData,xPlayerSimp,p);
 	float amt = 0;
 	if (action == 32) {
 		status = ON_HIT_JUMP;
-	} else if (yGetVar("p"+p+"characters", "attacking") == 0) {
+	} else if (xGetBool(db, xCharAttacking)) {
 		if ((action == 12) || (action == 6)) {
-			ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
-			ySetVar("p"+p+"characters", "attacking", 1);
-			ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
-			ySetVar("p"+p+"characters", "attackTargetIndex", 0);
+			xsSetContextPlayer(p);
+			target = kbUnitGetTargetUnitID(id);
+			xsSetContextPlayer(0);
+			xSetInt(db, xCharAttackTarget, target);
+			xSetBool(db, xCharAttacking, true);
+			xSetInt(db, xCharAttackNext, trTimeMS() + xGetInt(dPlayerData,xPlayerFirstDelay,p));
+			xSetInt(db, xCharAttackTargetIndex, 0);
 		}
 	} else {
 		if ((action == 12) || (action == 6)) {
-			if (trTimeMS() > yGetVar("p"+p+"characters", "attackNext")) {
+			if (trTimeMS() > xGetInt(db, xCharAttackNext)) {
 				
 				status = ON_HIT_NORMAL;
-				ySetVar("p"+p+"characters", "attackNext",
-					yGetVar("p"+p+"characters", "attackNext") + trQuestVarGet("p"+p+"nextDelay"));
+				xSetInt(db, xCharAttackNext, xGetInt(db, xCharAttackNext) + xGetInt(dPlayerData,xPlayerNextDelay,p));
 				/* only melee characters have special attacks */
 				if (action == 6) {
-					ySetVar("p"+p+"characters", "specialAttack", yGetVar("p"+p+"characters", "specialAttack") - 1);
-					if (yGetVar("p"+p+"characters", "specialAttack") <= 0) {
-						ySetVar("p"+p+"characters", "specialAttack", trQuestVarGet("p"+p+"specialAttackCooldown"));
+					xSetInt(db,xCharSpecialAttack,xGetInt(db,xCharSpecialAttack) - 1);
+					if (xGetInt(db, xCharSpecialAttack) <= 0) {
+						xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
 						status = ON_HIT_SPECIAL;
 					}
 				}
 				/* simp benefits */
-				if (trQuestVarGet("p"+p+"simp") > 0) {
-					simp = trQuestVarGet("p"+p+"simp");
-					for(x=yGetDatabaseCount("p"+simp+"characters"); >0) {
-						yDatabaseNext("p"+simp+"characters");
-						ySetVar("p"+simp+"characters", "specialAttack", yGetVar("p"+simp+"characters", "specialAttack") - 1);
+				if (simp > 0) {
+					simp = trQuestVarGet("p"+simp+"characters");
+					for(x=xGetDatabaseCount(simp); >0) {
+						xDatabaseNext(simp);
+						xSetInt(simp, xCharSpecialAttack, xGetInt(simp, xCharSpecialAttack) - 1);
 					}
 				}
 				/* get the target */
-				if (yGetVar("p"+p+"characters", "attackTargetIndex") == 0) {
-					for(x=yGetDatabaseCount("enemies"); >0) {
-						yDatabaseNext("enemies");
-						if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
-							ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
-							trQuestVarSet("p"+p+"poisonKillerActive", yGetVar("enemies", "poisonStatus"));
+				if (xGetInt(dPlayerCharacters, xCharAttackTargetIndex) == 0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						if (kbGetBlockID(""+xGetInt(dEnemies,xUnitName)) == xGetInt(db, xCharAttackTarget)) {
+							xSetInt(db, xCharAttackTargetIndex, xGetPointer(dEnemies));
+							xSetInt(dPlayerData,xPlayerPoisonKillerActive, xGetInt(dEnemies, xPoisonStatus),p);
 							break;
 						}
 					}
 				} else {
-					trQuestVarSet("p"+p+"poisonKillerActive",
-						yGetVarAtIndex("enemies", "poisonStatus", 1*yGetVar("p"+p+"characters", "attackTargetIndex")));
+					xSetInt(dPlayerData,xPlayerPoisonKillerActive, xGetInt(dEnemies, xPoisonStatus, xGetInt(db,xCharAttackTargetIndex)),p);
 				}
 				/* lifesteal */
-				amt = trQuestVarGet("p"+p+"Lifesteal") * trQuestVarGet("p"+p+"attack");
-				if (trQuestVarGet("p"+p+"poisonKillerActive") == 1) {
-					amt = amt * (1.0 + trQuestVarGet("p"+p+"poisonKiller"));
+				amt = xGetFloat(dPlayerData,xPlayerLifesteal,p) * xGetFloat(dPlayerData,xPlayerAttack,p);
+				if (xGetInt(dPlayerData,xPlayerPoisonKillerActive) == 1) {
+					amt = amt * (1.0 + xGetFloat(dPlayerData,xPlayerPoisonKiller,p));
 				}
-				trQuestVarSet("p"+p+"lifestealTotal", trQuestVarGet("p"+p+"lifestealTotal") + amt);
+				xSetFloat(dPlayerData,xPlayerLifestealTotal, xGetFloat(dPlayerData,xPlayerLifestealTotal,p) + amt,p);
 				if (onhit) {
-					OnHit(p, 1*yGetVar("p"+p+"characters", "attackTargetIndex"));
+					OnHit(p, xGetInt(db,xCharAttackTargetIndex));
 				}
 			} else {
-				int target = kbUnitGetTargetUnitID(id);
-				if (yGetVar("p"+p+"characters", "attackTarget") != target) {
-					ySetVar("p"+p+"characters", "attackNext", trTimeMS() + trQuestVarGet("p"+p+"firstDelay"));
-					ySetVar("p"+p+"characters", "attackTarget", target);
-					ySetVar("p"+p+"characters", "attackTargetIndex", 0);
+				xsSetContextPlayer(p);
+				target = kbUnitGetTargetUnitID(id);
+				xsSetContextPlayer(0);
+				if (xGetInt(db, xCharAttackTarget) != target) {
+					xSetInt(db, xCharAttackNext, trTimeMS() + xGetInt(dPlayerData,xPlayerFirstDelay,p));
+					xSetInt(db,xCharAttackTarget,target);
+					xSetInt(db,xCharAttackTargetIndex,0);
 				}
 				status = ON_HIT_ATTACKING;
 			}
 		} else {
-			ySetVar("p"+p+"characters", "attacking", 0);
-			trQuestVarSet("p"+p+"poisonKillerActive", 0);
+			xSetBool(db,xCharAttacking,false);
+			xSetInt(dPlayerData,xPlayerPoisonKillerActive,0,p);
 		}
 	}
 	return(status);
@@ -899,10 +906,13 @@ int CheckOnHit(int p = 0, int id = 0, bool onhit = true) {
 
 /* call this at the end of each class's function */
 void poisonKillerBonus(int p = 0) {
-	int class = trQuestVarGet("p"+p+"class");
-	float amt = trQuestVarGet("p"+p+"poisonKiller")*trQuestVarGet("p"+p+"attack")*trQuestVarGet("p"+p+"poisonKillerActive");
-	zSetProtoUnitStat(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),p,27,amt+trQuestVarGet("p"+p+"attack"));
-	zSetProtoUnitStat(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),p,31,amt+trQuestVarGet("p"+p+"attack"));
+	int class = xGetInt(dPlayerData,xPlayerClass,p);
+	float amt = xGetFloat(dPlayerData,xPlayerPoisonKiller,p) * xGetFloat(dPlayerData,xPlayerAttack,p);
+	amt = amt * xGetInt(dPlayerData,xPlayerPoisonKillerActive,p);
+	zSetProtoUnitStat(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),p,27,
+		amt+xGetFloat(dPlayerData,xPlayerAttack,p));
+	zSetProtoUnitStat(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),p,31,
+		amt+xGetFloat(dPlayerData,xPlayerAttack,p));
 }
 
 float calculateDecay(int p = 0, float decay = 0) {
@@ -921,39 +931,41 @@ PROJ_GROUND = the projectile has hit the ground and will turn into kronny
 PROJ_FALLING = the projectile is falling towards the ground. This is the recommended state for
 adding any additional computation
 */
-int processGenericProj(string db = "") {
+int processGenericProj(int db = 0) {
 	int id = 0;
 	int action = PROJ_NONE;
 	float scale = 0;
-	id = yDatabaseNext(db, true);
+	xDatabaseNext(db);
+	xUnitSelect(db,xUnitName);
+	id = kbGetBlockID(""+xGetInt(db,xUnitName),true);
+	int yeehaw = xGetInt(db, xProjYeehaw);
 	if (id == -1) {
-		yRemoveFromDatabase(db);
+		xFreeDatabaseBlock(db);
 		action = PROJ_REMOVE;
-	} else if (yGetVar(db, "yeehaw") == 1) {
-		trMutateSelected(1*yGetVar(db, "proto"));
-		trUnitOverrideAnimation(1*yGetVar(db, "anim"),0,true,true,-1);
-		scale = yGetVar(db, "scale");
+	} else if (yeehaw == 1) {
+		trMutateSelected(xGetInt(db,xProjProto));
+		trUnitOverrideAnimation(xGetInt(db,xProjAnim),0,true,true,-1);
+		scale = xGetFloat(db,xProjScale);
 		trSetSelectedScale(scale,scale,scale);
-		ySetVar(db, "yeehaw", 0);
+		xSetInt(db,xProjYeehaw,0);
 		action = PROJ_BOUNCE;
-	} else if (yGetVar(db, "yeehaw") == 2) {
+	} else if (yeehaw == 2) {
 		/* first time search */
-		ySetVar(db, "yeehaw", 1);
+		xSetInt(db, xProjYeehaw, 1);
 	} else {
-		trVectorSetUnitPos("pos", db);
-		if (trQuestVarGet("posY") < worldHeight + 0.5 || yGetVar(db, "yeehaw") == 99) {
+		vector pos = kbGetBlockPosition(""+xGetInt(db,xUnitName));
+		if (xsVectorGetY(pos) < worldHeight + 0.5 || xGetInt(db,xProjYeehaw) == 99) {
 			action = PROJ_GROUND;
-			yVarToVector(db, "dir");
-			zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, yGetVar(db, "speed"));
+			vector dir = xGetVector(db, xProjDir);
+			zSetProtoUnitStat("Kronny Flying", xGetInt(db,xPlayerOwner), 1, xGetFloat(db,xProjSpeed));
 			trUnitChangeProtoUnit("Kronny Flying");
-			trUnitSelectClear();
-			trUnitSelectByQV(db);
+			xUnitSelect(db,xUnitName);
 			trDamageUnitPercent(-100);
 			trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-			trSetUnitOrientation(trVectorQuestVarGet("dir"), vector(0,1,0), true);
-			trSetSelectedScale(0,0.0-yGetVar(db, "height"),0);
+			trSetUnitOrientation(dir, vector(0,1,0), true);
+			trSetSelectedScale(0,0.0-xGetFloat(db, xProjHeight),0);
 			trDamageUnitPercent(100);
-			ySetVar(db, "yeehaw", 1);
+			xSetInt(db,xProjYeehaw,1);
 		} else {
 			action = PROJ_FALLING;
 		}
@@ -968,260 +980,336 @@ start = the name of the start trVector
 dir = the name of the direction vector. Must be a normal vector (length 1) starting from the origin
 height = the negative height of the object (if you want something falling from a higher location, input a negative number here)
 */
-int addGenericProj(string db = "",string start="",string dir="",
+int addGenericProj(int db = 0,vector start = vector(0,0,0),vector dir = vector(0,0,0),
 	int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0, int p = 0) {
 	if (p == 0) {
 		p = ENEMY_PLAYER;
 	}
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	int index = yAddToDatabase(db, "next");
-	yAddUpdateVar(db, "proto", proto);
-	yAddUpdateVar(db, "anim", anim);
-	yAddUpdateVar(db, "speed", speed);
-	yAddUpdateVar(db, "height", height);
-	yAddUpdateVar(db, "scale", scale);
-	yAddUpdateVar(db, "dirX", trQuestVarGet(dir+"x"));
-	yAddUpdateVar(db, "dirZ", trQuestVarGet(dir+"z"));
-	yAddUpdateVar(db, "yeehaw", 2);
+	int next = trGetNextUnitScenarioNameNumber();
+	int index = xAddDatabaseBlock(db);
+	xSetPointer(db, index);
+	xSetInt(db, xUnitName, next);
+	xSetInt(db, xProjProto, proto);
+	xSetInt(db, xProjAnim, anim);
+	xSetFloat(db, xProjSpeed, speed);
+	xSetFloat(db, xProjHeight, height);
+	xSetFloat(db, xProjScale, scale);
+	xSetVector(db,xProjDir, dir);
+	xSetInt(db,xProjYeehaw,2);
 	
-	trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
+	trArmyDispatch(""+p+",0", "Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
 	trUnitSelectClear();
 	trUnitSelectByQV("next", true);
 	trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 	zSetProtoUnitStat("Kronny Flying", p, 1, speed);
-	trSetUnitOrientation(trVectorQuestVarGet(dir), vector(0,1,0), true);
+	trSetUnitOrientation(dir, vector(0,1,0), true);
 	trSetSelectedScale(0, 0.0 - height, 0);
 	trDamageUnitPercent(100);
 	return(index);
 }
 
+int initGenericProj(string name = "", int count = 10) {
+	int db = xInitDatabase(name,count);
+	xInitAddInt(db, "name");
+	xInitAddInt(db, "player");
+	xProjProto = xInitAddInt(db, "proto");
+	xProjYeehaw = xInitAddInt(db, "yeehaw");
+	xProjAnim = xInitAddInt(db, "anim");
+	xProjHeight = xInitAddFloat(db, "height");
+	xProjSpeed = xInitAddFloat(db, "speed");
+	xProjScale = xInitAddFloat(db, "scale");
+	xProjDir = xInitAddVector(db, "dir");
+}
 
-void activateSpecialUnit(string db = "", string pName = "", int proto = 0, int p = 0) {
+int dSphinxes = 0;
+int dDryads = 0;
+int dMedusas = 0;
+int dMountainGiants = 0;
+int dFrostGiants = 0;
+int dValkyries = 0;
+int dBallistas = 0;
+int dFireSiphons = 0;
+int dBattleBoars = 0;
+int dAutomatons = 0;
+int dScarabs = 0;
+int dSatyrs = 0;
+int dAvengers = 0;
+int dScorpionMen = 0;
+int dMummies = 0;
+int dNereids = 0;
+int dHydras = 0;
+int dKrakens = 0;
+int dLampades = 0;
+int dEinherjars = 0;
+int dLightningStatues = 0;
+int dManticores = 0;
+
+int xSpecialIndex = 0;
+int xSpecialStep = 0;
+int xSpecialNext = 0;
+int xSpecialTarget = 0;
+
+int dDelayLasers = 0;
+int xLaserDir = 0;
+int xLaserPhase = 0;
+int xLaserNext = 0;
+int xLaserDist = 0;
+
+int initSpecialDatabase(string name = "", bool step = true) {
+	int db = xInitDatabase(name);
+	xInitAddInt(db, "name");
+	xInitAddInt(db, "player");
+	xSpecialIndex = xInitAddInt(db, "index");
+	xSpecialStep = xInitAddInt(db, "step");
+	if (step) {
+		xSpecialNext = xInitAddInt(db,"next");
+	}
+	return(db);
+}
+
+void addSpecialToDatabase(int db = 0,int name = 0, int from = 0, int p = 0) {
+	xSetPointer(db, xAddDatabaseBlock(db));
+	xSetInt(db, xUnitName,name);
+	xSetInt(db,xPlayerOwner,p);
+	xSetInt(db, xSpecialIndex, xGetNewestPointer(from));
+}
+
+rule initialize_special_database
+active
+highFrequency
+{
+	xsDisableSelf();
+	dSphinxes = initSpecialDatabase("Sphinxes");
+	
+	dDryads = initSpecialDatabase("Dryads", false);
+	xInitAddVector(dDryads,"pos");
+	
+	dMedusas = initSpecialDatabase("Medusas");
+	xSpecialTarget = xInitAddInt(dMedusas, "target");
+
+	dMountainGiants = initSpecialDatabase("MountainGiants");
+	xInitAddVector(dMountainGiants, "target");
+
+	dFrostGiants = initSpecialDatabase("FrostGiants");
+	xInitAddInt(dFrostGiants,"target");
+
+	dValkyries = initSpecialDatabase("Valkyries");
+	xInitAddInt(dValkyries,"sfx");
+
+	dBallistas = initSpecialDatabase("Ballistas",false);
+	
+	dFireSiphons = initSpecialDatabase("FireSiphons",false);
+	
+	dBattleBoars = initSpecialDatabase("BattleBoars");
+	xInitAddInt(dBattleBoars,"target");
+
+	dAutomatons = initSpecialDatabase("Automatons");
+	
+	dScarabs = initSpecialDatabase("Scarabs", false);
+	xInitAddVector(dScarabs,"pos");
+	
+	dSatyrs = initSpecialDatabase("Satyrs");
+	
+	dAvengers = initSpecialDatabase("Avengers");
+	
+	dScorpionMen = initSpecialDatabase("ScorpionMen");
+	xInitAddInt(dScorpionMen,"target");
+
+	dMummies = initSpecialDatabase("Mummies");
+	
+	dNereids = initSpecialDatabase("Nereids");
+	xInitAddVector(dNereids,"target");
+
+	dHydras = initSpecialDatabase("Hydras");
+	
+	dKrakens = initSpecialDatabase("Krakens");
+	xInitAddVector(dKrakens, "target");
+
+	dLampades = initSpecialDatabase("SkyWitches");
+	
+	dEinherjars = initSpecialDatabase("Einherjars");
+	
+	dLightningStatues = initSpecialDatabase("LightningStatues");
+	
+	dManticores = initSpecialDatabase("Manticores");
+	
+	dDelayLasers = xInitDatabase("delayLasers");
+	xInitAddInt(dDelayLasers,"name");
+	xInitAddInt(dDelayLasers,"player");
+	xLaserDir = xInitAddVector(dDelayLasers, "dir");
+	xLaserPhase = xInitAddInt(dDelayLasers, "phase");
+	xLaserNext = xInitAddInt(dDelayLasers, "next");
+	xLaserDist = xInitAddFloat(dDelayLasers, "dist");
+}
+
+
+void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
+	int index = 0;
 	switch(proto)
 	{
 		case kbGetProtoUnitID("Sphinx"):
 		{
-			yAddToDatabase("Sphinxes", db);
-			yAddUpdateVar("Sphinxes", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Sphinxes", "step", 0);
-			yAddUpdateVar("Sphinxes", "player", p);
+			
+			addSpecialToDatabase(dSphinxes,name,db,p);
 		}
 		case kbGetProtoUnitID("Dryad"):
 		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("dryads", "player", p);
+			addSpecialToDatabase(dDryads,name,db,p);
 		}
 		case kbGetProtoUnitID("Wadjet"):
 		{
-			yAddToDatabase("Dryads", db);
-			yAddUpdateVar("dryads", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("dryads", "player", p);
+			addSpecialToDatabase(dDryads,name,db,p);
 		}
 		case kbGetProtoUnitID("Medusa"):
 		{
-			yAddToDatabase("Medusas", db);
-			yAddUpdateVar("Medusas", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Medusas", "step", 0);
-			yAddUpdateVar("Medusas", "player", p);
+			addSpecialToDatabase(dMedusas,name,db,p);
 		}
 		case kbGetProtoUnitID("Mountain Giant"):
 		{
-			yAddToDatabase("MountainGiants", db);
-			yAddUpdateVar("MountainGiants", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("MountainGiants", "step", 0);
-			yAddUpdateVar("MountainGiants", "player", p);
+			addSpecialToDatabase(dMountainGiants,name,db,p);
 		}
 		case kbGetProtoUnitID("Frost Giant"):
 		{
-			yAddToDatabase("FrostGiants", db);
-			yAddUpdateVar("FrostGiants", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("FrostGiants", "step", 0);
-			yAddUpdateVar("FrostGiants", "player", p);
+			addSpecialToDatabase(dFrostGiants,name,db,p);
 		}
 		case kbGetProtoUnitID("Valkyrie"):
 		{
-			yAddUpdateVar(pName, "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Valkyries", "silenced", 0);
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-			yAddUpdateVar("Valkyries", "player", p);
+			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+			addSpecialToDatabase(dValkyries,name,db,p);
+			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
+				xsVectorSet(dValkyries,xSpecialTarget,xGetNewestPointer(dValkyries)));
 		}
 		case kbGetProtoUnitID("Ballista"):
 		{
-			yAddToDatabase("ballistas", db);
-			yAddUpdateVar("ballistas", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("ballistas", "player", p);
+			addSpecialToDatabase(dBallistas,name,db,p);
 		}
 		case kbGetProtoUnitID("Colossus"):
 		{
-			yAddUpdateVar(pName, "magicResist", 1);
-			yAddToDatabase("Valkyries", db);
-			yAddUpdateVar("Valkyries", "index", yGetNewestPointer(pName));
-			spyEffect(1*trQuestVarGet(db),
-				kbGetProtoUnitID("Vortex Finish Linked"), yGetNewVarName("Valkyries", "sfx"));
-			yAddUpdateVar("Valkyries", "player", p);
+			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+			addSpecialToDatabase(dValkyries,name,db,p);
+			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
+				xsVectorSet(dValkyries,xSpecialTarget,xGetNewestPointer(dValkyries)));
 		}
 		case kbGetProtoUnitID("Fire Siphon"):
 		{
-			yAddToDatabase("siphons", db);
-			yAddUpdateVar("siphons", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("siphons", "player", p);
+			addSpecialToDatabase(dFireSiphons,name,db,p);
 		}
 		case kbGetProtoUnitID("Battle Boar"):
 		{
-			yAddToDatabase("battleBoars", db);
-			yAddUpdateVar("battleBoars", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("battleBoars", "step", 0);
-			yAddUpdateVar("battleBoars", "player", p);
+			addSpecialToDatabase(dBattleBoars,name,db,p);
 		}
 		case kbGetProtoUnitID("Automaton SPC"):
 		{
-			yAddToDatabase("automatons", db);
-			yAddUpdateVar("automatons", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("automatons", "player", p);
+			addSpecialToDatabase(dAutomatons,name,db,p);
 		}
 		case kbGetProtoUnitID("Behemoth"):
 		{
-			yAddUpdateVar(pName, "physicalResist", 1);
-			yAddUpdateVar(pName, "magicResist", -1);
+			xSetInt(db,xMagicResist,-1,xGetNewestPointer(db));
 		}
 		case kbGetProtoUnitID("Scarab"):
 		{
-			yAddUpdateVar(pName, "physicalResist", 1);
-			yAddUpdateVar(pName, "magicResist", -1);
-			yAddToDatabase("scarabs", db);
-			yAddUpdateVar("scarabs", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("scarabs", "player", p);
+			xSetInt(db,xMagicResist,-1,xGetNewestPointer(db));
+			addSpecialToDatabase(dScarabs,name,db,p);
 		}
 		case kbGetProtoUnitID("Satyr"):
 		{
-			yAddToDatabase("Satyrs", db);
-			yAddUpdateVar("Satyrs", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Satyrs", "step", 0);
-			yAddUpdateVar("Satyrs", "player", p);
+			addSpecialToDatabase(dSatyrs,name,db,p);
 		}
 		case kbGetProtoUnitID("Avenger"):
 		{
-			yAddToDatabase("Avengers", db);
-			yAddUpdateVar("Avengers", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Avengers", "step", 0);
-			yAddUpdateVar("Avengers", "player", p);
+			addSpecialToDatabase(dAvengers,name,db,p);
 		}
 		case kbGetProtoUnitID("Scorpion Man"):
 		{
-			yAddToDatabase("ScorpionMen", db);
-			yAddUpdateVar("ScorpionMen", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("ScorpionMen", "step", 0);
-			yAddUpdateVar("ScorpionMen", "player", p);
+			addSpecialToDatabase(dScorpionMen,name,db,p);
 		}
 		case kbGetProtoUnitID("Mummy"):
 		{
-			yAddToDatabase("Mummies", db);
-			yAddUpdateVar("Mummies", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Mummies", "step", 0);
-			yAddUpdateVar("Mummies", "player", p);
+			addSpecialToDatabase(dMummies,name,db,p);
 		}
 		case kbGetProtoUnitID("Nereid"):
 		{
-			yAddToDatabase("Nereids", db);
-			yAddUpdateVar("Nereids", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Nereids", "step", 0);
-			yAddUpdateVar("Nereids", "player", p);
+			addSpecialToDatabase(dNereids,name,db,p);
 		}
 		case kbGetProtoUnitID("Hydra"):
 		{
-			yAddToDatabase("Hydras", db);
-			yAddUpdateVar("Hydras", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Hydras", "last", trTime());
-			yAddUpdateVar("Hydras", "player", p);
+			addSpecialToDatabase(dHydras,name,db,p);
 		}
 		case kbGetProtoUnitID("Kraken"):
 		{
-			yAddToDatabase("Krakens", db);
-			yAddUpdateVar("Krakens", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Krakens", "step", 0);
-			yAddUpdateVar("Krakens", "player", p);
+			addSpecialToDatabase(dKrakens,name,db,p);
 		}
 		case kbGetProtoUnitID("Lampades"):
 		{
-			yAddToDatabase("SkyWitches", db);
-			yAddUpdateVar("SkyWitches", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("SkyWitches", "step", 0);
-			yAddUpdateVar("SkyWitches", "player", p);
+			addSpecialToDatabase(dLampades,name,db,p);
 		}
 		case kbGetProtoUnitID("Einheriar"):
 		{
-			yAddToDatabase("Einherjars", db);
-			yAddUpdateVar("Einherjars", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("Einherjars", "step", 0);
-			yAddUpdateVar("Einherjars", "player", p);
+			addSpecialToDatabase(dEinherjars,name,db,p);
 		}
 		case kbGetProtoUnitID("Statue of Lightning"):
 		{
-			yAddToDatabase("lightningStatues", db);
-			yAddUpdateVar("lightningStatues", "index", yGetNewestPointer(pName));
-			yAddUpdateVar("lightningStatues", "step", 0);
-			yAddUpdateVar("lightningStatues", "player", p);
-		}
-		case kbGetProtoUnitID("Manticore"):
-		{
-			yAddToDatabase("Manticores", db);
+			addSpecialToDatabase(dLightningStatues,name,db,p);
 		}
 	}
 }
 
-int activatePlayerUnit(string db = "", int p = 0, int proto = 0, float decay = 0) {
-	int index = yAddToDatabase("playerUnits", db);
-	yAddUpdateVar("playerUnits", "player", p);
-	yAddUpdateVar("playerUnits", "hero", 0);
-	yAddUpdateVar("playerUnits", "decay", decay);
-	yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 1000);
-	yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
-	yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("proto"+proto+"armor"));
+int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) {
+	int index = xAddDatabaseBlock(dPlayerUnits);
+	xSetPointer(dPlayerUnits,index);
+	xSetInt(dPlayerUnits,xUnitName,name);
+	xSetInt(dPlayerUnits,xPlayerOwner,p);
+	xSetFloat(dPlayerUnits,xDecay,decay);
+	xSetInt(dPlayerUnits,xDecayNext,trTimeMS()+1000);
+	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
+	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	if (PvP) {
 		if (trQuestVarGet("detached") == 1) {
-			ySetPointer("enemies", 1*trQuestVarGet("enemiesLeaveIndex"));
+			xSetPointer(dEnemies, 1*trQuestVarGet("enemiesLeaveIndex"));
 		}
-		yAddUpdateVar("playerUnits", "doppelganger", yAddToDatabase("enemies", db));
-		yAddUpdateVar("enemies", "doppelganger", yGetNewestPointer("playerUnits"));
-		yAddUpdateVar("enemies", "player", p);
-		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
+		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies));
+		xSetInt(dEnemies,xDoppelganger,index,xGetNewestPointer(dEnemies));
+		xSetInt(dEnemies,xPlayerOwner,p,xGetNewestPointer(dEnemies));
+		xSetInt(dEnemies,xUnitName,name,xGetNewestPointer(dEnemies));
+		xSetPointer(dEnemies, 1*trQuestVarGet("enemiesDummyIndex"));
 	}
-	activateSpecialUnit(db, "playerUnits", proto, p);
+	activateSpecialUnit(name, dPlayerUnits, proto, p);
 	return(index);
 }
 
-int spawnPlayerUnit(int p = 0, int proto = 0, string vdb = "", float decay = 0) {
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+int spawnPlayerUnit(int p = 0, int proto = 0, vector vdb = vector(0,0,0), float decay = 0) {
+	int next = trGetNextUnitScenarioNameNumber();
 	string pName = kbGetProtoUnitName(proto);
-	trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet(vdb+"x"),0,trQuestVarGet(vdb+"z"),0,true);
+	trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(vdb),0,xsVectorGetZ(vdb),0,true);
 	trArmySelect(""+p+",0");
 	trUnitChangeProtoUnit(pName);
-	return(activatePlayerUnit("next", p, proto, decay));
+	return(activatePlayerUnit(next, p, proto, decay));
 }
 
-void spawnPlayerClone(int p = 0, string vdb = "") {
-	int class = trQuestVarGet("p"+p+"class");
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	yAddToDatabase("p"+p+"characters", "next");
-	yAddUpdateVar("p"+p+"characters", "index", spawnPlayerUnit(p, 1*trQuestVarGet("class"+class+"proto"), vdb));
-	yAddUpdateVar("playerUnits", "hero", 1);
-	yAddToDatabase("playerCharacters", "next");
-	yAddUpdateVar("playerCharacters", "player", p);
-	yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
-	yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+void spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
+	xSetPointer(dPlayerData,p);
+	int class = xGetInt(dPlayerData,xPlayerClass);
+	int next = trGetNextUnitScenarioNameNumber();
+	int db = trQuestVarGet("p"+p+"characters");
+	int index = spawnPlayerUnit(p, xGetInt(dClass,xClassProto,class), vdb);
+	xSetPointer(db, xAddDatabaseBlock(db));
+	xSetInt(db, xCharIndex, index);
+	xSetBool(dPlayerUnits,xIsHero,true);
+	xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
+	xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
+	xSetPointer(dPlayerCharacters, xAddDatabaseBlock(dPlayerCharacters));
+	xSetInt(dPlayerCharacters,xUnitName,next);
+	xSetInt(dPlayerCharacters,xPlayerOwner,p);
+	xSetInt(dPlayerCharacters, xCharIndex, index);
 }
 
-void spawnPlayer(int p = 0, string vdb = "") {
-	trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
+void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
+	xSetInt(dPlayerData,xPlayerUnit,trGetNextUnitScenarioNameNumber(),p);
 	spawnPlayerClone(p, vdb);
-	trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
+	xSetInt(dPlayerData,xPlayerIndex,xGetNewestPointer(dPlayerUnits),p);
 	if (trCurrentPlayer() == p) {
-		int class = trQuestVarGet("p"+p+"class");
-		string proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+		int class = xGetInt(dPlayerData,xPlayerClass,p);
+		string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
 		uiFindType(proto);
 	}
 }
@@ -1230,26 +1318,25 @@ void revivePlayer(int p = 0) {
 	trUnitSelectClear();
 	trUnitSelectByQV("p"+p+"reviveBeam");
 	trUnitChangeProtoUnit("Rocket");
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
+	xSetPointer(dPlayerData,p);
+	xUnitSelect(dPlayerData,xPlayerUnit);
 	trUnitDestroy();
-	spawnPlayer(p, "dead"+p+"pos");
+	spawnPlayer(p, trVectorQuestVarGet("dead"+p+"pos"));
 	trSoundPlayFN("herorevived.wav","1",-1,"","");
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
+	xUnitSelect(dPlayerData,xPlayerUnit);
 	trDamageUnitPercent(50);
 	trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
 	equipRelicsAgain(p);
 	if (trCurrentPlayer() == p) {
-		uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+		uiLookAtUnitByName(""+xGetInt(dPlayerData,xPlayerUnit));
 	}
 }
 
-void shootLaser(string start = "", string dir = "", float dist = -1, int p = 0) {
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("1,0", "Dwarf",1,trQuestVarGet(start+"x"),0,trQuestVarGet(start+"z"),0,true);
+void shootLaser(vector start = vector(0,0,0), vector dir = vector(0,0,0), float dist = -1, int p = 0) {
+	int next = trGetNextUnitScenarioNameNumber();
+	trArmyDispatch("1,0", "Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
 	trUnitSelectClear();
-	trUnitSelectByQV("next", true);
+	trUnitSelect(""+next,true);
 	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 	if (dist < 0) {
 		trSetSelectedScale(3.0,0.0,80.0);
@@ -1257,14 +1344,15 @@ void shootLaser(string start = "", string dir = "", float dist = -1, int p = 0) 
 	} else {
 		trSetSelectedScale(3.0,0.0,dist * 1.3);
 	}
-	trSetUnitOrientation(xsVectorSet(0.0-trQuestVarGet(dir+"x"),0,0.0-trQuestVarGet(dir+"z")), xsVectorSet(0,1,0), true);
-	yAddToDatabase("delayLasers", "next");
-	yAddUpdateVar("delayLasers", "dirx", trQuestVarGet(dir+"x"));
-	yAddUpdateVar("delayLasers", "dirz", trQuestVarGet(dir+"z"));
-	yAddUpdateVar("delayLasers", "next", trTimeMS() + 2000);
-	yAddUpdateVar("delayLasers", "phase", 0);
-	yAddUpdateVar("delayLasers", "dist", dist);
-	yAddUpdateVar("delayLasers", "player", p);
+	trSetUnitOrientation(xsVectorSet(0.0-xsVectorGetX(dir),0,0.0-xsVectorGetZ(dir)), xsVectorSet(0,1,0), true);
+	
+	xSetPointer(dDelayLasers, xAddDatabaseBlock(dDelayLasers));
+	xSetInt(dDelayLasers,xUnitName,next);
+	xSetInt(dDelayLasers,xPlayerOwner,p);
+	xSetInt(dDelayLasers,xLaserNext,trTimeMS() + 2000);
+	xSetInt(dDelayLasers,xLaserPhase,0);
+	xSetFloat(dDelayLasers,xLaserDist,dist);
+	xSetVector(dDelayLasers, xLaserDir, dir);
 }
 
 rule spy_find
@@ -1273,56 +1361,58 @@ highFrequency
 {
 	int x = 0;
 	int id = 0;
-	while(trQuestVarGet("spysearch") < trGetNextUnitScenarioNameNumber()) {
-		id = kbGetBlockID(""+1*trQuestVarGet("spysearch"), true);
+	vector dest = vector(0,0,0);
+	while(spysearch < trGetNextUnitScenarioNameNumber()) {
+		id = kbGetBlockID(""+spysearch, true);
 		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
 			x = modularCounterNext("spyfound");
-			if (trQuestVarGet("spyEye"+x+"active") == 1) {
-				trQuestVarSet("spyEye"+x+"active", 0);
+			if (aiPlanGetUserVariableBool(ARRAYS,spyActive,x)) {
+				aiPlanSetUserVariableBool(ARRAYS,spyActive,x,false);
 				trUnitSelectClear();
-				trUnitSelectByQV("spyEye"+x+"unit");
+				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,spyUnit,x),true);
+				dest = aiPlanGetUserVariableVector(ARRAYS,spyDest,x);
 				if (trUnitAlive() == false) {
-					trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+					aiPlanSetUserVariableInt(xsVectorGetX(dest),xsVectorGetY(dest),xsVectorGetZ(dest),-1);
 				} else {
 					trUnitSelectClear();
 					trUnitSelectByID(id);
-					trMutateSelected(1*trQuestVarGet("spyEye"+x));
-					trQuestVarSet(trStringQuestVarGet("spyName"+x), trQuestVarGet("spysearch"));
+					trMutateSelected(aiPlanGetUserVariableInt(ARRAYS,spyProto,x));
+					aiPlanSetUserVariableInt(xsVectorGetX(dest),xsVectorGetY(dest),xsVectorGetZ(dest),spysearch);
 				}
 			}
 		}
-		trQuestVarSet("spysearch", 1 + trQuestVarGet("spysearch"));
+		spysearch = 1 + spysearch;
 	}
 	if (trQuestVarGet("spyfind") != trQuestVarGet("spyfound")) {
-		trQuestVarSet("spyreset", 1 + trQuestVarGet("spyreset"));
-		if (trQuestVarGet("spyreset") >= 3) {
+		spyreset = 1 + spyreset;
+		if (spyreset >= 5) {
 			while (trQuestVarGet("spyfind") != trQuestVarGet("spyfound")) {
 				x = modularCounterNext("spyFound");
-				if (trQuestVarGet("spyEye"+x+"active") == 1) {
-					trQuestVarSet("spyEye"+x+"active", 0);
-					trQuestVarSet(trStringQuestVarGet("spyName"+x), -1);
+				if (aiPlanGetUserVariableBool(ARRAYS,spyActive,x)) {
+					aiPlanSetUserVariableBool(ARRAYS,spyActive,x,false);
+					aiPlanSetUserVariableInt(xsVectorGetX(dest),xsVectorGetY(dest),xsVectorGetZ(dest),-1);
 				}
 			}
 			debugLog("resetting spyfound");
 		}
 	} else {
-		trQuestVarSet("spyreset", 0);
+		spyreset = 0;
 	}
 }
 
-string databaseName(int p = 0) {
+int databaseName(int p = 0) {
 	if (p == ENEMY_PLAYER) {
-		return("enemies");
+		return(dEnemies);
 	} else {
-		return("playerUnits");
+		return(dPlayerUnits);
 	}
 }
 
-string opponentDatabaseName(int p = 0) {
+int opponentDatabaseName(int p = 0) {
 	if (p == ENEMY_PLAYER) {
-		return("playerUnits");
+		return(dPlayerUnits);
 	} else {
-		return("enemies");
+		return(dEnemies);
 	}
 }
 

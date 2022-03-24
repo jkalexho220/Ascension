@@ -77,8 +77,8 @@ void rideLightningOff(int p = 0) {
 
 void refreshRideLightningTargets(int p = 0) {
 	yClearDatabase("p"+p+"rideLightningTargets");
-	for(x=yGetDatabaseCount("enemies"); >0) {
-		yDatabaseNext("enemies");
+	for(x=xGetDatabaseCount(dEnemies); >0) {
+		xDatabaseNext(dEnemies);
 		yAddToDatabase("p"+p+"rideLightningTargets", "enemies");
 		yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetPointer("enemies"));
 	}
@@ -128,7 +128,7 @@ void thunderRiderAlways(int eventID = -1) {
 	
 	if (yGetDatabaseCount("p"+p+"blitzSFX") > 0) {
 		/* stun enemies */
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -425,7 +425,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 					trArmySelect(""+p+",0");
 					trUnitChangeProtoUnit("Lightning Sparks");
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();

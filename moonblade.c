@@ -43,7 +43,7 @@ void moonbladeAlways(int eventID = -1) {
 					}
 				}
 				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.03;
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					yDatabaseNext("playerUnits", true);
 					healUnit(p, angle);
 				}
@@ -140,7 +140,7 @@ void moonbladeAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"protectionNext",
 					trTimeMS() + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					id = yDatabaseNext("playerUnits", true);
 					xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
 					ySetVar("playerUnits", "currentHealth", kbUnitGetCurrentHitpoints(id));
@@ -155,7 +155,7 @@ void moonbladeAlways(int eventID = -1) {
 	}
 	
 	if (PvP && (trQuestVarGet("p"+p+"protection") == 1)) {
-		for(x=yGetDatabaseCount("playerUnits"); >0) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			id = yDatabaseNext("playerUnits", true);
 			trUnitHighlight(0.2, false);
 			xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
@@ -192,7 +192,7 @@ void moonbladeAlways(int eventID = -1) {
 			angle = yGetVar("p"+p+"moonbeams", "radius");
 			posX = yGetVar("p"+p+"moonbeams", "damage");
 			posX = posX * 0.5;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();

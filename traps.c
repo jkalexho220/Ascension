@@ -17,7 +17,7 @@ highFrequency
 			if (yGetVar("laserRooms", "active") == 0) {
 				ySetVar("laserRooms", "next", trTimeMS() + 3000);
 				yVarToVector("laserRooms", "pos");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 400) {
@@ -66,7 +66,7 @@ highFrequency
 					yVarToVector("laserRooms", "xLaser"+laser+"1");
 					yVarToVector("laserRooms", "zLaser"+laser+"0");
 					yVarToVector("laserRooms", "zLaser"+laser+"1");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
@@ -89,7 +89,7 @@ highFrequency
 					ySetVar("laserRooms", "active", 0);
 					ySetVar("laserRooms", "next", yGetVar("laserRooms", "next") + 2000);
 					yVarToVector("laserRooms", "pos");
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "pos") < 400) {

@@ -93,7 +93,7 @@ void nightriderAlways(int eventID = -1) {
 			yVarToVector("p"+p+"Sentences", "pos");
 			hit = 0;
 			dist = 100;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (yGetVar("enemies", "deathSentence") == 0) {
@@ -156,7 +156,7 @@ void nightriderAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Kronny Birth SFX");
 				yRemoveFromDatabase("p"+p+"abducts");
 			} else {
-				for(y=yGetDatabaseCount("enemies"); >0) {
+				for(y=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (yGetVar("enemies", "launched") == 0) {
@@ -318,7 +318,7 @@ void nightriderAlways(int eventID = -1) {
 			}
 			dist = xsPow(dist, 2);
 			amt = 0;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (yGetVar("enemies", "deathSentence") == 0) {

@@ -223,7 +223,7 @@ void throneShieldAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			target = yDatabaseNext("p"+p+"characters", true);
 			trVectorSetUnitPos("pos", "p"+p+"characters");
-			for(y=yGetDatabaseCount("enemies"); >0) {
+			for(y=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -295,7 +295,7 @@ void throneShieldAlways(int eventID = -1) {
 						yAddUpdateVar("playerLasers", "range", 50);
 						dist = xsPow(trQuestVarGet("shieldOfLightWidth") * trQuestVarGet("p"+p+"spellRange"), 2);
 						amt = yGetVar("p"+p+"characters", "absorbed") * trQuestVarGet("p"+p+"spellDamage");
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							id = yDatabaseNext("enemies", true);
 							if (id == -1 || trUnitAlive() == false) {
 								removeEnemy();

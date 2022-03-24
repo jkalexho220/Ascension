@@ -1176,7 +1176,7 @@ void specialUnitsAlways() {
 		} else if ((kbUnitGetAnimationActionType(id) == 9) && (yGetVar("siphons","player") == ENEMY_PLAYER)) {
 			if (trTimeMS() > yGetVar("siphons", "next")) {
 				ySetVar("siphons", "next", trTimeMS() + 3000);
-				yDatabaseNext("playerUnits");
+				xDatabaseNext(dPlayerUnits);
 				trVectorSetUnitPos("pos", "playerUnits");
 				trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
 			}
@@ -1585,7 +1585,7 @@ void specialUnitsAlways() {
 				}
 			}
 			if (trQuestVarGet("boss") > 999) {
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < 1.0) {
@@ -1763,7 +1763,7 @@ void enemiesAlways() {
 		}
 	}
 	
-	if (yGetDatabaseCount("enemies") > 0) {
+	if (xGetDatabaseCount(dEnemies) > 0) {
 		id = yDatabaseNext("enemies", true);
 		if ((id == -1) || (trUnitAlive() == false)) {
 			removeEnemy();

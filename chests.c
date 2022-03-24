@@ -299,14 +299,14 @@ void processChests() {
 							trQuestVarSet("heading", trQuestVarGet("heading") + 30);
 						}
 						yClearDatabase("rainingFireTargets");
-						for(x=yGetDatabaseCount("playerUnits"); >0) {
-							yDatabaseNext("playerUnits");
+						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+							xDatabaseNext(dPlayerUnits);
 							if (zDistanceToVectorSquared("playerUnits", "pos") < 720) {
 								yAddToDatabase("rainingFireTargets", "playerUnits");
 							}
 						}
-						for(x=yGetDatabaseCount("enemies"); >0) {
-							yDatabaseNext("enemies");
+						for(x=xGetDatabaseCount(dEnemies); >0) {
+							xDatabaseNext(dEnemies);
 							if (zDistanceToVectorSquared("enemies", "pos") < 720) {
 								yAddToDatabase("rainingFireTargets", "enemies");
 								yAddUpdateVar("rainingFireTargets", "enemy", 1);
