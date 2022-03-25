@@ -682,9 +682,14 @@ void xPrintAll(int id = 0, int index = 0) {
 	}
 }
 
-void xUnitSelect(int id = 0, int index = 0, bool reverse = true) {
+void xUnitSelect(int id = 0, int varn = 0, bool reverse = true) {
 	trUnitSelectClear();
-	trUnitSelect(""+xGetInt(id,index), reverse);
+	trUnitSelect(""+xGetInt(id,varn), reverse);
+}
+
+void xUnitSelectByID(int db = 0, int varn = 0) {
+	trUnitSelectClear();
+	trUnitSelectByID(xGetInt(db,varn));
 }
 
 rule mInitializeMemory

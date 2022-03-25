@@ -1,7 +1,9 @@
 int dPlayerUnits = 0;
 int dEnemies = 0;
+
 int xUnitName = 0;
 int xPlayerOwner = 0;
+int xUnitID = 0;
 int xPhysicalResist = 0;
 int xMagicResist = 0;
 int xIsHero = 0;
@@ -22,6 +24,8 @@ int xSilenceTimeout = 0;
 int xSilenceSFX = 0;
 int xLaunched = 0;
 
+int xDatabaseIndex = 0;
+
 /* playerUnits specific */
 int xDecay = 0;
 int xDecayNext = 0;
@@ -31,6 +35,8 @@ int xUnity = 0;
 int xBounty = 0;
 int xDropRelic = 0;
 int xDeathSentence = 0;
+int xEchoBomb = 0;
+int xMissingTimeout = 0;
 
 /* playerCharacters */
 int dPlayerCharacters = 0;
@@ -161,10 +167,11 @@ highFrequency
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
 	dEnemies = xInitDatabase("enemies", 30);
 	for(db=dEnemies; >= dPlayerUnits) {
-		xUnitName = xInitAddInt(db);
+		xUnitName = xInitAddInt(db,"name");
+		xPlayerOwner = xInitAddInt(db,"player");
+		xUnitID = xInitAddInt(db,"ID");
 		xPhysicalResist = xInitAddFloat(db,"physicalResist");
 		xMagicResist = xInitAddFloat(db,"magicResist");
-		xPlayerOwner = xInitAddInt(db,"player");
 		xIsHero = xInitAddBool(db,"isHero");
 		xUnitPos = xInitAddVector(db,"UnitPos");
 		xDoppelganger = xInitAddInt(db,"doppelganger");
@@ -189,6 +196,10 @@ highFrequency
 	xBounty = xInitAddInt(dEnemies,"bounty");
 	xDropRelic = xInitAddInt(dEnemies,"relic");
 	xDeathSentence = xInitAddInt(dEnemies,"deathSentence");
+	xEchoBomb = xInitAddInt(dEnemies,"echoBomb");
+	xMissingTimeout = xInitAddInt(dEnemies,"missingTimeout");
+	
+	xDatabaseIndex = xPlayerOwner;
 	
 	
 	dFreeRelics = xInitDatabase("freeRelics", 10);
@@ -270,11 +281,13 @@ highFrequency
 	dStunnedUnits = xInitDatabase("stunnedUnits", 10);
 	xInitAddInt(dStunnedUnits,"name");
 	xInitAddInt(dStunnedUnits,"player");
+	xInitAddInt(dStunnedUnits,"id");
 	xStunnedProto = xInitAddInt(dStunnedUnits,"proto");
 	
 	dLaunchedUnits = xInitDatabase("launchedUnits",10);
 	xInitAddInt(dLaunchedUnits,"name");
 	xInitAddInt(dLaunchedUnits,"player");
+	xInitAddInt(dLaunchedUnits,"id");
 	xInitAddInt(dLaunchedUnits,"proto");
 	xLaunchedCar = xInitAddInt(dLaunchedUnits,"car");
 	xLaunchedDB = xInitAddInt(dLaunchedUnits,"database");
@@ -299,6 +312,7 @@ highFrequency
 	dPlayerCharacters = xInitDatabase("playerCharacters", cNumberPlayers - 2);
 	xInitAddInt(dPlayerCharacters,"name");
 	xInitAddInt(dPlayerCharacters,"player");
+	xInitAddInt(dPlayerCharacters,"id");
 	xCharIndex = xInitAddInt(dPlayerCharacters,"index");
 	
 	for(p=1; < cNumberPlayers - 1) {
@@ -313,9 +327,9 @@ highFrequency
 		trQuestVarSet("p"+p+"characters",xInitDatabase("p"+p+"characters"));
 		/* the three below are shared with playerCharacter */
 		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"name");
-		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"player");
-		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
 		xCharSpecialAttack = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"specialAttack");
+		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"id");
+		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
 		xCharAttacking = xInitAddBool(1*trQuestVarGet("p"+p+"characters"),"attacking");
 		xCharAttackNext = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackNext");
 		xCharAttackTarget = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackTarget");

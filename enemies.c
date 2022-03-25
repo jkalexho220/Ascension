@@ -32,21 +32,21 @@ void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, fl
 	
 }
 
-bool checkEnemyDeactivated(string db = "") {
-	int index = 1*yGetVar(db, "index");
+bool checkEnemyDeactivated(int db = 0) {
 	/* this only matters for enemies */
-	if (yGetVar(db, "player") < ENEMY_PLAYER) {
+	if (xGetInt(db,xPlayerOwner) < ENEMY_PLAYER) {
 		return(false);
 	}
-	if ((yGetVarAtIndex("enemies", "xActive", index) == 0) ||
-		yGetUnitAtIndex("enemies", index) != trQuestVarGet(db)) {
+	int index = xGetInt(db,xSpecialIndex);
+	if ((xGetBool(dEnemies, xDirtyBit, index) == false) ||
+		xGetInt(dEnemies, xUnitName, index) != xGetInt(db,xUnitName)) {
 		return(true);
 	}
 	return(false);
 }
 
-void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
-	int id = kbGetBlockID(""+1*trQuestVarGet(db));
+void activateEnemy(int name = 0, int bounty = -1, int relic = -1) {
+	int id = kbGetBlockID(""+name);
 	int proto = kbGetUnitBaseTypeID(id);
 	if (bounty < 0) {
 		bounty = trQuestVarGet("proto"+proto+"bounty");
@@ -60,38 +60,27 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 			}
 		}
 	}
-	
-	trVectorSetUnitPos("spawnPos", db);
-	yAddToDatabase("enemies", db);
+	float armor = trQuestVarGet("proto"+proto+"armor");
+	vector pos = kbGetBlockPosition(""+name);
+	xSetPointer(dEnemies, xAddDatabaseBlock(dEnemies));
+	xSetInt(dEnemies, xUnitName, name);
+	xSetInt(dEnemies, xPlayerOwner, ENEMY_PLAYER);
+	xSetInt(dEnemies, xUnitID, id);
 	trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
-	yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
-	yAddUpdateVar("enemies", "relic", relic);
-	yAddUpdateVar("enemies", "posX", trQuestVarGet("spawnPosX"));
-	yAddUpdateVar("enemies", "posZ", trQuestVarGet("spawnPosZ"));
-	yAddUpdateVar("enemies", "stunStatus", 0);
-	yAddUpdateVar("enemies", "stunTimeout", 0);
-	yAddUpdateVar("enemies", "stunSFX", 0);
-	yAddUpdateVar("enemies", "poisonStatus", 0);
-	yAddUpdateVar("enemies", "poisonTimeout", 0);
-	yAddUpdateVar("enemies", "poisonLast", 0);
-	yAddUpdateVar("enemies", "poisonDamage", 0);
-	yAddUpdateVar("enemies", "poisonSFX", 0);
-	yAddUpdateVar("enemies", "launched", 0);
-	yAddUpdateVar("enemies", "magicResist", trQuestVarGet("proto"+proto+"armor"));
-	yAddUpdateVar("enemies", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
-	yAddUpdateVar("enemies", "silenceStatus", 0);
-	yAddUpdateVar("enemies", "silenceTimeout", 0);
-	yAddUpdateVar("enemies", "silenceSFX", 0);
-	yAddUpdateVar("enemies", "bomb", 0);
-	yAddUpdateVar("enemies", "deathSentence", 0);
-	yAddUpdateVar("enemies", "missing", 0);
+	xSetInt(dEnemies, xBounty, trQuestVarGet("bounty"));
+	xSetInt(dEnemies, xDropRelic, relic);
+	xSetVector(dEnemies,xUnitPos,pos);
+	xSetFloat(dEnemies,xMagicResist,armor);
+	xSetFloat(dEnemies,xPhysicalResist,armor);
 	for(p=1; < ENEMY_PLAYER) {
 		if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-			yAddToDatabase("p"+p+"rideLightningTargets", db);
-			yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
+			int db = trQuestVarGet("p"+p+"rideLightningTargets");
+			xSetPointer(db, xAddDatabaseBlock(db));
+			xSetInt(db,xUnitName,name);
+			xSetInt(db,xDatabaseIndex,xGetNewestPointer(dEnemies));
 		}
 	}
-	activateSpecialUnit(db, "enemies", proto, ENEMY_PLAYER);
+	activateSpecialUnit(name, dEnemies, proto, ENEMY_PLAYER);
 }
 
 
@@ -163,7 +152,7 @@ highFrequency
 	trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
 	
 	for(class = 1; <= 16) {
-		setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),
+		setupProtounitBounty(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),
 			trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
 	}
 	
@@ -194,120 +183,153 @@ highFrequency
 	xsDisableSelf();
 }
 
-void ballistaShotPop() {
+void ballistaShotPop(vector pos = vector(0,0,0)) {
 	int id = 0;
-	int p = yGetVar("ballistaShots","player");
-	string pName = opponentDatabaseName(p);
-	for(x=yGetDatabaseCount(pName); >0) {
-		id = yDatabaseNext(pName, true);
+	int p = xGetInt(dBallistaShots,xPlayerOwner);
+	int db = opponentDatabaseName(p);
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		id = xGetInt(db, xUnitID);
 		if (id == -1 || trUnitAlive() == false) {
 			removeOpponentUnit(p);
-		} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+		} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 			damageOpponentUnit(p, 200);
 		}
 	}
 	
-	trUnitSelectClear();
-	trUnitSelect(""+1*yGetVar("ballistaShots", "next1"), true);
-	trUnitSelect(""+1*yGetVar("ballistaShots", "next2"), true);
+	xUnitSelect(dBallistaShots,xBallistaShot1);
 	trUnitDestroy();
-	trUnitSelectClear();
-	trUnitSelectByQV("ballistaShots", true);
+	xUnitSelect(dBallistaShots,xBallistaShot2);
+	trUnitDestroy();
+	xUnitSelect(dBallistaShots,xUnitName);
 	trDamageUnitPercent(100);
 	trUnitChangeProtoUnit("Meteorite");
 	trSoundPlayFN("fireball launch.wav","1",-1,"","");
-	yRemoveFromDatabase("ballistaShots");
+	xFreeDatabaseBlock(dBallistaShots);
 }
 
-bool spawnLightning(string pos = "", int p = 0) {
-	vectorToGrid(pos, "loc");
-	if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-		trArmyDispatch("0,0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+bool spawnLightning(vector pos = vector(0,0,0), int p = 0) {
+	vector loc = vectorToGrid(pos);
+	if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+		trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trArmySelect("0,0");
 		trUnitChangeProtoUnit("Arkantos Boost SFX");
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+		int next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trUnitSelectClear();
-		trUnitSelectByQV("next", true);
+		trUnitSelect(""+next,true);
 		trUnitSetStance("Passive");
 		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
-		yAddToDatabase("yeebLightning", "next");
-		yAddUpdateVar("yeebLightning", "timeout", trTimeMS() + 2000);
-		yAddUpdateVar("yeebLightning", "player", p);
+		xSetPointer(dYeebLightning, xAddDatabaseBlock(dYeebLightning));
+		xSetInt(dYeebLightning,xUnitName,next);
+		xSetInt(dYeebLightning,xPlayerOwner,p);
+		xSetInt(dYeebLightning,xTimeout, trTimeMS() + 2000);
 		return(true);
 	}
 	return(false);
+}
+
+int findShooter(int db = 0, vector pos = vector(0,0,0)) {
+	int closest = 0;
+	int id = 0;
+	float dist = 0;
+	float closestDistance = 25;
+	for (x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		id = xGetInt(db,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false) {
+			xFreeDatabaseBlock(db);
+		} else if (kbUnitGetAnimationActionType(id) == 12) {
+			trUnitSelectClear();
+			trUnitSelect(""+nextproj,true);
+			if (trUnitIsOwnedBy(xGetInt(db,xPlayerOwner))) {
+				dist = unitDistanceToVector(xGetInt(db,xUnitName),pos);
+				if (dist < closestDistance) {
+					closestDistance = dist;
+					closest = xGetPointer(db);
+				}
+			}
+		}
+	}
+	return(closest);
 }
 
 void specialUnitsAlways() {
 	int p = 0;
 	int proto = 0;
 	int id = 0;
+	int db = 0;
 	int target = 0;
 	int action = 0;
+	int closest = 0;
 	float amt = 0;
 	float dist = 0;
 	float angle = 0;
 	bool hit = false;
-	string pName = "";
+	vector start = vector(0,0,0);
+	vector end = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector loc = vector(0,0,0);
 	
-	for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
-		yDatabaseNext("ballistaShots", true);
-		trVectorSetUnitPos("pos", "ballistaShots");
-		vectorToGrid("pos", "loc");
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > yGetVar("ballistaShots", "timeout")) {
+	for (x=xsMin(5, xGetDatabaseCount(dBallistaShots)); >0) {
+		xDatabaseNext(dBallistaShots);
+		xUnitSelect(dBallistaShots,xUnitName);
+		pos = kbGetBlockPosition(""+xGetInt(dBallistaShots,xUnitName));
+		
+		loc = vectorToGrid(pos);
+		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > xGetInt(dBallistaShots, xTimeout)) {
 			ballistaShotPop();
-		} else if (yGetVar("ballistaShots", "player") == ENEMY_PLAYER) {
+		} else if ((xGetInt(dBallistaShots, xPlayerOwner) == ENEMY_PLAYER) || PvP) {
 			action = 0;
 			for(p=1; < ENEMY_PLAYER) {
-				action = action + trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),p,"Unit",2);
+				if (PvP && (p == xGetInt(dBallistaShots, xPlayerOwner))) {
+					continue;
+				}
+				action = action + trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),p,"Unit",2);
 			}
 			if (action > 0) {
 				ballistaShotPop();
 			}
-		} else if (trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),ENEMY_PLAYER,"Unit",2) > 0) {
+		} else if (trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),ENEMY_PLAYER,"Unit",2) > 0) {
 			ballistaShotPop();
 		}
 	}
 	
 	trQuestVarSet("sound", 0);
-	for(x=xsMin(10, yGetDatabaseCount("delayLasers")); >0) {
-		id = yDatabaseNext("delayLasers", true);
-		if (kbGetUnitBaseTypeID(id) == -1) {
-			yRemoveFromDatabase("delayLasers");
-		} else if (yGetVar("delayLasers", "phase") == 0) {
-			if (trTimeMS() > yGetVar("delayLasers", "next")) {
-				ySetVar("delayLasers", "phase", 1);
-				ySetVar("delayLasers", "next", trTimeMS() + 500);
-				trSetSelectedScale(6.0,6.0,yGetVar("delayLasers", "dist") * 1.3);
+	for(x=xsMin(10, xGetDatabaseCount(dDelayLasers)); >0) {
+		xDatabaseNext(dDelayLasers);
+		xUnitSelect(dDelayLasers,xUnitName);
+		if (xGetInt(dDelayLasers, xLaserPhase) == 0) {
+			if (trTimeMS() > xGetInt(dDelayLasers, xLaserNext)) {
+				xSetInt(dDelayLasers, xLaserPhase, 1);
+				xSetInt(dDelayLasers, xLaserNext, trTimeMS() + 500);
+				trSetSelectedScale(6.0,6.0,xGetFloat(dDelayLasers,xLaserDist) * 1.3);
 				trUnitHighlight(3.0,false);
 				trQuestVarSet("sound", 1);
-				trVectorSetUnitPos("start", "delayLasers");
-				p = yGetVar("delayLasers", "player");
-				pName = opponentDatabaseName(p);
-				for(y=yGetDatabaseCount(pName); >0) {
-					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+				start = kbGetBlockPosition(""+xGetInt(dDelayLasers,xUnitName));
+				p = xGetInt(dDelayLasers,xPlayerOwner);
+				db = opponentDatabaseName(p);
+				for(y=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					id = xGetInt(db, xUnitID);
+					dir = xGetVector(db,xLaserDir);
+					if (id == -1 || trUnitAlive() == false) {
 						removeOpponentUnit(p);
-					} else {
-						trVectorSetUnitPos("pos", pName);
-						amt = zDistanceBetweenVectors("pos", "start");
-						if (amt < yGetVar("delayLasers", "dist")) {
-							trQuestVarSet("intersectX", yGetVar("delayLasers", "dirX") * amt + trQuestVarGet("startX"));
-							trQuestVarSet("intersectZ", yGetVar("delayLasers", "dirZ") * amt + trQuestVarGet("startZ"));
-							if (zDistanceBetweenVectorsSquared("pos", "intersect") < 1.0) {
-								damageOpponentUnit(p, 300);
-							}
-						}
+					} else if (rayCollision(db,start,dir,xGetFloat(dDelayLasers,xLaserDist),1.0)) {
+						damageOpponentUnit(p, 300);
 					}
 				}
 			}
 		} else {
-			trQuestVarSet("scale", 0.012 * (yGetVar("delayLasers", "next") - trTimeMS()));
-			if (trQuestVarGet("scale") < 0) {
+			amt = 0.012 * (xGetFloat(dDelayLasers, xLaserNext) - trTimeMS());
+			if (amt < 0) {
 				trUnitDestroy();
-				yRemoveFromDatabase("delayLasers");
+				xFreeDatabaseBlock(dDelayLasers);
 			} else {
-				trSetSelectedScale(trQuestVarGet("scale"), trQuestVarGet("scale"), yGetVar("delayLasers", "dist") * 1.3);
+				trSetSelectedScale(amt, amt, xGetFloat(dDelayLasers, xLaserDist) * 1.3);
 			}
 		}
 	}
@@ -321,128 +343,92 @@ void specialUnitsAlways() {
 	/*
 	Projectiles from attacks
 	*/
-	while(trQuestVarGet("nextProj") < trGetNextUnitScenarioNameNumber()) {
+	while(nextproj < trGetNextUnitScenarioNameNumber()) {
 		trUnitSelectClear();
-		trUnitSelectByQV("nextProj", true);
+		trUnitSelect(""+nextproj,true);
 		if (trUnitIsOwnedBy(0) == false) {
-			id = kbGetBlockID(""+1*trQuestVarGet("nextProj"), true);
+			id = kbGetBlockID(""+nextproj, true);
 			proto = kbGetUnitBaseTypeID(id);
 			if (proto == kbGetProtoUnitID("Ballista Shot")) {
-				trVectorSetUnitPos("pos", "nextProj");
-				trQuestVarSet("closest", 0);
-				trQuestVarSet("closestName", 0);
-				trQuestVarSet("closestDistance", 25);
-				for (x=yGetDatabaseCount("ballistas"); >0) {
-					id = yDatabaseNext("ballistas", true);
-					if (trUnitAlive() == false) {
-						yRemoveFromDatabase("ballistas");
-					} else if (kbUnitGetAnimationActionType(id) == 12) {
-						trUnitSelectClear();
-						trUnitSelectByQV("nextProj");
-						if (trUnitIsOwnedBy(1*yGetVar("ballistas","player"))) {
-							trQuestVarSet("currentDistance", zDistanceToVectorSquared("ballistas", "pos"));
-							if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-								trQuestVarCopy("closestDistance", "currentDistance");
-								trQuestVarSet("closest", id);
-								trQuestVarCopy("closestName", "ballistas");
-								trQuestVarSet("closestPlayer", yGetVar("ballistas","player"));
-							}
-						}
-					}
-				}
-				if (trQuestVarGet("closest") > 0) {
-					xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
-					trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
-					trVectorSetUnitPos("start", "closestName");
-					trVectorSetUnitPos("end", "target");
-					vectorSetAsTargetVector("target", "start", "end", 100.0);
+				pos = kbGetBlockPosition(""+nextproj,true);
+				closest = findShooter(dBallistas,pos);
+				if (closest > 0) {
+					xSetPointer(dBallistas, closest);
+					id = xGetInt(dBallistas, xUnitID);
+					xsSetContextPlayer(xGetInt(dBallistas,xPlayerOwner));
+					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					xsSetContextPlayer(0);
+					
+					start = kbGetBlockPosition(""+xGetInt(dBallistas,xUnitName),true);
+					end = kbGetBlockPosition(""+target,true);
+					
+					pos = vectorSetAsTargetVector(start, end, 100.0);
 					
 					trUnitSelectClear();
-					trUnitSelectByQV("nextProj", true);
+					trUnitSelect(""+nextproj, true);
 					trUnitConvert(ENEMY_PLAYER);
 					trUnitChangeProtoUnit("Transport Ship Greek");
 					
-					trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
+					xSetPointer(dBallistaShots, xAddDatabaseBlock(dBallistaShots));
+					xSetInt(dBallistaShots, xBallistaShot1, trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,true);
-					trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
+					xSetInt(dBallistaShots, xUnitName, trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,false);
 					trArmySelect("1,0");
 					trUnitConvert(ENEMY_PLAYER);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("nextProj"));
+					trImmediateUnitGarrison(""+nextproj);
 					trUnitChangeProtoUnit("Dwarf");
 					
-					yAddToDatabase("ballistaShots", "next2");
-					yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
-					yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
-					yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 5000);
-					yAddUpdateVar("ballistaShots", "player", trQuestVarGet("closestPlayer"));
+					xSetInt(dBallistaShots, xBallistaShot2, nextproj);
+					xSetInt(dBallistaShots, xTimeout, trTimeMS() + 5000);
+					xSetInt(dBallistaShots, xPlayerOwner, xGetInt(dBallistas, xPlayerOwner));
 					
 					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
-					trUnitSelect(""+1*trQuestVarGet("nextProj"), true);
+					trUnitSelect(""+xGetInt(dBallistaShots, xBallistaShot1), true);
+					trUnitSelect(""+1*nextproj, true);
 					trUnitChangeProtoUnit("Relic");
 					
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					xUnitSelect(dBallistaShots,xUnitName);
 					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
 					
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					xUnitSelect(dBallistaShots,xBallistaShot1);
+					trImmediateUnitGarrison(""+xGetInt(dBallistaShots,xUnitName));
 					
 					trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
 					trUnitSelectClear();
-					trUnitSelectByQV("nextProj", true);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					trUnitSelect(""+nextproj, true);
+					trImmediateUnitGarrison(""+xGetInt(dBallistaShots,xUnitName));
 					trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
 					trUnitConvert(0);
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					xUnitSelect(dBallistaShots, xUnitName);
 					trMutateSelected(kbGetProtoUnitID("Priest Projectile"));
 					trSetSelectedScale(0,50,0);
-					trSetUnitOrientation(zGetUnitVector("start", "end"), xsVectorSet(0,1,0), true);
-					trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
+					trSetUnitOrientation(getUnitVector(start, end), xsVectorSet(0,1,0), true);
+					trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos), -1, false);
+					xUnitSelect(dBallistaShots,xBallistaShot1);
 					trUnitConvert(0);
 				}
 			} else if (proto == kbGetProtoUnitID("Fire Siphon Fire")) {
-				if (yGetDatabaseCount("siphons") > 0) {
-					trVectorSetUnitPos("pos", "nextProj");
+				if (xGetDatabaseCount(dFireSiphons) > 0) {
+					pos = kbGetBlockPosition(""+nextproj,true);
 					trUnitChangeProtoUnit("Lightning sparks");
-					trQuestVarSet("closest", -1);
-					trQuestVarSet("closestName", 0);
-					trQuestVarSet("closestDistance", 25);
-					for (x=yGetDatabaseCount("siphons"); >0) {
-						id = yDatabaseNext("siphons", true);
-						if (id == -1 || trUnitAlive() == false) {
-							yRemoveFromDatabase("siphons");
-						} else if (kbUnitGetAnimationActionType(id) == 12) {
-							trUnitSelectClear();
-							trUnitSelectByQV("nextProj");
-							if (trUnitIsOwnedBy(1*yGetVar("siphons","player"))) {
-								trQuestVarSet("currentDistance", zDistanceToVectorSquared("siphons", "pos"));
-								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-									trQuestVarCopy("closestDistance", "currentDistance");
-									trQuestVarSet("closest", id);
-									trQuestVarCopy("closestName", "siphons");
-									trQuestVarSet("closestPlayer", yGetVar("siphons","player"));
-								}
-							}
-						}
-					}
-					if (trQuestVarGet("closest") >= 0) {
-						xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
-						trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
+					closest = findShooter(dFireSiphons,pos);
+					if (closest > 0) {
+						xSetPointer(dFireSiphons,closest);
+						id = xGetInt(dFireSiphons,xUnitID);
+						xsSetContextPlayer(xGetInt(dFireSiphons,xPlayerOwner));
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						
 						trSoundPlayFN("skypassagein.wav","1",-1,"","");
-						trVectorSetUnitPos("start", "closestName");
-						trVectorSetUnitPos("pos", "target");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-						shootLaser("start", "dir", 60.0, 1*trQuestVarGet("closestPlayer"));
+						start = kbGetBlockPosition(""+xGetInt(dFireSiphons,xUnitName),true);
+						pos = kbGetBlockPosition(""+target,true);
+						dir = getUnitVector(start, pos);
+						shootLaser(start, dir, 60.0, xGetInt(dFireSiphons,xPlayerOwner));
 					}
 				}
 			} else if (proto == kbGetProtoUnitID("Mummy Flies")) {
-				if (yGetDatabaseCount("Mummies") > 0) {
+				if (xGetDatabaseCount(dMummies) > 0) {
 					trUnitChangeProtoUnit("Rocket");
 					trVectorSetUnitPos("pos", "nextProj");
 					trQuestVarSet("closest", -1);
@@ -454,7 +440,7 @@ void specialUnitsAlways() {
 							yRemoveFromDatabase("Mummies");
 						} else if (kbUnitGetAnimationActionType(id) == 12) {
 							trUnitSelectClear();
-							trUnitSelectByQV("nextProj");
+							trUnitSelect(""+nextproj,true);
 							if (trUnitIsOwnedBy(1*yGetVar("Mummies","player"))) {
 								trQuestVarSet("currentDistance", zDistanceToVectorSquared("Mummies", "pos"));
 								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
@@ -482,7 +468,7 @@ void specialUnitsAlways() {
 				}
 			}
 		}
-		trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
+		trQuestVarSet("nextProj", 1 + nextproj);
 	}
 	
 	if (yGetDatabaseCount("sphinxes") > 0) {
