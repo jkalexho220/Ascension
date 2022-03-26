@@ -463,14 +463,12 @@ float calculateArmor(float start = 0, float armor = 0) {
 }
 
 void relicEffect(int relic = 0, int p = 0, bool equip = true) {
-	int old = xsGetContextPlayer();
 	int db = 0;
 	int n = 0;
 	float m = 1.0;
 	if (equip == false) {
 		m = -1.0;
 	}
-	xsSetContextPlayer(0);
 	xSetPointer(dPlayerData,p);
 	int class = xGetInt(dPlayerData,xPlayerClass);
 	string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
@@ -712,7 +710,6 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		zSetProtoUnitStat(proto, p, 27, xGetFloat(dPlayerData,xPlayerBaseAttack));
 		zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
 	}
-	xsSetContextPlayer(old);
 }
 
 int relicProto(int relic = 0) {
@@ -951,3 +948,4 @@ void spawnRelicClosest(vector v = vector(0,0,0), int target = 0) {
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
 	spawnRelicSpecific(v, 1*trQuestVarGet("rand"));
 }
+

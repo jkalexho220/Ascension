@@ -1108,7 +1108,7 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Hydra"):
 			{
-				desc("Regenerates health each second.");
+				desc("Regenerates 1 percent health each second. (interrupted by Poison)");
 			}
 			case kbGetProtoUnitID("Nemean Lion"):
 			{

@@ -37,6 +37,7 @@ int spyUnit = 1;
 int spyDest = 2;
 int spyActive = 3;
 
+int boss = 0;
 int bossUnit = 0;
 int bossCooldownTime = 0;
 float bossScale = 0;
@@ -620,7 +621,7 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 		if (trTimeMS() + duration > xGetInt(db, xStunTimeout)) {
 			if (xGetInt(db, xStunStatus) == 0) {
 				trQuestVarSet("stunSound", 1);
-				if (trQuestVarGet("boss") == 3) {
+				if (boss == 3) {
 					growFrostGiantsIncoming(kbGetBlockPosition(""+xGetInt(db,xUnitName)));
 				}
 				index = xAddDatabaseBlock(dStunnedUnits);
@@ -1028,6 +1029,7 @@ int initGenericProj(string name = "", bool hitbox = false, int count = 10) {
 		xProjDist = xInitAddFloat(db,"dist");
 		xProjPrev = xInitAddVector(db,"prev");
 	}
+	return(db);
 }
 
 int dSphinxes = 0;
@@ -1053,6 +1055,8 @@ int dEinherjars = 0;
 int dLightningStatues = 0;
 int dManticores = 0;
 
+int dAutomatonBombs = 0;
+
 int xSpecialIndex = 0;
 int xSpecialStep = 0;
 int xSpecialNext = 0;
@@ -1071,12 +1075,32 @@ int xBallistaShot2 = 0;
 int dYeebLightning = 0;
 int xTimeout = 0;
 
+int dYeebLightningEnd = 0;
+
+int dBarrages = 0;
+int xBarragePos = 0;
+int xBarrageDir = 0;
+int xBarrageCount = 0;
+
 int dMedusaBalls = 0;
 int xMedusaBallTarget = 0;
 int xMedusaBallBounces = 0;
 
 int dMummyBalls = 0;
 int xProjType = 0;
+
+int dAvengerProj = 0;
+int xAvengerProjDist = 0;
+int xAvengerProjUnit = 0;
+int xAvengerProjIndex = 0;
+
+int xMummyStart = 0;
+int xMummyDir = 0;
+
+int dYeebLightningBalls = 0;
+
+int dAmbushRooms = 0;
+int xAmbushRoomPos = 0;
 
 int initSpecialDatabase(string name = "", bool step = true) {
 	int db = xInitDatabase(name);
@@ -1095,7 +1119,7 @@ void addSpecialToDatabase(int db = 0,int name = 0, int from = 0, int p = 0) {
 	xSetPointer(db, xAddDatabaseBlock(db));
 	xSetInt(db, xUnitName,name);
 	xSetInt(db,xPlayerOwner,p);
-	xSetInt(db, xUnitID, kbGetBlockID(""+name));
+	xSetInt(db, xUnitID, xGetInt(db,xUnitID,xGetNewestPointer(db)));
 	xSetInt(db, xSpecialIndex, xGetNewestPointer(from));
 }
 
@@ -1118,7 +1142,7 @@ highFrequency
 	dFrostGiants = initSpecialDatabase("FrostGiants");
 	xInitAddInt(dFrostGiants,"target");
 	
-	dValkyries = initSpecialDatabase("Valkyries");
+	dValkyries = initSpecialDatabase("Valkyries",false);
 	xInitAddInt(dValkyries,"sfx");
 	
 	dBallistas = initSpecialDatabase("Ballistas",false);
@@ -1128,7 +1152,7 @@ highFrequency
 	dBattleBoars = initSpecialDatabase("BattleBoars");
 	xInitAddInt(dBattleBoars,"target");
 	
-	dAutomatons = initSpecialDatabase("Automatons");
+	dAutomatons = initSpecialDatabase("Automatons",false);
 	
 	dScarabs = initSpecialDatabase("Scarabs", false);
 	xInitAddVector(dScarabs,"pos");
@@ -1136,21 +1160,25 @@ highFrequency
 	dSatyrs = initSpecialDatabase("Satyrs");
 	
 	dAvengers = initSpecialDatabase("Avengers");
+	xInitAddInt(dAvengers,"projIndex");
 	
 	dScorpionMen = initSpecialDatabase("ScorpionMen");
 	xInitAddInt(dScorpionMen,"target");
 	
 	dMummies = initSpecialDatabase("Mummies");
+	xMummyStart = xInitAddVector(dMummies,"start");
+	xMummyDir = xInitAddVector(dMummies,"dir");
 	
 	dNereids = initSpecialDatabase("Nereids");
 	xInitAddVector(dNereids,"target");
 	
-	dHydras = initSpecialDatabase("Hydras");
+	dHydras = initSpecialDatabase("Hydras",false);
 	
 	dKrakens = initSpecialDatabase("Krakens");
 	xInitAddVector(dKrakens, "target");
 	
 	dLampades = initSpecialDatabase("SkyWitches");
+	xInitAddVector(dLampades,"target");
 	
 	dEinherjars = initSpecialDatabase("Einherjars");
 	
@@ -1178,12 +1206,42 @@ highFrequency
 	xInitAddInt(dYeebLightning,"player");
 	xInitAddInt(dYeebLightning,"timeout");
 	
+	dYeebLightningEnd = xInitDatabase("yeebLightningEnd");
+	xInitAddInt(dYeebLightning,"name");
+	xInitAddInt(dYeebLightning,"player");
+	
+	dYeebLightningBalls = initGenericProj("yeebLightningBalls",false,0);
+	xInitAddInt(dYeebLightningBalls,"bounces");
+	xInitAddVector(dYeebLightningBalls,"prev");
+	
+	dAutomatonBombs = xInitDatabase("automatonBombs");
+	xInitAddInt(dAutomatonBombs,"name");
+	xInitAddInt(dAutomatonBombs,"player");
+	xInitAddInt(dAutomatonBombs,"timeout");
+	
 	dMedusaBalls = initGenericProj("medusaBalls",false,0);
 	xMedusaBallTarget = xInitAddInt(dMedusaBalls,"target");
 	xMedusaBallBounces = xInitAddInt(dMedusaBalls,"bounces");
 	
 	dMummyBalls = initGenericProj("mummyBalls",true,0);
 	xProjType = xInitAddInt(dMummyBalls,"type");
+	
+	dBarrages = xInitDatabase("barrages");
+	xInitAddInt(dBarrages,"name");
+	xInitAddInt(dBarrages,"player");
+	xInitAddInt(dBarrages,"timeout");
+	xBarragePos = xInitAddVector(dBarrages,"pos");
+	xBarrageDir = xInitAddVector(dBarrages,"dir");
+	xBarrageCount = xInitAddInt(dBarrages,"count");
+	
+	dAvengerProj = initGenericProj("avengerProj",true,0);
+	xAvengerProjDist = xInitAddFloat(dAvengerProj,"maxDist");
+	xAvengerProjUnit = xInitAddInt(dAvengerProj,"rider");
+	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");
+	
+	dAmbushRooms = xInitDatabase("ambushRooms");
+	xAmbushRoomPos = xInitAddVector(dAmbushRooms,"pos");
+	
 }
 
 
@@ -1220,7 +1278,7 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
 			addSpecialToDatabase(dValkyries,name,db,p);
 			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
-				xsVectorSet(dValkyries,xSpecialTarget,xGetNewestPointer(dValkyries)));
+				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
 		}
 		case kbGetProtoUnitID("Ballista"):
 		{
@@ -1231,7 +1289,7 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
 			addSpecialToDatabase(dValkyries,name,db,p);
 			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
-				xsVectorSet(dValkyries,xSpecialTarget,xGetNewestPointer(dValkyries)));
+				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
 		}
 		case kbGetProtoUnitID("Fire Siphon"):
 		{
@@ -1277,6 +1335,7 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Hydra"):
 		{
 			addSpecialToDatabase(dHydras,name,db,p);
+			xSetInt(dHydras,xSpecialStep,trTime());
 		}
 		case kbGetProtoUnitID("Kraken"):
 		{

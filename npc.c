@@ -2913,7 +2913,7 @@ highFrequency
 		}
 		
 		
-		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
+		if ((trTime() > trQuestVarGet("townHealNext")) && (boss == 0)) {
 			trQuestVarSet("townHealNext", trTime());
 			for(p=1; < ENEMY_PLAYER) {
 				if (zDistanceToVectorSquared("p"+p+"unit", "townCenter") < 400) {

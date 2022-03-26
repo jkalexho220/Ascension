@@ -204,8 +204,8 @@ rule boss_music
 minInterval 3
 inactive
 {
-	if (trQuestVarGet("boss") > 0 && trTime() > trQuestVarGet("musicTime")) {
-		if (trQuestVarGet("boss") == 11) {
+	if (boss > 0 && trTime() > trQuestVarGet("musicTime")) {
+		if (boss == 11) {
 			trMusicPlay("music\interface\if you can use a doorknob.mp3", "1",0.2);
 			trQuestVarSet("musicTime", trTime() + 60);
 		} else {
@@ -3705,7 +3705,7 @@ highFrequency
 						}
 					}
 					
-					if (trQuestVarGet("boss") > 999) {
+					if (boss > 999) {
 						for(x=xGetDatabaseCount(dEnemies); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
@@ -3783,7 +3783,7 @@ highFrequency
 						trQuestVarSet("cageCount", trQuestVarGet("cageRadius") * 2);
 						if (trQuestVarGet("cageRadius") <= 0) {
 							bossCooldown(6, 12);
-							if (trQuestVarGet("boss") > 999) {
+							if (boss > 999) {
 								/* phase 2 */
 								trQuestVarSet("boat", trGetNextUnitScenarioNameNumber());
 								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("cageCenterx"),0,trQuestVarGet("cageCenterz"),0,true);
@@ -3846,7 +3846,7 @@ highFrequency
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lightning sparks Ground");
 					if (trQuestVarGet("bossNext") <= 0) {
-						if (trQuestVarGet("boss") > 999) {
+						if (boss > 999) {
 							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 							trArmySelect("1,0");
@@ -3872,7 +3872,7 @@ highFrequency
 					}
 				}
 			}
-		} else if (trQuestVarGet("boss") > 999) {
+		} else if (boss > 999) {
 			/* phase 2 */
 			trQuestVarSetFromRand("bossSpell", 0, 3, true);
 			trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
@@ -3932,7 +3932,7 @@ highFrequency
 			}
 			case 2:
 			{
-				if (trQuestVarGet("boss") == 1) {
+				if (boss == 1) {
 					trPaintTerrain(30, 10, 32, 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 					trPaintTerrain(10, 30, 30, 32, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 					trChangeTerrainHeight(31, 10, 32, 32, worldHeight, false);
@@ -4004,7 +4004,7 @@ highFrequency
 				xsEnableRule("boss_music");
 				trVectorQuestVarSet("yeebDir", vector(1,0,0));
 				trQuestVarSet("yeebLightningNext", trTimeMS());
-				if (trQuestVarGet("boss") == 1) {
+				if (boss == 1) {
 					trQuestVarSet("yeebBossFight", 0);
 					trQuestVarSet("boss", 1000);
 					trMessageSetText("Reach the boss room to escape. You will get to keep the stolen relic.", 60);
@@ -4085,7 +4085,7 @@ highFrequency
 	/* all dead */
 	if (trQuestVarGet("gameOverStep") > 0) {
 		xsDisableSelf();
-	} else if ((trQuestVarGet("boss") == 1001) && (trQuestVarGet("deadPlayerCount") < trQuestVarGet("activePlayerCount"))) {
+	} else if ((boss == 1001) && (trQuestVarGet("deadPlayerCount") < trQuestVarGet("activePlayerCount"))) {
 		/* successful escape */
 		int escape = 0;
 		for(p=1; < ENEMY_PLAYER) {
@@ -4105,7 +4105,7 @@ highFrequency
 			trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON,
 				trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) + trQuestVarGet("yeebRelicRetrieved"));
 		}
-	} else if (trQuestVarGet("boss") < 1000) {
+	} else if (boss < 1000) {
 		xsDisableRule("yeebaagooon_battle");
 		xsDisableSelf();
 		trQuestVarSet("yeebhit", 0);

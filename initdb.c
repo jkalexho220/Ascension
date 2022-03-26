@@ -1,5 +1,6 @@
 int dPlayerUnits = 0;
 int dEnemies = 0;
+int dEnemiesIncoming = 0;
 
 int xUnitName = 0;
 int xPlayerOwner = 0;
@@ -164,8 +165,8 @@ rule initialize_databases
 active
 highFrequency
 {
-	xsDisableSelf();
 	xsSetContextPlayer(0);
+	xsDisableSelf();
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
 	dEnemies = xInitDatabase("enemies", 30);
 	for(db=dEnemies; >= dPlayerUnits) {
@@ -203,6 +204,8 @@ highFrequency
 	
 	xDatabaseIndex = xPlayerOwner;
 	
+	dEnemiesIncoming = xInitDatabase("enemiesIncoming",50);
+	xInitAddInt(db,"name");
 	
 	dFreeRelics = xInitDatabase("freeRelics", 10);
 	xRelicName = xInitAddInt(dFreeRelics,"name");

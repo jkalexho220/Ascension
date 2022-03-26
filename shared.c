@@ -4,50 +4,35 @@ const float PI = 3.141592;
 
 void trVectorQuestVarSet(string VQVname = "", vector QVv = vector(-1,-1,-1)) {
 	if (VQVname == "") return;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	if (trQuestVarGet(VQVname) == 0) {
 		trQuestVarSet(VQVname, mNewVector(QVv));
 	} else {
 		mSetVector(1*trQuestVarGet(VQVname),QVv);
 	}
-	xsSetContextPlayer(old);
 }
 
 vector trVectorQuestVarGet(string name = "") {
 if (name == "") { return(vector(-1,-1,-1)); }
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	
 	vector ret = mGetVector(1*trQuestVarGet(name));
-	xsSetContextPlayer(old);
 	return(ret);
 }
 
 float trVectorQuestVarGetX(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	float val = xsVectorGetX(mGetVector(1*trQuestVarGet(VQVname)));
-	xsSetContextPlayer(old);
 	return(val);
 }
 
 float trVectorQuestVarGetY(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	float val = xsVectorGetY(mGetVector(1*trQuestVarGet(VQVname)));
-	xsSetContextPlayer(old);
 	return(val);
 }
 
 float trVectorQuestVarGetZ(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	float val = xsVectorGetZ(mGetVector(1*trQuestVarGet(VQVname)));
-	xsSetContextPlayer(old);
 	return(val);
 }
 
@@ -58,21 +43,15 @@ void trVectorQuestVarEcho(string VQVname = "") {
 
 
 void trStringQuestVarSet(string name = "", string value = "") {
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	if (trQuestVarGet("string"+name) > 0) {
 		mSetString(1*trQuestVarGet("string"+name), value);
 	} else {
 		trQuestVarSet("string"+name, mNewString(value));
 	}
-	xsSetContextPlayer(old);
 }
 
 string trStringQuestVarGet(string name="") {
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	string val = mGetString(1*trQuestVarGet("string"+name));
-	xsSetContextPlayer(old);
 	return(val);
 }
 
@@ -211,12 +190,9 @@ bool vectorInRectangle(vector pos = vector(0,0,0), vector bot = vector(0,0,0), v
 }
 
 bool zVectorInRectangle(string pos = "", string bot = "", string top = "") {
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	vector tempPos = mGetVector(1*trQuestVarGet(pos));
 	vector tempBot = mGetVector(1*trQuestVarGet(bot));
 	vector tempTop = mGetVector(1*trQuestVarGet(top));
-	xsSetContextPlayer(old);
 	return(vectorInRectangle(tempPos,tempBot,tempTop));
 }
 

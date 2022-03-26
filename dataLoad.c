@@ -154,7 +154,6 @@ rule data_load_00
 highFrequency
 inactive
 {
-	xsSetContextPlayer(0);
 	int proto = 0;
 	/* only the local client needs this info */
 	/* owned relics */
@@ -232,7 +231,7 @@ inactive
 		}
 		
 		trBlockAllSounds(true);
-		xsEnableRule("data_load_01_ready");
+		trDelayedRuleActivation("data_load_01_ready");
 	} else {
 		xSetPointer(dPlayerData,1);
 		trForbidProtounit(1, "Swordsman Hero");
@@ -381,14 +380,17 @@ rule data_load_02_detect_data
 highFrequency
 inactive
 {
-	xsSetContextPlayer(0);
 	int swordsmen = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		swordsmen = swordsmen + trPlayerUnitCountSpecific(p, "Swordsman Hero");
 	}
 	if (swordsmen == cNumberPlayers - 2) {
 		for(p=1; < ENEMY_PLAYER) {
-			xSetPointer(dPlayerData,p);
+			if (xSetPointer(dPlayerData,p) == false) {
+				debugLog("Cannot set pointer for " + aiPlanGetName(dPlayerData) + " to: " + p);
+				debugLog("database size is " + aiPlanGetNumberUserVariableValues(dPlayerData,xDirtyBit));
+				debugLog("Progress: " + loadProgress + " context: " + xsGetContextPlayer());
+			}
 			swordsmen = 32 * (p - 1);
 			for(x=0; < 32) {
 				if (kbGetUnitBaseTypeID(x + swordsmen) == kbGetProtoUnitID("Swordsman Hero")) {
@@ -516,7 +518,6 @@ rule data_load_03_done
 highFrequency
 inactive
 {
-	xsSetContextPlayer(0);
 	/*
 	Destroy swordsmen
 	*/

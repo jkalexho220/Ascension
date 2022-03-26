@@ -476,6 +476,7 @@ class Declaration(StackFrame):
 		self.type = 'VARIABLE'
 		self.datatype = name
 		self.returner = None
+		self.returnType = 'void'
 
 	def resolve(self):
 		if not self.closed:
@@ -485,6 +486,9 @@ class Declaration(StackFrame):
 				FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
 				for frame in self.children:
 					FUNCTIONS[self.name].add(frame.datatype)
+		elif self.state == STATE_CLOSED:
+			if self.returnType != self.datatype:
+				error("Function must return a value of type " + self.datatype)
 
 	def accept(self, token):
 		global KNOWN_VARIABLES
@@ -551,6 +555,8 @@ class Declaration(StackFrame):
 				if self.returner.datatype != self.datatype:
 					if not (self.returner.datatype in ['int', 'float'] and self.datatype in ['int', 'float']):
 						error("Return type of " + self.returner.datatype + " does not match function return type of " + self.datatype)
+				else:
+					self.returnType = self.returner.datatype
 				self.returner = None
 		elif token == 'return':
 			child = self

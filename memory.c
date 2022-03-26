@@ -1,3 +1,15 @@
+
+rule context_change_always
+active
+highFrequency
+{
+	/*
+	For whatever reason, the context player is set to -1 at the start of
+	every trigger loop, but only in random map scripts. So here we are
+	*/
+	xsSetContextPlayer(0);
+}
+
 const int mInt = 0;
 const int mFloat = 1;
 const int mString = 2;
@@ -75,7 +87,6 @@ int zNewArray(int type = 0, int size = 0, string name = "") {
 }
 
 /*
-NOTE: player context must be 0 when calling this! (use xsSetContextPlayer(0))
 */
 bool free(int type = -1, int index = -1) {
 	bool success = false;
@@ -90,7 +101,6 @@ bool free(int type = -1, int index = -1) {
 }
 
 /*
-NOTE: player context must be 0 when calling this! (use xsSetContextPlayer(0))
 */
 int malloc(int type = -1) {
 	/*
@@ -258,8 +268,7 @@ Size is the starting size of the database, but databases can grow indefinitely
 returns the identifier of the database. Use this identifier in other xDatabase triggers
 */
 int xInitDatabase(string name = "", int size = 0) {
-	xsSetContextPlayer(0);
-	int id = aiPlanCreate(name, 0);
+	int id = aiPlanCreate(name, 8);
 	aiPlanAddUserVariableBool(id,xDirtyBit,"DirtyBit",size+1);
 	aiPlanAddUserVariableInt(id,xNextBlock,"NextBlock",size+1);
 	aiPlanAddUserVariableInt(id,xPrevBlock,"PrevBlock",size+1);
@@ -698,9 +707,8 @@ highFrequency
 {
 	xsDisableSelf();
 	aiSet("NoAI", 0);
-	xsSetContextPlayer(0);
-	MALLOC = aiPlanCreate("memory",0);
-	ARRAYS = aiPlanCreate("arrays",0);
+	MALLOC = aiPlanCreate("memory",8);
+	ARRAYS = aiPlanCreate("arrays",8);
 	for(i=0; < 5) {
 		aiPlanAddUserVariableBool(MALLOC,i * 3 + xDirtyBit - 1,"DirtyBit"+i,1);
 		aiPlanAddUserVariableInt(MALLOC,i * 3 + xNextBlock - 1,"NextBlock"+i,1);
@@ -719,4 +727,7 @@ highFrequency
 	aiPlanSetUserVariableString(MALLOC,15,mString,"String");
 	aiPlanSetUserVariableString(MALLOC,15,mVector,"Vector");
 	aiPlanSetUserVariableString(MALLOC,15,mBool,"Bool");
+	if (aiPlanGetActive(MALLOC)) {
+		debugLog("active?");
+	}
 }

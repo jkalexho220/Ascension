@@ -217,7 +217,7 @@ void reselectMyself() {
 }
 
 
-int setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
+void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
 	int p = kbGetProtoUnitID(proto);
 	xSetPointer(dClass,class);
 	xSetInt(dClass,xClassProto,p);
@@ -396,6 +396,7 @@ runImmediately
 	aiSet("NoAI", ENEMY_PLAYER);
 	xsSetContextPlayer(ENEMY_PLAYER);
 	aiSetAttackResponseDistance(0.0);
+	xsSetContextPlayer(0);
 	
 	/*
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
@@ -499,7 +500,6 @@ rule setup_classes
 active
 highFrequency
 {
-	xsSetContextPlayer(0);
 	
 	setupClass("Militia", 17, 500, 1000);
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
@@ -526,7 +526,6 @@ rule delayed_modify
 inactive
 highFrequency
 {
-	xsSetContextPlayer(0);
 	zInitProtoUnitStat("Revealer", 1, 2, 12);
 	setupPlayerProto("Kronny Flying", 1000, 0, 0);
 	
@@ -749,6 +748,11 @@ void paintTowerSegment(int stage = 0) {
 			tPrimary = 0;
 			tSubPrimary = 50;
 		}
+		case 9:
+		{
+			tPrimary = 5;
+			tSubPrimary = 7;
+		}
 	}
 	trPaintTerrain(68,43 + 3 * stage,76,46 + 3 * stage, tPrimary, tSubPrimary, false);
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -775,7 +779,6 @@ highFrequency
 		if (xGetInt(dPlayerData,xPlayerProgress,1) == 0) {
 			trQuestVarSet("stage", 1);
 		} else {
-			xPrintAll(dPlayerData,1);
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
 			xStageChoicesName = xInitAddInt(dStageChoices,"name");
 			xStageChoicesStage = xInitAddInt(dStageChoices,"stage");
