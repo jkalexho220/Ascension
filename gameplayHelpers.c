@@ -1012,7 +1012,7 @@ int addGenericProj(int db = 0,vector start = vector(0,0,0),vector dir = vector(0
 	return(index);
 }
 
-int initGenericProj(string name = "", int count = 10) {
+int initGenericProj(string name = "", bool hitbox = false, int count = 10) {
 	int db = xInitDatabase(name,count);
 	xInitAddInt(db, "name");
 	xInitAddInt(db, "player");
@@ -1024,6 +1024,10 @@ int initGenericProj(string name = "", int count = 10) {
 	xProjSpeed = xInitAddFloat(db, "speed");
 	xProjScale = xInitAddFloat(db, "scale");
 	xProjDir = xInitAddVector(db, "dir");
+	if (hitbox) {
+		xProjDist = xInitAddFloat(db,"dist");
+		xProjPrev = xInitAddVector(db,"prev");
+	}
 }
 
 int dSphinxes = 0;
@@ -1066,6 +1070,13 @@ int xBallistaShot2 = 0;
 
 int dYeebLightning = 0;
 int xTimeout = 0;
+
+int dMedusaBalls = 0;
+int xMedusaBallTarget = 0;
+int xMedusaBallBounces = 0;
+
+int dMummyBalls = 0;
+int xProjType = 0;
 
 int initSpecialDatabase(string name = "", bool step = true) {
 	int db = xInitDatabase(name);
@@ -1166,6 +1177,13 @@ highFrequency
 	xInitAddInt(dYeebLightning,"name");
 	xInitAddInt(dYeebLightning,"player");
 	xInitAddInt(dYeebLightning,"timeout");
+	
+	dMedusaBalls = initGenericProj("medusaBalls",false,0);
+	xMedusaBallTarget = xInitAddInt(dMedusaBalls,"target");
+	xMedusaBallBounces = xInitAddInt(dMedusaBalls,"bounces");
+	
+	dMummyBalls = initGenericProj("mummyBalls",true,0);
+	xProjType = xInitAddInt(dMummyBalls,"type");
 }
 
 

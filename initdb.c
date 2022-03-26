@@ -157,6 +157,8 @@ int xProjAnim = 0;
 int xProjDir = 0;
 int xProjHeight = 0;
 int xProjSpeed = 0;
+int xProjPrev = 0;
+int xProjDist = 0;
 
 rule initialize_databases
 active
