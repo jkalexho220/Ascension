@@ -941,7 +941,7 @@ int processGenericProj(int db = 0) {
 	float scale = 0;
 	xDatabaseNext(db);
 	xUnitSelectByID(db,xUnitID);
-	id = xGetInt(db,xUnitID);
+	id = kbGetBlockID(""+xGetInt(db,xUnitName));
 	int yeehaw = xGetInt(db, xProjYeehaw);
 	if (id == -1) {
 		xFreeDatabaseBlock(db);

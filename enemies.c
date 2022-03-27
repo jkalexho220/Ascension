@@ -184,14 +184,12 @@ highFrequency
 }
 
 void ballistaShotPop(vector pos = vector(0,0,0)) {
-	int id = 0;
 	int p = xGetInt(dBallistaShots,xPlayerOwner);
 	int db = opponentDatabaseName(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
-		id = xGetInt(db, xUnitID);
 		xUnitSelectByID(db,xUnitID);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			removeOpponentUnit(p);
 		} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 			damageOpponentUnit(p, 200);
@@ -238,8 +236,7 @@ int findShooter(int db = 0, vector pos = vector(0,0,0)) {
 	for (x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
 		id = xGetInt(db,xUnitID);
-		trUnitSelectClear();
-		trUnitSelectByID(id);
+		xUnitSelectByID(db,xUnitID);
 		if (trUnitAlive() == false) {
 			xFreeDatabaseBlock(db);
 		} else if (kbUnitGetAnimationActionType(id) == 12) {
@@ -315,10 +312,9 @@ void specialUnitsAlways() {
 				db = opponentDatabaseName(p);
 				for(y=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
-					id = xGetInt(db, xUnitID);
 					dir = xGetVector(db,xLaserDir);
 					xUnitSelectByID(db,xUnitID);
-					if (id == -1 || trUnitAlive() == false) {
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (rayCollision(db,start,dir,xGetFloat(dDelayLasers,xLaserDist),1.0)) {
 						damageOpponentUnit(p, 300);
@@ -463,7 +459,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dSphinxes,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dSphinxes)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dSphinxes)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -486,7 +482,7 @@ void specialUnitsAlways() {
 						for(x=xGetDatabaseCount(db); >0) {
 							xDatabaseNext(db);
 							xUnitSelectByID(db,xUnitID);
-							if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+							if (trUnitAlive() == false) {
 								removeOpponentUnit(p);
 							} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 								silenceUnit(db,5,p);
@@ -519,7 +515,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dMountainGiants,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			trUnitChangeProtoUnit("Mountain Giant");
 			xFreeDatabaseBlock(dMountainGiants);
@@ -551,7 +547,7 @@ void specialUnitsAlways() {
 					for(x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
 						xUnitSelectByID(db,xUnitID);
-						if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 4) {
 							damageOpponentUnit(p, 100 + 100 * trQuestVarGet("stage"));
@@ -594,7 +590,7 @@ void specialUnitsAlways() {
 		for(y=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
 			xUnitSelectByID(db,xUnitID);
-			if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+			if (trUnitAlive() == false) {
 				removeOpponentUnit(p);
 			} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 2.0) {
 				stunUnit(db, 3.0, p);
@@ -627,7 +623,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dMedusas, xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dMedusas)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dMedusas)) {
 			trUnitChangeProtoUnit("Medusa");
 			xFreeDatabaseBlock(dMedusas);
 		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMedusas, xSpecialIndex)) == 1) {
@@ -688,7 +684,7 @@ void specialUnitsAlways() {
 		db = databaseName(p);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dValkyries)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dValkyries)) {
 			xUnitSelect(dValkyries,xSpecialNext);
 			trUnitDestroy();
 			xFreeDatabaseBlock(dValkyries);
@@ -716,7 +712,7 @@ void specialUnitsAlways() {
 		p = xGetInt(dDryads, xPlayerOwner);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			if (xGetInt(dDryads, xSpecialStep) == 0) {
 				db = opponentDatabaseName(p);
 				pos = xGetVector(dDryads,xSpecialNext);
@@ -728,7 +724,7 @@ void specialUnitsAlways() {
 					id = xGetInt(db,xUnitID);
 					trUnitSelectClear();
 					trUnitSelectByID(id);
-					if (id == -1 || trUnitAlive() == false) {
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 						poisonUnit(db, 10.0, 5.0 * trQuestVarGet("stage"), p);
@@ -758,7 +754,7 @@ void specialUnitsAlways() {
 		id = xGetInt(dScarabs,xUnitID);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dScarabs)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dScarabs)) {
 			if (xGetInt(dScarabs, xSpecialStep) == 0) {
 				pos = xGetVector(dScarabs,xSpecialNext);
 				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -796,7 +792,7 @@ void specialUnitsAlways() {
 				xDatabaseNext(db);
 				id = xGetInt(db,xUnitID);
 				xUnitSelectByID(db,xUnitID);
-				if (id == -1 || trUnitAlive() == false) {
+				if (trUnitAlive() == false) {
 					removePlayerUnit();
 				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 					damageOpponentUnit(p, 200);
@@ -810,7 +806,7 @@ void specialUnitsAlways() {
 		id = xGetInt(dAutomatons,xUnitID);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			if (xGetInt(dAutomatons, xSpecialStep) == 0) {
 				trUnitHighlight(3.0, true);
 				trSoundPlayFN("gatherpoint.wav","1",-1,"","");
@@ -835,7 +831,7 @@ void specialUnitsAlways() {
 		trUnitSelectClear();
 		trUnitSelectByID(id);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			if (trQuestVarGet("frostGiantHunt") == 1) {
 				trQuestVarSet("frostGiantBones", 1 + trQuestVarGet("frostGiantBones"));
@@ -921,7 +917,7 @@ void specialUnitsAlways() {
 					xDatabaseNext(db);
 					id = xGetInt(db,xUnitID);
 					xUnitSelectByID(db,xUnitID);
-					if (id == -1 || trUnitAlive() == false) {
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 9.0) {
 						damageOpponentUnit(p,100);
@@ -957,7 +953,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dSatyrs,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dSatyrs)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dSatyrs)) {
 			xFreeDatabaseBlock(dSatyrs);
 		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSatyrs, xSpecialIndex)) == 1) {
 			xSetInt(dSatyrs, xSpecialNext, trTimeMS() + 10000);
@@ -992,7 +988,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dBattleBoars,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dBattleBoars)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dBattleBoars)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1023,10 +1019,8 @@ void specialUnitsAlways() {
 					db = opponentDatabaseName(p);
 					for (x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
-						id = xGetInt(db,xUnitID);
-						trUnitSelectClear();
-						trUnitSelectByID(id);
-						if (id == -1 || trUnitAlive() == false) {
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 9.0) {
 							pos = vectorSetAsTargetVector(start, kbGetBlockPosition(""+xGetInt(db,xUnitName)), 20.0);
@@ -1065,10 +1059,8 @@ void specialUnitsAlways() {
 				xSetFloat(dAvengerProj, xProjDist, xGetFloat(dAvengerProj, xProjDist) + amt);
 				for(x=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
-					id = xGetInt(db,xUnitID);
-					trUnitSelectClear();
-					trUnitSelectByID(id);
-					if (id == -1 || trUnitAlive() == false) {
+					xUnitSelectByID(db,xUnitID);
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (rayCollision(db,pos,dir,amt + 1.0,9.0)) {
 						damageOpponentUnit(p, amt * 20.0);
@@ -1108,7 +1100,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dAvengers,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dAvengers)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dAvengers)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1157,10 +1149,8 @@ void specialUnitsAlways() {
 	
 	if (xGetDatabaseCount(dBallistas) > 0) {
 		xDatabaseNext(dBallistas);
-		id = xGetInt(dBallistas,xUnitID);
-		trUnitSelectClear();
-		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dBallistas)) {
+		xUnitSelectByID(dBallistas,xUnitID);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dBallistas)) {
 			xFreeDatabaseBlock(dBallistas);
 		}
 	}
@@ -1170,7 +1160,7 @@ void specialUnitsAlways() {
 		id = xGetInt(dFireSiphons,xUnitID);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dFireSiphons)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dFireSiphons)) {
 			xFreeDatabaseBlock(dFireSiphons);
 		} else if ((kbUnitGetAnimationActionType(id) == 9) && (xGetInt(dFireSiphons,xPlayerOwner) == ENEMY_PLAYER)) {
 			if (trTimeMS() > xGetInt(dFireSiphons, xSpecialNext)) {
@@ -1194,7 +1184,7 @@ void specialUnitsAlways() {
 			for(x=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);
 				xUnitSelectByID(db,xUnitID);
-				if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+				if (trUnitAlive() == false) {
 					removeOpponentUnit(p);
 				} else if (rayCollision(db,pos,dir,amt + 4.0,xGetFloat(dMummyBalls,xProjDist))) {
 					damageOpponentUnit(p, xsMin(100.0, amt * 10));
@@ -1225,7 +1215,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dMummies, xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dMummies)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dMummies)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1288,7 +1278,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dScorpionMen,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dScorpionMen)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dScorpionMen)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1355,7 +1345,7 @@ void specialUnitsAlways() {
 	if (xGetDatabaseCount(dHydras) > 0) {
 		xDatabaseNext(dHydras);
 		xUnitSelectByID(dHydras,xUnitID);
-		if (xGetInt(dHydras,xUnitID) == -1 || trUnitAlive() == false || checkEnemyDeactivated(dHydras)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dHydras)) {
 			xFreeDatabaseBlock(dHydras);
 		} else if (trTime() > xGetInt(dHydras,xSpecialStep)) {
 			amt = trTime() - xGetInt(dHydras, xSpecialStep);
@@ -1375,7 +1365,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dNereids,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dNereids)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dNereids)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1408,7 +1398,7 @@ void specialUnitsAlways() {
 					for (x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
 						xUnitSelectByID(db,xUnitID);
-						if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 16.0) {
 							pos = vectorSetAsTargetVector(start, kbGetBlockPosition(""+xGetInt(db,xUnitName)), 40.0);
@@ -1445,7 +1435,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dKrakens,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			trUnitChangeProtoUnit("Kraken");
 			xFreeDatabaseBlock(dKrakens);
 		} else if (checkEnemyDeactivated(dKrakens)) {
@@ -1479,7 +1469,7 @@ void specialUnitsAlways() {
 					for (x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
 						xUnitSelectByID(db,xUnitID);
-						if (xGetInt(db, xUnitID) == -1 || trUnitAlive() == false) {
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (rayCollision(db, start,dir, 6.0, 3.0)) {
 							damageOpponentUnit(p, 300.0);
@@ -1513,7 +1503,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dEinherjars,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dEinherjars)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dEinherjars)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
@@ -1537,7 +1527,7 @@ void specialUnitsAlways() {
 					for (x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
 						xUnitSelectByID(db,xUnitID);
-						if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+						if (trUnitAlive() == false) {
 							removeAllyUnit(p);
 						} else if (xGetInt(db, xPoisonStatus) == 0) {
 							pos = kbGetBlockPosition(""+xGetInt(db,xUnitName),true);
@@ -1585,7 +1575,7 @@ void specialUnitsAlways() {
 			for(x=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);
 				xUnitSelectByID(db,xUnitID);
-				if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+				if (trUnitAlive() == false) {
 					removeOpponentUnit(p);
 				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 1.0) {
 					damageOpponentUnit(p, 470);
@@ -1600,7 +1590,7 @@ void specialUnitsAlways() {
 				for(x=xGetDatabaseCount(dEnemies); >0) {
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies,xUnitID);
-					if (xGetInt(dEnemies,xUnitID) == -1 || trUnitAlive() == false) {
+					if (trUnitAlive() == false) {
 						removeEnemy();
 					} else if (unitDistanceToVector(xGetInt(dEnemies,xUnitName), pos) < 1.0) {
 						damageEnemy(0, 470, true);
@@ -1661,7 +1651,7 @@ void specialUnitsAlways() {
 					for(x=xGetDatabaseCount(db); >0) {
 						xDatabaseNext(db);
 						xUnitSelectByID(db,xUnitID);
-						if (xGetInt(db,xUnitID) == -1 || trUnitAlive() == false) {
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (rayCollision(db, start, dir, dist, 9.0)) {
 							damageOpponentUnit(p, 120);
@@ -1686,7 +1676,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dLightningStatues,xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated(dLightningStatues)) {
+		if (trUnitAlive() == false || checkEnemyDeactivated(dLightningStatues)) {
 			xFreeDatabaseBlock(dLightningStatues);
 		} else if (trTimeMS() > xGetInt(dLightningStatues, xSpecialNext)) {
 			if (kbUnitGetAnimationActionType(id) == 59) {
@@ -1709,7 +1699,7 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		p = xGetInt(dLampades, xPlayerOwner);
 		db = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			trUnitChangeProtoUnit("Lampades");
 			xFreeDatabaseBlock(dLampades);
 		} else if (checkEnemyDeactivated(dLampades)) {
@@ -1789,10 +1779,9 @@ void enemiesAlways() {
 	
 	if (xGetDatabaseCount(dEnemies) > 0) {
 		xDatabaseNext(dEnemies);
-		id = xGetInt(dEnemies,xUnitID);
-		trUnitSelectClear();
-		trUnitSelectByID(id);
-		if ((id == -1) || (trUnitAlive() == false)) {
+		id = kbGetBlockID(""+xGetInt(dEnemies,xUnitID));
+		xUnitSelectByID(dEnemies,xUnitID);
+		if (id == -1 || trUnitAlive() == false) {
 			removeEnemy();
 		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
 			(xGetInt(dEnemies, xStunStatus) + xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) == 0)) {

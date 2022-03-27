@@ -57,7 +57,7 @@ string datatypeName(int data = 0) {
 	return(name);
 }
 
-int zNewArray(int type = 0, int size = 0, string name = "") {
+int zNewArray(int type = 0, int size = 1, string name = "") {
 	int index = mNumArrays;
 	mNumArrays = mNumArrays + 1;
 	switch(type)
