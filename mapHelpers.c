@@ -44,6 +44,13 @@ int xWallCircles = 0;
 int xWallEnd = 0;
 int xWallKey = 0;
 
+int dPoisonRelics = 0;
+int xPoisonRelicIndex = 0;
+
+int dEdgeFrontier = 0;
+
+int dFrontier = 0;
+
 rule initialize_map_databases
 active
 highFrequency
@@ -311,4 +318,5 @@ void placeTemple(int x = 0, int z = 0, float los = 0) {
 	trSetSelectedScale(2,2,2);
 	trUnitOverrideAnimation(2,0,true,false,-1);
 	trQuestVarSet("templeLOS", los);
+	trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
 }

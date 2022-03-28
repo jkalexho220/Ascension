@@ -69,6 +69,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 	int z1 = 0;
 	bool trapped = false;
 	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	trQuestVarSet("room"+room, type);
 	if (type < ROOM_CHEST) {
 		if ((trQuestVarGet("trapRooms") > 0) &&
@@ -346,8 +347,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Villager Chinese",23,19,315);
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Maceman",19,25,225);
-			yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
-			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Maceman"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Maceman"));
 			trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Villager Egyptian",11,27,180);
 			
@@ -448,10 +450,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Ulfsark",15,23,135);
 			trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Dwarf",25,25,225);
-			yAddToDatabase("stunnedUnits", "guy"+FETCH_GUY);
-			yAddUpdateVar("stunnedUnits","proto", kbGetProtoUnitID("Throwing Axeman"));
-			yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
-			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Ulfsark"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+FETCH_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Throwing Axeman"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Ulfsark"));
 		}
 		case ROOM_VILLAGE + 4:
 		{
@@ -521,16 +525,19 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Hypaspist",9,13,180);
 			trQuestVarSet("kastor", trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Kastor", 11, 29, 135);
-			yAddToDatabase("npcTalk", "kastor");
-			yAddUpdateVar("npcTalk", "dialog", NPC_KASTOR);
-			yAddToDatabase("stunnedUnits", "guy"+FETCH_GUY);
-			yAddUpdateVar("stunnedUnits","proto", kbGetProtoUnitID("Hypaspist"));
-			yAddToDatabase("stunnedUnits", "guy"+BOUNTY_GUY);
-			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Halberdier"));
-			yAddToDatabase("stunnedUnits", "guy"+SHOP_GUY);
-			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Toxotes"));
-			yAddToDatabase("stunnedUnits", "kastor");
-			yAddUpdateVar("stunnedUnits","proto", kbGetProtoUnitID("Kastor"));
+			xSetPointer(dNpcTalk, xAddDatabaseBlock(dNpcTalk));
+			xSetInt(dNpcTalk, xUnitName, 1*trQuestVarGet("kastor"));
+			xSetInt(dNpcTalk, xNpcDialog, NPC_KASTOR);
+			
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+SHOP_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Toxotes"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Halberdier"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("Kastor"));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Kastor"));
 		}
 		case ROOM_VILLAGE + 6:
 		{
@@ -557,8 +564,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
 			trQuestVarSet("guy"+SHOP_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Pharaoh of Osiris", 19, 19, 225);
-			yAddToDatabase("stunnedUnits", "guy"+FETCH_GUY);
-			yAddUpdateVar("stunnedUnits","proto", kbGetProtoUnitID("Pharaoh of Osiris"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy1"));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Pharaoh of Osiris"));
 			
 			if (trQuestVarGet("localQuest") == FETCH_GUY) {
 				deployTownEyecandy("Cinematic Scorch", 15, 9);
@@ -567,13 +575,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trVectorQuestVarSet("yeebRoomBottom", xsVectorSet(70 * x + 26, 0, 70 * z + 26));
 				trVectorQuestVarSet("yeebRoomTop", xsVectorSet(70 * x + 56, 0, 70 * z + 56));
 				trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
-				trVectorQuestVarSet("pos", randomNearEdge(x * 35 + 15, z * 35 + 15, x * 35 + 25, z * 35 + 25));
-				spawnRelicSpecific(trQuestVarGet("posX"),trQuestVarGet("posZ"), RELIC_YEEBAAGOOON);
+				pos = randomNearEdge(x * 35 + 15, z * 35 + 15, x * 35 + 25, z * 35 + 25);
+				spawnRelicSpecific(pos, RELIC_YEEBAAGOOON);
 				for(i=10; >0) {
-					trVectorQuestVarSet("pos", randomNearEdge(x * 35 + 15, z * 35 + 15, x * 35 + 25, z * 35 + 25));
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					yAddToDatabase("worthlessJunk", "next");
-					spawnRelicSpecific(trQuestVarGet("posX"),trQuestVarGet("posZ"), RELIC_WORTHLESS_JUNK);
+					xSetPointer(dWorthlessJunk, xAddDatabaseBlock(dWorthlessJunk));
+					xSetInt(dWorthlessJunk, xUnitName, trGetNextUnitScenarioNameNumber());
+					spawnRelicSpecific(pos, RELIC_WORTHLESS_JUNK);
 				}
 				xsEnableRule("yeeb_hit_list");
 			}
@@ -646,17 +653,15 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 34, 34, 225), true);
 			trUnitConvert(ENEMY_PLAYER);
 			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
-			trVectorQuestVarSet("dir", vector(0,0,16));
-			trVectorQuestVarSet("heading", vector(0,0,-1));
+			dir = vector(0,0,-1);
 			for(i=0; < 7) {
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+				xSetInt(dEnemiesIncoming, xUnitName, trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Statue of Lightning",1,
-					70.0 * x + 41.0 + trQuestVarGet("dirx"),0,70.0 * z + 41.0 + trQuestVarGet("dirz"),0,true);
+					70.0 * x + 41.0 - 16.0 * xsVectorGetX(dir),0,70.0 * z + 41.0 - 16.0 * xsVectorGetZ(dir),0,true);
 				trArmySelect(""+ENEMY_PLAYER+",0");
-				trSetUnitOrientation(trVectorQuestVarGet("heading"),vector(0,1,0),true);
-				yAddToDatabase("enemiesIncoming", "next");
-				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
-				trVectorQuestVarSet("heading", rotationMatrix("heading", 0.707107, 0.707107));
+				trSetUnitOrientation(dir,vector(0,1,0),true);
+				dir = rotationMatrix(dir, 0.707107, 0.707107);
 			}
 		}
 		case ROOM_VILLAGE + 11:
@@ -701,10 +706,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trArmyDispatch("1,0", "Hero Greek Hippolyta", 1, trQuestVarGet("choice2x"),0,trQuestVarGet("choice2z"),225,false);
 				trArmySelect("1,0");
 				trUnitConvert(0);
-				yAddToDatabase("stunnedUnits", "choice1unit");
-				yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Hero Greek Theseus"));
-				yAddToDatabase("stunnedUnits", "choice2unit");
-				yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Hero Greek Hippolyta"));
+				xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+				xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("choice1unit"));
+				xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Hero Greek Theseus"));
+				xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+				xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("choice2unit"));
+				xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Hero Greek Hippolyta"));
 				xsEnableRule("class_shop_always");
 			}
 		}
@@ -756,6 +763,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_NOTTUD:
 		{
+			dNottudShop = xInitDatabase("nottudShop");
+			xInitAddInt(dNottudShop,"name");
+			xInitAddInt(dNottudShop,"type");
+			xNottudShopPos = xInitAddVector(dNottudShop,"pos");
+			
 			paintCircle(x, z, 10, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 			trQuestVarSet("nottud", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0", "Victory Marker", 1, 70*x+40, 0, 70*z+40,225,true);
@@ -791,10 +803,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trUnitConvert(0);
 				trMutateSelected(kbGetProtoUnitID("Outpost"));
 				trQuestVarSetFromRand("rand", 0, 4 - i, true);
-				yAddToDatabase("nottudShop", "next");
-				yAddUpdateVar("nottudShop", "relic", trQuestVarGet("choice"+1*trQuestVarGet("rand")));
-				yAddUpdateVar("nottudShop", "shopPosx", trQuestVarGet("obeliskx"+i));
-				yAddUpdateVar("nottudShop", "shopPosz", trQuestVarGet("obeliskz"+i));
+				xSetPointer(dNottudShop, xAddDatabaseBlock(dNottudShop));
+				xSetInt(dNottudShop, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dNottudShop, xRelicType, 1*trQuestVarGet("choice"+1*trQuestVarGet("rand")));
+				xSetVector(dNottudShop, xNottudShopPos, xsVectorSet(trQuestVarGet("obeliskx"+i),0,trQuestVarGet("obeliskz"+i)));
 				trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
 			}
 		}
@@ -804,7 +816,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trVectorQuestVarSet("templePos", xsVectorSet(70*x+39,0,70*z+39));
 			paintCircle(x, z, 10, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 			placeTemple(x, z, 16);
-			trVectorQuestVarSet("dir", vector(1,0,0));
+			dir = vector(1,0,0);
 			trQuestVarSetFromRand("templeShadeTrue", 0, 15, true);
 			trQuestVarSet("templeShadesStart", trGetNextUnitScenarioNameNumber());
 			for(i=0; < 16) {
@@ -815,9 +827,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trArmyDispatch("0,0","Hoplite",1,1,0,1,0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
-				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-				trUnitTeleport(70.0*x+40.0-trQuestVarGet("dirx")*12.0,0,70.0*z+40.0-trQuestVarGet("dirz")*12.0);
-				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.923879, 0.382683));
+				trSetUnitOrientation(dir,vector(0,1,0),true);
+				trUnitTeleport(70.0*x+40.0-xsVectorGetX(dir)*12.0,0,70.0*z+40.0-xsVectorGetZ(dir)*12.0);
+				dir = rotationMatrix(dir, 0.923879, 0.382683);
 			}
 			trQuestVarSet("templeShadesEnd", trGetNextUnitScenarioNameNumber());
 			xsEnableRule("shade_temple_always");
@@ -848,6 +860,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_TEMPLE + 5:
 		{
+			dPoisonRelics = xInitDatabase("poisonRelics", 9);
+			xInitAddInt(dPoisonRelics, "name");
+			xPoisonRelicIndex = xInitAddInt(dPoisonRelics, "index");
 			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
 			placeTemple(x, z, 10);
@@ -862,9 +877,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				if (i == trQuestVarGet("rand")) {
 					trQuestVarSet("correctGoblet", trQuestVarGet("next"));
 				}
-				yAddToDatabase("poisonRelics","next");
-				yAddUpdateVar("poisonRelics","index",yAddToDatabase("freeRelics", "next"));
-				yAddUpdateVar("freeRelics","type",RELIC_BINARY_POISON);
+				xSetPointer(dPoisonRelics, xAddDatabaseBlock(dPoisonRelics));
+				xSetInt(dPoisonRelics, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dPoisonRelics, xPoisonRelicIndex, xAddDatabaseBlock(dFreeRelics));
+				xSetPointer(dFreeRelics, xGetNewestPointer(dFreeRelics));
+				xSetInt(dFreeRelics, xUnitName, xGetInt(dPoisonRelics, xUnitName));
+				xSetInt(dFreeRelics, xRelicType, RELIC_BINARY_POISON);
 				x0 = x0 + 2;
 				z0 = z0 - 2;
 			}

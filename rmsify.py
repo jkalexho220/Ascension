@@ -54,6 +54,7 @@ IGNORE = ['const']
 
 SYMBOLS = [ARITHMETIC, BINARY, FLOW]
 
+
 class CustomFunction:
 	def __init__(self, name, datatype):
 		self.name = name
@@ -110,7 +111,6 @@ class Job:
 		return val
 
 	def resolve(self):
-		global BASE_JOB
 		self.closed = True
 		for c in self.children:
 			c.resolve()

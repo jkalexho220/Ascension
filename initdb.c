@@ -163,9 +163,6 @@ int xProjDist = 0;
 
 int dBoons = 0;
 
-int dNpcTalk = 0;
-int xNpcDialog = 0;
-
 rule initialize_databases
 active
 highFrequency
@@ -321,10 +318,6 @@ highFrequency
 	
 	dBoons = xInitDatabase("boonStatues",12);
 	xInitAddInt(dBoons,"name");
-	
-	dNpcTalk = xInitDatabase("npcTalk",3);
-	xInitAddInt(dNpcTalk,"name");
-	xNpcDialog = xInitAddInt(dNpcTalk,"dialog");
 	
 	dPlayerCharacters = xInitDatabase("playerCharacters", cNumberPlayers - 2);
 	xInitAddInt(dPlayerCharacters,"name");

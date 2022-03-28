@@ -2084,6 +2084,10 @@ int xLeafType = 0;
 int dWorthlessJunk = 0;
 
 int dNottudShop = 0;
+int xNottudShopPos = 0;
+
+int dNpcTalk = 0;
+int xNpcDialog = 0;
 
 rule initialize_town_database
 active
@@ -2100,9 +2104,9 @@ highFrequency
 	dWorthlessJunk = xInitDatabase("worthlessJunk");
 	xInitAddInt(dWorthlessJunk,"name");
 	
-	dNottudShop = xInitDatabase("nottudShop");
-	xInitAddInt(dNottudShop,"name");
-	xInitAddInt(dNottudShop,"type");
+	dNpcTalk = xInitDatabase("npcTalk",3);
+	xInitAddInt(dNpcTalk,"name");
+	xNpcDialog = xInitAddInt(dNpcTalk,"dialog");
 }
 
 rule town_always
