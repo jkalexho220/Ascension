@@ -1100,6 +1100,7 @@ int xMummyDir = 0;
 int dYeebLightningBalls = 0;
 
 int dAmbushRooms = 0;
+int xAmbushRoomType = 0;
 int xAmbushRoomPos = 0;
 
 int initSpecialDatabase(string name = "", bool step = true) {

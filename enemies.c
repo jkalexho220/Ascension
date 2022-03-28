@@ -67,7 +67,7 @@ void activateEnemy(int name = 0, int bounty = -1, int relic = -1) {
 	xSetInt(dEnemies, xPlayerOwner, ENEMY_PLAYER);
 	xSetInt(dEnemies, xUnitID, id);
 	trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
-	xSetInt(dEnemies, xBounty, trQuestVarGet("bounty"));
+	xSetInt(dEnemies, xBounty, 1*trQuestVarGet("bounty"));
 	xSetInt(dEnemies, xDropRelic, relic);
 	xSetVector(dEnemies,xUnitPos,pos);
 	xSetFloat(dEnemies,xMagicResist,armor);

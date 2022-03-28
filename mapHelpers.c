@@ -52,6 +52,11 @@ highFrequency
 	dBasicRooms = xInitDatabase("basicRooms");
 	xRoomNumber = xInitAddInt(dBasicRooms,"roomNumber");
 	
+	dAmbushRooms = xInitDatabase("ambushRooms");
+	xInitAddInt(dAmbushRooms,"roomNumber");
+	xAmbushRoomType = xInitAddInt(dAmbushRooms,"type");
+	xAmbushRoomPos = xInitAddVector(dAmbushRooms,"pos");
+	
 	dUnlockWalls = xInitDatabase("unlockWalls");
 	xWallState = xInitAddInt(dUnlockWalls,"state");
 	xWallTimeout = xInitAddInt(dUnlockWalls,"timeout");

@@ -302,9 +302,9 @@ void chooseClass(int p = 0, int class = 0) {
 	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"));
 	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"));
 	
-	xSetInt(dPlayerData,xPlayerFirstDelay,trQuestVarGet("proto"+proto+"firstDelay"));
-	xSetInt(dPlayerData,xPlayerNextDelay,trQuestVarGet("proto"+proto+"nextDelay"));
-	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,trQuestVarGet("proto"+proto+"specialAttackCooldown"));
+	xSetInt(dPlayerData,xPlayerFirstDelay,1*trQuestVarGet("proto"+proto+"firstDelay"));
+	xSetInt(dPlayerData,xPlayerNextDelay,1*trQuestVarGet("proto"+proto+"nextDelay"));
+	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,1*trQuestVarGet("proto"+proto+"specialAttackCooldown"));
 	
 	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));
@@ -700,7 +700,6 @@ highFrequency
 }
 
 int dStageChoices = 0;
-int xStageChoicesName = 0;
 int xStageChoicesStage = 0;
 
 void paintTowerSegment(int stage = 0) {
@@ -766,7 +765,7 @@ void paintTowerSegment(int stage = 0) {
 	trArmySelect("0,0");
 	trMutateSelected(kbGetProtoUnitID("Outpost"));
 	xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
-	xSetInt(dStageChoices,xStageChoicesName,next);
+	xSetInt(dStageChoices,xUnitName,next);
 	xSetInt(dStageChoices,xStageChoicesStage,stage);
 }
 
@@ -780,7 +779,7 @@ highFrequency
 			trQuestVarSet("stage", 1);
 		} else {
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
-			xStageChoicesName = xInitAddInt(dStageChoices,"name");
+			xInitAddInt(dStageChoices,"name");
 			xStageChoicesStage = xInitAddInt(dStageChoices,"stage");
 			
 			trLetterBox(false);
@@ -801,7 +800,7 @@ highFrequency
 				trArmySelect("0,0");
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
 				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
-				xSetInt(dStageChoices,xStageChoicesName,next);
+				xSetInt(dStageChoices,xUnitName,next);
 				xSetInt(dStageChoices,xStageChoicesStage,0);
 				trPaintTerrain(65,47,65,47,0,80);
 				trPaintTerrain(65,46,65,46,0,74);

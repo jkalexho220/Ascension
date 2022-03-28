@@ -4,11 +4,10 @@ rule choose_stage_00
 inactive
 highFrequency
 {
-	int n = yDatabaseNext("stageChoices");
-	trUnitSelectClear();
-	trUnitSelectByQV("stageChoices");
+	int n = xDatabaseNext(dStageChoices);
+	xUnitSelect(dStageChoices,xUnitName);
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
-		trQuestVarSet("stage", yGetVar("stageChoices", "stage"));
+		trQuestVarSet("stage", xGetInt(dStageChoices,xStageChoicesStage));
 		if (trQuestVarGet("stage") == 0) {
 			xsEnableRule("pvp_build_map");
 		} else {
@@ -18,11 +17,12 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("chooser", true);
 		trUnitChangeProtoUnit("Rocket");
-		for(x=yGetDatabaseCount("stageChoices"); >0) {
-			yDatabaseNext("stageChoices", true);
+		for(x=xGetDatabaseCount(dStageChoices); >0) {
+			xDatabaseNext(dStageChoices);
+			xUnitSelect(dStageChoices,xStageChoicesStage);
 			trUnitDestroy();
 		}
-		yClearDatabase("stageChoices");
+		aiPlanDestroy(dStageChoices);
 		xsDisableSelf();
 		trForceNonCinematicModels(true);
 		trLetterBox(true);
@@ -53,13 +53,14 @@ highFrequency
 		xsEnableRule("delayed_modify");
 	} else if (trUnitIsSelected()) {
 		uiClearSelection();
-		trShowImageDialog(stageIcon(1*yGetVar("stageChoices", "stage")),
-			"Stage " + 1*yGetVar("stageChoices", "stage") + ": " + stageName(1*yGetVar("stageChoices", "stage")));
+		trShowImageDialog(stageIcon(xGetInt(dStageChoices,xStageChoicesStage)),
+			"Stage " + xGetInt(dStageChoices,xStageChoicesStage) + ": " + stageName(xGetInt(dStageChoices,xStageChoicesStage)));
 	}
 }
 
 
 void buildRoom(int x = 0, int z = 0, int type = 0) {
+	int next = 0;
 	int room = x + 4 * z;
 	int size = 0;
 	int x0 = 0;
@@ -67,6 +68,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 	int x1 = 0;
 	int z1 = 0;
 	bool trapped = false;
+	vector pos = vector(0,0,0);
 	trQuestVarSet("room"+room, type);
 	if (type < ROOM_CHEST) {
 		if ((trQuestVarGet("trapRooms") > 0) &&
@@ -88,28 +90,26 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 						trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
 						trVectorQuestVarSet("room"+room+"top1", xsVectorSet(x1,0,z1));
 						trVectorQuestVarSet("room"+room+"bottom1", xsVectorSet(x0,0,z0));
-						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+						next = trGetNextUnitScenarioNameNumber();
 						trArmyDispatch("1,0","Dwarf",1,x*70+41,0,z*70+41,0,true);
-						yAddToDatabase("laserRooms","next");
-						yAddUpdateVar("laserRooms", "posX", x * 70 + 40);
-						yAddUpdateVar("laserRooms", "posZ", z * 70 + 40);
-						yAddUpdateVar("laserRooms", "room", room);
-						yAddUpdateVar("laserRooms", "active", 0);
+						xSetPointer(dLaserRooms, xAddDatabaseBlock(dLaserRooms));
+						xSetInt(dLaserRooms,xUnitName,next);
+						xSetVector(dLaserRooms,xLaserRoomPos,xsVectorSet(x * 70 + 40, z * 70 + 40));
 						for(a=0; <8) {
 							/* z lasers */
 							trArmyDispatch("1,0","Dwarf",1,2*x0+4*a+3,0,2*z0+1,180,false);
 							trArmyDispatch("1,0","Dwarf",1,2*x0+4*a+3,0,2*z1-1,0,false);
-							yAddUpdateVar("laserRooms", "xLaser"+a+"0x", 2*x0+4*a + 2);
-							yAddUpdateVar("laserRooms", "xLaser"+a+"1x", 2*x0+4*a + 4);
-							yAddUpdateVar("laserRooms", "xLaser"+a+"0z", 2*z0);
-							yAddUpdateVar("laserRooms", "xLaser"+a+"1z", 2*z1);
+							xSetVector(dLaserRooms,xLaserRoomXBottom + a,
+								xsVectorSet(2 * x0 + 4 * a + 2, 0, 2 * z0));
+							xSetVector(dLaserRooms,xLaserRoomXTop + a,
+								xsVectorSet(2 * x1 + 4 * a + 4, 0, 2 * z1));
 							/* x lasers */
 							trArmyDispatch("1,0","Dwarf",1,2*x0+1,0,2*z0+4*a+3,270,false);
 							trArmyDispatch("1,0","Dwarf",1,2*x1-1,0,2*z0+4*a+3,90,false);
-							yAddUpdateVar("laserRooms", "zLaser"+a+"0x", 2*x0);
-							yAddUpdateVar("laserRooms", "zLaser"+a+"1x", 2*x1);
-							yAddUpdateVar("laserRooms", "zLaser"+a+"0z", 2*z0+4*a + 2);
-							yAddUpdateVar("laserRooms", "zLaser"+a+"1z", 2*z0+4*a + 4);
+							xSetVector(dLaserRooms,xLaserRoomZBottom + a,
+								xsVectorSet(2 * x0, 0, 2 * z0 + 4 * a + 2));
+							xSetVector(dLaserRooms,xLaserRoomZTop + a,
+								xsVectorSet(2 * x1, 0, 2 * z1 + 4 * a + 4));
 						}
 						trArmySelect("1,0");
 						trUnitSetStance("Passive");
@@ -178,14 +178,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		if (trQuestVarGet("room"+room+"key") > 0) {
 			vector v0 = randomNearEdge(x0, z0, x1, z1);
-			ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-			spawnRelicSpecific(xsVectorGetX(v0),xsVectorGetZ(v0),1*trQuestVarGet("room"+room+"key"));
+			xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
+			spawnRelicSpecific(v0,1*trQuestVarGet("room"+room+"key"));
 			trQuestVarSet("room"+room+"key", 0);
 		}
 	} else if (trQuestVarGet("room"+room+"key") > 0) {
 		debugLog("room was a special room.");
-		ySetVarAtIndex("unlockWalls", "relic", trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-		spawnRelicSpecific(70 * x + 36,70 * z + 36,1*trQuestVarGet("room"+room+"key"));
+		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
+		spawnRelicSpecific(xsVectorSet(70 * x + 36,0,70 * z + 36),1*trQuestVarGet("room"+room+"key"));
 		trQuestVarSet("room"+room+"key", 0);
 	}
 	switch(type)
@@ -193,33 +193,38 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		case ROOM_BASIC:
 		{
 			for(i = 2; >0) {
-				x0 = trQuestVarGet("room"+room+"bottom"+i+"x");
-				z0 = trQuestVarGet("room"+room+"bottom"+i+"z");
-				x1 = trQuestVarGet("room"+room+"top"+i+"x");
-				z1 = trQuestVarGet("room"+room+"top"+i+"z");
+				pos = trVectorQuestVarGet("room"+room+"bottom"+i);
+				x0 = xsVectorGetX(pos);
+				z0 = xsVectorGetZ(pos);
+				pos = trVectorQuestVarGet("room"+room+"top"+i);
+				x1 = xsVectorGetX(pos);
+				z1 = xsVectorGetZ(pos);
 				paintEnemies(x0, z0, x1, z1);
 			}
-			trQuestVarSet("room", room);
-			yAddToDatabase("basicRooms", "room");
+			xSetPointer(dBasicRooms, xAddDatabaseBlock(dBasicRooms));
+			xSetInt(dBasicRooms, xRoomNumber, room);
 		}
 		case ROOM_AMBUSH:
 		{
-			trQuestVarSet("room", room);
-			yAddToDatabase("ambushRooms", "room");
-			yAddUpdateVar("ambushRooms", "posX", x * 70 + 40);
-			yAddUpdateVar("ambushRooms", "posZ", z * 70 + 40);
 			trQuestVarSetFromRand("type", 1, trQuestVarGet("enemyProtoCount"), true);
-			yAddUpdateVar("ambushRooms", "type", trQuestVarGet("type"));
+			xSetPointer(dAmbushRooms, xAddDatabaseBlock(dAmbushRooms));
+			xSetInt(dAmbushRooms,xRoomNumber,room);
+			xSetInt(dAmbushRooms,xAmbushRoomType,1*trQuestVarGet("type"));
+			xSetVector(dAmbushRooms,xAmbushRoomPos, xsVectorSet(x * 70 + 40, 0, 70 * z + 40));
+			
 			trQuestVarSetFromRand("spawnRelic", 0, 1, false);
 			if (trQuestVarGet("spawnRelic") < 0.5) {
-				spawnRelic(x * 70 + 40, z * 70 + 40);
+				spawnRelic(xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
 			}
-			x0 = trQuestVarGet("room"+room+"bottom1x");
-			z0 = trQuestVarGet("room"+room+"bottom1z");
-			x1 = trQuestVarGet("room"+room+"top1x");
-			z1 = trQuestVarGet("room"+room+"top1z");
+			pos = trVectorQuestVarGet("room"+room+"bottom1");
+			x0 = xsVectorGetX(pos);
+			z0 = xsVectorGetZ(pos);
+			pos = trVectorQuestVarGet("room"+room+"top1");
+			x1 = xsVectorGetX(pos);
+			z1 = xsVectorGetZ(pos);
 			paintEnemies(x0, z0, x1, z1);
-			yAddToDatabase("basicRooms", "room");
+			xSetPointer(dBasicRooms, xAddDatabaseBlock(dBasicRooms));
+			xSetInt(dBasicRooms, xRoomNumber, room);
 		}
 		case ROOM_BOSS_ENTRANCE:
 		{
@@ -268,10 +273,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					trQuestVarSet("keyType", trQuestVarGet("keyType") - 1);
 				}
 			}
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			yAddToDatabase("chests", "next");
-			yAddUpdateVar("chests", "type", trQuestVarGet("chestType"));
-			yAddUpdateVar("chests", "room", room);
+			xSetPointer(dChests, xAddDatabaseBlock(dChests));
+			xSetInt(dChests,xUnitName,trGetNextUnitScenarioNameNumber());
+			xSetInt(dChests,xChestType, 1*trQuestVarGet("chestType"));
+			xSetInt(dChests,xChestRoom,room);
 			trArmyDispatch("1,0","Dwarf",1,x * 70 + 40,0, z * 70 + 40, 135, true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
@@ -285,9 +290,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			z1 = trQuestVarGet("room"+room+"top1z");
 			trPaintTerrain(x0,z0,x1,z1,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x0,z0,x1,z1,worldHeight, false);
-			trVectorQuestVarSet("center", xsVectorSet(x0 + x1, 0, z0 + z1));
-			trVectorQuestVarSet("relictransporterguypos", randomNearEdge(x0, z0, x1, z1));
-			trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors("relictransporterguypos", "center"));
+			pos = randomNearEdge(x0, z0, x1, z1);
+			trVectorQuestVarSet("relictransporterguypos", pos);
+			trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors(pos, xsVectorSet(x0 + x1, 0, z0 + z1)));
 			trQuestVarSet("relicTransporterGuyName", trGetNextUnitScenarioNameNumber());
 			x0 = trQuestVarGet("relicTransporterGuyPosx");
 			z0 = trQuestVarGet("relicTransporterGuyPosz");

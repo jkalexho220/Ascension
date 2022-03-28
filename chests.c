@@ -313,7 +313,7 @@ void processChests() {
 					}
 					xSetInt(dChests,xChestState,CHEST_STATE_REWARDING);
 					xSetInt(dChests,xChestSFX, trTimeMS());
-					xSetInt(dChests,xChestCount,trQuestVarGet("rand"));
+					xSetInt(dChests,xChestCount,1*trQuestVarGet("rand"));
 					trSoundPlayFN("plentybirth.wav","1",-1,"","");
 				}
 			}
