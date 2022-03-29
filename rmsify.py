@@ -68,6 +68,7 @@ FUNCTIONS = {'code':CustomFunction('code','void')}
 FUNCTIONS['code'].add('string')
 BASE_JOB = None
 RMS_JOB = None
+RESTORING = False
 ERRORED = False
 
 KNOWN_FOR = []
@@ -90,7 +91,7 @@ def getKnownVariables():
 	global KNOWN_VARIABLES
 	global KNOWN_VARIABLES_RMS
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		return KNOWN_VARIABLES_RMS
 	else:
 		return KNOWN_VARIABLES
@@ -99,7 +100,7 @@ def getKnownDatatypes():
 	global KNOWN_TYPES
 	global KNOWN_TYPES_RMS
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		return KNOWN_TYPES_RMS
 	else:
 		return KNOWN_TYPES
@@ -108,14 +109,14 @@ def getKnownFor():
 	global KNOWN_FOR
 	global KNOWN_FOR_RMS
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		return KNOWN_FOR_RMS
 	else:
 		return KNOWN_FOR
 
 def setKnownVariables(newlist):
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		global KNOWN_VARIABLES_RMS
 		KNOWN_VARIABLES_RMS = newlist
 	else:
@@ -124,7 +125,7 @@ def setKnownVariables(newlist):
 
 def setKnownDatatypes(newlist):
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		global KNOWN_TYPES_RMS
 		KNOWN_TYPES_RMS = newlist
 	else:
@@ -133,7 +134,7 @@ def setKnownDatatypes(newlist):
 
 def setKnownFor(newlist):
 	global ESCAPE
-	if ESCAPE:
+	if ESCAPE and not RESTORING:
 		global KNOWN_FOR_RMS
 		KNOWN_FOR_RMS = newlist
 	else:
@@ -877,11 +878,25 @@ class Parenthesis(Mathable):
 ####### END SYNTAX #######
 ##########################
 def restoreCode(code):
-	return
+	diced = code[code.find('code(')+6:code.rfind(');')-1]
+	inString = True
+	ignoreMe = False
+	restored = ''
+	for char in diced:
+		if char == '\\' and not ignoreMe:
+			ignoreMe = True
+		elif char == '"' and not ignoreMe:
+			inString = not inString
+			if inString:
+				restored = restored + '0'
+		elif inString:
+			restored = restored + char
+			ignoreMe = False
+	return restored
 
 def removeStrings(line):
 	retline = ""
-	isString = False
+	inString = False
 	ignoreNext = False
 	for token in line:
 		if ignoreNext:
@@ -890,8 +905,8 @@ def removeStrings(line):
 		if token == '\\':
 			ignoreNext = True
 		if token == '"':
-			isString = not isString
-		if not isString or token == '"':
+			inString = not inString
+		if not inString or token == '"':
 			retline = retline + token
 	if "//" in retline:
 		retline = retline[:retline.find("//")]
@@ -948,8 +963,9 @@ try:
 					nostrings = removeStrings(reline)
 					if '}' in nostrings:
 						thedepth = thedepth - 1
-					reline = "\t" * thedepth + reline
-					rewrite.append(reline)
+					if not RESTORING:
+						reline = "\t" * thedepth + reline
+						rewrite.append(reline)
 					if '{' in nostrings:
 						thedepth = thedepth + 1
 					thedepth = thedepth + nostrings.count('(') - nostrings.count(')')
@@ -984,7 +1000,7 @@ try:
 
 									for token in tokens:
 										if not token in IGNORE:
-											if ESCAPE:
+											if ESCAPE and not RESTORING:
 												RMS_JOB.accept(token)
 												if VERBOSE and not ERRORED:
 													RMS_JOB.debug()
@@ -1004,17 +1020,25 @@ try:
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
 
-								# reWrite the line
-								if first or ESCAPE:
-									file_data_2.write(templine + '\n')
+								if not RESTORING:
+									# reWrite the line
+									if first or ESCAPE:
+										file_data_2.write(templine + '\n')
+									else:
+										file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
 								else:
-									file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
+									RESTORING = False
 						if ('*/' in line):
 							comment = False
 					else:
 						file_data_2.write('\n')
-					line = file_data_1.readline()
-					ln = ln + 1
+
+					if ESCAPE and 'code("' in line:
+						line = restoreCode(line)
+						RESTORING = True
+					else:
+						line = file_data_1.readline()
+						ln = ln + 1
 			# reformat the .c raw code
 			with open(FILE_1, 'w') as file_data_1:
 				for line in rewrite:
