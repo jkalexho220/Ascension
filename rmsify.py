@@ -73,18 +73,28 @@ ERRORED = False
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = ['cNumberPlayers', 'cMapSize', 'cNumberTeams',
-					'cInvalidVector', 'cOriginVector', 'cActivationTime']
-KNOWN_TYPES = ['int', 'int', 'int',
-				'vector', 'vector', 'int']
+KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime']
+KNOWN_TYPES = ['int', 'vector', 'vector', 'int']
 
 KNOWN_FOR_RMS = []
 KNOWN_VARIABLES_RMS = ['cNumberPlayers', 'cMapSize', 'cNumberTeams', 'cNumberNonGaiaPlayers', 
 						'cConnectAllies', 'cConnectAreas', 'cConnectEnemies', 'cConnectPlayers',
-						'cCivZeus']
+						'cCivAtlantean', 'cCivEgyptian', 'cCivGreek', 'cCivNorse', 'cCivRandom', 'cCivNature',
+						'cCivZeus', 'cCivPoseidon', 'cCivHades',
+						'cCivRa', 'cCivIsis', 'cCivSet',
+						'cCivOdin', 'cCivThor', 'cCivLoki',
+						'cCivOuranos', 'cCivGaia', 'cCivKronos',
+						'cCultureAtlantean', 'cCultureEgyptian', 'cCultureGreek', 'cCultureNature', 'cCultureNorse',
+						'cInvalidVector', 'cOriginVector']
 KNOWN_TYPES_RMS = ['int', 'int', 'int', 'int',
 					'int', 'int', 'int', 'int',
-					'int']
+					'int', 'int', 'int', 'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int', 'int', 'int',
+					'vector', 'vector']
 ESCAPE = True
 
 def getKnownVariables():
