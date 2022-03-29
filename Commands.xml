@@ -3084,6 +3084,10 @@ Chats out the value of one of the trigger scratch variables.&#xD;
         <parameters type="int" name="z"/>
         <javadoc>Sets the size of the map.*/</javadoc>
     </method>
+    <method return="void" name="rmSetLightingSet">
+        <parameters type="string" name="Lighting"/>
+        <javadoc>Sets the lighting of the random map.</javadoc>
+    </method>
     <method return="void" name="rmSetStatusText">
         <parameters type="string" name="Text"/>
         <parameters type="float" name="Progress"/>
