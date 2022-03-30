@@ -28,6 +28,9 @@ int xChestSFX = 0;
 int xChestKey = 0;
 int xChestCount = 0;
 
+int xChestBegin = 0;
+int xChestEnd = 0;
+
 rule initialize_chest_database
 active
 highFrequency
@@ -47,9 +50,11 @@ highFrequency
 	xChestType = xInitAddInt(dChests,"type");
 	xChestState = xInitAddInt(dChests,"state");
 	xChestRoom = xInitAddInt(dChests,"room");
-	xChestSFX = xInitAddInt(dChests,"sfx");
-	xChestKey = xInitAddInt(dChests,"key"); // also doubles as temple indicator and count
+	xChestSFX = xInitAddInt(dChests,"sfx"); // also doubles as enemies begin
+	xChestKey = xInitAddInt(dChests,"key"); // also doubles as temple indicator and count and enemies end
 	xChestCount = xChestKey;
+	xChestBegin = xChestSFX;
+	xChestEnd = xChestKey;
 }
 
 void initializeStatuePuzzle(int room = 0) {

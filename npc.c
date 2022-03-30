@@ -2095,6 +2095,7 @@ highFrequency
 {
 	xsDisableSelf();
 	dQuestLeaves = initGenericProj("questLeaves");
+	xInitAddInt(dQuestLeaves, "name");
 	xLeafType = xInitAddInt(dQuestLeaves,"type");
 	
 	dQuestTargets = xInitDatabase("questTargets");

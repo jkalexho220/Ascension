@@ -493,9 +493,13 @@ int xGetNewestPointer(int id = 0) {
 	return(aiPlanGetUserVariableInt(id,xMetadata,mNewestBlock));
 }
 
-int xDatabaseNext(int id = 0) {
+int xDatabaseNext(int id = 0, bool reverse = false) {
 	int pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
-	pointer = aiPlanGetUserVariableInt(id,xNextBlock,pointer);
+	if (reverse) {
+		pointer = aiPlanGetUserVariableInt(id,xPrevBlock,pointer);
+	} else {
+		pointer = aiPlanGetUserVariableInt(id,xNextBlock,pointer);
+	}
 	if (aiPlanGetUserVariableBool(id,xDirtyBit,pointer)) {
 		aiPlanSetUserVariableInt(id,xMetadata,mPointer,pointer);
 	} else {

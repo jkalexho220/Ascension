@@ -54,6 +54,8 @@ int xEdgeFrontierLoc = 0;
 int dMapTiles = 0;
 
 int dFrontier = 0;
+int xFrontierEdge = 0;
+int xFrontierType = 0;
 
 int dVisited = 0;
 
@@ -83,9 +85,6 @@ highFrequency
 	xWallCircles = xInitAddInt(dUnlockWalls,"circlesStart");
 	xWallEnd = xInitAddInt(dUnlockWalls,"end");
 	xWallKey = xInitAddInt(dUnlockWalls,"key");
-	
-	dVisited = xInitDatabase("visited");
-	xInitAddInt(dVisited,"roomNumber");
 }
 
 int deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
