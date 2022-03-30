@@ -398,7 +398,16 @@ void xResetValues(int id = 0, int index = -1) {
 	}
 }
 
-int xAddDatabaseBlock(int id = 0) {
+bool xSetPointer(int id = 0, int index = 0) {
+	bool success = false;
+	if (aiPlanGetUserVariableBool(id,xDirtyBit,index)) {
+		aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
+		success = true;
+	}
+	return(success);
+}
+
+int xAddDatabaseBlock(int id = 0, bool setPointer = false) {
 	int next = aiPlanGetUserVariableInt(id,xMetadata,mNextFree);
 	if (next == 0) {
 		/*
@@ -446,6 +455,9 @@ int xAddDatabaseBlock(int id = 0) {
 	finally, initialize all the variables of the struct to their default values (whatever's in index 0 of the array)
 	*/
 	xResetValues(id,next);
+	if (setPointer) {
+		xSetPointer(id, next);
+	}
 	return(next);
 }
 
@@ -635,15 +647,6 @@ bool xSetBool(int id = 0, int data = 0, bool val = false, int index = -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 	}
 	return(aiPlanSetUserVariableBool(id,data,index,val));
-}
-
-bool xSetPointer(int id = 0, int index = 0) {
-	bool success = false;
-	if (aiPlanGetUserVariableBool(id,xDirtyBit,index)) {
-		aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
-		success = true;
-	}
-	return(success);
 }
 
 int xGetDatabaseCount(int id = 0) {

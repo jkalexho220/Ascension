@@ -9,6 +9,7 @@ int xStatueState = 0;
 int xStatueTimeout = 0;
 int xStatueConnections = 0;
 int xStatueArray = 0;
+int xStatuePos = 0;
 
 int dRainingRelics = 0;
 int xRainingRelicMorphed = 0;
@@ -61,6 +62,7 @@ void initializeStatuePuzzle(int room = 0) {
 	xStatueTimeout = xInitAddInt(db,"timeout");
 	xStatueConnections = xInitAddInt(db,"connections");
 	xStatueArray = xInitAddInt(db,"array");
+	xStatuePos = xInitAddVector(db,"pos");
 }
 
 void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate = false) {

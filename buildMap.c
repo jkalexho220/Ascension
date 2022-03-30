@@ -775,8 +775,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitSelectByQV("nottud", true);
 			trUnitConvert(0);
 			trUnitChangeProtoUnit("Minotaur");
-			yAddToDatabase("stunnedUnits", "nottud");
-			yAddUpdateVar("stunnedUnits", "proto", kbGetProtoUnitID("Minotaur"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("nottud"));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Minotaur"));
 			xsEnableRule("nottud_always");
 			for(i=0; <5) {
 				trQuestVarSet("choice"+i, RELIC_CURSED_RANGE + i);
@@ -893,8 +894,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		case ROOM_TEMPLE + 6:
 		{
 			trQuestVarSet("templeSize", 16);
-			trQuestVarSet("templePosX", 70 * x + 40);
-			trQuestVarSet("templePosZ", 70 * z + 40);
+			trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
 			trQuestVarSet("templeRoomUpperX", 70*x+56);
 			trQuestVarSet("templeRoomUpperZ", 70*z+56);
 			trQuestVarSet("templeRoomLowerX", 70*x+24);
@@ -911,18 +911,17 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			paintSecondary(x*35+10, z*35+10, x*35+30, z*35+30);
 			paintEyecandy(x*35+10, z*35+10, x*35+30, z*35+30);
 			placeTemple(x, z, 10);
-			trQuestVarSet("templePosX", 70 * x + 40);
-			trQuestVarSet("templePosZ", 70 * z + 40);
-			trVectorQuestVarSet("dir", vector(1,0,0));
+			trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
+			dir = vector(1,0,0);
 			trQuestVarSet("columnsStart", trGetNextUnitScenarioNameNumber());
 			for(i=0; < 8) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("0,0","Hoplite",1,1,0,1,0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
-				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-				trUnitTeleport(70.0*x+40.0-trQuestVarGet("dirx")*16.0,0,70.0*z+40.0-trQuestVarGet("dirz")*16.0);
-				trVectorQuestVarSet("dir", rotationMatrix("dir", 0.707107, 0.707107));
+				trSetUnitOrientation(dir,vector(0,1,0),true);
+				trUnitTeleport(70.0*x+40.0-xsVectorGetX(dir)*16.0,0,70.0*z+40.0-xsVectorGetZ(dir)*16.0);
+				dir = rotationMatrix(dir, 0.707107, 0.707107);
 			}
 			trQuestVarSet("columnsEnd", trGetNextUnitScenarioNameNumber());
 			xsEnableRule("monster_temple_init");
@@ -933,19 +932,18 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			size = 12;
 			paintCircle(x, z, size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 			placeTemple(x, z, 24);
-			yAddToDatabase("chests", "temple");
-			yAddUpdateVar("chests", "type", CHEST_STATUES);
-			yAddUpdateVar("chests", "room", room);
-			yAddUpdateVar("chests", "temple", 1);
+			xSetPointer(dChests, xAddDatabaseBlock(dChests));
+			xSetInt(dChests, xUnitName, 1*trQuestVarGet("temple"));
+			xSetInt(dChests, xChestType, CHEST_STATUES);
+			xSetInt(dChests, xChestRoom, room);
+			xSetInt(dChests, xChestKey, 1);
 		}
 		case ROOM_TEMPLE + 11:
 		{
 			size = 12;
 			paintCircle(x, z, size, 0, 53, worldHeight);
 			placeTemple(x, z, 20);
-			trQuestVarSet("templePosX", 70 * x + 40);
-			trQuestVarSet("templePosY", worldHeight + 15.0);
-			trQuestVarSet("templePosZ", 70 * z + 40);
+			trVectorQuestVarSet("templePos", xsVectorSet(70*x+41,worldHeight + 15.0,70*z+41));
 			xsEnableRule("zeno_temple_always");
 		}
 	}
@@ -968,42 +966,46 @@ void buildEdge(int edge = 0, int type = 0) {
 	int x1 = second - 4 * z1;
 	int x = 0;
 	int z = 0;
+	float height = 0;
+	vector pos = vector(0,0,0);
 	if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
 		if (type == EDGE_MOUNTAIN) {
-			yClearDatabase("edgeFrontier");
+			xClearDatabase(dEdgeFrontier);
 			x0 = x0 * 35;
 			z0 = z0 * 35;
 			x1 = x1 * 35;
 			z1 = z1 * 35;
 			x1 = (x0 + x1) / 2 + 20;
 			z1 = (z0 + z1) / 2 + 20;
-			trQuestVarSet("next", wallHeight - worldHeight);
-			yAddToDatabase("edgeFrontier", "next");
-			yAddUpdateVar("edgeFrontier", "locx", x1);
-			yAddUpdateVar("edgeFrontier", "locz", z1);
-			trQuestVarSet("x"+x1+"z"+z1, TILE_FOUND);
+			xSetPointer(dEdgeFrontier, xAddDatabaseBlock(dEdgeFrontier));
+			xSetFloat(dEdgeFrontier, xEdgeFrontierHeight, wallHeight - worldHeight);
+			xSetVector(dEdgeFrontier, xEdgeFrontierLoc, xsVectorSet(x1,0,z1));
+			aiPlanSetUserVariableInt(dMapTiles,x1,z1, TILE_FOUND);
+			
 			trQuestVarSetFromRand("size", 40, 80);
 			for(a=trQuestVarGet("size"); >0) {
 				trQuestVarSetFromRand("rand", 0, 7, true);
-				yDatabaseNext("edgeFrontier");
+				xDatabaseNext(dEdgeFrontier);
 				for(b=trQuestVarGet("rand"); >0) {
-					yDatabaseNext("edgeFrontier");
+					xDatabaseNext(dEdgeFrontier);
 				}
-				x0 = yGetVar("edgeFrontier", "locx");
-				z0 = yGetVar("edgeFrontier", "locz");
+				pos = xGetVector(dEdgeFrontier, xEdgeFrontierLoc);
+				x0 = xsVectorGetX(pos);
+				z0 = xsVectorGetZ(pos);
 				trPaintTerrain(x0-2,z0-2,x0+1,z0+1,TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-				trChangeTerrainHeight(x0-1,z0-1,x0+1,z0+1,worldHeight+trQuestVarGet("edgeFrontier"),false);
+				trChangeTerrainHeight(x0-1,z0-1,x0+1,z0+1,worldHeight+xGetFloat(dEdgeFrontier,xEdgeFrontierHeight),false);
 				if (xsPow(x0-x1, 2) + xsPow(z0-z1,2) < 324) {
 					for(b=0; < 4) {
-						trQuestVarSetFromRand("next", trQuestVarGet("edgeFrontier") - 1, trQuestVarGet("edgeFrontier"), true);
-						if (trQuestVarGet("next") > 0) {
+						trQuestVarSetFromRand("next", -1, 0, true);
+						height = trQuestVarGet("next") + xGetFloat(dEdgeFrontier,xEdgeFrontierHeight);
+						if (height > 0) {
 							x = x0 + 2 * trQuestVarGet("rotX"+b);
 							z = z0 + 2 * trQuestVarGet("rotZ"+b);
-							if (trQuestVarGet("x"+x+"z"+z) == TILE_NOT_FOUND) {
-								yAddToDatabase("edgeFrontier", "next");
-								yAddUpdateVar("edgeFrontier", "locx", x);
-								yAddUpdateVar("edgeFrontier", "locz", z);
-								trQuestVarSet("x"+x+"z"+z, TILE_FOUND);
+							if (aiPlanGetUserVariableInt(dMapTiles, x, z) == TILE_NOT_FOUND) {
+								xSetPointer(dEdgeFrontier, xAddDatabaseBlock(dEdgeFrontier));
+								xSetFloat(dEdgeFrontier, xEdgeFrontierHeight, height);
+								xSetVector(dEdgeFrontier, xEdgeFrontierLoc, xsVectorSet(x,0,z));
+								aiPlanSetUserVariableInt(dMapTiles, x, z, TILE_FOUND);
 							}
 						}
 					}
@@ -1036,10 +1038,12 @@ void buildEdge(int edge = 0, int type = 0) {
 			trUnitSelectByQV("next2", true);
 			trMutateSelected(kbGetProtoUnitID("Sky Passage"));
 			trSetSelectedScale(0,0.2,0);
-			yAddToDatabase("skyPassages", "next1");
-			yAddUpdateVar("skyPassages", "exit", trQuestVarGet("next2"));
-			yAddToDatabase("skyPassages", "next2");
-			yAddUpdateVar("skyPassages", "exit", trQuestVarGet("next1"));
+			xAddDatabaseBlock(dSkyPassages, true);
+			xSetInt(dSkyPassages, xUnitName, 1*trQuestVarGet("next1"));
+			xSetInt(dSkyPassages, xSkyPassageExit, 1*trQuestVarGet("next2"));
+			xAddDatabaseBlock(dSkyPassages, true);
+			xSetInt(dSkyPassages, xUnitName, 1*trQuestVarGet("next2"));
+			xSetInt(dSkyPassages, xSkyPassageExit, 1*trQuestVarGet("next1"));
 		} else {
 			z0 = z0 * 35 + 17;
 			x0 = x0 * 35 + 17;
@@ -1067,21 +1071,19 @@ void buildEdge(int edge = 0, int type = 0) {
 				paintSecondary(x0, z0, x1, z1);
 			}
 			
-			if ((type == EDGE_WALL) && (trQuestVarGet("wallEdges") * yGetDatabaseCount("visited") > 0)) {
+			if ((type == EDGE_WALL) && (trQuestVarGet("wallEdges") * xGetDatabaseCount(dVisited) > 0)) {
 				trQuestVarSetFromRand("rand", 1, 16, true);
 				for (x=trQuestVarGet("rand"); >0) {
-					yDatabaseNext("visited");
+					xDatabaseNext(dVisited);
 				}
-				trQuestVarSet("room"+1*trQuestVarGet("visited")+"key", trQuestVarGet("keyType"));
-				trQuestVarSet("room"+1*trQuestVarGet("visited")+"index", yAddToDatabase("unlockWalls", "visited"));
-				yAddUpdateVar("unlockWalls", "sfxStart", trGetNextUnitScenarioNameNumber());
-				yAddUpdateVar("unlockWalls", "posX", x0 + x1);
-				yAddUpdateVar("unlockWalls", "posZ", z0 + z1);
-				yRemoveFromDatabase("visited");
+				trQuestVarSet("room"+xGetInt(dVisited,xRoomNumber)+"key", trQuestVarGet("keyType"));
+				trQuestVarSet("room"+xGetInt(dVisited,xRoomNumber)+"index", xAddDatabaseBlock(dUnlockWalls, true));
+				xSetInt(dUnlockWalls, xWallSFX, trGetNextUnitScenarioNameNumber());
+				xSetVector(dUnlockWalls, xWallPos, xsVectorSet(x0 + x1, 0, z0 + z1));
+				xFreeDatabaseBlock(dVisited);
 				
 				if (x1 - x0 > z1 - z0) {
-					yAddUpdateVar("unlockWalls", "xMod", 0);
-					yAddUpdateVar("unlockWalls", "zMod", z1 - z0);
+					xSetVector(dUnlockWalls, xWallMod, xsVectorSet(0, 0, z1 - z0));
 					x0 = (x0 + x1);
 					for(z=z0; <= z1) {
 						trArmyDispatch("1,0","Dwarf",1,x0+2,0,2*z,0,true);
@@ -1091,7 +1093,7 @@ void buildEdge(int edge = 0, int type = 0) {
 					x0 = x0 / 2;
 					trPaintTerrain(x0-1, z0-1, x0+1, z1+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 					trChangeTerrainHeight(x0, z0, x0+1, z1+1, wallHeight, false);
-					yAddUpdateVar("unlockWalls", "greenCirclesStart", trGetNextUnitScenarioNameNumber());
+					xSetInt(dUnlockWalls, xWallCircles, trGetNextUnitScenarioNameNumber());
 					x0 = x0 * 2;
 					for(z=z0; <= z1) {
 						trArmyDispatch("1,0","Dwarf",1,x0,0,2*z,270,true);
@@ -1099,8 +1101,7 @@ void buildEdge(int edge = 0, int type = 0) {
 						trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
 					}
 				} else {
-					yAddUpdateVar("unlockWalls", "xMod", x1 - x0);
-					yAddUpdateVar("unlockWalls", "zMod", 0);
+					xSetVector(dUnlockWalls, xWallPos, xsVectorSet(x1-x0,0,0));
 					z0 = (z0 + z1);
 					for(x=x0; <= x1) {
 						trArmyDispatch("1,0","Dwarf",1,2*x,0,z0,90,true);
@@ -1110,7 +1111,7 @@ void buildEdge(int edge = 0, int type = 0) {
 					z0 = z0 / 2;
 					trPaintTerrain(x0-1, z0-1, x1+1, z0+1, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 					trChangeTerrainHeight(x0, z0, x1+1, z0+1, wallHeight, false);
-					yAddUpdateVar("unlockWalls", "greenCirclesStart", trGetNextUnitScenarioNameNumber());
+					xSetInt(dUnlockWalls, xWallCircles, trGetNextUnitScenarioNameNumber());
 					z0 = z0 * 2;
 					for(x=x0; <= x1) {
 						trArmyDispatch("1,0","Dwarf",1,2*x,0,z0,180,true);
@@ -1118,7 +1119,7 @@ void buildEdge(int edge = 0, int type = 0) {
 						trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
 					}
 				}
-				yAddUpdateVar("unlockWalls", "end", trGetNextUnitScenarioNameNumber());
+				xSetInt(dUnlockWalls, xWallEnd, trGetNextUnitScenarioNameNumber());
 				trQuestVarSet("keyType", trQuestVarGet("keyType") - 1);
 				trQuestVarSet("wallEdges", trQuestVarGet("wallEdges") - 1);
 			}
@@ -1129,32 +1130,33 @@ void buildEdge(int edge = 0, int type = 0) {
 }
 
 void connectStatues(int index1 = 0, int index2 = 0, int room = 0) {
-	ySetPointer("statuesIn"+room, index1);
-	ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
-	ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index2);
-	trQuestVarSet("pos1X", yGetVar("statuesIn"+room, "posX"));
-	trQuestVarSet("pos1Z", yGetVar("statuesIn"+room, "posZ"));
+	int db = trQuestVarGet("statuesIn"+room);
+	xSetPointer(db, index1);
+	int index = xGetInt(db, xStatueConnections);
+	xSetInt(db, xStatueConnections, 1 + index);
+	aiPlanSetNumberUserVariableValues(ARRAYS,xGetInt(db,xStatueArray),xGetInt(db,xStatueConnections),false);
+	aiPlanSetUserVariableInt(ARRAYS,xGetInt(db,xStatueArray),index,index2);
+	vector first = xGetVector(db,xStatuePos);
 	
-	ySetPointer("statuesIn"+room, index2);
-	ySetVar("statuesIn"+room, "connections", 1 + yGetVar("statuesIn"+room, "connections"));
-	ySetVar("statuesIn"+room, "connection"+1*yGetVar("statuesIn"+room, "connections"), index1);
-	trQuestVarSet("pos2X", yGetVar("statuesIn"+room, "posX"));
-	trQuestVarSet("pos2Z", yGetVar("statuesIn"+room, "posZ"));
+	xSetPointer(db, index2);
+	index = xGetInt(db, xStatueConnections);
+	xSetInt(db, xStatueConnections, 1 + index);
+	aiPlanSetNumberUserVariableValues(ARRAYS,xGetInt(db,xStatueArray),xGetInt(db,xStatueConnections),false);
+	aiPlanSetUserVariableInt(ARRAYS,xGetInt(db,xStatueArray),index,index1);
+	vector second = xGetVector(db,xStatuePos);
 	
-	trVectorQuestVarSet("dir", zGetUnitVector("pos1", "pos2"));
-	trQuestVarSet("temp", trQuestVarGet("dirX"));
-	trQuestVarSet("dirX", 0.0 - trQuestVarGet("dirZ"));
-	trQuestVarSet("dirZ", trQuestVarGet("temp"));
+	vector dir = getUnitVector(first, second);
+	dir = rotationMatrix(dir, 0, 1);
 	
-	float dist = zDistanceBetweenVectors("pos1", "pos2");
-	float x = 0.5 * (trQuestVarGet("pos1x") + trQuestVarGet("pos2x"));
-	float z = 0.5 * (trQuestVarGet("pos1z") + trQuestVarGet("pos2z"));
+	float dist = distanceBetweenVectors(first, second, false);
+	float x = 0.5 * (xsVectorGetX(first) + xsVectorGetX(second));
+	float z = 0.5 * (xsVectorGetZ(first) + xsVectorGetZ(second));
 	
 	trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 	trArmySelect("1,0");
 	trUnitConvert(0);
 	trSetSelectedScale(dist / 9.0, 1, 0.3);
-	trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+	trSetUnitOrientation(dir,vector(0,1,0),true);
 	trUnitTeleport(x,0,z);
 	trMutateSelected(kbGetProtoUnitID("undermine ground decal long"));
 }
@@ -1227,7 +1229,7 @@ highFrequency
 				trQuestVarSet("columnDensity", 0.05);
 				
 				trStringQuestVarSet("bossProto", "Nemean Lion");
-				trQuestVarSet("bossScale", 2);
+				bossScale = 2;
 				
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1279,7 +1281,7 @@ highFrequency
 				trQuestVarSet("columnDensity", 0);
 				
 				trStringQuestVarSet("bossProto", "Tamarisk Tree");
-				trQuestVarSet("bossScale", 1.5);
+				bossScale = 1.5;
 			}
 			case 3:
 			{
@@ -1324,7 +1326,7 @@ highFrequency
 				trQuestVarSet("columnDensity", 0.05);
 				
 				trStringQuestVarSet("bossProto", "King Folstag");
-				trQuestVarSet("bossScale", 1.25);
+				bossScale = 1.25;
 				
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1375,7 +1377,7 @@ highFrequency
 				trStringQuestVarSet("enemyProto5", "Avenger");
 				
 				trStringQuestVarSet("bossProto", "Chimera");
-				trQuestVarSet("bossScale", 1.5);
+				bossScale = 1.5;
 				
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1428,7 +1430,7 @@ highFrequency
 				trQuestVarSet("columnDensity", 0.1);
 				
 				trStringQuestVarSet("bossProto", "Shade of Hades");
-				trQuestVarSet("bossScale", 1.5);
+				bossScale = 1.5;
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
@@ -1443,6 +1445,7 @@ highFrequency
 			{
 				trQuestVarSet("stageTemple", BOON_STATUS_COOLDOWNS);
 				xsEnableRule("laser_rooms_always");
+				initializeLaserTrapDatabase();
 				/* engineers */
 				trTechSetStatus(ENEMY_PLAYER, 59, 4);
 				ambientColor(100,50,0);
@@ -1485,7 +1488,7 @@ highFrequency
 				trStringQuestVarSet("enemyProto5", "Colossus");
 				
 				trStringQuestVarSet("bossProto", "Helepolis");
-				trQuestVarSet("bossScale", 0.25);
+				bossScale = 0.25;
 				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1541,7 +1544,7 @@ highFrequency
 				trStringQuestVarSet("enemyProto6", "Hydra");
 				
 				trStringQuestVarSet("bossProto", "Scylla");
-				trQuestVarSet("bossScale", 1.3);
+				bossScale = 1.3;
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1551,12 +1554,15 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
 				
-				for(x=1; < 30) {
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trQuestVarSet("fishHawks", zNewArray(mInt, 30, "fishHawks"));
+				trQuestVarSet("fishes", zNewArray(mInt, 30, "fishes"));
+				for(i=0; < 30) {
+					int next = trGetNextUnitScenarioNameNumber();
+					aiPlanSetUserVariableInt(ARRAYS, 1*trQuestVarGet("fishHawks"), i, next);
 					trQuestVarSetFromRand("rand",1,360,true);
 					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
-					yAddToDatabase("fishHawks", "next");
-					spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("fishHawks", "sfx"));
+					
+					spyEffect(next, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS, 1*trQuestVarGet("fishes"), i));
 				}
 				xsEnableRule("the_deep_build_01");
 			}
@@ -1614,16 +1620,19 @@ highFrequency
 				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 26, 1);
 				
 				trStringQuestVarSet("bossProto", "Nidhogg");
-				trQuestVarSet("bossScale", 1.0);
+				bossScale = 1.0;
 				
-				for(x=10; >0) {
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trQuestVarSet("cloudTornados", zNewArray(mInt, 10, "cloudTornados"));
+				trQuestVarSet("cloudTornadoSFX", zNewArray(mInt, 10, "cloudTornadoSFX"));
+				trQuestVarSet("cloudTornadoBlock", zNewArray(mInt, 10, "cloudTornadoBlock"));
+				for(i=0; <10) {
+					int next = trGetNextUnitScenarioNameNumber();
 					trQuestVarSetFromRand("heading", 1, 360, true);
-					yAddToDatabase("cloudTornados", "next");
+					aiPlanSetUserVariableInt(ARRAYS,1*trQuestVarGet("cloudTornados"),i,next);
 					trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,145,0,145,trQuestVarGet("heading"),true);
 					trArmySelect(""+ENEMY_PLAYER+",0");
-					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Cinematic Block"), yGetNewVarName("cloudTornados", "sfx"));
-					spyEffect(1*trQuestVarGet("next"),kbGetProtoUnitID("Invisible Target"), yGetNewVarName("cloudTornados", "block"));
+					spyEffect(next,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS, 1*trQuestVarGet("cloudTornadoSFX"), i));
+					spyEffect(next,kbGetProtoUnitID("Invisible Target"),xsVectorSet(ARRAYS, 1*trQuestVarGet("cloudTornadoBlock"), i));
 				}
 			}
 			case 9:
@@ -1677,13 +1686,14 @@ highFrequency
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 				
 				trStringQuestVarSet("bossProto", "Guardian");
-				trQuestVarSet("bossScale", 1.2);
+				bossScale = 1.2;
 			}
 			case 11:
 			{
 				trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
 				trStringQuestVarSet("advice", "And then there were none...");
 				xsEnableRule("laser_rooms_always");
+				initializeLaserTrapDatabase();
 				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
 				worldHeight = 0;
 				wallHeight = 0;
@@ -1729,12 +1739,14 @@ highFrequency
 						kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
 				}
 				
-				for(x=1; < 20) {
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				trQuestVarSet("timeshiftHawks", zNewArray(mInt, 20, "timeshiftHawks"));
+				trQuestVarSet("timeshiftHawkSFX", zNewArray(mInt, 20, "timeshiftHawkSFX"));
+				for(i=0; < 20) {
+					int next = trGetNextUnitScenarioNameNumber();
+					aiPlanSetUserVariableInt(ARRAYS,1*trQuestVarGet("timeshiftHawks"),i,next);
 					trQuestVarSetFromRand("rand",1,360,true);
 					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
-					yAddToDatabase("timeshiftHawks", "next");
-					spyEffect(1*trQuestVarGet("next"), kbGetProtoUnitID("Timeshift In"), yGetNewVarName("timeshiftHawks", "sfx"));
+					spyEffect(next,kbGetProtoUnitID("Timeshift In"),xsVectorSet(ARRAYS, 1*trQuestVarGet("timeshiftHawkSFX"), i));
 				}
 				xsEnableRule("zenos_paradox_build_01");
 				

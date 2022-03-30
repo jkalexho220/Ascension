@@ -48,8 +48,18 @@ int dPoisonRelics = 0;
 int xPoisonRelicIndex = 0;
 
 int dEdgeFrontier = 0;
+int xEdgeFrontierHeight = 0;
+int xEdgeFrontierLoc = 0;
+
+int dMapTiles = 0;
 
 int dFrontier = 0;
+
+int dVisited = 0;
+
+int dSkyPassages = 0;
+int xSkyPassageExit = 0;
+
 
 rule initialize_map_databases
 active
@@ -73,6 +83,9 @@ highFrequency
 	xWallCircles = xInitAddInt(dUnlockWalls,"circlesStart");
 	xWallEnd = xInitAddInt(dUnlockWalls,"end");
 	xWallKey = xInitAddInt(dUnlockWalls,"key");
+	
+	dVisited = xInitDatabase("visited");
+	xInitAddInt(dVisited,"roomNumber");
 }
 
 int deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {

@@ -1,23 +1,34 @@
 import os
 import sys
 
-# The syntax validator will stop after encountering the first error.
-# After fixing that error, additional ones may be reported.
+###############################
+########### READ ME ###########
+###############################
+
+# rmsify.py is a command line program that runs on Python. Just download the latest version from the python website.
+# To setup this program, create a new folder for your project. Put this file and the Commands.xml file in that folder.
+# Then create a new folder named XS inside of your folder. This is where the ouput files go. Add your RMS .xml file in this folder.
+
+# To run this program, use a command prompt to navigate to this folder. Then run the command: python rmsify.py
+# You can add -v to the command to see verbose output, though this will not be helpful to most people.
+
+# The syntax validator will stop after encountering the first error. After fixing that error, additional ones may be reported.
 # In files[], the very first file contains all the rms code in void main() that EXCLUDES trigger code.
 # The other files after the first file are parsed as raw trigger code.
 # If you wish to inject RMS code between the lines of trigger code, use the % character to escape trigger code and another % to return to trigger code.
 # The % characters must be placed on their own lines.
-# Syntax validator does not check RMS code or code between the % signs. Use at your own risk.
+# While in RMS code, you can write code(""); to create trigger code the old-fashioned nottud way.
+# This program will also correctly format your code with the correct indentation.
+# This file should know every valid AoM constant for RMS and trigger code.
+# Let me know of any problems you encounter with this file.
 
 ###############################
 ####### CUSTOMIZE THESE #######
 ###############################
 FILENAME = 'Ascension MMORPG.xs'
-files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
-files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c','setup.c', 'dataload.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 
-		'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c', 'buildMap.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -546,11 +557,15 @@ class Returner(Job):
 class Declaration(StackFrame):
 	def __init__(self, name, parent):
 		super().__init__('', parent)
+		global ln
+		global line
 		self.state = STATE_NEED_NAME
 		self.type = 'VARIABLE'
 		self.datatype = name
 		self.returner = None
 		self.returnType = 'void'
+		self.ln = ln
+		self.line = line
 
 	def resolve(self):
 		if not self.closed:
@@ -562,7 +577,10 @@ class Declaration(StackFrame):
 					FUNCTIONS[self.name].add(frame.datatype)
 		elif self.state == STATE_CLOSED:
 			if self.returnType != self.datatype:
-				error("Function must return a value of type " + self.datatype)
+				global ERRORED
+				ERRORED = True
+				print("Function must return a value of type " + self.datatype)
+				print("Line " + str(self.ln) + ":\n    " + self.line)
 
 	def accept(self, token):
 		knownVars = getKnownVariables()
@@ -940,8 +958,6 @@ with open('Commands.xml', 'r') as fd:
 
 print("rmsification start!")
 
-functions = {''}
-unknowns = {''}
 ln = 1
 FILE_1 = None
 comment = False
@@ -1079,8 +1095,3 @@ except IOError:
 	sys.exit("Files not found!")
 
 print("Done!")
-if (len(unknowns) > 1):
-	print("Unknowns: ")
-	print(unknowns)
-	"""
-	#"""

@@ -15,11 +15,7 @@ int xLaserRoomZTop = 0;
 int dShrinkingLasers = 0;
 int xShrinkingLaserTimeout = 0;
 
-rule initialize_trap_databases
-active
-highFrequency
-{
-	xsDisableSelf();
+void initializeLaserTrapDatabase() {
 	dLaserRooms = xInitDatabase("laserRooms");
 	xInitAddInt(dLaserRooms,"name");
 	xLaserRoomActive = xInitAddInt(dLaserRooms,"active");
