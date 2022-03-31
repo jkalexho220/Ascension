@@ -2327,12 +2327,15 @@ inactive
 highFrequency
 {
 	if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
-		for(x=yGetDatabaseCount("fishHawks"); >0) {
-			yDatabaseNext("fishHawks", true);
+		int db = trQuestVarGet("fishHawks");
+		int fishes = trQuestVarGet("fishes");
+		for(x=0; < 30) {
+			trUnitSelectClear();
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,db,x),true);
 			trMutateSelected(kbGetProtoUnitID("Hawk"));
 			trSetSelectedScale(0,0,0);
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("fishHawks", "sfx"),true);
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,fishes,x),true);
 			trQuestVarSetFromRand("rand", 1, 3, true);
 			switch(1*trQuestVarGet("rand"))
 			{
@@ -2350,7 +2353,7 @@ highFrequency
 				}
 			}
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("fishHawks", "sfx"),true);
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,fishes,x),true);
 			trSetSelectedUpVector(0,-10,0);
 			trQuestVarSetFromRand("scale", 1, 2, false);
 			trSetSelectedScale(trQuestVarGet("scale"),0.1 * trQuestVarGet("scale"),trQuestVarGet("scale"));
@@ -2366,6 +2369,7 @@ highFrequency
 {
 	int class = 0;
 	string proto = "";
+	vector pos = trVectorQuestVarGet("startPosition");
 	if (trQuestVarGet("play") == 1) {
 		/* no LOS for you */
 		for(p=1; < ENEMY_PLAYER) {
@@ -2382,7 +2386,7 @@ highFrequency
 			zSetProtoUnitStat("Flying Medic", p, 2, 25.0);
 			
 			trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch(""+p+",0","Flying Medic",1,trQuestVarGet("startPositionx"),0,trQuestVarGet("startPositionz"),0,true);
+			trArmyDispatch(""+p+",0","Flying Medic",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		}
 		for (i=1; < 40) {
 			proto = kbGetProtoUnitName(monsterPetProto(i));
@@ -2432,24 +2436,29 @@ highFrequency
 		trModifyProtounit("Hawk", ENEMY_PLAYER, 1, -2);
 		trModifyProtounit("Tornado", 0, 2, -999);
 		
-		for(i=yGetDatabaseCount("cloudTornados"); >0) {
-			yDatabaseNext("cloudTornados", true);
+		int db = trQuestVarGet("cloudTornados");
+		int cloudSFX = trQuestVarGet("cloudTornadoSFX");
+		int cloudBlock = trQuestVarGet("cloudTornadoBlock");
+		
+		for(i=0; < 10) {
+			trUnitSelectClear();
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,db,i),true);
 			trMutateSelected(kbGetProtoUnitID("Hawk"));
 			trSetSelectedScale(0,0,0);
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("cloudTornados", "sfx"), true);
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,cloudSFX,i), true);
 			trUnitChangeProtoUnit("Tornado");
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("cloudTornados", "sfx"), true);
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,cloudSFX,i), true);
 			trUnitOverrideAnimation(1,0,true,true,-1);
 			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("cloudTornados", "block"), true);
+			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,cloudBlock,i), true);
 			trUnitChangeProtoUnit("Invisible Target");
 		}
 		
 		
 		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"favorRegen", trQuestVarGet("p"+p+"favorRegen") - 0.5);
+			xSetFloat(dPlayerData,xPlayerFavorRegen, xGetFloat(dPlayerData,xPlayerFavorRegen) - 0.5, p);
 		}
 		startNPCDialog(NPC_EXPLAIN_CLOUDS);
 		xsEnableRule("the_cloud_damage");
@@ -2470,17 +2479,18 @@ highFrequency
 	trQuestVarSet("yeebBossFight", 0);
 	for(p=1; < ENEMY_PLAYER) {
 		trQuestVarSet("p"+p+"unit", 0);
-		yClearDatabase("p"+p+"characters");
-		yClearDatabase("p"+p+"relics");
-		yClearDatabase("p"+p+"warehouse");
+		xClearDatabase(1*trQuestVarGet("p"+p+"characters"));
+		xClearDatabase(1*trQuestVarGet("p"+p+"relics"));
+		xClearDatabase(1*trQuestVarGet("p"+p+"warehouse"));
 	}
-	yClearDatabase("freeRelics");
-	yClearDatabase("enemies");
-	yClearDatabase("enemiesIncoming");
-	yClearDatabase("ambushRooms");
-	yClearDatabase("playerCharacters");
-	yClearDatabase("playerUnits");
-	yClearDatabase("chests");
+	xClearDatabase(dFreeRelics);
+	xClearDatabase(dEnemies);
+	xClearDatabase(dEnemiesIncoming);
+	xClearDatabase(dAmbushRooms);
+	xClearDatabase(dBasicRooms);
+	xClearDatabase(dChests);
+	xClearDatabase(dPlayerCharacters);
+	xClearDatabase(dPlayerUnits);
 	for(i = trQuestVarGet("eyecandyStart"); < trGetNextUnitScenarioNameNumber()) {
 		trUnitSelectClear();
 		trUnitSelect(""+i, true);
