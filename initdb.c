@@ -108,6 +108,14 @@ int xPlayerRainCooldownStatus = 0;
 int xPlayerWellCooldown = 0;
 int xPlayerLureCooldown = 0;
 int xPlayerRainCooldown = 0;
+int xPlayerWellCost = 0;
+int xPlayerLureCost = 0;
+int xPlayerRainCost = 0;
+int xPlayerWellActivated = 0;
+int xPlayerLureActivated = 0;
+int xPlayerRainActivated = 0;
+int xPlayerWellPos = 0;
+int xPlayerLurePos = 0;
 
 int xPlayerRegenerateFavorLast = 0;
 
@@ -162,6 +170,10 @@ int xProjPrev = 0;
 int xProjDist = 0;
 
 int dBoons = 0;
+
+int dPlayerWolves = 0;
+int xPlayerWolfDead = 0;
+int xPlayerWolfTimeout = 0;
 
 rule initialize_databases
 active
@@ -267,6 +279,14 @@ highFrequency
 	xPlayerWellCooldown = xInitAddInt(dPlayerData,"wellCooldown");
 	xPlayerLureCooldown = xInitAddInt(dPlayerData,"lureCooldown");
 	xPlayerRainCooldown = xInitAddInt(dPlayerData,"rainCooldown");
+	xPlayerWellCost = xInitAddFloat(dPlayerData,"wellCost");
+	xPlayerLureCost = xInitAddFloat(dPlayerData,"lureCost");
+	xPlayerRainCost = xInitAddFloat(dPlayerData,"rainCost");
+	xPlayerWellActivated = xInitAddBool(dPlayerData, "wellActivated");
+	xPlayerLureActivated = xInitAddBool(dPlayerData, "lureActivated");
+	xPlayerRainActivated = xInitAddBool(dPlayerData, "rainActivated");
+	xPlayerWellPos = xInitAddVector(dPlayerData, "wellPos");
+	xPlayerLurePos = xInitAddVector(dPlayerData, "lurePos");
 	
 	xPlayerRegenerateFavorLast = xInitAddInt(dPlayerData,"regenerateFavorLast");
 	
@@ -347,4 +367,23 @@ highFrequency
 		
 		xAddDatabaseBlock(dPlayerData);
 	}
+	
+	dPlayerWolves = xInitDatabase("playerWolves");
+	xInitAddInt(dPlayerWolves, "name");
+	xPlayerWolfDead = xInitAddBool(dPlayerWolves, "dead");
+	xPlayerWolfTimeout = xInitAddInt(dPlayerWolves, "timeout");
+}
+
+void resetCharacterCustomVars(int p = 0) {
+	int db = trQuestVarGet("p"+p+"characters");
+	/*
+	The latest var is xCharAttackTargetIndex
+	We remove all extra user variables created
+	*/
+	int start = xCharAttackTargetIndex - xVarNames + 1;
+	for (i = start; < aiPlanGetNumberUserVariableValues(db,xVarNames)) {
+		aiPlanRemoveUserVariable(db,i + xVarNames);
+	}
+	aiPlanSetNumberUserVariableValues(db, xVarNames, start, false);
+	aiPlanSetNumberUserVariableValues(db, xMetadata, start + mVariableTypes, false);
 }

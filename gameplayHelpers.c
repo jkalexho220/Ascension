@@ -88,7 +88,12 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 }
 
 void gainFavor(int p = 0, float amt = 0) {
-	xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt)),p);
+	xSetFloat(dPlayerData,xPlayerFavor,xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt),p);
+	if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_DOUBLE_FAVOR) {
+		xSetFloat(dPlayerData,xPlayerFavor,xsMin(200, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
+	} else {
+		xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
+	}
 	trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 }
 
@@ -1485,12 +1490,16 @@ highFrequency
 				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,spyUnit,x),true);
 				dest = aiPlanGetUserVariableVector(ARRAYS,spyDest,x);
 				if (trUnitAlive() == false) {
-					aiPlanSetUserVariableInt(xsVectorGetX(dest),xsVectorGetY(dest),xsVectorGetZ(dest),-1);
+					if (aiPlanSetUserVariableInt(1*xsVectorGetX(dest),1*xsVectorGetY(dest),1*xsVectorGetZ(dest),-1) == false) {
+						debugLog("spy error: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
+					}
 				} else {
 					trUnitSelectClear();
 					trUnitSelectByID(id);
 					trMutateSelected(aiPlanGetUserVariableInt(ARRAYS,spyProto,x));
-					aiPlanSetUserVariableInt(xsVectorGetX(dest),xsVectorGetY(dest),xsVectorGetZ(dest),spysearch);
+					if (aiPlanSetUserVariableInt(1*xsVectorGetX(dest),1*xsVectorGetY(dest),1*xsVectorGetZ(dest),spysearch) == false) {
+						debugLog("spy error: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
+					}
 				}
 			}
 		}

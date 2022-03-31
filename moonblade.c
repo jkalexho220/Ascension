@@ -1,133 +1,144 @@
+const int moonbeamCooldown = 18;
+const float moonbeamDamage = 30;
+const float moonbeamDuration = 6;
+const float moonbeamRadius = 6;
+
+const int crescentCooldown = 12;
+const float crescentCount = 3;
+const float crescentDamage = 50;
+
+const float protectionDelay = 83.33;
+
+int xCrescentCount = 0;
+int xCrescentTimeout = 0;
+int xCrescentSFX = 0;
+int xCrescentOn = 0;
+
+/* moonbeams */
+int xMoonbeamRadius = 0;
+int xMoonbeamDamage = 0;
+int xMoonbeamTimeout = 0;
+int xMoonbeamStart = 0;
+int xMoonbeamPos = 0;
+int xMoonbeamNext = 0;
+int xMoonbeamEnd = 0;
+
 void removeMoonblade(int p = 0) {
 	removePlayerSpecific(p);
-	yRemoveUpdateVar("p"+p+"characters", "crescentCount");
-	yRemoveUpdateVar("p"+p+"characters", "crescentDamage");
-	yRemoveUpdateVar("p"+p+"characters", "crescentTimeout");
-	yRemoveUpdateVar("p"+p+"characters", "crescentSFX");
-	yRemoveUpdateVar("p"+p+"characters", "crescentOn");
 }
 
 void moonbladeAlways(int eventID = -1) {
 	int p = eventID - 12 * MOONBLADE;
+	int db = trQuestVarGet("p"+p+"characters");
+	int moonbeams = trQuestVarGet("p"+p+"moonbeams");
+	xSetPointer(dPlayerData, p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int index = yGetPointer("enemies");
-	float angle = 0;
+	int index = xGetPointer(dEnemies);
+	float dist = 0;
 	float amt = 0;
-	float posX = 0;
-	float posZ = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
-		if (id == -1 || trUnitAlive() == false) {
+	
+	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	
+	if (xGetDatabaseCount(db) > 0) {
+		xDatabaseNext(db);
+		id = xGetInt(db, xUnitID);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeMoonblade(p);
 		} else {
-			hit = CheckOnHit(p, id);
+			hit = CheckOnHit(p);
 			if (hit > ON_HIT_ATTACKING) {
-				if (yGetVar("p"+p+"characters", "crescentCount") > 0) {
-					ySetVar("p"+p+"characters", "crescentCount", yGetVar("p"+p+"characters", "crescentCount") - 1);
-					ySetVar("p"+p+"characters", "crescentTimeout", trTimeMS() + 5000);
-					target = yGetPointer("enemies");
-					if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
-						stunUnit("enemies", 2.0, p);
-						trUnitSelectClear();
-						trUnitSelectByQV("enemies");
-						damageEnemy(p, 50*trQuestVarGet("p"+p+"spellDamage"), false);
-						trVectorSetUnitPos("pos", "enemies");
-						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				if (xGetInt(db, xCrescentCount) > 0) {
+					xSetInt(db, xCrescentCount, xGetInt(db, xCrescentCount) - 1);
+					xSetInt(db, xCrescentTimeout, trTimeMS() + 5000);
+					target = xGetPointer(dEnemies);
+					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
+						stunUnit(dEnemies, 2.0, p);
+						xUnitSelectByID(dEnemies, xUnitID);
+						damageEnemy(p, crescentDamage * xGetFloat(dPlayerData,xPlayerSpellDamage), false);
+						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName));
+						
+						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("Lightning Sparks Ground");
-						gainFavor(p, 3);
+						gainFavor(p, 3.0);
 					}
 				}
-				angle = trQuestVarGet("p"+p+"health") * trQuestVarGet("p"+p+"spellDamage") * 0.03;
+				amt = xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerSpellDamage) * 0.03;
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					yDatabaseNext("playerUnits", true);
-					healUnit(p, angle);
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					healUnit(p, amt);
 				}
 				if (hit == ON_HIT_SPECIAL) {
 					if (trCurrentPlayer() == p) {
 						trSoundPlayFN("mythcreate.wav","1",-1,"","");
 					}
-					trVectorSetUnitPos("pos", "p"+p+"characters");
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					yAddToDatabase("playerwolves", "next");
-					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), "pos", calculateDecay(p, 5.0));
+					pos = kbGetBlockPosition(""+xGetInt(db, xUnitName));
+					xAddDatabaseBlock(dPlayerWolves, true);
+					xSetInt(dPlayerData, xUnitName, trGetNextUnitScenarioNameNumber());
+					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), pos, calculateDecay(p, 5.0));
 				}
 			}
-			if ((yGetVar("p"+p+"characters", "crescentCount") > 0) &&
-				(trTimeMS() > yGetVar("p"+p+"characters", "crescentTimeout"))) {
-				ySetVar("p"+p+"characters", "crescentTimeout", trTimeMS() + 5000);
-				ySetVar("p"+p+"characters", "crescentCount", yGetVar("p"+p+"characters", "crescentCount") - 1);
+			if ((xGetInt(db, xCrescentCount) > 0) &&
+				(trTimeMS() > xGetInt(db, xCrescentTimeout))) {
+				xSetInt(db, xCrescentTimeout, trTimeMS() + 5000);
+				xSetInt(db, xCrescentCount, xGetInt(db, xCrescentCount) - 1);
 			}
 			
-			if ((yGetVar("p"+p+"characters", "crescentOn") == 1) && (yGetVar("p"+p+"characters", "crescentCount") == 0)) {
-				ySetVar("p"+p+"characters", "crescentOn", 0);
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "crescentSFX"), true);
+			if (xGetBool(db, xCrescentOn) && (xGetInt(db, xCrescentCount) <= 0)) {
+				xSetBool(db, xCrescentOn, false);
+				xUnitSelect(db, xCrescentSFX);
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 			}
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("eclipsebirth.wav","1",-1,"","");
-		vectorSnapToGrid("p"+p+"wellPos");
-		posX = trQuestVarGet("p"+p+"wellPosx");
-		posZ = trQuestVarGet("p"+p+"wellPosz");
-		yAddToDatabase("p"+p+"moonbeams", "next");
-		yAddUpdateVar("p"+p+"moonbeams", "radius", xsPow(trQuestVarGet("moonbeamRadius")*trQuestVarGet("p"+p+"spellRange"),2));
-		yAddUpdateVar("p"+p+"moonbeams", "damage", trQuestVarGet("moonbeamDamage") * trQuestVarGet("p"+p+"spellDamage"));
-		yAddUpdateVar("p"+p+"moonbeams", "timeout",
-			trTimeMS() + 1000 * trQuestVarGet("moonbeamDuration") * trQuestVarGet("p"+p+"spellDuration"));
-		yAddUpdateVar("p"+p+"moonbeams", "start", trGetNextUnitScenarioNameNumber());
-		yAddUpdateVar("p"+p+"moonbeams", "posx", posX);
-		yAddUpdateVar("p"+p+"moonbeams", "posz", posZ);
-		yAddUpdateVar("p"+p+"moonbeams", "next", trTimeMS());
+		pos = vectorSnapToGrid(xGetVector(dPlayerData, xPlayerWellPos));
+		xAddDatabaseBlock(moonbeams, true);
+		xSetFloat(moonbeams, xMoonbeamRadius, xsPow(moonbeamRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2));
+		xSetFloat(moonbeams, xMoonbeamDamage, moonbeamDamage * xGetFloat(dPlayerData, xPlayerSpellDamage));
+		xSetInt(moonbeams,xMoonbeamTimeout, trTimeMS() + 1000 * moonbeamDuration * xGetFloat(dPlayerData,xPlayerSpellDuration));
+		xSetInt(moonbeams, xMoonbeamStart, trGetNextUnitScenarioNameNumber());
+		xSetVector(moonbeams, xMoonbeamPos, pos);
+		xSetInt(moonbeams, xMoonbeamNext, trTimeMS());
+		dir = xsVectorSet(moonbeamRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 0, 0);
 		for(x=0; <16) {
-			trVectorSetFromAngle("dir", angle);
-			angle = angle + 6.283185 / 16;
-			trQuestVarSet("dirx",
-				trQuestVarGet("dirx") * trQuestVarGet("moonbeamRadius") * trQuestVarGet("p"+p+"spellRange") + posX);
-			trQuestVarSet("dirz",
-				trQuestVarGet("dirz") * trQuestVarGet("moonbeamRadius") * trQuestVarGet("p"+p+"spellRange") + posZ);
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("dirx"),0,trQuestVarGet("dirz"),0,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
+			trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(dir)+xsVectorGetX(pos),0,xsVectorGetZ(dir)+xsVectorGetZ(pos),0,true);
+			trArmySelect(""+p+",0");
 			trMutateSelected(kbGetProtoUnitID("Healing SFX"));
+			dir = rotationMatrix(dir, 0.92388, 0.382683); // rotate 22.5 degrees
 		}
-		yAddUpdateVar("p"+p+"moonbeams", "end", trGetNextUnitScenarioNameNumber());
+		xSetInt(moonbeams, xMoonbeamEnd, trGetNextUnitScenarioNameNumber());
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
 		trQuestVarSet("p"+p+"crescentStarted", 1);
 		trSoundPlayFN("olympustemplesfx.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("p"+p+"Characters"); >0) {
-			yDatabaseNext("p"+p+"Characters");
-			ySetVar("p"+p+"Characters", "crescentCount", yGetVar("p"+p+"Characters", "crescentCount") + 3);
-			ySetVar("p"+p+"Characters", "crescentDamage", trQuestVarGet("crescentDamage") * trQuestVarGet("p"+p+"spellDamage"));
-			ySetVar("p"+p+"Characters", "crescentTimeout", trTimeMS() + 5000);
-			ySetVar("p"+p+"characters", "crescentOn", 1);
-			if ((yGetVar("p"+p+"Characters", "crescentSFX") == 0) ||
-				(kbGetBlockID(""+1*yGetVar("p"+p+"characters", "crescentSFX")) == -1)) {
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"characters", true);
-				spyEffect(1*trQuestVarGet("p"+p+"Characters"),
-					kbGetProtoUnitID("Rocket"), yGetVarName("p"+p+"characters", "crescentSFX"));
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xSetInt(db, xCrescentCount, xGetInt(db, xCrescentCount) + 3);
+			xSetInt(db, xCrescentTimeout, trTimeMS() + 5000);
+			xSetBool(db, xCrescentOn, true);
+			if ((xGetInt(db, xCrescentSFX) == 0) ||
+				(kbGetBlockID(""+xGetInt(db, xCrescentSFX)) == -1)) {
+				spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Rocket"), xsVectorSet(db,xCrescentSFX,xGetPointer(db)));
 			}
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"protection", 1 - trQuestVarGet("p"+p+"protection"));
 		if (trQuestVarGet("p"+p+"protection") == 1) {
 			if (trPlayerResourceCount(p, "favor") < 1) {
@@ -138,12 +149,17 @@ void moonbladeAlways(int eventID = -1) {
 			} else {
 				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
 				trQuestVarSet("p"+p+"protectionNext",
-					trTimeMS() + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + protectionDelay / trQuestVarGet("p"+p+"ultimateCost"));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					id = yDatabaseNext("playerUnits", true);
-					xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
-					ySetVar("playerUnits", "currentHealth", kbUnitGetCurrentHitpoints(id));
+					xDatabaseNext(dPlayerUnits);
+					id = xGetInt(dPlayerUnits, xUnitID);
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					xsSetContextPlayer(xGetInt(dPlayerUnits,xPlayerOwner));
+					amt = kbUnitGetCurrentHitpoints(id);
+					xsSetContextPlayer(0);
+					xSetFloat(dPlayerUnits, xCurrentHealth, amt);
 				}
 			}
 		} else {
@@ -156,66 +172,58 @@ void moonbladeAlways(int eventID = -1) {
 	
 	if (PvP && (trQuestVarGet("p"+p+"protection") == 1)) {
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-			id = yDatabaseNext("playerUnits", true);
+			xDatabaseNext(dPlayerUnits);
+			id = xGetInt(dPlayerUnits, xUnitID);
+			trUnitSelectClear();
+			trUnitSelectByID(id);
 			trUnitHighlight(0.2, false);
-			xsSetContextPlayer(1*yGetVar("playerUnits", "player"));
+			xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner));
 			amt = kbUnitGetCurrentHitpoints(id);
-			if (amt > yGetVar("playerUnits", "currentHealth")) {
-				ySetVar("playerUnits", "currentHealth", amt);
+			xsSetContextPlayer(0);
+			if (amt > xGetFloat(dPlayerUnits, xCurrentHealth)) {
+				xSetFloat(dPlayerUnits, xCurrentHealth, amt);
 			} else {
-				trDamageUnit(amt - yGetVar("playerUnits", "currentHealth"));
+				trDamageUnit(amt - xGetFloat(dPlayerUnits, xCurrentHealth));
 			}
 		}
 	}
 	
 	if ((trQuestVarGet("p"+p+"crescentStarted") == 1) && (trQuestVarGet("spyFind") == trQuestVarGet("spyFound"))) {
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters");
-			if (yGetVar("p"+p+"characters", "crescentSFX") < 0) {
-				ySetVar("p"+p+"characters", "crescentSFX", trQuestVarGet("spyEye"+(0-yGetVar("p"+p+"characters", "crescentSFX"))));
-			}
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("p"+p+"characters", "crescentSFX"), true);
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelect(db, xCrescentSFX);
 			trMutateSelected(kbGetProtoUnitID("Outpost"));
 			trSetSelectedScale(0.0,0.0,0.0);
 		}
 		trQuestVarSet("p"+p+"crescentStarted", 0);
 	}
 	
-	if (yGetDatabaseCount("p"+p+"moonbeams") > 0) {
+	if (xGetDatabaseCount(moonbeams) > 0) {
 		target = 0;
-		yDatabaseNext("p"+p+"moonbeams");
-		if (trTimeMS() > yGetVar("p"+p+"moonbeams", "next")) {
-			ySetVar("p"+p+"moonbeams", "next", trTimeMS() + 500);
-			trQuestVarSet("centerX", yGetVar("p"+p+"moonbeams", "posX"));
-			trQuestVarSet("centerZ", yGetVar("p"+p+"moonbeams", "posZ"));
-			angle = yGetVar("p"+p+"moonbeams", "radius");
-			posX = yGetVar("p"+p+"moonbeams", "damage");
-			posX = posX * 0.5;
+		xDatabaseNext(moonbeams);
+		if (trTimeMS() > xGetInt(moonbeams, xMoonbeamNext)) {
+			xSetInt(moonbeams, xMoonbeamNext, xGetInt(moonbeams, xMoonbeamNext) + 500);
+			pos = xGetVector(moonbeams, xMoonbeamPos);
+			dist = xGetFloat(moonbeams, xMoonbeamRadius);
+			
+			amt = xGetFloat(moonbeams, xMoonbeamDamage);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
-				id = yDatabaseNext("enemies", true);
-				if (id == -1 || trUnitAlive() == false) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (trUnitAlive() == false) {
 					removeEnemy();
-				} else if (zDistanceToVectorSquared("enemies", "center") < angle) {
-					silenceUnit("enemies",1.0,p);
-					damageEnemy(p, posX);
+				} else if (unitDistanceToVector(dEnemies, pos) < dist) {
+					silenceUnit(dEnemies,1.0,p);
+					damageEnemy(p, amt);
 				}
 			}
-			if (trTimeMS() > yGetVar("p"+p+"moonbeams", "timeout")) {
-				for(x=yGetVar("p"+p+"moonbeams", "start"); < yGetVar("p"+p+"moonbeams", "end")) {
+			if (trTimeMS() > xGetInt(moonbeams, xMoonbeamTimeout)) {
+				for(x=xGetInt(moonbeams, xMoonbeamStart); < xGetInt(moonbeams, xMoonbeamEnd)) {
 					trUnitSelectClear();
 					trUnitSelect(""+x, true);
 					trUnitDestroy();
 				}
-				yRemoveFromDatabase("p"+p+"moonbeams");
-				yRemoveUpdateVar("p"+p+"moonbeams", "radius");
-				yRemoveUpdateVar("p"+p+"moonbeams", "damage");
-				yRemoveUpdateVar("p"+p+"moonbeams", "timeout");
-				yRemoveUpdateVar("p"+p+"moonbeams", "posX");
-				yRemoveUpdateVar("p"+p+"moonbeams", "posZ");
-				yRemoveUpdateVar("p"+p+"moonbeams", "next");
-				yRemoveUpdateVar("p"+p+"moonbeams", "start");
-				yRemoveUpdateVar("p"+p+"moonbeams", "end");
+				xFreeDatabaseBlock(moonbeams);
 			}
 		}
 	}
@@ -223,8 +231,8 @@ void moonbladeAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"protection") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
 			trQuestVarSet("p"+p+"protectionNext",
-				trQuestVarGet("p"+p+"protectionNext") + trQuestVarGet("protectionDelay") / trQuestVarGet("p"+p+"ultimateCost"));
-			gainFavor(p, 0 - 1);
+				trQuestVarGet("p"+p+"protectionNext") + protectionDelay / trQuestVarGet("p"+p+"ultimateCost"));
+			gainFavor(p, 0.0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);
 				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);
@@ -232,13 +240,16 @@ void moonbladeAlways(int eventID = -1) {
 			}
 		}
 	}
-	ySetPointer("enemies", index);
+	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
 }
 
 void chooseMoonblade(int eventID = -1) {
 	int p = eventID - 1000 - 12 * MOONBLADE;
+	int db = trQuestVarGet("p"+p+"characters");
+	xPrintAll(db);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData,p);
 	if (trCurrentPlayer() == p) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
 		wellName = "(Q) Moonbeam";
@@ -250,12 +261,31 @@ void chooseMoonblade(int eventID = -1) {
 		lureName = "(W) Crescent Strikes";
 		lureIsUltimate = false;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("moonbeamCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("crescentCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", 0);
+	xSetInt(dPlayerData,xPlayerWellCooldown, moonbeamCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, crescentCooldown);
+	xSetFloat(dPlayerData,xPlayerLureCost,0);
+	xSetInt(dPlayerData,xPlayerRainCooldown,1);
+	xSetFloat(dPlayerData,xPlayerRainCost, 0);
+	
+	xCrescentCount = xInitAddInt(db, "crescentCount");
+	xCrescentTimeout = xInitAddInt(db, "crescentTimeout");
+	xCrescentSFX = xInitAddInt(db, "crescentSFX");
+	xCrescentOn = xInitAddBool(db, "crescentOn");
+	
+	xPrintAll(db);
+	
+	if (trQuestVarGet("p"+p+"moonbeams") == 0) {
+		db = xInitDatabase("p"+p+"moonbeams");
+		trQuestVarSet("p"+p+"moonbeams", db);
+		xMoonbeamRadius = xInitAddFloat(db, "radius");
+		xMoonbeamDamage = xInitAddFloat(db, "damage");
+		xMoonbeamTimeout = xInitAddInt(db, "timeout");
+		xMoonbeamStart = xInitAddInt(db, "start");
+		xMoonbeamEnd = xInitAddInt(db, "end");
+		xMoonbeamPos = xInitAddVector(db, "pos");
+		xMoonbeamNext = xInitAddInt(db, "next");
+	}
 }
 
 void moonbladeModify(int eventID = -1) {
@@ -274,15 +304,4 @@ highFrequency
 		trEventSetHandler(1000 + 12 * MOONBLADE + p, "chooseMoonblade");
 		trEventSetHandler(5000 + 12 * MOONBLADE + p, "moonbladeModify");
 	}
-	trQuestVarSet("moonbeamCooldown", 18);
-	trQuestVarSet("moonbeamDamage", 30);
-	trQuestVarSet("moonbeamDuration", 6);
-	trQuestVarSet("moonbeamRadius", 6);
-	
-	trQuestVarSet("crescentCooldown", 12);
-	trQuestVarSet("crescentCount", 3);
-	trQuestVarSet("crescentDamage", 50);
-	
-	trQuestVarSet("protectionCost", 12);
-	trQuestVarSet("protectionDelay", 1000.0 / trQuestVarGet("protectionCost"));
 }
