@@ -114,10 +114,14 @@ int xPlayerRainCost = 0;
 int xPlayerWellActivated = 0;
 int xPlayerLureActivated = 0;
 int xPlayerRainActivated = 0;
+int xPlayerWellReadyTime = 0;
+int xPlayerLureReadyTime = 0;
+int xPlayerRainReadyTime = 0;
 int xPlayerWellPos = 0;
 int xPlayerLurePos = 0;
 
 int xPlayerRegenerateFavorLast = 0;
+int xPlayerRegenerateHealthLast = 0;
 
 int xPlayerUnit = 0;
 int xPlayerLevel = 0;
@@ -127,12 +131,22 @@ int xPlayerIndex = 0;
 int xPlayerSimp = 0;
 int xPlayerQueen = 0;
 int xPlayerLaunched = 0;
+int xPlayerAnimation = 0;
+int xPlayerAction = 0;
+int xPlayerSilenced = 0;
 
 int xPlayerMonsterIndex = 0;
+int xPlayerMonsterProto = 0;
+int xPlayerMonsterName = 0;
 int xPlayerRelicTransporterLevel = 0;
 int xPlayerGold = 0;
 int xPlayerFavor = 0;
 int xPlayerDead = 0;
+
+int xPlayerPetDogReady = 0;
+int xPlayerPetDogNext = 0;
+int xPlayerPetMonsterReady = 0;
+int xPlayerPetMonsterNext = 0;
 
 int dClass = 0;
 int xClassProto = 0;
@@ -174,6 +188,10 @@ int dBoons = 0;
 int dPlayerWolves = 0;
 int xPlayerWolfDead = 0;
 int xPlayerWolfTimeout = 0;
+
+int dPlayerLasers = 0;
+int xPlayerLaserTimeout = 0;
+int xPlayerLaserRange = 0;
 
 rule initialize_databases
 active
@@ -285,10 +303,14 @@ highFrequency
 	xPlayerWellActivated = xInitAddBool(dPlayerData, "wellActivated");
 	xPlayerLureActivated = xInitAddBool(dPlayerData, "lureActivated");
 	xPlayerRainActivated = xInitAddBool(dPlayerData, "rainActivated");
+	xPlayerWellReadyTime = xInitAddInt(dPlayerData, "wellReadyTime");
+	xPlayerLureReadyTime = xInitAddInt(dPlayerData, "lureReadyTime");
+	xPlayerRainReadyTime = xInitAddInt(dPlayerData, "rainReadyTime");
 	xPlayerWellPos = xInitAddVector(dPlayerData, "wellPos");
 	xPlayerLurePos = xInitAddVector(dPlayerData, "lurePos");
 	
 	xPlayerRegenerateFavorLast = xInitAddInt(dPlayerData,"regenerateFavorLast");
+	xPlayerRegenerateHealthLast = xInitAddInt(dPlayerData,"regenerateHealthLast");
 	
 	xPlayerUnit = xInitAddInt(dPlayerData,"playerUnit");
 	xPlayerLevel = xInitAddInt(dPlayerData,"level");
@@ -301,9 +323,19 @@ highFrequency
 	xPlayerSimp = xInitAddInt(dPlayerData,"simp");
 	xPlayerQueen = xInitAddInt(dPlayerData,"queen");
 	xPlayerLaunched = xInitAddBool(dPlayerData,"launched");
+	xPlayerAnimation = xInitAddInt(dPlayerData,"animation");
+	xPlayerAction = xInitAddInt(dPlayerData,"action");
+	xPlayerSilenced = xInitAddBool(dPlayerData,"silenced");
 	
 	xPlayerMonsterIndex = xInitAddInt(dPlayerData,"monsterIndex");
+	xPlayerMonsterProto = xInitAddInt(dPlayerData,"monsterProto");
+	xPlayerMonsterName = xInitAddInt(dPlayerData,"monsterName");
 	xPlayerRelicTransporterLevel = xInitAddInt(dPlayerData,"relicTransporterLevel");
+	
+	xPlayerPetDogReady = xInitAddBool(dPlayerData, "petDogReady");
+	xPlayerPetDogNext = xInitAddInt(dPlayerData, "petDogNext");
+	xPlayerPetMonsterReady = xInitAddBool(dPlayerData, "petMonsterReady");
+	xPlayerPetMonsterNext = xInitAddInt(dPlayerData, "petMonsterNext");
 	
 	dStunnedUnits = xInitDatabase("stunnedUnits", 10);
 	xInitAddInt(dStunnedUnits,"name");
@@ -372,6 +404,11 @@ highFrequency
 	xInitAddInt(dPlayerWolves, "name");
 	xPlayerWolfDead = xInitAddBool(dPlayerWolves, "dead");
 	xPlayerWolfTimeout = xInitAddInt(dPlayerWolves, "timeout");
+	
+	dPlayerLasers = xInitDatabase("playerLasers");
+	xInitAddInt(dPlayerLasers, "name");
+	xPlayerLaserRange = xInitAddFloat(dPlayerLasers, "range");
+	xPlayerLaserTimeout = xInitAddInt(dPlayerLasers, "timeout");
 }
 
 void resetCharacterCustomVars(int p = 0) {

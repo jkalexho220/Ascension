@@ -2,9 +2,6 @@ const int ABILITY_READY = 0;
 const int ABILITY_COOLDOWN = 1;
 const int ABILITY_COST = 2;
 
-const int ABILITY_OFF = 0;
-const int ABILITY_ON = 1;
-
 const int ON_HIT_NONE = 0;
 const int ON_HIT_JUMP = 1;
 const int ON_HIT_ATTACKING = 2;
@@ -41,6 +38,7 @@ int boss = 0;
 int bossUnit = 0;
 int bossCooldownTime = 0;
 float bossScale = 0;
+bool bossAnim = false;
 
 int nextproj = 0;
 
@@ -128,7 +126,7 @@ vector vectorSetAsCurrentPosition(vector prev = vector(0,0,0),
 }
 
 
-void silencePlayer(int p = 0, float duration = 0) {
+void silencePlayer(int p = 0) {
 	if ((trQuestVarGet("p"+p+"negationCloak") == 1) && (xGetInt(dPlayerData,xPlayerDead,p) == 0)) {
 		if (getBit(STATUS_SILENCE, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_SILENCE));
@@ -139,14 +137,12 @@ void silencePlayer(int p = 0, float duration = 0) {
 			}
 		}
 	} else {
-		float timeout = duration * 1000 + trTimeMS();
-		if (trQuestVarGet("p"+p+"silenceTimeout") < timeout) {
-			trQuestVarSet("p"+p+"silenceTimeout", timeout);
-		}
-		if (trQuestVarGet("p"+p+"silenced") == 0) {
-			trQuestVarSet("p"+p+"silenced", 1);
-			trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
-			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
+		if (xGetBool(dPlayerData, xPlayerSilenced, p) == false) {
+			xSetBool(dPlayerData, xPlayerSilenced, true, p);
+			if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+				trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
+				trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been silenced!");
+			}
 			trPlayerKillAllGodPowers(p);
 			if (trCurrentPlayer() == p) {
 				trCounterAbort("lure");
@@ -178,7 +174,7 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 		xSetPointer(dPlayerData,p);
 		duration = duration * xGetFloat(dPlayerData,xPlayerSilenceResistance);
 		if (xGetInt(dPlayerData,xPlayerUnit) == xGetInt(db,xUnitName)) {
-			silencePlayer(p, duration);
+			silencePlayer(p);
 		}
 	}
 	duration = duration * 1000;
@@ -323,7 +319,7 @@ void removePlayerSpecific(int p = 0) {
 		} else {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass,xClassProto,xGetInt(dPlayerData,xPlayerClass,p))));
 		}
-		silencePlayer(p, 0);
+		silencePlayer(p);
 		/* NOOOO MY QUEEEEN */
 		if (xGetInt(dPlayerData,xPlayerSimp,p) > 0) {
 			int simp = xGetInt(dPlayerData,xPlayerSimp,p);

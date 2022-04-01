@@ -409,7 +409,7 @@ inactive
 						xSetInt(dPlayerData,xPlayerMonsterIndex,x * 4);
 					} else if (loadProgress == 6) {
 						xSetInt(dPlayerData,xPlayerMonsterIndex,xGetInt(dPlayerData,xPlayerMonsterIndex) + x);
-						trQuestVarSet("p"+p+"monsterProto", monsterPetProto(xGetInt(dPlayerData,xPlayerMonsterIndex)));
+						xSetInt(dPlayerData,xPlayerMonsterProto,monsterPetProto(xGetInt(dPlayerData,xPlayerMonsterIndex)));
 					} else if (loadProgress == 7) {
 						xSetInt(dPlayerData,xPlayerGold,x);
 					} else if (loadProgress == 8) {
