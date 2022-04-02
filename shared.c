@@ -92,7 +92,9 @@ void trVectorScale(string db = "", float s = 1.0) {
 }
 
 vector vectorSnapToGrid(vector v = vector(0,0,0)) {
-	return(xsVectorSet(xsVectorGetX(v) * 2 + 1,xsVectorGetY(v),xsVectorGetZ(v) * 2 + 1));
+	int x = xsVectorGetX(v) / 2;
+	int z = xsVectorGetZ(v) / 2;
+	return(xsVectorSet(x * 2 + 1,xsVectorGetY(v),z * 2 + 1));
 }
 
 void zVectorSnapToGrid(string qv = "") {

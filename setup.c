@@ -290,11 +290,11 @@ void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=
 
 
 void chooseClass(int p = 0, int class = 0) {
-	xSetInt(dPlayerData, xPlayerClass, class);
 	trEventFire(1000 + 12 * class + p);
 	int proto = xGetInt(dClass,xClassProto,class);
 	xSetPointer(dPlayerData,p);
 	xResetValues(dPlayerData, xPlayerUnit);
+	xSetInt(dPlayerData, xPlayerClass, class);
 	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"));
 	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"));
 	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"));
@@ -327,7 +327,7 @@ void chooseClass(int p = 0, int class = 0) {
 	}
 	
 	if (Multiplayer == false) {
-		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class));
+		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class) - 1);
 		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel)));
 	}
 	

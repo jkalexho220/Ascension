@@ -110,9 +110,6 @@ void moonbladeAlways(int eventID = -1) {
 		xSetVector(moonbeams, xMoonbeamPos, pos);
 		xSetInt(moonbeams, xMoonbeamNext, trTimeMS());
 		dir = xsVectorSet(moonbeamRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 0, 0);
-		trChatSend(0, "pos: " + xGetVector(dPlayerData, xPlayerWellPos));
-		trChatSend(0, "pos: " + pos);
-		trChatSend(0, "dir: " + dir);
 		for(x=0; <16) {
 			trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(dir)+xsVectorGetX(pos),0,xsVectorGetZ(dir)+xsVectorGetZ(pos),0,true);
 			trArmySelect(""+p+",0");
