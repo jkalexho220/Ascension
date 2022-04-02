@@ -522,6 +522,7 @@ highFrequency
 	vector pos = trVectorQuestVarGet("startPosition");
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
+		debugLog("pos is " + pos);
 		spawnPlayer(p, pos);
 		trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
 		trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
@@ -552,6 +553,9 @@ highFrequency
 		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData, xPlayerLevel, p)));
 	}
 	trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
+	
+	/* DELETE ME */
+	xPrintAll(dPlayerData, 1);
 	
 	if (Multiplayer) {
 		trSetUnitIdleProcessing(true);
@@ -956,7 +960,7 @@ highFrequency
 					saveAllData();
 				}
 			} else {
-				trEventFire(12*xGetInt(dPlayerData, xPlayerClass) + p);
+				trEventFire(12*xGetInt(dPlayerData, xPlayerClass, p) + p);
 			}
 		}
 	}

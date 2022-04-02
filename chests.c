@@ -61,7 +61,7 @@ void initializeStatuePuzzle(int room = 0) {
 	int db = xInitDatabase("statuesIn"+room);
 	trQuestVarSet("statuesIn"+room, db);
 	xInitAddInt(db,"name");
-	xStatueState = xInitAddBool(db,"state");
+	xStatueState = xInitAddInt(db,"state");
 	xStatuePosition = xInitAddInt(db,"position");
 	xStatueAngle = xInitAddFloat(db,"angle");
 	xStatueTimeout = xInitAddInt(db,"timeout");

@@ -212,7 +212,7 @@ void reselectMyself() {
 	trackAddWaypoint();
 	trackAddWaypoint();
 	trBlockAllSounds(false);
-	uiFindType(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")));
+	uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, class)));
 	trackPlay(1,999);
 }
 

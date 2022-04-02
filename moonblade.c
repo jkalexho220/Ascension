@@ -80,7 +80,7 @@ void moonbladeAlways(int eventID = -1) {
 					}
 					pos = kbGetBlockPosition(""+xGetInt(db, xUnitName));
 					xAddDatabaseBlock(dPlayerWolves, true);
-					xSetInt(dPlayerData, xUnitName, trGetNextUnitScenarioNameNumber());
+					xSetInt(dPlayerWolves, xUnitName, trGetNextUnitScenarioNameNumber());
 					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), pos, calculateDecay(p, 5.0));
 				}
 			}
@@ -249,7 +249,6 @@ void chooseMoonblade(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * MOONBLADE;
 	int db = trQuestVarGet("p"+p+"characters");
-	xPrintAll(db);
 	resetCharacterCustomVars(p);
 	xSetPointer(dPlayerData,p);
 	if (trCurrentPlayer() == p) {
@@ -274,8 +273,6 @@ void chooseMoonblade(int eventID = -1) {
 	xCrescentTimeout = xInitAddInt(db, "crescentTimeout");
 	xCrescentSFX = xInitAddInt(db, "crescentSFX");
 	xCrescentOn = xInitAddBool(db, "crescentOn");
-	
-	xPrintAll(db);
 	
 	if (trQuestVarGet("p"+p+"moonbeams") == 0) {
 		db = xInitDatabase("p"+p+"moonbeams");

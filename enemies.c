@@ -38,7 +38,7 @@ bool checkEnemyDeactivated(int db = 0) {
 		return(false);
 	}
 	int index = xGetInt(db,xSpecialIndex);
-	if ((xGetBool(dEnemies, xDirtyBit, index) == false) ||
+	if ((aiPlanGetUserVariableBool(dEnemies, xDirtyBit, index) == false) ||
 		xGetInt(dEnemies, xUnitName, index) != xGetInt(db,xUnitName)) {
 		return(true);
 	}
@@ -153,7 +153,7 @@ highFrequency
 	
 	for(class = 1; <= 16) {
 		setupProtounitBounty(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),
-			trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
+			trQuestVarGet("proto"+xGetInt(dClass,xClassProto,class)+"armor"), 8, 0);
 	}
 	
 	/* ballista projectiles */
@@ -1795,7 +1795,7 @@ void enemiesAlways() {
 					}
 				}
 				if (xGetInt(dEnemies, xMissingTimeout) >= 10) {
-					xSetInt(dEnemiesIncoming,xAddDatabaseBlock(dEnemiesIncoming));
+					xAddDatabaseBlock(dEnemiesIncoming, true);
 					xSetInt(dEnemiesIncoming,xUnitName,xGetInt(dEnemies,xUnitName));
 					xFreeDatabaseBlock(dEnemies);
 				}

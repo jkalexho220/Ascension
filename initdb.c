@@ -252,7 +252,7 @@ highFrequency
 	xDatabaseIndex = xPlayerOwner;
 	
 	dEnemiesIncoming = xInitDatabase("enemiesIncoming",50);
-	xInitAddInt(db,"name");
+	xInitAddInt(dEnemiesIncoming,"name");
 	
 	dFreeRelics = xInitDatabase("freeRelics", 10);
 	xRelicName = xInitAddInt(dFreeRelics,"name");

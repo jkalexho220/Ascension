@@ -836,7 +836,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 	float amt = 0;
 	if (action == 32) {
 		status = ON_HIT_JUMP;
-	} else if (xGetBool(db, xCharAttacking)) {
+	} else if (xGetBool(db, xCharAttacking) == false) {
 		if ((action == 12) || (action == 6)) {
 			xsSetContextPlayer(p);
 			target = kbUnitGetTargetUnitID(id);

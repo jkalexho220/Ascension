@@ -539,7 +539,7 @@ inactive
 		trForbidProtounit(p, "Swordsman Hero");
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
 		class = xGetInt(dPlayerData,xPlayerClass,p);
-		proto = trQuestVarGet("class"+class+"proto");
+		proto = xGetInt(dClass, xClassProto, class);
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, xGetInt(dPlayerData,xPlayerLevel,p));
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_TWO_RELICS) {
 			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, 2);

@@ -4,7 +4,8 @@ rule choose_stage_00
 inactive
 highFrequency
 {
-	int n = xDatabaseNext(dStageChoices);
+	xDatabaseNext(dStageChoices);
+	int n = xGetInt(dStageChoices, xUnitName);
 	xUnitSelect(dStageChoices,xUnitName);
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", xGetInt(dStageChoices,xStageChoicesStage));
@@ -295,8 +296,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trVectorQuestVarSet("relictransporterguypos", pos);
 			trQuestVarSet("heading", 180.0 / 3.141592 * angleBetweenVectors(pos, xsVectorSet(x0 + x1, 0, z0 + z1)));
 			trQuestVarSet("relicTransporterGuyName", trGetNextUnitScenarioNameNumber());
-			x0 = trQuestVarGet("relicTransporterGuyPosx");
-			z0 = trQuestVarGet("relicTransporterGuyPosz");
+			x0 = xsVectorGetX(pos);
+			z0 = xsVectorGetZ(pos);
 			trArmyDispatch("1,0","Villager Atlantean Hero",1,x0,0,z0,trQuestVarGet("heading"), true);
 			trUnitSelectClear();
 			trUnitSelectByQV("relicTransporterGuyName", true);
@@ -2081,16 +2082,16 @@ highFrequency
 					if (xGetInt(dChests, xChestKey) == 1) {
 						trQuestVarSet("rand", 9);
 					}
-					trQuestVarSet("angle", 0.785398);
-					trQuestVarSet("angleMod", 6.283185 / trQuestVarGet("rand"));
+					float angle = 0.785398;
+					float angleMod = 6.283185 / trQuestVarGet("rand");
 					for(x=0; < trQuestVarGet("rand")) {
-						trVectorSetFromAngle("dir", trQuestVarGet("angle"));
+						dir = xsVectorSet(xsCos(angle),0,xsSin(angle));
 						if (xGetInt(dChests, xChestKey) == 0) { // not a temple
-							statueX = xsVectorGetX(pos) - 10.0 * trQuestVarGet("dirX");
-							statueZ = xsVectorGetZ(pos) - 10.0 * trQuestVarGet("dirZ");
+							statueX = xsVectorGetX(pos) - 10.0 * xsVectorGetX(dir);
+							statueZ = xsVectorGetZ(pos) - 10.0 * xsVectorGetZ(dir);
 						} else {
-							statueX = xsVectorGetX(pos) - 15.0 * trQuestVarGet("dirX");
-							statueZ = xsVectorGetZ(pos) - 15.0 * trQuestVarGet("dirZ");
+							statueX = xsVectorGetX(pos) - 15.0 * xsVectorGetX(dir);
+							statueZ = xsVectorGetZ(pos) - 15.0 * xsVectorGetZ(dir);
 						}
 						
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -2105,7 +2106,7 @@ highFrequency
 						xAddDatabaseBlock(dStatuesReady, true);
 						xSetInt(dStatuesReady, xStatuesReadyIndex, xAddDatabaseBlock(db, true));
 						
-						xSetFloat(db, xStatueAngle, trQuestVarGet("angle"));
+						xSetFloat(db, xStatueAngle, angle);
 						xSetVector(db, xStatuePos, xsVectorSet(statueX, 0, statueZ));
 						xSetInt(db, xStatueArray, zNewArray(mInt, 1*trQuestVarGet("rand") - 1, "statue"+xGetPointer(db)));
 						
@@ -2114,7 +2115,7 @@ highFrequency
 							xDatabaseNext(dStatuesReady);
 						}
 						
-						trQuestVarSet("angle", fModulo(6.283185, trQuestVarGet("angle") + trQuestVarGet("angleMod")));
+						angle = fModulo(6.283185, angle + angleMod);
 					}
 					
 					for(x=trQuestVarGet("rand"); >0) {
