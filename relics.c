@@ -488,8 +488,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			xSetFloat(dPlayerData,xPlayerRange,xGetFloat(dPlayerData,xPlayerRange) + 5.0 * m);
 			xSetFloat(dPlayerData,xPlayerLos,xGetFloat(dPlayerData,xPlayerLos) + 5.0 * m);
-			zSetProtoUnitStat(proto, p, 11, trQuestVarGet("p"+p+"range"));
-			zSetProtoUnitStat(proto, p, 2, trQuestVarGet("p"+p+"los"));
+			zSetProtoUnitStat(proto, p, 11, xGetFloat(dPlayerData, xPlayerRange));
+			zSetProtoUnitStat(proto, p, 2, xGetFloat(dPlayerData, xPlayerLos));
 			zSetProtoUnitStat("Revealer to Player", p, 2, xGetFloat(dPlayerData,xPlayerLos));
 		}
 		case RELIC_SPELL_RANGE:

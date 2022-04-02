@@ -294,7 +294,7 @@ void chooseClass(int p = 0, int class = 0) {
 	trEventFire(1000 + 12 * class + p);
 	int proto = xGetInt(dClass,xClassProto,class);
 	xSetPointer(dPlayerData,p);
-	xResetValues(dPlayerData);
+	xResetValues(dPlayerData, xPlayerUnit);
 	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"));
 	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"));
 	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"));

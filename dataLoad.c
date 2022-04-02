@@ -264,6 +264,7 @@ inactive
 		}
 		xSetInt(dPlayerData,xPlayerGold,savedata);
 		trQuestVarSet("p1startinggold", savedata);
+		trPlayerGrantResources(1, "gold", savedata);
 		
 		/* equipped relics */
 		for(y=0; <2) {
@@ -556,8 +557,8 @@ inactive
 		if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 			trQuestVarSet("yeebBossFight", p);
 		}
-		trPlayerGrantResources(p, "Gold", xGetInt(dPlayerData,xPlayerGold));
-		trQuestVarSet("p"+p+"startingGold", xGetInt(dPlayerData,xPlayerGold));
+		trPlayerGrantResources(p, "Gold", xGetInt(dPlayerData,xPlayerGold, p));
+		trQuestVarSet("p"+p+"startingGold", xGetInt(dPlayerData,xPlayerGold, p));
 	}
 	if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
 		trQuestVarSet("yeebHit", 1);

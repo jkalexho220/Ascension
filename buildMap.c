@@ -1744,7 +1744,7 @@ highFrequency
 				trQuestVarSet("enemyProtoCount", ENEMY_PLAYER - 1);
 				for(p=1; < ENEMY_PLAYER) {
 					trStringQuestVarSet("enemyProto" + p,
-						kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p"+p+"class")+"proto")));
+						kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))));
 				}
 				
 				trQuestVarSet("timeshiftHawks", zNewArray(mInt, 20, "timeshiftHawks"));
@@ -2381,8 +2381,8 @@ highFrequency
 	if (trQuestVarGet("play") == 1) {
 		/* no LOS for you */
 		for(p=1; < ENEMY_PLAYER) {
-			class = trQuestVarGet("p"+p+"class");
-			proto = kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto"));
+			class = xGetInt(dPlayerData, xPlayerClass, p);
+			proto = kbGetProtoUnitName(xGetInt(dClass, xClassProto, class));
 			trModifyProtounit(proto, p, 2, -999);
 			trModifyProtounit("Dog", p, 2, -999);
 			trModifyProtounit("Wolf", p, 2, -999);

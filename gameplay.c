@@ -248,7 +248,7 @@ void checkGodPowers(int p = 0) {
 	{
 		case ABILITY_READY:
 		{
-			if (trPlayerUnitCountSpecific(p, "Animal Attractor") == 2) {
+			if (trPlayerUnitCountSpecific(p, "Animal Attractor") == 1) {
 				yFindLatestReverse("p"+p+"LureObject", "Animal Attractor", p);
 				xSetVector(dPlayerData, xPlayerLurePos, kbGetBlockPosition(""+1*trQuestVarGet("p"+p+"LureObject"), true), p);
 				trMutateSelected(kbGetProtoUnitID("Rocket"));
@@ -456,7 +456,7 @@ void petDogs(int p = 0) {
 			trCounterAddTime("petDogs",30,1,"Pet Dog respawn",-1);
 		}
 	}
-	if (trQuestVarGet("p"+p+"godBoon") == BOON_MONSTER_COMPANION) {
+	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_MONSTER_COMPANION) {
 		if (xGetBool(dPlayerData, xPlayerPetMonsterReady, p)) {
 			if (trTime() > xGetInt(dPlayerData, xPlayerPetMonsterNext, p)) {
 				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true);

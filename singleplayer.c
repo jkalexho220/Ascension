@@ -305,7 +305,7 @@ void answerQuestion(int eventID = -1) {
 void classNewUnlock(int class = 0) {
 	bool unlocked = false;
 	int db = trQuestVarGet("p1relics");
-	if (trQuestVarGet("class"+class+"level") == 0) {
+	if (xGetInt(dClass, xClassLevel, class) == 0) {
 		switch(class)
 		{
 			case FIREKNIGHT:
@@ -540,7 +540,6 @@ highFrequency
 			z = z - 2;
 		}
 		
-		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
 		/* monster-pedia */
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 3) {
 			dMonsterpedia = xInitDatabase("monsterpedia");
@@ -571,7 +570,6 @@ highFrequency
 			xsEnableRule("monsterpedia_always");
 		}
 		
-		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
 		dBoons = xInitDatabase("boonStatues",12);
 		xInitAddInt(dBoons,"name");
 		xBoonType = xInitAddInt(dBoons, "type");
@@ -608,7 +606,6 @@ highFrequency
 			}
 		}
 		
-		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
 		/* if player is new */
 		if (xGetInt(dClass, xClassLevel, 1) == 0) {
 			xsEnableRule("singleplayer_cin");
@@ -704,19 +701,15 @@ highFrequency
 			}
 		}
 		
-		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
-		xPrintAll(dPlayerData, 1);
 		if (xGetInt(dPlayerData, xPlayerClass) == 0) {
 			xSetInt(dPlayerData, xPlayerClass, MOONBLADE);
 		}
 		chooseClass(1, xGetInt(dPlayerData, xPlayerClass));
-		xPrintAll(dPlayerData, 1);
 		
 		/* class selection */
 		trPaintTerrain(69,49, 75,56, 4,15, false);
 		x = 138;
 		z = 98;
-		debugLog("my progress is " + xGetInt(dPlayerData, xPlayerProgress) + " and player is " + xGetPointer(dPlayerData));
 		for(a=1; <= CLASS_COUNT) {
 			proto = xGetInt(dClass, xClassProto, a);
 			trModifyProtounit(kbGetProtoUnitName(proto),1,5,xGetInt(dClass, xClassLevel, a)-1);

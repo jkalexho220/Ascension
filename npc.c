@@ -2067,7 +2067,7 @@ void questComplete(int gem = -1, int gold = -1) {
 	}
 	if (gold > 0) {
 		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"gold", gold + trQuestVarGet("p"+p+"gold"));
+			xSetInt(dPlayerData, xPlayerGold, gold + xGetInt(dPlayerData, xPlayerGold), p);
 			trPlayerGrantResources(p, "gold", gold);
 		}
 	}

@@ -372,9 +372,11 @@ void xResetValues(int id = 0, int index = -1, int stopAt = -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 	}
 	if (stopAt == -1) {
-		stopAt = mVariableTypes + aiPlanGetNumberUserVariableValues(id, xVarNames);
+		stopAt = aiPlanGetNumberUserVariableValues(id, xVarNames);
+	} else {
+		stopAt = stopAt - mVariableTypes;
 	}
-	for(i = 1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
+	for(i = 1; < stopAt) {
 		switch(aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i))
 		{
 			case mInt:
