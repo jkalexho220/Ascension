@@ -554,9 +554,6 @@ highFrequency
 	}
 	trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
 	
-	/* DELETE ME */
-	xPrintAll(dPlayerData, 1);
-	
 	if (Multiplayer) {
 		trSetUnitIdleProcessing(true);
 	}

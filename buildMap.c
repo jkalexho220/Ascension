@@ -1007,6 +1007,8 @@ void buildEdge(int edge = 0, int type = 0) {
 								xSetFloat(dEdgeFrontier, xEdgeFrontierHeight, height);
 								xSetVector(dEdgeFrontier, xEdgeFrontierLoc, xsVectorSet(x,0,z));
 								aiPlanSetUserVariableBool(dMapTiles, x, z, true);
+							} else {
+								debugLog("this tile is true: " + x + ":" + z);
 							}
 						}
 					}
@@ -1176,6 +1178,7 @@ highFrequency
 		int n = 0;
 		int total = 0;
 		int backtrack = 5;
+		int index = 0;
 		
 		int room = 0;
 		int x0 = 0;
@@ -1817,7 +1820,10 @@ highFrequency
 			}
 			dMapTiles = aiPlanCreate("mapTiles", 8);
 			for(i=0; < 144) {
-				aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144);
+				if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
+					trSoundPlayFN("cantdothat.wav","1",-1,"","");
+					debugLog("Cannot create new user variable at " + i);
+				}
 			}
 		}
 		
@@ -1860,16 +1866,17 @@ highFrequency
 		
 		/* build guaranteed path to every room */
 		for(i=0; < 64) {
-			trQuestVarSetFromRand("search", 1, backtrack, true);
+			trQuestVarSetFromRand("search", 0, backtrack, true);
 			for(j=trQuestVarGet("search"); >0) {
 				xDatabaseNext(dFrontier, true);
 			}
+			index = xGetPointer(dFrontier);
 			if (trQuestVarGet("tile"+xGetInt(dFrontier, xRoomNumber)) < TILE_VISITED) {
 				z = xGetInt(dFrontier, xRoomNumber) / 4;
 				x = xGetInt(dFrontier, xRoomNumber) - 4 * z;
 				buildEdge(xGetInt(dFrontier, xFrontierEdge), xGetInt(dFrontier, xFrontierType));
 				
-				edgeIsPortal = (xGetInt(dFrontier, xRoomNumber) == EDGE_PORTAL);
+				edgeIsPortal = (xGetInt(dFrontier, xFrontierType) == EDGE_PORTAL);
 				trQuestVarSet("tile"+xGetInt(dFrontier, xRoomNumber), TILE_VISITED);
 				if (xGetInt(dFrontier, xRoomNumber) < 15 && xGetInt(dFrontier, xRoomNumber) != trQuestVarGet("village")) {
 					xAddDatabaseBlock(dVisited, true);
@@ -1887,18 +1894,18 @@ highFrequency
 							}
 							n = 0 + trQuestVarGet("newX") + 4 * trQuestVarGet("newZ");
 							if (trQuestVarGet("tile"+n) < TILE_VISITED) {
-								xAddDatabaseBlock(dFrontier, false);
-								xSetInt(dFrontier, xRoomNumber, n, xGetNewestPointer(dFrontier));
-								xSetInt(dFrontier, xFrontierEdge, edgeName(xGetInt(dFrontier, xRoomNumber), n), xGetNewestPointer(dFrontier));
-								xSetInt(dFrontier, xFrontierType, EDGE_NORMAL, xGetNewestPointer(dFrontier));
+								xAddDatabaseBlock(dFrontier, true);
+								xSetInt(dFrontier, xRoomNumber, n);
+								xSetInt(dFrontier, xFrontierEdge, edgeName(xGetInt(dFrontier, xRoomNumber, index), n));
+								xSetInt(dFrontier, xFrontierType, EDGE_NORMAL);
 								if (trQuestVarGet("wallEdges") > 0 && xGetDatabaseCount(dVisited) > 0) {
 									trQuestVarSetFromRand("rand", 1, xsMin(3, trQuestVarGet("wallEdges")), true);
 									if (trQuestVarGet("rand") == 1) {
-										xSetInt(dFrontier, xFrontierType, EDGE_WALL, xGetNewestPointer(dFrontier));
+										xSetInt(dFrontier, xFrontierType, EDGE_WALL);
 									}
 								}
 								if (trQuestVarGet("mapType") == MAP_OPEN) {
-									xSetInt(dFrontier, xFrontierType, EDGE_MOUNTAIN, xGetNewestPointer(dFrontier));
+									xSetInt(dFrontier, xFrontierType, EDGE_MOUNTAIN);
 								}
 							}
 						}
@@ -1907,19 +1914,20 @@ highFrequency
 						trQuestVarSet("relicTransporterDepth", trQuestVarGet("relicTransporterDepth") - 1);
 						if ((trQuestVarGet("relicTransporterDepth") <= 0) &&
 							(trQuestVarGet("relictransporterguy") == 0) &&
-							(xGetInt(dFrontier, xRoomNumber) != trQuestVarGet("villageEntrance")) &&
-							(xGetInt(dFrontier, xRoomNumber) != trQuestVarGet("bossEntranceRoom"))) {
-							trQuestVarSet("relicTransporterGuy", xGetInt(dFrontier, xRoomNumber));
+							(xGetInt(dFrontier, xRoomNumber, index) != trQuestVarGet("villageEntrance")) &&
+							(xGetInt(dFrontier, xRoomNumber, index) != trQuestVarGet("bossEntranceRoom"))) {
+							trQuestVarSet("relicTransporterGuy", xGetInt(dFrontier, xRoomNumber, index));
 						} else if (trQuestVarGet("mapType") == MAP_PORTALS) {
 							trQuestVarSetFromRand("rand", 1, 14, true);
 							n = trQuestVarGet("rand");
 							if (trQuestVarGet("tile"+n) < TILE_VISITED &&
 								n != trQuestVarGet("villageEntrance") &&
 								n != trQuestVarGet("relicTransporterGuy") &&
-								trQuestVarGet("villageEntrance") != xGetInt(dFrontier, xRoomNumber)) {
-								xAddDatabaseBlock(dFrontier, false);
-								xSetInt(dFrontier, xFrontierEdge, edgeName(xGetInt(dFrontier, xRoomNumber), n), xGetNewestPointer(dFrontier));
-								xSetInt(dFrontier, xFrontierType, EDGE_PORTAL, xGetNewestPointer(dFrontier));
+								trQuestVarGet("villageEntrance") != xGetInt(dFrontier, xRoomNumber, index)) {
+								xAddDatabaseBlock(dFrontier, true);
+								xSetInt(dFrontier, xRoomNumber, n);
+								xSetInt(dFrontier, xFrontierEdge, edgeName(xGetInt(dFrontier, xRoomNumber, index), n));
+								xSetInt(dFrontier, xFrontierType, EDGE_PORTAL);
 							}
 						}
 					}
@@ -1932,7 +1940,7 @@ highFrequency
 			} else {
 				backtrack = backtrack + 1;
 			}
-			xFreeDatabaseBlock(dFrontier);
+			xFreeDatabaseBlock(dFrontier, index);
 		}
 		
 		buildRoom(0,0, ROOM_STARTER);
