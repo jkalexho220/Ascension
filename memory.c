@@ -367,9 +367,12 @@ int xInitAddBool(int id = 0, string name = "", bool defVal = false) {
 	return(index);
 }
 
-void xResetValues(int id = 0, int index = -1) {
+void xResetValues(int id = 0, int index = -1, int stopAt = -1) {
 	if (index == -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+	}
+	if (stopAt == -1) {
+		stopAt = mVariableTypes + aiPlanGetNumberUserVariableValues(id, xVarNames);
 	}
 	for(i = 1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
 		switch(aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i))
@@ -664,7 +667,7 @@ int xGetPointer(int id = 0) {
 void xPrintAll(int id = 0, int index = 0) {
 	trChatSend(0, "<u>" + aiPlanGetName(id) + "</u>");
 	trChatSend(0, "size: " + xGetDatabaseCount(id));
-	trChatSend(0, "index: " + index);
+	trChatSend(0, "pointer: " + index);
 	for(i=1; < aiPlanGetNumberUserVariableValues(id,xVarNames)) {
 		string name = aiPlanGetUserVariableString(id,xVarNames,i);
 		int type = aiPlanGetUserVariableInt(id,xMetadata,mVariableTypes + i);
@@ -734,7 +737,4 @@ highFrequency
 	aiPlanSetUserVariableString(MALLOC,15,mString,"String");
 	aiPlanSetUserVariableString(MALLOC,15,mVector,"Vector");
 	aiPlanSetUserVariableString(MALLOC,15,mBool,"Bool");
-	if (aiPlanGetActive(MALLOC)) {
-		debugLog("active?");
-	}
 }

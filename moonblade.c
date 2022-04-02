@@ -28,6 +28,7 @@ void removeMoonblade(int p = 0) {
 }
 
 void moonbladeAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * MOONBLADE;
 	int db = trQuestVarGet("p"+p+"characters");
 	int moonbeams = trQuestVarGet("p"+p+"moonbeams");
@@ -245,6 +246,7 @@ void moonbladeAlways(int eventID = -1) {
 }
 
 void chooseMoonblade(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * MOONBLADE;
 	int db = trQuestVarGet("p"+p+"characters");
 	xPrintAll(db);
@@ -289,6 +291,7 @@ void chooseMoonblade(int eventID = -1) {
 }
 
 void moonbladeModify(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 5000 - 12 * MOONBLADE;
 	zSetProtoUnitStat("Wolf", p, 0, 0.2 * trQuestVarGet("p"+p+"health"));
 	zSetProtoUnitStat("Wolf", p, 27, 0.2 * trQuestVarGet("p"+p+"baseAttack"));

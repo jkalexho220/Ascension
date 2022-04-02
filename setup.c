@@ -290,7 +290,7 @@ void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=
 
 
 void chooseClass(int p = 0, int class = 0) {
-	trQuestVarSet("p"+p+"class", class);
+	xSetInt(dPlayerData, xPlayerClass, class);
 	trEventFire(1000 + 12 * class + p);
 	int proto = xGetInt(dClass,xClassProto,class);
 	xSetPointer(dPlayerData,p);
@@ -775,8 +775,9 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 5) {
 		trModifyProtounit("Curse SFX", 1, 8, -8);
-		if (xGetInt(dPlayerData,xPlayerProgress,1) == 0) {
+		if (xGetInt(dPlayerData,xPlayerProgress,1) <= 0) {
 			trQuestVarSet("stage", 1);
+			xsEnableRule("choose_stage_02");
 		} else {
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
 			xInitAddInt(dStageChoices,"name");
@@ -829,7 +830,6 @@ highFrequency
 		}
 		trSetLighting("default", 0.1);
 		xsDisableSelf();
-		xsEnableRule("choose_stage_01");
 	}
 }
 

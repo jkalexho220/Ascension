@@ -98,7 +98,7 @@ void saveAllData() {
 		for(y=0; <2) {
 			savedata = 0;
 			for(x=8; >0) {
-				currentdata = 1*xsMin(10, 1*trQuestVarGet("class"+(x+8*y)+"level"));
+				currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, x + 8 * y));
 				savedata = savedata * 11 + currentdata;
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
@@ -233,7 +233,9 @@ inactive
 		trBlockAllSounds(true);
 		trDelayedRuleActivation("data_load_01_ready");
 	} else {
-		xSetPointer(dPlayerData,1);
+		if (xSetPointer(dPlayerData,1) == false) {
+			debugLog("Cannot set pointer to 1 for dPlayerData!");
+		}
 		trForbidProtounit(1, "Swordsman Hero");
 		
 		/* progress, level, class */
@@ -282,7 +284,7 @@ inactive
 				savedata = 0;
 			}
 			for(x=1; <9) {
-				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
+				xSetInt(dClass, xClassLevel, iModulo(11, savedata), x + 8 * y);
 				savedata = savedata / 11;
 			}
 		}
@@ -570,7 +572,7 @@ rule data_load_emergency_exit
 highFrequency
 inactive
 {
-	if (trTime() > cActivationTime + 8) {
+	if (trTime() > cActivationTime + 5) {
 		xsDisableSelf();
 		if (loadProgress == 0) {
 			int x = 0;

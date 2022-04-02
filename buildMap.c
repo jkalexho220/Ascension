@@ -1183,6 +1183,8 @@ highFrequency
 		int z1 = 0;
 		string pName = "";
 		
+		int next = 0;
+		
 		vector pos = vector(0,0,0);
 		vector dir = vector(0,0,0);
 		
@@ -1561,7 +1563,7 @@ highFrequency
 				trQuestVarSet("fishHawks", zNewArray(mInt, 30, "fishHawks"));
 				trQuestVarSet("fishes", zNewArray(mInt, 30, "fishes"));
 				for(i=0; < 30) {
-					int next = trGetNextUnitScenarioNameNumber();
+					next = trGetNextUnitScenarioNameNumber();
 					aiPlanSetUserVariableInt(ARRAYS, 1*trQuestVarGet("fishHawks"), i, next);
 					trQuestVarSetFromRand("rand",1,360,true);
 					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
@@ -1632,7 +1634,7 @@ highFrequency
 				trQuestVarSet("cloudTornadoSFX", zNewArray(mInt, 10, "cloudTornadoSFX"));
 				trQuestVarSet("cloudTornadoBlock", zNewArray(mInt, 10, "cloudTornadoBlock"));
 				for(i=0; <10) {
-					int next = trGetNextUnitScenarioNameNumber();
+					next = trGetNextUnitScenarioNameNumber();
 					trQuestVarSetFromRand("heading", 1, 360, true);
 					aiPlanSetUserVariableInt(ARRAYS,1*trQuestVarGet("cloudTornados"),i,next);
 					trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,145,0,145,trQuestVarGet("heading"),true);
@@ -1748,7 +1750,7 @@ highFrequency
 				trQuestVarSet("timeshiftHawks", zNewArray(mInt, 20, "timeshiftHawks"));
 				trQuestVarSet("timeshiftHawkSFX", zNewArray(mInt, 20, "timeshiftHawkSFX"));
 				for(i=0; < 20) {
-					int next = trGetNextUnitScenarioNameNumber();
+					next = trGetNextUnitScenarioNameNumber();
 					aiPlanSetUserVariableInt(ARRAYS,1*trQuestVarGet("timeshiftHawks"),i,next);
 					trQuestVarSetFromRand("rand",1,360,true);
 					trArmyDispatch("1,0","Dwarf",1,150,0,150,trQuestVarGet("rand"),true);
@@ -2484,7 +2486,7 @@ highFrequency
 	trQuestVarSet("play", 0);
 	trQuestVarSet("yeebBossFight", 0);
 	for(p=1; < ENEMY_PLAYER) {
-		trQuestVarSet("p"+p+"unit", 0);
+		xSetInt(dPlayerData, xPlayerUnit, 0, p);
 		xClearDatabase(1*trQuestVarGet("p"+p+"characters"));
 		xClearDatabase(1*trQuestVarGet("p"+p+"relics"));
 		xClearDatabase(1*trQuestVarGet("p"+p+"warehouse"));

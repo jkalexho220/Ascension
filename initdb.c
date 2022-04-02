@@ -187,6 +187,7 @@ int xProjPrev = 0;
 int xProjDist = 0;
 
 int dBoons = 0;
+int xBoonType = 0;
 
 int dPlayerWolves = 0;
 int xPlayerWolfDead = 0;
@@ -199,12 +200,20 @@ int xPlayerLaserRange = 0;
 int dSlotRelics = 0;
 int xSlotRelicPad = 0;
 
+int dSlotUnits = 0;
+
+int dMonsterpedia = 0;
+int xMonsterIndex = 0;
+
+int dRelicDescriptors = 0;
+
 rule initialize_databases
 active
 highFrequency
 {
 	xsSetContextPlayer(0);
 	xsDisableSelf();
+	int db = 0;
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
 	dEnemies = xInitDatabase("enemies", 30);
 	for(db=dEnemies; >= dPlayerUnits) {
@@ -376,9 +385,6 @@ highFrequency
 		xAddDatabaseBlock(dClass);
 	}
 	
-	dBoons = xInitDatabase("boonStatues",12);
-	xInitAddInt(dBoons,"name");
-	
 	dPlayerCharacters = xInitDatabase("playerCharacters", cNumberPlayers - 2);
 	xInitAddInt(dPlayerCharacters,"name");
 	xInitAddInt(dPlayerCharacters,"player");
@@ -386,24 +392,27 @@ highFrequency
 	xCharIndex = xInitAddInt(dPlayerCharacters,"index");
 	
 	for(p=1; < cNumberPlayers - 1) {
-		trQuestVarSet("p"+p+"relics",xInitDatabase("p"+p+"relics"));
-		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"name");
-		xInitAddInt(1*trQuestVarGet("p"+p+"relics"),"type");
+		db = xInitDatabase("p"+p+"relics");
+		trQuestVarSet("p"+p+"relics",db);
+		xInitAddInt(db,"name");
+		xInitAddInt(db,"type");
 		
-		trQuestVarSet("p"+p+"warehouse",xInitDatabase("p"+p+"warehouse"));
-		xInitAddInt(1*trQuestVarGet("p"+p+"warehouse"),"name");
-		xInitAddInt(1*trQuestVarGet("p"+p+"warehouse"),"type");
+		db = xInitDatabase("p"+p+"warehouse");
+		trQuestVarSet("p"+p+"warehouse",db);
+		xInitAddInt(db,"name");
+		xInitAddInt(db,"type");
 		
-		trQuestVarSet("p"+p+"characters",xInitDatabase("p"+p+"characters"));
+		db = xInitDatabase("p"+p+"characters");
+		trQuestVarSet("p"+p+"characters",db);
 		/* the three below are shared with playerCharacter */
-		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"name");
-		xCharSpecialAttack = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"specialAttack");
-		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"id");
-		xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"index");
-		xCharAttacking = xInitAddBool(1*trQuestVarGet("p"+p+"characters"),"attacking");
-		xCharAttackNext = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackNext");
-		xCharAttackTarget = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackTarget");
-		xCharAttackTargetIndex = xInitAddInt(1*trQuestVarGet("p"+p+"characters"),"attackTargetIndex");
+		xInitAddInt(db,"name");
+		xCharSpecialAttack = xInitAddInt(db,"specialAttack");
+		xInitAddInt(db,"id");
+		xInitAddInt(db,"index");
+		xCharAttacking = xInitAddBool(db,"attacking");
+		xCharAttackNext = xInitAddInt(db,"attackNext");
+		xCharAttackTarget = xInitAddInt(db,"attackTarget");
+		xCharAttackTargetIndex = xInitAddInt(db,"attackTargetIndex");
 		
 		xAddDatabaseBlock(dPlayerData);
 	}

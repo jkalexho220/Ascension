@@ -1125,7 +1125,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 }
 
 string className(int class = 0) {
-	string name = "N/A";
+	string name = "number: " + class;
 	switch(class)
 	{
 		case MOONBLADE:

@@ -1,52 +1,62 @@
+
 void spChooseBoon(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int proto = 0;
+	if (xSetPointer(dPlayerData,1) == false) {
+		debugLog("Cannot set pointer of dPlayerData to 1! Context: " + xsGetContextPlayer());
+	}
 	/* TWO RELICS off */
-	if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+	if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_TWO_RELICS) {
 		for(a=1; <= CLASS_COUNT) {
-			proto = trQuestVarGet("class"+a+"proto");
+			proto = xGetInt(dClass, xClassProto, a);
 			trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, -2);
 		}
-		trUnitSelectClear();
-		trUnitSelectByQV("p1unit");
-		trUnitChangeProtoUnit(kbGetProtoUnitName(1*trQuestVarGet("class"+1*trQuestVarGet("p1class")+"proto")));
+		xUnitSelect(dPlayerData, xPlayerUnit);
+		trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData,xPlayerClass))));
 		equipRelicsAgain(1);
-	} else if (trQuestVarGet("p1godBoon") == BOON_DOUBLE_FAVOR) {
+	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_DOUBLE_FAVOR) {
 		trSetCivAndCulture(1, 1, 0);
 	}
-	
-	trQuestVarSet("p1godBoon", trQuestVarGet("selectedBoon"));
+	xSetInt(dPlayerData, xPlayerGodBoon, trQuestVarGet("selectedBoon"));
 	trQuestVarSetFromRand("rand", 1, 5, true);
 	trSoundPlayFN("ui\thunder"+1*trQuestVarGet("rand")+".wav","1",-1,"","");
-	trVectorSetUnitPos("pos", "selectedBoonUnit");
+	vector pos = kbGetBlockPosition(""+1*trQuestVarGet("selectedBoonUnit"));
 	trUnitSelectClear();
 	trUnitSelectByQV("boonSpotlight", true);
-	trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+	trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
 	
 	/* TWO RELICS on */
-	if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+	if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_TWO_RELICS) {
 		for(a=1; <= CLASS_COUNT) {
-			proto = trQuestVarGet("class"+a+"proto");
+			proto = xGetInt(dClass, xClassProto, a);
 			trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, 2);
 		}
-	} else if (trQuestVarGet("p1godBoon") == BOON_DOUBLE_FAVOR) {
+	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_DOUBLE_FAVOR) {
 		trSetCivAndCulture(1, 0, 0);
-	} else if (trQuestVarGet("p1godboon") == BOON_MONSTER_COMPANION) {
+	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_MONSTER_COMPANION) {
 		uiMessageBox("Select a monster in the Monsterpedia to be your pet.");
 	}
 }
 
 void spSwitchToClass(int class = -1) {
+	xsSetContextPlayer(0);
 	chooseClass(1, class - 3000);
 }
 
 void spExplainClass(int class = -1) {
+	xsSetContextPlayer(0);
 	class = class - 4000;
 	explainClass(class);
 }
 
 void spAscendClass(int class = -1) {
+	xsSetContextPlayer(0);
 	class = class - 7000;
-	int gemstone = trQuestVarGet("class"+class+"gemstone");
+	xSetPointer(dClass, class);
+	xSetPointer(dPlayerData, 1);
+	int gemstone = xGetInt(dClass, xClassGemstone);
+	vector pos = vector(0,0,0);
+	vector loc = vector(0,0,0);
 	if (trPlayerResourceCount(1, "Gold") < trQuestVarGet("goldCost")) {
 		trSoundPlayFN("cantdothat.wav","1",-1,"","");
 		uiMessageBox("You don't have enough gold! You need " + 1*trQuestVarGet("goldCost"));
@@ -59,45 +69,45 @@ void spAscendClass(int class = -1) {
 		trPlayerGrantResources(1, "Gold", 0-trQuestVarGet("goldCost"));
 		trQuestVarSet("gemstone"+gemstone, trQuestVarGet("gemstone"+gemstone) - trQuestVarGet("gemstoneCost"));
 		trSoundPlayFN("ageadvance.wav","1",-1,"","");
-		trQuestVarSet("class"+class+"level", 1 + trQuestVarGet("class"+class+"level"));
-		trQuestVarSet("p1level", 1 + trQuestVarGet("p1level"));
-		uiMessageBox(className(class) + " ascended to level " + 1*trQuestVarGet("class"+class+"level") + "! +1 relic slot!");
-		trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),1,5,1);
-		trSetCivilizationNameOverride(1, "Level " + (1+trQuestVarGet("p1level")));
-		if (trQuestVarGet("class"+class+"level") >= 5) {
-			if (trQuestVarGet("class"+ALCHEMIST+"level") == 0) {
-				trQuestVarSet("class"+ALCHEMIST+"level", 1);
-				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+ALCHEMIST+"proto")),1,5,1);
+		xSetInt(dClass, xClassLevel, 1 + xGetInt(dClass, xClassLevel));
+		xSetInt(dPlayerData, xPlayerLevel, 1 + xGetInt(dPlayerData, xPlayerLevel));
+		uiMessageBox(className(class) + " ascended to level " + xGetInt(dClass, xClassLevel) + "! +1 relic slot!");
+		trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto)),1,5,1);
+		trSetCivilizationNameOverride(1, "Level " + (1+xGetInt(dPlayerData, xPlayerLevel)));
+		if (xGetInt(dClass, xClassLevel) >= 5) {
+			if (xGetInt(dClass, xClassLevel, ALCHEMIST) == 0) {
+				xSetInt(dClass, xClassLevel, ALCHEMIST);
+				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, ALCHEMIST)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), ALCHEMIST);
 				xsEnableRule("singleplayer_unlocks");
-				trVectorSetUnitPos("pos", "class"+ALCHEMIST+"unit");
-				vectorToGrid("pos", "loc");
-				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("class"+ALCHEMIST+"unit"));
+				loc = vectorToGrid(pos);
+				trPaintTerrain(xsVectorGetX(loc),xsVectorGetZ(loc),xsVectorGetX(loc),xsVectorGetZ(loc),4,15,false);
 			}
 		}
-		if (trQuestVarGet("class"+class+"level") >= 7) {
-			if (trQuestVarGet("class"+STARSEER+"level") == 0) {
-				trQuestVarSet("class"+STARSEER+"level", 1);
-				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+STARSEER+"proto")),1,5,1);
+		if (xGetInt(dClass, xClassLevel) >= 7) {
+			if (xGetInt(dClass, xClassLevel, STARSEER) == 0) {
+				xSetInt(dClass, xClassLevel, STARSEER);
+				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, STARSEER)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), STARSEER);
 				xsEnableRule("singleplayer_unlocks");
-				trVectorSetUnitPos("pos", "class"+STARSEER+"unit");
-				vectorToGrid("pos", "loc");
-				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("class"+STARSEER+"unit"));
+				loc = vectorToGrid(pos);
+				trPaintTerrain(xsVectorGetX(loc),xsVectorGetZ(loc),xsVectorGetX(loc),xsVectorGetZ(loc),4,15,false);
 			}
 		}
-		if (trQuestVarGet("class"+class+"level") >= 9) {
-			if (trQuestVarGet("class"+SAVIOR+"level") == 0) {
-				trQuestVarSet("class"+SAVIOR+"level", 1);
-				trModifyProtounit(kbGetProtoUnitName(1*trQuestVarGet("class"+SAVIOR+"proto")),1,5,1);
+		if (xGetInt(dClass, xClassLevel) >= 9) {
+			if (xGetInt(dClass, xClassLevel, SAVIOR) == 0) {
+				xSetInt(dClass, xClassLevel, SAVIOR);
+				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, SAVIOR)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), SAVIOR);
 				xsEnableRule("singleplayer_unlocks");
-				trVectorSetUnitPos("pos", "class"+SAVIOR+"unit");
-				vectorToGrid("pos", "loc");
-				trPaintTerrain(trQuestVarGet("locx"),trQuestVarGet("locz"),trQuestVarGet("locx"),trQuestVarGet("locz"),4,15,false);
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("class"+SAVIOR+"unit"));
+				loc = vectorToGrid(pos);
+				trPaintTerrain(xsVectorGetX(loc),xsVectorGetZ(loc),xsVectorGetX(loc),xsVectorGetZ(loc),4,15,false);
 			}
 		}
 		trChatHistoryClear();
@@ -109,17 +119,18 @@ void spAscendClass(int class = -1) {
 }
 
 void spinQuantumSlotMachine(int eventID = -1) {
+	xsSetContextPlayer(0);
 	trQuestVarSet("quantumRelic", 0);
-	for(x=yGetDatabaseCount("slotRelics"); >0) {
-		yDatabaseNext("slotRelics");
-		trQuestVarSet("ownedRelics"+1*yGetVar("slotRelics", "type"),
-			trQuestVarGet("ownedRelics"+1*yGetVar("slotRelics", "type")) - 1);
-		trQuestVarSet("quantumRelic", trQuestVarGet("quantumRelic") + yGetVar("slotRelics", "type"));
+	for(x=xGetDatabaseCount(dSlotRelics); >0) {
+		xDatabaseNext(dSlotRelics);
+		trQuestVarSet("ownedRelics"+xGetInt(dSlotRelics, xRelicType),
+			trQuestVarGet("ownedRelics"+xGetInt(dSlotRelics, xRelicType)) - 1);
+		trQuestVarSet("quantumRelic", trQuestVarGet("quantumRelic") + xGetInt(dSlotRelics, xRelicType));
 	}
 	trQuestVarSetFromRand("quantumRelic", 1, xsMin(25, trQuestVarGet("quantumRelic")), true);
-	for(x=yGetDatabaseCount("slotRelics"); >0) {
-		yDatabaseNext("slotRelics");
-		if (trQuestVarGet("quantumRelic") == yGetVar("slotRelics", "type")) {
+	for(x=xGetDatabaseCount(dSlotRelics); >0) {
+		xDatabaseNext(dSlotRelics);
+		if (trQuestVarGet("quantumRelic") == xGetInt(dSlotRelics, xRelicType)) {
 			trQuestVarSet("quantumRelic", RELIC_NICKONHAWK_TICKET);
 			trQuestVarSet("dreamGogglesCount", 1 + trQuestVarGet("dreamGogglesCount"));
 		}
@@ -209,7 +220,8 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trUnitConvert(0);
 			trMutateSelected(kbGetProtoUnitID("Helepolis"));
 			trSetSelectedScale(1.2,0.25,2.0);
-			yAddToDatabase("monsterpedia", "next");
+			xAddDatabaseBlock(dMonsterpedia, true);
+			xSetInt(dMonsterpedia, xUnitName, 1*trQuestVarGet("next"));
 			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
 			trUnitSelectClear();
@@ -253,11 +265,12 @@ void monsterpedia(int stage = 0, int x = 0) {
 		trArmySelect("1,0");
 		trUnitConvert(0);
 		trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
-		yAddToDatabase("monsterpedia", "next");
+		xAddDatabaseBlock(dMonsterpedia, true);
+		xSetInt(dMonsterpedia, xUnitName, 1*trQuestVarGet("next"));
 		if (i < 5) {
-			yAddUpdateVar("monsterpedia", "index", 4 * (stage - 1) + i - 1);
+			xSetInt(dMonsterpedia,xMonsterIndex, 4 * (stage - 1) + i - 1);
 		} else {
-			yAddUpdateVar("monsterpedia", "index", -1);
+			xSetInt(dMonsterpedia, xMonsterIndex, -1);
 		}
 	}
 	trUnitSelectClear();
@@ -266,6 +279,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 }
 
 void answerQuestion(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int answer = eventID - 6000;
 	int question = trQuestVarGet("currentQuestion");
 	string result = "Incorrect! ";
@@ -290,6 +304,7 @@ void answerQuestion(int eventID = -1) {
 
 void classNewUnlock(int class = 0) {
 	bool unlocked = false;
+	int db = trQuestVarGet("p1relics");
 	if (trQuestVarGet("class"+class+"level") == 0) {
 		switch(class)
 		{
@@ -325,13 +340,14 @@ void classNewUnlock(int class = 0) {
 			}
 			case SPARKWITCH:
 			{
+				trQuestVarSet("relicCount", xGetDatabaseCount(db) + xGetDatabaseCount(dFreeRelics));
 				if (trQuestVarGet("relicCount") >= 100) {
 					unlocked = true;
 				}
 			}
 			case COMMANDO:
 			{
-				trQuestVarSet("relicCount", yGetDatabaseCount("p1relics") + yGetDatabaseCount("freeRelics"));
+				trQuestVarSet("relicCount", xGetDatabaseCount(db) + xGetDatabaseCount(dFreeRelics));
 				if (trQuestVarGet("relicCount") >= 50) {
 					unlocked = true;
 				}
@@ -357,7 +373,7 @@ void classNewUnlock(int class = 0) {
 		}
 	}
 	if (unlocked) {
-		trQuestVarSet("class"+class+"level", 1);
+		xSetInt(dClass, xClassLevel, 1, class);
 		trQuestVarSet("newClasses", 1 + trQuestVarGet("newClasses"));
 		trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), class);
 	}
@@ -394,13 +410,17 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 2) {
+		xsSetContextPlayer(0);
 		bool boons = false;
 		int proto = 0;
+		vector pos = vector(0,0,0);
 		xsDisableSelf();
 		trLetterBox(false);
 		trUIFadeToColor(0,0,0,1000,0,false);
 		trMusicPlayCurrent();
 		trPlayNextMusicTrack();
+		
+		xSetPointer(dPlayerData, 1);
 		
 		trVectorQuestVarSet("startPosition", vector(135,0,135));
 		
@@ -439,6 +459,10 @@ highFrequency
 		trUnitConvert(0);
 		trMutateSelected(kbGetProtoUnitID("Outpost"));
 		
+		dRelicDescriptors = xInitDatabase("relicDescriptors");
+		xInitAddInt(dRelicDescriptors, "name");
+		xInitAddInt(dRelicDescriptors, "type");
+		
 		/* relic warehouse */
 		trPaintTerrain(46,65, 57,78, 0,70, false);
 		x = 115;
@@ -450,15 +474,17 @@ highFrequency
 				trArmySelect("0,0");
 				trMutateSelected(relicProto(a));
 				trSetSelectedScale(0.5,0.5,0.5);
-				yAddToDatabase("relicDescriptors", "next");
-				yAddUpdateVar("relicDescriptors", "type", a);
+				xAddDatabaseBlock(dRelicDescriptors, true);
+				xSetInt(dRelicDescriptors, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dRelicDescriptors, xRelicType, a);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Relic");
 				for(b=0; <trQuestVarGet("ownedRelics"+a)) {
-					yAddToDatabase("freeRelics", "next");
-					yAddUpdateVar("freeRelics", "type", a);
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics,xUnitName,1*trQuestVarGet("next"));
+					xSetInt(dFreeRelics,xRelicType, a);
 					trQuestVarSet("next", 1 + trQuestVarGet("next"));
 				}
 			}
@@ -470,15 +496,17 @@ highFrequency
 				trArmySelect("0,0");
 				trMutateSelected(relicProto(a+10));
 				trSetSelectedScale(0.5,0.5,0.5);
-				yAddToDatabase("relicDescriptors", "next");
-				yAddUpdateVar("relicDescriptors", "type", a+10);
+				xAddDatabaseBlock(dRelicDescriptors, true);
+				xSetInt(dRelicDescriptors, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dRelicDescriptors, xRelicType, a + 10);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+(a+10)),x,0,z,0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Relic");
 				for(b=0; <trQuestVarGet("ownedRelics"+(a+10))) {
-					yAddToDatabase("freeRelics", "next");
-					yAddUpdateVar("freeRelics", "type", a+10);
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics,xUnitName,1*trQuestVarGet("next"));
+					xSetInt(dFreeRelics,xRelicType, a + 10);
 					trQuestVarSet("next", 1 + trQuestVarGet("next"));
 				}
 			}
@@ -495,41 +523,47 @@ highFrequency
 				trArmySelect("0,0");
 				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(a)));
 				trSetSelectedScale(0.5,0.5,0.5);
-				yAddToDatabase("relicDescriptors", "next");
-				yAddUpdateVar("relicDescriptors", "type", a);
+				xAddDatabaseBlock(dRelicDescriptors, true);
+				xSetInt(dRelicDescriptors, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dRelicDescriptors, xRelicType, a);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Dwarf",trQuestVarGet("ownedRelics"+a),x,0,z,0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Relic");
 				for(b=0; <trQuestVarGet("ownedRelics"+a)) {
-					yAddToDatabase("freeRelics", "next");
-					yAddUpdateVar("freeRelics", "type", a);
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics,xUnitName,1*trQuestVarGet("next"));
+					xSetInt(dFreeRelics,xRelicType, a);
 					trQuestVarSet("next", 1 + trQuestVarGet("next"));
 				}
 			}
 			z = z - 2;
 		}
 		
+		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
 		/* monster-pedia */
-		if (trQuestVarGet("p1progress") >= 3) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 3) {
+			dMonsterpedia = xInitDatabase("monsterpedia");
+			xInitAddInt(dMonsterpedia, "name");
+			xMonsterIndex = xInitAddInt(dMonsterpedia, "index");
 			/* 72 is the center. 15 is the width */
-			for(x=0; < trQuestVarGet("p1progress")) {
+			for(x=0; < xGetInt(dPlayerData, xPlayerProgress)) {
 				monsterpedia(x+1, 57 + 3 * x);
 			}
 			trPaintTerrain(71,71,73,87,0,53,false);
 			trQuestVarSet("monsterpediaSpotlight", -1);
-			if (trQuestVarGet("p1godBoon") == BOON_MONSTER_COMPANION) {
+			if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_MONSTER_COMPANION) {
 				trQuestVarSet("monsterpediaSpotlight", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
 				trArmySelect("0,0");
 				trUnitChangeProtoUnit("Garrison Flag Sky Passage");
-				for(x=yGetDatabaseCount("monsterpedia"); >0) {
-					yDatabaseNext("monsterpedia");
-					if (yGetVar("monsterpedia", "index") == trQuestVarGet("p1monsterIndex")) {
-						trVectorSetUnitPos("pos", "monsterpedia");
+				for(x=xGetDatabaseCount(dMonsterpedia); >0) {
+					xDatabaseNext(dMonsterpedia);
+					if (xGetInt(dMonsterpedia, xMonsterIndex) == xGetInt(dPlayerData, xPlayerMonsterIndex)) {
+						pos = kbGetBlockPosition(""+xGetInt(dMonsterpedia, xUnitName));
 						trUnitSelectClear();
 						trUnitSelectByQV("monsterpediaSpotlight");
-						trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+						trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
 						break;
 					}
 				}
@@ -537,6 +571,10 @@ highFrequency
 			xsEnableRule("monsterpedia_always");
 		}
 		
+		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
+		dBoons = xInitDatabase("boonStatues",12);
+		xInitAddInt(dBoons,"name");
+		xBoonType = xInitAddInt(dBoons, "type");
 		/* boons */
 		for(a=1; <=12) {
 			if (trQuestVarGet("boonUnlocked"+a) == 1) {
@@ -551,30 +589,31 @@ highFrequency
 					trPaintTerrain(88,69, 92,75, 4,15, false);
 					boons = true;
 				}
-				x = 176 + 4 * iModulo(3, a-1);
-				z = 138 + 4 * ((a-1) / 3);
+				x = 177 + 4 * iModulo(3, a-1);
+				z = 139 + 4 * ((a-1) / 3);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Statue of Lightning",1,x,0,z,180,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
 				trUnitConvert(0);
 				overrideStatue(a);
-				yAddToDatabase("boons", "next");
-				yAddUpdateVar("boons", "type", a);
-				if (trQuestVarGet("p1godBoon") == a) {
-					trVectorSetUnitPos("pos", "next");
+				xAddDatabaseBlock(dBoons, true);
+				xSetInt(dBoons, xUnitName, 1*trQuestVarGet("next"));
+				xSetInt(dBoons, xBoonType, a);
+				if (xGetInt(dPlayerData, xPlayerGodBoon) == a) {
 					trUnitSelectClear();
 					trUnitSelectByQV("boonSpotlight", true);
-					trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+					trUnitTeleport(x,0,z);
 				}
 			}
 		}
 		
+		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
 		/* if player is new */
-		if (trQuestVarGet("class1level") == 0) {
+		if (xGetInt(dClass, xClassLevel, 1) == 0) {
 			xsEnableRule("singleplayer_cin");
-			trQuestVarSet("class1level", 1);
-			trQuestVarSet("class2level", 1);
+			xSetInt(dClass, xClassLevel, 1, 1);
+			xSetInt(dClass, xClassLevel, 1, 2);
 			trQuestVarSet("gemstone"+STARSTONE, 1 + trQuestVarGet("gemstone"+STARSTONE));
 			startNPCDialog(NPC_EXPLAIN_SINGLEPLAYER);
 		} else {
@@ -582,13 +621,13 @@ highFrequency
 			xsEnableRule("singleplayer_unlocks");
 			trEventSetHandler(6001, "answerQuestion");
 			trEventSetHandler(6002, "answerQuestion");
-			for(a=4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2)); >2) {
+			for(a=4 * (1 + xsFloor(xGetInt(dPlayerData, xPlayerProgress) / 2)); >2) {
 				classNewUnlock(a);
 			}
 			if (boons && (trQuestVarGet("boonUnlocked0") == 0)) {
 				startNPCDialog(NPC_EXPLAIN_BOONS);
 			}
-			if (trQuestVarGet("p1progress") > trQuestVarGet("zenoQuiz")) {
+			if (xGetInt(dPlayerData, xPlayerProgress) > trQuestVarGet("zenoQuiz")) {
 				trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Hoplite", 1, 131, 0, 161, 225, true);
 				trUnitSelectClear();
@@ -597,7 +636,7 @@ highFrequency
 				xsEnableRule("zeno_quiz_start");
 				if (trQuestVarGet("zenoQuiz") == 2) {
 					/* introduce monsterpedia */
-					uiLookAtUnitByName(""+1*yDatabaseNext("monsterpedia"));
+					uiLookAtUnitByName(""+xGetInt(dMonsterpedia, xUnitName));
 					startNPCDialog(NPC_MONSTERPEDIA);
 				}
 			}
@@ -608,6 +647,8 @@ highFrequency
 				dSlotRelics = xInitDatabase("slotRelics");
 				xInitAddInt(dSlotRelics, "name");
 				xInitAddInt(dSlotRelics, "type");
+				dSlotUnits = xInitDatabase("slotUnits");
+				xInitAddInt(dSlotUnits, "name");
 				xSlotRelicPad = xInitAddInt(dSlotRelics, "pad");
 				trQuestVarSet("nextPad", 0);
 				trEventSetHandler(9000, "spinQuantumSlotMachine");
@@ -620,31 +661,32 @@ highFrequency
 					trUnitConvert(0);
 					if (trQuestVarGet("p1nickQuestProgress") < 5) {
 						trUnitChangeProtoUnit("Relic");
-						yAddToDatabase("freeRelics", "nickonhawk");
-						yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK);
+						xAddDatabaseBlock(dFreeRelics, true);
+						xSetInt(dFreeRelics, xUnitName, 1*trQuestVarGet("nickonhawk"));
+						xSetInt(dFreeRelics, xRelicType, RELIC_NICKONHAWK);
 					} else {
 						xsEnableRule("quantum_slot_machine");
 						trQuestVarSet("quantumSlotMachine", 1);
 						trUnitChangeProtoUnit("Hero Greek Odysseus");
-						trVectorQuestVarSet("padPos", vector(161,0,165));
+						pos = vector(161,0,165);
 						for(x=1; <= 3) {
 							trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+							trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
 							trUnitSelectClear();
 							trUnitSelectByQV("pad"+x, true);
 							trUnitConvert(0);
 							trMutateSelected(kbGetProtoUnitID("Statue of Automaton Base"));
 							trSetSelectedScale(1.5,1,1.5);
-							trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
-							trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+							pos = xsVectorSet(xsVectorGetX(pos) + 2, 0, xsVectorGetZ(pos) - 2);
 						}
 						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 						trArmyDispatch("1,0","Dwarf",trQuestVarGet("dreamGogglesCount"),163,0,159,225,true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("Relic");
 						for(x=trQuestVarGet("dreamGogglesCount"); >0) {
-							yAddToDatabase("freeRelics", "next");
-							yAddUpdateVar("freeRelics", "type", RELIC_NICKONHAWK_TICKET);
+							xAddDatabaseBlock(dFreeRelics, true);
+							xSetInt(dFreeRelics, xUnitName, 1*trQuestVarGet("next"));
+							xSetInt(dFreeRelics, xRelicType, RELIC_NICKONHAWK_TICKET);
 							trQuestVarSet("next", 1 + trQuestVarGet("next"));
 						}
 					}
@@ -662,31 +704,35 @@ highFrequency
 			}
 		}
 		
-		if (trQuestVarGet("p1class") == 0) {
-			trQuestVarSet("p1class", MOONBLADE);
+		debugLog("My progress is " + xGetInt(dPlayerData, xPlayerProgress));
+		xPrintAll(dPlayerData, 1);
+		if (xGetInt(dPlayerData, xPlayerClass) == 0) {
+			xSetInt(dPlayerData, xPlayerClass, MOONBLADE);
 		}
-		chooseClass(1, 1*trQuestVarGet("p1class"));
+		chooseClass(1, xGetInt(dPlayerData, xPlayerClass));
+		xPrintAll(dPlayerData, 1);
 		
 		/* class selection */
 		trPaintTerrain(69,49, 75,56, 4,15, false);
 		x = 138;
 		z = 98;
+		debugLog("my progress is " + xGetInt(dPlayerData, xPlayerProgress) + " and player is " + xGetPointer(dPlayerData));
 		for(a=1; <= CLASS_COUNT) {
-			proto = trQuestVarGet("class"+a+"proto");
-			trModifyProtounit(kbGetProtoUnitName(proto),1,5,trQuestVarGet("class"+a+"level")-1);
-			if (trQuestVarGet("p1godBoon") == BOON_TWO_RELICS) {
+			proto = xGetInt(dClass, xClassProto, a);
+			trModifyProtounit(kbGetProtoUnitName(proto),1,5,xGetInt(dClass, xClassLevel, a)-1);
+			if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_TWO_RELICS) {
 				trModifyProtounit(kbGetProtoUnitName(proto), 1, 5, 2);
 			}
 			trQuestVarSet("class"+a+"unit", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Dwarf",1,x,0,z,180,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
-			if (a <= 4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2))) {
-				trMutateSelected(1*trQuestVarGet("class"+a+"proto"));
+			if (a <= 4 * (1 + xsFloor(xGetInt(dPlayerData, xPlayerProgress) / 2))) {
+				trMutateSelected(xGetInt(dClass, xClassProto, a));
 			} else {
 				trUnitChangeProtoUnit("Atlantis Wall Connector");
 			}
-			if (trQuestVarGet("class"+a+"level") == 0) {
+			if (xGetInt(dClass, xClassLevel, a) == 0) {
 				trPaintTerrain(x/2,z/2,x/2,z/2,2,12,false);
 			}
 			x = x + 4;
@@ -721,10 +767,11 @@ rule singleplayer_always
 inactive
 highFrequency
 {
+	xsSetContextPlayer(0);
 	int class = 0;
 	int gem = 0;
-	trUnitSelectClear();
-	trUnitSelectByQV("p1unit");
+	xSetPointer(dPlayerData, 1);
+	xUnitSelect(dPlayerData, xPlayerUnit);
 	if (trUnitGetIsContained("Sky Passage")) {
 		xsDisableSelf();
 		xsDisableRule("gameplay_always");
@@ -733,9 +780,9 @@ highFrequency
 		for(x=30; >0) {
 			trQuestVarSet("ownedRelics"+x, 0);
 		}
-		for(x=yGetDatabaseCount("freeRelics"); >0) {
-			yDatabaseNext("freeRelics");
-			class = yGetVar("freeRelics", "type");
+		for(x=xGetDatabaseCount(dFreeRelics); >0) {
+			xDatabaseNext(dFreeRelics);
+			class = xGetInt(dFreeRelics, xRelicType);
 			trQuestVarSet("ownedRelics"+class, 1 + trQuestVarGet("ownedRelics"+class));
 		}
 		saveAllData();
@@ -750,16 +797,16 @@ highFrequency
 		trUnitSelectByQV("class"+x+"unit");
 		if (trUnitIsSelected()) {
 			reselectMyself();
-			if (x > 4 * (1 + xsFloor(trQuestVarGet("p1progress") / 2))) {
+			if (x > 4 * (1 + xsFloor(xGetInt(dPlayerData, xPlayerProgress) / 2))) {
 				explainClass(x + 16);
-			} else if (trQuestVarGet("p1class") == x || trQuestVarGet("class"+x+"level") == 0) {
+			} else if (xGetInt(dPlayerData, xPlayerClass) == x || xGetInt(dClass, xClassLevel, x) == 0) {
 				explainClass(x);
-				if (trQuestVarGet("class"+x+"level") == 0) {
+				if (xGetInt(dClass, xClassLevel, x) == 0) {
 					trDelayedRuleActivation("singleplayer_explain_class");
 				}
-			} else if (trQuestVarGet("class"+x+"level") > 0) {
-				gem = 1*trQuestVarGet("class"+x+"gemstone");
-				trShowChoiceDialog(className(x) + " (Level " + 1*trQuestVarGet("class"+x+"level")+") [" + gemstoneName(gem) + "]",
+			} else if (xGetInt(dClass, xClassLevel, x) > 0) {
+				gem = xGetInt(dClass, xClassGemstone, x);
+				trShowChoiceDialog(className(x) + " (Level " + xGetInt(dClass, xClassLevel, x)+") [" + gemstoneName(gem) + "]",
 					"Switch to this class", 3000 + x, "View class details", 4000 + x);
 			}
 		}
@@ -769,12 +816,13 @@ highFrequency
 	trUnitSelectByQV("levelupObelisk");
 	if (trUnitIsSelected()) {
 		reselectMyself();
-		class = trQuestVarGet("p1class");
-		trQuestVarSet("goldCost", 100 * trQuestVarGet("class"+class+"level"));
-		trQuestVarSet("gemstoneCost", (1 + trQuestVarGet("class"+class+"level")) / 2);
+		class = xGetInt(dPlayerData, xPlayerClass);
+		xSetPointer(dClass, class);
+		trQuestVarSet("goldCost", 100 * xGetInt(dClass, xClassLevel));
+		trQuestVarSet("gemstoneCost", (1 + xGetInt(dClass, xClassLevel)) / 2);
 		string yesPrompt = "Yes (" + 1*trQuestVarGet("goldCost") + " gold + " + 1*trQuestVarGet("gemstoneCost") + " ";
-		yesPrompt = yesPrompt + gemstoneName(1*trQuestVarGet("class"+class+"gemstone")) + ")";
-		if (trQuestVarGet("p1level") < 9) {
+		yesPrompt = yesPrompt + gemstoneName(xGetInt(dClass, xClassGemstone)) + ")";
+		if (xGetInt(dPlayerData, xPlayerLevel) < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
 				yesPrompt, 7000+class, "No", -1);
 			trChatHistoryClear();
@@ -787,16 +835,17 @@ highFrequency
 		}
 	}
 	
-	if (yGetDatabaseCount("relicDescriptors") > 0) {
-		yDatabaseNext("relicDescriptors", true);
+	if (xGetDatabaseCount(dRelicDescriptors) > 0) {
+		xDatabaseNext(dRelicDescriptors);
+		xUnitSelect(dRelicDescriptors, xUnitName);
 		if (trUnitIsSelected()) {
-			if (trQuestVarGet("selectedDescriptor") != trQuestVarGet("relicDescriptors")) {
-				trStringQuestVarSet("description", relicName(1*yGetVar("relicDescriptors","type")) + ":Count: ");
+			if (trQuestVarGet("selectedDescriptor") != xGetInt(dRelicDescriptors, xUnitName)) {
+				trStringQuestVarSet("description", relicName(xGetInt(dRelicDescriptors, xRelicType)) + ":Count: ");
 				trSoundPlayFN("","1",-1,
-					trStringQuestVarGet("description") + 1*trQuestVarGet("ownedRelics"+1*yGetVar("relicDescriptors","type")),"");
-				trQuestVarSet("selectedDescriptor", trQuestVarGet("relicDescriptors"));
+					trStringQuestVarGet("description") + 1*trQuestVarGet("ownedRelics"+xGetInt(dRelicDescriptors, xRelicType)),"");
+				trQuestVarSet("selectedDescriptor", xGetInt(dRelicDescriptors, xUnitName));
 			}
-		} else if (trQuestVarGet("selectedDescriptor") == trQuestVarGet("relicDescriptors")) {
+		} else if (trQuestVarGet("selectedDescriptor") == xGetInt(dRelicDescriptors, xUnitName)) {
 			trQuestVarSet("selectedDescriptor",0);
 			trLetterBox(false);
 		}
@@ -1019,7 +1068,10 @@ rule monsterpedia_always
 inactive
 highFrequency
 {
-	int id = yDatabaseNext("monsterpedia", true);
+	xDatabaseNext(dMonsterpedia);
+	int id = kbGetBlockID(""+xGetInt(dMonsterpedia, xUnitName));
+	trUnitSelectClear();
+	trUnitSelectByID(id);
 	string name = "N/A";
 	if (trUnitIsSelected()) {
 		name = kbGetProtoUnitName(kbGetUnitBaseTypeID(id));
@@ -1178,11 +1230,11 @@ highFrequency
 		for(x=2; <= trQuestVarGet("descriptionCount")) {
 			trChatSend(0, trStringQuestVarGet("description"+x));
 		}
-		if (trQuestVarGet("p1godBoon") == BOON_MONSTER_COMPANION) {
-			if (yGetVar("monsterpedia","index") > 0) {
-				trQuestVarSet("p1monsterIndex", yGetVar("monsterpedia","index"));
-				trQuestVarSet("p1monsterProto", kbGetUnitBaseTypeID(id));
-				trVectorSetUnitPos("pos", "monsterpedia");
+		if (xGetInt(dPlayerData, xPlayerGodBoon, 1) == BOON_MONSTER_COMPANION) {
+			if (xGetInt(dMonsterpedia,xMonsterIndex) > 0) {
+				xSetInt(dPlayerData, xPlayerMonsterIndex, xGetInt(dMonsterpedia, xMonsterIndex), 1);
+				xSetInt(dPlayerData, xPlayerMonsterProto, kbGetUnitBaseTypeID(id), 1);
+				vector pos = kbGetBlockPosition(""+xGetInt(dMonsterpedia, xUnitName));
 				trUnitSelectClear();
 				trUnitSelectByQV("monsterpediaSpotlight");
 				if (trUnitAlive() == false) {
@@ -1191,7 +1243,7 @@ highFrequency
 					trArmySelect("0,0");
 					trUnitChangeProtoUnit("Garrison Flag Sky Passage");
 				}
-				trUnitTeleport(trQuestVarGet("posx"),0,trQuestVarGet("posz"));
+				trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
 			}
 		}
 	}
@@ -1212,14 +1264,15 @@ rule select_boon
 inactive
 highFrequency
 {
-	yDatabaseNext("boons", true);
-	int boon = yGetVar("boons", "type");
+	xDatabaseNext(dBoons);
+	xUnitSelect(dBoons, xUnitName);
+	int boon = xGetInt(dBoons, xBoonType);
 	if (trUnitIsSelected()) {
 		reselectMyself();
 		trShowImageDialog(boonIcon(boon), boonName(boon));
-		if (trQuestVarGet("p1godBoon") != boon) {
+		if (xGetInt(dPlayerData, xPlayerGodBoon, 1) != boon) {
 			trQuestVarSet("selectedBoon", boon);
-			trQuestVarSet("selectedBoonUnit", trQuestVarGet("boons"));
+			trQuestVarSet("selectedBoonUnit", xGetInt(dBoons, xUnitName));
 			xsEnableRule("choose_boon");
 			xsDisableSelf();
 		}
@@ -1250,10 +1303,10 @@ highFrequency
 				startNPCDialog(NPC_NICK_QUEST_COMPLETE);
 				xsDisableSelf();
 				
-				trVectorQuestVarSet("padPos", vector(161,0,165));
+				vector pos = vector(161,0,165);
 				for(x=1; <= 3) {
 					trQuestVarSet("pad"+x, trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("pad"+x, true);
 					trUnitConvert(0);
@@ -1261,15 +1314,15 @@ highFrequency
 					trSetSelectedScale(1.5,1,1.5);
 					
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("padPosx"),0,trQuestVarGet("padPosz"),225,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("next", true);
 					trUnitConvert(0);
 					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-					yAddToDatabase("slotRelics", "next");
+					xAddDatabaseBlock(dSlotRelics, true);
+					xSetInt(dSlotRelics, xUnitName, 1*trQuestVarGet("next"));
 					
-					trQuestVarSet("padPosx", trQuestVarGet("padPosx") + 2);
-					trQuestVarSet("padPosz", trQuestVarGet("padPosz") - 2);
+					pos = xsVectorSet(xsVectorGetX(pos) + 2, 0, xsVectorGetZ(pos) - 2);
 				}
 			}
 		}
@@ -1288,21 +1341,20 @@ highFrequency
 			trUnitSelectClear();
 			trUnitSelectByQV("nickonhawk", true);
 			if (trUnitIsSelected()) {
-				if (yGetDatabaseCount("slotRelics") < 3) {
+				if (xGetDatabaseCount(dSlotRelics) < 3) {
 					startNPCDialog(NPC_NICK_SLOT_MACHINE);
 				} else {
 					trShowChoiceDialog("Sacrifice these relics to get a random new one?","Yes",9000,"No",-1);
 				}
 				reselectMyself();
 			}
-			if (yGetDatabaseCount("slotRelics") > 0) {
-				id = yDatabaseNext("slotRelics", true);
+			if (xGetDatabaseCount(dSlotRelics) > 0) {
+				xDatabaseNext(dSlotRelics);
+				xUnitSelect(dSlotRelics, xUnitName);
 				if (trUnitIsOwnedBy(1)) {
-					yAddToDatabase("freeRelics", "slotRelics");
-					yAddUpdateVar("freeRelics", "type", yGetVar("slotRelics", "type"));
-					yRemoveFromDatabase("slotRelics");
+					xFreeDatabaseBlock(dSlotRelics);
 				} else if (trUnitIsSelected()) {
-					relicDescription(1*yGetVar("slotRelics", "type"));
+					relicDescription(xGetInt(dSlotRelics, xRelicType));
 					reselectMyself();
 				}
 			}
@@ -1310,16 +1362,18 @@ highFrequency
 		case 2:
 		{
 			trQuestVarSetFromRand("type", 1, 26, true);
-			yDatabaseNext("slotRelics", true);
+			xDatabaseNext(dSlotRelics);
+			xUnitSelect(dSlotRelics, xUnitName);
 			trMutateSelected(relicProto(1*trQuestVarGet("type")));
 			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
 				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 1000);
 				trSoundPlayFN("plentyvaultstolen.wav","1",-1,"","");
 				trSoundPlayFN("skypassagein.wav","1",-1,"","");
 				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("quantumRelic"))));
-				yAddToDatabase("slotUnits", "slotRelics");
-				yRemoveFromDatabase("slotRelics");
-				if (yGetDatabaseCount("slotRelics") == 0) {
+				xAddDatabaseBlock(dSlotUnits, true);
+				xSetInt(dSlotUnits, xUnitName, xGetInt(dSlotRelics, xUnitName));
+				xFreeDatabaseBlock(dSlotRelics);
+				if (xGetDatabaseCount(dSlotRelics) == 0) {
 					trQuestVarSet("quantumSlotMachine", 3);
 				}
 			}
@@ -1342,17 +1396,19 @@ highFrequency
 		case 4:
 		{
 			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
-				for(x=yGetDatabaseCount("slotUnits"); >0) {
-					yDatabaseNext("slotUnits", true);
+				for(x=xGetDatabaseCount(dSlotUnits); >0) {
+					xDatabaseNext(dSlotUnits);
+					xUnitSelect(dSlotUnits, xUnitName);
 					trUnitChangeProtoUnit("Hero Death");
 				}
-				yClearDatabase("slotUnits");
+				xClearDatabase(dSlotUnits);
 				trSoundPlayFN("favordump.wav","1",-1,"","");
 				trUnitSelectClear();
 				trUnitSelectByQV("newRelic", true);
 				trUnitChangeProtoUnit("Relic");
-				yAddToDatabase("freeRelics", "newRelic");
-				yAddUpdateVar("freeRelics", "type", trQuestVarGet("quantumRelic"));
+				xAddDatabaseBlock(dFreeRelics, true);
+				xSetInt(dFreeRelics, xUnitName, 1*trQuestVarGet("newRelic"));
+				xSetInt(dFreeRelics, xRelicType, 1*trQuestVarGet("quantumRelic"));
 				trQuestVarSet("quantumSlotMachine", 1);
 			}
 		}

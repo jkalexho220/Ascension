@@ -496,7 +496,7 @@ highFrequency
 	xsDisableSelf();
 	trDelayedRuleActivation("gameplay_start_2");
 	for(p=1; < ENEMY_PLAYER) {
-		chooseClass(p, xGetInt(dPlayerData xPlayerClass, p));
+		chooseClass(p, xGetInt(dPlayerData, xPlayerClass, p));
 	}
 	trMusicPlayCurrent();
 	trPlayNextMusicTrack();
