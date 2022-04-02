@@ -62,6 +62,9 @@ int dVisited = 0;
 int dSkyPassages = 0;
 int xSkyPassageExit = 0;
 
+int dMagicalJourney = 0;
+
+int dCloudDeployStars = 0;
 
 rule initialize_map_databases
 active

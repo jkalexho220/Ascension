@@ -1505,6 +1505,7 @@ highFrequency
 			}
 			case 7:
 			{
+				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
 				trSetLighting("fimbulwinter", 0.01);
 				wallHeight = worldHeight + 3;
@@ -1571,6 +1572,8 @@ highFrequency
 			}
 			case 8:
 			{
+				dCloudDeployStars = initGenericProj();
+				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
 				xsEnableRule("the_clouds_build_01");
 				xsEnableRule("the_clouds_build_02");
 				worldHeight = 5;
@@ -1776,6 +1779,9 @@ highFrequency
 		dSkyPassages = xInitDatabase("skyPassages");
 		xInitAddInt(dSkyPassages,"name");
 		xSkyPassageExit = xInitAddInt(dSkyPassages, "exit");
+		
+		dMagicalJourney = xInitDatabase("magicalJourney");
+		xInitAddInt(dMagicalJourney, "name");
 		
 		/* build the grid */
 		trQuestVarSet("keyType", RELIC_KEY_EGYPT);

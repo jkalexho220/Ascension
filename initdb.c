@@ -31,6 +31,7 @@ int xDatabaseIndex = 0;
 int xDecay = 0;
 int xDecayNext = 0;
 int xUnity = 0;
+int xDeepDamageLast = 0;
 
 /* enemies specific */
 int xBounty = 0;
@@ -142,6 +143,8 @@ int xPlayerRelicTransporterLevel = 0;
 int xPlayerGold = 0;
 int xPlayerFavor = 0;
 int xPlayerDead = 0;
+int xPlayerResigned = 0;
+int xPlayerReviveNext = 0;
 
 int xPlayerPetDogReady = 0;
 int xPlayerPetDogNext = 0;
@@ -193,6 +196,9 @@ int dPlayerLasers = 0;
 int xPlayerLaserTimeout = 0;
 int xPlayerLaserRange = 0;
 
+int dSlotRelics = 0;
+int xSlotRelicPad = 0;
+
 rule initialize_databases
 active
 highFrequency
@@ -224,7 +230,7 @@ highFrequency
 		xSilenceSFX = xInitAddInt(db,"silenceSFX");
 		xLaunched = xInitAddBool(db,"launched");
 	}
-	xDecay = xInitAddInt(dPlayerUnits,"decay");
+	xDecay = xInitAddFloat(dPlayerUnits,"decay");
 	xDecayNext = xInitAddInt(dPlayerUnits,"decayNext");
 	xUnity = xInitAddInt(dPlayerUnits,"unity");
 	
@@ -319,6 +325,8 @@ highFrequency
 	xPlayerGold = xInitAddInt(dPlayerData,"gold");
 	xPlayerFavor = xInitAddFloat(dPlayerData,"favor");
 	xPlayerDead = xInitAddInt(dPlayerData,"dead");
+	xPlayerResigned = xInitAddBool(dPlayerData,"resigned");
+	xPlayerReviveNext = xInitAddInt(dPlayerData,"reviveNext");
 	xPlayerIndex = xInitAddInt(dPlayerData,"index");
 	xPlayerSimp = xInitAddInt(dPlayerData,"simp");
 	xPlayerQueen = xInitAddInt(dPlayerData,"queen");

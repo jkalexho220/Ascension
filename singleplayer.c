@@ -605,6 +605,10 @@ highFrequency
 				if (trQuestVarGet("p1nickQuestProgress") == 6) {
 					trQuestVarSet("p1nickQuestProgress", 5);
 				}
+				dSlotRelics = xInitDatabase("slotRelics");
+				xInitAddInt(dSlotRelics, "name");
+				xInitAddInt(dSlotRelics, "type");
+				xSlotRelicPad = xInitAddInt(dSlotRelics, "pad");
 				trQuestVarSet("nextPad", 0);
 				trEventSetHandler(9000, "spinQuantumSlotMachine");
 				trVectorQuestVarSet("nickPos", vector(161,0,161));
