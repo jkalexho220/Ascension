@@ -985,22 +985,28 @@ start = the name of the start trVector
 dir = the name of the direction vector. Must be a normal vector (length 1) starting from the origin
 height = the negative height of the object (if you want something falling from a higher location, input a negative number here)
 */
-int addGenericProj(int db = 0,vector start = vector(0,0,0),vector dir = vector(0,0,0),
-	int proto=0,int anim=0,float speed=10.0,float height=4,float scale=0, int p = 0) {
-	if (p == 0) {
-		p = ENEMY_PLAYER;
-	}
+int addGenericProj(int db = 0, vector start = vector(0,0,0), vector dir = vector(0,0,0),
+	int p = -1, float speed = -1, float height = -1) {
 	int next = trGetNextUnitScenarioNameNumber();
-	int index = xAddDatabaseBlock(db);
-	xSetPointer(db, index);
+	int index = xAddDatabaseBlock(db, true);
 	xSetInt(db, xUnitName, next);
-	xSetInt(db, xProjProto, proto);
-	xSetInt(db, xProjAnim, anim);
-	xSetFloat(db, xProjSpeed, speed);
-	xSetFloat(db, xProjHeight, height);
-	xSetFloat(db, xProjScale, scale);
 	xSetVector(db,xProjDir, dir);
-	xSetInt(db,xProjYeehaw,2);
+	
+	if (speed == -1) {
+		speed = xGetFloat(db, xProjSpeed, 0);
+	} else {
+		xSetFloat(db, xProjSpeed, speed);
+	}
+	if (height == -1) {
+		height = xGetFloat(db, xProjHeight, 0);
+	} else {
+		xSetFloat(db, xProjHeight, height);
+	}
+	if (p == -1) {
+		p = xGetInt(db, xPlayerOwner, 0);
+	} else {
+		xSetInt(db, xPlayerOwner, p);
+	}
 	
 	trArmyDispatch(""+p+",0", "Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
 	trUnitSelectClear();
@@ -1014,17 +1020,18 @@ int addGenericProj(int db = 0,vector start = vector(0,0,0),vector dir = vector(0
 	return(index);
 }
 
-int initGenericProj(string name = "", bool hitbox = false, int count = 10) {
+int initGenericProj(string name = "", int proto = 0, int anim = 0, float speed = 10.0,
+	float height = 4.5, float scale = 0, int p = 0, bool hitbox = false, int count = 0) {
 	int db = xInitDatabase(name,count);
 	xInitAddInt(db, "name");
-	xInitAddInt(db, "player");
+	xInitAddInt(db, "player", p);
 	xInitAddInt(db, "id");
-	xProjProto = xInitAddInt(db, "proto");
-	xProjYeehaw = xInitAddInt(db, "yeehaw");
-	xProjAnim = xInitAddInt(db, "anim");
-	xProjHeight = xInitAddFloat(db, "height");
-	xProjSpeed = xInitAddFloat(db, "speed");
-	xProjScale = xInitAddFloat(db, "scale");
+	xProjProto = xInitAddInt(db, "proto", proto);
+	xProjYeehaw = xInitAddInt(db, "yeehaw", 2);
+	xProjAnim = xInitAddInt(db, "anim", anim);
+	xProjHeight = xInitAddFloat(db, "height", height);
+	xProjSpeed = xInitAddFloat(db, "speed", speed);
+	xProjScale = xInitAddFloat(db, "scale", scale);
 	xProjDir = xInitAddVector(db, "dir");
 	if (hitbox) {
 		xProjDist = xInitAddFloat(db,"dist");
@@ -1212,7 +1219,7 @@ highFrequency
 	xInitAddInt(dYeebLightning,"name");
 	xInitAddInt(dYeebLightning,"player");
 	
-	dYeebLightningBalls = initGenericProj("yeebLightningBalls",false,0);
+	dYeebLightningBalls = initGenericProj("yeebLightningBalls",kbGetProtoUnitID("Arkantos God"),26,10.0,5.0,0.0);
 	xInitAddInt(dYeebLightningBalls,"bounces");
 	xInitAddVector(dYeebLightningBalls,"prev");
 	
@@ -1221,11 +1228,11 @@ highFrequency
 	xInitAddInt(dAutomatonBombs,"player");
 	xInitAddInt(dAutomatonBombs,"timeout");
 	
-	dMedusaBalls = initGenericProj("medusaBalls",false,0);
+	dMedusaBalls = initGenericProj("medusaBalls",kbGetProtoUnitID("Curse SFX"),2,4.0,4.5,0.0);
 	xMedusaBallTarget = xInitAddInt(dMedusaBalls,"target");
 	xMedusaBallBounces = xInitAddInt(dMedusaBalls,"bounces");
 	
-	dMummyBalls = initGenericProj("mummyBalls",true,0);
+	dMummyBalls = initGenericProj("mummyBalls",kbGetProtoUnitID("Kronny Birth SFX"),2,8.0,4.5,0.0,ENEMY_PLAYER,true);
 	xProjType = xInitAddInt(dMummyBalls,"type");
 	
 	dBarrages = xInitDatabase("barrages");
@@ -1236,7 +1243,7 @@ highFrequency
 	xBarrageDir = xInitAddVector(dBarrages,"dir");
 	xBarrageCount = xInitAddInt(dBarrages,"count");
 	
-	dAvengerProj = initGenericProj("avengerProj",true,0);
+	dAvengerProj = initGenericProj("avengerProj",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0,ENEMY_PLAYER,true);
 	xAvengerProjDist = xInitAddFloat(dAvengerProj,"maxDist");
 	xAvengerProjUnit = xInitAddInt(dAvengerProj,"rider");
 	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");

@@ -213,7 +213,7 @@ void moonbladeAlways(int eventID = -1) {
 				xUnitSelectByID(dEnemies, xUnitID);
 				if (trUnitAlive() == false) {
 					removeEnemy();
-				} else if (unitDistanceToVector(dEnemies, pos) < dist) {
+				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
 					silenceUnit(dEnemies,1.0,p);
 					damageEnemy(p, amt);
 				}

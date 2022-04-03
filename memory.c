@@ -547,7 +547,12 @@ bool xSetInt(int id = 0, int data = 0, int val = 0, int index = -1) {
 	if (index == -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 	}
-	return(aiPlanSetUserVariableInt(id,data,index,val));
+	bool success = aiPlanSetUserVariableInt(id,data,index,val);
+	if (success == false) {
+		string err = ": Could not assign value: " + val;
+		debugLog("xSetInt: " + aiPlanGetName(id) + aiPlanGetUserVariableString(id,xVarNames,data - xVarNames) + err);
+	}
+	return(success);
 }
 
 
@@ -574,7 +579,12 @@ bool xSetFloat(int id = 0, int data = 0, float val = 0, int index = -1) {
 	if (index == -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 	}
-	return(aiPlanSetUserVariableFloat(id,data,index,val));
+	bool success = aiPlanSetUserVariableFloat(id,data,index,val);
+	if (success == false) {
+		string err = ": Could not assign value: " + val;
+		debugLog("xSetFloat: " + aiPlanGetName(id) + aiPlanGetUserVariableString(id,xVarNames,data - xVarNames) + err);
+	}
+	return(success);
 }
 
 

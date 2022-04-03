@@ -441,7 +441,7 @@ void specialUnitsAlways() {
 						pos = kbGetBlockPosition(""+target,true);
 						dir = getUnitVector(start, pos);
 						
-						addGenericProj(dMummyBalls,start,dir,kbGetProtoUnitID("Kronny Birth SFX"),2,8,4.5,0,xGetInt(dMummies,xPlayerOwner));
+						addGenericProj(dMummyBalls,start,dir,xGetInt(dMummies,xPlayerOwner));
 						xSetVector(dMummyBalls,xProjPrev, start);
 						xSetFloat(dMummyBalls,xProjDist,4.0);
 						xSetInt(dMummyBalls,xProjType, STATUS_SILENCE);
@@ -650,7 +650,7 @@ void specialUnitsAlways() {
 					end = kbGetBlockPosition(""+xGetInt(dMedusas, xSpecialTarget));
 					start = kbGetBlockPosition(""+xGetInt(dMedusas,xUnitName));
 					dir = getUnitVector(start, end);
-					addGenericProj(dMedusaBalls,start,dir,kbGetProtoUnitID("Curse SFX"),2,4,4.5,0,p);
+					addGenericProj(dMedusaBalls,start,dir,p);
 					xSetInt(dMedusaBalls, xMedusaBallTarget, xGetInt(dMedusas, xSpecialTarget));
 					xSetInt(dMedusaBalls, xMedusaBallBounces, 10);
 					xSetInt(dMedusas, xSpecialStep, 2);
@@ -1124,7 +1124,7 @@ void specialUnitsAlways() {
 							trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
 							dir = getUnitVector(start,end);
 							trSetSelectedScale(0,0,0);
-							addGenericProj(dAvengerProj,start,dir,kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0,p);
+							addGenericProj(dAvengerProj,start,dir,p);
 							xSetVector(dAvengerProj,xProjPrev,start);
 							xSetFloat(dAvengerProj,xAvengerProjDist,distanceBetweenVectors(start, end,false) + 5.0);
 							xSetInt(dAvengerProj,xAvengerProjUnit,xGetInt(dAvengers,xUnitName));
@@ -1247,7 +1247,8 @@ void specialUnitsAlways() {
 				{
 					start = xGetVector(dMummies,xMummyStart);
 					dir = xGetVector(dMummies,xMummyDir);
-					addGenericProj(dMummyBalls,start,dir,kbGetProtoUnitID("Lampades Blood"),2,10,4.0,0,p);
+					addGenericProj(dMummyBalls,start,dir,p);
+					xSetInt(dMummyBalls, xProjProto, kbGetProtoUnitID("Lampades Blood"));
 					xSetVector(dMummyBalls,xProjPrev,start);
 					xSetFloat(dMummyBalls,xProjDist,16);
 					xSetInt(dMummyBalls,xProjType,STATUS_POISON);
@@ -1729,7 +1730,7 @@ void specialUnitsAlways() {
 					end = xGetVector(dLampades,xSpecialTarget);
 					start = kbGetBlockPosition(""+dLampades);
 					dir = getUnitVector(start,end);
-					addGenericProj(dYeebLightningBalls,start,dir,kbGetProtoUnitID("Arkantos God"),26,10,5,0,p);
+					addGenericProj(dYeebLightningBalls,start,dir,p);
 					xSetVector(dYeebLightningBalls,xProjPrev,start);
 					xSetInt(dYeebLightningBalls,xProjDist,3); // bounces
 					xSetInt(dLampades, xSpecialStep, 2);

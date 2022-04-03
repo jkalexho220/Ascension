@@ -2094,7 +2094,7 @@ active
 highFrequency
 {
 	xsDisableSelf();
-	dQuestLeaves = initGenericProj("questLeaves");
+	dQuestLeaves = initGenericProj("questLeaves",kbGetProtoUnitID("Einheriar"),18,10.0,1.0);
 	xInitAddInt(dQuestLeaves, "name");
 	xLeafType = xInitAddInt(dQuestLeaves,"type");
 	
@@ -2563,7 +2563,7 @@ highFrequency
 									x = trQuestVarGet("village") - 4 * z;
 									trQuestVarSetFromRand("rand", 8, 20, false);
 									addGenericProj(dQuestLeaves,xsVectorSet(70*x+40,0,70*z+40),trVectorQuestVarGet("questDir"),
-										kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"),1);
+										ENEMY_PLAYER,trQuestVarGet("rand"),1);
 									trVectorQuestVarSet("questDir", rotationMatrix(trVectorQuestVarGet("questDir"), -0.757322, 0.653041));
 									trUnitSelectClear();
 									trUnitSelectByQV("akardTower", true);
@@ -2649,7 +2649,7 @@ highFrequency
 									x = trQuestVarGet("village") - 4 * z;
 									trQuestVarSetFromRand("rand", 12, 16, false);
 									addGenericProj(dQuestLeaves,xsVectorSet(70*x+36,0,70*z+36),trVectorQuestVarGet("questDir"),
-										kbGetProtoUnitID("Einheriar"),18,trQuestVarGet("rand"),1);
+										ENEMY_PLAYER,trQuestVarGet("rand"));
 									xSetInt(dQuestLeaves,xLeafType, RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
 									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
 									trVectorQuestVarSet("questDir", rotationMatrix(trVectorQuestVarGet("questDir"), -0.757322, 0.653041));

@@ -1255,7 +1255,7 @@ highFrequency
 				pos = trVectorQuestVarGet("cloudDeployCenter");
 				pos = xsVectorSet(xsVectorGetX(pos) - trQuestVarGet("dist") * xsVectorGetX(dir),0,
 					xsVectorGetZ(pos) - trQuestVarGet("dist") * xsVectorGetZ(dir));
-				addGenericProj(dCloudDeployStars,pos,dir,kbGetProtoUnitID("Lampades"),18,0.01,2.5,0,ENEMY_PLAYER);
+				addGenericProj(dCloudDeployStars,pos,dir);
 				trQuestVarSet("cloudDeployCount",trQuestVarGet("cloudDeployCount") - 1);
 				if (trQuestVarGet("cloudDeployCount") == 0) {
 					trQuestVarSet("cloudDeployStep", 3);
