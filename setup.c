@@ -331,7 +331,7 @@ void chooseClass(int p = 0, int class = 0) {
 		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel)));
 	}
 	
-	int relics = trQuestVarGet("p"+p+"relics");
+	int relics = getRelicsDB(p);
 	for(x=xGetDatabaseCount(relics); >0) {
 		xDatabaseNext(relics);
 		if (x > xGetInt(dPlayerData,xPlayerLevel,p)+1) {

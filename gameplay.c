@@ -324,7 +324,7 @@ void playerLasers() {
 
 void relicTransporterGuy(int p = 0) {
 	int id = 0;
-	int db = trQuestVarGet("p"+p+"warehouse");
+	int db = getWarehouseDB(p);
 	if (xGetDatabaseCount(db) > 0) {
 		xDatabaseNext(db);
 		id = xGetInt(db, xUnitID);
@@ -370,7 +370,7 @@ void processFreeRelics(int count = 1) {
 							if (xGetInt(dFreeRelics, xRelicType) < KEY_RELICS) {
 								trUnitSetAnimationPath("1,0,1,1,0,0,0");
 							}
-							db = trQuestVarGet("p"+p+"warehouse");
+							db = getWarehouseDB(p);
 							xAddDatabaseBlock(db, true);
 							xSetInt(db, xUnitName, xGetInt(dFreeRelics, xUnitName));
 							xSetInt(db, xRelicType, xGetInt(dFreeRelics, xRelicType));
@@ -402,7 +402,7 @@ void processFreeRelics(int count = 1) {
 						trChatSend(0, relicName(xGetInt(dFreeRelics, xRelicType)) + " equipped!");
 						trSoundPlayFN("researchcomplete.wav","1",-1,"","");
 					}
-					db = trQuestVarGet("p"+p+"relics");
+					db = getRelicsDB(p);
 					xAddDatabaseBlock(db, true);
 					xSetInt(db, xUnitName, xGetInt(dFreeRelics, xUnitName));
 					xSetInt(db, xRelicType, xGetInt(dFreeRelics, xRelicType));
@@ -530,7 +530,7 @@ highFrequency
 			trQuestVarSet("p"+p+"nickEquipped", 0); // Set it to 0 because relicEffect will set it back to 1
 			trQuestVarSet("p"+p+"relic12", RELIC_NICKONHAWK);
 		}
-		db = trQuestVarGet("p"+p+"relics");
+		db = getRelicsDB(p);
 		for(x=12; >0) {
 			if (trQuestVarGet("p"+p+"relic"+x) > 0) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -652,7 +652,7 @@ highFrequency
 		xUnitSelect(dPlayerData, xPlayerUnit);
 		if (trUnitAlive() && (xGetBool(dPlayerData, xPlayerLaunched) == false) && xGetInt(dPlayerData, xPlayerDead) <= 0) {
 			pos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit), true);
-			db = trQuestVarGet("p"+p+"relics");
+			db = getRelicsDB(p);
 			for(x=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);
 				xUnitSelect(db, xUnitName);
@@ -851,7 +851,7 @@ highFrequency
 							if (xGetInt(dPlayerData, xPlayerGodBoon) > 0) {
 								trChatSend(0, boonName(xGetInt(dPlayerData, xPlayerGodBoon)));
 							}
-							db = trQuestVarGet("p"+p+"relics");
+							db = getRelicsDB(p);
 							count = xGetPointer(db);
 							for(x=xGetDatabaseCount(db); >0) {
 								xDatabaseNext(db);
@@ -919,7 +919,7 @@ highFrequency
 			if (kbIsPlayerResigned(p)) {
 				xSetBool(dPlayerData, xPlayerResigned, true);
 				trQuestVarSet("activePlayerCount", trQuestVarGet("activePlayerCount") - 1);
-				db = trQuestVarGet("p"+p+"relics");
+				db = getRelicsDB(p);
 				for(x=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
 					if (xGetInt(db, xRelicType) > NORMAL_RELICS) {
@@ -931,7 +931,7 @@ highFrequency
 						trUnitChangeProtoUnit("Relic");
 					}
 				}
-				db = trQuestVarGet("p"+p+"warehouse");
+				db = getWarehouseDB(p);
 				for(x=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
 					if (xGetInt(db, xRelicType) > NORMAL_RELICS) {

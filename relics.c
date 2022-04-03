@@ -649,7 +649,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				(trQuestVarGet("p"+p+"nickQuestProgress") * trQuestVarGet("p"+p+"nickEquipped") >= 5)) {
 				/* No duplicates */
 				trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") - 1);
-				db = trQuestVarGet("p"+p+"relics");
+				db = getRelicsDB(p);
 				xSetPointer(db, xGetNewestPointer(db));
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(db),true);

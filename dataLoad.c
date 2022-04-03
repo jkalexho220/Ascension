@@ -21,7 +21,7 @@ void saveAllData() {
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
-	int db = trQuestVarGet("p"+p+"warehouse");
+	int db = getWarehouseDB(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
 		relic = xGetInt(db,xRelicType);
@@ -50,7 +50,7 @@ void saveAllData() {
 	savedata = savedata + trGetScenarioUserData(1);
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
-	db = trQuestVarGet("p"+p+"relics");
+	db = getRelicsDB(p);
 	for(x=12; > xGetDatabaseCount(db)) {
 		trQuestVarSet("p"+p+"relic"+x, 0);
 	}

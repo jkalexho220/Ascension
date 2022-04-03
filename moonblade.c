@@ -30,7 +30,7 @@ void removeMoonblade(int p = 0) {
 void moonbladeAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * MOONBLADE;
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	int moonbeams = trQuestVarGet("p"+p+"moonbeams");
 	xSetPointer(dPlayerData, p);
 	int id = 0;
@@ -248,7 +248,7 @@ void moonbladeAlways(int eventID = -1) {
 void chooseMoonblade(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * MOONBLADE;
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	resetCharacterCustomVars(p);
 	xSetPointer(dPlayerData,p);
 	if (trCurrentPlayer() == p) {

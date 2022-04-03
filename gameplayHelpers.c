@@ -294,7 +294,7 @@ void removePlayerCharacter() {
 }
 
 void removePlayerSpecific(int p = 0) {
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	if (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p)) {
 		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit));
 		trVectorQuestVarSet("dead"+p+"pos",pos);
@@ -334,7 +334,7 @@ void removePlayerSpecific(int p = 0) {
 }
 
 void equipRelicsAgain(int p = 0) {
-	int db = trQuestVarGet("p"+p+"relics");
+	int db = getRelicsDB(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
 		trUnitSelectClear();
@@ -757,7 +757,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		
 		if ((p < ENEMY_PLAYER) && (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p))) {
 			xSetBool(dPlayerData,xPlayerLaunched,true,p);
-			int relics = 1*trQuestVarGet("p"+p+"relics");
+			int relics = getRelicsDB(p);
 			for(x=xGetDatabaseCount(relics); >0) {
 				xDatabaseNext(relics);
 				xUnitSelect(relics,xRelicName);
@@ -808,8 +808,7 @@ void OnHit(int p = 0, int index = 0, bool magic = false) {
 		if (index != prev) {
 			xSetPointer(dEnemies, index);
 		}
-		trVectorSetUnitPos("onHitPos", "enemies");
-		vector pos = kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName));
+		vector pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 		for(x=xGetDatabaseCount(dEnemies); >1) {
 			xDatabaseNext(dEnemies);
 			if (unitDistanceToVector(xGetInt(dEnemies,xUnitName), pos) < 16.0) {
@@ -817,7 +816,7 @@ void OnHit(int p = 0, int index = 0, bool magic = false) {
 				damageEnemy(p, xGetFloat(dPlayerData,xPlayerCleave,p) * xGetFloat(dPlayerData,xPlayerAttack,p), magic);
 			}
 		}
-		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("onHitPosx"),0,trQuestVarGet("onHitPosz"),0,true);
+		trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trArmySelect("1,0");
 		trDamageUnitPercent(100);
 		trUnitChangeProtoUnit("Meteorite");
@@ -828,7 +827,7 @@ void OnHit(int p = 0, int index = 0, bool magic = false) {
 int CheckOnHit(int p = 0, bool onhit = true) {
 	int status = ON_HIT_NONE;
 	int class = xGetInt(dPlayerData,xPlayerClass,p);
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	int target = 0;
 	int simp = xGetInt(dPlayerData,xPlayerSimp,p);
 	int id = xGetInt(db,xUnitID);
@@ -1407,7 +1406,7 @@ void spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetPointer(dPlayerData,p);
 	int class = xGetInt(dPlayerData,xPlayerClass);
 	int next = trGetNextUnitScenarioNameNumber();
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	int index = spawnPlayerUnit(p, xGetInt(dClass,xClassProto,class), vdb);
 	int id = kbGetBlockID(""+next,true);
 	xSetPointer(db, xAddDatabaseBlock(db));

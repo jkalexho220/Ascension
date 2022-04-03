@@ -2498,9 +2498,9 @@ highFrequency
 	trQuestVarSet("yeebBossFight", 0);
 	for(p=1; < ENEMY_PLAYER) {
 		xSetInt(dPlayerData, xPlayerUnit, 0, p);
-		xClearDatabase(1*trQuestVarGet("p"+p+"characters"));
-		xClearDatabase(1*trQuestVarGet("p"+p+"relics"));
-		xClearDatabase(1*trQuestVarGet("p"+p+"warehouse"));
+		xClearDatabase(getCharactersDB(p));
+		xClearDatabase(getRelicsDB(p));
+		xClearDatabase(getWarehouseDB(p));
 	}
 	xClearDatabase(dFreeRelics);
 	xClearDatabase(dEnemies);

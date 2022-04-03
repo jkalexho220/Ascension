@@ -207,6 +207,22 @@ int xMonsterIndex = 0;
 
 int dRelicDescriptors = 0;
 
+int dPlayerCharacterArray = 0;
+int dPlayerRelicsArray = 0;
+int dPlayerWarehouseArray = 0;
+
+int getCharactersDB(int p = 0) {
+	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerCharacterArray,p));
+}
+
+int getRelicsDB(int p = 0) {
+	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerRelicsArray,p));
+}
+
+int getWarehouseDB(int p = 0) {
+	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerWarehouseArray,p));
+}
+
 rule initialize_databases
 active
 highFrequency
@@ -391,19 +407,23 @@ highFrequency
 	xInitAddInt(dPlayerCharacters,"id");
 	xCharIndex = xInitAddInt(dPlayerCharacters,"index");
 	
+	dPlayerCharacterArray = zNewArray(mInt, cNumberPlayers, "playerCharacterArrays");
+	dPlayerRelicsArray = zNewArray(mInt, cNumberPlayers, "playerRelicArrays");
+	dPlayerWarehouseArray = zNewArray(mInt, cNumberPlayers, "playerWarehouseArrays");
+	
 	for(p=1; < cNumberPlayers - 1) {
 		db = xInitDatabase("p"+p+"relics");
-		trQuestVarSet("p"+p+"relics",db);
+		aiPlanSetUserVariableInt(ARRAYS, dPlayerRelicsArray, p, db);
 		xInitAddInt(db,"name");
 		xInitAddInt(db,"type");
 		
 		db = xInitDatabase("p"+p+"warehouse");
-		trQuestVarSet("p"+p+"warehouse",db);
+		aiPlanSetUserVariableInt(ARRAYS, dPlayerWarehouseArray, p, db);
 		xInitAddInt(db,"name");
 		xInitAddInt(db,"type");
 		
 		db = xInitDatabase("p"+p+"characters");
-		trQuestVarSet("p"+p+"characters",db);
+		aiPlanSetUserVariableInt(ARRAYS, dPlayerCharacterArray, p, db);
 		/* the three below are shared with playerCharacter */
 		xInitAddInt(db,"name");
 		xCharSpecialAttack = xInitAddInt(db,"specialAttack");
@@ -429,7 +449,7 @@ highFrequency
 }
 
 void resetCharacterCustomVars(int p = 0) {
-	int db = trQuestVarGet("p"+p+"characters");
+	int db = getCharactersDB(p);
 	/*
 	The latest var is xCharAttackTargetIndex
 	We remove all extra user variables created
