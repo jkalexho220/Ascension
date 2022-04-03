@@ -185,8 +185,8 @@ void blastmageAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
 		blastmageSpell(p);
 		zSetProtoUnitStat("Kronny Flying", p, 1, 0.1);
@@ -205,8 +205,8 @@ void blastmageAlways(int eventID = -1) {
 		yAddUpdateVar("p"+p+"starfalls", "posZ", trQuestVarGet("p"+p+"wellposZ"));
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("end", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -296,8 +296,8 @@ void blastmageAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		blastmageSpell(p);
 		trQuestVarSet("p"+p+"solarFlareNext", trTimeMS());

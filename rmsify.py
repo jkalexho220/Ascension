@@ -31,7 +31,7 @@ files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 's
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
 
 files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
-        'buildMap.c', 'moonblade.c', 'gameplay.c', 'singleplayer.c']
+        'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'gameplay.c', 'singleplayer.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -433,11 +433,11 @@ class Logic(StackFrame):
 						if self.children[0].datatype != 'int':
 							error("Contents of " + self.name + " do not resolve to an integer! " + self.children[0].datatype)
 							accepted = False
-					elif self.children[0].datatype != 'bool':
-						error("Contents of " + self.name + " do not resolve to a boolean! " + self.children[0].datatype)
-						accepted = False
 					elif self.children[0].type == 'ASSIGNMENT':
 						error("Assignment operator in " + self.name + ". Use == instead.")
+						accepted = False
+					elif self.children[0].datatype != 'bool':
+						error("Contents of " + self.name + " do not resolve to a boolean! " + self.children[0].datatype)
 						accepted = False
 					if accepted:
 						self.children[0].resolve()

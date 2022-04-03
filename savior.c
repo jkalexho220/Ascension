@@ -15,8 +15,8 @@ void saviorAlways(int eventID = -1) {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		
 		dist = xsPow(2 * trQuestVarGet("guardianAngelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 		hit = -1;
@@ -99,8 +99,8 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		if (trQuestVarGet("p"+p+"unity") == 1) {
 			for(x=trQuestVarGet("p"+p+"unityNext"); < trQuestVarGet("p"+p+"unityend")) {
 				trUnitSelectClear();
@@ -206,8 +206,8 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"intervention", 1);
 	}
 	

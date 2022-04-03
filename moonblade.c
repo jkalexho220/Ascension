@@ -7,7 +7,7 @@ const int crescentCooldown = 12;
 const float crescentCount = 3;
 const float crescentDamage = 50;
 
-const float protectionDelay = 83.33;
+const float protectionDelay = 83.33; // 1000 / 12
 
 int xCrescentCount = 0;
 int xCrescentTimeout = 0;

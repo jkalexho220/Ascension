@@ -144,8 +144,8 @@ void alchemistAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		dist = 100;
 		hit = -1;
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
@@ -190,8 +190,8 @@ void alchemistAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -230,8 +230,8 @@ void alchemistAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"potion", 1 + trQuestVarGet("p"+p+"potion"));
 		if (trQuestVarGet("p"+p+"potion") > 2) {
 			trQuestVarSet("p"+p+"potion", 0);

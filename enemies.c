@@ -1807,6 +1807,7 @@ void enemiesAlways() {
 		if (id == -1 || trUnitAlive() == false) {
 			removeEnemy();
 		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
+			(xGetBool(dEnemies, xLaunched) == false) &&
 			(xGetInt(dEnemies, xStunStatus) + xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) == 0)) {
 			/* if idle and out of LOS, we remove it */
 			xSetInt(dEnemies, xMissingTimeout, 1 + xGetInt(dEnemies, xMissingTimeout));

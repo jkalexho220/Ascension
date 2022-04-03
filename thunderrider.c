@@ -228,8 +228,8 @@ void thunderRiderAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		vectorSnapToGrid("p"+p+"wellPos");
 		posX = trQuestVarGet("p"+p+"wellPosx");
 		posZ = trQuestVarGet("p"+p+"wellPosz");
@@ -292,8 +292,8 @@ void thunderRiderAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trSoundPlayFN("suckup1.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
@@ -308,8 +308,8 @@ void thunderRiderAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("end", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);

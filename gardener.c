@@ -217,8 +217,8 @@ void gardenerAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		
 		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"wellPosx"),0,trQuestVarGet("p"+p+"wellPosz"),0,true);
@@ -260,8 +260,8 @@ void gardenerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -285,8 +285,8 @@ void gardenerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trSoundPlayFN("walkingwoods1.wav", "1", -1, "", "");
 		trSoundPlayFN("gaiaforest.wav", "1", -1, "", "");
 		gainFavor(p, 0.0 - trQuestVarGet("natureBountyCost") * trQuestVarGet("p"+p+"ultimateCost"));

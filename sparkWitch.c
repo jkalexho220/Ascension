@@ -260,8 +260,8 @@ void sparkWitchAlways(int eventID = -1) {
 		yRemoveFromDatabase("p"+p+"thunderstrikes");
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			ySetVar("p"+p+"characters", "bounces", 1 + yGetVar("p"+p+"characters", "bounces"));
@@ -303,8 +303,8 @@ void sparkWitchAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			ySetVar("p"+p+"characters", "bounces", 1 + yGetVar("p"+p+"characters", "bounces"));
@@ -384,8 +384,8 @@ void sparkWitchAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"hex", 1 - trQuestVarGet("p"+p+"hex"));
 		if (trCurrentPlayer() == p) {
 			trSoundPlayFN("skypassageout.wav","1",-1,"","");

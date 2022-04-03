@@ -207,7 +207,7 @@ string stageIcon(int stage = 0) {
 void reselectMyself() {
 	uiClearSelection();
 	int p = trCurrentPlayer();
-	int class = trQuestVarGet("p"+p+"class");
+	int class = xGetInt(dPlayerData, xPlayerClass, p);
 	trackInsert();
 	trackAddWaypoint();
 	trackAddWaypoint();
@@ -643,7 +643,7 @@ highFrequency
 			trPlayerGrantResources(p, "Favor", -1000.0);
 		}
 		if (Multiplayer == false) {
-			trPlayerGrantResources(1, "Gold", trQuestVarGet("p1gold"));
+			trPlayerGrantResources(1, "Gold", xGetInt(dPlayerData, xPlayerGold, 1));
 		}
 		xsDisableSelf();
 	}

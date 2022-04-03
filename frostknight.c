@@ -176,13 +176,13 @@ void castIcicle(int p = 0, string pos = "") {
 				}
 			}
 			
-			if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+				xSetBool(dPlayerData, xPlayerWellActivated, false);
 				castIcicle(p, "p"+p+"wellPos");
 			}
 			
-			if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+				xSetBool(dPlayerData, xPlayerRainActivated, false);
 				trSoundPlayFN("recreation.wav","1",-1,"","");
 				trSoundPlayFN("frostgiantattack.wav","1",-1,"","");
 				trQuestVarSet("p"+p+"blizzard", 1);
@@ -239,8 +239,8 @@ void castIcicle(int p = 0, string pos = "") {
 					}
 				}
 				
-				if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-					trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+				if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+					xSetBool(dPlayerData, xPlayerLureActivated, false);
 					gainFavor(p, 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"lureObject", true);

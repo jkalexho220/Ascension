@@ -60,8 +60,8 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -286,8 +286,8 @@ void spellstealerAlways(int eventID = -1) {
 	}
 	trQuestVarSet("spellsound", 0);
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("manticorespecialattack.wav","1",-1,"","");
 		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
@@ -323,8 +323,8 @@ void spellstealerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"spellstealStatus", 0);
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"negationCloak", 1);
 		trQuestVarSet("p"+p+"negationCloakTimeout",
 			trTimeMS() + 1000 * trQuestVarGet("negationCloakDuration") * trQuestVarGet("p"+p+"spellDuration"));

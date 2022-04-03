@@ -101,8 +101,8 @@ void fireknightAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("nidhoggflame1.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
@@ -176,8 +176,8 @@ void fireknightAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trSoundPlayFN("firegiantdie.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"overheat", 1);
 		trQuestVarSet("p"+p+"overheatTimeout",
@@ -200,8 +200,8 @@ void fireknightAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);

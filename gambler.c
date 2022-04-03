@@ -209,8 +209,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("swing"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		amt = xsSqrt(trQuestVarGet("p"+p+"gamble")) * 0.5;
@@ -343,8 +343,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("gambleCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("plentybirth.wav","1",-1,"","");
 		trUnitSelectClear();
@@ -490,8 +490,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("p"+p+"decktarget", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject");

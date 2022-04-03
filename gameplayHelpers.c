@@ -371,11 +371,11 @@ width is the squared value
 bool rayCollision(int db = 0, vector start = vector(0,0,0), vector dir = vector(1,0,0),
 	float dist = 0, float width = 0) {
 	vector pos = kbGetBlockPosition(""+xGetInt(db,xUnitName),true);
-	float current = distanceBetweenVectors(pos, start);
+	float current = distanceBetweenVectors(pos, start, false);
 	if (current < dist) {
 		vector hitbox = xsVectorSet(xsVectorGetX(start) + current * xsVectorGetX(dir),0,
 			xsVectorGetZ(start) + current * xsVectorGetZ(dir));
-		if (distanceBetweenVectors(pos, hitbox, false) < width) {
+		if (distanceBetweenVectors(pos, hitbox, true) < width) {
 			return(true);
 		}
 	}
@@ -697,18 +697,17 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		xSetBool(db, xLaunched, true);
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(db,xUnitName)));
 		int p = xGetInt(db,xPlayerOwner);
-		xUnitSelect(db,xUnitName);
+		xUnitSelectByID(db,xUnitID);
 		trUnitChangeProtoUnit("Transport Ship Greek");
 		
 		vector start = kbGetBlockPosition(""+xGetInt(db,xUnitName));
 		vector dir = getUnitVector(start,dest);
 		
 		int next = trGetNextUnitScenarioNameNumber();
-		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
 		trUnitSelectClear();
 		trUnitSelect(""+next,true);
 		trImmediateUnitGarrison(""+xGetInt(db,xUnitName));
-		trUnitConvert(p);
 		trUnitChangeProtoUnit("Dwarf");
 		
 		trUnitSelectClear();
@@ -716,11 +715,11 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		trSetUnitOrientation(dir, vector(0,1,0), true);
 		trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
 		
-		xUnitSelect(db,xUnitID);
+		xUnitSelectByID(db,xUnitID);
 		trMutateSelected(type);
 		trUnitOverrideAnimation(24,0,true,true,-1);
 		trMutateSelected(kbGetProtoUnitID("Relic"));
-		trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
+		trImmediateUnitGarrison(""+next);
 		trMutateSelected(type);
 		if (xGetInt(db,xUnitName) == bossUnit) {
 			trSetSelectedScale(bossScale,bossScale,bossScale);
@@ -730,8 +729,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		for(x=0; < dist / 2) {
 			vector nextpos = xsVectorSet(xsVectorGetX(start) + 2.0 * xsVectorGetX(dir),0,
 				xsVectorGetZ(start) + 2.0 * xsVectorGetZ(dir));
-			vector loc = vectorToGrid(nextpos);
-			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			if (terrainIsType(vectorToGrid(nextpos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 				hitWall = true;
 				break;
 			} else {
@@ -753,6 +751,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		xSetVector(dLaunchedUnits,xLaunchedDest,start);
 		xSetInt(dLaunchedUnits,xLaunchedTimeout, trTimeMS() + 1100 * dist / 15);
 		xSetBool(dLaunchedUnits,xLaunchedStun, hitWall);
+		xSetInt(dLaunchedUnits, xLaunchedDB, db);
 		
 		
 		if ((p < ENEMY_PLAYER) && (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p))) {

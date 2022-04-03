@@ -252,8 +252,8 @@ void commandoAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("catapultattack.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
@@ -370,8 +370,8 @@ void commandoAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -428,8 +428,8 @@ void commandoAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"minigun", 1 - trQuestVarGet("p"+p+"minigun"));
 		if (trQuestVarGet("p"+p+"minigun") == 1) {
 			if (trPlayerResourceCount(p, "favor") == 0) {

@@ -456,7 +456,7 @@ void petDogs(int p = 0) {
 			trCounterAddTime("petDogs",30,1,"Pet Dog respawn",-1);
 		}
 	}
-	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_MONSTER_COMPANION) {
+	if ((xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_MONSTER_COMPANION) && Multiplayer) {
 		if (xGetBool(dPlayerData, xPlayerPetMonsterReady, p)) {
 			if (trTime() > xGetInt(dPlayerData, xPlayerPetMonsterNext, p)) {
 				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true);

@@ -185,8 +185,8 @@ void nightriderAlways(int eventID = -1) {
 	}
 	
 	dist = trQuestVarGet("abductRange") * trQuestVarGet("p"+p+"spellRange");
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 				removeNightrider(p);
@@ -207,8 +207,8 @@ void nightriderAlways(int eventID = -1) {
 		trSoundPlayFN("changeunit.wav","1",-1,"","");
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"ariseCount", trQuestVarGet("p"+p+"ariseCount") + 3 + yGetDatabaseCount("p"+p+"sentences"));
 		trQuestVarSetFromRand("p"+p+"ariseAngle", 0, 3.14, false);
 		trQuestVarSet("p"+p+"ariseDist", 2);
@@ -336,8 +336,8 @@ void nightriderAlways(int eventID = -1) {
 		}
 		case 0:
 		{
-			if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+				xSetBool(dPlayerData, xPlayerLureActivated, false);
 				gainFavor(p, 0.0 - trQuestVarGet("nightfallCost") * trQuestVarGet("p"+p+"ultimateCost"));
 				trVectorSetUnitPos("p"+p+"nightfallCenter", "p"+p+"lureObject");
 				vectorSnapToGrid("p"+p+"nightfallCenter");

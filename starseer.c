@@ -168,8 +168,8 @@ void starseerAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitSetStance("Passive");
@@ -226,8 +226,8 @@ void starseerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"Repel", 1);
 		trQuestVarSet("p"+p+"RepelTimeout", trTimeMS() + 1200);
 		trSoundPlayFN("oracledone.wav","1",-1,"","");
@@ -260,8 +260,8 @@ void starseerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("eventHorizonCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trQuestVarSet("p"+p+"eventHorizon", 1);
 		trQuestVarSet("p"+p+"eventHorizonTimeout",
