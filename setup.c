@@ -302,8 +302,8 @@ void chooseClass(int p = 0, int class = 0) {
 	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"));
 	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"));
 	
-	xSetInt(dPlayerData,xPlayerFirstDelay,1*trQuestVarGet("proto"+proto+"firstDelay"));
-	xSetInt(dPlayerData,xPlayerNextDelay,1*trQuestVarGet("proto"+proto+"nextDelay"));
+	xSetInt(dPlayerData,xPlayerFirstDelay,xGetInt(dClass, xClassFirstDelay, class));
+	xSetInt(dPlayerData,xPlayerNextDelay,xGetInt(dClass, xClassNextDelay, class));
 	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,1*trQuestVarGet("proto"+proto+"specialAttackCooldown"));
 	
 	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
@@ -346,6 +346,8 @@ void chooseClass(int p = 0, int class = 0) {
 			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
 	}
+	
+	xPrintAll(dPlayerData, p);
 }
 
 rule setup

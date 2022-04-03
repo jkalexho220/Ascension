@@ -971,6 +971,7 @@ void buildEdge(int edge = 0, int type = 0) {
 	vector pos = vector(0,0,0);
 	if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
 		if (type == EDGE_MOUNTAIN) {
+			debugLog("this is a mountain");
 			xClearDatabase(dEdgeFrontier);
 			x0 = x0 * 35;
 			z0 = z0 * 35;
@@ -1007,8 +1008,6 @@ void buildEdge(int edge = 0, int type = 0) {
 								xSetFloat(dEdgeFrontier, xEdgeFrontierHeight, height);
 								xSetVector(dEdgeFrontier, xEdgeFrontierLoc, xsVectorSet(x,0,z));
 								aiPlanSetUserVariableBool(dMapTiles, x, z, true);
-							} else {
-								debugLog("this tile is true: " + x + ":" + z);
 							}
 						}
 					}
@@ -1819,6 +1818,9 @@ highFrequency
 				trQuestVarSet("bossKeyRoom", trQuestVarGet("bossKeyRoom") - 14);
 			}
 			dMapTiles = aiPlanCreate("mapTiles", 8);
+			dEdgeFrontier = xInitDatabase("edgeFrontier");
+			xEdgeFrontierHeight = xInitAddFloat(dEdgeFrontier, "height");
+			xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
 			for(i=0; < 144) {
 				if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
 					trSoundPlayFN("cantdothat.wav","1",-1,"","");
