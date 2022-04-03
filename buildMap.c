@@ -2094,7 +2094,7 @@ highFrequency
 					float angle = 0.785398;
 					float angleMod = 6.283185 / trQuestVarGet("rand");
 					for(x=0; < trQuestVarGet("rand")) {
-						dir = xsVectorSet(xsCos(angle),0,xsSin(angle));
+						dir = xsVectorSet(xsSin(angle),0,xsCos(angle)); // AoM developers weren't the brightest light bulbs
 						if (xGetInt(dChests, xChestKey) == 0) { // not a temple
 							statueX = xsVectorGetX(pos) - 10.0 * xsVectorGetX(dir);
 							statueZ = xsVectorGetZ(pos) - 10.0 * xsVectorGetZ(dir);
@@ -2110,11 +2110,11 @@ highFrequency
 						trUnitConvert(ENEMY_PLAYER);
 						trUnitTeleport(statueX,0,statueZ);
 						trMutateSelected(kbGetProtoUnitID("Monument 2"));
-						trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+						trSetUnitOrientation(dir,vector(0,1,0),true);
 						
 						xAddDatabaseBlock(dStatuesReady, true);
 						xSetInt(dStatuesReady, xStatuesReadyIndex, xAddDatabaseBlock(db, true));
-						
+						xSetInt(db, xUnitName, 1*trQuestVarGet("next"));
 						xSetFloat(db, xStatueAngle, angle);
 						xSetVector(db, xStatuePos, xsVectorSet(statueX, 0, statueZ));
 						xSetInt(db, xStatueArray, zNewArray(mInt, 1*trQuestVarGet("rand") - 1, "statue"+xGetPointer(db)));
