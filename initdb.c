@@ -367,7 +367,7 @@ highFrequency
 	
 	xPlayerPetDogReady = xInitAddBool(dPlayerData, "petDogReady");
 	xPlayerPetDogNext = xInitAddInt(dPlayerData, "petDogNext");
-	xPlayerPetMonsterReady = xInitAddBool(dPlayerData, "petMonsterReady");
+	xPlayerPetMonsterReady = xInitAddBool(dPlayerData, "petMonsterReady", true);
 	xPlayerPetMonsterNext = xInitAddInt(dPlayerData, "petMonsterNext");
 	
 	dStunnedUnits = xInitDatabase("stunnedUnits", 10);

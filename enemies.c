@@ -255,6 +255,7 @@ int findShooter(int db = 0, vector pos = vector(0,0,0)) {
 }
 
 void specialUnitsAlways() {
+	xsSetContextPlayer(0);
 	int p = 0;
 	int proto = 0;
 	int id = 0;
@@ -573,7 +574,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dMountainGiants, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dMountainGiants, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMountainGiants, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dMountainGiants, xSpecialStep) == 1) {
 				xSetInt(dMountainGiants, xSpecialStep, 0);
 				xSetInt(dMountainGiants, xSpecialNext, trTimeMS() + 15000);
@@ -665,7 +668,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dMedusas, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dMedusas, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMedusas, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dMedusas, xSpecialStep) == 1) {
 				xSetInt(dMedusas, xSpecialStep, 0);
 				xSetInt(dMedusas, xSpecialNext, trTimeMS() + 18000);
@@ -895,7 +900,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dFrostGiants, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dFrostGiants, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dFrostGiants, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dFrostGiants, xSpecialStep) == 1) {
 				xSetInt(dFrostGiants, xSpecialStep, 0);
 				xSetInt(dFrostGiants, xSpecialNext, trTimeMS() + 18000);
@@ -1039,7 +1046,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dBattleBoars, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dBattleBoars, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dBattleBoars, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dBattleBoars, xSpecialStep) == 1) {
 				xSetInt(dBattleBoars, xSpecialStep, 0);
 				xSetInt(dBattleBoars, xSpecialNext, trTimeMS() + 18000);
@@ -1264,7 +1273,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dMummies, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dMummies, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMummies, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dMummies, xSpecialStep) == 1) {
 				xSetInt(dMummies, xSpecialStep, 0);
 				xSetInt(dMummies, xSpecialNext, trTimeMS() + 18000);
@@ -1335,7 +1346,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dScorpionMen, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dScorpionMen, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dScorpionMen, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dScorpionMen, xSpecialStep) == 1) {
 				xSetInt(dScorpionMen, xSpecialStep, 0);
 				xSetInt(dScorpionMen, xSpecialNext, trTimeMS() + 18000);
@@ -1421,7 +1434,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dNereids, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dNereids, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dNereids, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dNereids, xSpecialStep) == 1) {
 				xSetInt(dNereids, xSpecialStep, 0);
 				xSetInt(dNereids, xSpecialNext, trTimeMS() + 18000);
@@ -1490,7 +1505,9 @@ void specialUnitsAlways() {
 			trSetUnitOrientation(xGetVector(dKrakens,xSpecialTarget),vector(0,1,0),true);
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dKrakens, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dKrakens, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dKrakens, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dKrakens, xSpecialStep) == 1) {
 				xSetInt(dKrakens, xSpecialStep, 0);
 			}
@@ -1552,7 +1569,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dEinherjars, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dEinherjars, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dEinherjars, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dEinherjars, xSpecialStep) == 1) {
 				xSetInt(dEinherjars, xSpecialStep, 0);
 				xSetInt(dEinherjars, xSpecialNext, trTimeMS() + 15000);
@@ -1745,7 +1764,9 @@ void specialUnitsAlways() {
 			}
 		} else {
 			action = xGetInt(db, xStunStatus, xGetInt(dLampades, xSpecialIndex));
-			action = action + xGetInt(db, xLaunched, xGetInt(dLampades, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dLampades, xSpecialIndex))) {
+				action = action + 1;
+			}
 			if (action > 0 && xGetInt(dLampades, xSpecialStep) == 1) {
 				xSetInt(dLampades, xSpecialStep, 0);
 				xSetInt(dLampades, xSpecialNext, trTimeMS() + 18000);
@@ -1780,8 +1801,9 @@ void enemiesAlways() {
 	
 	if (xGetDatabaseCount(dEnemies) > 0) {
 		xDatabaseNext(dEnemies);
-		id = kbGetBlockID(""+xGetInt(dEnemies,xUnitID));
-		xUnitSelectByID(dEnemies,xUnitID);
+		id = kbGetBlockID(""+xGetInt(dEnemies,xUnitName));
+		trUnitSelectClear();
+		trUnitSelectByID(id);
 		if (id == -1 || trUnitAlive() == false) {
 			removeEnemy();
 		} else if ((kbUnitGetAnimationActionType(id) == 9) &&

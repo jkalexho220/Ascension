@@ -190,7 +190,7 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 		xSetInt(db, xSilenceStatus, 1);
 		if (kbGetBlockID(""+1*xGetInt(db, xSilenceSFX)) == -1) {
 			spyEffect(xGetInt(db,xUnitName),kbGetProtoUnitID("UI Range Indicator Egypt SFX"),
-				xsVectorSet(db,xSilenceStatus,xGetPointer(db)));
+				xsVectorSet(db,xSilenceSFX,xGetPointer(db)));
 		} else {
 			trUnitSelectClear();
 			trUnitSelect(""+xGetInt(db, xSilenceSFX), true);
@@ -480,7 +480,7 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerPoisonResistance);
 	}
 	duration = duration * 1000;
-	if (targetPlayers && (xGetInt(db, xIsHero) == 1) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+	if (targetPlayers && xGetBool(db, xIsHero) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
 		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
 			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
 			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
@@ -778,7 +778,7 @@ void stunsAndPoisons(int db = 0) {
 			xUnitSelect(db, xPoisonSFX);
 			trMutateSelected(kbGetProtoUnitID("Rocket"));
 		} else if (amt > 500) {
-			trDamageUnit(amt * xGetInt(db, xPoisonDamage) * 0.001);
+			trDamageUnit(amt * xGetFloat(db, xPoisonDamage) * 0.001);
 			xSetInt(db, xPoisonLast, trTimeMS());
 		}
 	}
@@ -868,7 +868,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 					}
 				}
 				/* get the target */
-				if (xGetInt(dPlayerCharacters, xCharAttackTargetIndex) == 0) {
+				if (xGetInt(db, xCharAttackTargetIndex) == 0) {
 					for(x=xGetDatabaseCount(dEnemies); >0) {
 						xDatabaseNext(dEnemies);
 						if (xGetInt(dEnemies,xUnitID) == xGetInt(db, xCharAttackTarget)) {
@@ -876,6 +876,9 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 							xSetInt(dPlayerData,xPlayerPoisonKillerActive, xGetInt(dEnemies, xPoisonStatus),p);
 							break;
 						}
+					}
+					if (xGetInt(db, xCharAttackTargetIndex) == 0) {
+						debugLog("Player " + p +" target not found: " + xGetInt(db, xCharAttackTarget));
 					}
 				} else {
 					xSetInt(dPlayerData,xPlayerPoisonKillerActive, xGetInt(dEnemies, xPoisonStatus, xGetInt(db,xCharAttackTargetIndex)),p);
@@ -1126,8 +1129,8 @@ int initSpecialDatabase(string name = "", bool step = true) {
 void addSpecialToDatabase(int db = 0,int name = 0, int from = 0, int p = 0) {
 	xSetPointer(db, xAddDatabaseBlock(db));
 	xSetInt(db, xUnitName,name);
-	xSetInt(db,xPlayerOwner,p);
-	xSetInt(db, xUnitID, xGetInt(db,xUnitID,xGetNewestPointer(db)));
+	xSetInt(db, xPlayerOwner,p);
+	xSetInt(db, xUnitID, xGetInt(from,xUnitID));
 	xSetInt(db, xSpecialIndex, xGetNewestPointer(from));
 }
 

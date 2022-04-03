@@ -522,7 +522,6 @@ highFrequency
 	vector pos = trVectorQuestVarGet("startPosition");
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
-		debugLog("pos is " + pos);
 		spawnPlayer(p, pos);
 		trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
 		trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
@@ -592,9 +591,10 @@ highFrequency
 			removePlayerUnit();
 		} else {
 			if (xGetFloat(dPlayerUnits, xDecay) > 0) {
-				if (trTimeMS() > xGetInt(dPlayerUnits, xDecayNext)) {
-					xSetInt(dPlayerUnits, xDecayNext, 1000 + xGetInt(dPlayerUnits, xDecayNext));
-					trDamageUnitPercent(xGetFloat(dPlayerUnits, xDecay));
+				count = trTimeMS() - xGetInt(dPlayerUnits, xDecayNext);
+				if (count > 1000) {
+					xSetInt(dPlayerUnits, xDecayNext, trTimeMS());
+					trDamageUnitPercent(xGetFloat(dPlayerUnits, xDecay) * 0.001 * count);
 				}
 			}
 			if (trQuestVarGet("stage") == 5) {

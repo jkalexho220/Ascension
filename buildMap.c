@@ -971,7 +971,6 @@ void buildEdge(int edge = 0, int type = 0) {
 	vector pos = vector(0,0,0);
 	if (trQuestVarGet("edge"+edge) == EDGE_NOT_FOUND) {
 		if (type == EDGE_MOUNTAIN) {
-			debugLog("this is a mountain");
 			xClearDatabase(dEdgeFrontier);
 			x0 = x0 * 35;
 			z0 = z0 * 35;

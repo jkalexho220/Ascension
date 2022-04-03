@@ -304,7 +304,7 @@ void chooseClass(int p = 0, int class = 0) {
 	
 	xSetInt(dPlayerData,xPlayerFirstDelay,xGetInt(dClass, xClassFirstDelay, class));
 	xSetInt(dPlayerData,xPlayerNextDelay,xGetInt(dClass, xClassNextDelay, class));
-	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,1*trQuestVarGet("proto"+proto+"specialAttackCooldown"));
+	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,xGetInt(dClass, xClassSpecialAttackCooldown, class));
 	
 	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));

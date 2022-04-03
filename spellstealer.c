@@ -113,6 +113,7 @@ void spellstealerAlways(int eventID = -1) {
 					id = yGetVar("p"+p+"bladeDanceTargets", "index");
 					hit = yGetVarAtIndex("enemies", "stunStatus", id) * stunned;
 					hit = hit + yGetVarAtIndex("enemies", "poisonStatus", id) * poisoned;
+					hit = hit + yGetVarAtIndex("enemies", "silenceStatus", id) * silenced;
 					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < 2.0 * amt)) {
 						yRemoveFromDatabase("p"+p+"bladeDanceTargets");
 					} else {

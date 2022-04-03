@@ -150,7 +150,7 @@ void moonbladeAlways(int eventID = -1) {
 			} else {
 				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
 				trQuestVarSet("p"+p+"protectionNext",
-					trTimeMS() + protectionDelay / trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + protectionDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);
@@ -232,7 +232,7 @@ void moonbladeAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"protection") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
 			trQuestVarSet("p"+p+"protectionNext",
-				trQuestVarGet("p"+p+"protectionNext") + protectionDelay / trQuestVarGet("p"+p+"ultimateCost"));
+				trQuestVarGet("p"+p+"protectionNext") + protectionDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
 			gainFavor(p, 0.0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);
@@ -290,8 +290,8 @@ void chooseMoonblade(int eventID = -1) {
 void moonbladeModify(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 5000 - 12 * MOONBLADE;
-	zSetProtoUnitStat("Wolf", p, 0, 0.2 * trQuestVarGet("p"+p+"health"));
-	zSetProtoUnitStat("Wolf", p, 27, 0.2 * trQuestVarGet("p"+p+"baseAttack"));
+	zSetProtoUnitStat("Wolf", p, 0, 0.2 * xGetFloat(dPlayerData, xPlayerHealth, p));
+	zSetProtoUnitStat("Wolf", p, 27, 0.2 * xGetFloat(dPlayerData, xPlayerAttack, p));
 }
 
 rule moonblade_init
