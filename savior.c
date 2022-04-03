@@ -15,12 +15,12 @@ void saviorAlways(int eventID = -1) {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		
 		dist = xsPow(2 * trQuestVarGet("guardianAngelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 		hit = -1;
-		for(x=yGetDatabaseCount("playerUnits"); >0) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			id = yDatabaseNext("playerUnits", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removePlayerUnit();
@@ -81,8 +81,8 @@ void saviorAlways(int eventID = -1) {
 			amt = trQuestVarGet("guardianAngelHeal") * (1.0 + 0.1 * amt);
 			dist = xsPow(trQuestVarGet("guardianAngelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
 			
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
 				if (zDistanceToVectorSquared("playerUnits", "pos") < dist) {
 					trUnitSelectClear();
 					trUnitSelectByQV("playerUnits", true);
@@ -99,8 +99,8 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		if (trQuestVarGet("p"+p+"unity") == 1) {
 			for(x=trQuestVarGet("p"+p+"unityNext"); < trQuestVarGet("p"+p+"unityend")) {
 				trUnitSelectClear();
@@ -153,8 +153,8 @@ void saviorAlways(int eventID = -1) {
 			zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, trQuestVarGet("p"+p+"baseAttack"));
 			trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack"));
 			trQuestVarSet("p"+p+"unity", 0);
-			for (x=yGetDatabaseCount("playerUnits"); >0) {
-				yDatabaseNext("playerUnits");
+			for (x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
 				if (getBit(p, 1*yGetVar("playerUnits", "unity")) == true) {
 					ySetVar("playerUnits", "unity", yGetVar("playerUnits", "unity") - xsPow(2, p));
 					ySetVar("playerUnits", "magicResist", calculateArmor(yGetVar("playerUnits", "magicResist"), -1.0));
@@ -185,8 +185,8 @@ void saviorAlways(int eventID = -1) {
 			if (trTime() > trQuestVarGet("p"+p+"unityTime")) {
 				trQuestVarSet("p"+p+"unityTime", trTime());
 				hit = 0;
-				for (x=yGetDatabaseCount("playerUnits"); >0) {
-					yDatabaseNext("playerUnits");
+				for (x=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
 					if (zDistanceToVectorSquared("playerUnits", "p"+p+"unitypos") < dist) {
 						hit = hit + 1;
 						if (getBit(p, 1*yGetVar("playerUnits", "unity")) == false) {
@@ -206,8 +206,8 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"intervention", 1);
 	}
 	
@@ -222,8 +222,8 @@ void saviorAlways(int eventID = -1) {
 				if (yGetVar("p"+p+"characters", "jumping") == 0) {
 					ySetVar("p"+p+"characters", "jumping", 1);
 					ySetVar("p"+p+"characters", "attackTarget", kbUnitGetTargetUnitID(id));
-					for(x=yGetDatabaseCount("enemies"); >0) {
-						yDatabaseNext("enemies");
+					for(x=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
 						if (kbGetBlockID(""+1*trQuestVarGet("enemies")) == yGetVar("p"+p+"characters", "attackTarget")) {
 							ySetVar("p"+p+"characters", "attackTargetIndex", yGetPointer("enemies"));
 							trQuestVarSet("p"+p+"poisonKillerActive", yGetVar("enemies", "poisonStatus"));
@@ -255,7 +255,7 @@ void saviorAlways(int eventID = -1) {
 						yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 500);
 						yAddUpdateVar("playerLasers", "range", dist * 1.3);
 						amt = trQuestVarGet("p"+p+"attack");
-						for(x=yGetDatabaseCount("enemies"); >1) {
+						for(x=xGetDatabaseCount(dEnemies); >1) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
 							} else {
@@ -277,7 +277,7 @@ void saviorAlways(int eventID = -1) {
 					amt = trQuestVarGet("p"+p+"attack") * trQuestVarGet("unityHeal") * target;
 					dist = xsPow(trQuestVarGet("unityRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 					gainFavor(p, 2.0);
-					for(x=yGetDatabaseCount("playerUnits"); >0) {
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 						if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (zDistanceToVectorSquared("playerUnits", "p"+p+"unityPos") < dist) {

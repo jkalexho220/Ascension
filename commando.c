@@ -84,7 +84,7 @@ void commandoAlways(int eventID = -1) {
 			hit = 0;
 			yVarToVector("p"+p+"pellets", "prev");
 			current = dist - yGetVar("p"+p+"pellets", "dist");
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (rayCollision("enemies", "prev", "dir", current + 2.0, 4.0)) {
@@ -153,7 +153,7 @@ void commandoAlways(int eventID = -1) {
 		trQuestVarSet("inner", xsPow(yGetVar("p"+p+"shotgunHitboxes", "dist"), 2));
 		dist = yGetVar("p"+p+"shotgunHitboxes", "dist");
 		target = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -252,8 +252,8 @@ void commandoAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("catapultattack.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
@@ -330,7 +330,7 @@ void commandoAlways(int eventID = -1) {
 				yVarToVector("p"+p+"echoBombs", "pos");
 				amt = amt * trQuestVarGet("p"+p+"spellDamage");
 				dist = xsPow(trQuestVarGet("echoBombRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -370,8 +370,8 @@ void commandoAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -379,7 +379,7 @@ void commandoAlways(int eventID = -1) {
 		trUnitDestroy();
 		dist = xsPow(12, 2);
 		target = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -428,8 +428,8 @@ void commandoAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"minigun", 1 - trQuestVarGet("p"+p+"minigun"));
 		if (trQuestVarGet("p"+p+"minigun") == 1) {
 			if (trPlayerResourceCount(p, "favor") == 0) {

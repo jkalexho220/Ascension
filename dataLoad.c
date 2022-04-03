@@ -16,13 +16,15 @@ const int VERSION_NUMBER = 6;
 const int TOTAL_LOAD = 24;
 
 void saveAllData() {
+	xsSetContextPlayer(0);
 	trSetCurrentScenarioUserData(VERSION_NUMBER, 0);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
-	for(x=yGetDatabaseCount("p"+p+"warehouse"); >0) {
-		yDatabaseNext("p"+p+"warehouse");
-		relic = yGetVar("p"+p+"warehouse", "type");
+	int db = getWarehouseDB(p);
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		relic = xGetInt(db,xRelicType);
 		if (relic <= NORMAL_RELICS) {
 			trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
 		}
@@ -32,35 +34,32 @@ void saveAllData() {
 		trQuestVarSet("p"+p+"nickQuestProgress", 0);
 	}
 	
+	xSetPointer(dPlayerData,p);
+	
 	/* slot 0 */
 	savedata = 0;
-	currentdata = trQuestVarGet("p"+p+"monsterIndex");
-	savedata = savedata * 40 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"relicTransporterLevel");
-	savedata = savedata * 10 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"class");
-	savedata = savedata * 31 + trQuestVarGet("p"+p+"class");
-	currentdata = trQuestVarGet("p"+p+"godBoon");
-	savedata = savedata * 13 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"level");
-	savedata = savedata * 10 + trQuestVarGet("p"+p+"level");
-	currentdata = trQuestVarGet("p"+p+"progress");
-	savedata = savedata * 10 + trQuestVarGet("p"+p+"progress");
+	savedata = savedata * 40 + xGetInt(dPlayerData,xPlayerMonsterIndex);
+	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerRelicTransporterLevel);
+	savedata = savedata * 31 + xGetInt(dPlayerData,xPlayerClass);
+	savedata = savedata * 13 + xGetInt(dPlayerData,xPlayerGodBoon);
+	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerLevel);
+	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerProgress);
 	trSetCurrentScenarioUserData(0, savedata);
 	/* gold */
-	savedata = trQuestVarGet("p"+p+"gold") - trQuestVarGet("p"+p+"startingGold");
+	savedata = xGetInt(dPlayerData,xPlayerGold) - trQuestVarGet("p"+p+"startingGold");
 	savedata = savedata + trGetScenarioUserData(1);
 	trSetCurrentScenarioUserData(1, savedata);
 	/* current relics */
-	for(x=12; > yGetDatabaseCount("p"+p+"relics")) {
+	db = getRelicsDB(p);
+	for(x=12; > xGetDatabaseCount(db)) {
 		trQuestVarSet("p"+p+"relic"+x, 0);
 	}
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics");
-		if (yGetVar("p"+p+"relics", "type") <= NORMAL_RELICS) {
-			trQuestVarSet("p"+p+"relic"+x, yGetVar("p"+p+"relics", "type"));
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		if (xGetInt(db, xRelicType) <= NORMAL_RELICS) {
+			trQuestVarSet("p"+p+"relic"+x, xGetInt(db, xRelicType));
 		} else {
-			if (yGetVar("p"+p+"relics", "type") == RELIC_NICKONHAWK_TICKET) {
+			if (xGetInt(db, xRelicType) == RELIC_NICKONHAWK_TICKET) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 6);
 			}
 			trQuestVarSet("p"+p+"relic"+x, 0);
@@ -99,7 +98,7 @@ void saveAllData() {
 		for(y=0; <2) {
 			savedata = 0;
 			for(x=8; >0) {
-				currentdata = 1*xsMin(10, 1*trQuestVarGet("class"+(x+8*y)+"level"));
+				currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, x + 8 * y));
 				savedata = savedata * 11 + currentdata;
 			}
 			trSetCurrentScenarioUserData(10 + y, savedata);
@@ -232,8 +231,11 @@ inactive
 		}
 		
 		trBlockAllSounds(true);
-		xsEnableRule("data_load_01_ready");
+		trDelayedRuleActivation("data_load_01_ready");
 	} else {
+		if (xSetPointer(dPlayerData,1) == false) {
+			debugLog("Cannot set pointer to 1 for dPlayerData!");
+		}
 		trForbidProtounit(1, "Swordsman Hero");
 		
 		/* progress, level, class */
@@ -241,27 +243,28 @@ inactive
 		if (savedata < 0) {
 			savedata = 0;
 		}
-		trQuestVarSet("p1progress", iModulo(10, savedata));
+		xSetInt(dPlayerData,xPlayerProgress,iModulo(10, savedata));
 		savedata = savedata / 10;
-		trQuestVarSet("p1level", iModulo(10, savedata));
+		xSetInt(dPlayerData,xPlayerLevel,iModulo(10, savedata));
 		savedata = savedata / 10;
-		trQuestVarSet("p1godBoon", iModulo(13, savedata));
+		xSetInt(dPlayerData,xPlayerGodBoon,iModulo(13, savedata));
 		savedata = savedata / 13;
-		trQuestVarSet("p1class", iModulo(31, savedata));
+		xSetInt(dPlayerData,xPlayerClass,iModulo(31, savedata));
 		savedata = savedata / 31;
-		trQuestVarSet("p1relicTransporterLevel", iModulo(10, savedata));
+		xSetInt(dPlayerData,xPlayerRelicTransporterLevel,iModulo(10, savedata));
 		savedata = savedata / 10;
-		trQuestVarSet("p1monsterIndex", iModulo(40, savedata));
+		xSetInt(dPlayerData,xPlayerMonsterIndex,iModulo(40, savedata));
 		savedata = savedata / 40;
-		trQuestVarSet("p1monsterProto", monsterPetProto(1*trQuestVarGet("p1monsterIndex")));
+		trQuestVarSet("p1monsterProto", monsterPetProto(xGetInt(dPlayerData,xPlayerMonsterIndex)));
 		
 		/* gold */
 		savedata = trGetScenarioUserData(1);
 		if (savedata < 0) {
 			savedata = 0;
 		}
-		trQuestVarSet("p1gold", savedata);
+		xSetInt(dPlayerData,xPlayerGold,savedata);
 		trQuestVarSet("p1startinggold", savedata);
+		trPlayerGrantResources(1, "gold", savedata);
 		
 		/* equipped relics */
 		for(y=0; <2) {
@@ -282,7 +285,7 @@ inactive
 				savedata = 0;
 			}
 			for(x=1; <9) {
-				trQuestVarSet("class"+(x+8*y)+"level", iModulo(11, savedata));
+				xSetInt(dClass, xClassLevel, iModulo(11, savedata), x + 8 * y);
 				savedata = savedata / 11;
 			}
 		}
@@ -308,11 +311,12 @@ inactive
 		
 		xsEnableRule("singleplayer_init");
 		trDelayedRuleActivation("delayed_modify");
+		xPrintAll(dPlayerData, 1);
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game
 	*/
-	trQuestVarSet("enemyVictoryMarker", trGetNextUnitScenarioNameNumber());
+	trQuestVarSet("temp", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Victory Marker",1,1,0,1,0,true);
 	trArmySelect("1,0");
 	trUnitConvert(ENEMY_PLAYER);
@@ -386,29 +390,34 @@ inactive
 	}
 	if (swordsmen == cNumberPlayers - 2) {
 		for(p=1; < ENEMY_PLAYER) {
+			if (xSetPointer(dPlayerData,p) == false) {
+				debugLog("Cannot set pointer for " + aiPlanGetName(dPlayerData) + " to: " + p);
+				debugLog("database size is " + aiPlanGetNumberUserVariableValues(dPlayerData,xDirtyBit));
+				debugLog("Progress: " + loadProgress + " context: " + xsGetContextPlayer());
+			}
 			swordsmen = 32 * (p - 1);
 			for(x=0; < 32) {
 				if (kbGetUnitBaseTypeID(x + swordsmen) == kbGetProtoUnitID("Swordsman Hero")) {
 					/* read the data */
 					if (loadProgress == 0) {
-						trQuestVarSet("p"+p+"progress", x);
+						xSetInt(dPlayerData,xPlayerProgress,x);
 					} else if (loadProgress == 1) {
-						trQuestVarSet("p"+p+"level", x);
+						xSetInt(dPlayerData,xPlayerLevel,x);
 					} else if (loadProgress == 2) {
-						trQuestVarSet("p"+p+"godBoon", x);
+						xSetInt(dPlayerData,xPlayerGodBoon,x);
 					} else if (loadProgress == 3) {
-						trQuestVarSet("p"+p+"class", x);
+						xSetInt(dPlayerData,xPlayerClass,x);
 					} else if (loadProgress == 4) {
-						trQuestVarSet("p"+p+"relicTransporterLevel", x);
+						xSetInt(dPlayerData,xPlayerRelicTransporterLevel,x);
 					} else if (loadProgress == 5) {
-						trQuestVarSet("p"+p+"monsterIndex", x * 4);
+						xSetInt(dPlayerData,xPlayerMonsterIndex,x * 4);
 					} else if (loadProgress == 6) {
-						trQuestVarSet("p"+p+"monsterIndex", trQuestVarGet("p"+p+"monsterIndex") + x);
-						trQuestVarSet("p"+p+"monsterProto", monsterPetProto(1*trQuestVarGet("p"+p+"monsterIndex")));
+						xSetInt(dPlayerData,xPlayerMonsterIndex,xGetInt(dPlayerData,xPlayerMonsterIndex) + x);
+						xSetInt(dPlayerData,xPlayerMonsterProto,monsterPetProto(xGetInt(dPlayerData,xPlayerMonsterIndex)));
 					} else if (loadProgress == 7) {
-						trQuestVarSet("p"+p+"gold", x);
+						xSetInt(dPlayerData,xPlayerGold,x);
 					} else if (loadProgress == 8) {
-						trQuestVarSet("p"+p+"gold", trQuestVarGet("p"+p+"gold") + 32 * x);
+						xSetInt(dPlayerData,xPlayerGold,xGetInt(dPlayerData,xPlayerGold) + 32 * x);
 					} else if (loadProgress < 21) {
 						trQuestVarSet("p"+p+"relic"+(loadProgress - 5), x);
 					} else if (loadProgress == 21) {
@@ -516,7 +525,7 @@ inactive
 	/*
 	Destroy swordsmen
 	*/
-	for(x=0; < trQuestVarGet("enemyVictoryMarker")) {
+	for(x=0; < trQuestVarGet("temp")) {
 		trUnitSelectClear();
 		trUnitSelectByID(x);
 		trUnitDestroy();
@@ -529,17 +538,17 @@ inactive
 	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		trForbidProtounit(p, "Swordsman Hero");
-		trQuestVarSet("p"+p+"victoryMarker", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
-		class = trQuestVarGet("p"+p+"class");
-		proto = trQuestVarGet("class"+class+"proto");
-		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, trQuestVarGet("p"+p+"level"));
-		if (trQuestVarGet("p"+p+"godBoon") == BOON_TWO_RELICS) {
+		class = xGetInt(dPlayerData,xPlayerClass,p);
+		proto = xGetInt(dClass, xClassProto, class);
+		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, xGetInt(dPlayerData,xPlayerLevel,p));
+		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_TWO_RELICS) {
 			trModifyProtounit(kbGetProtoUnitName(proto), p, 5, 2);
-		} else if (trQuestVarGet("p"+p+"godBoon") == BOON_DOUBLE_FAVOR) {
+		} else if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_DOUBLE_FAVOR) {
 			trSetCivAndCulture(p, 0, 0);
 		}
-		if (trQuestVarGet("p"+p+"class") == 0) {
+		if (xGetInt(dPlayerData,xPlayerClass,p) == 0) {
+			xSetInt(dPlayerData,xPlayerClass,17,p);
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
@@ -549,8 +558,8 @@ inactive
 		if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 			trQuestVarSet("yeebBossFight", p);
 		}
-		trPlayerGrantResources(p, "Gold", trQuestVarGet("p"+p+"gold"));
-		trQuestVarSet("p"+p+"startingGold", trQuestVarGet("p"+p+"gold"));
+		trPlayerGrantResources(p, "Gold", xGetInt(dPlayerData,xPlayerGold, p));
+		trQuestVarSet("p"+p+"startingGold", xGetInt(dPlayerData,xPlayerGold, p));
 	}
 	if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
 		trQuestVarSet("yeebHit", 1);
@@ -565,7 +574,7 @@ rule data_load_emergency_exit
 highFrequency
 inactive
 {
-	if (trTime() > cActivationTime + 8) {
+	if (trTime() > cActivationTime + 5) {
 		xsDisableSelf();
 		if (loadProgress == 0) {
 			int x = 0;

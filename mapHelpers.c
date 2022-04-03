@@ -31,6 +31,65 @@ const int ROOM_SQUARE = 1;
 const int TRAP_LASERS = 1;
 const int TRAP_CAROUSEL = 2;
 
+int dBasicRooms = 0;
+int xRoomNumber = 0;
+
+int dUnlockWalls = 0;
+int xWallState = 0;
+int xWallTimeout = 0;
+int xWallPos = 0;
+int xWallMod = 0;
+int xWallSFX = 0;
+int xWallCircles = 0;
+int xWallEnd = 0;
+int xWallKey = 0;
+
+int dPoisonRelics = 0;
+int xPoisonRelicIndex = 0;
+
+int dEdgeFrontier = 0;
+int xEdgeFrontierHeight = 0;
+int xEdgeFrontierLoc = 0;
+
+int dMapTiles = 0;
+
+int dFrontier = 0;
+int xFrontierEdge = 0;
+int xFrontierType = 0;
+
+int dVisited = 0;
+
+int dSkyPassages = 0;
+int xSkyPassageExit = 0;
+
+int dMagicalJourney = 0;
+
+int dCloudDeployStars = 0;
+
+rule initialize_map_databases
+active
+highFrequency
+{
+	xsDisableSelf();
+	dBasicRooms = xInitDatabase("basicRooms");
+	xRoomNumber = xInitAddInt(dBasicRooms,"roomNumber");
+	
+	dAmbushRooms = xInitDatabase("ambushRooms");
+	xInitAddInt(dAmbushRooms,"roomNumber");
+	xAmbushRoomType = xInitAddInt(dAmbushRooms,"type");
+	xAmbushRoomPos = xInitAddVector(dAmbushRooms,"pos");
+	
+	dUnlockWalls = xInitDatabase("unlockWalls");
+	xWallState = xInitAddInt(dUnlockWalls,"state");
+	xWallTimeout = xInitAddInt(dUnlockWalls,"timeout");
+	xWallPos = xInitAddVector(dUnlockWalls,"pos");
+	xWallMod = xInitAddVector(dUnlockWalls,"mod");
+	xWallSFX = xInitAddInt(dUnlockWalls,"sfxStart");
+	xWallCircles = xInitAddInt(dUnlockWalls,"circlesStart");
+	xWallEnd = xInitAddInt(dUnlockWalls,"end");
+	xWallKey = xInitAddInt(dUnlockWalls,"key");
+}
+
 int deployTownEyecandy(string proto = "", int x = 0, int z = 0, int heading = 0) {
 	int n = trGetNextUnitScenarioNameNumber();
 	trArmyDispatch("0,0","Dwarf",1,x+trQuestVarGet("villageX"),0,z+trQuestVarGet("villageZ"),heading,true);
@@ -79,51 +138,53 @@ vector randomNearEdgeOfRoom(int room = 0) {
 input values are grid positions
 */
 void paintRelicEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
-	trVectorQuestVarSet("pos",randomNearEdge(x1, z1, x2, z2));
+	vector pos = randomNearEdge(x1, z1, x2, z2);
 	int count = (x2-x1) / 2;
 	for(i = count; >0) {
-		vectorToGrid("pos", "loc");
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-			trVectorQuestVarSet("pos",randomNearEdge(x1, z1, x2, z2));
+		vector loc = vectorToGrid(pos);
+		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			pos = randomNearEdge(x1, z1, x2, z2);
 		} else {
 			break;
 		}
 	}
-	spawnRelic(trQuestVarGet("posx"), trQuestVarGet("posz"));
+	spawnRelic(pos);
 }
 
 void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
+	vector loc = vector(0,0,0);
+	int next = 0;
 	for(a=x0; < x1) {
-		trQuestVarSetFromRand("deploy", 0, 1, false);
-		if (trQuestVarGet("deploy") < trQuestVarGet("enemyDensity")) {
+		trQuestVarSetFromRand("rand", 0, 1, false);
+		if (trQuestVarGet("rand") < trQuestVarGet("enemyDensity")) {
 			trQuestVarSetFromRand("z", z0, z1, true);
-			trQuestVarSet("posX", a);
-			trQuestVarSet("posZ", trQuestVarGet("z"));
-			if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+			loc = xsVectorSet(a,0,trQuestVarGet("z"));
+			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
 				trUnitSelectClear();
-				trUnitSelectByQV("next");
+				trUnitSelect(""+next,true);
 				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				yAddToDatabase("enemiesIncoming", "next");
+				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+				xSetInt(dEnemiesIncoming,xUnitName,next);
 			}
 		}
 	}
 	for(b=z0; < z1) {
-		trQuestVarSetFromRand("deploy", 0, 1, false);
-		if (trQuestVarGet("deploy") < trQuestVarGet("enemyDensity")) {
+		trQuestVarSetFromRand("rand", 0, 1, false);
+		if (trQuestVarGet("rand") < trQuestVarGet("enemyDensity")) {
 			trQuestVarSetFromRand("x", x0, x1, true);
-			trQuestVarSet("posX", trQuestVarGet("x"));
-			trQuestVarSet("posZ", b);
-			if (terrainIsType("pos", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+			loc = xsVectorSet(trQuestVarGet("x"),0,b);
+			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
 				trUnitSelectClear();
-				trUnitSelectByQV("next");
+				trUnitSelect(""+next,true);
 				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				yAddToDatabase("enemiesIncoming", "next");
+				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+				xSetInt(dEnemiesIncoming,xUnitName,next);
 			}
 		}
 	}
@@ -131,21 +192,22 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 
 void paintEyecandy(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0, string type = "sprite") {
 	float scale = trQuestVarGet(type+"scale");
+	int next = 0;
+	vector loc = vector(0,0,0);
 	if (trQuestVarGet(type+"Density") > 0) {
 		for(a=x0; < x1) {
 			trQuestVarSetFromRand("deploy", 0, 1, false);
 			if (trQuestVarGet("deploy") < trQuestVarGet(type+"Density")) {
 				trQuestVarSetFromRand("z", z0, z1, true);
-				trQuestVarSet("locX", a);
-				trQuestVarSet("locZ", trQuestVarGet("z"));
-				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+				loc = xsVectorSet(a,0,trQuestVarGet("z"));
+				if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 					trQuestVarSetFromRand("type", 1, 3, true);
 					trQuestVarSetFromRand("heading", 0, 360, true);
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					next = trGetNextUnitScenarioNameNumber();
 					trArmyDispatch("1,0",trStringQuestVarGet(type+"Proto"+1*trQuestVarGet("type")),1,
 						2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
 					trUnitSelectClear();
-					trUnitSelectByQV("next", true);
+					trUnitSelect(""+next,true);
 					trUnitConvert(0);
 					if (scale > 0) {
 						trSetSelectedScale(scale,scale,scale);
@@ -157,16 +219,15 @@ void paintEyecandy(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0, string type =
 			trQuestVarSetFromRand("deploy", 0, 1, false);
 			if (trQuestVarGet("deploy") < trQuestVarGet(type+"Density")) {
 				trQuestVarSetFromRand("x", x0, x1, true);
-				trQuestVarSet("locX", trQuestVarGet("x"));
-				trQuestVarSet("locZ", b);
-				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				loc = xsVectorSet(trQuestVarGet("x"),0,b);
+				if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 					trQuestVarSetFromRand("type", 1, 3, true);
 					trQuestVarSetFromRand("heading", 0, 360, true);
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+					next = trGetNextUnitScenarioNameNumber();
 					trArmyDispatch("1,0",trStringQuestVarGet(type+"Proto"+1*trQuestVarGet("type")),1,
 						2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
 					trUnitSelectClear();
-					trUnitSelectByQV("next", true);
+					trUnitSelect(""+next,true);
 					trUnitConvert(0);
 					if (scale > 0) {
 						trSetSelectedScale(scale,scale,scale);
@@ -222,19 +283,18 @@ int countRoomEntrances(int x = 0, int z = 0) {
 }
 
 void paintSecondary(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
+	vector loc = vector(0,0,0);
 	for(a=x0; < x1) {
 		trQuestVarSetFromRand("z", z0, z1, true);
-		trQuestVarSet("locx", a);
-		trQuestVarSet("locz", trQuestVarGet("z"));
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+		loc = xsVectorSet(a,0,trQuestVarGet("z"));
+		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 			trPaintTerrain(a, 1*trQuestVarGet("z"), a, 1*trQuestVarGet("z"), TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, false);
 		}
 	}
 	for(b=z0; < z1) {
 		trQuestVarSetFromRand("x", x0, x1, true);
-		trQuestVarSet("locx", trQuestVarGet("x"));
-		trQuestVarSet("locz", b);
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+		loc = xsVectorSet(trQuestVarGet("x"),0,b);
+		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 			trPaintTerrain(1*trQuestVarGet("x"), b, 1*trQuestVarGet("x"), b, TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, false);
 		}
 	}
@@ -273,4 +333,5 @@ void placeTemple(int x = 0, int z = 0, float los = 0) {
 	trSetSelectedScale(2,2,2);
 	trUnitOverrideAnimation(2,0,true,false,-1);
 	trQuestVarSet("templeLOS", los);
+	trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
 }

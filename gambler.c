@@ -106,7 +106,7 @@ void gamblerAlways(int eventID = -1) {
 		if (dist > 2.0) {
 			yVarToVector("p"+p+"dice", "dir");
 			if (yGetVar("p"+p+"dice", "type") == DICE_HEAL) {
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (rayCollision("playerUnits","prev","dir",dist + 2.0,4.0)) {
@@ -115,7 +115,7 @@ void gamblerAlways(int eventID = -1) {
 					}
 				}
 			} else {
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
 						removeEnemy();
@@ -174,7 +174,7 @@ void gamblerAlways(int eventID = -1) {
 						
 						dist = xsPow(trQuestVarGet("diceRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 						amt = trQuestVarGet("diceDamage") * trQuestVarGet("p"+p+"spellDamage");
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
 							} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -209,8 +209,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("swing"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		amt = xsSqrt(trQuestVarGet("p"+p+"gamble")) * 0.5;
@@ -343,8 +343,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("gambleCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		trSoundPlayFN("plentybirth.wav","1",-1,"","");
 		trUnitSelectClear();
@@ -368,7 +368,7 @@ void gamblerAlways(int eventID = -1) {
 			ySetVar("p"+p+"deckBurns","next", trTimeMS() + 500);
 			yVarToVector("p"+p+"deckBurns","pos");
 			amt = 2;
-			for(x=yGetDatabaseCount("playerUnits"); >0) {
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 					removePlayerUnit();
 				} else if (zDistanceToVectorSquared("playerUnits", "pos") < yGetVar("p"+p+"deckBurns", "radius")) {
@@ -376,7 +376,7 @@ void gamblerAlways(int eventID = -1) {
 				}
 			}
 			amt = amt * 0.5 * yGetVar("p"+p+"deckBurns","damage");
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < yGetVar("p"+p+"deckBurns", "radius")) {
@@ -458,7 +458,7 @@ void gamblerAlways(int eventID = -1) {
 					trMutateSelected(kbGetProtoUnitID("Frost Drift"));
 					trSetSelectedScale(0.3 * dist,1,0.4*dist);
 					dist = xsPow(dist, 2);
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (zDistanceToVectorSquared("enemies","p"+p+"decktarget") < dist) {
@@ -490,8 +490,8 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("p"+p+"decktarget", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject");

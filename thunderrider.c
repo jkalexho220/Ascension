@@ -77,8 +77,8 @@ void rideLightningOff(int p = 0) {
 
 void refreshRideLightningTargets(int p = 0) {
 	yClearDatabase("p"+p+"rideLightningTargets");
-	for(x=yGetDatabaseCount("enemies"); >0) {
-		yDatabaseNext("enemies");
+	for(x=xGetDatabaseCount(dEnemies); >0) {
+		xDatabaseNext(dEnemies);
 		yAddToDatabase("p"+p+"rideLightningTargets", "enemies");
 		yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetPointer("enemies"));
 	}
@@ -128,7 +128,7 @@ void thunderRiderAlways(int eventID = -1) {
 	
 	if (yGetDatabaseCount("p"+p+"blitzSFX") > 0) {
 		/* stun enemies */
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			id = yDatabaseNext("enemies", true);
 			if (id == -1 || trUnitAlive() == false) {
 				removeEnemy();
@@ -228,8 +228,8 @@ void thunderRiderAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		vectorSnapToGrid("p"+p+"wellPos");
 		posX = trQuestVarGet("p"+p+"wellPosx");
 		posZ = trQuestVarGet("p"+p+"wellPosz");
@@ -292,8 +292,8 @@ void thunderRiderAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trSoundPlayFN("suckup1.wav","1",-1,"","");
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
@@ -308,8 +308,8 @@ void thunderRiderAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("end", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -425,7 +425,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
 					trArmySelect(""+p+",0");
 					trUnitChangeProtoUnit("Lightning Sparks");
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();

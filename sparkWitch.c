@@ -56,8 +56,8 @@ void sparkWitchAlways(int eventID = -1) {
 							}
 							ySetVar("p"+p+"characters", "bounces", 0);
 							ySetVar("p"+p+"characters", "hex", 0);
-							for(x=yGetDatabaseCount("enemies"); >0) {
-								if (yDatabaseNext("enemies") == trQuestVarGet("next")) {
+							for(x=xGetDatabaseCount(dEnemies); >0) {
+								if (xDatabaseNext(dEnemies) == trQuestVarGet("next")) {
 									yAddUpdateVar("p"+p+"zaps", "index", yGetPointer("enemies"));
 									break;
 								}
@@ -108,7 +108,7 @@ void sparkWitchAlways(int eventID = -1) {
 			amt = 0.001 * amt * trQuestVarGet("hexBoltDamage") * trQuestVarGet("p"+p+"spellDamage");
 			yVarToVector("p"+p+"hexOrbs", "pos");
 			dist = xsPow(trQuestVarGet("hexboltRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -218,7 +218,7 @@ void sparkWitchAlways(int eventID = -1) {
 				if (yGetVar("p"+p+"zaps", "bounces") > 0) {
 					dist = xsPow(trQuestVarGet("p"+p+"Range") - 5, 2);
 					hit = 0;
-					for(x=yGetDatabaseCount("enemies"); >0) {
+					for(x=xGetDatabaseCount(dEnemies); >0) {
 						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (trQuestVarGet("p"+p+"zaps") == trQuestVarGet("enemies")) {
@@ -260,8 +260,8 @@ void sparkWitchAlways(int eventID = -1) {
 		yRemoveFromDatabase("p"+p+"thunderstrikes");
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			ySetVar("p"+p+"characters", "bounces", 1 + yGetVar("p"+p+"characters", "bounces"));
@@ -281,7 +281,7 @@ void sparkWitchAlways(int eventID = -1) {
 		dist = xsPow(trQuestVarGet("thunderstrikeRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 		amt = trQuestVarGet("thunderstrikeDamage") * trQuestVarGet("p"+p+"spellDamage");
 		hit = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else if (zDistanceToVectorSquared("enemies", "p"+p+"wellPos") < dist) {
@@ -303,8 +303,8 @@ void sparkWitchAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			ySetVar("p"+p+"characters", "bounces", 1 + yGetVar("p"+p+"characters", "bounces"));
@@ -364,7 +364,7 @@ void sparkWitchAlways(int eventID = -1) {
 				trSoundPlayFN("vortexstart.wav","1",-1,"","");
 				dist = xsPow(trQuestVarGet("vortexRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 				yVarToVector("p"+p+"vortexObjects", "center");
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "center") < dist) {
@@ -384,8 +384,8 @@ void sparkWitchAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"hex", 1 - trQuestVarGet("p"+p+"hex"));
 		if (trCurrentPlayer() == p) {
 			trSoundPlayFN("skypassageout.wav","1",-1,"","");

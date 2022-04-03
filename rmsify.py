@@ -1,21 +1,37 @@
 import os
 import sys
 
-# The syntax validator will stop after encountering the first error.
-# After fixing that error, additional ones may be reported.
+###############################
+########### READ ME ###########
+###############################
+
+# rmsify.py is a command line program that runs on Python. Just download the latest version from the python website.
+# To setup this program, create a new folder for your project. Put this file and the Commands.xml file in that folder.
+# Then create a new folder named XS inside of your folder. This is where the ouput files go. Add your RMS .xml file in this folder.
+
+# To run this program, use a command prompt to navigate to this folder. Then run the command: python rmsify.py
+# You can add -v to the command to see verbose output, though this will not be helpful to most people.
+
+# The syntax validator will stop after encountering the first error. After fixing that error, additional ones may be reported.
 # In files[], the very first file contains all the rms code in void main() that EXCLUDES trigger code.
 # The other files after the first file are parsed as raw trigger code.
 # If you wish to inject RMS code between the lines of trigger code, use the % character to escape trigger code and another % to return to trigger code.
 # The % characters must be placed on their own lines.
-# Syntax validator does not check RMS code or code between the % signs. Use at your own risk.
+# While in RMS code, you can write code(""); to create trigger code the old-fashioned nottud way.
+# This program will also correctly format your code with the correct indentation.
+# This file should know every valid AoM constant for RMS and trigger code.
+# Let me know of any problems you encounter with this file.
 
 ###############################
 ####### CUSTOMIZE THESE #######
 ###############################
 FILENAME = 'Ascension MMORPG.xs'
-files = ['main.c', 'shared.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
+
+files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+        'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'gameplay.c', 'singleplayer.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -52,6 +68,7 @@ IGNORE = ['const']
 
 SYMBOLS = [ARITHMETIC, BINARY, FLOW]
 
+
 class CustomFunction:
 	def __init__(self, name, datatype):
 		self.name = name
@@ -61,19 +78,95 @@ class CustomFunction:
 	def add(self, datatype):
 		self.parameters.append(datatype)
 
-FUNCTIONS = {}
+FUNCTIONS = {'code':CustomFunction('code','void')}
+FUNCTIONS['code'].add('string')
 BASE_JOB = None
+RMS_JOB = None
+RESTORING = False
+ERRORED = False
 
 KNOWN_FOR = []
 KNOWN_TRIGGERS = []
-KNOWN_VARIABLES = ['cNumberPlayers', 'cNumberNonGaiaPlayers', 'cMapSize', 'cNumberTeams',
-					'cConnectAllies', 'cConnectAreas', 'cConnectEnemies', 'cConnectPlayers',
-					'cInvalidVector', 'cOriginVector', 'cActivationTime']
-KNOWN_TYPES = ['int', 'int', 'int', 'int',
-				'int', 'int', 'int', 'int',
-				'vector', 'vector', 'int']
+KNOWN_VARIABLES = ['cNumberPlayers', 'cInvalidVector', 'cOriginVector', 'cActivationTime']
+KNOWN_TYPES = ['int', 'vector', 'vector', 'int']
 
-ERRORED = False
+THE_TRIGGER_KNOWS = []
+IN_TRIGGER = False
+
+KNOWN_FOR_RMS = []
+KNOWN_VARIABLES_RMS = ['cNumberPlayers', 'cMapSize', 'cNumberTeams', 'cNumberNonGaiaPlayers', 
+						'cConnectAllies', 'cConnectAreas', 'cConnectEnemies', 'cConnectPlayers',
+						'cCivAtlantean', 'cCivEgyptian', 'cCivGreek', 'cCivNorse', 'cCivRandom', 'cCivNature',
+						'cCivZeus', 'cCivPoseidon', 'cCivHades',
+						'cCivRa', 'cCivIsis', 'cCivSet',
+						'cCivOdin', 'cCivThor', 'cCivLoki',
+						'cCivOuranos', 'cCivGaia', 'cCivKronos',
+						'cCultureAtlantean', 'cCultureEgyptian', 'cCultureGreek', 'cCultureNature', 'cCultureNorse',
+						'cInvalidVector', 'cOriginVector']
+KNOWN_TYPES_RMS = ['int', 'int', 'int', 'int',
+					'int', 'int', 'int', 'int',
+					'int', 'int', 'int', 'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int',
+					'int', 'int', 'int', 'int', 'int',
+					'vector', 'vector']
+ESCAPE = True
+
+def getKnownVariables():
+	global KNOWN_VARIABLES
+	global KNOWN_VARIABLES_RMS
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		return KNOWN_VARIABLES_RMS
+	else:
+		return KNOWN_VARIABLES
+
+def getKnownDatatypes():
+	global KNOWN_TYPES
+	global KNOWN_TYPES_RMS
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		return KNOWN_TYPES_RMS
+	else:
+		return KNOWN_TYPES
+
+def getKnownFor():
+	global KNOWN_FOR
+	global KNOWN_FOR_RMS
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		return KNOWN_FOR_RMS
+	else:
+		return KNOWN_FOR
+
+def setKnownVariables(newlist):
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		global KNOWN_VARIABLES_RMS
+		KNOWN_VARIABLES_RMS = newlist
+	else:
+		global KNOWN_VARIABLES
+		KNOWN_VARIABLES = newlist
+
+def setKnownDatatypes(newlist):
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		global KNOWN_TYPES_RMS
+		KNOWN_TYPES_RMS = newlist
+	else:
+		global KNOWN_TYPES
+		KNOWN_TYPES = newlist
+
+def setKnownFor(newlist):
+	global ESCAPE
+	if ESCAPE and not RESTORING:
+		global KNOWN_FOR_RMS
+		KNOWN_FOR_RMS = newlist
+	else:
+		global KNOWN_FOR
+		KNOWN_FOR = newlist
 
 def error(msg):
 	global ln
@@ -108,7 +201,6 @@ class Job:
 		return val
 
 	def resolve(self):
-		global BASE_JOB
 		self.closed = True
 		for c in self.children:
 			c.resolve()
@@ -129,11 +221,11 @@ class Job:
 		self.parent.children.append(self)
 
 	def parseGeneric(self, token):
-		global KNOWN_VARIABLES
+		knownVars = getKnownVariables()
 		accepted = True
 		if token in FUNCTIONS:
 			self.children.append(Function(token, self))
-		elif token in KNOWN_VARIABLES:
+		elif token in knownVars:
 			self.children.append(Variable(token, self))
 		elif token == '""':
 			self.children.append(Literal(token, self, 'string'))
@@ -223,17 +315,14 @@ class BaseFrame(Job):
 
 class StackFrame(Job):
 	def __init__(self, name, parent):
-		global KNOWN_VARIABLES
+		knownVars = getKnownVariables()
 		super().__init__(name, parent)
-		self.depth = len(KNOWN_VARIABLES)
+		self.depth = len(knownVars)
 		self.state = 0
 
-	def resolve(self):
-		super().resolve()
-
 	def accept(self, token):
-		global KNOWN_VARIABLES
-		global KNOWN_TYPES
+		knownVars = getKnownVariables()
+		knownTypes = getKnownDatatypes()
 		accepted = True
 		if not super().accept(token):
 			if self.state == STATE_WAITING_BRACKETS:
@@ -254,8 +343,8 @@ class StackFrame(Job):
 						error("Unrecognized command.")
 					self.children.pop()
 				elif token == '}':
-					KNOWN_VARIABLES = KNOWN_VARIABLES[:self.depth]
-					KNOWN_TYPES = KNOWN_TYPES[:self.depth]
+					setKnownVariables(knownVars[:self.depth])
+					setKnownDatatypes(knownTypes[:self.depth])
 					self.state = STATE_CLOSED
 				elif self.name == 'switch' and not token == 'case':
 					accepted = False
@@ -289,24 +378,24 @@ class StackFrame(Job):
 
 class Logic(StackFrame):
 	def __init__(self, name, parent):
-		global KNOWN_FOR
+		knownFor = getKnownFor()
 		super().__init__(name, parent)
 		self.state = STATE_NEED_PARENTHESIS
 		self.type = 'LOGIC'
 		self.datatype = 'void'
-		self.fordepth = len(KNOWN_FOR)
+		self.fordepth = len(knownFor)
 		if name == 'case':
 			self.state = STATE_IN_PARENTHESIS
 
 	def resolve(self):
-		global KNOWN_FOR
+		knownFor = getKnownFor()
 		super().resolve()
-		KNOWN_FOR = KNOWN_FOR[:self.fordepth]
+		setKnownFor(knownFor[:self.fordepth])
 
 	def accept(self, token):
-		global KNOWN_VARIABLES
-		global KNOWN_TYPES
-		global KNOWN_FOR
+		knownVars = getKnownVariables()
+		knownTypes = getKnownDatatypes()
+		knownFor = getKnownFor()
 		accepted = True
 		if not super().accept(token):
 			if self.state == STATE_NEED_PARENTHESIS:
@@ -321,20 +410,20 @@ class Logic(StackFrame):
 					self.children.append(Declaration('int', self))
 					self.children[0].name = token
 					self.children[0].state = STATE_NEED_PARENTHESIS
-					if token in KNOWN_FOR:
+					if token in knownFor:
 						error("Using duplicate variable in nested for loop")
 						accepted = False
-					elif token in KNOWN_VARIABLES:
-						if KNOWN_TYPES[KNOWN_VARIABLES.index(token)] != 'int':
+					elif token in knownVars:
+						if knownTypes[knownVars.index(token)] != 'int':
 							error("Using a non-integer variable in for-loop: " + token)
 							accepted = False
 						else:
-							KNOWN_FOR.append(token)
+							knownFor.append(token)
 					else:
-						KNOWN_VARIABLES.append(token)
-						KNOWN_TYPES.append('int')
-						self.depth = len(KNOWN_VARIABLES) # variables declared in for loops persist
-						KNOWN_FOR.append(token)
+						knownVars.append(token)
+						knownTypes.append('int')
+						self.depth = len(knownVars) # variables declared in for loops persist
+						knownFor.append(token)
 					self.state = STATE_WAITING_COMMA
 				elif (self.name == 'case' and token == ':') or (self.name != 'case' and token == ')'):
 					if len(self.children) == 0:
@@ -344,6 +433,9 @@ class Logic(StackFrame):
 						if self.children[0].datatype != 'int':
 							error("Contents of " + self.name + " do not resolve to an integer! " + self.children[0].datatype)
 							accepted = False
+					elif self.children[0].type == 'ASSIGNMENT':
+						error("Assignment operator in " + self.name + ". Use == instead.")
+						accepted = False
 					elif self.children[0].datatype != 'bool':
 						error("Contents of " + self.name + " do not resolve to a boolean! " + self.children[0].datatype)
 						accepted = False
@@ -405,6 +497,15 @@ class Trigger(StackFrame):
 		self.state = STATE_NEED_NAME
 		self.type = 'TRIGGER'
 		self.datatype = 'void'
+		global IN_TRIGGER
+		IN_TRIGGER = True
+
+	def resolve(self):
+		if self.state == STATE_CLOSED:
+			global THE_TRIGGER_KNOWS
+			global IN_TRIGGER
+			IN_TRIGGER = False
+			THE_TRIGGER_KNOWS = []
 
 	def accept(self, token):
 		global KNOWN_VARIABLES
@@ -471,10 +572,15 @@ class Returner(Job):
 class Declaration(StackFrame):
 	def __init__(self, name, parent):
 		super().__init__('', parent)
+		global ln
+		global line
 		self.state = STATE_NEED_NAME
 		self.type = 'VARIABLE'
 		self.datatype = name
 		self.returner = None
+		self.returnType = 'void'
+		self.ln = ln
+		self.line = line
 
 	def resolve(self):
 		if not self.closed:
@@ -484,28 +590,40 @@ class Declaration(StackFrame):
 				FUNCTIONS.update({self.name : CustomFunction(self.name, self.datatype)})
 				for frame in self.children:
 					FUNCTIONS[self.name].add(frame.datatype)
+		elif self.state == STATE_CLOSED:
+			if self.returnType != self.datatype:
+				global ERRORED
+				ERRORED = True
+				print("Function must return a value of type " + self.datatype)
+				print("Line " + str(self.ln) + ":\n    " + self.line)
 
 	def accept(self, token):
-		global KNOWN_VARIABLES
-		global KNOWN_TYPES
+		global THE_TRIGGER_KNOWS
+		global IN_TRIGGER
+		knownVars = getKnownVariables()
+		knownTypes = getKnownDatatypes()
 		accepted = True
 		# intercept return statements
 		if not super().accept(token):
 			if self.state == STATE_NEED_NAME:
-				if token in KNOWN_VARIABLES:
+				if token in knownVars:
 					error("Declaring a function or variable name that was already declared in this context: " + token)
 					accepted = False
+				elif token in THE_TRIGGER_KNOWS and IN_TRIGGER:
+					error("Duplicate declaration of variable within the same trigger: " + token)
 				else:
 					self.name = token
 					self.state = STATE_NEED_PARENTHESIS
-					KNOWN_VARIABLES.append(self.name)
-					KNOWN_TYPES.append(self.datatype)
+					knownVars.append(self.name)
+					knownTypes.append(self.datatype)
+					if IN_TRIGGER:
+						THE_TRIGGER_KNOWS.append(self.name)
 			elif self.state == STATE_NEED_PARENTHESIS:
 				if not token in ['=', '(']:
 					accepted = False
 				elif token == '(':
 					# shift depth forward to remember this function
-					self.depth = len(KNOWN_VARIABLES)
+					self.depth = len(knownVars)
 					self.state = STATE_IN_PARENTHESIS
 					self.type = 'FUNCTION'
 				else:
@@ -550,6 +668,8 @@ class Declaration(StackFrame):
 				if self.returner.datatype != self.datatype:
 					if not (self.returner.datatype in ['int', 'float'] and self.datatype in ['int', 'float']):
 						error("Return type of " + self.returner.datatype + " does not match function return type of " + self.datatype)
+				else:
+					self.returnType = self.returner.datatype
 				self.returner = None
 		elif token == 'return':
 			child = self
@@ -642,7 +762,7 @@ class Function(Mathable):
 		if not self.closed:
 			super().resolve()
 			self.closed = True
-			if self.state != 2:
+			if self.state != 3:
 				error("Missing close parenthesis");
 			elif len(self.children) > len(self.expected):
 				error("Too many inputs for " + self.name + " expected " + str(len(self.expected)) + " but received " + str(len(self.children)))
@@ -665,26 +785,35 @@ class Function(Mathable):
 				else:
 					accepted = False
 			elif token == ')':
-				self.state = 2;
+				self.state = 3;
 				self.resolve()
-			elif token == ',':
-				if len(self.children) == self.count:
-					error("Unused comma")
-					accepted = False
-				else:
-					self.children[-1].resolve()
-					self.count = len(self.children)
-			else:
+			elif self.state == 1:
 				accepted = self.parseGeneric(token)
+				if accepted:
+					self.state = 2
+			elif self.state == 2:
+				if token == ',':
+					if len(self.children) == self.count:
+						error("Unused comma")
+						accepted = False
+					else:
+						self.children[-1].resolve()
+						self.count = len(self.children)
+						self.state = 1;
+				else:
+					error("Missing comma in function statement in: " + self.name)
+					accepted = False
+				
 		return accepted
 
 class Variable(Mathable):
 	def __init__(self, name, parent):
-		global KNOWN_VARIABLES
+		knownVars = getKnownVariables()
+		knownTypes = getKnownDatatypes()
 		super().__init__(name, parent)
 		self.name = name
 		self.type = 'VARIABLE'
-		self.datatype = KNOWN_TYPES[KNOWN_VARIABLES.index(name)]
+		self.datatype = knownTypes[knownVars.index(name)]
 		self.closed = True
 
 	def accept(self, token):
@@ -805,53 +934,36 @@ class Parenthesis(Mathable):
 ##########################
 ####### END SYNTAX #######
 ##########################
-
-
-def checkStringConcatenation(templine, ln):
-	tokens = templine.replace('(', ' ( ').replace(')', ' ) ').replace(',', ' , ').replace('+', ' + ').replace('=', ' = ').replace('"', ' " ').split(' ')
-	tokens = [token for token in tokens if token != '']
-	inString = False
-	prev = ''
-	for x in tokens:
-		if not inString and prev == '"':
-			if not (x == ')' or x == ';' or x == '+' or x == ',' or x == ''):
-				print("Error in string concatenation. Subsequent token was " + x)
-				print("Line " + str(ln) + ":\n    " + line)
-				break
-		if (x == '"'):
+def restoreCode(code):
+	diced = code[code.find('code(')+6:code.rfind(');')-1]
+	inString = True
+	ignoreMe = False
+	restored = ''
+	for char in diced:
+		if char == '\\' and not ignoreMe:
+			ignoreMe = True
+		elif char == '"' and not ignoreMe:
 			inString = not inString
 			if inString:
-				if not (prev == '(' or prev == '+' or prev == '=' or prev == ',' or prev == ''):
-					print("Error in string concatenation. Previous token was " + prev)
-					print("Line " + str(ln) + ":\n    " + line)
-					break
-		prev = x
-
-def checkUnknownFunctions(templine, ln):
-	tokens = templine.replace('=', ' ').replace(';', ' ').replace('(', ' ( ').replace(')', ' ) ').replace('*', ' ').replace('+', ' ').replace(',', ' ').replace('"', ' " ').replace('-', ' ').replace('/', ' ').replace('<', ' ').replace('>', ' ').split(' ')
-	if (tokens[0] == 'void' or tokens[0] == 'int' or tokens[0] == 'string' or tokens[0] == 'vector' or tokens[0] == 'float' or tokens[0] == 'bool') and tokens[2] == '(':
-		functions.add(tokens[1])
-	else:
-		ignore = False
-
-		for t in range(len(tokens)):
-			if '"' in tokens[t]:
-				ignore = not ignore
-			if not ignore:
-				if t > 0 and tokens[t] == '(':
-					if (not tokens[t-1] in functions) and (not tokens[t-1].isspace()):
-						print("Unknown function")
-						print("Line " + str(ln) + ":\n    " + tokens[t-1])
-						if not tokens[t-1] in unknowns:
-							unknowns.add(tokens[t-1])
+				restored = restored + '0'
+		elif inString:
+			restored = restored + char
+			ignoreMe = False
+	return restored
 
 def removeStrings(line):
 	retline = ""
-	isString = False
+	inString = False
+	ignoreNext = False
 	for token in line:
+		if ignoreNext:
+			ignoreNext = False
+			continue
+		if token == '\\':
+			ignoreNext = True
 		if token == '"':
-			isString = not isString
-		if not isString or token == '"':
+			inString = not inString
+		if not inString or token == '"':
 			retline = retline + token
 	if "//" in retline:
 		retline = retline[:retline.find("//")]
@@ -875,13 +987,10 @@ with open('Commands.xml', 'r') as fd:
 
 print("rmsification start!")
 
-functions = {''}
-unknowns = {''}
 ln = 1
 FILE_1 = None
 comment = False
 first = True
-escape = False
 try:
 	with open('XS/' + FILENAME, 'w') as file_data_2:
 		file_data_2.write('void code(string xs="") {\n')
@@ -898,6 +1007,9 @@ try:
 			rewrite = []
 			thedepth = 0
 			BASE_JOB = BaseFrame()
+			RMS_JOB = BaseFrame()
+			RMS_JOB.children.append(StackFrame('rms',RMS_JOB))
+			RMS_JOB.children[0].state = STATE_IN_BRACKETS
 			with open(FILE_1, 'r') as file_data_1:
 				line = file_data_1.readline()
 				while line:
@@ -906,8 +1018,9 @@ try:
 					nostrings = removeStrings(reline)
 					if '}' in nostrings:
 						thedepth = thedepth - 1
-					reline = "\t" * thedepth + reline
-					rewrite.append(reline)
+					if not RESTORING:
+						reline = "\t" * thedepth + reline
+						rewrite.append(reline)
 					if '{' in nostrings:
 						thedepth = thedepth + 1
 					thedepth = thedepth + nostrings.count('(') - nostrings.count(')')
@@ -920,11 +1033,9 @@ try:
 
 						if not comment:
 							if ('%' in line):
-								escape = not escape
-							elif escape:
-								file_data_2.write(line)
+								ESCAPE = not ESCAPE
 							else:
-								if not first and not ERRORED:
+								if not ERRORED:
 									templine = nostrings
 									for s in SYMBOLS:
 										for n in s:
@@ -944,37 +1055,47 @@ try:
 
 									for token in tokens:
 										if not token in IGNORE:
-											#print(token)
-											BASE_JOB.accept(token)
-											if VERBOSE and not ERRORED:
-												BASE_JOB.debug()
+											if ESCAPE and not RESTORING:
+												RMS_JOB.accept(token)
+												if VERBOSE and not ERRORED:
+													RMS_JOB.debug()
+											else:
+												BASE_JOB.accept(token)
+												if VERBOSE and not ERRORED:
+													BASE_JOB.debug()
 								
 								templine = reline.strip()
 								if '//' in templine:
 									templine = templine[:templine.find('//')].strip()
 
-								# Obsolete Sanity Checks
-								checkStringConcatenation(templine, ln)
-								#if not first:
-									#checkUnknownFunctions(templine, ln)
 								if (len(templine) > 120):
 									print("Line length greater than 120! Length is " + str(len(templine)))
 									print("Line " + str(ln) + ":\n    " + line)
-								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch('):
+								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch(' or templine[-1] == '%'):
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
 
-								# reWrite the line
-								if first:
-									file_data_2.write(templine + '\n')
+								if not RESTORING:
+									# reWrite the line
+									if first or ESCAPE:
+										file_data_2.write(templine + '\n')
+									else:
+										file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
 								else:
-									file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
+									RESTORING = False
 						if ('*/' in line):
 							comment = False
 					else:
 						file_data_2.write('\n')
-					line = file_data_1.readline()
-					ln = ln + 1
+
+					if ESCAPE and 'code("' in line:
+						line = restoreCode(line)
+						RESTORING = True
+					else:
+						line = file_data_1.readline()
+						ln = ln + 1
+			
+			BASE_JOB.resolve()
 			# reformat the .c raw code
 			with open(FILE_1, 'w') as file_data_1:
 				for line in rewrite:
@@ -996,6 +1117,7 @@ try:
 				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");}}/*");\n')
 				first = False
+				ESCAPE = False
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowashereagain inactive {if(true){xsDisableSelf();//");\n')
 		file_data_2.write('rmSetStatusText("", 0.99);')
@@ -1004,8 +1126,3 @@ except IOError:
 	sys.exit("Files not found!")
 
 print("Done!")
-if (len(unknowns) > 1):
-	print("Unknowns: ")
-	print(unknowns)
-	"""
-	#"""

@@ -93,7 +93,7 @@ void nightriderAlways(int eventID = -1) {
 			yVarToVector("p"+p+"Sentences", "pos");
 			hit = 0;
 			dist = 100;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (yGetVar("enemies", "deathSentence") == 0) {
@@ -156,7 +156,7 @@ void nightriderAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Kronny Birth SFX");
 				yRemoveFromDatabase("p"+p+"abducts");
 			} else {
-				for(y=yGetDatabaseCount("enemies"); >0) {
+				for(y=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (yGetVar("enemies", "launched") == 0) {
@@ -185,8 +185,8 @@ void nightriderAlways(int eventID = -1) {
 	}
 	
 	dist = trQuestVarGet("abductRange") * trQuestVarGet("p"+p+"spellRange");
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 				removeNightrider(p);
@@ -207,8 +207,8 @@ void nightriderAlways(int eventID = -1) {
 		trSoundPlayFN("changeunit.wav","1",-1,"","");
 	}
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"ariseCount", trQuestVarGet("p"+p+"ariseCount") + 3 + yGetDatabaseCount("p"+p+"sentences"));
 		trQuestVarSetFromRand("p"+p+"ariseAngle", 0, 3.14, false);
 		trQuestVarSet("p"+p+"ariseDist", 2);
@@ -276,6 +276,13 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
+						ySetVar("p"+p+"characters", "index", activatePlayerUnit("p"+p+"characters"));
+						yAddUpdateVar("playerUnits", "hero", 1);
+						yAddUpdateVar("playerUnits", "magicResist", trQuestVarGet("p"+p+"magicResist"));
+						yAddUpdateVar("playerUnits", "physicalResist", trQuestVarGet("p"+p+"physicalResist"));
+						if (trQuestVarGet("p"+p+"unit") == trQuestVarGet("p"+p+"characters")) {
+							trQuestVarSet("p"+p+"index", yGetNewestPointer("playerUnits"));
+						}
 					}
 				}
 				equipRelicsAgain(p);
@@ -311,7 +318,7 @@ void nightriderAlways(int eventID = -1) {
 			}
 			dist = xsPow(dist, 2);
 			amt = 0;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (yGetVar("enemies", "deathSentence") == 0) {
@@ -329,8 +336,8 @@ void nightriderAlways(int eventID = -1) {
 		}
 		case 0:
 		{
-			if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+				xSetBool(dPlayerData, xPlayerLureActivated, false);
 				gainFavor(p, 0.0 - trQuestVarGet("nightfallCost") * trQuestVarGet("p"+p+"ultimateCost"));
 				trVectorSetUnitPos("p"+p+"nightfallCenter", "p"+p+"lureObject");
 				vectorSnapToGrid("p"+p+"nightfallCenter");
@@ -344,6 +351,8 @@ void nightriderAlways(int eventID = -1) {
 					if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 						removeNightrider(p);
 					} else {
+						ySetPointer("playerUnits", 1*yGetVar("p"+p+"characters", "index"));
+						yRemoveFromDatabase("playerUnits");
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 					}
 				}

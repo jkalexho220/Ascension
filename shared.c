@@ -2,38 +2,38 @@ const int DIMENSION_X = 290;
 const int DIMENSION_Z = 290;
 const float PI = 3.141592;
 
-void debugLog(string msg = "") {
-	if (trCurrentPlayer() == 1) {
-		trChatSend(0, "<color=1,0,0>" + msg);
-	}
-}
-
 void trVectorQuestVarSet(string VQVname = "", vector QVv = vector(-1,-1,-1)) {
 	if (VQVname == "") return;
-	trQuestVarSet(""+VQVname+"X", xsVectorGetX(QVv));
-	trQuestVarSet(""+VQVname+"Y", xsVectorGetY(QVv));
-	trQuestVarSet(""+VQVname+"Z", xsVectorGetZ(QVv));
+	if (trQuestVarGet(VQVname) == 0) {
+		trQuestVarSet(VQVname, mNewVector(QVv));
+	} else {
+		mSetVector(1*trQuestVarGet(VQVname),QVv);
+	}
 }
 
 vector trVectorQuestVarGet(string name = "") {
 if (name == "") { return(vector(-1,-1,-1)); }
-	vector ret = xsVectorSet(trQuestVarGet(name+"X"),trQuestVarGet(name+"Y"),trQuestVarGet(name+"Z"));
+	
+	vector ret = mGetVector(1*trQuestVarGet(name));
 	return(ret);
 }
 
 float trVectorQuestVarGetX(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	return(trQuestVarGet(""+VQVname+"X"));
+	float val = xsVectorGetX(mGetVector(1*trQuestVarGet(VQVname)));
+	return(val);
 }
 
 float trVectorQuestVarGetY(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	return(trQuestVarGet(""+VQVname+"Y"));
+	float val = xsVectorGetY(mGetVector(1*trQuestVarGet(VQVname)));
+	return(val);
 }
 
 float trVectorQuestVarGetZ(string VQVname = "") {
 	if (VQVname == "") return(-1);
-	return(trQuestVarGet(""+VQVname+"Z"));
+	float val = xsVectorGetZ(mGetVector(1*trQuestVarGet(VQVname)));
+	return(val);
 }
 
 void trVectorQuestVarEcho(string VQVname = "") {
@@ -41,27 +41,17 @@ void trVectorQuestVarEcho(string VQVname = "") {
 	trChatSend(0, ""+VQVname+": "+trVectorQuestVarGet(VQVname));
 }
 
-void vectorRotate90Deg(string qv = "") {
-	float x = trQuestVarGet(qv+"x");
-	trQuestVarSet(qv+"x", 0.0 - trQuestVarGet(qv+"z"));
-	trQuestVarSet(qv+"z", x);
-}
 
 void trStringQuestVarSet(string name = "", string value = "") {
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
 	if (trQuestVarGet("string"+name) > 0) {
-		kbArmyDestroy(1*trQuestVarGet("string"+name));
+		mSetString(1*trQuestVarGet("string"+name), value);
+	} else {
+		trQuestVarSet("string"+name, mNewString(value));
 	}
-	trQuestVarSet("string"+name, kbArmyCreate(value));
-	xsSetContextPlayer(old);
 }
 
 string trStringQuestVarGet(string name="") {
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(0);
-	string val = kbArmyGetName(1*trQuestVarGet("string"+name));
-	xsSetContextPlayer(old);
+	string val = mGetString(1*trQuestVarGet("string"+name));
 	return(val);
 }
 
@@ -72,7 +62,7 @@ bool playerIsPlaying(int p = 0) {
 
 
 void trUnitTeleportToVector(string v = "") {
-	trUnitTeleport(trVectorQuestVarGetX(""+v), trVectorQuestVarGetY(""+v), trVectorQuestVarGetZ(""+v));
+	trUnitTeleport(trVectorQuestVarGetX(v), trVectorQuestVarGetY(v), trVectorQuestVarGetZ(v));
 }
 
 void trUnitSelectByQV(string s = "", bool reverse = true) {
@@ -98,16 +88,17 @@ void trUnitMoveToVector(string v = "", bool attack = false) {
 }
 
 void trVectorScale(string db = "", float s = 1.0) {
-	trQuestVarSet(db+"x", trQuestVarGet(db+"x") * s);
-	trQuestVarSet(db+"z", trQuestVarGet(db+"z") * s);
+	trVectorQuestVarSet(db, trVectorQuestVarGet(db) * s);
 }
 
+vector vectorSnapToGrid(vector v = vector(0,0,0)) {
+	int x = xsVectorGetX(v) / 2;
+	int z = xsVectorGetZ(v) / 2;
+	return(xsVectorSet(x * 2 + 1,xsVectorGetY(v),z * 2 + 1));
+}
 
-void vectorSnapToGrid(string qv = "") {
-	int x = trQuestVarGet(qv+"x") / 2;
-	int z = trQuestVarGet(qv+"z") / 2;
-	trQuestVarSet(qv+"x", x * 2 + 1);
-	trQuestVarSet(qv+"z", z * 2 + 1);
+void zVectorSnapToGrid(string qv = "") {
+	trVectorQuestVarSet(qv, vectorSnapToGrid(trVectorQuestVarGet(qv)));
 }
 
 int zModulo(int mod = 10, float val = 0) {
@@ -150,106 +141,113 @@ for(zsps=0; >1){}
 	trQuestVarSet("p"+p+"pf"+zsps+"f"+f, 0.0 + v);
 }
 
-void vectorToGrid(string from = "", string to = ""){
-	int x = 0 + trQuestVarGet(from+"x") / 2;
-	int z = 0 + trQuestVarGet(from+"z") / 2;
-	trQuestVarSet(to+"x", x);
-	trQuestVarSet(to+"z", z);
+vector vectorToGrid(vector v = vector(0,0,0)) {
+	return(xsVectorSet(0 + xsVectorGetX(v) / 2,xsVectorGetY(v),0 + xsVectorGetZ(v) / 2));
 }
 
-void gridToVector(string from = "", string to = "") {
-	trQuestVarSet(to+"x", trQuestVarGet(from+"x") * 2 + 1);
-	trQuestVarSet(to+"z", trQuestVarGet(from+"z") * 2 + 1);
+void zVectorToGrid(string from = "", string to = ""){
+	trVectorQuestVarSet(to, vectorToGrid(trVectorQuestVarGet(from)));
 }
 
-float gridDistanceSquared(string from = "", string to = "") {
-	float xdiff = trQuestVarGet(to+"x") - trQuestVarGet(from+"x");
-	float zdiff = trQuestVarGet(to+"z") - trQuestVarGet(from+"z");
-	return(xdiff * xdiff + zdiff * zdiff);
+vector gridToVector(vector g = vector(0,0,0)) {
+	return(xsVectorSet(xsVectorGetX(g) * 2 + 1,xsVectorGetY(g),xsVectorGetZ(g) * 2 + 1));
+}
+
+void zGridToVector(string from = "", string to = "") {
+	trVectorQuestVarSet(to, gridToVector(trVectorQuestVarGet(from)));
 }
 
 void zSquareVar(string qv = "") {
 	trQuestVarSet(qv, xsPow(trQuestVarGet(qv), 2));
 }
 
-float zDistanceBetweenVectorsSquared(string start = "", string end = "") {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
-	float dist = xdiff * xdiff + zdiff * zdiff;
+float distanceBetweenVectors(vector start = vector(0,0,0), vector end = vector(0,0,0), bool squared = true) {
+	float xDiff = xsVectorGetX(end) - xsVectorGetX(start);
+	float zDiff = xsVectorGetZ(end) - xsVectorGetZ(start);
+	float dist = xDiff * xDiff + zDiff * zDiff;
+	if (squared == false) {
+		dist = xsSqrt(dist);
+	}
 	return(dist);
 }
 
-float zManhattanDistance(string start = "", string end = "") {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
-	if (xdiff < 0) {
-		xdiff = 0.0 - xdiff;
-	}
-	if (zdiff < 0) {
-		zdiff = 0.0 - zdiff;
-	}
-	return(xdiff + zdiff);
+float zDistanceBetweenVectorsSquared(string start = "", string end = "") {
+	return(distanceBetweenVectors(trVectorQuestVarGet(start),trVectorQuestVarGet(end)));
 }
 
-bool vectorInRectangle(string pos = "", string bottom = "", string top = "") {
-	if (trQuestVarGet(pos+"x") < trQuestVarGet(bottom+"x")) {
+bool vectorInRectangle(vector pos = vector(0,0,0), vector bot = vector(0,0,0), vector top = vector(0,0,0)) {
+	if (xsVectorGetX(pos) < xsVectorGetX(bot)) {
 		return(false);
 	}
-	if (trQuestVarGet(pos+"x") > trQuestVarGet(top+"x")) {
+	if (xsVectorGetX(pos) > xsVectorGetX(top)) {
 		return(false);
 	}
-	if (trQuestVarGet(pos+"z") < trQuestVarGet(bottom+"z")) {
+	if (xsVectorGetZ(pos) < xsVectorGetZ(bot)) {
 		return(false);
 	}
-	if (trQuestVarGet(pos+"z") > trQuestVarGet(top+"z")) {
+	if (xsVectorGetZ(pos) > xsVectorGetZ(top)) {
 		return(false);
 	}
 	return(true);
 }
 
-vector rotationMatrix(string v = "", float cosT = 0, float sinT = 0) {
-	float x = trQuestVarGet(v+"x");
-	float z = trQuestVarGet(v+"z");
+bool zVectorInRectangle(string pos = "", string bot = "", string top = "") {
+	vector tempPos = mGetVector(1*trQuestVarGet(pos));
+	vector tempBot = mGetVector(1*trQuestVarGet(bot));
+	vector tempTop = mGetVector(1*trQuestVarGet(top));
+	return(vectorInRectangle(tempPos,tempBot,tempTop));
+}
+
+vector rotationMatrix(vector v = vector(0,0,0), float cosT = 0, float sinT = 0) {
+	float x = xsVectorGetX(v);
+	float z = xsVectorGetZ(v);
 	vector ret = xsVectorSet(x * cosT - z * sinT, 0, x * sinT + z * cosT);
 	return(ret);
 }
 
 float zDistanceBetweenVectors(string start = "", string end = "") {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
-	float dist = xsSqrt(xdiff * xdiff + zdiff * zdiff);
+	return(distanceBetweenVectors(trVectorQuestVarGet(start),trVectorQuestVarGet(end),false));
+}
+
+float distanceBetweenVectors3d(vector start = vector(0,0,0), vector end = vector(0,0,0), bool squared = true) {
+	float xdiff = xsVectorGetX(start) - xsVectorGetX(end);
+	float ydiff = xsVectorGetY(start) - xsVectorGetY(end);
+	float zdiff = xsVectorGetZ(start) - xsVectorGetZ(end);
+	float dist = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
+	if (squared == false) {
+		dist = xsSqrt(dist);
+	}
 	return(dist);
 }
 
 float zDistanceBetweenVectors3d(string start = "", string end = "") {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float ydiff = trQuestVarGet(end + "Y") - trQuestVarGet(start + "Y");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
-	float dist = xsSqrt(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
-	return(dist);
+	return(distanceBetweenVectors3d(trVectorQuestVarGet(start),trVectorQuestVarGet(end),false));
+}
+
+float unitDistanceToVector(int name = 0, vector v = vector(0,0,0), bool squared = true) {
+	vector temp = kbGetBlockPosition(""+name,true);
+	return(distanceBetweenVectors(temp,v,squared));
 }
 
 float zDistanceToVectorSquared(string qv = "", string v = "") {
-	trVectorQuestVarSet("abcd", kbGetBlockPosition(""+1*trQuestVarGet(qv), true));
-	return(zDistanceBetweenVectorsSquared("abcd", v));
+	return(unitDistanceToVector(1*trQuestVarGet(qv),trVectorQuestVarGet(v)));
 }
 
 /* For use in a ySearch */
 float zDistanceToVector(string qv = "", string v = "") {
-	trVectorQuestVarSet("abcd", kbGetBlockPosition(""+1*trQuestVarGet(qv), true));
-	return(zDistanceBetweenVectors("abcd", v));
+	return(unitDistanceToVector(1*trQuestVarGet(qv),trVectorQuestVarGet(v),false));
 }
 
 void trVectorSetFromAngle(string qv = "", float angle = 0) {
 	trVectorQuestVarSet(qv,xsVectorSet(xsSin(angle), 0, xsCos(angle)));
 }
 
-float angleBetweenVectors(string from = "", string to = "") {
-	float a = trQuestVarGet(to+"X")-trQuestVarGet(from+"X");
-	a = a / (trQuestVarGet(to+"Z")-trQuestVarGet(from+"Z"));
+float angleBetweenVectors(vector from = vector(0,0,0), vector to = vector(0,0,0)) {
+	float a = xsVectorGetX(to) - xsVectorGetX(from);
+	a = a / (xsVectorGetZ(to) - xsVectorGetZ(from));
 	a = xsAtan(a);
-	if (trVectorQuestVarGetZ(from) > trVectorQuestVarGetZ(to)) {
-		if (trVectorQuestVarGetX(from) > trVectorQuestVarGetX(to)) {
+	if (xsVectorGetZ(from) > xsVectorGetZ(to)) {
+		if (xsVectorGetX(from) > xsVectorGetX(to)) {
 			a = a - PI;
 		} else {
 			a = a + PI;
@@ -258,11 +256,15 @@ float angleBetweenVectors(string from = "", string to = "") {
 	return(a);
 }
 
-float angleOfVector(string dir = "") {
-	float a = trQuestVarGet(dir+"X") / trQuestVarGet(dir+"Z");
+float zAngleBetweenVectors(string from = "", string to = "") {
+	return(angleBetweenVectors(trVectorQuestVarGet(from),trVectorQuestVarGet(to)));
+}
+
+float angleOfVector(vector dir = vector(0,0,0)) {
+	float a = xsVectorGetX(dir) / xsVectorGetZ(dir);
 	a = xsAtan(a);
-	if (0.0 > trVectorQuestVarGetZ(dir)) {
-		if (0.0 > trVectorQuestVarGetX(dir)) {
+	if (0.0 > xsVectorGetZ(dir)) {
+		if (0.0 > xsVectorGetX(dir)) {
 			a = a - PI;
 		} else {
 			a = a + PI;
@@ -271,9 +273,13 @@ float angleOfVector(string dir = "") {
 	return(a);
 }
 
-vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
+float zAngleOfVector(string v = "") {
+	return(angleOfVector(trVectorQuestVarGet(v)));
+}
+
+vector getUnitVector(vector start = vector(0,0,0), vector end = vector(0,0,0), float mod = 1.0) {
+	float xdiff = xsVectorGetX(end) - xsVectorGetX(start);
+	float zdiff = xsVectorGetZ(end) - xsVectorGetZ(start);
 	float dist = xsSqrt(xdiff * xdiff + zdiff * zdiff);
 	vector ret = vector(1,0,0);
 	if (dist > 0) {
@@ -282,58 +288,46 @@ vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
 	return(ret);
 }
 
-vector zGetUnitVector3d(string start = "", string end = "", float mod = 1.0) {
-	float xdiff = trQuestVarGet(end + "X") - trQuestVarGet(start + "X");
-	float ydiff = trQuestVarGet(end + "Y") - trQuestVarGet(start + "Y");
-	float zdiff = trQuestVarGet(end + "Z") - trQuestVarGet(start + "Z");
+vector zGetUnitVector(string start = "", string end = "", float mod = 1.0) {
+	return(getUnitVector(trVectorQuestVarGet(start),trVectorQuestVarGet(end),mod));
+}
+
+vector getUnitVector3d(vector start = vector(0,0,0), vector end = vector(0,0,0), float mod = 1.0) {
+	float xdiff = xsVectorGetX(end) - xsVectorGetX(start);
+	float ydiff = xsVectorGetY(end) - xsVectorGetY(start);
+	float zdiff = xsVectorGetZ(end) - xsVectorGetZ(start);
 	float dist = xsSqrt(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
-	vector ret = xsVectorSet(xdiff / dist * mod, ydiff / dist * mod, zdiff / dist * mod);
+	vector ret = vector(0,1,0);
+	if (dist > 0) {
+		ret = xsVectorSet(xdiff / dist * mod, ydiff / dist * mod, zdiff / dist * mod);
+	}
 	return(ret);
 }
 
-vector crossProduct(string a = "", string b = "") {
-	float x = trQuestVarGet(a + "y") * trQuestVarGet(b + "z") - trQuestVarGet(a + "z") * trQuestVarGet(b + "y");
-	float y = trQuestVarGet(a + "z") * trQuestVarGet(b + "x") - trQuestVarGet(a + "x") * trQuestVarGet(b + "z");
-	float z = trQuestVarGet(a + "x") * trQuestVarGet(b + "y") - trQuestVarGet(a + "y") * trQuestVarGet(b + "x");
+vector zGetUnitVector3d(string start = "", string end = "", float mod = 1.0) {
+	return(getUnitVector3d(trVectorQuestVarGet(start),trVectorQuestVarGet(end),mod));
+}
+
+vector crossProduct(vector a = vector(0,0,0), vector b = vector(0,0,0)) {
+	float x = xsVectorGetY(a) * xsVectorGetZ(b) - xsVectorGetZ(a) * xsVectorGetY(b);
+	float y = xsVectorGetZ(a) * xsVectorGetX(b) - xsVectorGetX(a) * xsVectorGetZ(b);
+	float z = xsVectorGetX(a) * xsVectorGetY(b) - xsVectorGetY(a) * xsVectorGetX(b);
 	vector ret = xsVectorSet(x, y, z);
 	return(ret);
 }
 
-float dotProduct(string a = "", string b = "") {
-	return(trQuestVarGet(a+"x") * trQuestVarGet(b+"x") + trQuestVarGet(a+"z") * trQuestVarGet(b+"z"));
+float dotProduct(vector a = vector(0,0,0), vector b = vector(0,0,0)) {
+	return(xsVectorGetX(a) * xsVectorGetX(b) + xsVectorGetZ(a) * xsVectorGetZ(b));
 }
 
-bool terrainIsType(string qv = "", int type = 0, int subtype = 0) {
-	bool isType = trGetTerrainType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == type;
-	isType = trGetTerrainSubType(trQuestVarGet(qv+"x"),trQuestVarGet(qv+"z")) == subtype;
+bool terrainIsType(vector v = vector(0,0,0), int type = 0, int subtype = 0) {
+	bool isType = trGetTerrainType(xsVectorGetX(v),xsVectorGetZ(v)) == type;
+	isType = trGetTerrainSubType(xsVectorGetX(v),xsVectorGetZ(v)) == subtype;
 	return(isType);
 }
 
-/*
-A shitty binary search algorithm to approximate the intersection of a line with
-the circle specified by the center vector and radius. Behavior is undefined if start
-vector is outside the circle.
-Did this to avoid using trig as much as possible because trig is expensive.
-*/
-vector intersectionWithCircle(string start = "", string end = "", string center = "", float radius = 0) {
-	trVectorQuestVarSet("iDir", zGetUnitVector(start, end));
-	float x = 0;
-	float z = 0;
-	float dist = 0;
-	float len = radius * 2;
-	float lenmod = radius;
-	for(i=8; >0) {
-		x = trQuestVarGet(start+"x") + trQuestVarGet("iDirx") * len;
-		z = trQuestVarGet(start+"z") + trQuestVarGet("iDirz") * len;
-		dist = xsPow(x - trQuestVarGet(center+"x"), 2) + xsPow(z - trQuestVarGet(center+"z"), 2);
-		if (dist > radius * radius) {
-			len = len - lenmod;
-		} else {
-			len = len + lenmod;
-		}
-		lenmod = lenmod * 0.5;
-	}
-	return(xsVectorSet(x,0,z));
+bool zTerrainIsType(string qv = "", int type = 0, int subtype = 0) {
+	return(terrainIsType(trVectorQuestVarGet(qv),type,subtype));
 }
 
 /* initializes a modular counter. */
@@ -362,7 +356,7 @@ int peekModularCounterNext(string name = "") {
 	return(0 + trQuestVarGet("counter" + name + "fake"));
 }
 
-
+/*
 float yGetVarAtIndex(string db = "", string var = "", int index = 0) {
 	return(trQuestVarGet("xdata"+db+index+var));
 }
@@ -430,7 +424,7 @@ int yDatabaseNext(string db = "", bool select = false, bool reverse = false) {
 void yRemoveFromDatabase(string db = "") {
 	int index = trQuestVarGet("xdata"+db+"pointer");
 	if (yGetVar(db, "xActive") == 1) {
-		/* connect next with prev */
+		
 		ySetVarAtIndex(db, "xNextBlock", yGetVar(db, "xNextBlock"), 1*yGetVar(db, "xPrevBlock"));
 		ySetVarAtIndex(db, "xPrevBlock", yGetVar(db, "xPrevBlock"), 1*yGetVar(db, "xNextBlock"));
 		
@@ -545,7 +539,7 @@ void ySetVarFromVector(string db = "", string attr = "", string v = "") {
 	ySetVar(db, attr+"x", trQuestVarGet(v+"x"));
 	ySetVar(db, attr+"z", trQuestVarGet(v+"z"));
 }
-
+*/
 /*
 Starting from NextUnitScenarioNameNumber and going backwards until the quest var 'qv',
 looks for the specified protounit. If none found, returns -1. Otherwise, returns the

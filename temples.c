@@ -334,7 +334,7 @@ highFrequency
 				}
 				trVectorSetUnitPos("pos", "yeebLightningEnd");
 				trUnitChangeProtoUnit("Lightning sparks");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 0.75) {
@@ -800,14 +800,14 @@ highFrequency
 				trUnitChangeProtoUnit("Meteor Impact Ground");
 				trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
 				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
-				for(x=yGetDatabaseCount("playerUnits"); >0) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 25.0) {
 						trUnitDelete(false);
 					}
 				}
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (zDistanceToVectorSquared("enemies", "pos") < 25.0) {

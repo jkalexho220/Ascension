@@ -55,7 +55,7 @@ void castIcicle(int p = 0, string pos = "") {
 		dist = xsPow(trQuestVarGet("p"+p+"spellRange") * trQuestVarGet("icicleRadius"), 2);
 		amt = dist;
 		hit = 0;
-		for(x=yGetDatabaseCount("enemies"); >0) {
+		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 				removeEnemy();
 			} else {
@@ -135,7 +135,7 @@ void castIcicle(int p = 0, string pos = "") {
 			if (trQuestVarGet("p"+p+"blizzard") == 1) {
 				if (trTimeMS() > trQuestVarGet("p"+p+"blizzardNext")) {
 					trQuestVarSet("p"+p+"blizzardNext", trQuestVarGet("p"+p+"blizzardNext") + 1000);
-					for (x=yGetDatabaseCount("enemies"); >0) {
+					for (x=xGetDatabaseCount(dEnemies); >0) {
 						id = yDatabaseNext("enemies", true);
 						if (id == -1 || trUnitAlive() == false) {
 							removeEnemy();
@@ -176,13 +176,13 @@ void castIcicle(int p = 0, string pos = "") {
 				}
 			}
 			
-			if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+				xSetBool(dPlayerData, xPlayerWellActivated, false);
 				castIcicle(p, "p"+p+"wellPos");
 			}
 			
-			if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-				trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+			if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+				xSetBool(dPlayerData, xPlayerRainActivated, false);
 				trSoundPlayFN("recreation.wav","1",-1,"","");
 				trSoundPlayFN("frostgiantattack.wav","1",-1,"","");
 				trQuestVarSet("p"+p+"blizzard", 1);
@@ -239,8 +239,8 @@ void castIcicle(int p = 0, string pos = "") {
 					}
 				}
 				
-				if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-					trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+				if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+					xSetBool(dPlayerData, xPlayerLureActivated, false);
 					gainFavor(p, 0 - trQuestVarGet("frostGiantCost") * trQuestVarGet("p"+p+"ultimateCost"));
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"lureObject", true);
@@ -285,8 +285,8 @@ void castIcicle(int p = 0, string pos = "") {
 							case 1:
 							{
 								hit = 0;
-								for (x=yGetDatabaseCount("enemies"); >0) {
-									if (yGetVar("p"+p+"frostGiants", "target") == yDatabaseNext("enemies")) {
+								for (x=xGetDatabaseCount(dEnemies); >0) {
+									if (yGetVar("p"+p+"frostGiants", "target") == xDatabaseNext(dEnemies)) {
 										trUnitSelectClear();
 										trUnitSelectByQV("enemies");
 										stunUnit("enemies", 2.0, p);

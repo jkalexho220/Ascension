@@ -64,7 +64,7 @@ void blastmageAlways(int eventID = -1) {
 			yVarToVector("p"+p+"stars", "pos");
 			dist = trQuestVarGet("starRadius") * trQuestVarGet("p"+p+"spellRange");
 			dist = xsPow(dist, 2);
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				yDatabaseNext("enemies", true);
 				if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 					damageEnemy(p, amt);
@@ -96,7 +96,7 @@ void blastmageAlways(int eventID = -1) {
 			dist = trQuestVarGet("empoweredRadius") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0;
 			dist = xsPow(dist, 2);
 			amt = trQuestVarGet("empoweredDamage") * trQuestVarGet("p"+p+"spellDamage");
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -165,7 +165,7 @@ void blastmageAlways(int eventID = -1) {
 			current = xsPow(trQuestVarGet("starfallStunRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
 			amt = trQuestVarGet("starfallDamage") * trQuestVarGet("p"+p+"spellDamage");
 			hit = 0;
-			for(x=yGetDatabaseCount("enemies"); >0) {
+			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
@@ -185,8 +185,8 @@ void blastmageAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
 		blastmageSpell(p);
 		zSetProtoUnitStat("Kronny Flying", p, 1, 0.1);
@@ -205,8 +205,8 @@ void blastmageAlways(int eventID = -1) {
 		yAddUpdateVar("p"+p+"starfalls", "posZ", trQuestVarGet("p"+p+"wellposZ"));
 	}
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("end", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -269,7 +269,7 @@ void blastmageAlways(int eventID = -1) {
 				trVectorSetUnitPos("start", "p"+p+"characters");
 				vectorSnapToGrid("start");
 				trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-				for(x=yGetDatabaseCount("enemies"); >0) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 						removeEnemy();
 					} else if (rayCollision("enemies", "start", "dir", dist + 2.0, 4.0)) {
@@ -296,8 +296,8 @@ void blastmageAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
 		blastmageSpell(p);
 		trQuestVarSet("p"+p+"solarFlareNext", trTimeMS());

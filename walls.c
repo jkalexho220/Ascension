@@ -2,42 +2,46 @@ const int WALL_WAITING = 0;
 const int WALL_FALLING = 1;
 
 void processWalls() {
-	if (yGetDatabaseCount("unlockWalls") > 0) {
-		yDatabaseNext("unlockWalls");
-		switch(1*yGetVar("unlockWalls", "state"))
+	vector pos = vector(0,0,0);
+	vector wallpos = vector(0,0,0);
+	vector wallmod = vector(0,0,0);
+	if (xGetDatabaseCount(dUnlockWalls) > 0) {
+		xDatabaseNext(dUnlockWalls);
+		wallpos = xGetVector(dUnlockWalls,xWallPos);
+		wallmod = xGetVector(dUnlockWalls,xWallMod);
+		switch(1*xGetInt(dUnlockWalls, xWallState))
 		{
 			case WALL_WAITING:
 			{
-				trVectorQuestVarSet("pos", kbGetBlockPosition(""+1*yGetVar("unlockWalls", "relic")));
-				if ((yGetVar("unlockWalls", "posX") - yGetVar("unlockWalls", "xMod") - 7 < trQuestVarGet("posX")) &&
-					(yGetVar("unlockWalls", "posX") + yGetVar("unlockWalls", "xMod") + 7 > trQuestVarGet("posX")) &&
-					(yGetVar("unlockWalls", "posZ") - yGetVar("unlockWalls", "zMod") - 7 < trQuestVarGet("posZ")) &&
-					(yGetVar("unlockWalls", "posZ") + yGetVar("unlockWalls", "zMod") + 7 > trQuestVarGet("posZ"))) {
-					ySetVar("unlockWalls", "state", WALL_FALLING);
-					ySetVar("unlockWalls", "timeout", trTimeMS() + 2500);
-					for(x=yGetVar("unlockWalls", "greenCirclesStart"); < yGetVar("unlockWalls", "end")) {
+				pos = kbGetBlockPosition(""+xGetInt(dUnlockWalls,xWallKey));
+				if ((xsVectorGetX(wallpos) - xsVectorGetX(wallmod) - 7 < xsVectorGetX(pos)) &&
+					(xsVectorGetX(wallpos) + xsVectorGetX(wallmod) + 7 > xsVectorGetX(pos)) &&
+					(xsVectorGetZ(wallpos) - xsVectorGetZ(wallmod) - 7 < xsVectorGetZ(pos)) &&
+					(xsVectorGetZ(wallpos) + xsVectorGetZ(wallmod) + 7 > xsVectorGetZ(pos))) {
+					xSetInt(dUnlockWalls,xWallState, WALL_FALLING);
+					xSetInt(dUnlockWalls,xWallTimeout, trTimeMS() + 2500);
+					for(x=xGetInt(dUnlockWalls, xWallCircles); < xGetInt(dUnlockWalls, xWallEnd)) {
 						trUnitSelectClear();
 						trUnitSelect(""+x);
 						trUnitDestroy();
 					}
-					for(x=yGetVar("unlockWalls", "sfxStart"); < yGetVar("unlockWalls", "greenCirclesStart")) {
+					for(x=xGetInt(dUnlockWalls, xWallSFX); < xGetInt(dUnlockWalls, xWallCircles)) {
 						trUnitSelectClear();
 						trUnitSelect(""+x);
 						trUnitChangeProtoUnit("Heka Shockwave SFX");
 					}
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("unlockWalls", "relic"));
+					xUnitSelect(dUnlockWalls,xWallKey);
 					trUnitChangeProtoUnit("Osiris Box Glow");
 					trSoundPlayFN("xpack\xcinematics\8_in\pyramidscrape.mp3","1",-1,"","");
 				}
 			}
 			case WALL_FALLING:
 			{
-				float progress = (yGetVar("unlockWalls", "timeout") - trTimeMS()) / 2500.0;
-				int x0 = (yGetVar("unlockWalls", "posX") - yGetVar("unlockWalls", "xMod")) / 2;
-				int x1 = (yGetVar("unlockWalls", "posX") + yGetVar("unlockWalls", "xMod")) / 2;
-				int z0 = (yGetVar("unlockWalls", "posZ") - yGetVar("unlockWalls", "zMod")) / 2;
-				int z1 = (yGetVar("unlockWalls", "posZ") + yGetVar("unlockWalls", "zMod")) / 2;
+				float progress = (xGetInt(dUnlockWalls, xWallTimeout) - trTimeMS()) / 2500.0;
+				int x0 = (xsVectorGetX(wallpos) - xsVectorGetX(wallmod)) / 2;
+				int x1 = (xsVectorGetX(wallpos) + xsVectorGetX(wallmod)) / 2;
+				int z0 = (xsVectorGetZ(wallpos) - xsVectorGetZ(wallmod)) / 2;
+				int z1 = (xsVectorGetZ(wallpos) + xsVectorGetZ(wallmod)) / 2;
 				if (progress > 0) {
 					progress = progress * (wallHeight - worldHeight) + worldHeight;
 					trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, progress, false);
@@ -47,12 +51,12 @@ void processWalls() {
 					trPaintTerrain(0,0,5,5,0,70,true);
 					trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 					trSoundPlayFN("cinematics\12_in\bang1.mp3","1",-1,"","");
-					for(x=yGetVar("unlockWalls", "sfxStart"); < yGetVar("unlockWalls", "greenCirclesStart")) {
+					for(x=xGetInt(dUnlockWalls, xWallSFX); < xGetInt(dUnlockWalls, xWallCircles)) {
 						trUnitSelectClear();
 						trUnitSelect(""+x);
 						trUnitDestroy();
 					}
-					yRemoveFromDatabase("unlockWalls");
+					xFreeDatabaseBlock(dUnlockWalls);
 				}
 			}
 		}

@@ -1,3 +1,7 @@
-int variii = 2;
+int danger(int f = 0) {
+	trChatSend(f, "hello world?");
+}
 
-vector fart = vector(1,variii,3);
+void death() {
+	return(1.0);
+}

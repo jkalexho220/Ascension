@@ -68,9 +68,9 @@ void detachPlayer(int eventID = -1) {
 	trQuestVarSet("playerUnitsDetachedSize", detachFromDatabase("playerUnits", p));
 	trQuestVarSet("enemiesDetachedSize", detachFromDatabase("enemies", p));
 	
-	trQuestVarSet("playerUnitsRemainingSize", yGetDatabaseCount("playerUnits") - trQuestVarGet("playerUnitsDetachedSize"));
+	trQuestVarSet("playerUnitsRemainingSize", xGetDatabaseCount(dPlayerUnits) - trQuestVarGet("playerUnitsDetachedSize"));
 	trQuestVarSet("xdataplayerUnitscount", trQuestVarGet("playerUnitsDetachedSize"));
-	trQuestVarSet("xdataenemiescount", yGetDatabaseCount("enemies") - trQuestVarGet("enemiesDetachedSize"));
+	trQuestVarSet("xdataenemiescount", xGetDatabaseCount(dEnemies) - trQuestVarGet("enemiesDetachedSize"));
 	ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsLeaveIndex"));
 	ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
 }
@@ -81,8 +81,8 @@ void reAttachPlayer(int eventID = -1) {
 	reAttachToDatabase("enemies", p);
 	ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsDummyIndex"));
 	ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-	trQuestVarSet("xdataplayerUnitscount", yGetDatabaseCount("playerUnits") + trQuestVarGet("playerUnitsRemainingSize"));
-	trQuestVarSet("xdataenemiescount", yGetDatabaseCount("enemies") + trQuestVarGet("enemiesDetachedSize"));
+	trQuestVarSet("xdataplayerUnitscount", xGetDatabaseCount(dPlayerUnits) + trQuestVarGet("playerUnitsRemainingSize"));
+	trQuestVarSet("xdataenemiescount", xGetDatabaseCount(dEnemies) + trQuestVarGet("enemiesDetachedSize"));
 	trQuestVarSet("detached", 0);
 }
 
@@ -754,10 +754,10 @@ highFrequency
 			case 10:
 			{
 				trLetterBox(true);
-				debugLog("playerUnits count is " + 1*yGetDatabaseCount("playerUnits"));
+				debugLog("playerUnits count is " + 1*xGetDatabaseCount(dPlayerUnits));
 				ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsDummyIndex"));
 				ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-				for(x=yGetDatabaseCount("playerUnits"); >1) {
+				for(x=xGetDatabaseCount(dPlayerUnits); >1) {
 					yDatabaseNext("playerUnits", true);
 					debugLog("player owner is " + 1*yGetVar("playerUnits", "player"));
 					trUnitDestroy();
@@ -947,9 +947,9 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int id = 0;
-	if (yGetDatabaseCount("playerUnits") > 1) {
+	if (xGetDatabaseCount(dPlayerUnits) > 1) {
 		if (ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsPrevPointer")) == false) {
-			debugLog("player units size is " + yGetDatabaseCount("playeRUnits"));
+			debugLog("player units size is " + xGetDatabaseCount(dPlayerUnits));
 		}
 		id = yDatabaseNext("playerUnits", true);
 		if (yGetPointer("playerUnits") == trQuestVarGet("playerUnitsDummyIndex")) {
@@ -1043,7 +1043,7 @@ highFrequency
 			yRemoveFromDatabase("participants");
 			trSoundPlayFN("townbell.wav","1",-1,"","");
 			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been knocked out!");
-			for(y=yGetDatabaseCount("playerUnits"); >0) {
+			for(y=xGetDatabaseCount(dPlayerUnits); >0) {
 				yDatabaseNext("playerUnits", true);
 				if (trUnitIsOwnedBy(p)) {
 					trUnitDelete(false);

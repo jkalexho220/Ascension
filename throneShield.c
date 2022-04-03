@@ -25,8 +25,8 @@ void throneShieldAlways(int eventID = -1) {
 	int old = xsGetContextPlayer();
 	xsSetContextPlayer(p);
 	
-	if (trQuestVarGet("p"+p+"wellStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"wellStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
+		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		target = 0;
 		dist = 100;
 		for(x=1; < ENEMY_PLAYER) {
@@ -158,8 +158,8 @@ void throneShieldAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"lureStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"lureStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trVectorSetUnitPos("pos", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
@@ -214,8 +214,8 @@ void throneShieldAlways(int eventID = -1) {
 	}
 	
 	
-	if (trQuestVarGet("p"+p+"rainStatus") == ABILITY_ON) {
-		trQuestVarSet("p"+p+"rainStatus", ABILITY_OFF);
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		xsSetContextPlayer(ENEMY_PLAYER);
 		yClearDatabase("justice");
 		dist = trQuestVarGet("justiceRadius") * trQuestVarGet("p"+p+"spellRange");
@@ -223,7 +223,7 @@ void throneShieldAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			target = yDatabaseNext("p"+p+"characters", true);
 			trVectorSetUnitPos("pos", "p"+p+"characters");
-			for(y=yGetDatabaseCount("enemies"); >0) {
+			for(y=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -295,7 +295,7 @@ void throneShieldAlways(int eventID = -1) {
 						yAddUpdateVar("playerLasers", "range", 50);
 						dist = xsPow(trQuestVarGet("shieldOfLightWidth") * trQuestVarGet("p"+p+"spellRange"), 2);
 						amt = yGetVar("p"+p+"characters", "absorbed") * trQuestVarGet("p"+p+"spellDamage");
-						for(x=yGetDatabaseCount("enemies"); >0) {
+						for(x=xGetDatabaseCount(dEnemies); >0) {
 							id = yDatabaseNext("enemies", true);
 							if (id == -1 || trUnitAlive() == false) {
 								removeEnemy();

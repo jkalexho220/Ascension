@@ -138,7 +138,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiLookAtUnitByName(""+1*yDatabaseNext("boons"));
+					uiLookAtUnitByName(""+xGetInt(dBoons,xUnitName));
 					uiMessageBox("You have acquired a Blessing! A Blessing is a powerful passive effect.");
 				}
 				case 2:
@@ -2067,7 +2067,7 @@ void questComplete(int gem = -1, int gold = -1) {
 	}
 	if (gold > 0) {
 		for(p=1; < ENEMY_PLAYER) {
-			trQuestVarSet("p"+p+"gold", gold + trQuestVarGet("p"+p+"gold"));
+			xSetInt(dPlayerData, xPlayerGold, gold + xGetInt(dPlayerData, xPlayerGold), p);
 			trPlayerGrantResources(p, "gold", gold);
 		}
 	}
@@ -2077,6 +2077,39 @@ void questComplete(int gem = -1, int gold = -1) {
 	uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
 }
 
+int dQuestLeaves = 0;
+int dQuestTargets = 0;
+int xLeafType = 0;
+
+int dWorthlessJunk = 0;
+
+int dNottudShop = 0;
+int xNottudShopPos = 0;
+
+int dNpcTalk = 0;
+int xNpcDialog = 0;
+
+rule initialize_town_database
+active
+highFrequency
+{
+	xsDisableSelf();
+	dQuestLeaves = initGenericProj("questLeaves",kbGetProtoUnitID("Einheriar"),18,10.0,1.0);
+	xInitAddInt(dQuestLeaves, "name");
+	xLeafType = xInitAddInt(dQuestLeaves,"type");
+	
+	dQuestTargets = xInitDatabase("questTargets");
+	xInitAddInt(dQuestTargets,"name");
+	xInitAddInt(dQuestTargets,"type");
+	
+	dWorthlessJunk = xInitDatabase("worthlessJunk");
+	xInitAddInt(dWorthlessJunk,"name");
+	
+	dNpcTalk = xInitDatabase("npcTalk",3);
+	xInitAddInt(dNpcTalk,"name");
+	xNpcDialog = xInitAddInt(dNpcTalk,"dialog");
+}
+
 rule town_always
 inactive
 highFrequency
@@ -2084,15 +2117,22 @@ highFrequency
 	int x = 0;
 	int z = 0;
 	int p = 0;
+	int next = 0;
 	int room = 0;
 	int action = 0;
 	float amt = 0;
+	float angle = 0;
+	vector center = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector loc = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	if (trQuestVarGet("townFound") == 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("guy1");
 		for(p=1; < ENEMY_PLAYER) {
 			if (trUnitHasLOS(p)) {
 				trQuestVarSet("townFound", 1);
+				trVectorSetUnitPos("questGuyPos", "questGuy");
 				break;
 			}
 		}
@@ -2106,16 +2146,16 @@ highFrequency
 			trSoundPlayFN("settlement.wav","1",-1,"","");
 		}
 	} else {
-		yDatabaseNext("npcTalk", true);
+		xDatabaseNext(dNpcTalk);
+		xUnitSelect(dNpcTalk,xUnitName);
 		if (trUnitIsSelected()) {
-			startNPCDialog(1*yGetVar("npcTalk", "dialog"));
+			startNPCDialog(xGetInt(dNpcTalk,xNpcDialog));
 			reselectMyself();
 		}
 		
 		if (trQuestVarGet("questActive") == 0) {
-			trVectorSetUnitPos("questGuyPos", "questGuy");
 			for(p=1; < ENEMY_PLAYER) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+				if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), trVectorQuestVarGet("questGuyPos")) < 16) {
 					uiLookAtUnitByName(""+1*trQuestVarGet("questGuy"));
 					trQuestVarSet("questActive", 1);
 					startNPCDialog(NPC_QUEST + trQuestVarGet("stage") + 10 * trQuestVarGet("localQuest"));
@@ -2198,8 +2238,8 @@ highFrequency
 						{
 							for(i=1; <4) {
 								if (trQuestVarGet("pigReturned"+i) == 0) {
-									trVectorSetUnitPos("pos", "pig"+i);
-									if (vectorInRectangle("pos", "pigpenLower", "pigpenUpper")) {
+									pos = kbGetBlockPosition(""+1*trQuestVarGet("pig"+i));
+									if (vectorInRectangle(pos, trVectorQuestVarGet("pigpenLower"), trVectorQuestVarGet("pigpenUpper"))) {
 										trQuestVarSet("pigReturned"+i, 1);
 										trQuestVarSet("pigReturnCount", 1 + trQuestVarGet("pigReturnCount"));
 										trChatSend(0, "<color=1,1,1>Pig returned!</color>");
@@ -2234,7 +2274,7 @@ highFrequency
 							trUnitSelectByQV("bountyTarget", true);
 							trUnitConvert(ENEMY_PLAYER);
 							trUnitChangeProtoUnit("Mummy");
-							activateEnemy("bountyTarget", 100);
+							activateEnemy(1*trQuestVarGet("bountyTarget"), 100);
 							trModifyProtounit("Mummy", ENEMY_PLAYER, 0, 700);
 						}
 						case 2:
@@ -2250,7 +2290,7 @@ highFrequency
 						{
 							trVectorSetUnitPos("bountyGuyPos", "questguy");
 							for(p=1; < ENEMY_PLAYER) {
-								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+								if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), trVectorQuestVarGet("questGuyPos")) < 16) {
 									questComplete(STARSTONE, 0);
 									break;
 								}
@@ -2278,13 +2318,14 @@ highFrequency
 							trUnitSelectClear();
 							trUnitSelectByQV("fetchTarget", true);
 							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "fetchTarget");
-							yAddUpdateVar("freeRelics", "type", RELIC_GHOST_PICTURE);
+							xSetPointer(dFreeRelics,xAddDatabaseBlock(dFreeRelics));
+							xSetInt(dFreeRelics,xRelicName,1*trQuestVarGet("fetchTarget"));
+							xSetInt(dFreeRelics,xRelicType, RELIC_GHOST_PICTURE);
 						}
 						case 2:
 						{
-							trVectorSetUnitPos("pos", "fetchTarget");
-							if (zDistanceBetweenVectorsSquared("pos", "questGuyPos") < 16.0) {
+							pos = kbGetBlockPosition(""+1*trQuestVarGet("fetchTarget"),true);
+							if (distanceBetweenVectors(pos, trVectorQuestVarGet("questGuyPos")) < 16.0) {
 								questComplete(SOULSTONE, 0);
 								trUnitSelectClear();
 								trUnitSelectByQV("fetchTarget", true);
@@ -2300,8 +2341,8 @@ highFrequency
 						case 1:
 						{
 							trQuestVarSet("portalsActive", 0);
-							trCounterAddTime("countdown", 15, 1, "The shade attacks", -1);
-							trQuestVarSet("shadeAttackTime", trTime() + 15);
+							trCounterAddTime("countdown", 10, 1, "The shade attacks", -1);
+							trQuestVarSet("shadeAttackTime", trTime() + 10);
 							trQuestVarSet("questActive", 2);
 							trModifyProtounit("Shade", 0, 2, 30);
 							trModifyProtounit("Shade", 0, 27, 3000);
@@ -2392,26 +2433,26 @@ highFrequency
 								trQuestVarSet("questActive", -1);
 							} else if (zDistanceToVector("fetchTarget", "townCenter") < trQuestVarGet("fetchWolvesSpawn")) {
 								trQuestVarSet("fetchWolvesSpawn", trQuestVarGet("fetchWolvesSpawn") - 20);
-								trVectorSetUnitPos("center", "fetchTarget");
+								center = kbGetBlockPosition(""+1*trQuestVarGet("fetchTarget"),true);
 								trQuestVarSetFromRand("count", 1, ENEMY_PLAYER, true);
 								for(x=trQuestVarGet("count"); >0) {
 									trQuestVarSetFromRand("angle", 0, 6.283185, false);
-									trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-									trQuestVarSet("heading", 57.29578 * trQuestVarGet("angle") - 180);
-									trQuestVarSet("posx", 20.0 * trQuestVarGet("dirx") + trQuestVarGet("centerx"));
-									trQuestVarSet("posz", 20.0 * trQuestVarGet("dirz") + trQuestVarGet("centerz"));
-									trQuestVarSet("next" , trGetNextUnitScenarioNameNumber());
-									vectorToGrid("pos", "loc");
-									if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-										trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+									angle = trQuestVarGet("angle");
+									dir = xsVectorSet(xsSin(angle),0,xsCos(angle));
+									trQuestVarSet("heading", 57.29578 * angle - 180);
+									pos = xsVectorSet(20.0 * xsVectorGetX(dir) + xsVectorGetX(center),0,20.0 * xsVectorGetZ(dir) + xsVectorGetZ(center));
+									next = trGetNextUnitScenarioNameNumber();
+									loc = vectorToGrid(pos);
+									if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+										trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 										trUnitSelectClear();
-										trUnitSelectByQV("next", true);
+										trUnitSelect(""+next,true);
 										trUnitConvert(ENEMY_PLAYER);
 										trUnitChangeProtoUnit("Fenris Wolf");
 										trUnitSelectClear();
-										trUnitSelectByQV("next", true);
-										trUnitMoveToPoint(trQuestVarGet("centerx"),0,trQuestVarGet("centerz"),-1,true);
-										activateEnemy("next");
+										trUnitSelect(""+next,true);
+										trUnitMoveToPoint(xsVectorGetX(center),0,xsVectorGetZ(center),-1,true);
+										activateEnemy(next);
 									}
 								}
 							} else if (zDistanceToVectorSquared("fetchTarget", "townCenter") < 400) {
@@ -2439,13 +2480,14 @@ highFrequency
 								} else {
 									z = i / 4;
 									x = i - z * 4;
-									trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+									next = trGetNextUnitScenarioNameNumber();
 									trQuestVarSetFromRand("heading", 0, 360, true);
 									trArmyDispatch("1,0", "Dwarf", 1, 70*x+40,0,70*z+40,trQuestVarGet("heading"),true);
 									trArmySelect("1,0");
 									trUnitConvert(ENEMY_PLAYER);
 									trUnitChangeProtoUnit("Frost Giant");
-									yAddToDatabase("enemiesIncoming", "next");
+									xSetPointer(dEnemiesIncoming,xAddDatabaseBlock(dEnemiesIncoming));
+									xSetInt(dEnemiesIncoming,xUnitName,next);
 								}
 							}
 						}
@@ -2465,8 +2507,9 @@ highFrequency
 						case 3:
 						{
 							trVectorSetUnitPos("bountyGuyPos", "questguy");
+							pos = kbGetBlockPosition(""+1*trQuestVarGet("questguy"),true);
 							for(p=1; < ENEMY_PLAYER) {
-								if (zDistanceToVectorSquared("p"+p+"unit", "questGuyPos") < 16) {
+								if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), pos) < 16) {
 									questComplete(MANASTONE, 0);
 									break;
 								}
@@ -2490,18 +2533,17 @@ highFrequency
 						}
 						case 2:
 						{
-							if (yGetDatabaseCount("questLeaves") > 0) {
-								action = processGenericProj("questLeaves");
+							if (xGetDatabaseCount(dQuestLeaves) > 0) {
+								action = processGenericProj(dQuestLeaves);
 								if (action == PROJ_GROUND) {
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
+									xUnitSelectByID(dQuestLeaves,xUnitID);
 									trUnitChangeProtoUnit("Dryad");
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
+									xUnitSelectByID(dQuestLeaves,xUnitID);
 									trDamageUnitPercent(-100);
-									activateEnemy("questLeaves",-1,0);
-									yAddToDatabase("questTargets", "questLeaves");
-									yRemoveFromDatabase("questLeaves");
+									activateEnemy(xGetInt(dQuestLeaves,xUnitName),-1,0);
+									xSetPointer(dQuestTargets,xAddDatabaseBlock(dQuestTargets));
+									xSetInt(dQuestTargets,xUnitName,xGetInt(dQuestLeaves,xUnitName));
+									xFreeDatabaseBlock(dQuestLeaves);
 									if (trQuestVarGet("questSpawns") == 0) {
 										trQuestVarSet("questActive", 3);
 										trUnblockAllSounds();
@@ -2519,10 +2561,10 @@ highFrequency
 									trQuestVarSet("questNext", trQuestVarGet("questNext") + 500);
 									z = trQuestVarGet("village") / 4;
 									x = trQuestVarGet("village") - 4 * z;
-									trVectorQuestVarSet("start", xsVectorSet(70*x+40,0,70*z+40));
 									trQuestVarSetFromRand("rand", 8, 20, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Kronny Birth SFX"),2,trQuestVarGet("rand"),1);
-									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+									addGenericProj(dQuestLeaves,xsVectorSet(70*x+40,0,70*z+40),trVectorQuestVarGet("questDir"),
+										ENEMY_PLAYER,trQuestVarGet("rand"),1);
+									trVectorQuestVarSet("questDir", rotationMatrix(trVectorQuestVarGet("questDir"), -0.757322, 0.653041));
 									trUnitSelectClear();
 									trUnitSelectByQV("akardTower", true);
 									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
@@ -2540,9 +2582,11 @@ highFrequency
 						}
 						case 3:
 						{
-							if (yGetDatabaseCount("questTargets") > 0) {
-								if (yDatabaseNext("questTargets", true) == -1 || trUnitAlive() == false) {
-									yRemoveFromDatabase("questTargets");
+							if (xGetDatabaseCount(dQuestTargets) > 0) {
+								xDatabaseNext(dQuestTargets);
+								xUnitSelect(dQuestTargets,xUnitName);
+								if (trUnitAlive() == false) {
+									xFreeDatabaseBlock(dQuestTargets);
 								}
 							} else {
 								questComplete(-1, 300);
@@ -2569,21 +2613,23 @@ highFrequency
 						}
 						case 2:
 						{
-							if (yGetDatabaseCount("questLeaves") > 0) {
-								action = processGenericProj("questLeaves");
+							if (xGetDatabaseCount(dQuestLeaves) > 0) {
+								action = processGenericProj(dQuestLeaves);
 								if (action == PROJ_GROUND) {
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
+									xUnitSelectByID(dQuestLeaves,xUnitID);
 									trUnitChangeProtoUnit("Relic");
-									trUnitSelectClear();
-									trUnitSelectByQV("questLeaves");
+									xUnitSelectByID(dQuestLeaves,xUnitID);
 									trDamageUnitPercent(-100);
-									yAddToDatabase("freeRelics", "questLeaves");
-									yAddUpdateVar("freeRelics", "type", yGetVar("questLeaves", "type"));
-									yAddToDatabase("questApples", "questLeaves");
-									yAddUpdateVar("questApples", "type", yGetVar("questLeaves", "type"));
-									yRemoveFromDatabase("questLeaves");
-									if (yGetDatabaseCount("questLeaves") + trQuestVarGet("questSpawns") == 0) {
+									xSetPointer(dFreeRelics,xAddDatabaseBlock(dFreeRelics));
+									xSetInt(dFreeRelics,xRelicName,xGetInt(dQuestLeaves,xUnitName));
+									xSetInt(dFreeRelics,xRelicType,xGetInt(dQuestLeaves,xLeafType));
+									
+									xSetPointer(dQuestTargets,xAddDatabaseBlock(dQuestTargets));
+									xSetInt(dQuestTargets,xUnitName,xGetInt(dQuestLeaves,xUnitName));
+									xSetInt(dQuestTargets,xRelicType,xGetInt(dQuestLeaves,xLeafType));
+									
+									xFreeDatabaseBlock(dQuestLeaves);
+									if (xGetDatabaseCount(dQuestLeaves) + trQuestVarGet("questSpawns") == 0) {
 										trQuestVarSet("questActive", 3);
 										trUnblockAllSounds();
 									}
@@ -2601,12 +2647,12 @@ highFrequency
 									trQuestVarSet("questNext", trQuestVarGet("questNext") + 200);
 									z = trQuestVarGet("village") / 4;
 									x = trQuestVarGet("village") - 4 * z;
-									trVectorQuestVarSet("start", xsVectorSet(70*x+36,0,70*z+36));
 									trQuestVarSetFromRand("rand", 12, 16, false);
-									addGenericProj("questLeaves","start","questDir",kbGetProtoUnitID("Einheriar"),18,trQuestVarGet("rand"),1);
-									yAddUpdateVar("questLeaves", "type", RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
+									addGenericProj(dQuestLeaves,xsVectorSet(70*x+36,0,70*z+36),trVectorQuestVarGet("questDir"),
+										ENEMY_PLAYER,trQuestVarGet("rand"));
+									xSetInt(dQuestLeaves,xLeafType, RELIC_MATH_PROBLEM + trQuestVarGet("questSpawns"));
 									trQuestVarSet("questSpawns", trQuestVarGet("questSpawns") - 1);
-									trVectorQuestVarSet("questDir", rotationMatrix("questDir", -0.757322, 0.653041));
+									trVectorQuestVarSet("questDir", rotationMatrix(trVectorQuestVarGet("questDir"), -0.757322, 0.653041));
 									trUnitSelectClear();
 									trUnitSelectByQV("akardTower", true);
 									trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
@@ -2625,16 +2671,15 @@ highFrequency
 						}
 						case 3:
 						{
-							yDatabaseNext("questApples");
-							if (zDistanceToVectorSquared("questApples", "questGuyPos") < 9) {
-								trUnitSelectClear();
-								trUnitSelectByQV("questApples", true);
-								if (yGetVar("questApples", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
+							xDatabaseNext(dQuestTargets);
+							if (unitDistanceToVector(xGetInt(dQuestTargets,xUnitName), trVectorQuestVarGet("questGuyPos")) < 9) {
+								xUnitSelect(dQuestTargets,xUnitName);
+								if (xGetInt(dQuestTargets, xRelicType) - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
 									trUnitChangeProtoUnit("Osiris Box Glow");
 									questComplete(STARSTONE, -1);
 								} else {
-									trQuestVarSet("wrongAnswer", yGetVar("questApples", "type") - RELIC_MATH_PROBLEM);
-									yClearDatabase("questApples");
+									trQuestVarSet("wrongAnswer", xGetInt(dQuestTargets, xRelicType) - RELIC_MATH_PROBLEM);
+									xClearDatabase(dQuestTargets);
 									xsDisableRule("gameplay_always");
 									xsDisableRule("town_always");
 									xsDisableRule("boss_entrance_always");
@@ -2644,8 +2689,7 @@ highFrequency
 									xsDisableRule("relic_transporter_guy_always");
 									xsDisableRule("relic_transporter_guy_found");
 									trUnitChangeProtoUnit("Dwarf");
-									trUnitSelectClear();
-									trUnitSelectByQV("questApples", true);
+									xUnitSelect(dQuestTargets,xUnitName);
 									trUnitConvert(0);
 									trUnitChangeProtoUnit("Implode Sphere Effect");
 									trSoundPlayFN("wonderdeath.wav","1",-1,"","");
@@ -2666,38 +2710,30 @@ highFrequency
 						case 1:
 						{
 							trQuestVarSet("questActive", 2);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms) - 1, true);
 							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
+								xDatabaseNext(dBasicRooms);
 							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							room = xGetInt(dBasicRooms,xRoomNumber);
+							pos = randomNearEdgeOfRoom(room);
 							trQuestVarSet("fecesRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							spawnRelicSpecific(pos,RELIC_LITERAL_FECES);
+							trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms) - 1, true);
 							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
+								xDatabaseNext(dBasicRooms);
 							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							room = xGetInt(dBasicRooms,xRoomNumber);
+							pos = randomNearEdgeOfRoom(room);
 							trQuestVarSet("berryRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms") - 1, true);
+							spawnRelicSpecific(pos,RELIC_BERRY_BUSH);
+							trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms) - 1, true);
 							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
+								xDatabaseNext(dBasicRooms);
 							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							room = xGetInt(dBasicRooms,xRoomNumber);
+							pos = randomNearEdgeOfRoom(room);
 							trQuestVarSet("corpseRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,false);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "fecesRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_LITERAL_FECES);
-							yAddToDatabase("freeRelics", "berryRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_BERRY_BUSH);
-							yAddToDatabase("freeRelics", "corpseRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_A_FUCKING_CORPSE);
+							spawnRelicSpecific(pos,RELIC_A_FUCKING_CORPSE);
 						}
 						case 2:
 						{
@@ -2735,13 +2771,14 @@ highFrequency
 								trUnitSelectClear();
 								trUnitSelectByQV("questGuy", true);
 								trUnitDestroy();
-								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX"),0,trQuestVarGet("questGuyPosZ"),180,true);
+								pos = trVectorQuestVarGet("questGuyPos");
+								next = trGetNextUnitScenarioNameNumber();
+								trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),180,true);
 								trUnitSelectClear();
-								trUnitSelectByQV("next");
+								trUnitSelect(""+next,true);
 								trUnitConvert(ENEMY_PLAYER);
 								trUnitChangeProtoUnit("Walking Berry Bush");
-								activateEnemy("next", 10);
+								activateEnemy(next, 10);
 							}
 						}
 						case 5:
@@ -2764,19 +2801,16 @@ highFrequency
 						case 1:
 						{
 							trQuestVarSet("poisonBucket", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questGuyPosZ"),0,true);
-							trUnitSelectClear();
-							trUnitSelectByQV("poisonBucket", true);
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "poisonBucket");
-							yAddUpdateVar("freeRelics", "type", RELIC_POISON_BUCKET);
+							pos = trVectorQuestVarGet("questGuyPos");
+							pos = xsVectorSet(xsVectorGetX(pos) - 2, 0, xsVectorGetZ(pos) - 2);
+							spawnRelicSpecific(pos,RELIC_POISON_BUCKET);
 							trQuestVarSet("questActive", 2);
 						}
 						case 2:
 						{
 							p = trQuestVarGet("poisonBucketHolder");
 							if (p > 0) {
-								if (yGetVarAtIndex("playerUnits", "poisonStatus", 1*trQuestVarGet("p"+p+"index")) > 0) {
+								if (xGetInt(dPlayerUnits, xPoisonStatus, xGetInt(dPlayerData,xPlayerIndex,p)) > 0) {
 									if (trTime() > trQuestVarGet("poisonBucketNext")) {
 										trQuestVarSet("poisonBucketNext", trTime());
 										trQuestVarSet("poisonBucketFill", trQuestVarGet("poisonBucketFill") + 3);
@@ -2808,25 +2842,19 @@ highFrequency
 					{
 						case 1:
 						{
-							trQuestVarSetFromRand("rand", 1, yGetDatabaseCount("basicRooms"), true);
+							trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms), true);
 							for(i=0; < trQuestVarGet("rand")) {
-								yDatabaseNext("basicRooms");
+								xDatabaseNext(dBasicRooms);
 							}
-							room = trQuestVarGet("basicRooms");
-							trVectorQuestVarSet("pos", randomNearEdgeOfRoom(room));
+							room = xGetInt(dBasicRooms,xRoomNumber);
+							pos = randomNearEdgeOfRoom(room);
 							trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
+							spawnRelicSpecific(pos, RELIC_YEEBAAGOOON);
 							trQuestVarSet("questActive", 2);
 							trQuestVarSet("magicDetectorRelic", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("questGuyPosX") - 2,0,trQuestVarGet("questguyposz")-2,0,true);
-							trArmySelect("1,0");
-							trUnitChangeProtoUnit("Relic");
-							yAddToDatabase("freeRelics", "yeebRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_YEEBAAGOOON);
-							yAddToDatabase("freeRelics", "magicDetectorRelic");
-							yAddUpdateVar("freeRelics", "type", RELIC_MAGIC_DETECTOR);
+							pos = trVectorQuestVarGet("questGuyPos");
+							pos = xsVectorSet(xsVectorGetX(pos) - 2, 0, xsVectorGetZ(pos) - 2);
+							spawnRelicSpecific(pos, RELIC_MAGIC_DETECTOR);
 							xsEnableRule("yeeb_hit_list");
 						}
 						case 2:
@@ -2840,6 +2868,7 @@ highFrequency
 								questComplete(-1, 300);
 								xsDisableRule("yeeb_hit_list");
 								trQuestVarSet("yeebHit", 0);
+								trQuestVarSet("yeebBossFight", 0);
 							} else if (p > 0) {
 								if (trTime() > trQuestVarGet("magicDetectorNext")) {
 									trQuestVarSet("magicDetectorNext", trTime());
@@ -2862,13 +2891,13 @@ highFrequency
 									trUnitSelectClear();
 									trUnitSelectByQV("magicDetectorRelic", true);
 									trUnitDestroy();
-									trVectorSetUnitPos("pos", "p"+p+"unit");
-									trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+									pos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit,p));
+									trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 									trArmySelect("1,0");
 									trDamageUnitPercent(100);
 									trUnitChangeProtoUnit("Implode Sphere Effect");
 									trUnitSelectClear();
-									trUnitSelectByQV("p"+p+"unit");
+									trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
 									trUnitDelete(false);
 									trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
 									trCameraShake(1.0, 0.5);
@@ -2888,18 +2917,20 @@ highFrequency
 						}
 						case 2:
 						{
-							if (yGetDatabaseCount("worthlessJunk") > 0) {
-								yDatabaseNext("worthlessJunk");
-								trVectorSetUnitPos("pos", "worthlessJunk");
-								if (vectorInRectangle("pos", "yeebRoomBottom", "yeebRoomTop") == false) {
-									trUnitSelectClear();
-									trUnitSelectByQV("worthlessJunk", true);
+							if (xGetDatabaseCount(dWorthlessJunk) > 0) {
+								xDatabaseNext(dWorthlessJunk);
+								pos = kbGetBlockPosition(""+xGetInt(dWorthlessJunk,xUnitName));
+								if (vectorInRectangle(pos, trVectorQuestVarGet("yeebRoomBottom"), trVectorQuestVarGet("yeebRoomTop")) == false) {
+									xUnitSelect(dWorthlessJunk,xUnitName);
 									trUnitChangeProtoUnit("Dust Large");
 									trSoundPlayFN("swing2.wav","1",-1,"","");
 									trChatSend(0, "<color=1,1,1>Worthless junk removed.");
-									yRemoveFromDatabase("worthlessJunk");
+									xFreeDatabaseBlock(dWorthlessJunk);
 								}
 							} else {
+								xsDisableRule("yeeb_hit_list");
+								trQuestVarSet("yeebHit", 0);
+								trQuestVarSet("yeebBossFight", 0);
 								questComplete(MANASTONE, -1);
 							}
 						}
@@ -2909,12 +2940,13 @@ highFrequency
 		}
 		
 		
-		if ((trTime() > trQuestVarGet("townHealNext")) && (trQuestVarGet("boss") == 0)) {
+		if ((trTime() > trQuestVarGet("townHealNext")) && (boss == 0)) {
 			trQuestVarSet("townHealNext", trTime());
+			pos = trVectorQuestVarGet("townCenter");
 			for(p=1; < ENEMY_PLAYER) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "townCenter") < 400) {
+				if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p),pos) < 400) {
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
+					trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
 					if (trUnitAlive()) {
 						trDamageUnitPercent(-1);
 					}
@@ -2948,9 +2980,10 @@ highFrequency
 			startNPCDialog(NPC_NOTTUD);
 			reselectMyself();
 		}
-		yDatabaseNext("nottudShop", true);
+		xDatabaseNext(dNottudShop);
+		xUnitSelect(dNottudShop,xUnitName);
 		if (trUnitIsSelected()) {
-			relic = yGetVar("nottudShop", "relic");
+			relic = xGetInt(dNottudShop, xRelicType);
 			trShowImageDialog(relicIcon(relic), relicName(relic));
 			reselectMyself();
 		}
@@ -3007,7 +3040,7 @@ highFrequency
 
 rule nick_dialog
 inactive
-highFrequency
+minInterval 3
 {
 	int p = trCurrentPlayer();
 	if (trQuestVarGet("nickEquippedLocal") != trQuestVarGet("p"+p+"nickEquipped")) {
@@ -3016,13 +3049,19 @@ highFrequency
 			if (Multiplayer) {
 				startNPCDialog(NPC_NICK_DROP);
 			} else if (trQuestVarGet("nickQuestProgressLocal") == 4) {
-				if (zDistanceToVectorSquared("p"+p+"unit", "nickPos") < 4) {
-					ySetPointer("freeRelics", yGetNewestPointer("freeRelics"));
-					trUnitSelectClear();
-					trUnitSelectByQV("freeRelics", true);
+				if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), trVectorQuestVarGet("nickPos")) < 4) {
+					xSetPointer(dFreeRelics,xGetNewestPointer(dFreeRelics));
+					for(i=xGetDatabaseCount(dFreeRelics); >0) {
+						if (xGetInt(dFreeRelics,xRelicType) != RELIC_NICKONHAWK) {
+							xDatabaseNext(dFreeRelics);
+						} else {
+							break;
+						}
+					}
+					xUnitSelect(dFreeRelics,xUnitName);
 					trUnitChangeProtoUnit("Cinematic Block");
-					trQuestVarSet("nickonhawk", trQuestVarGet("freeRelics"));
-					yRemoveFromDatabase("freeRelics");
+					trQuestVarSet("nickonhawk", xGetInt(dFreeRelics,xUnitName));
+					xFreeDatabaseBlock(dFreeRelics);
 					trQuestVarSet("cinTime", trTimeMS() + 5000);
 					trQuestVarSet("cinStep", 0);
 					xsEnableRule("nick_transform");
@@ -3050,7 +3089,7 @@ inactive
 highFrequency
 {
 	int p = trCurrentPlayer();
-	if (trCountUnitsInArea(""+1*trQuestVarGet("p"+p+"unit"),ENEMY_PLAYER,"Unit",20) == 0) {
+	if (trCountUnitsInArea(""+xGetInt(dPlayerData,xPlayerUnit,p),ENEMY_PLAYER,"Unit",20) == 0) {
 		xsDisableSelf();
 		startNPCDialog(NPC_NICK_NEXT + trQuestVarGet("p"+p+"nickQuestProgress") - 2);
 		trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+p+"nickQuestProgress"));

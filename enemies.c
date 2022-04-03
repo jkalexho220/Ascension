@@ -32,21 +32,21 @@ void setupProtounitBounty(string proto = "", float armor = 0, int bounty = 2, fl
 	
 }
 
-bool checkEnemyDeactivated(string db = "") {
-	int index = 1*yGetVar(db, "index");
+bool checkEnemyDeactivated(int db = 0) {
 	/* this only matters for enemies */
-	if (yGetVar(db, "player") < ENEMY_PLAYER) {
+	if (xGetInt(db,xPlayerOwner) < ENEMY_PLAYER) {
 		return(false);
 	}
-	if ((yGetVarAtIndex("enemies", "xActive", index) == 0) ||
-		yGetUnitAtIndex("enemies", index) != trQuestVarGet(db)) {
+	int index = xGetInt(db,xSpecialIndex);
+	if ((aiPlanGetUserVariableBool(dEnemies, xDirtyBit, index) == false) ||
+		xGetInt(dEnemies, xUnitName, index) != xGetInt(db,xUnitName)) {
 		return(true);
 	}
 	return(false);
 }
 
-void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
-	int id = kbGetBlockID(""+1*trQuestVarGet(db));
+void activateEnemy(int name = 0, int bounty = -1, int relic = -1) {
+	int id = kbGetBlockID(""+name);
 	int proto = kbGetUnitBaseTypeID(id);
 	if (bounty < 0) {
 		bounty = trQuestVarGet("proto"+proto+"bounty");
@@ -60,38 +60,27 @@ void activateEnemy(string db = "", int bounty = -1, int relic = -1) {
 			}
 		}
 	}
-	
-	trVectorSetUnitPos("spawnPos", db);
-	yAddToDatabase("enemies", db);
+	float armor = trQuestVarGet("proto"+proto+"armor");
+	vector pos = kbGetBlockPosition(""+name);
+	xSetPointer(dEnemies, xAddDatabaseBlock(dEnemies));
+	xSetInt(dEnemies, xUnitName, name);
+	xSetInt(dEnemies, xPlayerOwner, ENEMY_PLAYER);
+	xSetInt(dEnemies, xUnitID, id);
 	trQuestVarSetFromRand("bounty", bounty / 2, bounty, true);
-	yAddUpdateVar("enemies", "bounty", trQuestVarGet("bounty"));
-	yAddUpdateVar("enemies", "relic", relic);
-	yAddUpdateVar("enemies", "posX", trQuestVarGet("spawnPosX"));
-	yAddUpdateVar("enemies", "posZ", trQuestVarGet("spawnPosZ"));
-	yAddUpdateVar("enemies", "stunStatus", 0);
-	yAddUpdateVar("enemies", "stunTimeout", 0);
-	yAddUpdateVar("enemies", "stunSFX", 0);
-	yAddUpdateVar("enemies", "poisonStatus", 0);
-	yAddUpdateVar("enemies", "poisonTimeout", 0);
-	yAddUpdateVar("enemies", "poisonLast", 0);
-	yAddUpdateVar("enemies", "poisonDamage", 0);
-	yAddUpdateVar("enemies", "poisonSFX", 0);
-	yAddUpdateVar("enemies", "launched", 0);
-	yAddUpdateVar("enemies", "magicResist", trQuestVarGet("proto"+proto+"armor"));
-	yAddUpdateVar("enemies", "physicalResist", trQuestVarGet("proto"+proto+"armor"));
-	yAddUpdateVar("enemies", "silenceStatus", 0);
-	yAddUpdateVar("enemies", "silenceTimeout", 0);
-	yAddUpdateVar("enemies", "silenceSFX", 0);
-	yAddUpdateVar("enemies", "bomb", 0);
-	yAddUpdateVar("enemies", "deathSentence", 0);
-	yAddUpdateVar("enemies", "missing", 0);
+	xSetInt(dEnemies, xBounty, 1*trQuestVarGet("bounty"));
+	xSetInt(dEnemies, xDropRelic, relic);
+	xSetVector(dEnemies,xUnitPos,pos);
+	xSetFloat(dEnemies,xMagicResist,armor);
+	xSetFloat(dEnemies,xPhysicalResist,armor);
 	for(p=1; < ENEMY_PLAYER) {
 		if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-			yAddToDatabase("p"+p+"rideLightningTargets", db);
-			yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetNewestPointer("enemies"));
+			int db = trQuestVarGet("p"+p+"rideLightningTargets");
+			xSetPointer(db, xAddDatabaseBlock(db));
+			xSetInt(db,xUnitName,name);
+			xSetInt(db,xDatabaseIndex,xGetNewestPointer(dEnemies));
 		}
 	}
-	activateSpecialUnit(db, "enemies", proto, ENEMY_PLAYER);
+	activateSpecialUnit(name, dEnemies, proto, ENEMY_PLAYER);
 }
 
 
@@ -163,8 +152,8 @@ highFrequency
 	trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
 	
 	for(class = 1; <= 16) {
-		setupProtounitBounty(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")),
-			trQuestVarGet("proto"+1*trQuestVarGet("class"+class+"proto")+"armor"), 8, 0);
+		setupProtounitBounty(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),
+			trQuestVarGet("proto"+xGetInt(dClass,xClassProto,class)+"armor"), 8, 0);
 	}
 	
 	/* ballista projectiles */
@@ -194,120 +183,152 @@ highFrequency
 	xsDisableSelf();
 }
 
-void ballistaShotPop() {
-	int id = 0;
-	int p = yGetVar("ballistaShots","player");
-	string pName = opponentDatabaseName(p);
-	for(x=yGetDatabaseCount(pName); >0) {
-		id = yDatabaseNext(pName, true);
-		if (id == -1 || trUnitAlive() == false) {
+void ballistaShotPop(vector pos = vector(0,0,0)) {
+	int p = xGetInt(dBallistaShots,xPlayerOwner);
+	int db = opponentDatabaseName(p);
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db,xUnitID);
+		if (trUnitAlive() == false) {
 			removeOpponentUnit(p);
-		} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+		} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 			damageOpponentUnit(p, 200);
 		}
 	}
 	
-	trUnitSelectClear();
-	trUnitSelect(""+1*yGetVar("ballistaShots", "next1"), true);
-	trUnitSelect(""+1*yGetVar("ballistaShots", "next2"), true);
+	xUnitSelect(dBallistaShots,xBallistaShot1);
 	trUnitDestroy();
-	trUnitSelectClear();
-	trUnitSelectByQV("ballistaShots", true);
+	xUnitSelect(dBallistaShots,xBallistaShot2);
+	trUnitDestroy();
+	xUnitSelect(dBallistaShots,xUnitName);
 	trDamageUnitPercent(100);
 	trUnitChangeProtoUnit("Meteorite");
 	trSoundPlayFN("fireball launch.wav","1",-1,"","");
-	yRemoveFromDatabase("ballistaShots");
+	xFreeDatabaseBlock(dBallistaShots);
 }
 
-bool spawnLightning(string pos = "", int p = 0) {
-	vectorToGrid(pos, "loc");
-	if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-		trArmyDispatch("0,0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+bool spawnLightning(vector pos = vector(0,0,0), int p = 0) {
+	vector loc = vectorToGrid(pos);
+	if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
+		trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trArmySelect("0,0");
 		trUnitChangeProtoUnit("Arkantos Boost SFX");
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,trQuestVarGet(pos+"x"),0,trQuestVarGet(pos+"z"),0,true);
+		int next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trUnitSelectClear();
-		trUnitSelectByQV("next", true);
+		trUnitSelect(""+next,true);
 		trUnitSetStance("Passive");
 		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
-		yAddToDatabase("yeebLightning", "next");
-		yAddUpdateVar("yeebLightning", "timeout", trTimeMS() + 2000);
-		yAddUpdateVar("yeebLightning", "player", p);
+		xSetPointer(dYeebLightning, xAddDatabaseBlock(dYeebLightning));
+		xSetInt(dYeebLightning,xUnitName,next);
+		xSetInt(dYeebLightning,xPlayerOwner,p);
+		xSetInt(dYeebLightning,xTimeout, trTimeMS() + 2000);
 		return(true);
 	}
 	return(false);
 }
 
+int findShooter(int db = 0, vector pos = vector(0,0,0)) {
+	int closest = 0;
+	int id = 0;
+	float dist = 0;
+	float closestDistance = 25;
+	for (x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		id = xGetInt(db,xUnitID);
+		xUnitSelectByID(db,xUnitID);
+		if (trUnitAlive() == false) {
+			xFreeDatabaseBlock(db);
+		} else if (kbUnitGetAnimationActionType(id) == 12) {
+			trUnitSelectClear();
+			trUnitSelect(""+nextproj,true);
+			if (trUnitIsOwnedBy(xGetInt(db,xPlayerOwner))) {
+				dist = unitDistanceToVector(xGetInt(db,xUnitName),pos);
+				if (dist < closestDistance) {
+					closestDistance = dist;
+					closest = xGetPointer(db);
+				}
+			}
+		}
+	}
+	return(closest);
+}
+
 void specialUnitsAlways() {
+	xsSetContextPlayer(0);
 	int p = 0;
 	int proto = 0;
 	int id = 0;
+	int db = 0;
 	int target = 0;
 	int action = 0;
+	int closest = 0;
 	float amt = 0;
 	float dist = 0;
 	float angle = 0;
 	bool hit = false;
-	string pName = "";
+	vector start = vector(0,0,0);
+	vector end = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector loc = vector(0,0,0);
 	
-	for (x=xsMin(5, yGetDatabaseCount("ballistaShots")); >0) {
-		yDatabaseNext("ballistaShots", true);
-		trVectorSetUnitPos("pos", "ballistaShots");
-		vectorToGrid("pos", "loc");
-		if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > yGetVar("ballistaShots", "timeout")) {
+	for (x=xsMin(5, xGetDatabaseCount(dBallistaShots)); >0) {
+		xDatabaseNext(dBallistaShots);
+		xUnitSelect(dBallistaShots,xUnitName);
+		pos = kbGetBlockPosition(""+xGetInt(dBallistaShots,xUnitName));
+		
+		loc = vectorToGrid(pos);
+		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > xGetInt(dBallistaShots, xTimeout)) {
 			ballistaShotPop();
-		} else if (yGetVar("ballistaShots", "player") == ENEMY_PLAYER) {
+		} else if ((xGetInt(dBallistaShots, xPlayerOwner) == ENEMY_PLAYER) || PvP) {
 			action = 0;
 			for(p=1; < ENEMY_PLAYER) {
-				action = action + trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),p,"Unit",2);
+				if (PvP && (p == xGetInt(dBallistaShots, xPlayerOwner))) {
+					continue;
+				}
+				action = action + trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),p,"Unit",2);
 			}
 			if (action > 0) {
 				ballistaShotPop();
 			}
-		} else if (trCountUnitsInArea(""+1*trQuestVarGet("ballistaShots"),ENEMY_PLAYER,"Unit",2) > 0) {
+		} else if (trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),ENEMY_PLAYER,"Unit",2) > 0) {
 			ballistaShotPop();
 		}
 	}
 	
 	trQuestVarSet("sound", 0);
-	for(x=xsMin(10, yGetDatabaseCount("delayLasers")); >0) {
-		id = yDatabaseNext("delayLasers", true);
-		if (kbGetUnitBaseTypeID(id) == -1) {
-			yRemoveFromDatabase("delayLasers");
-		} else if (yGetVar("delayLasers", "phase") == 0) {
-			if (trTimeMS() > yGetVar("delayLasers", "next")) {
-				ySetVar("delayLasers", "phase", 1);
-				ySetVar("delayLasers", "next", trTimeMS() + 500);
-				trSetSelectedScale(6.0,6.0,yGetVar("delayLasers", "dist") * 1.3);
+	for(x=xsMin(10, xGetDatabaseCount(dDelayLasers)); >0) {
+		xDatabaseNext(dDelayLasers);
+		xUnitSelect(dDelayLasers,xUnitName);
+		if (xGetInt(dDelayLasers, xLaserPhase) == 0) {
+			if (trTimeMS() > xGetInt(dDelayLasers, xLaserNext)) {
+				xSetInt(dDelayLasers, xLaserPhase, 1);
+				xSetInt(dDelayLasers, xLaserNext, trTimeMS() + 500);
+				trSetSelectedScale(6.0,6.0,xGetFloat(dDelayLasers,xLaserDist) * 1.3);
 				trUnitHighlight(3.0,false);
 				trQuestVarSet("sound", 1);
-				trVectorSetUnitPos("start", "delayLasers");
-				p = yGetVar("delayLasers", "player");
-				pName = opponentDatabaseName(p);
-				for(y=yGetDatabaseCount(pName); >0) {
-					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+				start = kbGetBlockPosition(""+xGetInt(dDelayLasers,xUnitName));
+				p = xGetInt(dDelayLasers,xPlayerOwner);
+				db = opponentDatabaseName(p);
+				for(y=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					dir = xGetVector(db,xLaserDir);
+					xUnitSelectByID(db,xUnitID);
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
-					} else {
-						trVectorSetUnitPos("pos", pName);
-						amt = zDistanceBetweenVectors("pos", "start");
-						if (amt < yGetVar("delayLasers", "dist")) {
-							trQuestVarSet("intersectX", yGetVar("delayLasers", "dirX") * amt + trQuestVarGet("startX"));
-							trQuestVarSet("intersectZ", yGetVar("delayLasers", "dirZ") * amt + trQuestVarGet("startZ"));
-							if (zDistanceBetweenVectorsSquared("pos", "intersect") < 1.0) {
-								damageOpponentUnit(p, 300);
-							}
-						}
+					} else if (rayCollision(db,start,dir,xGetFloat(dDelayLasers,xLaserDist),1.0)) {
+						damageOpponentUnit(p, 300);
 					}
 				}
 			}
 		} else {
-			trQuestVarSet("scale", 0.012 * (yGetVar("delayLasers", "next") - trTimeMS()));
-			if (trQuestVarGet("scale") < 0) {
+			amt = 0.012 * (xGetFloat(dDelayLasers, xLaserNext) - trTimeMS());
+			if (amt < 0) {
 				trUnitDestroy();
-				yRemoveFromDatabase("delayLasers");
+				xFreeDatabaseBlock(dDelayLasers);
 			} else {
-				trSetSelectedScale(trQuestVarGet("scale"), trQuestVarGet("scale"), yGetVar("delayLasers", "dist") * 1.3);
+				trSetSelectedScale(amt, amt, xGetFloat(dDelayLasers, xLaserDist) * 1.3);
 			}
 		}
 	}
@@ -321,205 +342,156 @@ void specialUnitsAlways() {
 	/*
 	Projectiles from attacks
 	*/
-	while(trQuestVarGet("nextProj") < trGetNextUnitScenarioNameNumber()) {
+	while(nextproj < trGetNextUnitScenarioNameNumber()) {
 		trUnitSelectClear();
-		trUnitSelectByQV("nextProj", true);
+		trUnitSelect(""+nextproj,true);
 		if (trUnitIsOwnedBy(0) == false) {
-			id = kbGetBlockID(""+1*trQuestVarGet("nextProj"), true);
+			id = kbGetBlockID(""+nextproj, true);
 			proto = kbGetUnitBaseTypeID(id);
 			if (proto == kbGetProtoUnitID("Ballista Shot")) {
-				trVectorSetUnitPos("pos", "nextProj");
-				trQuestVarSet("closest", 0);
-				trQuestVarSet("closestName", 0);
-				trQuestVarSet("closestDistance", 25);
-				for (x=yGetDatabaseCount("ballistas"); >0) {
-					id = yDatabaseNext("ballistas", true);
-					if (trUnitAlive() == false) {
-						yRemoveFromDatabase("ballistas");
-					} else if (kbUnitGetAnimationActionType(id) == 12) {
-						trUnitSelectClear();
-						trUnitSelectByQV("nextProj");
-						if (trUnitIsOwnedBy(1*yGetVar("ballistas","player"))) {
-							trQuestVarSet("currentDistance", zDistanceToVectorSquared("ballistas", "pos"));
-							if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-								trQuestVarCopy("closestDistance", "currentDistance");
-								trQuestVarSet("closest", id);
-								trQuestVarCopy("closestName", "ballistas");
-								trQuestVarSet("closestPlayer", yGetVar("ballistas","player"));
-							}
-						}
-					}
-				}
-				if (trQuestVarGet("closest") > 0) {
-					xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
-					trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
-					trVectorSetUnitPos("start", "closestName");
-					trVectorSetUnitPos("end", "target");
-					vectorSetAsTargetVector("target", "start", "end", 100.0);
+				pos = kbGetBlockPosition(""+nextproj,true);
+				closest = findShooter(dBallistas,pos);
+				if (closest > 0) {
+					xSetPointer(dBallistas, closest);
+					id = xGetInt(dBallistas, xUnitID);
+					xsSetContextPlayer(xGetInt(dBallistas,xPlayerOwner));
+					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					xsSetContextPlayer(0);
+					
+					start = kbGetBlockPosition(""+xGetInt(dBallistas,xUnitName),true);
+					end = kbGetBlockPosition(""+target,true);
+					
+					pos = vectorSetAsTargetVector(start, end, 100.0);
 					
 					trUnitSelectClear();
-					trUnitSelectByQV("nextProj", true);
+					trUnitSelect(""+nextproj, true);
 					trUnitConvert(ENEMY_PLAYER);
 					trUnitChangeProtoUnit("Transport Ship Greek");
 					
-					trQuestVarSet("next1", trGetNextUnitScenarioNameNumber());
+					xSetPointer(dBallistaShots, xAddDatabaseBlock(dBallistaShots));
+					xSetInt(dBallistaShots, xBallistaShot1, trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,true);
-					trQuestVarSet("next2", trGetNextUnitScenarioNameNumber());
+					xSetInt(dBallistaShots, xUnitName, trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0", "Dwarf", 1, 1,0,1,0,false);
 					trArmySelect("1,0");
 					trUnitConvert(ENEMY_PLAYER);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("nextProj"));
+					trImmediateUnitGarrison(""+nextproj);
 					trUnitChangeProtoUnit("Dwarf");
 					
-					yAddToDatabase("ballistaShots", "next2");
-					yAddUpdateVar("ballistaShots", "next1", trQuestVarGet("next1"));
-					yAddUpdateVar("ballistaShots", "next2", trQuestVarGet("nextProj"));
-					yAddUpdateVar("ballistaShots", "timeout", trTimeMS() + 5000);
-					yAddUpdateVar("ballistaShots", "player", trQuestVarGet("closestPlayer"));
+					xSetInt(dBallistaShots, xBallistaShot2, nextproj);
+					xSetInt(dBallistaShots, xTimeout, trTimeMS() + 5000);
+					xSetInt(dBallistaShots, xPlayerOwner, xGetInt(dBallistas, xPlayerOwner));
 					
 					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
-					trUnitSelect(""+1*trQuestVarGet("nextProj"), true);
+					trUnitSelect(""+xGetInt(dBallistaShots, xBallistaShot1), true);
+					trUnitSelect(""+1*nextproj, true);
 					trUnitChangeProtoUnit("Relic");
 					
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					xUnitSelect(dBallistaShots,xUnitName);
 					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
 					
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					xUnitSelect(dBallistaShots,xBallistaShot1);
+					trImmediateUnitGarrison(""+xGetInt(dBallistaShots,xUnitName));
 					
 					trMutateSelected(kbGetProtoUnitID("Ballista Shot"));
 					trUnitSelectClear();
-					trUnitSelectByQV("nextProj", true);
-					trImmediateUnitGarrison(""+1*trQuestVarGet("next2"));
+					trUnitSelect(""+nextproj, true);
+					trImmediateUnitGarrison(""+xGetInt(dBallistaShots,xUnitName));
 					trMutateSelected(kbGetProtoUnitID("Fire Siphon Fire"));
 					trUnitConvert(0);
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next2"), true);
+					xUnitSelect(dBallistaShots, xUnitName);
 					trMutateSelected(kbGetProtoUnitID("Priest Projectile"));
 					trSetSelectedScale(0,50,0);
-					trSetUnitOrientation(zGetUnitVector("start", "end"), xsVectorSet(0,1,0), true);
-					trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"), -1, false);
-					trUnitSelectClear();
-					trUnitSelect(""+1*trQuestVarGet("next1"), true);
+					trSetUnitOrientation(getUnitVector(start, end), xsVectorSet(0,1,0), true);
+					trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos), -1, false);
+					xUnitSelect(dBallistaShots,xBallistaShot1);
 					trUnitConvert(0);
 				}
 			} else if (proto == kbGetProtoUnitID("Fire Siphon Fire")) {
-				if (yGetDatabaseCount("siphons") > 0) {
-					trVectorSetUnitPos("pos", "nextProj");
+				if (xGetDatabaseCount(dFireSiphons) > 0) {
+					pos = kbGetBlockPosition(""+nextproj,true);
 					trUnitChangeProtoUnit("Lightning sparks");
-					trQuestVarSet("closest", -1);
-					trQuestVarSet("closestName", 0);
-					trQuestVarSet("closestDistance", 25);
-					for (x=yGetDatabaseCount("siphons"); >0) {
-						id = yDatabaseNext("siphons", true);
-						if (id == -1 || trUnitAlive() == false) {
-							yRemoveFromDatabase("siphons");
-						} else if (kbUnitGetAnimationActionType(id) == 12) {
-							trUnitSelectClear();
-							trUnitSelectByQV("nextProj");
-							if (trUnitIsOwnedBy(1*yGetVar("siphons","player"))) {
-								trQuestVarSet("currentDistance", zDistanceToVectorSquared("siphons", "pos"));
-								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-									trQuestVarCopy("closestDistance", "currentDistance");
-									trQuestVarSet("closest", id);
-									trQuestVarCopy("closestName", "siphons");
-									trQuestVarSet("closestPlayer", yGetVar("siphons","player"));
-								}
-							}
-						}
-					}
-					if (trQuestVarGet("closest") >= 0) {
-						xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
-						trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
+					closest = findShooter(dFireSiphons,pos);
+					if (closest > 0) {
+						xSetPointer(dFireSiphons,closest);
+						id = xGetInt(dFireSiphons,xUnitID);
+						xsSetContextPlayer(xGetInt(dFireSiphons,xPlayerOwner));
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						
 						trSoundPlayFN("skypassagein.wav","1",-1,"","");
-						trVectorSetUnitPos("start", "closestName");
-						trVectorSetUnitPos("pos", "target");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-						shootLaser("start", "dir", 60.0, 1*trQuestVarGet("closestPlayer"));
+						start = kbGetBlockPosition(""+xGetInt(dFireSiphons,xUnitName),true);
+						pos = kbGetBlockPosition(""+target,true);
+						dir = getUnitVector(start, pos);
+						shootLaser(start, dir, 60.0, xGetInt(dFireSiphons,xPlayerOwner));
 					}
 				}
 			} else if (proto == kbGetProtoUnitID("Mummy Flies")) {
-				if (yGetDatabaseCount("Mummies") > 0) {
+				if (xGetDatabaseCount(dMummies) > 0) {
+					pos = kbGetBlockPosition(""+nextproj,true);
 					trUnitChangeProtoUnit("Rocket");
-					trVectorSetUnitPos("pos", "nextProj");
-					trQuestVarSet("closest", -1);
-					trQuestVarSet("closestName", 0);
-					trQuestVarSet("closestDistance", 25);
-					for (x=yGetDatabaseCount("Mummies"); >0) {
-						id = yDatabaseNext("Mummies", true);
-						if (id == -1 || trUnitAlive() == false) {
-							yRemoveFromDatabase("Mummies");
-						} else if (kbUnitGetAnimationActionType(id) == 12) {
-							trUnitSelectClear();
-							trUnitSelectByQV("nextProj");
-							if (trUnitIsOwnedBy(1*yGetVar("Mummies","player"))) {
-								trQuestVarSet("currentDistance", zDistanceToVectorSquared("Mummies", "pos"));
-								if (trQuestVarGet("currentDistance") < trQuestVarGet("closestDistance")) {
-									trQuestVarCopy("closestDistance", "currentDistance");
-									trQuestVarSet("closest", id);
-									trQuestVarCopy("closestName", "Mummies");
-									trQuestVarSet("closestPlayer", 1*yGetVar("Mummies","player"));
-								}
-							}
-						}
-					}
-					if (trQuestVarGet("closest") >= 0) {
-						xsSetContextPlayer(1*trQuestVarGet("closestPlayer"));
-						trQuestVarSet("target", trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(1*trQuestVarGet("closest"))));
-						trVectorSetUnitPos("start", "closestName");
-						trVectorSetUnitPos("pos", "target");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "pos"));
-						addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Kronny Birth SFX"),2,8,4.5);
-						yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
-						yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
-						yAddUpdateVar("MummyBalls", "dist", 4.0);
-						yAddUpdateVar("MummyBalls", "type", STATUS_SILENCE);
-						yAddUpdateVar("MummyBalls", "player", 1*trQuestVarGet("closestPlayer"));
+					closest = findShooter(dMummies,pos);
+					if (closest > 0) {
+						xSetPointer(dMummies, closest);
+						id = xGetInt(dMummies,xUnitID);
+						xsSetContextPlayer(xGetInt(dMummies,xPlayerOwner));
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						
+						start = kbGetBlockPosition(""+xGetInt(dMummies,xUnitName),true);
+						pos = kbGetBlockPosition(""+target,true);
+						dir = getUnitVector(start, pos);
+						
+						addGenericProj(dMummyBalls,start,dir,xGetInt(dMummies,xPlayerOwner));
+						xSetVector(dMummyBalls,xProjPrev, start);
+						xSetFloat(dMummyBalls,xProjDist,4.0);
+						xSetInt(dMummyBalls,xProjType, STATUS_SILENCE);
 					}
 				}
 			}
 		}
-		trQuestVarSet("nextProj", 1 + trQuestVarGet("nextProj"));
+		nextproj = 1 + nextproj;
 	}
 	
-	if (yGetDatabaseCount("sphinxes") > 0) {
-		id = yDatabaseNext("sphinxes", true);
-		p = yGetVar("sphinxes","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("sphinxes")) {
+	if (xGetDatabaseCount(dSphinxes) > 0) {
+		xDatabaseNext(dSphinxes);
+		id = xGetInt(dSphinxes,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dSphinxes,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dSphinxes)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Sphinx");
 			}
-			yRemoveFromDatabase("sphinxes");
-			yRemoveUpdateVar("sphinxes", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("sphinxes", "index")) == 1) {
-			ySetVar("sphinxes", "step", 1);
-		} else if (trTimeMS() > yGetVar("sphinxes", "next")) {
-			switch(1*yGetVar("sphinxes", "step"))
+			xFreeDatabaseBlock(dSphinxes);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSphinxes,xSpecialIndex)) == 1) {
+			xSetInt(dSphinxes,xSpecialStep,2);
+		} else if (trTimeMS() > xGetInt(dSphinxes,xSpecialNext)) {
+			switch(xGetInt(dSphinxes, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
-						ySetVar("sphinxes", "next", trTimeMS() + 1600);
-						ySetVar("sphinxes", "step", 1);
+						xSetInt(dSphinxes, xSpecialNext, trTimeMS() + 1600);
+						xSetInt(dSphinxes, xSpecialStep, 1);
 						trUnitOverrideAnimation(39,0,false,false,-1);
-						trVectorSetUnitPos("pos", "sphinxes");
-						pName = opponentDatabaseName(p);
-						for(x=yGetDatabaseCount(pName); >0) {
-							if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+						pos = kbGetBlockPosition(""+xGetInt(dSphinxes,xUnitName));
+						db = opponentDatabaseName(p);
+						for(x=xGetDatabaseCount(db); >0) {
+							xDatabaseNext(db);
+							xUnitSelectByID(db,xUnitID);
+							if (trUnitAlive() == false) {
 								removeOpponentUnit(p);
-							} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
-								silenceUnit(pName,5,p);
+							} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
+								silenceUnit(db,5,p);
 							}
 						}
 						if (p == ENEMY_PLAYER) {
 							if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 1) {
-								if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+								if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer()), pos) < 16) {
 									trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 2);
 									xsEnableRule("nick_next_dialog");
 								}
@@ -529,363 +501,387 @@ void specialUnitsAlways() {
 				}
 				case 1:
 				{
-					ySetVar("sphinxes", "next", trTimeMS() + 10000);
-					ySetVar("sphinxes", "step", 0);
+					xSetInt(dSphinxes, xSpecialNext, trTimeMS() + 10000);
+					xSetInt(dSphinxes, xSpecialStep, 0);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("MountainGiants") > 0) {
-		id = yDatabaseNext("MountainGiants", true);
-		p = yGetVar("MountainGiants", "player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+	if (xGetDatabaseCount(dMountainGiants) > 0) {
+		xDatabaseNext(dMountainGiants);
+		id = xGetInt(dMountainGiants,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dMountainGiants,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			trUnitChangeProtoUnit("Mountain Giant");
-			yRemoveFromDatabase("MountainGiants");
-			yRemoveUpdateVar("MountainGiants", "step");
-		} else if (checkEnemyDeactivated("MountainGiants")) {
+			xFreeDatabaseBlock(dMountainGiants);
+		} else if (checkEnemyDeactivated(dMountainGiants)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			yRemoveFromDatabase("MountainGiants");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("MountainGiants", "index")) == 1) {
-			ySetVar("MountainGiants", "step", 2);
-		} else if (trTimeMS() > yGetVar("MountainGiants", "next")) {
-			switch(1*yGetVar("MountainGiants", "step"))
+			xFreeDatabaseBlock(dMountainGiants);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMountainGiants, xSpecialIndex)) == 1) {
+			xSetInt(dMountainGiants, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dMountainGiants, xSpecialNext)) {
+			switch(xGetInt(dMountainGiants, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						ySetVarFromVector("MountainGiants", "end", "end");
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetVector(dMountainGiants,xSpecialTarget,kbGetBlockPosition(""+target));
 						
-						ySetVar("MountainGiants", "next", trTimeMS() + 1800);
-						ySetVar("MountainGiants", "step", 1);
+						xSetInt(dMountainGiants, xSpecialNext, trTimeMS() + 1800);
+						xSetInt(dMountainGiants, xSpecialStep, 1);
 						trUnitOverrideAnimation(39,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorSetUnitPos("pos", "MountainGiants");
-					yVarToVector("MountainGiants", "end");
-					pName = opponentDatabaseName(p);
-					for(x=yGetDatabaseCount(pName); >0) {
-						id = yDatabaseNext(pName, true);
-						if (id == -1 || trUnitAlive() == false) {
+					end = xGetVector(dMountainGiants,xSpecialTarget);
+					db = opponentDatabaseName(p);
+					for(x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (zDistanceToVectorSquared(pName, "end") < 4) {
+						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 4) {
 							damageOpponentUnit(p, 100 + 100 * trQuestVarGet("stage"));
-							if (yGetVar(pName, "hero") == 1 && trCurrentPlayer() == yGetVar(pName, "player")) {
+							if (xGetBool(db, xIsHero) && trCurrentPlayer() == xGetInt(db, xPlayerOwner)) {
 								trCameraShake(0.7, 0.7);
 							}
 						}
 					}
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),45,true);
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),135,false);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),45,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),135,false);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Tartarian Gate Flame");
-					ySetVar("MountainGiants", "step", 2);
-					ySetVar("MountainGiants", "next", yGetVar("MountainGiants", "next") + 1200);
+					xSetInt(dMountainGiants, xSpecialStep, 2);
+					xSetInt(dMountainGiants, xSpecialNext, xGetInt(dMountainGiants, xSpecialNext) + 1200);
 					
 				}
 				case 2:
 				{
-					ySetVar("MountainGiants", "step", 0);
-					ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+					xSetInt(dMountainGiants, xSpecialStep, 0);
+					xSetInt(dMountainGiants, xSpecialNext, trTimeMS() + 15000);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("MountainGiants", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("MountainGiants", "index"));
-			if (action > 0 && yGetVar("MountainGiants", "step") == 1) {
-				ySetVar("MountainGiants", "step", 0);
-				ySetVar("MountainGiants", "next", trTimeMS() + 15000);
+			action = xGetInt(db, xStunStatus, xGetInt(dMountainGiants, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMountainGiants, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dMountainGiants, xSpecialStep) == 1) {
+				xSetInt(dMountainGiants, xSpecialStep, 0);
+				xSetInt(dMountainGiants, xSpecialNext, trTimeMS() + 15000);
 			}
 		}
 	}
 	
-	for(x=xsMin(4, yGetDatabaseCount("MedusaBalls")); >0) {
-		action = processGenericProj("MedusaBalls");
-		p = yGetVar("MedusaBalls", "player");
-		pName = opponentDatabaseName(p);
-		trVectorSetUnitPos("pos", "MedusaBalls");
-		vectorToGrid("pos", "loc");
-		for(y=yGetDatabaseCount(pName); >0) {
-			id = yDatabaseNext(pName, true);
-			if (id == -1 || trUnitAlive() == false) {
+	for(x=xsMin(4, xGetDatabaseCount(dMedusaBalls)); >0) {
+		action = processGenericProj(dMedusaBalls);
+		p = xGetInt(dMedusaBalls, xPlayerOwner);
+		db = opponentDatabaseName(p);
+		pos = kbGetBlockPosition(""+xGetInt(dMedusaBalls,xUnitName));
+		loc = vectorToGrid(pos);
+		for(y=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db,xUnitID);
+			if (trUnitAlive() == false) {
 				removeOpponentUnit(p);
-			} else if (zDistanceToVectorSquared(pName, "pos") < 2.0) {
-				stunUnit(pName, 3.0, p);
+			} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 2.0) {
+				stunUnit(db, 3.0, p);
 				action = PROJ_REMOVE;
 				break;
 			}
 		}
 		if (action == PROJ_FALLING) {
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("MedusaBalls", "target"));
+			xUnitSelect(dMedusaBalls,xMedusaBallTarget);
 			if (trUnitAlive()) {
-				trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("MedusaBalls", "target")));
-				trVectorQuestVarSet("dir", zGetUnitVector("pos", "end"));
-				ySetVarFromVector("MedusaBalls", "dir", "dir");
+				end = kbGetBlockPosition(""+xGetInt(dMedusaBalls,xMedusaBallTarget));
+				dir = getUnitVector(pos,end);
+				xSetVector(dMedusaBalls,xProjDir,dir);
 			}
 		} else if (action == PROJ_BOUNCE) {
-			ySetVar("MedusaBalls", "bounces", yGetVar("MedusaBalls", "bounces") - 1);
+			xSetInt(dMedusaBalls, xMedusaBallBounces, xGetInt(dMedusaBalls, xMedusaBallBounces) - 1);
 		} else if (action == PROJ_REMOVE ||
-			terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) ||
-			yGetVar("MedusaBalls", "bounces") <= 0) {
-			trUnitSelectClear();
-			trUnitSelectByQV("MedusaBalls");
+			terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) ||
+			xGetInt(dMedusaBalls, xMedusaBallBounces) <= 0) {
+			xUnitSelectByID(dMedusaBalls,xUnitID);
 			trUnitChangeProtoUnit("Conversion SFX");
-			yRemoveFromDatabase("MedusaBalls");
+			xFreeDatabaseBlock(dMedusaBalls);
 		}
 	}
 	
-	if (yGetDatabaseCount("Medusas") >0) {
-		id = yDatabaseNext("Medusas", true);
-		p = yGetVar("Medusas", "player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Medusas")) {
+	if (xGetDatabaseCount(dMedusas) >0) {
+		xDatabaseNext(dMedusas);
+		id = xGetInt(dMedusas,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dMedusas, xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dMedusas)) {
 			trUnitChangeProtoUnit("Medusa");
-			yRemoveFromDatabase("Medusas");
-			yRemoveUpdateVar("Medusas", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Medusas", "index")) == 1) {
+			xFreeDatabaseBlock(dMedusas);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMedusas, xSpecialIndex)) == 1) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			ySetVar("Medusas", "step", 2);
-		} else if (trTimeMS() > yGetVar("Medusas", "next")) {
-			switch(1*yGetVar("Medusas", "step"))
+			xSetInt(dMedusas, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dMedusas, xSpecialNext)) {
+			switch(xGetInt(dMedusas, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 12) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						ySetVar("Medusas", "target", trGetUnitScenarioNameNumber(target));
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetInt(dMedusas, xSpecialTarget, target);
 						
-						ySetVar("Medusas", "step", 1);
-						ySetVar("Medusas", "next", trTimeMS() + 1200);
+						xSetInt(dMedusas, xSpecialStep, 1);
+						xSetInt(dMedusas, xSpecialNext, trTimeMS() + 1200);
 						trUnitOverrideAnimation(40,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("Medusas", "target")));
-					trVectorSetUnitPos("start", "Medusas");
-					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					addGenericProj("MedusaBalls","start","dir",kbGetProtoUnitID("Curse SFX"),2,4,4.5,0,p);
-					yAddUpdateVar("MedusaBalls", "target", yGetVar("Medusas", "target"));
-					yAddUpdateVar("MedusaBalls", "bounces", 10);
-					yAddUpdateVar("MedusaBalls", "player", p);
-					ySetVar("Medusas", "step", 2);
-					ySetVar("Medusas", "next", yGetVar("Medusas", "next") + 800);
+					end = kbGetBlockPosition(""+xGetInt(dMedusas, xSpecialTarget));
+					start = kbGetBlockPosition(""+xGetInt(dMedusas,xUnitName));
+					dir = getUnitVector(start, end);
+					addGenericProj(dMedusaBalls,start,dir,p);
+					xSetInt(dMedusaBalls, xMedusaBallTarget, xGetInt(dMedusas, xSpecialTarget));
+					xSetInt(dMedusaBalls, xMedusaBallBounces, 10);
+					xSetInt(dMedusas, xSpecialStep, 2);
+					xSetInt(dMedusas, xSpecialNext, xGetInt(dMedusas, xSpecialNext) + 800);
 				}
 				case 2:
 				{
-					ySetVar("Medusas", "step", 0);
-					ySetVar("Medusas", "next", trTimeMS() + 18000);
+					xSetInt(dMedusas, xSpecialStep, 0);
+					xSetInt(dMedusas, xSpecialNext, trTimeMS() + 18000);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Medusas", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Medusas", "index"));
-			if (action > 0 && yGetVar("Medusas", "step") == 1) {
-				ySetVar("Medusas", "step", 0);
-				ySetVar("Medusas", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dMedusas, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMedusas, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dMedusas, xSpecialStep) == 1) {
+				xSetInt(dMedusas, xSpecialStep, 0);
+				xSetInt(dMedusas, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("Valkyries") > 0) {
-		id = yDatabaseNext("Valkyries", true);
-		p = yGetVar("Valkyries","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Valkyries")) {
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
+	/*
+	xSpecialStep = valkyrie silenced status
+	xSpecialNext = valkyrie sfx
+	*/
+	if (xGetDatabaseCount(dValkyries) > 0) {
+		xDatabaseNext(dValkyries);
+		id = xGetInt(dValkyries,xUnitID);
+		p = xGetInt(dValkyries,xPlayerOwner);
+		db = databaseName(p);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dValkyries)) {
+			xUnitSelect(dValkyries,xSpecialNext);
 			trUnitDestroy();
-			yRemoveFromDatabase("Valkyries");
+			xFreeDatabaseBlock(dValkyries);
 		} else {
-			id = yGetPointer(pName);
-			if (ySetPointer(pName, 1*yGetVar("Valkyries", "index"))) {
-				ySetVar(pName, "magicResist", 1 - yGetVar(pName, "silenceStatus"));
-				if (yGetVar(pName, "silenceStatus") != yGetVar("Valkyries", "silenced")) {
-					ySetVar("Valkyries", "silenced", yGetVar(pName, "silenceStatus"));
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("Valkyries", "sfx"), true);
-					if (yGetVar(pName, "silenceStatus") == 1) {
+			id = xGetPointer(db);
+			if (xSetPointer(db, xGetInt(dValkyries, xSpecialIndex))) {
+				xSetInt(db, xMagicResist, 1 - xGetInt(db, xSilenceStatus));
+				if (xGetInt(db, xSilenceStatus) != xGetInt(dValkyries, xSpecialStep)) {
+					xSetInt(dValkyries, xSpecialStep, xGetInt(db, xSilenceStatus));
+					xUnitSelect(dValkyries,xSpecialNext);
+					if (xGetInt(db, xSilenceStatus) == 1) {
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 					} else {
 						trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
 					}
 				}
-				ySetPointer(pName, id);
+				xSetPointer(db, id);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("Dryads") > 0) {
-		id = yDatabaseNext("Dryads", true);
-		p = yGetVar("Dryads", "player");
-		if (id == -1 || trUnitAlive() == false) {
-			if (yGetVar("dryads", "silenceStatus") == 0) {
-				pName = opponentDatabaseName(p);
-				yVarToVector("Dryads", "pos");
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+	if (xGetDatabaseCount(dDryads) > 0) {
+		xDatabaseNext(dDryads);
+		id = xGetInt(dDryads,xUnitID);
+		p = xGetInt(dDryads, xPlayerOwner);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false) {
+			if (xGetInt(dDryads, xSpecialStep) == 0) {
+				db = opponentDatabaseName(p);
+				pos = xGetVector(dDryads,xSpecialNext);
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Lampades Blood");
-				for(x=yGetDatabaseCount(pName); >0) {
-					id = yDatabaseNext(pName, true);
-					if (id == -1 || trUnitAlive() == false) {
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					id = xGetInt(db,xUnitID);
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
-					} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
-						poisonUnit(pName, 10.0, 5.0 * trQuestVarGet("stage"), p);
+					} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
+						poisonUnit(db, 10.0, 5.0 * trQuestVarGet("stage"), p);
 					}
 				}
 				if (p == ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
-						if (zDistanceToVectorSquared("p"+trCurrentPlayer()+"unit", "pos") < 16) {
+						if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer()), pos) < 16) {
 							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
 							xsEnableRule("nick_next_dialog");
 						}
 					}
 				}
 			}
-			yRemoveFromDatabase("Dryads");
-		} else if (checkEnemyDeactivated("Dryads")) {
-			yRemoveFromDatabase("Dryads");
+			xFreeDatabaseBlock(dDryads);
+		} else if (checkEnemyDeactivated(dDryads)) {
+			xFreeDatabaseBlock(dDryads);
 		} else {
-			pName = databaseName(p);
-			trVectorSetUnitPos("pos", "Dryads");
-			ySetVarFromVector("Dryads", "pos", "pos");
-			ySetVar("Dryads", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Dryads", "index")));
+			db = databaseName(p);
+			xSetVector(dDryads, xSpecialNext, kbGetBlockPosition(""+xGetInt(dDryads,xUnitName)));
+			xSetInt(dDryads, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dDryads, xSpecialIndex)));
 		}
 	}
 	
-	if (yGetDatabaseCount("scarabs") > 0) {
-		id = yDatabaseNext("scarabs", true);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("scarabs")) {
-			if (yGetVar("scarabs", "silenceStatus") == 0) {
-				yVarToVector("scarabs", "pos");
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+	if (xGetDatabaseCount(dScarabs) > 0) {
+		xDatabaseNext(dScarabs);
+		id = xGetInt(dScarabs,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dScarabs)) {
+			if (xGetInt(dScarabs, xSpecialStep) == 0) {
+				pos = xGetVector(dScarabs,xSpecialNext);
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Pestilence SFX1");
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Victory Marker");
 			}
-			yRemoveFromDatabase("scarabs");
-		} else if (checkEnemyDeactivated("scarabs")) {
-			yRemoveFromDatabase("scarabs");
+			xFreeDatabaseBlock(dScarabs);
+		} else if (checkEnemyDeactivated(dScarabs)) {
+			xFreeDatabaseBlock(dScarabs);
 		} else {
-			pName = databaseName(1*yGetVar("scarabs","player"));
-			trVectorSetUnitPos("pos", "scarabs");
-			ySetVarFromVector("scarabs", "pos", "pos");
-			ySetVar("scarabs", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("scarabs", "index")));
+			db = databaseName(xGetInt(dScarabs,xPlayerOwner));
+			xSetVector(dScarabs,xSpecialNext,kbGetBlockPosition(""+xGetInt(dScarabs,xUnitName)));
+			xSetInt(dScarabs, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dScarabs, xSpecialIndex)));
 		}
 	}
 	
-	if (yGetDatabaseCount("automatonBombs") > 0) {
-		yDatabaseNext("automatonBombs");
-		if (trTimeMS() > yGetVar("automatonBombs", "timeout")) {
-			p = yGetVar("automatonBombs","player");
-			pName = opponentDatabaseName(p);
-			yVarToVector("automatonBombs", "pos");
-			trUnitSelectClear();
-			trUnitSelectByQV("automatonBombs", true);
+	if (xGetDatabaseCount(dAutomatonBombs) > 0) {
+		xDatabaseNext(dAutomatonBombs);
+		if (trTimeMS() > xGetInt(dAutomatonBombs, xTimeout)) {
+			p = xGetInt(dAutomatonBombs,xPlayerOwner);
+			db = opponentDatabaseName(p);
+			pos = kbGetBlockPosition(""+xGetInt(dAutomatonBombs,xUnitName));
+			xUnitSelect(dAutomatonBombs,xUnitName);
 			trDamageUnitPercent(-100);
 			trUnitChangeProtoUnit("Tartarian Gate Flame");
-			trUnitSelectClear();
-			trUnitSelectByQV("automatonBombs", true);
+			xUnitSelect(dAutomatonBombs,xUnitName);
 			trDamageUnitPercent(-100);
 			trSetSelectedScale(1.0,1.0,0.4);
-			yRemoveFromDatabase("automatonBombs");
-			for(x=yGetDatabaseCount(pName); >0) {
-				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+			xFreeDatabaseBlock(dAutomatonBombs);
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				id = xGetInt(db,xUnitID);
+				xUnitSelectByID(db,xUnitID);
+				if (trUnitAlive() == false) {
 					removePlayerUnit();
-				} else if (zDistanceToVectorSquared(pName, "pos") < 16) {
+				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 					damageOpponentUnit(p, 200);
 				}
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("automatons") > 0) {
-		if (yDatabaseNext("automatons", true) == -1 || trUnitAlive() == false) {
-			if (yGetVar("automatons", "silenceStatus") == 0) {
+	if (xGetDatabaseCount(dAutomatons) > 0) {
+		xDatabaseNext(dAutomatons);
+		id = xGetInt(dAutomatons,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false) {
+			if (xGetInt(dAutomatons, xSpecialStep) == 0) {
 				trUnitHighlight(3.0, true);
 				trSoundPlayFN("gatherpoint.wav","1",-1,"","");
-				yAddToDatabase("automatonBombs", "automatons");
-				yAddUpdateVar("automatonBombs", "timeout", trTimeMS() + 3000);
-				yAddUpdateVar("automatonBombs", "posx", yGetVar("automatons", "posx"));
-				yAddUpdateVar("automatonBombs", "posz", yGetVar("automatons", "posz"));
-				yAddUpdateVar("automatonBombs", "player", yGetVar("automatons","player"));
+				xSetPointer(dAutomatonBombs, xAddDatabaseBlock(dAutomatonBombs));
+				xSetInt(dAutomatonBombs,xUnitName,xGetInt(dAutomatons,xUnitName));
+				xSetInt(dAutomatonBombs,xPlayerOwner,xGetInt(dAutomatons,xPlayerOwner));
+				xSetInt(dAutomatonBombs,xTimeout,trTimeMS() + 3000);
 			}
-			yRemoveFromDatabase("automatons");
-		} else if (checkEnemyDeactivated("automatons")) {
-			yRemoveFromDatabase("automatons");
+			xFreeDatabaseBlock(dAutomatons);
+		} else if (checkEnemyDeactivated(dAutomatons)) {
+			xFreeDatabaseBlock(dAutomatons);
 		} else {
-			pName = databaseName(1*yGetVar("automatons","player"));
-			trVectorSetUnitPos("pos", "automatons");
-			ySetVarFromVector("automatons", "pos", "pos");
-			ySetVar("automatons", "silenceStatus", 1*yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("automatons", "index")));
+			db = databaseName(xGetInt(dAutomatons,xPlayerOwner));
+			xSetInt(dAutomatons, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dAutomatons, xSpecialIndex)));
 		}
 	}
 	
-	if(yGetDatabaseCount("frostGiants") >0) {
-		id = yDatabaseNext("frostGiants", true);
-		p = yGetVar("frostGiants","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+	if(xGetDatabaseCount(dFrostGiants) >0) {
+		xDatabaseNext(dFrostGiants);
+		id = xGetInt(dFrostGiants,xUnitID);
+		p = xGetInt(dFrostGiants,xPlayerOwner);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
 			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
 			if (trQuestVarGet("frostGiantHunt") == 1) {
 				trQuestVarSet("frostGiantBones", 1 + trQuestVarGet("frostGiantBones"));
 			}
 			trUnitChangeProtoUnit("Frost Giant");
-			yRemoveFromDatabase("frostGiants");
-			yRemoveUpdateVar("frostGiants", "step");
-		} else if (checkEnemyDeactivated("frostGiants")) {
+			xFreeDatabaseBlock(dFrostGiants);
+		} else if (checkEnemyDeactivated(dFrostGiants)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			yRemoveFromDatabase("frostGiants");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("frostGiants", "index")) == 1) {
-			ySetVar("frostGiants", "step", 2);
-		} else if (trTimeMS() > yGetVar("frostGiants", "specialnext")) {
-			switch(1*yGetVar("frostGiants", "step"))
+			xFreeDatabaseBlock(dFrostGiants);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dFrostGiants, xSpecialIndex)) == 1) {
+			xSetInt(dFrostGiants, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dFrostGiants, xSpecialNext)) {
+			switch(xGetInt(dFrostGiants, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						ySetVar("frostGiants", "target", trGetUnitScenarioNameNumber(target));
-						ySetVar("frostGiants", "step", 1);
-						ySetVar("frostGiants", "specialnext", trTimeMS() + 1400);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetInt(dFrostGiants, xSpecialTarget, target);
+						xSetInt(dFrostGiants, xSpecialStep, 1);
+						xSetInt(dFrostGiants, xSpecialNext, trTimeMS() + 1400);
 						trUnitOverrideAnimation(40,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
 					action = 0;
-					pName = opponentDatabaseName(p);
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yGetVar("frostGiants", "target") == yDatabaseNext(pName)) {
-							trUnitSelectClear();
-							trUnitSelectByQV(pName);
-							stunUnit(pName, 3.0, p);
+					db = opponentDatabaseName(p);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						if (xGetInt(dFrostGiants, xSpecialTarget) == xGetInt(db,xUnitName)) {
+							xUnitSelectByID(db,xUnitID);
+							stunUnit(db, 3.0, p);
 							action = 1;
 							break;
 						}
 					}
-					ySetVar("frostGiants", "step", 2);
-					ySetVar("frostGiants", "specialnext", yGetVar("frostGiants", "specialnext") + 600);
+					xSetInt(dFrostGiants, xSpecialStep, 2);
+					xSetInt(dFrostGiants, xSpecialNext, xGetInt(dFrostGiants, xSpecialNext) + 600);
 					if (action == 0) {
-						ySetVar("frostGiants", "target", -1);
+						xSetInt(dFrostGiants, xSpecialTarget, -1);
 					} else if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) {
-						if (yGetVar("frostGiants", "target") == trQuestVarGet("p"+trCurrentPlayer()+"unit")) {
+						if (xGetInt(dFrostGiants, xSpecialTarget) == xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer())) {
 							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 4);
 							xsEnableRule("nick_next_dialog");
 						}
@@ -894,850 +890,886 @@ void specialUnitsAlways() {
 				case 2:
 				{
 					trUnitOverrideAnimation(-1,0,false,true,-1);
-					ySetVar("frostGiants", "step", 0);
-					if (yGetVar("frostGiants", "target") == -1) {
-						ySetVar("frostGiants", "specialnext", trTimeMS());
+					xSetInt(dFrostGiants, xSpecialStep, 0);
+					if (xGetInt(dFrostGiants, xSpecialTarget) == -1) {
+						xSetInt(dFrostGiants, xSpecialNext, trTimeMS());
 					} else {
-						ySetVar("frostGiants", "specialnext", trTimeMS() + 15000);
+						xSetInt(dFrostGiants, xSpecialNext, trTimeMS() + 15000);
 					}
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("frostGiants", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("frostGiants", "index"));
-			if (action > 0 && yGetVar("frostGiants", "step") == 1) {
-				ySetVar("frostGiants", "step", 0);
-				ySetVar("frostGiants", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dFrostGiants, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dFrostGiants, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dFrostGiants, xSpecialStep) == 1) {
+				xSetInt(dFrostGiants, xSpecialStep, 0);
+				xSetInt(dFrostGiants, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("barrages") > 0) {
-		yDatabaseNext("barrages");
-		if (trTimeMS() > yGetVar("barrages", "next")) {
-			p = yGetVar("barrages","player");
-			pName = opponentDatabaseName(p);
-			ySetVar("barrages", "next", 300 + yGetVar("barrages", "next"));
+	if (xGetDatabaseCount(dBarrages) > 0) {
+		xDatabaseNext(dBarrages);
+		if (trTimeMS() > xGetInt(dBarrages, xTimeout)) {
+			p = xGetInt(dBarrages,xPlayerOwner);
+			db = opponentDatabaseName(p);
+			xSetInt(dBarrages, xTimeout, 300 + xGetInt(dBarrages, xTimeout));
 			/* do the damage */
-			yVarToVector("barrages", "pos");
-			yVarToVector("barrages", "dir");
-			if (yGetVar("barrages", "count") <= 3) {
-				for(x=yGetDatabaseCount(pName); >0) {
-					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+			pos = xGetVector(dBarrages,xBarragePos);
+			dir = xGetVector(dBarrages,xBarrageDir);
+			if (xGetInt(dBarrages, xBarrageCount) <= 3) {
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					id = xGetInt(db,xUnitID);
+					xUnitSelectByID(db,xUnitID);
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
-					} else if (zDistanceToVectorSquared(pName, "pos") < 9.0) {
+					} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 9.0) {
 						damageOpponentUnit(p,100);
 					}
 				}
 			}
 			
-			if (yGetVar("barrages", "count") >= 0) {
-				trQuestVarSet("endx", trQuestVarGet("posx") + 4.0 * trQuestVarGet("dirx"));
-				trQuestVarSet("endz", trQuestVarGet("posz") + 4.0 * trQuestVarGet("dirz"));
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("endx"),0,trQuestVarGet("endz"),0,true);
+			end = xsVectorSet(xsVectorGetX(pos) + 2.0 * xsVectorGetX(dir),0,xsVectorGetZ(pos) + 2.0 * xsVectorGetZ(dir));
+			if (xGetInt(dBarrages, xBarrageCount) >= 0) {
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),0,true);
 				trArmySelect("1,0");
-				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+				trSetUnitOrientation(dir,vector(0,1,0),true);
 				trUnitConvert(0);
 				trUnitChangeProtoUnit("Barrage");
 			}
 			
 			
-			ySetVar("barrages", "count", yGetVar("barrages", "count") - 1);
-			trQuestVarSet("posx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-			trQuestVarSet("posz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-			vectorToGrid("pos", "loc");
-			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) || yGetVar("barrages", "count") <= -2) {
-				yRemoveFromDatabase("barrages");
+			xSetInt(dBarrages, xBarrageCount, xGetInt(dBarrages, xBarrageCount) - 1);
+			
+			loc = vectorToGrid(end);
+			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) || xGetInt(dBarrages, xBarrageCount) <= -2) {
+				xFreeDatabaseBlock(dBarrages);
 			} else {
-				ySetVarFromVector("barrages", "pos", "pos");
+				xSetVector(dBarrages,xBarragePos,end);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("Satyrs") >0) {
-		id = yDatabaseNext("Satyrs", true);
-		p = yGetVar("satyrs","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Satyrs")) {
-			yRemoveFromDatabase("Satyrs");
-			yRemoveUpdateVar("Satyrs", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Satyrs", "index")) == 1) {
-			ySetVar("Satyrs", "specialnext", trTimeMS() + 10000);
-		} else if (trTimeMS() > yGetVar("Satyrs", "specialnext")) {
+	if(xGetDatabaseCount(dSatyrs) >0) {
+		xDatabaseNext(dSatyrs);
+		id = xGetInt(dSatyrs,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dSatyrs,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dSatyrs)) {
+			xFreeDatabaseBlock(dSatyrs);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSatyrs, xSpecialIndex)) == 1) {
+			xSetInt(dSatyrs, xSpecialNext, trTimeMS() + 10000);
+		} else if (trTimeMS() > xGetInt(dSatyrs, xSpecialNext)) {
 			if (kbUnitGetAnimationActionType(id) == 12) {
 				xsSetContextPlayer(p);
-				target = kbUnitGetTargetUnitID(id);
-				ySetVar("Satyrs", "specialnext", trTimeMS() + 20000);
-				trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-				trVectorSetUnitPos("start", "Satyrs");
-				trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+				target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+				xsSetContextPlayer(0);
+				xSetInt(dSatyrs, xSpecialNext, trTimeMS() + 20000);
+				end = kbGetBlockPosition(""+target);
+				start = kbGetBlockPosition(""+xGetInt(dSatyrs,xUnitName));
+				dir = getUnitVector(start,end);
 				
 				trQuestVarSetFromRand("sound", 1, 3, true);
 				trSoundPlayFN("rainofarrows"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				
-				yAddToDatabase("barrages", "next");
-				yAddUpdateVar("barrages", "dirx", trQuestVarGet("dirx"));
-				yAddUpdateVar("barrages", "dirz", trQuestVarGet("dirz"));
-				yAddUpdateVar("barrages", "posx", trQuestVarGet("endx") - 8.0 * trQuestVarGet("dirX"));
-				yAddUpdateVar("barrages", "posz", trQuestVarGet("endz") - 8.0 * trQuestVarGet("dirZ"));
-				yAddUpdateVar("barrages", "next", trTimeMS());
-				yAddUpdateVar("barrages", "count", 5);
-				yAddUpdateVar("barrages", "player", p);
+				pos = xsVectorSet(xsVectorGetX(end) - 8.0 * xsVectorGetX(dir),0,xsVectorGetZ(end) - 8.0 * xsVectorGetZ(dir));
+				xSetPointer(dBarrages, xAddDatabaseBlock(dBarrages));
+				xSetVector(dBarrages,xBarrageDir,dir);
+				xSetVector(dBarrages,xBarragePos,pos);
+				xSetInt(dBarrages,xTimeout,trTimeMS());
+				xSetInt(dBarrages,xBarrageCount,5);
+				xSetInt(dBarrages,xPlayerOwner,p);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("battleBoars") >0) {
-		id = yDatabaseNext("battleBoars", true);
-		p = yGetVar("battleBoars","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("battleBoars")) {
+	if(xGetDatabaseCount(dBattleBoars) >0) {
+		xDatabaseNext(dBattleBoars);
+		id = xGetInt(dBattleBoars,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dBattleBoars,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dBattleBoars)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Battle Boar");
 			}
-			yRemoveFromDatabase("battleBoars");
-			yRemoveUpdateVar("battleBoars", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("battleBoars", "index")) == 1) {
-			ySetVar("battleBoars", "step", 2);
-		} else if (trTimeMS() > yGetVar("battleBoars", "specialnext")) {
-			switch(1*yGetVar("battleBoars", "step"))
+			xFreeDatabaseBlock(dBattleBoars);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dBattleBoars, xSpecialIndex)) == 1) {
+			xSetInt(dBattleBoars, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dBattleBoars, xSpecialNext)) {
+			switch(xGetInt(dBattleBoars, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						ySetVar("battleBoars", "target", trGetUnitScenarioNameNumber(target));
-						ySetVar("battleBoars", "step", 1);
-						ySetVar("battleBoars", "specialnext", trTimeMS() + 450);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetInt(dBattleBoars, xSpecialTarget, target);
+						xSetInt(dBattleBoars, xSpecialStep, 1);
+						xSetInt(dBattleBoars, xSpecialNext, trTimeMS() + 450);
 						trUnitOverrideAnimation(26,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorSetUnitPos("start", "battleBoars");
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("battleBoars", "target")));
-					pName = opponentDatabaseName(p);
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					start = kbGetBlockPosition(""+xGetInt(dBattleBoars,xUnitName));
+					end = kbGetBlockPosition(""+xGetInt(dBattleBoars,xSpecialTarget));
+					db = opponentDatabaseName(p);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (zDistanceToVectorSquared(pName, "end") < 9.0) {
-							trVectorSetUnitPos("pos", pName);
-							vectorSetAsTargetVector("target", "start", "pos", 20.0);
-							launchUnit(pName, "target");
+						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 9.0) {
+							pos = vectorSetAsTargetVector(start, kbGetBlockPosition(""+xGetInt(db,xUnitName)), 20.0);
+							launchUnit(db, pos);
 						}
 					}
-					ySetVar("battleBoars", "step", 2);
-					ySetVar("battleBoars", "specialnext", yGetVar("battleBoars", "specialnext") + 300);
+					xSetInt(dBattleBoars, xSpecialStep, 2);
+					xSetInt(dBattleBoars, xSpecialNext, xGetInt(dBattleBoars, xSpecialNext) + 300);
 				}
 				case 2:
 				{
 					trUnitOverrideAnimation(-1,0,false,true,-1);
-					ySetVar("battleBoars", "step", 0);
-					if (yGetVar("battleBoars", "target") == -1) {
-						ySetVar("battleBoars", "specialnext", trTimeMS());
-					} else {
-						ySetVar("battleBoars", "specialnext", trTimeMS() + 15000);
-					}
+					xSetInt(dBattleBoars, xSpecialStep, 0);
+					xSetInt(dBattleBoars, xSpecialNext, trTimeMS() + 15000);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("battleBoars", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("battleBoars", "index"));
-			if (action > 0 && yGetVar("battleBoars", "step") == 1) {
-				ySetVar("battleBoars", "step", 0);
-				ySetVar("battleBoars", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dBattleBoars, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dBattleBoars, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dBattleBoars, xSpecialStep) == 1) {
+				xSetInt(dBattleBoars, xSpecialStep, 0);
+				xSetInt(dBattleBoars, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("AvengerProj") > 0) {
-		if (processGenericProj("AvengerProj") == PROJ_FALLING) {
-			p = yGetVar("AvengerProj","player");
-			pName = opponentDatabaseName(p);
-			yVarToVector("AvengerProj", "prev");
-			yVarToVector("AvengerProj", "dir");
-			trVectorSetUnitPos("pos", "AvengerProj");
-			amt = zDistanceBetweenVectors("pos", "prev");
+	if (xGetDatabaseCount(dAvengerProj) > 0) {
+		if (processGenericProj(dAvengerProj) == PROJ_FALLING) {
+			p = xGetInt(dAvengerProj,xPlayerOwner);
+			db = opponentDatabaseName(p);
+			pos = xGetVector(dAvengerProj,xProjPrev);
+			dir = xGetVector(dAvengerProj,xProjDir);
+			end = kbGetBlockPosition(""+xGetInt(dAvengerProj,xUnitName));
+			amt = distanceBetweenVectors(pos,end,false);
 			if (amt > 2.0) {
-				yVarToVector("AvengerProj", "dir");
-				ySetVar("AvengerProj", "currentDist", yGetVar("AvengerProj", "currentDist") + amt);
-				for(x=yGetDatabaseCount(pName); >0) {
-					if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+				xSetFloat(dAvengerProj, xProjDist, xGetFloat(dAvengerProj, xProjDist) + amt);
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db,xUnitID);
+					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
-					} else {
-						dist = zDistanceToVector(pName, "prev");
-						if (dist < amt + 1.0) {
-							trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
-							trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-							if (zDistanceToVectorSquared(pName, "hitbox") < 9.0) {
-								damageOpponentUnit(p, amt * 20.0);
-								silenceUnit(pName,5.0,p);
-							}
-						}
+					} else if (rayCollision(db,pos,dir,amt + 1.0,9.0)) {
+						damageOpponentUnit(p, amt * 20.0);
+						silenceUnit(db,5.0,p);
 					}
 				}
-				ySetVarFromVector("AvengerProj", "prev", "pos");
+				xSetVector(dAvengerProj,xProjPrev,end);
 			}
-			trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-			trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
-			vectorToGrid("next", "loc");
-			if (yGetVar("AvengerProj", "currentDist") >= yGetVar("AvengerProj", "distance") ||
-				terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				pName = databaseName(p);
-				trUnitSelectClear();
-				trUnitSelectByQV("AvengerProj", true);
+			end = xsVectorSet(xsVectorGetX(end) + 4.0 * xsVectorGetX(dir),0,xsVectorGetZ(end) + 4.0 * xsVectorGetZ(dir));
+			loc = vectorToGrid(end);
+			if (xGetFloat(dAvengerProj, xProjDist) >= xGetFloat(dAvengerProj, xAvengerProjDist) ||
+				terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				db = databaseName(p);
+				xUnitSelectByID(dAvengerProj,xUnitID);
 				trDamageUnitPercent(-100);
 				trUnitChangeProtoUnit("Transport Ship Greek");
-				trUnitSelectClear();
-				trUnitSelectByQV("AvengerProj", true);
+				xUnitSelectByID(dAvengerProj,xUnitID);
 				trDamageUnitPercent(-100);
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("AvengerProj","unit"),true);
+				xUnitSelectByID(dAvengerProj,xAvengerProjUnit);
 				if (trUnitAlive()) {
-					trImmediateUnitGarrison(""+1*trQuestVarGet("AvengerProj"));
+					trImmediateUnitGarrison(""+xGetInt(dAvengerProj,xUnitName));
 					trUnitChangeProtoUnit("Avenger");
-					ySetVarAtIndex("Avengers","step",2,1*yGetVar("AvengerProj","index"));
+					xSetInt(dAvengers,xSpecialStep,2,xGetInt(dAvengerProj,xAvengerProjIndex));
 				}
-				trUnitSelectClear();
-				trUnitSelectByQV("AvengerProj");
+				xUnitSelectByID(dAvengerProj,xUnitID);
 				trUnitChangeProtoUnit("Dust Small");
 				
-				yRemoveFromDatabase("AvengerProj");
+				xFreeDatabaseBlock(dAvengerProj);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("Avengers") >0) {
-		id = yDatabaseNext("Avengers", true);
-		p = yGetVar("Avengers","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Avengers")) {
+	if(xGetDatabaseCount(dAvengers) >0) {
+		xDatabaseNext(dAvengers);
+		id = xGetInt(dAvengers,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dAvengers,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dAvengers)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
-				trUnitChangeProtoUnit("Avengers");
+				trUnitChangeProtoUnit("Avenger");
 			}
-			yRemoveFromDatabase("Avengers");
-			yRemoveUpdateVar("Avengers", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Avengers", "index")) == 1) {
-			ySetVar("Avengers", "specialnext", trTimeMS() + 10000);
-		} else if (trTimeMS() > yGetVar("Avengers", "specialnext")) {
-			switch(1*yGetVar("Avengers","step"))
+			xFreeDatabaseBlock(dAvengers);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dAvengers, xSpecialIndex)) == 1) {
+			xSetInt(dAvengers, xSpecialNext, trTimeMS() + 10000);
+		} else if (trTimeMS() > xGetInt(dAvengers, xSpecialNext)) {
+			switch(xGetInt(dAvengers,xSpecialStep))
 			{
 				case 0:
 				{
 					xsSetContextPlayer(p);
 					if ((kbUnitGetActionType(id) == 6) || (kbUnitGetActionType(id) == 48)) {
-						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						trVectorSetUnitPos("start", "Avengers");
-						if (zDistanceBetweenVectorsSquared("start", "end") < 144) {
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						end = kbGetBlockPosition(""+target);
+						start = kbGetBlockPosition(""+xGetInt(dAvengers,xUnitName));
+						if (distanceBetweenVectors(start, end) < 144) {
 							trSoundPlayFN("sphinxspecialattack.wav","1",-1,"","");
-							trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
+							dir = getUnitVector(start,end);
 							trSetSelectedScale(0,0,0);
-							addGenericProj("avengerProj","start","dir",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0,p);
-							yAddUpdateVar("avengerProj", "prevX", trQuestVarGet("startx"));
-							yAddUpdateVar("avengerProj", "prevz", trQuestVarGet("startz"));
-							yAddUpdateVar("avengerProj", "distance", zDistanceBetweenVectors("start","end") + 5.0);
-							yAddUpdateVar("avengerProj", "currentDist", 0);
-							yAddUpdateVar("avengerProj", "unit", trQuestVarGet("Avengers"));
-							yAddUpdateVar("avengerProj", "index", yGetPointer("Avengers"));
-							yAddUpdateVar("avengerProj", "player",p);
-							ySetVar("Avengers","step", 1);
-							ySetVar("Avengers", "specialnext", trTimeMS() + 3000);
-							ySetVar("Avengers","proj",yGetNewestPointer("avengerProj"));
+							addGenericProj(dAvengerProj,start,dir,p);
+							xSetVector(dAvengerProj,xProjPrev,start);
+							xSetFloat(dAvengerProj,xAvengerProjDist,distanceBetweenVectors(start, end,false) + 5.0);
+							xSetInt(dAvengerProj,xAvengerProjUnit,xGetInt(dAvengers,xUnitName));
+							xSetInt(dAvengerProj,xAvengerProjIndex,xGetPointer(dAvengers));
+							
+							xSetInt(dAvengers,xSpecialStep, 1);
+							xSetInt(dAvengers, xSpecialNext, trTimeMS() + 3000);
+							xSetInt(dAvengers,xSpecialTarget,xGetNewestPointer(dAvengerProj));
 						}
+					} else {
+						xsSetContextPlayer(0);
 					}
 				}
 				case 2:
 				{
-					ySetVar("Avengers","step",0);
-					ySetVar("Avengers","specialNext", trTimeMS() + 10000);
+					xSetInt(dAvengers,xSpecialStep,0);
+					xSetInt(dAvengers,xSpecialNext, trTimeMS() + 10000);
 				}
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("ballistas") > 0) {
-		id = yDatabaseNext("ballistas", true);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ballistas")) {
-			yRemoveFromDatabase("ballistas");
+	if (xGetDatabaseCount(dBallistas) > 0) {
+		xDatabaseNext(dBallistas);
+		xUnitSelectByID(dBallistas,xUnitID);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dBallistas)) {
+			xFreeDatabaseBlock(dBallistas);
 		}
 	}
 	
-	if (yGetDatabaseCount("siphons") > 0) {
-		id = yDatabaseNext("siphons", true);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("siphons")) {
-			yRemoveFromDatabase("siphons");
-		} else if ((kbUnitGetAnimationActionType(id) == 9) && (yGetVar("siphons","player") == ENEMY_PLAYER)) {
-			if (trTimeMS() > yGetVar("siphons", "next")) {
-				ySetVar("siphons", "next", trTimeMS() + 3000);
-				yDatabaseNext("playerUnits");
-				trVectorSetUnitPos("pos", "playerUnits");
-				trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
+	if (xGetDatabaseCount(dFireSiphons) > 0) {
+		xDatabaseNext(dFireSiphons);
+		id = xGetInt(dFireSiphons,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dFireSiphons)) {
+			xFreeDatabaseBlock(dFireSiphons);
+		} else if ((kbUnitGetAnimationActionType(id) == 9) && (xGetInt(dFireSiphons,xPlayerOwner) == ENEMY_PLAYER)) {
+			if (trTimeMS() > xGetInt(dFireSiphons, xSpecialNext)) {
+				xSetInt(dFireSiphons, xSpecialNext, trTimeMS() + 3000);
+				xDatabaseNext(dPlayerUnits);
+				pos = xGetVector(dPlayerUnits,xUnitPos);
+				trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos),-1,true);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("MummyBalls") > 0) {
-		if (processGenericProj("MummyBalls") == PROJ_FALLING) {
-			p = yGetVar("MummyBalls","player");
-			pName = opponentDatabaseName(p);
-			yVarToVector("MummyBalls", "prev");
-			yVarToVector("MummyBalls", "dir");
-			amt = zDistanceBetweenVectors("pos", "prev");
-			ySetVarFromVector("MummyBalls", "prev", "pos");
-			for(x=yGetDatabaseCount(pName); >0) {
-				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+	if (xGetDatabaseCount(dMummyBalls) > 0) {
+		if (processGenericProj(dMummyBalls) == PROJ_FALLING) {
+			p = xGetInt(dMummyBalls,xPlayerOwner);
+			db = opponentDatabaseName(p);
+			pos = xGetVector(dMummyBalls,xProjPrev);
+			dir = xGetVector(dMummyBalls,xProjDir);
+			end = kbGetBlockPosition(""+xGetInt(dMummyBalls,xUnitName));
+			amt = distanceBetweenVectors(end, pos, false);
+			xSetVector(dMummyBalls, xProjPrev, end);
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db,xUnitID);
+				if (trUnitAlive() == false) {
 					removeOpponentUnit(p);
-				} else {
-					dist = zDistanceToVector(pName, "prev");
-					if (dist < amt + 4.0) {
-						trQuestVarSet("hitboxX", trQuestVarGet("prevX") + dist * trQuestVarGet("dirX"));
-						trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + dist * trQuestVarGet("dirZ"));
-						if (zDistanceToVectorSquared(pName, "hitbox") < yGetVar("MummyBalls", "dist")) {
-							damageOpponentUnit(p, xsMin(100.0, amt * 10));
-							switch(1*yGetVar("MummyBalls", "type"))
-							{
-								case STATUS_SILENCE:
-								{
-									silenceUnit(pName, 5.0, p);
-								}
-								case STATUS_POISON:
-								{
-									poisonUnit(pName, 10, 5.0 * trQuestVarGet("stage"), p);
-								}
-							}
+				} else if (rayCollision(db,pos,dir,amt + 4.0,xGetFloat(dMummyBalls,xProjDist))) {
+					damageOpponentUnit(p, xsMin(100.0, amt * 10));
+					switch(xGetInt(dMummyBalls, xProjType))
+					{
+						case STATUS_SILENCE:
+						{
+							silenceUnit(db, 5.0, p);
+						}
+						case STATUS_POISON:
+						{
+							poisonUnit(db, 10, 5.0 * trQuestVarGet("stage"), p);
 						}
 					}
 				}
 			}
-			vectorToGrid("pos", "loc");
-			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				yRemoveFromDatabase("MummyBalls");
+			loc = vectorToGrid(end);
+			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				xFreeDatabaseBlock(dMummyBalls);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("Mummies") >0) {
-		id = yDatabaseNext("Mummies", true);
-		p = yGetVar("Mummies", "player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Mummies")) {
+	if (xGetDatabaseCount(dMummies) >0) {
+		xDatabaseNext(dMummies);
+		id = xGetInt(dMummies,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dMummies, xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dMummies)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Mummy");
 			}
-			yRemoveFromDatabase("Mummies");
-			yRemoveUpdateVar("Mummies", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Mummies", "index")) == 1) {
-			ySetVar("Mummies", "step", 2);
-		} else if (trTimeMS() > yGetVar("Mummies", "next")) {
-			switch(1*yGetVar("Mummies", "step"))
+			xFreeDatabaseBlock(dMummies);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMummies, xSpecialIndex)) == 1) {
+			xSetInt(dMummies, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dMummies, xSpecialNext)) {
+			switch(xGetInt(dMummies, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 12) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						trVectorSetUnitPos("start", "Mummies");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-						ySetVarFromVector("Mummies", "dir", "dir");
-						ySetVarFromVector("Mummies", "start", "start");
-						ySetVar("Mummies", "step", 1);
-						ySetVar("Mummies", "next", trTimeMS() + 1000);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						end = kbGetBlockPosition(""+target);
+						start = kbGetBlockPosition(""+xGetInt(dMummies,xUnitName));
+						dir = getUnitVector(start,end);
+						xSetVector(dMummies,xMummyStart,start);
+						xSetVector(dMummies,xMummyDir,dir);
+						xSetInt(dMummies, xSpecialStep, 1);
+						xSetInt(dMummies, xSpecialNext, trTimeMS() + 1000);
 						trUnitOverrideAnimation(37,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					yVarToVector("Mummies", "start");
-					yVarToVector("Mummies", "dir");
-					addGenericProj("MummyBalls","start","dir",kbGetProtoUnitID("Lampades Blood"),2,10,4.0);
-					yAddUpdateVar("MummyBalls", "prevX", trQuestVarGet("startx"));
-					yAddUpdateVar("MummyBalls", "prevZ", trQuestVarGet("startz"));
-					yAddUpdateVar("MummyBalls", "dist", 16);
-					yAddUpdateVar("MummyBalls", "type", STATUS_POISON);
-					yAddUpdateVar("MummyBalls","player",p);
-					ySetVar("Mummies", "step", 2);
-					ySetVar("Mummies", "next", yGetVar("Mummies", "next") + 3000);
+					start = xGetVector(dMummies,xMummyStart);
+					dir = xGetVector(dMummies,xMummyDir);
+					addGenericProj(dMummyBalls,start,dir,p);
+					xSetInt(dMummyBalls, xProjProto, kbGetProtoUnitID("Lampades Blood"));
+					xSetVector(dMummyBalls,xProjPrev,start);
+					xSetFloat(dMummyBalls,xProjDist,16);
+					xSetInt(dMummyBalls,xProjType,STATUS_POISON);
+					xSetInt(dMummies, xSpecialStep, 2);
+					xSetInt(dMummies, xSpecialNext, xGetInt(dMummies, xSpecialNext) + 3000);
 				}
 				case 2:
 				{
-					ySetVar("Mummies", "step", 0);
-					ySetVar("Mummies", "next", trTimeMS() + 18000);
+					xSetInt(dMummies, xSpecialStep, 0);
+					xSetInt(dMummies, xSpecialNext, trTimeMS() + 18000);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Mummies", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Mummies", "index"));
-			if (action > 0 && yGetVar("Mummies", "step") == 1) {
-				ySetVar("Mummies", "step", 0);
-				ySetVar("Mummies", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dMummies, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dMummies, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dMummies, xSpecialStep) == 1) {
+				xSetInt(dMummies, xSpecialStep, 0);
+				xSetInt(dMummies, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("ScorpionMen") >0) {
-		id = yDatabaseNext("ScorpionMen", true);
-		p = yGetVar("ScorpionMen","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("ScorpionMen")) {
+	if(xGetDatabaseCount(dScorpionMen) >0) {
+		xDatabaseNext(dScorpionMen);
+		id = xGetInt(dScorpionMen,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dScorpionMen,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dScorpionMen)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Scorpion Man");
 			}
-			yRemoveFromDatabase("ScorpionMen");
-			yRemoveUpdateVar("ScorpionMen", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("ScorpionMen", "index")) == 1) {
-			ySetVar("ScorpionMen", "step", 2);
-		} else if (trTimeMS() > yGetVar("ScorpionMen", "specialnext")) {
-			switch(1*yGetVar("ScorpionMen", "step"))
+			xFreeDatabaseBlock(dScorpionMen);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dScorpionMen, xSpecialIndex)) == 1) {
+			xSetInt(dScorpionMen, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dScorpionMen, xSpecialNext)) {
+			switch(xGetInt(dScorpionMen, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						ySetVar("ScorpionMen", "target", trGetUnitScenarioNameNumber(target));
-						ySetVar("ScorpionMen", "step", 1);
-						ySetVar("ScorpionMen", "specialnext", trTimeMS() + 500);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetInt(dScorpionMen, xSpecialTarget, target);
+						xSetInt(dScorpionMen, xSpecialStep, 1);
+						xSetInt(dScorpionMen, xSpecialNext, trTimeMS() + 500);
 						trUnitOverrideAnimation(39,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
 					action = 0;
-					pName = opponentDatabaseName(p);
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yGetVar("ScorpionMen", "target") == yDatabaseNext(pName)) {
-							trUnitSelectClear();
-							trUnitSelectByQV(pName);
-							poisonUnit(pName, 10, 5.0 * trQuestVarGet("stage"), p);
+					db = opponentDatabaseName(p);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						if (xGetInt(dScorpionMen, xSpecialTarget) == xGetInt(db,xUnitName)) {
+							xUnitSelectByID(db,xUnitID);
+							poisonUnit(db, 10, 5.0 * trQuestVarGet("stage"), p);
 							action = 1;
 							break;
 						}
 					}
-					ySetVar("ScorpionMen", "step", 2);
-					ySetVar("ScorpionMen", "specialnext", yGetVar("ScorpionMen", "specialnext") + 500);
+					xSetInt(dScorpionMen, xSpecialStep, 2);
+					xSetInt(dScorpionMen, xSpecialNext, xGetInt(dScorpionMen, xSpecialNext) + 500);
 					if (action == 0) {
-						ySetVar("ScorpionMen", "target", -1);
+						xSetInt(dScorpionMen, xSpecialTarget, -1);
 					}
 				}
 				case 2:
 				{
 					trUnitOverrideAnimation(-1,0,false,true,-1);
-					ySetVar("ScorpionMen", "step", 0);
-					if (yGetVar("ScorpionMen", "target") == -1) {
-						ySetVar("ScorpionMen", "specialnext", trTimeMS());
+					xSetInt(dScorpionMen, xSpecialStep, 0);
+					if (xGetInt(dScorpionMen, xSpecialTarget) == -1) {
+						xSetInt(dScorpionMen, xSpecialNext, trTimeMS());
 					} else {
-						ySetVar("ScorpionMen", "specialnext", trTimeMS() + 15000);
+						xSetInt(dScorpionMen, xSpecialNext, trTimeMS() + 15000);
 					}
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("ScorpionMen", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("ScorpionMen", "index"));
-			if (action > 0 && yGetVar("ScorpionMen", "step") == 1) {
-				ySetVar("ScorpionMen", "step", 0);
-				ySetVar("ScorpionMen", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dScorpionMen, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dScorpionMen, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dScorpionMen, xSpecialStep) == 1) {
+				xSetInt(dScorpionMen, xSpecialStep, 0);
+				xSetInt(dScorpionMen, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("hydras") > 0) {
-		if (yDatabaseNext("hydras", true) == -1 || trUnitAlive() == false || checkEnemyDeactivated("Hydras")) {
-			yRemoveFromDatabase("hydras");
-		} else if (trTime() > yGetVar("hydras","last")) {
-			amt = trTime() - yGetVar("hydras", "last");
-			ySetVar("hydras","last", trTime());
-			trDamageUnitPercent(0 - amt);
+	if (xGetDatabaseCount(dHydras) > 0) {
+		xDatabaseNext(dHydras);
+		xUnitSelectByID(dHydras,xUnitID);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dHydras)) {
+			xFreeDatabaseBlock(dHydras);
+		} else if (trTime() > xGetInt(dHydras,xSpecialStep)) {
+			amt = trTime() - xGetInt(dHydras, xSpecialStep);
+			xSetInt(dHydras,xSpecialStep, trTime());
+			db = databaseName(xGetInt(dHydras,xPlayerOwner));
+			if (xGetInt(db,xPoisonStatus,xGetInt(dHydras,xSpecialIndex)) == 0) {
+				xUnitSelectByID(dHydras,xUnitID);
+				trDamageUnitPercent(0 - amt);
+			}
 		}
 	}
 	
-	if(yGetDatabaseCount("Nereids") >0) {
-		id = yDatabaseNext("Nereids", true);
-		p = yGetVar("Nereids","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Nereids")) {
+	if(xGetDatabaseCount(dNereids) >0) {
+		xDatabaseNext(dNereids);
+		id = xGetInt(dNereids,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dNereids,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dNereids)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Nereid");
 			}
-			yRemoveFromDatabase("Nereids");
-			yRemoveUpdateVar("Nereids", "step");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("Nereids", "index")) == 1) {
-			ySetVar("Nereids", "step", 2);
-		} else if (trTimeMS() > yGetVar("Nereids", "specialnext")) {
-			switch(1*yGetVar("Nereids", "step"))
+			xFreeDatabaseBlock(dNereids);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dNereids, xSpecialIndex)) == 1) {
+			xSetInt(dNereids, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dNereids, xSpecialNext)) {
+			switch(xGetInt(dNereids, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("pos", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						ySetVarFromVector("Nereids", "end", "pos");
-						ySetVar("Nereids", "step", 1);
-						ySetVar("Nereids", "specialnext", trTimeMS() + 1400);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						pos = kbGetBlockPosition(""+target);
+						xSetVector(dNereids,xSpecialTarget,pos);
+						xSetInt(dNereids, xSpecialStep, 1);
+						xSetInt(dNereids, xSpecialNext, trTimeMS() + 1400);
 						trUnitOverrideAnimation(39,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorSetUnitPos("start", "Nereids");
-					yVarToVector("Nereids", "end");
-					pName = opponentDatabaseName(p);
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					start = kbGetBlockPosition(""+xGetInt(dNereids,xUnitName));
+					end = xGetVector(dNereids,xSpecialTarget);
+					db = opponentDatabaseName(p);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (zDistanceToVectorSquared(pName, "end") < 16.0) {
-							trVectorSetUnitPos("pos", pName);
-							vectorSetAsTargetVector("target", "start", "pos", 40.0);
+						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 16.0) {
+							pos = vectorSetAsTargetVector(start, kbGetBlockPosition(""+xGetInt(db,xUnitName)), 40.0);
 							damageOpponentUnit(p, 200.0);
 							if (trUnitAlive()) {
-								launchUnit(pName, "target");
+								launchUnit(db, pos);
 							}
 						}
 					}
-					ySetVar("Nereids", "step", 2);
-					ySetVar("Nereids", "specialnext", yGetVar("Nereids", "specialnext") + 1600);
+					xSetInt(dNereids, xSpecialStep, 2);
+					xSetInt(dNereids, xSpecialNext, xGetInt(dNereids, xSpecialNext) + 1600);
 				}
 				case 2:
 				{
 					trUnitOverrideAnimation(-1,0,false,true,-1);
-					ySetVar("Nereids", "step", 0);
-					if (yGetVar("Nereids", "target") == -1) {
-						ySetVar("Nereids", "specialnext", trTimeMS());
-					} else {
-						ySetVar("Nereids", "specialnext", trTimeMS() + 15000);
-					}
+					xSetInt(dNereids, xSpecialStep, 0);
+					xSetInt(dNereids, xSpecialNext, trTimeMS() + 15000);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Nereids", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Nereids", "index"));
-			if (action > 0 && yGetVar("Nereids", "step") == 1) {
-				ySetVar("Nereids", "step", 0);
-				ySetVar("Nereids", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dNereids, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dNereids, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dNereids, xSpecialStep) == 1) {
+				xSetInt(dNereids, xSpecialStep, 0);
+				xSetInt(dNereids, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("krakens") >0) {
-		id = yDatabaseNext("krakens", true);
-		p = yGetVar("krakens","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+	if(xGetDatabaseCount(dKrakens) >0) {
+		xDatabaseNext(dKrakens);
+		id = xGetInt(dKrakens,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dKrakens,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
 			trUnitChangeProtoUnit("Kraken");
-			yRemoveFromDatabase("krakens");
-			yRemoveUpdateVar("krakens", "step");
-		} else if (checkEnemyDeactivated("krakens")) {
+			xFreeDatabaseBlock(dKrakens);
+		} else if (checkEnemyDeactivated(dKrakens)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			yRemoveFromDatabase("krakens");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("krakens", "index")) == 1) {
-			ySetVar("krakens", "step", 0);
-		} else if (trTimeMS() > yGetVar("krakens", "specialnext")) {
-			switch(1*yGetVar("krakens", "step"))
+			xFreeDatabaseBlock(dKrakens);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dKrakens, xSpecialIndex)) == 1) {
+			xSetInt(dKrakens, xSpecialStep, 0);
+		} else if (trTimeMS() > xGetInt(dKrakens, xSpecialNext)) {
+			switch(xGetInt(dKrakens, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						trVectorSetUnitPos("start", "krakens");
-						trVectorQuestVarSet("dir", zGetUnitVector("start", "target"));
-						ySetVar("krakens", "dirx", trQuestVarGet("dirx"));
-						ySetVar("krakens", "dirz", trQuestVarGet("dirz"));
-						ySetVar("krakens", "step", 1);
-						ySetVar("krakens", "specialnext", trTimeMS() + 2100);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						end = kbGetBlockPosition(""+target);
+						start = kbGetBlockPosition(""+xGetInt(dKrakens,xUnitName));
+						dir = getUnitVector(start, end);
+						xSetVector(dKrakens,xSpecialTarget,dir);
+						xSetInt(dKrakens, xSpecialStep, 1);
+						xSetInt(dKrakens, xSpecialNext, trTimeMS() + 2100);
 						trUnitOverrideAnimation(1,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					pName = opponentDatabaseName(p);
-					yVarToVector("krakens", "dir");
-					trVectorSetUnitPos("start", "krakens");
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					db = opponentDatabaseName(p);
+					dir = xGetVector(dKrakens,xSpecialTarget);
+					start = kbGetBlockPosition(""+xGetInt(dKrakens,xUnitName));
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (rayCollision(pName, "start","dir", 6.0, 3.0)) {
+						} else if (rayCollision(db, start,dir, 6.0, 3.0)) {
 							damageOpponentUnit(p, 300.0);
-							stunUnit(pName, 2.0);
+							stunUnit(db, 2.0);
 						}
 					}
-					ySetVar("krakens", "step", 2);
-					ySetVar("krakens", "specialnext", yGetVar("krakens", "specialnext") + 1500);
+					xSetInt(dKrakens, xSpecialStep, 2);
+					xSetInt(dKrakens, xSpecialNext, xGetInt(dKrakens, xSpecialNext) + 1500);
 				}
 				case 2:
 				{
-					ySetVar("krakens", "step", 0);
+					xSetInt(dKrakens, xSpecialStep, 0);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
-		} else if (yGetVar("krakens", "step") != 0) {
-			trSetUnitOrientation(xsVectorSet(yGetVar("krakens","dirx"),0,yGetVar("krakens","dirz")),vector(0,1,0),true);
+		} else if (xGetInt(dKrakens, xSpecialStep) != 0) {
+			trSetUnitOrientation(xGetVector(dKrakens,xSpecialTarget),vector(0,1,0),true);
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("krakens", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("krakens", "index"));
-			if (action > 0 && yGetVar("krakens", "step") == 1) {
-				ySetVar("krakens", "step", 0);
+			action = xGetInt(db, xStunStatus, xGetInt(dKrakens, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dKrakens, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dKrakens, xSpecialStep) == 1) {
+				xSetInt(dKrakens, xSpecialStep, 0);
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("Einherjars") >0) {
-		id = yDatabaseNext("Einherjars", true);
-		p = yGetVar("Einherjars","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("Einherjars")) {
+	if(xGetDatabaseCount(dEinherjars) >0) {
+		xDatabaseNext(dEinherjars);
+		id = xGetInt(dEinherjars,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dEinherjars,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dEinherjars)) {
 			if (trUnitAlive()) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
 			} else {
 				trUnitChangeProtoUnit("Einheriar");
 			}
-			yRemoveFromDatabase("Einherjars");
-			yRemoveUpdateVar("Einherjars", "step");
-		} else if (trTimeMS() > yGetVar("Einherjars", "specialnext")) {
-			switch(1*yGetVar("Einherjars", "step"))
+			xFreeDatabaseBlock(dEinherjars);
+		} else if (trTimeMS() > xGetInt(dEinherjars, xSpecialNext)) {
+			switch(xGetInt(dEinherjars, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 6) {
-						ySetVar("Einherjars", "step", 1);
-						ySetVar("Einherjars", "specialnext", trTimeMS() + 1400);
+						xSetInt(dEinherjars, xSpecialStep, 1);
+						xSetInt(dEinherjars, xSpecialNext, trTimeMS() + 1400);
 						trUnitOverrideAnimation(39,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorSetUnitPos("start", "Einherjars");
-					for (x=yGetDatabaseCount(pName); >0) {
-						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					start = kbGetBlockPosition(""+xGetInt(dEinherjars,xUnitName),true);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeAllyUnit(p);
-						} else if (yGetVar(pName, "poisonStatus") == 0) {
-							trVectorSetUnitPos("pos", pName);
-							if (zDistanceBetweenVectorsSquared("pos", "start") < 9.0) {
+						} else if (xGetInt(db, xPoisonStatus) == 0) {
+							pos = kbGetBlockPosition(""+xGetInt(db,xUnitName),true);
+							if (distanceBetweenVectors(pos, start) < 9.0) {
 								trDamageUnit(-100);
-								trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+								trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 								trArmySelect("0,0");
 								trUnitChangeProtoUnit("Regeneration SFX");
 							}
 						}
 					}
-					ySetVar("Einherjars", "step", 2);
-					ySetVar("Einherjars", "specialnext", yGetVar("Einherjars", "specialnext") + 2600);
+					xSetInt(dEinherjars, xSpecialStep, 2);
+					xSetInt(dEinherjars, xSpecialNext, xGetInt(dEinherjars, xSpecialNext) + 2600);
 				}
 				case 2:
 				{
 					trUnitOverrideAnimation(-1,0,false,true,-1);
-					ySetVar("Einherjars", "step", 0);
-					if (yGetVar("Einherjars", "target") == -1) {
-						ySetVar("Einherjars", "specialnext", trTimeMS());
-					} else {
-						ySetVar("Einherjars", "specialnext", trTimeMS() + 15000);
-					}
+					xSetInt(dEinherjars, xSpecialStep, 0);
+					xSetInt(dEinherjars, xSpecialNext, trTimeMS() + 15000);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("Einherjars", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("Einherjars", "index"));
-			if (action > 0 && yGetVar("Einherjars", "step") == 1) {
-				ySetVar("Einherjars", "step", 0);
-				ySetVar("Einherjars", "next", trTimeMS() + 15000);
+			action = xGetInt(db, xStunStatus, xGetInt(dEinherjars, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dEinherjars, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dEinherjars, xSpecialStep) == 1) {
+				xSetInt(dEinherjars, xSpecialStep, 0);
+				xSetInt(dEinherjars, xSpecialNext, trTimeMS() + 15000);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("yeebLightningEnd") > 0) {
+	if (xGetDatabaseCount(dYeebLightningEnd) > 0) {
 		trQuestVarSetFromRand("sound", 1, 5, true);
 		hit = false;
-		for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
-			yDatabaseNext("yeebLightningEnd", true);
-			p = yGetVar("yeebLightningEnd","player");
-			pName = opponentDatabaseName(p);
+		for(y=xGetDatabaseCount(dYeebLightningEnd); >0) {
+			xDatabaseNext(dYeebLightningEnd);
+			p = xGetInt(dYeebLightningEnd,xPlayerOwner);
+			db = opponentDatabaseName(p);
+			xUnitSelect(dYeebLightningEnd,xUnitName);
 			if (trUnitVisToPlayer()) {
 				hit = true;
 			}
-			trVectorSetUnitPos("pos", "yeebLightningEnd");
+			pos = kbGetBlockPosition(""+xGetInt(dYeebLightningEnd,xUnitName));
 			trUnitChangeProtoUnit("Lightning sparks");
-			for(x=yGetDatabaseCount(pName); >0) {
-				if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db,xUnitID);
+				if (trUnitAlive() == false) {
 					removeOpponentUnit(p);
-				} else if (zDistanceToVectorSquared(pName, "pos") < 1.0) {
+				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 1.0) {
 					damageOpponentUnit(p, 470);
-					if (trQuestVarGet("boss") > 0) {
-						if (yGetVar(pName, "hero") == 1) {
-							gainFavor(1*yGetVar(pName, "player"), -5.0);
+					if (boss > 0) {
+						if (xGetBool(db, xIsHero)) {
+							gainFavor(xGetInt(db, xPlayerOwner), -5.0);
 						}
 					}
 				}
 			}
-			if (trQuestVarGet("boss") > 999) {
-				for(x=yGetDatabaseCount("enemies"); >0) {
-					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+			if (boss > 999) {
+				for(x=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies,xUnitID);
+					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (zDistanceToVectorSquared("enemies", "pos") < 1.0) {
+					} else if (unitDistanceToVector(xGetInt(dEnemies,xUnitName), pos) < 1.0) {
 						damageEnemy(0, 470, true);
 						damageEnemy(0, 470, false);
 					}
 				}
 			}
 		}
-		yClearDatabase("yeebLightningEnd");
+		xClearDatabase(dYeebLightningEnd);
 		if (hit) {
 			trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
 	}
 	
-	for(x=xsMin(10, yGetDatabaseCount("yeebLightning")); >0) {
-		yDatabaseNext("yeebLightning");
-		if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
+	for(x=xsMin(10, xGetDatabaseCount(dYeebLightning)); >0) {
+		xDatabaseNext(dYeebLightning);
+		if (trTimeMS() > xGetInt(dYeebLightning, xTimeout)) {
 			hit = true;
 			trChatSetStatus(false);
 			trDelayedRuleActivation("enable_chat");
-			yAddToDatabase("yeebLightningEnd", "yeebLightning");
-			yAddUpdateVar("yeebLightningEnd","player",yGetVar("yeebLightning","player"));
-			trUnitSelectClear();
-			trUnitSelectByQV("yeebLightning", true);
+			xSetPointer(dYeebLightningEnd,xAddDatabaseBlock(dYeebLightningEnd));
+			xSetInt(dYeebLightningEnd,xUnitName,xGetInt(dYeebLightning,xUnitName));
+			xSetInt(dYeebLightningEnd,xPlayerOwner,xGetInt(dYeebLightning,xPlayerOwner));
+			xUnitSelect(dYeebLightning,xUnitName);
 			trUnitChangeProtoUnit("Militia");
-			trUnitSelectClear();
-			trUnitSelectByQV("yeebLightning", true);
+			xUnitSelect(dYeebLightning,xUnitName);
 			trSetSelectedScale(0,0,0);
 			trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
-			yRemoveFromDatabase("yeebLightning");
+			xFreeDatabaseBlock(dYeebLightning);
 		}
 	}
 	
-	for(y=xsMin(4, yGetDatabaseCount("yeebLightningBalls")); >0) {
-		action = processGenericProj("yeebLightningBalls");
-		p = yGetVar("yeebLightningBalls","player");
-		pName = opponentDatabaseName(p);
+	for(y=xsMin(4, xGetDatabaseCount(dYeebLightningBalls)); >0) {
+		action = processGenericProj(dYeebLightningBalls);
+		p = xGetInt(dYeebLightningBalls,xPlayerOwner);
+		db = opponentDatabaseName(p);
 		if ((action == PROJ_FALLING) || (action == PROJ_GROUND)) {
-			yVarToVector("yeebLightningBalls", "dir");
-			yVarToVector("yeebLightningBalls", "prev");
-			trQuestVarSet("destx", trQuestVarGet("dirx") * 3.0 + trQuestVarGet("posx"));
-			trQuestVarSet("destz", trQuestVarGet("dirz") * 3.0 + trQuestVarGet("posz"));
-			vectorToGrid("dest", "loc");
-			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				if (yGetVar("yeebLightningBalls", "bounces") > 0) {
-					ySetVar("yeebLightningBalls", "bounces", yGetVar("yeebLightningBalls","bounces") - 1);
-					trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
-					ySetVar("yeebLightningBalls", "yeehaw", 99);
-					ySetVarFromVector("yeebLightningBalls", "dir", "dir");
+			dir = xGetVector(dYeebLightningBalls,xProjDir);
+			start = xGetVector(dYeebLightningBalls,xProjPrev);
+			pos = kbGetBlockPosition(""+xGetInt(dYeebLightningBalls,xUnitName),true);
+			end = xsVectorSet(xsVectorGetX(start) + 3.0 * xsVectorGetX(dir),0,xsVectorGetZ(start) + 3.0 * xsVectorGetZ(dir));
+			loc = vectorToGrid(end);
+			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				if (xGetInt(dYeebLightningBalls, xProjDist) > 0) {
+					xSetInt(dYeebLightningBalls, xProjDist, xGetInt(dYeebLightningBalls,xProjDist) - 1);
+					dir = getBounceDir(start,loc,dir);
+					xSetInt(dYeebLightningBalls, xProjYeehaw, 99);
+					xSetVector(dYeebLightningBalls,xProjDir,dir);
 					trQuestVarSetFromRand("sound", 1, 2, true);
 					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				} else {
-					yRemoveFromDatabase("yeebLightningBalls");
+					xFreeDatabaseBlock(dYeebLightningBalls);
 				}
 			} else {
-				dist = zDistanceBetweenVectorsSquared("pos", "prev");
+				dist = distanceBetweenVectors(pos,start);
 				if (dist > 4.0) {
 					dist = xsSqrt(dist) + 3.0;
-					for(x=yGetDatabaseCount(pName); >0) {
-						if (yDatabaseNext(pName, true) == -1 || trUnitAlive() == false) {
+					for(x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db,xUnitID);
+						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
-						} else if (rayCollision(pName, "prev", "dir", dist, 9.0)) {
+						} else if (rayCollision(db, start, dir, dist, 9.0)) {
 							damageOpponentUnit(p, 120);
-							stunUnit(pName, 3.0, p, false);
-							if (trQuestVarGet("boss") > 0) {
-								if (yGetVar(pName, "hero") == 1) {
-									gainFavor(1*yGetVar(pName,"player"), -1.0);
+							stunUnit(db, 3.0, p, false);
+							if (boss > 0) {
+								if (xGetBool(db, xIsHero)) {
+									gainFavor(xGetInt(db,xPlayerOwner), -1.0);
 								}
 							}
 						}
 					}
-					ySetVarFromVector("yeebLightningBalls", "prev", "pos");
+					xSetVector(dYeebLightningBalls,xProjPrev,start);
 				}
 			}
 		}
 	}
 	
-	if(yGetDatabaseCount("lightningStatues") >0) {
-		id = yDatabaseNext("lightningStatues", true);
-		p = yGetVar("lightningStatues","player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false || checkEnemyDeactivated("lightningStatues")) {
-			yRemoveFromDatabase("lightningStatues");
-		} else if (trTimeMS() > yGetVar("lightningStatues", "specialnext")) {
+	if(xGetDatabaseCount(dLightningStatues) >0) {
+		xDatabaseNext(dLightningStatues);
+		id = xGetInt(dLightningStatues,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dLightningStatues,xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false || checkEnemyDeactivated(dLightningStatues)) {
+			xFreeDatabaseBlock(dLightningStatues);
+		} else if (trTimeMS() > xGetInt(dLightningStatues, xSpecialNext)) {
 			if (kbUnitGetAnimationActionType(id) == 59) {
 				xsSetContextPlayer(p);
-				target = kbUnitGetTargetUnitID(id);
-				trVectorQuestVarSet("target", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-				vectorSnapToGrid("target");
+				target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+				xsSetContextPlayer(0);
+				pos = vectorSnapToGrid(kbGetBlockPosition(""+target));
 				trUnitOverrideAnimation(2,0,false,true,-1);
-				ySetVar("lightningStatues","specialNext",trTimeMS() + 1000);
-				spawnLightning("target", p);
+				xSetInt(dLightningStatues,xSpecialNext,trTimeMS() + 1000);
+				spawnLightning(pos, p);
 				trSoundPlayFN("mirrortowerfire.wav","1",-1,"","");
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("SkyWitches") >0) {
-		id = yDatabaseNext("SkyWitches", true);
-		p = yGetVar("SkyWitches", "player");
-		pName = databaseName(p);
-		if (id == -1 || trUnitAlive() == false) {
+	if (xGetDatabaseCount(dLampades) >0) {
+		xDatabaseNext(dLampades);
+		id = xGetInt(dLampades,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dLampades, xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
 			trUnitChangeProtoUnit("Lampades");
-			yRemoveFromDatabase("SkyWitches");
-		} else if (checkEnemyDeactivated("SkyWitches")) {
+			xFreeDatabaseBlock(dLampades);
+		} else if (checkEnemyDeactivated(dLampades)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			yRemoveFromDatabase("SkyWitches");
-		} else if (yGetVarAtIndex(pName, "silenceStatus", 1*yGetVar("SkyWitches", "index")) == 1) {
+			xFreeDatabaseBlock(dLampades);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dLampades, xSpecialIndex)) == 1) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
-			ySetVar("SkyWitches", "step", 2);
-		} else if (trTimeMS() > yGetVar("SkyWitches", "next")) {
-			switch(1*yGetVar("SkyWitches", "step"))
+			xSetInt(dLampades, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dLampades, xSpecialNext)) {
+			switch(xGetInt(dLampades, xSpecialStep))
 			{
 				case 0:
 				{
 					if (kbUnitGetAnimationActionType(id) == 12) {
 						xsSetContextPlayer(p);
-						target = kbUnitGetTargetUnitID(id);
-						ySetVar("SkyWitches", "target", trGetUnitScenarioNameNumber(target));
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetVector(dLampades, xSpecialTarget, kbGetBlockPosition(""+target));
 						
-						ySetVar("SkyWitches", "step", 1);
-						ySetVar("SkyWitches", "next", trTimeMS() + 500);
+						xSetInt(dLampades, xSpecialStep, 1);
+						xSetInt(dLampades, xSpecialNext, trTimeMS() + 500);
 						trUnitOverrideAnimation(37,0,false,false,-1);
 					}
 				}
 				case 1:
 				{
-					trVectorQuestVarSet("end", kbGetBlockPosition(""+1*yGetVar("SkyWitches", "target")));
-					trVectorSetUnitPos("start", "SkyWitches");
-					trVectorQuestVarSet("dir", zGetUnitVector("start", "end"));
-					addGenericProj("yeebLightningBalls","start","dir",kbGetProtoUnitID("Arkantos God"),26,10,5);
-					yAddUpdateVar("yeebLightningBalls", "prevx", trQuestVarGet("startx"));
-					yAddUpdateVar("yeebLightningBalls", "prevz", trQuestVarGet("startz"));
-					yAddUpdateVar("yeebLightningBalls", "bounces", 3);
-					yAddUpdateVar("yeebLightningBalls","player",p);
-					ySetVar("SkyWitches", "step", 2);
-					ySetVar("SkyWitches", "next", yGetVar("SkyWitches", "next") + 500);
+					end = xGetVector(dLampades,xSpecialTarget);
+					start = kbGetBlockPosition(""+dLampades);
+					dir = getUnitVector(start,end);
+					addGenericProj(dYeebLightningBalls,start,dir,p);
+					xSetVector(dYeebLightningBalls,xProjPrev,start);
+					xSetInt(dYeebLightningBalls,xProjDist,3); // bounces
+					xSetInt(dLampades, xSpecialStep, 2);
+					xSetInt(dLampades, xSpecialNext, xGetInt(dLampades, xSpecialNext) + 500);
 				}
 				case 2:
 				{
-					ySetVar("SkyWitches", "step", 0);
-					ySetVar("SkyWitches", "next", trTimeMS() + 18000);
+					xSetInt(dLampades, xSpecialStep, 0);
+					xSetInt(dLampades, xSpecialNext, trTimeMS() + 18000);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 				}
 			}
 		} else {
-			action = yGetVarAtIndex(pName, "stunStatus", 1*yGetVar("SkyWitches", "index"));
-			action = action + yGetVarAtIndex(pName, "launched", 1*yGetVar("SkyWitches", "index"));
-			if (action > 0 && yGetVar("SkyWitches", "step") == 1) {
-				ySetVar("SkyWitches", "step", 0);
-				ySetVar("SkyWitches", "next", trTimeMS() + 18000);
+			action = xGetInt(db, xStunStatus, xGetInt(dLampades, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dLampades, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dLampades, xSpecialStep) == 1) {
+				xSetInt(dLampades, xSpecialStep, 0);
+				xSetInt(dLampades, xSpecialNext, trTimeMS() + 18000);
 			}
 		}
 	}
@@ -1746,84 +1778,88 @@ void specialUnitsAlways() {
 void enemiesAlways() {
 	int p = 0;
 	int id = 0;
+	int target = 0;
 	float angle = 0;
 	float amt = 0;
-	string pName = "";
+	string protoName = "";
+	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	/*
 	Enemies incoming
 	*/
-	for (x=xsMin(5, yGetDatabaseCount("enemiesIncoming")); > 0) {
-		yDatabaseNext("enemiesIncoming", true);
+	for (x=xsMin(5, xGetDatabaseCount(dEnemiesIncoming)); > 0) {
+		xDatabaseNext(dEnemiesIncoming);
+		xUnitSelect(dEnemiesIncoming,xUnitName);
 		for(p=1; < ENEMY_PLAYER) {
 			if (trUnitHasLOS(p)) {
-				activateEnemy("enemiesIncoming");
-				yRemoveFromDatabase("enemiesIncoming");
+				activateEnemy(xGetInt(dEnemiesIncoming,xUnitName));
+				xFreeDatabaseBlock(dEnemiesIncoming);
 				break;
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("enemies") > 0) {
-		id = yDatabaseNext("enemies", true);
-		if ((id == -1) || (trUnitAlive() == false)) {
+	if (xGetDatabaseCount(dEnemies) > 0) {
+		xDatabaseNext(dEnemies);
+		id = kbGetBlockID(""+xGetInt(dEnemies,xUnitName));
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (id == -1 || trUnitAlive() == false) {
 			removeEnemy();
 		} else if ((kbUnitGetAnimationActionType(id) == 9) &&
-			(yGetVar("enemies", "stunStatus") + yGetVar("enemies", "poisonStatus") + yGetVar("enemies", "silenceStatus") == 0)) {
+			(xGetBool(dEnemies, xLaunched) == false) &&
+			(xGetInt(dEnemies, xStunStatus) + xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) == 0)) {
 			/* if idle and out of LOS, we remove it */
-			ySetVar("enemies", "missing", 1 + yGetVar("enemies", "missing"));
-			if (yGetVar("enemies", "missing") >= 10) {
+			xSetInt(dEnemies, xMissingTimeout, 1 + xGetInt(dEnemies, xMissingTimeout));
+			if (xGetInt(dEnemies, xMissingTimeout) >= 10) {
 				for(p=1; < ENEMY_PLAYER) {
 					if (trUnitHasLOS(p)) {
-						ySetVar("enemies", "missing", 0);
+						xSetInt(dEnemies, xMissingTimeout, 0);
 						break;
 					}
 				}
-				if (yGetVar("enemies", "missing") >= 10) {
-					yAddToDatabase("enemiesIncoming", "enemies");
-					yRemoveFromDatabase("enemies");
+				if (xGetInt(dEnemies, xMissingTimeout) >= 10) {
+					xAddDatabaseBlock(dEnemiesIncoming, true);
+					xSetInt(dEnemiesIncoming,xUnitName,xGetInt(dEnemies,xUnitName));
+					xFreeDatabaseBlock(dEnemies);
 				}
 			}
 		} else {
-			stunsAndPoisons("enemies");
-			trVectorSetUnitPos("pos", "enemies");
-			ySetVar("enemies", "posX", trQuestVarGet("posX"));
-			ySetVar("enemies", "posZ", trQuestVarGet("posZ"));
+			stunsAndPoisons(dEnemies);
+			xSetVector(dEnemies,xUnitPos,kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName)));
 		}
 	}
 	
 	/* ambush rooms */
-	if (yGetDatabaseCount("ambushRooms") > 0) {
-		yDatabaseNext("ambushRooms");
-		trQuestVarSet("posX", yGetVar("ambushRooms", "posX"));
-		trQuestVarSet("posZ", yGetVar("ambushRooms", "posZ"));
+	if (xGetDatabaseCount(dAmbushRooms) > 0) {
+		xDatabaseNext(dAmbushRooms);
+		pos = xGetVector(dAmbushRooms,xAmbushRoomPos);
 		for(p=1; < ENEMY_PLAYER) {
-			if (zDistanceToVectorSquared("p"+p+"unit", "pos") < 100) {
-				pName = trStringQuestVarGet("enemyProto"+1*yGetVar("ambushRooms", "type"));
+			if (unitDistanceToVector(xGetInt(dPlayerData,xUnitName,p), pos) < 100) {
+				trQuestVarSetFromRand("rand", 1, trQuestVarGet("enemyProtoCount"),true);
+				protoName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand"));
 				trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
 				angle = 6.283185 / trQuestVarGet("count");
-				amt = 0;
-				trQuestVarSet("angle",0);
+				amt = 57.29578 * angle;
+				float cSin = 0.0 - xsSin(angle);
+				float cCos = xsCos(angle);
+				float heading = 0;
+				dir = xsVectorSet(0, 0, -1);
 				for(x=trQuestVarGet("count"); >0) {
 					trQuestVarSetFromRand("dist", 6, 18, true);
-					trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-					trVectorScale("dir", trQuestVarGet("dist"));
-					trQuestVarSet("dirX", trQuestVarGet("posX") + trQuestVarGet("dirX"));
-					trQuestVarSet("dirZ", trQuestVarGet("posZ") + trQuestVarGet("dirZ"));
-					amt = fModulo(360.0, trQuestVarGet("angle") * 180.0 / 3.141592 - 180.0);
-					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0",pName,1,trQuestVarGet("dirX"),0,trQuestVarGet("dirZ"),amt,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("next", true);
-					trUnitConvert(ENEMY_PLAYER);
-					activateEnemy("next");
-					trQuestVarSet("angle", trQuestVarGet("angle") + angle);
+					
+					target = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+ENEMY_PLAYER+",0",protoName,1,
+						xsVectorGetX(pos) - trQuestVarGet("dist") * xsVectorGetX(dir),0,
+						xsVectorGetZ(pos) - trQuestVarGet("dist") * xsVectorGetZ(dir),heading,true);
+					activateEnemy(target);
+					
+					heading = heading + amt;
+					dir = rotationMatrix(dir,cCos,cSin);
 				}
 				trSoundPlayFN("attackwarning.wav","1",-1,"","");
 				trSoundPlayFN("wild.wav","1",-1,"","");
-				yRemoveFromDatabase("ambushRooms");
-				yRemoveUpdateVar("ambushRooms", "posX");
-				yRemoveUpdateVar("ambushRooms", "posZ");
-				yRemoveUpdateVar("ambushRooms", "type");
+				xFreeDatabaseBlock(dAmbushRooms);
 				break;
 			}
 		}

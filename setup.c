@@ -138,7 +138,7 @@ string stageName(int stage = 0) {
 		}
 		case 9:
 		{
-			name = "The Pit";
+			name = "The Pit (UNDER CONSTRUCTION)";
 		}
 		case 10:
 		{
@@ -207,13 +207,25 @@ string stageIcon(int stage = 0) {
 void reselectMyself() {
 	uiClearSelection();
 	int p = trCurrentPlayer();
-	int class = trQuestVarGet("p"+p+"class");
+	int class = xGetInt(dPlayerData, xPlayerClass, p);
 	trackInsert();
 	trackAddWaypoint();
 	trackAddWaypoint();
 	trBlockAllSounds(false);
-	uiFindType(kbGetProtoUnitName(1*trQuestVarGet("class"+class+"proto")));
+	uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, class)));
 	trackPlay(1,999);
+}
+
+
+void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
+	int p = kbGetProtoUnitID(proto);
+	xSetPointer(dClass,class);
+	xSetInt(dClass,xClassProto,p);
+	xSetInt(dClass,xClassFirstDelay,firstDelay);
+	xSetInt(dClass,xClassNextDelay,nextDelay);
+	xSetInt(dClass,xClassSpecialAttackCooldown,specialCD);
+	xSetInt(dClass,xClassGemstone,gem);
+	trQuestVarSet("proto"+p+"class", class);
 }
 
 void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=4,float armor=0,float range=0) {
@@ -276,68 +288,30 @@ void setupPlayerProto(string proto="",float health=0,float attack=0,float speed=
 	trModifyProtounit(proto, 0, 2, -20);
 }
 
-void setupClass(string proto = "", int class = 0, int firstDelay = 0, int nextDelay = 0,int gem = 0,int specialCD = 0) {
-	int p = kbGetProtoUnitID(proto);
-	trQuestVarSet("class"+class+"proto", p);
-	trQuestVarSet("proto"+p+"class", class);
-	trQuestVarSet("class"+class+"firstDelay", firstDelay);
-	trQuestVarSet("class"+class+"nextDelay", nextDelay);
-	trQuestVarSet("class"+class+"specialAttackCooldown", specialCD);
-	trQuestVarSet("class"+class+"gemstone", gem);
-}
 
 void chooseClass(int p = 0, int class = 0) {
-	trQuestVarSet("p"+p+"class", class);
 	trEventFire(1000 + 12 * class + p);
-	int proto = trQuestVarGet("class"+class+"proto");
-	trQuestVarSet("p"+p+"health", trQuestVarGet("proto"+proto+"health"));
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"baseAttackTrue", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"baseAttack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("proto"+proto+"attack"));
-	trQuestVarSet("p"+p+"range", trQuestVarGet("proto"+proto+"range"));
-	trQuestVarSet("p"+p+"speed", trQuestVarGet("proto"+proto+"speed"));
-	trQuestVarSet("p"+p+"firstDelay", trQuestVarGet("class"+class+"firstDelay"));
-	trQuestVarSet("p"+p+"nextDelay", trQuestVarGet("class"+class+"nextDelay"));
-	trQuestVarSet("p"+p+"specialAttackCooldown", trQuestVarGet("class"+class+"specialAttackCooldown"));
-	trQuestVarSet("p"+p+"los", 20);
-	trQuestVarSet("p"+p+"projectiles", 1);
-	trQuestVarSet("p"+p+"spellRange", 1);
-	trQuestVarSet("p"+p+"spellDamage", 1);
-	trQuestVarSet("p"+p+"spellDuration", 1);
-	trQuestVarSet("p"+p+"spellRangeTrue", 1);
-	trQuestVarSet("p"+p+"spellDamageTrue", 1);
-	trQuestVarSet("p"+p+"spellDurationTrue", 1);
-	trQuestVarSet("p"+p+"healBoost", 1);
-	trQuestVarSet("p"+p+"favorFromAttacks", 0);
-	trQuestVarSet("p"+p+"poisonSpeed", 0);
-	trQuestVarSet("p"+p+"lifesteal", 0);
-	trQuestVarSet("p"+p+"favorRegen", 0);
-	trQuestVarSet("p"+p+"physicalResist", trQuestVarGet("proto"+proto+"armor"));
-	trQuestVarSet("p"+p+"magicResist", trQuestVarGet("proto"+proto+"armor"));
-	trQuestVarSet("p"+p+"petDogs", 0);
-	trQuestVarSet("p"+p+"magicPen", 0);
-	trQuestVarSet("p"+p+"cleave", 0);
-	trQuestVarSet("p"+p+"defiance", 0);
+	int proto = xGetInt(dClass,xClassProto,class);
+	xSetPointer(dPlayerData,p);
+	xResetValues(dPlayerData, xPlayerUnit);
+	xSetInt(dPlayerData, xPlayerClass, class);
+	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"));
+	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerBaseAttackTrue,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerAttack,trQuestVarGet("proto"+proto+"attack"));
+	xSetFloat(dPlayerData,xPlayerRange,trQuestVarGet("proto"+proto+"range"));
+	xSetFloat(dPlayerData,xPlayerSpeed,trQuestVarGet("proto"+proto+"speed"));
 	
-	trQuestVarSet("p"+p+"ultimateCost", 1);
-	trQuestVarSet("p"+p+"cooldownReduction", 1);
-	trQuestVarSet("p"+p+"stunResistance", 1);
-	trQuestVarSet("p"+p+"poisonResistance", 1);
-	trQuestVarSet("p"+p+"silenceResistance", 1);
+	xSetInt(dPlayerData,xPlayerFirstDelay,xGetInt(dClass, xClassFirstDelay, class));
+	xSetInt(dPlayerData,xPlayerNextDelay,xGetInt(dClass, xClassNextDelay, class));
+	xSetInt(dPlayerData,xPlayerSpecialAttackCooldown,xGetInt(dClass, xClassSpecialAttackCooldown, class));
 	
-	trQuestVarSet("p"+p+"ultimateCostCount", 0);
-	trQuestVarSet("p"+p+"cooldownReductionCount", 0);
-	trQuestVarSet("p"+p+"stunResistanceCount", 0);
-	trQuestVarSet("p"+p+"poisonResistanceCount", 0);
-	trQuestVarSet("p"+p+"silenceResistanceCount", 0);
-	
-	trQuestVarSet("p"+p+"stunDamage", 0);
-	trQuestVarSet("p"+p+"poisonKiller", 0);
+	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
+	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
-	if (trUnitAlive() && trQuestVarGet("p"+p+"unit") > 0) {
+	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
+	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit) > 0) {
 		trMutateSelected(proto);
 	}
 	trPlayerKillAllGodPowers(p);
@@ -347,29 +321,33 @@ void chooseClass(int p = 0, int class = 0) {
 		trCounterAbort("rain");
 	}
 	if (class > 0) {
-		trQuestVarSet("p"+p+"wellCooldownStatus", 1);
-		trQuestVarSet("p"+p+"lureCooldownStatus", 1);
-		trQuestVarSet("p"+p+"rainCooldownStatus", 1);
+		xSetInt(dPlayerData,xPlayerWellCooldownStatus,1);
+		xSetInt(dPlayerData,xPlayerLureCooldownStatus,1);
+		xSetInt(dPlayerData,xPlayerRainCooldownStatus,1);
 	}
 	
 	if (Multiplayer == false) {
-		trQuestVarSet("p"+p+"level", trQuestVarGet("class"+class+"level") - 1);
-		trSetCivilizationNameOverride(p, "Level " + (1+trQuestVarGet("p"+p+"level")));
+		xSetInt(dPlayerData,xPlayerLevel,xGetInt(dClass,xClassLevel,class) - 1);
+		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData,xPlayerLevel)));
 	}
 	
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		yDatabaseNext("p"+p+"relics");
-		if (x > trQuestVarGet("p"+p+"level")+1) {
-			yAddToDatabase("freeRelics", "p"+p+"relics");
-			yAddUpdateVar("freeRelics", "type", 1*yGetVar("p"+p+"relics", "type"));
-			yRemoveFromDatabase("p"+p+"relics");
+	int relics = getRelicsDB(p);
+	for(x=xGetDatabaseCount(relics); >0) {
+		xDatabaseNext(relics);
+		if (x > xGetInt(dPlayerData,xPlayerLevel,p)+1) {
+			int index = xAddDatabaseBlock(dFreeRelics);
+			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
+			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
+			xFreeDatabaseBlock(relics);
 			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"relics");
+			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
 		} else {
-			relicEffect(1*yGetVar("p"+p+"relics", "type"), p, true);
+			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
 	}
+	
+	xPrintAll(dPlayerData, p);
 }
 
 rule setup
@@ -411,9 +389,6 @@ runImmediately
 	trLetterBox(true);
 	trUIFadeToColor(0,0,0,0,0,true);
 	
-	modularCounterInit("spyFind", 64);
-	modularCounterInit("spyFound", 64);
-	
 	/*
 	player 0 omniscience
 	*/
@@ -423,35 +398,14 @@ runImmediately
 	aiSet("NoAI", ENEMY_PLAYER);
 	xsSetContextPlayer(ENEMY_PLAYER);
 	aiSetAttackResponseDistance(0.0);
+	xsSetContextPlayer(0);
 	
-	setupClass("Militia", 0, 500, 1000);
-	setupClass("Militia", 13, 500, 1000);
-	setupClass("Militia", 14, 500, 1000);
-	setupClass("Militia", 15, 500, 1000);
-	setupClass("Militia", 16, 500, 1000);
-	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
-	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
-	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
-	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
-	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
-	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
-	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
-	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
-	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
-	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
-	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
-	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
-	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
-	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
-	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
-	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
-	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
-	
+	/*
 	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
 	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
 	trQuestVarSet("p0stunResistance", 1);
 	trQuestVarSet("p0poisonResistance", 1);
-	
+	*/
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 26, 1);
@@ -541,6 +495,32 @@ runImmediately
 	trQuestVarSet("rotZ3", 1);
 	
 	xsEnableRule("data_load_00");
+	xsDisableSelf();
+}
+
+rule setup_classes
+active
+highFrequency
+{
+	
+	setupClass("Militia", 17, 500, 1000);
+	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
+	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
+	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
+	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
+	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
+	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
+	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
+	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
+	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
+	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
+	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
+	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
+	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
+	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
+	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
+	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
+	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	xsDisableSelf();
 }
 
@@ -663,7 +643,7 @@ highFrequency
 			trPlayerGrantResources(p, "Favor", -1000.0);
 		}
 		if (Multiplayer == false) {
-			trPlayerGrantResources(1, "Gold", trQuestVarGet("p1gold"));
+			trPlayerGrantResources(1, "Gold", xGetInt(dPlayerData, xPlayerGold, 1));
 		}
 		xsDisableSelf();
 	}
@@ -721,6 +701,9 @@ highFrequency
 	}
 }
 
+int dStageChoices = 0;
+int xStageChoicesStage = 0;
+
 void paintTowerSegment(int stage = 0) {
 	int tPrimary = 0;
 	int tSubPrimary = 0;
@@ -766,6 +749,11 @@ void paintTowerSegment(int stage = 0) {
 			tPrimary = 0;
 			tSubPrimary = 50;
 		}
+		case 9:
+		{
+			tPrimary = 5;
+			tSubPrimary = 7;
+		}
 	}
 	trPaintTerrain(68,43 + 3 * stage,76,46 + 3 * stage, tPrimary, tSubPrimary, false);
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -774,12 +762,13 @@ void paintTowerSegment(int stage = 0) {
 	if (iModulo(2, stage) == 0) {
 		x = 151;
 	}
-	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	int next = trGetNextUnitScenarioNameNumber();
 	trArmyDispatch("0,0","Dwarf",1,x,0,z,180,true);
 	trArmySelect("0,0");
 	trMutateSelected(kbGetProtoUnitID("Outpost"));
-	yAddToDatabase("stageChoices", "next");
-	yAddUpdateVar("stageChoices", "stage", stage);
+	xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+	xSetInt(dStageChoices,xUnitName,next);
+	xSetInt(dStageChoices,xStageChoicesStage,stage);
 }
 
 rule Z_cin_02
@@ -788,9 +777,14 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 5) {
 		trModifyProtounit("Curse SFX", 1, 8, -8);
-		if (trQuestVarGet("p1progress") == 0) {
+		if (xGetInt(dPlayerData,xPlayerProgress,1) <= 0) {
 			trQuestVarSet("stage", 1);
+			xsEnableRule("choose_stage_02");
 		} else {
+			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
+			xInitAddInt(dStageChoices,"name");
+			xStageChoicesStage = xInitAddInt(dStageChoices,"stage");
+			
 			trLetterBox(false);
 			uiClearSelection();
 			trMusicPlay("cinematics\9_in\music.mp3", "1", 0.5);
@@ -804,13 +798,13 @@ highFrequency
 			trPaintTerrain(0,0,195,45,0,34,false); // sand A
 			
 			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && ENEMY_PLAYER > 2) {
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Dwarf",1,129,0,93,180,true);
-				trArmySelect("1,0");
-				trUnitConvert(0);
+				int next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Dwarf",1,129,0,93,180,true);
+				trArmySelect("0,0");
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
-				yAddToDatabase("stageChoices", "next");
-				yAddUpdateVar("stageChoices", "stage", 0);
+				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+				xSetInt(dStageChoices,xUnitName,next);
+				xSetInt(dStageChoices,xStageChoicesStage,0);
 				trPaintTerrain(65,47,65,47,0,80);
 				trPaintTerrain(65,46,65,46,0,74);
 				trPaintTerrain(65,45,65,45,0,81);
@@ -823,7 +817,7 @@ highFrequency
 			}
 			
 			trPaintTerrain(68,46,76,76,5,4,false); // black
-			for(i=0; <= trQuestVarGet("p1progress")) {
+			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
 				paintTowerSegment(i+1);
 			}
 			trPaintTerrain(67,46,67,76,0,74,false); // left wall
@@ -838,7 +832,6 @@ highFrequency
 		}
 		trSetLighting("default", 0.1);
 		xsDisableSelf();
-		xsEnableRule("choose_stage_01");
 	}
 }
 
