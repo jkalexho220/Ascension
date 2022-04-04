@@ -52,7 +52,7 @@ void debugLog(string msg = "") {
 string datatypeName(int data = 0) {
 	string name = "void";
 	if (data >= 0 && data <= 4) {
-		aiPlanGetUserVariableString(MALLOC,15,data);
+		name = aiPlanGetUserVariableString(MALLOC,15,data);
 	}
 	return(name);
 }

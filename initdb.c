@@ -261,8 +261,8 @@ highFrequency
 	
 	xBounty = xInitAddInt(dEnemies,"bounty");
 	xDropRelic = xInitAddInt(dEnemies,"relic");
-	xDeathSentence = xInitAddInt(dEnemies,"deathSentence");
-	xEchoBomb = xInitAddInt(dEnemies,"echoBomb");
+	xDeathSentence = xInitAddBool(dEnemies,"deathSentence", false);
+	xEchoBomb = xInitAddBool(dEnemies,"echoBomb", false);
 	xMissingTimeout = xInitAddInt(dEnemies,"missingTimeout");
 	
 	xDatabaseIndex = xPlayerOwner;

@@ -1151,6 +1151,10 @@ rule the_deep_damage
 inactive
 highFrequency
 {
+	int index = xGetPointer(dPlayerUnits);
+	xSetPointer(dPlayerUnits, 1*trQuestVarGet("deepPlayerPointer"));
+	xDatabaseNext(dPlayerUnits);
+	trQuestVarSet("deepPlayerPointer", xGetPointer(dPlayerUnits));
 	bool found = false;
 	float amt = trTimeMS() - xGetInt(dPlayerUnits, xDeepDamageLast);
 	if (amt > 500) {
@@ -1168,6 +1172,8 @@ highFrequency
 			trDamageUnit(0.2 * amt);
 		}
 	}
+	
+	xSetPointer(dPlayerUnits, index);
 }
 
 rule the_cloud_damage
