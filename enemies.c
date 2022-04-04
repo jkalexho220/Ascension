@@ -696,7 +696,7 @@ void specialUnitsAlways() {
 		} else {
 			id = xGetPointer(db);
 			if (xSetPointer(db, xGetInt(dValkyries, xSpecialIndex))) {
-				xSetInt(db, xMagicResist, 1 - xGetInt(db, xSilenceStatus));
+				xSetFloat(db, xMagicResist, 1.0 - xGetInt(db, xSilenceStatus));
 				if (xGetInt(db, xSilenceStatus) != xGetInt(dValkyries, xSpecialStep)) {
 					xSetInt(dValkyries, xSpecialStep, xGetInt(db, xSilenceStatus));
 					xUnitSelect(dValkyries,xSpecialNext);
@@ -1088,7 +1088,7 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Transport Ship Greek");
 				xUnitSelectByID(dAvengerProj,xUnitID);
 				trDamageUnitPercent(-100);
-				xUnitSelectByID(dAvengerProj,xAvengerProjUnit);
+				xUnitSelect(dAvengerProj,xAvengerProjUnit);
 				if (trUnitAlive()) {
 					trImmediateUnitGarrison(""+xGetInt(dAvengerProj,xUnitName));
 					trUnitChangeProtoUnit("Avenger");

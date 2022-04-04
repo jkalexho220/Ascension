@@ -2,11 +2,11 @@ float rainOfLightningCost = 50;
 float rainOfLightningDuration = 10;
 float rainOfLightningRadius = 5;
 
-float disengageCooldown = 8;
+int disengageCooldown = 8;
 float disengageRadius = 4;
 float disengageRange = 12;
 
-float shockArrowCooldown = 10;
+int shockArrowCooldown = 10;
 float shockArrowRange = 30;
 float shockArrowDamage = 100;
 
@@ -355,12 +355,7 @@ void chooseStormcutter(int eventID = -1) {
 		lureName = "(Q) Shock Arrow";
 		lureIsUltimate = false;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("disengageCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("shockArrowCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", trQuestVarGet("rainOfLightningCost"));
+	xRainStormSFX = xInitAddInt(db, "rainSFX");
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, disengageCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
@@ -389,8 +384,6 @@ void chooseStormcutter(int eventID = -1) {
 		xShockArrowTimeout = xInitAddInt(db, "timeout", -1);
 		xShockArrowDist = xInitAddFloat(db, "dist");
 	}
-	
-	xRainStormSFX = xInitAddInt(db, "rainSFX");
 }
 
 void modifyStormcutter(int eventID = -1) {

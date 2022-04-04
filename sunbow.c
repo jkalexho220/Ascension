@@ -1,9 +1,9 @@
-float sunlightCooldown = 18;
+int sunlightCooldown = 18;
 float sunlightRadius = 6;
 float sunlightDuration = 6;
 float sunlightPower = 60;
 
-float healingRaysCooldown = 12;
+int healingRaysCooldown = 12;
 float healingRaysPower = 100;
 float healingRaysDuration = 6;
 

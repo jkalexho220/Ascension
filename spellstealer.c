@@ -1,57 +1,79 @@
+
+float spellstealerPassiveRadius = 6;
+
+float bladeDanceCost = 10;
+float bladeDanceRadius = 15;
+
+float negationCloakDuration = 3;
+int negationCloakCooldown = 12;
+
+int spellbladesCooldown = 9;
+int spellbladesCount = 3;
+
+int xBladeDanceIndex = 0;
+int xBladeDanceStatus = 0;
+
+int xSpellbladePrev = 0;
+int xSpellbladeDir = 0;
+int xSpellbladeStatus = 0;
+
+int xCloakSFX = 0;
+
 void removeSpellstealer(int p = 0) {
 	removePlayerSpecific(p);
-	yRemoveUpdateVar("p"+p+"characters", "cloakSFX");
 }
 
 void spellstealerAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * SPELLSTEALER;
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int index = yGetPointer("enemies");
+	int db = getCharactersDB(p);
+	int bladeDanceTargets = trQuestVarGet("p"+p+"bladeDanceTargets");
+	int spellblades = trQuestVarGet("p"+p+"spellblades");
+	int index = xGetPointer(dEnemies);
 	int stunned = 0;
 	int poisoned = 0;
 	int silenced = 0;
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
+	xSetPointer(dPlayerData, p);
 	
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
-		if (id == -1 || trUnitAlive() == false) {
+	vector pos = vector(0,0,0);
+	vector end = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	
+	if (xGetDatabaseCount(db) > 0) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeSpellstealer(p);
 		} else {
-			hit = CheckOnHit(p, id);
+			hit = CheckOnHit(p);
 			if (hit >= ON_HIT_NORMAL) {
-				if (ySetPointer("enemies", 1*yGetVar("p"+p+"characters", "attackTargetIndex"))) {
+				if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
 					amt = 1;
-					if (yGetVar("enemies", "poisonStatus") > 0) {
+					if (xGetInt(dEnemies, xStunStatus) > 0) {
 						amt = amt * 2;
 					}
-					if (yGetVar("enemies", "stunStatus") > 0) {
-						amt = amt * 2;
-					}
-					if (yGetVar("enemies", "silencestatus") > 0) {
-						amt = amt * 2;
-					}
-					amt = amt - 1;
-					trUnitSelectClear();
-					trUnitSelectByQV("enemies", true);
-					damageEnemy(p, amt * trQuestVarGet("p"+p+"baseAttack"), false);
+					amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus)) - 1; // -1 because character attack
+					xUnitSelectByID(dEnemies, xUnitID);
+					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerAttack), false);
 					if (hit == ON_HIT_SPECIAL) {
-						trVectorSetUnitPos("pos", "enemies");
-						dist = xsPow(trQuestVarGet("spellstealerPassiveRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
+						dist = xsPow(spellstealerPassiveRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("Lampades Blood");
 						for(x=xGetDatabaseCount(dEnemies); >0) {
-							id = yDatabaseNext("enemies", true);
-							if (id == -1 || trUnitAlive() == false) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
 								removeEnemy();
-							} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-								poisonUnit("enemies", 12.0, 12.0, p);
+							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+								poisonUnit(dEnemies, 12.0, 12.0, p);
 							}
 						}
 					}
@@ -62,76 +84,77 @@ void spellstealerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		trVectorSetUnitPos("pos", "p"+p+"lureObject");
+		pos = xGetVector(dPlayerData, xPlayerLurePos);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
-		trMutateSelected(kbGetProtoUnitID("Rocket"));
 		trUnitDestroy();
-		dist = xsPow(trQuestVarGet("bladeDanceRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+		dist = xsPow(bladeDanceRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 		amt = dist;
 		target = -1;
 		for(x=xGetDatabaseCount(dEnemies); >0) {
-			id = yDatabaseNext("enemies", true);
-			if (id == -1 || trUnitAlive() == false) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			if (trUnitAlive() == false) {
 				removeEnemy();
 			} else {
-				current = zDistanceToVectorSquared("enemies", "pos");
+				current = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
 				if (current < dist) {
-					yAddToDatabase("p"+p+"bladeDanceTargets", "enemies");
-					yAddUpdateVar("p"+p+"bladeDanceTargets", "index", yGetPointer("enemies"));
+					xAddDatabaseBlock(bladeDanceTargets, true);
+					xSetInt(bladeDanceTargets, xUnitName, xGetInt(dEnemies, xUnitName));
+					xSetInt(bladeDanceTargets, xBladeDanceIndex, xGetPointer(dEnemies));
 					if (current < amt) {
 						amt = current;
-						target = yGetNewestPointer("p"+p+"bladeDanceTargets");
+						target = xGetNewestPointer(bladeDanceTargets);
 					}
 				}
 			}
 		}
 		if (target > 0) {
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				id = yDatabaseNext("p"+p+"characters", true);
-				if (id == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
 					removeSpellstealer(p);
 				} else {
 					trMutateSelected(kbGetProtoUnitID("Revealer to Player"));
 				}
 			}
-			trQuestVarSet("p"+p+"launched", 1);
+			xSetBool(dPlayerData, xPlayerLaunched, true);
 			
-			amt = trQuestVarGet("bladeDanceCost") * trQuestVarGet("p"+p+"ultimateCost");
+			amt = bladeDanceCost * xGetFloat(dPlayerData, xPlayerUltimateCost);
 			
-			ySetPointer("p"+p+"bladeDanceTargets", target);
-			ySetVar("p"+p+"bladeDanceTargets", "status", trQuestVarGet("p"+p+"spellstealStatus"));
-			if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
-				stunned = yGetVar("enemies", "stunStatus");
-				poisoned = yGetVar("enemies", "poisonStatus");
-				silenced = yGetVar("enemies", "silenceStatus");
+			xSetPointer(bladeDanceTargets, target);
+			xSetInt(bladeDanceTargets, xBladeDanceStatus, 1*trQuestVarGet("p"+p+"spellStealStatus"));
+			if (xSetPointer(dEnemies, xGetInt(bladeDanceTargets, xBladeDanceIndex))) {
+				stunned = xGetInt(dEnemies, xStunStatus);
+				poisoned = xGetInt(dEnemies, xPoisonStatus);
+				silenced = xGetInt(dEnemies, xSilenceStatus);
 			}
 			
-			for(x=yGetDatabaseCount("p"+p+"bladeDanceTargets"); >0) {
-				yDatabaseNext("p"+p+"bladeDanceTargets");
-				if (target != yGetPointer("p"+p+"bladeDanceTargets")) {
-					id = yGetVar("p"+p+"bladeDanceTargets", "index");
-					hit = yGetVarAtIndex("enemies", "stunStatus", id) * stunned;
-					hit = hit + yGetVarAtIndex("enemies", "poisonStatus", id) * poisoned;
-					hit = hit + yGetVarAtIndex("enemies", "silenceStatus", id) * silenced;
+			for(x=xGetDatabaseCount(bladeDanceTargets); >0) {
+				xDatabaseNext(bladeDanceTargets);
+				if (target != xGetPointer(bladeDanceTargets)) {
+					id = xGetInt(bladeDanceTargets, xBladeDanceIndex);
+					hit = xGetInt(dEnemies, xStunStatus, id) * stunned;
+					hit = hit + xGetInt(dEnemies, xPoisonStatus, id) * poisoned;
+					hit = hit + xGetInt(dEnemies, xSilenceStatus, id) * silenced;
 					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < 2.0 * amt)) {
-						yRemoveFromDatabase("p"+p+"bladeDanceTargets");
+						xFreeDatabaseBlock(bladeDanceTargets);
 					} else {
-						ySetVar("p"+p+"bladeDanceTargets", "status", trQuestVarGet("p"+p+"spellstealStatus"));
+						xSetInt(bladeDanceTargets, xBladeDanceStatus, trQuestVarGet("p"+p+"spellStealStatus"));
 					}
 				}
 			}
 			trQuestVarSet("p"+p+"spellstealStatus", 0);
 			trQuestVarSet("p"+p+"bladeDanceNext", trTimeMS() - 1);
-			ySetPointer("p"+p+"bladeDanceTargets", target);
+			xSetPointer(bladeDanceTargets, target);
 			
-			if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 1) {
+			if (xGetDatabaseCount(bladeDanceTargets) > 1) {
 				amt = amt * 2;
 			}
 			gainFavor(p, 0.0 - amt);
 		} else {
-			yClearDatabase("p"+p+"bladeDanceTargets");
-			trQuestVarSet("p"+p+"lureReadyTime", 0);
+			xClearDatabase(bladeDanceTargets);
 			if (trCurrentPlayer() == p) {
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
 				trChatSend(0, "There are no enemies near your cursor!");
@@ -139,64 +162,57 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"bladeDanceTargets") > 0) {
+	if (xGetDatabaseCount(bladeDanceTargets) > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"bladeDanceNext")) {
 			trQuestVarSet("p"+p+"bladeDanceNext", trQuestVarGet("p"+p+"bladeDanceNext") + 300);
-			for(x=yGetDatabaseCount("p"+p+"bladeDanceTargets"); >0) {
-				yDatabaseNext("p"+p+"bladeDanceTargets", true);
+			for(x=xGetDatabaseCount(bladeDanceTargets); >0) {
+				xDatabaseNext(bladeDanceTargets, true);
 				if (trUnitAlive() == false) {
-					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
-				} else if (ySetPointer("enemies", 1*yGetVar("p"+p+"bladeDanceTargets", "index"))) {
+					xFreeDatabaseBlock(bladeDanceTargets);
+				} else if (xSetPointer(dEnemies, xGetInt(bladeDanceTargets, xBladeDanceIndex))) {
 					trSoundPlayFN("shadeofhadesacknowledge2.wav","1",-1,"","");
-					hit = yGetVar("p"+p+"bladeDanceTargets", "status");
-					amt = 1;
+					hit = xGetInt(bladeDanceTargets, xBladeDanceStatus);
+					amt = xGetFloat(dPlayerData, xPlayerAttack) * xGetFloat(dPlayerData, xPlayerSpellDamage);
 					if (hit >= xsPow(2, STATUS_SILENCE)) {
 						hit = hit - xsPow(2, STATUS_SILENCE);
-						silenceUnit("enemies", 9.0, p);
+						silenceUnit(dEnemies, 9.0, p);
 					}
 					if (hit >= xsPow(2, STATUS_POISON)) {
 						hit = hit - xsPow(2, STATUS_POISON);
-						poisonUnit("enemies", 12.0, 12.0, p);
+						poisonUnit(dEnemies, 12.0, 12.0, p);
 					}
 					if (hit >= xsPow(2, STATUS_STUN)) {
 						hit = hit - xsPow(2, STATUS_STUN);
-						stunUnit("enemies", 2.0, p);
+						stunUnit(dEnemies, 2.0, p);
 					}
-					if (yGetVar("enemies", "stunstatus") > 0) {
+					if (xGetInt(dEnemies, xStunStatus) > 0) {
 						amt = amt * 2;
 					}
-					if (yGetVar("enemies", "poisonstatus") > 0) {
-						amt = amt * 2;
-					}
-					if (yGetVar("enemies", "silencestatus") > 0) {
-						amt = amt * 2;
-					}
-					amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage");
-					trVectorSetUnitPos("pos", "enemies");
+					amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus));
+					pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch(""+p+",0", "Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"bladeDanceTargets");
+					trArmyDispatch(""+p+",0", "Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					xUnitSelect(bladeDanceTargets, xUnitName);
 					damageEnemy(p, amt, false, 1.0);
-					OnHit(p, 1*yGetVar("p"+p+"bladeDanceTargets", "index"), false);
-					yRemoveFromDatabase("p"+p+"bladeDanceTargets");
+					OnHit(p, xGetInt(bladeDanceTargets, xBladeDanceIndex), false);
+					xFreeDatabaseBlock(bladeDanceTargets);
 					break;
 				}
 			}
 			trUnitSelectClear();
 			trUnitSelectByQV("next", true);
-			if (yGetDatabaseCount("p"+p+"bladeDanceTargets") == 0) {
+			if (xGetDatabaseCount(bladeDanceTargets) == 0) {
 				trUnitChangeProtoUnit("Transport Ship Greek");
-				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-					yDatabaseNext("p"+p+"characters", true);
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
 					trMutateSelected(kbGetProtoUnitID("Dwarf"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 					trUnitChangeProtoUnit("Swordsman Hero");
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"characters");
+					xUnitSelectByID(db, xUnitID);
 					trMutateSelected(kbGetProtoUnitID("Swordsman Hero"));
 				}
-				trQuestVarSet("p"+p+"launched", 0);
+				xSetBool(dPlayerData, xPlayerLaunched, false);
 				equipRelicsAgain(p);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
@@ -207,73 +223,58 @@ void spellstealerAlways(int eventID = -1) {
 		}
 	}
 	
-	for(y=xsMin(2, yGetDatabaseCount("p"+p+"spellblades")); >0) {
+	for(y=xsMin(2, xGetDatabaseCount(spellblades)); >0) {
 		hit = 0;
-		yDatabaseNext("p"+p+"spellblades");
-		yVarToVector("p"+p+"spellblades", "prev");
-		yVarToVector("p"+p+"spellblades", "dir");
-		dist = zDistanceToVector("p"+p+"spellblades", "prev");
+		xDatabaseNext(spellblades);
+		pos = xGetVector(spellblades, xSpellbladePrev);
+		dir = xGetVector(spellblades, xSpellbladeDir);
+		dist = unitDistanceToVector(xGetInt(spellblades, xUnitName), pos, false);
 		for(x=xGetDatabaseCount(dEnemies); >0) {
-			if ((yDatabaseNext("enemies", true) == -1) || trUnitAlive() == false) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies,xUnitID);
+			if (trUnitAlive() == false) {
 				removeEnemy();
-			} else {
-				trVectorSetUnitPos("pos", "enemies");
-				current = zDistanceBetweenVectors("pos", "prev");
-				if (current < dist + 3.0) {
-					trQuestVarSet("hitboxX", trQuestVarGet("prevX") + current * trQuestVarGet("dirX"));
-					trQuestVarSet("hitboxZ", trQuestVarGet("prevZ") + current * trQuestVarGet("dirZ"));
-					if (zDistanceBetweenVectorsSquared("pos", "hitbox") < 9.0) {
-						trQuestVarSet("spellsound", 2);
-						amt = 0.5;
-						hit = yGetVar("p"+p+"spellblades", "status");
-						if (hit >= xsPow(2, STATUS_SILENCE)) {
-							hit = hit - xsPow(2, STATUS_SILENCE);
-							silenceUnit("enemies", 9.0, p);
-						}
-						if (hit >= xsPow(2, STATUS_POISON)) {
-							hit = hit - xsPow(2, STATUS_POISON);
-							poisonUnit("enemies", 12.0, 12.0, p);
-						}
-						if (hit >= xsPow(2, STATUS_STUN)) {
-							hit = hit - xsPow(2, STATUS_STUN);
-							stunUnit("enemies", 2.0, p);
-						}
-						if (yGetVar("enemies", "stunstatus") > 0) {
-							amt = amt * 2;
-						}
-						if (yGetVar("enemies", "poisonstatus") > 0) {
-							amt = amt * 2;
-						}
-						if (yGetVar("enemies", "silencestatus") > 0) {
-							amt = amt * 2;
-						}
-						amt = amt * trQuestVarGet("p"+p+"baseAttack") * trQuestVarGet("p"+p+"spellDamage");
-						damageEnemy(p, amt, true);
-						hit = 1;
-					}
+			} else if (rayCollision(dEnemies, pos, dir, dist + 3.0, 9.0)) {
+				trQuestVarSet("spellsound", 2);
+				amt = 0.5 * xGetFloat(dPlayerData, xPlayerAttack) * xGetFloat(dPlayerData, xPlayerSpellDamage);
+				hit = xGetInt(spellblades, xSpellbladeStatus);
+				if (hit >= xsPow(2, STATUS_SILENCE)) {
+					hit = hit - xsPow(2, STATUS_SILENCE);
+					silenceUnit(dEnemies, 9.0, p);
 				}
+				if (hit >= xsPow(2, STATUS_POISON)) {
+					hit = hit - xsPow(2, STATUS_POISON);
+					poisonUnit(dEnemies, 12.0, 12.0, p);
+				}
+				if (hit >= xsPow(2, STATUS_STUN)) {
+					hit = hit - xsPow(2, STATUS_STUN);
+					stunUnit(dEnemies, 2.0, p);
+				}
+				if (xGetInt(dEnemies, xStunStatus) > 0) {
+					amt = amt * 2;
+				}
+				amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus));
+				damageEnemy(p, amt, true);
+				hit = 1;
 			}
 		}
 		if (hit == 0) {
-			trVectorSetUnitPos("pos", "p"+p+"spellblades");
-			vectorToGrid("pos", "loc");
-			if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			pos = kbGetBlockPosition(""+xGetInt(spellblades, xUnitName), true);
+			if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 				hit = 1;
 				trQuestVarSet("spellsound", 1);
 			} else {
-				ySetVarFromVector("p"+p+"spellblades", "prev", "pos");
+				xSetVector(spellblades, xSpellbladePrev, pos);
 			}
 		}
 		
 		if (hit == 1) {
 			gainFavor(p, 1);
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"spellblades");
+			xUnitSelect(spellblades, xUnitName);
 			trUnitChangeProtoUnit("Lightning Sparks Ground");
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"spellblades");
+			xUnitSelect(spellblades, xUnitName);
 			trDamageUnitPercent(-100);
-			yRemoveFromDatabase("p"+p+"spellblades");
+			xFreeDatabaseBlock(spellblades);
 		}
 	}
 	
@@ -289,34 +290,33 @@ void spellstealerAlways(int eventID = -1) {
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		trSoundPlayFN("manticorespecialattack.wav","1",-1,"","");
-		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-			id = yDatabaseNext("p"+p+"characters", true);
-			if (id == -1 || trUnitAlive() == false) {
+		for(y=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db, xUnitID);
+			if (trUnitAlive() == false) {
 				removeSpellstealer(p);
 			} else {
-				trVectorSetUnitPos("start", "p"+p+"characters");
-				hit = trQuestVarGet("spellbladesCount") + 2 * trQuestVarGet("p"+p+"projectiles");
-				amt = angleBetweenVectors("start", "p"+p+"wellPos");
+				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+				hit = spellbladesCount + 2 * xGetInt(dPlayerData, xPlayerProjectiles);
+				amt = angleBetweenVectors(pos, xGetVector(dPlayerData, xPlayerWellPos));
 				amt = fModulo(6.283185, amt - 0.196349 * (hit - 1) * 0.5);
 				for(x=hit; >0) {
-					trVectorSetFromAngle("dir", amt);
-					trQuestVarSet("endx", trQuestVarGet("startx") + trQuestVarGet("dirx"));
-					trQuestVarSet("endz", trQuestVarGet("startz") + trQuestVarGet("dirz"));
-					vectorSetAsTargetVector("target","start","end",300.0);
+					dir = xsVectorSet(xsSin(amt),0,xsCos(amt)); // AoM devs not the sharpest tools in the shed
+					end = pos + dir;
+					end = vectorSetAsTargetVector(pos,end,300.0);
 					amt = fModulo(6.283185, amt + 0.196349);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
+					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trUnitSelectClear();
 					trUnitSelectByQV("next", true);
 					trMutateSelected(kbGetProtoUnitID("Stymph Bird Feather"));
-					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-					trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"));
-					yAddToDatabase("p"+p+"spellblades","next");
-					yAddUpdateVar("p"+p+"spellblades","prevX", trQuestVarGet("startX"));
-					yAddUpdateVar("p"+p+"spellblades","prevZ", trQuestVarGet("startZ"));
-					yAddUpdateVar("p"+p+"spellblades","dirX", trQuestVarGet("dirX"));
-					yAddUpdateVar("p"+p+"spellblades","dirZ", trQuestVarGet("dirZ"));
-					yAddUpdateVar("p"+p+"spellblades","status", trQuestVarGet("p"+p+"spellstealStatus"));
+					trSetUnitOrientation(dir,vector(0,1,0),true);
+					trUnitMoveToPoint(xsVectorGetX(end),0,xsVectorGetZ(end),-1,false);
+					xAddDatabaseBlock(spellblades, true);
+					xSetInt(spellblades, xUnitName, 1*trQuestVarGet("next"));
+					xSetVector(spellblades, xSpellbladePrev, pos);
+					xSetVector(spellblades, xSpellbladeDir, dir);
+					xSetInt(spellblades, xSpellbladeStatus, 1*trQuestVarGet("p"+p+"spellstealStatus"));
 				}
 			}
 		}
@@ -327,51 +327,53 @@ void spellstealerAlways(int eventID = -1) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trQuestVarSet("p"+p+"negationCloak", 1);
 		trQuestVarSet("p"+p+"negationCloakTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("negationCloakDuration") * trQuestVarGet("p"+p+"spellDuration"));
+			trTimeMS() + 1000 * negationCloakDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 		trSoundPlayFN("spybirth.wav","1",-1,"","");
 	}
 	
 	if (trQuestVarGet("p"+p+"negationCloak") == 1) {
-		if (trTime() > trQuestVarGet("p"+p+"negationCloakNext")) {
-			trQuestVarSet("p"+p+"negationCloakNext", trTime());
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				id = yDatabaseNext("p"+p+"characters", true);
-				if (id == -1 || trUnitAlive() == false) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"negationCloakTimeout")) {
+			trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+			trQuestVarSet("p"+p+"negationCloak", 0);
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
 					removeSpellstealer(p);
 				} else {
-					if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "cloakSFX")) == -1) {
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-							kbGetProtoUnitID("Kronny Birth SFX"), yGetVarName("p"+p+"characters", "cloakSFX"));
+					xUnitSelect(db, xCloakSFX);
+					trUnitChangeProtoUnit("Cinematic Block");
+				}
+			}
+		} else if (trTime() > trQuestVarGet("p"+p+"negationCloakNext")) {
+			trQuestVarSet("p"+p+"negationCloakNext", trTime());
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
+					removeSpellstealer(p);
+				} else {
+					if (kbGetBlockID(""+xGetInt(db, xCloakSFX)) == -1) {
+						spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Kronny Birth SFX"), xsVectorSet(db, xCloakSFX, xGetPointer(db)));
 					} else {
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
+						xUnitSelect(db, xCloakSFX);
 						trUnitChangeProtoUnit("Kronny Birth SFX");
 					}
 				}
 			}
 		}
-		if (trTimeMS() > trQuestVarGet("p"+p+"negationCloakTimeout")) {
-			trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
-			trQuestVarSet("p"+p+"negationCloak", 0);
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if ((yDatabaseNext("p"+p+"characters", true) == -1) || (trUnitAlive() == false)) {
-					removeSpellstealer(p);
-				} else {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "cloakSFX"), true);
-					trUnitChangeProtoUnit("Cinematic Block");
-				}
-			}
-		}
 	}
 	
-	ySetPointer("enemies", index);
+	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
 }
 
 void chooseSpellstealer(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * SPELLSTEALER;
+	int db = getCharactersDB(p);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData, p);
 	if (trCurrentPlayer() == p) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
 		wellName = "(Q) Spellblades";
@@ -383,12 +385,32 @@ void chooseSpellstealer(int eventID = -1) {
 		lureName = "(E) Blade Dance";
 		lureIsUltimate = true;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("spellbladesCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", 1);
-	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("bladeDanceCost"));
-	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("negationCloakCooldown"));
-	trQuestVarSet("p"+p+"rainCost", 0);
+	
+	xCloakSFX = xInitAddInt(db, "cloakSFX");
+	
+	xSetInt(dPlayerData,xPlayerWellCooldown, spellbladesCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 1);
+	xSetFloat(dPlayerData,xPlayerLureCost, bladeDanceCost);
+	xSetInt(dPlayerData,xPlayerRainCooldown,negationCloakCooldown);
+	xSetFloat(dPlayerData,xPlayerRainCost, 0);
+	
+	if (trQuestVarGet("p"+p+"bladeDanceTargets") == 0) {
+		db = xInitDatabase("p"+p+"bladeDanceTargets");
+		trQuestVarSet("p"+p+"bladeDanceTargets", db);
+		xInitAddInt(db, "name");
+		xBladeDanceIndex = xInitAddInt(db, "index");
+		xBladeDanceStatus = xInitAddInt(db, "status");
+	}
+	
+	if (trQuestVarGet("p"+p+"spellblades") == 0) {
+		db = xInitDatabase("p"+p+"spellblades");
+		trQuestVarSet("p"+p+"spellblades", db);
+		xInitAddInt(db, "name");
+		xSpellbladePrev = xInitAddVector(db, "prev");
+		xSpellbladeDir = xInitAddVector(db, "dir");
+		xSpellbladeStatus = xInitAddInt(db, "status");
+	}
 }
 
 
@@ -401,15 +423,4 @@ highFrequency
 		trEventSetHandler(12 * SPELLSTEALER + p, "spellstealerAlways");
 		trEventSetHandler(1000 + 12 * SPELLSTEALER + p, "chooseSpellstealer");
 	}
-	trQuestVarSet("spellstealerPassiveRadius", 6);
-	
-	trQuestVarSet("bladeDanceCost", 10);
-	trQuestVarSet("bladeDanceRadius", 15);
-	
-	trQuestVarSet("negationCloakDuration", 3);
-	trQuestVarSet("negationCloakCooldown", 12);
-	
-	trQuestVarSet("spellbladesCooldown", 9);
-	trQuestVarSet("spellbladesCount", 3);
-	
 }

@@ -286,10 +286,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_TRANSPORTER_GUY:
 		{
-			x0 = trQuestVarGet("room"+room+"bottom1x");
-			z0 = trQuestVarGet("room"+room+"bottom1z");
-			x1 = trQuestVarGet("room"+room+"top1x");
-			z1 = trQuestVarGet("room"+room+"top1z");
+			pos = trVectorQuestVarGet("room"+room+"bottom1");
+			x0 = xsVectorGetX(pos);
+			z0 = xsVectorGetZ(pos);
+			pos = trVectorQuestVarGet("room"+room+"top1");
+			x1 = xsVectorGetX(pos);
+			z1 = xsVectorGetZ(pos);
 			trPaintTerrain(x0,z0,x1,z1,TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x0,z0,x1,z1,worldHeight, false);
 			pos = randomNearEdge(x0, z0, x1, z1);

@@ -1404,7 +1404,7 @@ int spawnPlayerUnit(int p = 0, int proto = 0, vector vdb = vector(0,0,0), float 
 	return(activatePlayerUnit(next, p, proto, decay));
 }
 
-void spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
+int spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetPointer(dPlayerData,p);
 	int class = xGetInt(dPlayerData,xPlayerClass);
 	int next = trGetNextUnitScenarioNameNumber();
@@ -1423,6 +1423,7 @@ void spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetInt(dPlayerCharacters,xPlayerOwner,p);
 	xSetInt(dPlayerCharacters,xUnitID,id);
 	xSetInt(dPlayerCharacters, xCharIndex, index);
+	return(index);
 }
 
 void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {

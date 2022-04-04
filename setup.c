@@ -293,7 +293,7 @@ void chooseClass(int p = 0, int class = 0) {
 	trEventFire(1000 + 12 * class + p);
 	int proto = xGetInt(dClass,xClassProto,class);
 	xSetPointer(dPlayerData,p);
-	xResetValues(dPlayerData, xPlayerUnit);
+	xResetValues(dPlayerData, p, xPlayerUnit);
 	xSetInt(dPlayerData, xPlayerClass, class);
 	xSetFloat(dPlayerData,xPlayerHealth,trQuestVarGet("proto"+proto+"health"));
 	xSetFloat(dPlayerData,xPlayerBaseAttack,trQuestVarGet("proto"+proto+"attack"));
@@ -346,8 +346,8 @@ void chooseClass(int p = 0, int class = 0) {
 			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
 	}
-	
-	xPrintAll(dPlayerData, p);
+
+	zSetProtoUnitStat("Cinematic Block", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
 }
 
 rule setup

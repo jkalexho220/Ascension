@@ -2,54 +2,77 @@ const int POTION_STUN = 0;
 const int POTION_POISON = 1;
 const int POTION_HEAL = 2;
 
+int xPotionTimeout = 0;
+int xPotionPos = 0;
+int xPotionType = 0;
+
+int xDuplicateIndex = 0;
+int xDuplicateDecay = 0;
+int xDuplicateDecayNext = 0;
+
+int xNextPotion = 0;
+
+
+float potionHeal = 5;
+
+int elixirCooldown = 12;
+float elixirHeal = 200;
+
+float duplicateCost = 50;
+
 void removeAlchemist(int p = 0) {
 	removePlayerSpecific(p);
-	yRemoveUpdateVar("p"+p+"characters", "potion");
 }
 
 void alchemistAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * ALCHEMIST;
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int index = yGetPointer("enemies");
+	int db = getCharactersDB(p);
+	int index = xGetPointer(dEnemies);
+	int potions = trQuestVarGet("p"+p+"potions");
+	int duplicates = trQuestVarGet("p"+p+"duplicates");
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
-		if (id == -1 || trUnitAlive() == false) {
+	vector pos = vector(0,0,0);
+	vector end = vector(0,0,0);
+	xSetPointer(dPlayerData, p);
+	if (xGetDatabaseCount(db) > 0) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeAlchemist(p);
 		} else {
-			hit = CheckOnHit(p, id);
+			hit = CheckOnHit(p);
 			if (hit == ON_HIT_NORMAL) {
-				target = yGetVar("p"+p+"characters", "attackTarget");
-				ySetVar("p"+p+"characters", "potion", 1+yGetVar("p"+p+"characters", "potion"));
-				if (yGetVar("p"+p+"characters", "potion") == 3) {
-					gainFavor(p, trQuestVarGet("p"+p+"projectiles"));
-					ySetVar("p"+p+"characters", "potion", 0);
+				target = xGetInt(db, xCharAttackTarget);
+				xSetInt(db, xNextPotion, 1 + xGetInt(db, xNextPotion));
+				if (xGetInt(db, xNextPotion) == 3) {
+					gainFavor(p, xGetInt(dPlayerData, xPlayerProjectiles));
+					xSetInt(db, xNextPotion, 0);
 					if (trQuestVarGet("p"+p+"potion") == POTION_HEAL) {
-						amt = trQuestVarGet("potionHeal") * trQuestVarGet("p"+p+"spellDamage") * trQuestVarGet("p"+p+"projectiles");
+						amt = potionHeal * xGetFloat(dPlayerData, xPlayerSpellDamage) * xGetFloat(dPlayerData, xPlayerHealBoost);
+						amt = amt * xGetInt(dPlayerData, xPlayerProjectiles);
 						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-							id = yDatabaseNext("playerUnits", true);
-							if (id == -1 || trUnitAlive() == false) {
+							xDatabaseNext(dPlayerUnits);
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							if (trUnitAlive() == false) {
 								removePlayerUnit();
-							} else if (yGetVar("playerUnits", "poisonStatus") == 0) {
-								trDamageUnitPercent(0.0 - amt * trQuestVarGet("p"+p+"spellDamage") * trQuestVarGet("p"+p+"healBoost"));
+							} else if (xGetInt(dPlayerUnits, xPoisonStatus) == 0) {
+								trDamageUnitPercent(0.0 - amt);
 							}
 						}
-						xsSetContextPlayer(p);
 					} else {
-						yAddToDatabase("p"+p+"potions", yGetVarName("p"+p+"characters", "attackTarget"));
-						yAddUpdateVar("p"+p+"potions", "type", trQuestVarGet("p"+p+"potion"));
-						yAddUpdateVar("p"+p+"potions", "target", trGetUnitScenarioNameNumber(target));
-						trVectorSetUnitPos("start", "p"+p+"characters");
-						trVectorQuestVarSet("end", kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target)));
-						yAddUpdateVar("p"+p+"potions", "timeout", trTimeMS() + zDistanceBetweenVectors("start", "end") * 32);
-						yAddUpdateVar("p"+p+"potions", "posx", trQuestVarGet("endx"));
-						yAddUpdateVar("p"+p+"potions", "posz", trQuestVarGet("endz"));
+						xAddDatabaseBlock(potions, true);
+						xSetInt(potions, xUnitName, trGetUnitScenarioNameNumber(target));
+						xSetInt(potions, xPotionType, 1*trQuestVarGet("p"+p+"potion"));
+						pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+						end = kbGetBlockPosition(""+xGetInt(potions, xUnitName), true);
+						xSetInt(potions, xPotionTimeout, trTimeMS() + 33 * distanceBetweenVectors(pos, end, false));
+						xSetVector(potions, xPotionPos, end);
 					}
 				}
 				
@@ -57,31 +80,33 @@ void alchemistAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"potions") >0) {
-		yDatabaseNext("p"+p+"potions");
-		if (trTimeMS() > yGetVar("p"+p+"potions", "timeout")) {
-			yVarToVector("p"+p+"potions", "pos");
-			switch(1*yGetVar("p"+p+"potions", "type"))
+	if (xGetDatabaseCount(potions) >0) {
+		xDatabaseNext(potions);
+		if (trTimeMS() > xGetInt(potions, xPotionTimeout)) {
+			pos = xGetVector(potions, xPotionPos);
+			switch(xGetInt(potions, xPotionType))
 			{
 				case POTION_STUN:
 				{
-					hit = trQuestVarGet("p"+p+"projectiles") - 1;
+					hit = xGetInt(dPlayerData, xPlayerProjectiles) - 1;
 					for (x=xGetDatabaseCount(dEnemies); >0) {
-						id = yDatabaseNext("enemies", true);
-						if (id == -1 || trUnitAlive() == false) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
 							removeEnemy();
-						} else if (id == 1*trQuestVarGet("p"+p+"potions")) {
-							stunUnit("enemies", 2.0, p);
+						} else if (xGetInt(dEnemies, xUnitName) == xGetInt(potions, xUnitName)) {
+							stunUnit(dEnemies, 2.0, p);
 							break;
 						}
 					}
 					if (hit > 0) {
 						for (x=xGetDatabaseCount(dEnemies) - 1; >0) {
-							id = yDatabaseNext("enemies", true);
-							if (id == -1 || trUnitAlive() == false) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
 								removeEnemy();
-							} else if (zDistanceToVectorSquared("enemies", "pos") < 16) {
-								stunUnit("enemies", 2.0, p);
+							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+								stunUnit(dEnemies, 2.0, p);
 								hit = hit - 1;
 								if (hit == 0) {
 									break;
@@ -92,31 +117,35 @@ void alchemistAlways(int eventID = -1) {
 				}
 				case POTION_POISON:
 				{
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lampades Blood");
 					for(x=xGetDatabaseCount(dEnemies); >0) {
-						id = yDatabaseNext("enemies", true);
-						if (id == -1 || trUnitAlive() == false) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
 							removeEnemy();
-						} else if (zDistanceToVectorSquared("enemies", "pos") < 16) {
-							poisonUnit("enemies", 12,12 * trQuestVarGet("p"+p+"projectiles"), p);
+						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+							poisonUnit(dEnemies, 12.0,12.0 * xGetInt(dPlayerData, xPlayerProjectiles), p);
 						}
 					}
 				}
 			}
-			yRemoveFromDatabase("p"+p+"potions");
+			xFreeDatabaseBlock(potions);
 		}
 	}
 	
-	for(y=trQuestVarGet("p"+p+"projectiles"); >0) {
+	for(y=xGetInt(dPlayerData, xPlayerProjectiles); >0) {
 		if (yFindLatest("p"+p+"latestProj", "Priest Projectile", p) > 0) {
-			for (x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				id = yDatabaseNext("p"+p+"characters", true);
-				if (id == -1 || trUnitAlive() == false) {
+			for (x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				id = xGetInt(db, xUnitID);
+				trUnitSelectClear();
+				trUnitSelectByID(id);
+				if (trUnitAlive() == false) {
 					removeAlchemist(p);
 				} else if (kbUnitGetAnimationActionType(id) == 12) {
-					if (yGetVar("p"+p+"characters", "potion") == 2) {
+					if (xGetInt(db, xNextPotion) == 2) {
 						trUnitSelectClear();
 						trUnitSelectByQV("p"+p+"latestProj", true);
 						switch(1*trQuestVarGet("p"+p+"potion"))
@@ -146,34 +175,32 @@ void alchemistAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
+		pos = xGetVector(dPlayerData, xPlayerWellPos);
 		dist = 100;
 		hit = -1;
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-			id = yDatabaseNext("playerUnits", true);
-			if (id == -1 || trUnitAlive() == false) {
+			xDatabaseNext(dPlayerUnits);
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			if (trUnitAlive() == false) {
 				removePlayerUnit();
 			} else {
-				amt = zDistanceToVectorSquared("playerUnits", "p"+p+"wellPos");
+				amt = unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos);
 				if (amt < dist) {
 					dist = amt;
-					hit = yGetPointer("playerUnits");
+					hit = xGetPointer(dPlayerUnits);
 				}
 			}
 		}
 		if (hit > 0) {
-			ySetPointer("playerUnits", hit);
-			target = yGetVar("playerUnits", "player");
-			ySetVar("playerUnits", "poisonTimeout", 0);
-			ySetVar("playerUnits", "stunTimeout", 0);
-			if (trQuestVarGet("playerUnits") == trQuestVarGet("p"+target+"unit")) {
-				trQuestVarSet("p"+target+"silenceTimeout", 0);
-			}
+			xSetPointer(dPlayerUnits, hit);
+			xSetInt(dPlayerUnits, xPoisonTimeout, 0);
+			xSetInt(dPlayerUnits, xStunTimeout, 0);
+			xSetInt(dPlayerUnits, xSilenceTimeout, 0);
 			trSoundPlayFN("recreation.wav","1",-1,"","");
-			trUnitSelectClear();
-			trUnitSelect(""+1*yGetUnitAtIndex("playerUnits", hit));
-			healUnit(p, trQuestVarGet("elixirHeal") * trQuestVarGet("p"+p+"spellDamage"), hit);
-			trVectorSetUnitPos("pos", "playerUnits");
-			trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			healUnit(p, elixirHeal * xGetFloat(dPlayerData, xPlayerSpellDamage));
+			pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+			trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect("1,0");
 			if (Multiplayer) {
 				trUnitChangeProtoUnit("Recreation");
@@ -186,42 +213,43 @@ void alchemistAlways(int eventID = -1) {
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
 				trChatSend(0, "You must target an ally!");
 			}
-			trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
+			xSetInt(dPlayerData, xPlayerWellCooldownStatus, ABILITY_COST);
 		}
 	}
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		trVectorSetUnitPos("pos", "p"+p+"lureObject");
+		pos = xGetVector(dPlayerData, xPlayerLurePos);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
 		dist = 81;
 		hit = -1;
-		for(x=yGetDatabaseCount("playerCharacters"); >0) {
-			id = yDatabaseNext("playerCharacters", true);
-			if (id == -1 || trUnitAlive() == false) {
+		for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
+			xDatabaseNext(dPlayerCharacters);
+			xUnitSelectByID(dPlayerCharacters, xUnitID);
+			if (trUnitAlive() == false) {
 				removePlayerCharacter();
 			} else {
-				amt = zDistanceToVectorSquared("playerCharacters", "pos");
+				amt = unitDistanceToVector(xGetInt(dPlayerCharacters, xUnitName), pos);
 				if (amt < dist) {
 					dist = amt;
-					hit = yGetPointer("playerCharacters");
+					hit = xGetPointer(dPlayerCharacters);
 				}
 			}
 		}
 		if (hit > 0) {
-			gainFavor(p, 0.0 - trQuestVarGet("duplicateCost") * trQuestVarGet("p"+p+"ultimateCost"));
-			ySetPointer("playerCharacters", hit);
-			trVectorSetUnitPos("pos", "playerCharacters");
-			spawnPlayerClone(1*yGetVar("playerCharacters", "player"), "pos");
-			yAddToDatabase("p"+p+"duplicates", "next");
-			yAddUpdateVar("p"+p+"duplicates", "index", yGetNewestPointer("playerUnits"));
-			yAddUpdateVar("p"+p+"duplicates", "decay", 0);
-			yAddUpdateVar("p"+p+"duplicates", "decayNext", trTime());
+			gainFavor(p, 0.0 - duplicateCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
+			xSetPointer(dPlayerCharacters, hit);
+			pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName));
+			xAddDatabaseBlock(duplicates, true);
+			xSetInt(duplicates, xUnitName, trGetNextUnitScenarioNameNumber());
+			
+			xSetInt(duplicates, xDuplicateIndex, spawnPlayerClone(xGetInt(dPlayerCharacters, xPlayerOwner), pos));
+			xSetFloat(duplicates, xDuplicateDecayNext, trTime());
 			trSoundPlayFN("changeunit.wav","1",-1,"","");
 			trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
-			if (trCurrentPlayer() == 1*yGetVar("playerCharacters", "player")) {
+			if (trCurrentPlayer() == xGetInt(dPlayerCharacters, xPlayerOwner)) {
 				trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has summoned a copy of you!");
 			}
 		} else if (trCurrentPlayer() == p) {
@@ -258,24 +286,28 @@ void alchemistAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"duplicates") > 0) {
-		id = yDatabaseNext("p"+p+"duplicates", true);
-		if (id == -1 || trUnitAlive() == false) {
-			yRemoveFromDatabase("p"+p+"duplicates");
-		} else if (trTime() > yGetVar("p"+p+"duplicates", "decayNext")) {
-			ySetVar("p"+p+"duplicates", "decayNext", 1 + yGetVar("p"+p+"duplicates", "decayNext"));
-			ySetVar("p"+p+"duplicates", "decay", yGetVar("p"+p+"duplicates", "decay") + calculateDecay(p, 1.0));
-			trDamageUnitPercent(yGetVar("p"+p+"duplicates", "decay"));
+	if (xGetDatabaseCount(duplicates) > 0) {
+		xDatabaseNext(duplicates);
+		xUnitSelect(duplicates, xUnitName);
+		if (trUnitAlive() == false) {
+			xFreeDatabaseBlock(duplicates);
+		} else if (trTime() > xGetInt(duplicates, xDuplicateDecayNext)) {
+			xSetInt(duplicates, xDuplicateDecayNext, 1 + xGetInt(duplicates, xDuplicateDecayNext));
+			xSetFloat(duplicates, xDuplicateDecay, xGetFloat(duplicates, xDuplicateDecay) + calculateDecay(p, 1.0));
+			trDamageUnitPercent(xGetFloat(duplicates, xDuplicateDecay));
 		}
 	}
 	
-	ySetPointer("enemies", index);
+	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
 }
 
 void chooseAlchemist(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * ALCHEMIST;
+	int db = getCharactersDB(p);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData, p);
 	trQuestVarSet("p"+p+"latestProj", trGetNextUnitScenarioNameNumber() - 1);
 	if (trCurrentPlayer() == p) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
@@ -290,12 +322,33 @@ void chooseAlchemist(int eventID = -1) {
 		trSetCounterDisplay("Potion: FREEZE");
 	}
 	trQuestVarSet("p"+p+"potion", POTION_STUN);
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("elixirCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", 1);
-	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("duplicateCost"));
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", 0);
+	
+	xNextPotion = xInitAddInt(db, "nextPotion");
+	
+	xSetInt(dPlayerData,xPlayerWellCooldown, elixirCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 0);
+	xSetFloat(dPlayerData,xPlayerLureCost, duplicateCost);
+	xSetInt(dPlayerData,xPlayerRainCooldown,1);
+	xSetFloat(dPlayerData,xPlayerRainCost, 0);
+	
+	if (trQuestVarGet("p"+p+"potions") == 0) {
+		db = xInitDatabase("p"+p+"potions");
+		trQuestVarSet("p"+p+"potions", db);
+		xInitAddInt(db, "name");
+		xPotionTimeout = xInitAddInt(db, "timeout");
+		xPotionPos = xInitAddVector(db, "pos");
+		xPotionType = xInitAddInt(db, "type");
+	}
+	
+	if (trQuestVarGet("p"+p+"duplicates") == 0) {
+		db = xInitDatabase("p"+p+"duplicates");
+		trQuestVarSet("p"+p+"duplicates", db);
+		xInitAddInt(db, "name");
+		xDuplicateIndex = xInitAddInt(db, "index");
+		xDuplicateDecay = xInitAddFloat(db, "decay");
+		xDuplicateDecayNext = xInitAddInt(db, "next");
+	}
 }
 
 
@@ -308,11 +361,4 @@ highFrequency
 		trEventSetHandler(12 * ALCHEMIST + p, "alchemistAlways");
 		trEventSetHandler(1000 + 12 * ALCHEMIST + p, "chooseAlchemist");
 	}
-	
-	trQuestVarSet("potionHeal", 5);
-	
-	trQuestVarSet("elixirCooldown", 12);
-	trQuestVarSet("elixirHeal", 200);
-	
-	trQuestVarSet("duplicateCost", 50);
 }
