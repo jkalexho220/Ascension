@@ -1104,7 +1104,7 @@ void buildEdge(int edge = 0, int type = 0) {
 						trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("keyType"))));
 					}
 				} else {
-					xSetVector(dUnlockWalls, xWallPos, xsVectorSet(x1-x0,0,0));
+					xSetVector(dUnlockWalls, xWallMod, xsVectorSet(x1-x0,0,0));
 					z0 = (z0 + z1);
 					for(x=x0; <= x1) {
 						trArmyDispatch("1,0","Dwarf",1,2*x,0,z0,90,true);

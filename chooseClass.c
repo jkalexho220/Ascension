@@ -1020,7 +1020,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\special x lampades icons 64";
-					msg = "Cooldown: 18 | Duration: 5 | Electrify Damage: 30 per second";
+					msg = "Cooldown: 18 | Duration: 6 | Electrify Damage: 30 per second";
 				}
 				case 11:
 				{

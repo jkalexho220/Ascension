@@ -9,7 +9,7 @@ void processWalls() {
 		xDatabaseNext(dUnlockWalls);
 		wallpos = xGetVector(dUnlockWalls,xWallPos);
 		wallmod = xGetVector(dUnlockWalls,xWallMod);
-		switch(1*xGetInt(dUnlockWalls, xWallState))
+		switch(xGetInt(dUnlockWalls, xWallState))
 		{
 			case WALL_WAITING:
 			{
