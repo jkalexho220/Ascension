@@ -134,7 +134,7 @@ void thunderRiderAlways(int eventID = -1) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+1*trQuestVarGet("enemies"), p, "Victory Marker", 3) > 0) {
 				gainFavor(p, 3);
-				damageEnemy(p, trQuestVarGet("blitzDamage") * trQuestVarGet("p"+p+"spellDamage"), true);
+				damageEnemy(p, trQuestVarGet("blitzDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
 				if (trUnitAlive()) {
 					stunUnit("enemies", 1.5, p);
 				}
@@ -170,7 +170,7 @@ void thunderRiderAlways(int eventID = -1) {
 				dist = vectorSetAsCurrentPosition("pos","prev","dir",
 					yGetVar("p"+p+"lightningBalls", "last"), 2.0*trQuestVarGet("p"+p+"speed"));
 				trQuestVarSet("p"+p+"thunderRiderBonus",
-					trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+					trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack));
 				
 				ySetVar("p"+p+"lightningBalls", "last", trTimeMS());
 				
@@ -203,7 +203,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trQuestVarSetFromRand("sound", 1, 2, true);
 					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					ySetVarFromVector("p"+p+"lightningBalls", "dir", "dir");
-					amt = 0.5 * trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage");
+					amt = 0.5 * trQuestVarGet("rideLightningDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 					ySetVar("p"+p+"lightningBalls", "damage", amt + yGetVar("p"+p+"lightningBalls", "damage"));
 					lightningBallBounce(p, "pos");
 					refreshRideLightningTargets(p);
@@ -216,7 +216,7 @@ void thunderRiderAlways(int eventID = -1) {
 		}
 		if (trTimeMS() > trQuestVarGet("p"+p+"rideLightningNext")) {
 			trQuestVarSet("p"+p+"rideLightningNext",
-				trQuestVarGet("p"+p+"rideLightningNext") + trQuestVarGet("rideLightningDelay") / trQuestVarGet("p"+p+"ultimateCost"));
+				trQuestVarGet("p"+p+"rideLightningNext") + trQuestVarGet("rideLightningDelay") / xGetFloat(dPlayerData, xPlayerUltimateCost));
 			gainFavor(p, -1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"rideLightning", 0);
@@ -242,7 +242,7 @@ void thunderRiderAlways(int eventID = -1) {
 					removeThunderRider(p);
 				} else {
 					trVectorSetUnitPos("pos", "p"+p+"characters");
-					target = 1 + xsMin(trQuestVarGet("blitzRange") * trQuestVarGet("p"+p+"spellRange"),
+					target = 1 + xsMin(trQuestVarGet("blitzRange") * xGetFloat(dPlayerData, xPlayerSpellRange),
 						zDistanceBetweenVectors("pos", "p"+p+"wellPos")) / 2;
 					trVectorQuestVarSet("step", zGetUnitVector("pos", "p"+p+"wellPos"));
 					for(i=target; >0) {
@@ -298,13 +298,13 @@ void thunderRiderAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitHighlight(0.5, false);
-			healUnit(p, trQuestVarGet("p"+p+"attack"), 1*yGetVar("p"+p+"characters", "index"));
+			healUnit(p, xGetFloat(dPlayerData, xPlayerAttack), 1*yGetVar("p"+p+"characters", "index"));
 			trVectorSetUnitPos("pos", "p"+p+"characters");
 			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
 			trArmySelect(""+p+",0");
 			trUnitChangeProtoUnit("Regeneration SFX");
 		}
-		gainFavor(p, 0.1 * trQuestVarGet("p"+p+"attack"));
+		gainFavor(p, 0.1 * xGetFloat(dPlayerData, xPlayerAttack));
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
 	}
 	
@@ -325,12 +325,12 @@ void thunderRiderAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"launched", 1);
 				refreshRideLightningTargets(p);
 				trQuestVarSet("p"+p+"rideLightningNext",
-					trTimeMS() + trQuestVarGet("rideLightningDelay") / trQuestVarGet("p"+p+"ultimateCost"));
+					trTimeMS() + trQuestVarGet("rideLightningDelay") / xGetFloat(dPlayerData, xPlayerUltimateCost));
 				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 				zSetProtoUnitStat("Attack Revealer", p, 2, trQuestVarGet("p"+p+"los"));
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * trQuestVarGet("p"+p+"speed"));
 				trQuestVarSet("p"+p+"rideLightningRange",
-					trQuestVarGet("rideLightningRange") * trQuestVarGet("p"+p+"spellRange"));
+					trQuestVarGet("rideLightningRange") * xGetFloat(dPlayerData, xPlayerSpellRange));
 				for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 					id = yDatabaseNext("p"+p+"characters", true);
 					if (id == -1 || trUnitAlive() == false) {
@@ -348,7 +348,7 @@ void thunderRiderAlways(int eventID = -1) {
 						yAddUpdateVar("p"+p+"lightningBalls", "last", trTimeMS());
 						yAddUpdateVar("p"+p+"lightningBalls", "start", trTimeMS());
 						yAddUpdateVar("p"+p+"lightningBalls", "damage",
-							trQuestVarGet("rideLightningDamage") * trQuestVarGet("p"+p+"spellDamage"));
+							trQuestVarGet("rideLightningDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage));
 						yAddUpdateVar("p"+p+"lightningBalls", "yeehaw", 1);
 						
 						trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("startx"),0,trQuestVarGet("startz"),0,true);
@@ -417,7 +417,7 @@ void thunderRiderAlways(int eventID = -1) {
 					target = yGetVar("p"+p+"characters", "attackTarget");
 					trQuestVarSet("target", trGetUnitScenarioNameNumber(target));
 					yAddToDatabase("p"+p+"thunderShocks", "target");
-					yAddUpdateVar("p"+p+"thunderShocks", "damage", trQuestVarGet("p"+p+"attack"));
+					yAddUpdateVar("p"+p+"thunderShocks", "damage", xGetFloat(dPlayerData, xPlayerAttack));
 					yAddUpdateVar("p"+p+"thunderShocks", "next", trTimeMS() + 100);
 					trVectorSetUnitPos("pos", "target");
 					yAddUpdateVar("p"+p+"thunderShocks", "posX", trQuestVarGet("posX"));
@@ -446,14 +446,14 @@ void thunderRiderAlways(int eventID = -1) {
 					trQuestVarSet("p"+p+"thunderRiderBonus", trQuestVarGet("p"+p+"thunderRiderBonus") - amt);
 				} else {
 					trQuestVarSet("p"+p+"thunderRiderBonus",
-						trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * trQuestVarGet("p"+p+"baseAttack"));
+						trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack));
 					ySetVarFromVector("p"+p+"characters", "prev", "pos");
 				}
 			}
 		}
 		trQuestVarSet("p"+p+"thunderRiderBonus", xsMax(0, trQuestVarGet("p"+p+"thunderRiderBonus")));
-		trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack") + trQuestVarGet("p"+p+"thunderRiderBonus"));
-		zSetProtoUnitStat("Hero Greek Atalanta", p, 27, trQuestVarGet("p"+p+"attack"));
+		trQuestVarSet("p"+p+"attack", xGetFloat(dPlayerData, xPlayerBaseAttack) + trQuestVarGet("p"+p+"thunderRiderBonus"));
+		zSetProtoUnitStat("Hero Greek Atalanta", p, 27, xGetFloat(dPlayerData, xPlayerAttack));
 	}
 	
 	if (yGetDatabaseCount("p"+p+"thunderShocks") > 0) {

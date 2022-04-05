@@ -71,8 +71,8 @@ void fireknightAlways(int eventID = -1) {
 				trDamageUnitPercent(100);
 				trUnitChangeProtoUnit("Meteorite");
 				yRemoveFromDatabase("p"+p+"fireCharges");
-				amt = trQuestVarGet("flamingImpactDamage") * trQuestVarGet("p"+p+"spellDamage");
-				dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange") * 2, 2);
+				amt = trQuestVarGet("flamingImpactDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
+				dist = xsPow(trQuestVarGet("flamingImpactRange") * xGetFloat(dPlayerData, xPlayerSpellRange) * 2, 2);
 				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
 					if (id == -1 || trUnitAlive() == false) {
@@ -85,7 +85,7 @@ void fireknightAlways(int eventID = -1) {
 				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
 			}
 		} else {
-			dist = xsPow(trQuestVarGet("flamingImpactRange") * trQuestVarGet("p"+p+"spellRange"), 2);
+			dist = xsPow(trQuestVarGet("flamingImpactRange") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
@@ -168,7 +168,7 @@ void fireknightAlways(int eventID = -1) {
 				
 				yAddToDatabase("p"+p+"fireCharges", "next");
 				yAddUpdateVar("p"+p+"fireCharges", "index", yGetPointer("p"+p+"characters"));
-				yAddUpdateVar("p"+p+"fireCharges", "timeout", trTimeMS() + 2000 * trQuestVarGet("p"+p+"spellDuration"));
+				yAddUpdateVar("p"+p+"fireCharges", "timeout", trTimeMS() + 2000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
 				yAddUpdateVar("p"+p+"fireCharges", "sfx", trQuestVarGet("sfx"));
 				yAddUpdateVar("p"+p+"fireCharges", "destX", trQuestVarGet("posx"));
 				yAddUpdateVar("p"+p+"fireCharges", "destZ", trQuestVarGet("posz"));
@@ -181,7 +181,7 @@ void fireknightAlways(int eventID = -1) {
 		trSoundPlayFN("firegiantdie.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"overheat", 1);
 		trQuestVarSet("p"+p+"overheatTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("overheatDuration") * trQuestVarGet("p"+p+"spellDuration"));
+			trTimeMS() + 1000 * trQuestVarGet("overheatDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
 			if (id == -1 || trUnitAlive() == false) {
@@ -202,13 +202,13 @@ void fireknightAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		gainFavor(p, 0.0 - trQuestVarGet("infernoCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("infernoCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
 		trSoundPlayFN("forestfirebirth.wav","1",-1,"","");
 		trSoundPlayFN("flamingweapons.wav","1",-1,"","");
-		zSetProtoUnitStat("Ball of Fire Impact", p, 8, trQuestVarGet("p"+p+"spellDuration") * trQuestVarGet("infernoDuration"));
+		zSetProtoUnitStat("Ball of Fire Impact", p, 8, xGetFloat(dPlayerData, xPlayerSpellDuration) * trQuestVarGet("infernoDuration"));
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			id = yDatabaseNext("p"+p+"characters", true);
 			if (id == -1 || trUnitAlive() == false) {
@@ -219,11 +219,11 @@ void fireknightAlways(int eventID = -1) {
 				yAddUpdateVar("p"+p+"inferno", "posx", trQuestVarGet("posX"));
 				yAddUpdateVar("p"+p+"inferno", "posz", trQuestVarGet("posZ"));
 				yAddUpdateVar("p"+p+"inferno", "radius", 0);
-				yAddUpdateVar("p"+p+"inferno", "damage", trQuestVarGet("infernoDamage") * trQuestVarGet("p"+p+"spellDamage"));
-				yAddUpdateVar("p"+p+"inferno", "maxradius", trQuestVarGet("infernoRange") * trQuestVarGet("p"+p+"spellRange"));
+				yAddUpdateVar("p"+p+"inferno", "damage", trQuestVarGet("infernoDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage));
+				yAddUpdateVar("p"+p+"inferno", "maxradius", trQuestVarGet("infernoRange") * xGetFloat(dPlayerData, xPlayerSpellRange));
 				yAddUpdateVar("p"+p+"inferno", "next", trTimeMS());
 				yAddUpdateVar("p"+p+"inferno", "timeout",
-					trTimeMS() + 1000 * trQuestVarGet("infernoDuration") * trQuestVarGet("p"+p+"spellDuration"));
+					trTimeMS() + 1000 * trQuestVarGet("infernoDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 			}
 		}
 	}
@@ -253,7 +253,7 @@ void fireknightAlways(int eventID = -1) {
 			trVectorSetUnitPos("pos", "p"+p+"characters");
 			hit = CheckOnHit(p, id);
 			if (hit == ON_HIT_SPECIAL) {
-				damagePlayerUnit(50.0 * trQuestVarGet("p"+p+"spellDamage"), 1*yGetVar("p"+p+"characters", "index"));
+				damagePlayerUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage), 1*yGetVar("p"+p+"characters", "index"));
 				
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
@@ -261,7 +261,7 @@ void fireknightAlways(int eventID = -1) {
 				trUnitSelectByQV("next", true);
 				trDamageUnitPercent(100);
 				trUnitChangeProtoUnit("Meteorite");
-				amt = 50.0 * trQuestVarGet("p"+p+"spellDamage");
+				amt = 50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage);
 				trSoundPlayFN("fireball fall 2.wav","1",-1,"","");
 			}
 			current = kbUnitGetCurrentHitpoints(id);
@@ -270,20 +270,20 @@ void fireknightAlways(int eventID = -1) {
 					ySetVar("p"+p+"characters", "overheatNext", yGetVar("p"+p+"characters", "overheatNext") + 500);
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"characters");
-					damagePlayerUnit(trQuestVarGet("overheatDamage") * trQuestVarGet("p"+p+"spellDamage") * 0.5,
+					damagePlayerUnit(trQuestVarGet("overheatDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage) * 0.5,
 						1*yGetVar("p"+p+"characters","index"));
 					current = kbUnitGetCurrentHitpoints(id);
 				}
 				amt = amt + xsMax(0, yGetVar("p"+p+"characters", "health") - current);
 			}
 			ySetVar("p"+p+"characters", "health", current);
-			dist = xsPow(trQuestVarGet("overheatRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+			dist = xsPow(trQuestVarGet("overheatRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				id = yDatabaseNext("enemies", true);
 				if (id == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-					damageEnemy(p, amt * trQuestVarGet("p"+p+"spellDamage"), true);
+					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
 				}
 			}
 		}

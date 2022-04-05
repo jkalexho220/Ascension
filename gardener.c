@@ -1,78 +1,115 @@
+float seedHeal = 30;
+float seedDuration = 15;
+
+int bloodbloomCooldown = 15;
+
+int stranglethornsCooldown = 12;
+float stranglethornsRange = 6;
+float stranglethornsRadius = 3;
+float stranglethornsDuration = 3;
+float stranglethornsDamage = 20;
+
+float natureBountyCost = 60;
+float natureBountyDuration = 12;
+
+int xSeedReadyTime = 0;
+int xSeedTimeout = 0;
+int xSeedType = 0;
+
+int xLifeArrowPos = 0;
+
+int xBloodbloomAttacking = 0;
+int xBloodbloomAttackNext = 0;
+
+int xStranglethornTimeout = 0;
+int xStranglethornPos = 0;
+
 void removeGardener(int p = 0) {
 	removePlayerSpecific(p);
 }
 
-void plantSeed(string next = "", int p = 0) {
+void plantSeed(int next = 0, int p = 0) {
+	int seeds = trQuestVarGet("p"+p+"seeds");
 	trUnitSelectClear();
-	trUnitSelect(""+1*trQuestVarGet(next), true);
+	trUnitSelect(""+next, true);
 	trUnitChangeProtoUnit("Rock Granite Small");
-	yAddToDatabase("p"+p+"seeds", next);
-	yAddUpdateVar("p"+p+"seeds", "ready", trTimeMS() + 2000);
-	yAddUpdateVar("p"+p+"seeds", "timeout",
-		trTimeMS() + 1000 * trQuestVarGet("seedDuration") * trQuestVarGet("p"+p+"spellDuration"));
-	yAddUpdateVar("p"+p+"seeds", "type", trQuestVarGet("p"+p+"natureBounty"));
+	xAddDatabaseBlock(seeds, true);
+	xSetInt(seeds, xUnitName, next);
+	xSetInt(seeds, xSeedReadyTime, trTimeMS() + 2000);
+	xSetInt(seeds, xSeedTimeout, trTimeMS() + 1000 * seedDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
+	xSetInt(seeds, xSeedType, 1*trQuestVarGet("p"+p+"natureBounty"));
 	trUnitSelectClear();
-	trUnitSelect(""+1*trQuestVarGet(next), true);
+	trUnitSelect(""+next, true);
 	if (trQuestVarGet("p"+p+"natureBounty") == 0) {
 		trUnitSetAnimationPath("1,0,0,0,0");
 	} else {
 		trUnitChangeProtoUnit("Spy Eye");
 		trUnitSelectClear();
-		trUnitSelect(""+1*trQuestVarGet("next"), true);
+		trUnitSelect(""+next, true);
 		trMutateSelected(kbGetProtoUnitID("Berry Bush"));
 	}
 	if (trCurrentPlayer() == p) {
-		trUnitHighlight(trQuestVarGet("seedDuration") * trQuestVarGet("p"+p+"spellDuration"), true);
+		trUnitHighlight(seedDuration * xGetFloat(dPlayerData, xPlayerSpellDuration), true);
 	}
 }
 
 void gardenerAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * GARDENER;
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int index = xGetPointer(dEnemies);
+	int db = getCharactersDB(p);
+	int seeds = trQuestVarGet("p"+p+"seeds");
+	int lifeArrows = trQuestVarGet("p"+p+"lifeArrows");
+	int bloodblooms = trQuestVarGet("p"+p+"bloodblooms");
+	int stranglethorns = trQuestVarGet("p"+p+"stranglethorns");
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
+	
+	vector pos = vector(0,0,0);
+	vector start = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	
+	xSetPointer(dPlayerData, p);
+	if (xGetDatabaseCount(db) > 0) {
+		id = xDatabaseNext(db, true);
 		if (id == -1 || trUnitAlive() == false) {
 			removeGardener(p);
 		} else {
-			hit = CheckOnHit(p, id);
+			hit = CheckOnHit(p);
 		}
 	}
 	
-	current = trQuestVarGet("seedDuration") * trQuestVarGet("p"+p+"spellDuration");
-	amt = trQuestVarGet("seedHeal");
+	current = seedDuration * xGetFloat(dPlayerData, xPlayerSpellDuration);
+	amt = seedHeal;
 	target = trQuestVarGet("p"+p+"seedHealPlayer") + 1;
 	if (target >= ENEMY_PLAYER) {
 		target = 1;
 	}
-	if (trQuestVarGet("p"+target+"dead") == 0) {
-		for (y=yGetDatabaseCount("p"+p+"seeds"); >0) {
-			yDatabaseNext("p"+p+"seeds");
+	if (xGetInt(dPlayerData, xPlayerDead, target) == 0) {
+		for (y=xGetDatabaseCount(seeds); >0) {
+			xDatabaseNext(seeds);
 			hit = 0;
-			dist = yGetVar("p"+p+"seeds", "timeout") - trTimeMS();
+			dist = xGetInt(seeds, xSeedTimeout) - trTimeMS();
 			if (dist > 0) {
 				dist = 0.001 * dist / current;
-				trVectorSetUnitPos("pos", "p"+p+"seeds");
-				if (zDistanceToVectorSquared("p"+target+"unit", "pos") < 1) {
+				pos = kbGetBlockPosition(""+xGetInt(seeds, xUnitName));
+				if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, target), pos) < 1) {
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+target+"unit");
+					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, target), true);
 					if (trUnitPercentDamaged() > 0) {
-						if (yGetVar("p"+p+"seeds", "type") == 1) {
-							healUnit(p, 4.0 * amt, 1*trQuestVarGet("p"+target+"index"));
+						if (xGetInt(seeds, xSeedType) == 1) {
+							healUnit(p, 4.0 * amt, xGetInt(dPlayerData, xPlayerIndex, target));
 						} else {
-							healUnit(p, amt, 1*trQuestVarGet("p"+target+"index"));
+							healUnit(p, amt, xGetInt(dPlayerData, xPlayerIndex, target));
 						}
 						hit = 1;
 					}
 				}
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"seeds", true);
+				xUnitSelect(seeds, xUnitName);
 				if (hit == 1) {
 					trQuestVarSet("eatSound", 1);
 					trUnitChangeProtoUnit("Regeneration SFX");
@@ -81,10 +118,9 @@ void gardenerAlways(int eventID = -1) {
 					trSetSelectedScale(dist, dist, dist);
 				}
 			} else {
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"seeds", true);
+				xUnitSelect(seeds, xUnitName);
 				trUnitChangeProtoUnit("Dust Small");
-				yRemoveFromDatabase("p"+p+"seeds");
+				xFreeDatabaseBlock(seeds);
 			}
 		}
 	}
@@ -96,59 +132,62 @@ void gardenerAlways(int eventID = -1) {
 		trSoundPlayFN("colossuseat.wav","1",-1,"","");
 	}
 	
-	if (yGetDatabaseCount("p"+p+"lifeArrows") > 0) {
-		id = yDatabaseNext("p"+p+"lifeArrows", true);
-		if (id == -1 || trUnitAlive() == false) {
-			yVarToVector("p"+p+"lifeArrows", "pos");
-			yRemoveFromDatabase("p"+p+"lifeArrows");
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
-			plantSeed("next", p);
+	if (xGetDatabaseCount(lifeArrows) > 0) {
+		xDatabaseNext(lifeArrows);
+		xUnitSelect(lifeArrows, xUnitName);
+		if (trUnitAlive() == false) {
+			pos = xGetVector(lifeArrows, xLifeArrowPos);
+			
+			xFreeDatabaseBlock(lifeArrows);
+			target = trGetNextUnitScenarioNameNumber();
+			trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+			plantSeed(target, p);
 		} else {
-			trVectorSetUnitPos("pos", "p"+p+"lifeArrows");
-			if (trQuestVarGet("posy") < worldHeight + 0.3) {
+			pos = kbGetBlockPosition(""+xGetInt(lifeArrows, xUnitName), true);
+			if (xsVectorGetY(pos) < worldHeight + 0.3) {
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
-				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+				target = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
 				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("next"), true);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("p"+p+"lifeArrows"));
+				trUnitSelect(""+target, true);
+				trImmediateUnitGarrison(""+xGetInt(lifeArrows, xUnitName));
 				trUnitChangeProtoUnit("Rock Granite Small");
 				
-				trUnitSelectClear();
-				trUnitSelect(""+1*trQuestVarGet("p"+p+"lifeArrows"), true);
+				xUnitSelect(lifeArrows, xUnitName);
 				trMutateSelected(kbGetProtoUnitID("Arrow Flaming"));
-				yRemoveFromDatabase("p"+p+"lifeArrows");
+				xFreeDatabaseBlock(lifeArrows);
 				
-				plantSeed("next", p);
+				plantSeed(target, p);
 			}
 		}
 	}
 	
-	for(y=trQuestVarGet("p"+p+"projectiles"); >0) {
+	for(y=xGetInt(dPlayerData, xPlayerProjectiles); >0) {
 		if (yFindLatest("p"+p+"latestProj", "Arrow Flaming", p) > 0) {
-			trVectorSetUnitPos("start", "p"+p+"latestProj");
+			start = kbGetBlockPosition(""+1*trQuestVarGet("p"+p+"latestProj"));
 			target = 0;
 			dist = 25;
-			for (x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				id = yDatabaseNext("p"+p+"characters", true);
-				if (id == -1 || trUnitAlive() == false) {
+			for (x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				id = xGetInt(db, xUnitID);
+				trUnitSelectClear();
+				trUnitSelectByID(id);
+				if (trUnitAlive() == false) {
 					removeGardener(p);
 				} else if (kbUnitGetAnimationActionType(id) == 12) {
-					current = zDistanceToVectorSquared("p"+p+"characters", "start");
+					current = unitDistanceToVector(xGetInt(db, xUnitName), start);
 					if (current < dist) {
 						dist = current;
-						target = yGetPointer("p"+p+"characters");
+						target = xGetPointer(db);
 					}
 				}
 			}
 			if (target > 0) {
-				ySetPointer("p"+p+"characters", target);
-				target = trGetUnitScenarioNameNumber(1*yGetVar("p"+p+"characters", "attackTarget"));
-				trVectorQuestVarSet("pos", kbGetBlockPosition(""+target));
-				yAddToDatabase("p"+p+"lifeArrows", "p"+p+"latestProj");
-				yAddUpdateVar("p"+p+"lifeArrows", "posx", trQuestVarGet("posx"));
-				yAddUpdateVar("p"+p+"lifeArrows", "posz", trQuestVarGet("posz"));
+				xSetPointer(db, target);
+				target = trGetUnitScenarioNameNumber(xGetInt(db, xCharAttackTarget));
+				xAddDatabaseBlock(lifeArrows, true);
+				xSetInt(lifeArrows, xUnitName, 1*trQuestVarGet("p"+p+"latestProj"));
+				xSetVector(lifeArrows, xLifeArrowPos, kbGetBlockPosition(""+target));
 			} else {
 				break;
 			}
@@ -157,56 +196,65 @@ void gardenerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"bloodblooms") > 0) {
-		id = yDatabaseNext("p"+p+"bloodblooms", true);
-		if (id == -1 || trUnitAlive() == false) {
+	if (xGetDatabaseCount(bloodblooms) > 0) {
+		xDatabaseNext(bloodblooms);
+		id = xGetInt(bloodblooms, xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false) {
 			trUnitSelectClear();
-			trUnitSelect(""+(1+trQuestVarGet("p"+p+"bloodblooms")), true);
+			trUnitSelect(""+(1+xGetInt(bloodblooms, xUnitName)), true);
 			trDamageUnitPercent(100);
-			yRemoveFromDatabase("p"+p+"bloodblooms");
+			xFreeDatabaseBlock(bloodblooms);
 		} else if (kbUnitGetAnimationActionType(id) == 6) {
-			if (yGetVar("p"+p+"bloodblooms", "attacking") == 0) {
-				ySetVar("p"+p+"bloodblooms", "attacking", 1);
-				ySetVar("p"+p+"bloodblooms", "attackNext", trTimeMS() + 600);
-			} else if (trTimeMS() > yGetVar("p"+p+"bloodblooms", "attackNext")) {
-				ySetVar("p"+p+"bloodblooms", "attackNext", yGetVar("p"+p+"bloodblooms", "attackNext") + 1300);
+			if (xGetBool(bloodblooms, xBloodbloomAttacking) == false) {
+				xSetBool(bloodblooms, xBloodbloomAttacking, true);
+				xSetInt(bloodblooms, xBloodbloomAttackNext, trTimeMS() + 600);
+			} else if (trTimeMS() > xGetInt(bloodblooms, xBloodbloomAttackNext)) {
+				xSetInt(bloodblooms, xBloodbloomAttackNext, xGetInt(bloodblooms, xBloodbloomAttackNext) + 1300);
+				xsSetContextPlayer(p);
 				target = kbUnitGetTargetUnitID(id);
+				xsSetContextPlayer(0);
 				for(x=xGetDatabaseCount(dEnemies); >0) {
-					if (yDatabaseNext("enemies", true) == target) {
+					xDatabaseNext(dEnemies);
+					if (xGetInt(dEnemies, xUnitID) == target) {
 						gainFavor(p, 1);
-						poisonUnit("enemies", 12.0, 12.0, p);
-						trVectorSetUnitPos("pos", "enemies");
-						trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-						trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),0,true);
-						plantSeed("next", p);
+						poisonUnit(dEnemies, 12.0, 12.0, p);
+						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
+						target = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						plantSeed(target, p);
 						trSoundPlayFN("farming1.wav","1",-1,"","");
 						break;
 					}
 				}
 			}
-		} else if (yGetVar("p"+p+"bloodblooms", "attacking") == 1) {
-			ySetVar("p"+p+"bloodblooms", "attacking", 0);
+		} else if (xGetBool(bloodblooms, xBloodbloomAttacking)) {
+			xSetBool(bloodblooms, xBloodbloomAttacking, false);
 		}
 	}
 	
-	hit = yGetDatabaseCount("p"+p+"stranglethorns");
+	hit = xGetDatabaseCount(stranglethorns);
 	if (hit > 0) {
 		current = 1000.0 / hit;
 		if (trTimeMS() > trQuestVarGet("p"+p+"stranglethornsNext") + current) {
 			trQuestVarSet("p"+p+"stranglethornsNext", trQuestVarGet("p"+p+"stranglethornsNext") + current);
-			yDatabaseNext("p"+p+"stranglethorns", true);
-			if (trTimeMS() > yGetVar("p"+p+"stranglethorns", "timeout")) {
+			xDatabaseNext(stranglethorns);
+			xUnitSelect(stranglethorns, xUnitName);
+			if (trTimeMS() > xGetInt(stranglethorns, xStranglethornTimeout)) {
 				trDamageUnitPercent(100);
-				yRemoveFromDatabase("p"+p+"stranglethorns");
+				xFreeDatabaseBlock(stranglethorns);
 			} else {
-				yVarToVector("p"+p+"stranglethorns", "pos");
-				dist = xsPow(trQuestVarGet("stranglethornsRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-				amt = trQuestVarGet("stranglethornsDamage") * trQuestVarGet("p"+p+"spellDamage");
+				pos = xGetVector(stranglethorns, xStranglethornPos);
+				dist = xsPow(stranglethornsRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+				amt = stranglethornsDamage * xGetFloat(dPlayerData, xPlayerSpellDuration);
 				for (x=xGetDatabaseCount(dEnemies); >0) {
-					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-						stunUnit("enemies", 1.0, p, false);
+					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+						stunUnit(dEnemies, 1.0, p, false);
 						damageEnemy(p, amt);
 					}
 				}
@@ -219,64 +267,63 @@ void gardenerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
-		
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"wellPosx"),0,trQuestVarGet("p"+p+"wellPosz"),0,true);
+		pos = xGetVector(dPlayerData, xPlayerWellPos);
+		target = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trArmySelect(""+p+",0");
 		trUnitChangeProtoUnit("Heavenlight");
-		dist = xsPow(trQuestVarGet("stranglethornsRange") * trQuestVarGet("p"+p+"spellRange"), 2);
-		for(x=yGetDatabaseCount("p"+p+"seeds"); >0) {
-			yDatabaseNext("p"+p+"seeds");
-			if (zDistanceToVectorSquared("p"+p+"seeds", "p"+p+"wellPos") < dist) {
+		dist = xsPow(stranglethornsRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+		for(x=xGetDatabaseCount(seeds); >0) {
+			xDatabaseNext(seeds);
+			if (unitDistanceToVector(xGetInt(seeds, xUnitName), pos) < dist) {
 				gainFavor(p, 1);
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"seeds", true);
+				xUnitSelect(seeds, xUnitName);
 				trUnitHighlight(0.01,false);
-				if (yGetVar("p"+p+"seeds", "type") == 1) {
+				if (xGetInt(seeds, xSeedType) == 1) {
 					trUnitChangeProtoUnit("Walking Berry Bush");
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"seeds", true);
+					xUnitSelect(seeds, xUnitName);
 					trUnitConvert(p);
 					trUnitChangeProtoUnit("Walking Berry Bush");
-					activatePlayerUnit("p"+p+"seeds", p, kbGetProtoUnitID("Walking Berry Bush"), calculateDecay(p, 5.0));
-					yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 5000);
+					activatePlayerUnit(xGetInt(seeds, xUnitName), p, kbGetProtoUnitID("Walking Berry Bush"), calculateDecay(p, 5.0));
+					xSetInt(dPlayerUnits, xDecayNext, trTimeMS() + 5000); // berry bush birth animation is five seconds long wtf
 				} else {
 					trUnitConvert(0);
 					trUnitChangeProtoUnit("Uproot 2x2");
 					trQuestVarSetFromRand("angle", 0, 3.14, false);
-					trVectorSetFromAngle("dir", trQuestVarGet("angle"));
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"seeds", true);
-					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
-					trSetSelectedScale(trQuestVarGet("p"+p+"spellRange"),1,trQuestVarGet("p"+p+"spellRange"));
-					trVectorSetUnitPos("pos", "p"+p+"seeds");
-					yAddToDatabase("p"+p+"stranglethorns", "p"+p+"seeds");
-					yAddUpdateVar("p"+p+"stranglethorns", "posx", trQuestVarGet("posx"));
-					yAddUpdateVar("p"+p+"stranglethorns", "posZ", trQuestVarGet("posZ"));
-					yAddUpdateVar("p"+p+"stranglethorns", "timeout", trTimeMS() + 1000 * trQuestVarGet("stranglethornsDuration"));
+					dir = xsVectorSet(xsCos(trQuestVarGet("angle")),0,xsSin(trQuestVarGet("angle")));
+					xUnitSelect(seeds, xUnitName);
+					trSetUnitOrientation(dir,vector(0,1,0),true);
+					trSetSelectedScale(xGetFloat(dPlayerData, xPlayerSpellRange),1,xGetFloat(dPlayerData, xPlayerSpellRange));
+					xAddDatabaseBlock(stranglethorns, true);
+					xSetInt(stranglethorns, xUnitName, xGetInt(seeds, xUnitName));
+					xSetVector(stranglethorns, xStranglethornPos, kbGetBlockPosition(""+xGetInt(seeds, xUnitName),true));
+					xSetInt(stranglethorns, xStranglethornTimeout, trTimeMS() + 1000 * stranglethornsDuration);
 				}
-				yRemoveFromDatabase("p"+p+"seeds");
+				xFreeDatabaseBlock(seeds);
 			}
 		}
 	}
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		trVectorSetUnitPos("pos", "p"+p+"lureObject");
+		pos = xGetVector(dPlayerData, xPlayerLurePos);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch(""+p+",0","Dwarf",2,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+		target = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+p+",0","Dwarf",2,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trUnitSelectClear();
-		trUnitSelect(""+(1+trQuestVarGet("next")), true);
+		trUnitSelect(""+(1+target), true);
 		trUnitChangeProtoUnit("Audrey Base");
 		trUnitSelectClear();
-		trUnitSelectByQV("next", true);
+		trUnitSelect(""+target, true);
 		trUnitChangeProtoUnit("Audrey");
-		yAddToDatabase("p"+p+"bloodblooms", "next");
-		activatePlayerUnit("next", p, kbGetProtoUnitID("Audrey"), calculateDecay(p, 8.0));
-		yAddUpdateVar("playerUnits", "decayNext", trTimeMS() + 2000);
+		xAddDatabaseBlock(bloodblooms, true);
+		xSetInt(bloodblooms, xUnitName, target);
+		xSetInt(bloodblooms, xUnitID, kbGetBlockID(""+target, true));
+		
+		activatePlayerUnit(target, p, kbGetProtoUnitID("Audrey"), calculateDecay(p, 8.0));
+		xSetInt(dPlayerUnits, xDecayNext, trTimeMS() + 2000);
 	}
 	
 	if (trQuestVarGet("p"+p+"natureBounty") == 1) {
@@ -289,19 +336,22 @@ void gardenerAlways(int eventID = -1) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		trSoundPlayFN("walkingwoods1.wav", "1", -1, "", "");
 		trSoundPlayFN("gaiaforest.wav", "1", -1, "", "");
-		gainFavor(p, 0.0 - trQuestVarGet("natureBountyCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - natureBountyCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trQuestVarSet("p"+p+"natureBounty", 1);
 		trQuestVarSet("p"+p+"natureBountyTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("natureBountyDuration") * trQuestVarGet("p"+p+"spellDuration"));
+			trTimeMS() + 1000 * natureBountyDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 	}
 	
-	
+	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
 }
 
 void chooseGardener(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * GARDENER;
+	int db = getCharactersDB(p);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData, p);
 	trQuestVarSet("p"+p+"latestProj", trGetNextUnitScenarioNameNumber() - 1);
 	if (trCurrentPlayer() == p) {
 		map("w", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
@@ -314,20 +364,55 @@ void chooseGardener(int eventID = -1) {
 		lureName = "(Q) Bloodbloom";
 		lureIsUltimate = false;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("stranglethornsCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("bloodbloomCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", trQuestVarGet("natureBountyCost"));
+	
+	xSetInt(dPlayerData,xPlayerWellCooldown, stranglethornsCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, bloodbloomCooldown);
+	xSetFloat(dPlayerData,xPlayerLureCost, 0);
+	xSetInt(dPlayerData,xPlayerRainCooldown,1);
+	xSetFloat(dPlayerData,xPlayerRainCost, natureBountyCost);
+	
+	if (trQuestVarGet("p"+p+"seeds") == 0) {
+		db = xInitDatabase("p"+p+"seeds");
+		trQuestVarSet("p"+p+"seeds", db);
+		xInitAddInt(db, "name");
+		xSeedReadyTime = xInitAddInt(db, "ready");
+		xSeedTimeout = xInitAddInt(db, "timeout");
+		xSeedType = xInitAddInt(db, "type");
+	}
+	
+	if (trQuestVarGet("p"+p+"lifeArrows") == 0) {
+		db = xInitDatabase("p"+p+"lifeArrows");
+		trQuestVarSet("p"+p+"lifeArrows", db);
+		xInitAddInt(db, "name");
+		xLifeArrowPos = xInitAddVector(db, "pos");
+	}
+	
+	if (trQuestVarGet("p"+p+"bloodblooms") == 0) {
+		db = xInitDatabase("p"+p+"bloodblooms");
+		trQuestVarSet("p"+p+"bloodblooms", db);
+		xInitAddInt(db, "name");
+		xBloodbloomAttacking = xInitAddBool(db, "attacking");
+		xInitAddInt(db, "id");
+		xBloodbloomAttackNext = xInitAddInt(db, "attackNext");
+	}
+	
+	if (trQuestVarGet("p"+p+"stranglethorns") == 0) {
+		db = xInitDatabase("p"+p+"stranglethorns");
+		trQuestVarSet("p"+p+"stranglethorns", db);
+		xInitAddInt(db, "name");
+		xStranglethornTimeout = xInitAddInt(db, "timeout");
+		xStranglethornPos = xInitAddVector(db, "pos");
+	}
 }
 
 void modifyGardener(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 5000 - 12 * GARDENER;
-	zSetProtoUnitStat("Walking Berry Bush", p, 0, 0.5 * trQuestVarGet("p"+p+"health"));
-	zSetProtoUnitStat("Walking Berry Bush", p, 27, 0.5 * trQuestVarGet("p"+p+"attack"));
-	zSetProtoUnitStat("Audrey", p, 0, trQuestVarGet("p"+p+"health"));
-	zSetProtoUnitStat("Audrey", p, 27, trQuestVarGet("p"+p+"attack"));
+	zSetProtoUnitStat("Walking Berry Bush", p, 0, 0.5 * xGetFloat(dPlayerData, xPlayerHealth, p));
+	zSetProtoUnitStat("Walking Berry Bush", p, 27, 0.5 * xGetFloat(dPlayerData, xPlayerAttack, p));
+	zSetProtoUnitStat("Audrey", p, 0, xGetFloat(dPlayerData, xPlayerHealth, p));
+	zSetProtoUnitStat("Audrey", p, 27, xGetFloat(dPlayerData, xPlayerAttack, p));
 }
 
 
@@ -341,18 +426,4 @@ highFrequency
 		trEventSetHandler(1000 + 12 * GARDENER + p, "chooseGardener");
 		trEventSetHandler(5000 + 12 * GARDENER + p, "modifyGardener");
 	}
-	
-	trQuestVarSet("seedHeal", 30);
-	trQuestVarSet("seedDuration", 15);
-	
-	trQuestVarSet("bloodbloomCooldown", 15);
-	
-	trQuestVarSet("stranglethornsCooldown", 12);
-	trQuestVarSet("stranglethornsRange", 6);
-	trQuestVarSet("stranglethornsRadius", 3);
-	trQuestVarSet("stranglethornsDuration", 3);
-	trQuestVarSet("stranglethornsDamage", 20);
-	
-	trQuestVarSet("natureBountyCost", 60);
-	trQuestVarSet("natureBountyDuration", 12);
 }

@@ -30,7 +30,7 @@ void spawnStar(int p = 0, string pos = "") {
 	yAddUpdateVar("p"+p+"stars", "posx", trQuestVarGet(pos+"x"));
 	yAddUpdateVar("p"+p+"stars", "posz", trQuestVarGet(pos+"z"));
 	yAddUpdateVar("p"+p+"stars", "timeout",
-		trTimeMS() + 1000 * trQuestVarGet("starDuration") * trQuestVarGet("p"+p+"spellDuration"));
+		trTimeMS() + 1000 * trQuestVarGet("starDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 	yAddUpdateVar("p"+p+"stars", "last", trTimeMS());
 }
 
@@ -59,10 +59,10 @@ void blastmageAlways(int eventID = -1) {
 		amt = 0.001 * (trTimeMS() - yGetVar("p"+p+"stars", "last"));
 		
 		if (amt >= 1) {
-			amt = amt * trQuestVarGet("starDamage") * trQuestVarGet("p"+p+"spellDamage");
+			amt = amt * trQuestVarGet("starDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			ySetVar("p"+p+"stars", "last", trTimeMS());
 			yVarToVector("p"+p+"stars", "pos");
-			dist = trQuestVarGet("starRadius") * trQuestVarGet("p"+p+"spellRange");
+			dist = trQuestVarGet("starRadius") * xGetFloat(dPlayerData, xPlayerSpellRange);
 			dist = xsPow(dist, 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				yDatabaseNext("enemies", true);
@@ -95,7 +95,7 @@ void blastmageAlways(int eventID = -1) {
 			trUnitChangeProtoUnit("Meteorite");
 			dist = trQuestVarGet("empoweredRadius") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0;
 			dist = xsPow(dist, 2);
-			amt = trQuestVarGet("empoweredDamage") * trQuestVarGet("p"+p+"spellDamage");
+			amt = trQuestVarGet("empoweredDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -161,9 +161,9 @@ void blastmageAlways(int eventID = -1) {
 		} else if (trTimeMS() > yGetVar("p"+p+"starfalls", "timeout")) {
 			yVarToVector("p"+p+"starfalls", "pos");
 			trVectorQuestVarSet("dir", vector(1,0,0));
-			dist = xsPow(trQuestVarGet("starfallRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			current = xsPow(trQuestVarGet("starfallStunRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-			amt = trQuestVarGet("starfallDamage") * trQuestVarGet("p"+p+"spellDamage");
+			dist = xsPow(trQuestVarGet("starfallRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+			current = xsPow(trQuestVarGet("starfallStunRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+			amt = trQuestVarGet("starfallDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			hit = 0;
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
@@ -222,7 +222,7 @@ void blastmageAlways(int eventID = -1) {
 			} else {
 				trVectorSetUnitPos("pos", "p"+p+"characters");
 				spawnStar(p, "pos");
-				target = 1 + xsMin(trQuestVarGet("warpRange") * trQuestVarGet("p"+p+"spellRange"),
+				target = 1 + xsMin(trQuestVarGet("warpRange") * xGetFloat(dPlayerData, xPlayerSpellRange),
 					zDistanceBetweenVectors("pos", "end")) / 2;
 				trVectorQuestVarSet("step", zGetUnitVector("pos", "end"));
 				for(i=target; >0) {
@@ -262,8 +262,8 @@ void blastmageAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"solarFlareNext", trQuestVarGet("p"+p+"solarFlareNext") + 200);
 			yDatabaseNext("p"+p+"solarFlare");
 			yVarToVector("p"+p+"solarFlare", "pos");
-			amt = trQuestVarGet("solarFlareDamage") * trQuestVarGet("p"+p+"spellDamage");
-			dist = trQuestVarGet("solarFlareRange") * trQuestVarGet("p"+p+"spellRange");
+			amt = trQuestVarGet("solarFlareDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
+			dist = trQuestVarGet("solarFlareRange") * xGetFloat(dPlayerData, xPlayerSpellRange);
 			for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
 				yDatabaseNext("p"+p+"characters");
 				trVectorSetUnitPos("start", "p"+p+"characters");
@@ -298,7 +298,7 @@ void blastmageAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
-		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("solarFlareCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		blastmageSpell(p);
 		trQuestVarSet("p"+p+"solarFlareNext", trTimeMS());
 		trSoundPlayFN("petsuchosattack.wav","1",-1,"","");

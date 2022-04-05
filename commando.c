@@ -257,7 +257,7 @@ void commandoAlways(int eventID = -1) {
 					dir = getUnitVector(start, pos);
 					trSoundPlayFN("titanfall.wav","1",-1,"","");
 					if (trQuestVarGet("p"+p+"minigun") == 1) {
-						gainFavor(p, 0.0 - trQuestVarGet("p"+p+"ultimateCost"));
+						gainFavor(p, 0.0 - xGetFloat(dPlayerData, xPlayerUltimateCost));
 						if (trPlayerResourceCount(p, "favor") == 0) {
 							minigunOff(p);
 						}

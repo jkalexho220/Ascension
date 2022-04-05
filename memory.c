@@ -290,7 +290,7 @@ int xInitDatabase(string name = "", int size = 0) {
 /*
 returns the index of the newly added variable
 */
-int  xInitAddVar(int id = 0, string name = "", int type = 0) {
+int xInitAddVar(int id = 0, string name = "", int type = 0) {
 	int count = aiPlanGetNumberUserVariableValues(id,xDirtyBit);
 	/*
 	first, add the type to our list of types in this struct

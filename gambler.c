@@ -110,7 +110,7 @@ void gamblerAlways(int eventID = -1) {
 					if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
 						removePlayerUnit();
 					} else if (rayCollision("playerUnits","prev","dir",dist + 2.0,4.0)) {
-						healUnit(p, dist * trQuestVarGet("diceDamage") * 0.25 * trQuestVarGet("p"+p+"spellDamage"));
+						healUnit(p, dist * trQuestVarGet("diceDamage") * 0.25 * xGetFloat(dPlayerData, xPlayerSpellDamage));
 						gainFavor(p, dist);
 					}
 				}
@@ -172,8 +172,8 @@ void gamblerAlways(int eventID = -1) {
 						trDamageUnitPercent(100);
 						trUnitChangeProtoUnit("Meteorite");
 						
-						dist = xsPow(trQuestVarGet("diceRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-						amt = trQuestVarGet("diceDamage") * trQuestVarGet("p"+p+"spellDamage");
+						dist = xsPow(trQuestVarGet("diceRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+						amt = trQuestVarGet("diceDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 						for(x=xGetDatabaseCount(dEnemies); >0) {
 							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 								removeEnemy();
@@ -345,7 +345,7 @@ void gamblerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
-		gainFavor(p, 0.0 - trQuestVarGet("gambleCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("gambleCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trSoundPlayFN("plentybirth.wav","1",-1,"","");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"unit");
@@ -420,7 +420,7 @@ void gamblerAlways(int eventID = -1) {
 				{
 					trSoundPlayFN("flamingweapons.wav","1",-1,"","");
 					yVarToVector("p"+p+"cards", "target");
-					dist = trQuestVarGet("deckRadius") * trQuestVarGet("p"+p+"spellRange");
+					dist = trQuestVarGet("deckRadius") * xGetFloat(dPlayerData, xPlayerSpellRange);
 					trVectorQuestVarSet("dir", xsVectorSet(dist,0,0));
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					for(x=16; >0) {
@@ -438,16 +438,16 @@ void gamblerAlways(int eventID = -1) {
 					yAddUpdateVar("p"+p+"deckBurns", "posx", trQuestVarGet("targetx"));
 					yAddUpdateVar("p"+p+"deckBurns", "posz", trQuestVarGet("targetz"));
 					yAddUpdateVar("p"+p+"deckBurns", "damage",
-						trQuestVarGet("deckDamage") * trQuestVarGet("p"+p+"spellDamage") * yGetVar("p"+p+"cards","count"));
+						trQuestVarGet("deckDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage) * yGetVar("p"+p+"cards","count"));
 					yAddUpdateVar("p"+p+"deckBurns", "next", trTimeMS());
 					yAddUpdateVar("p"+p+"deckBurns", "timeout",
-						trTimeMS() + 1000 * trQuestVarGet("deckDuration") * trQuestVarGet("p"+p+"spellDuration"));
+						trTimeMS() + 1000 * trQuestVarGet("deckDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 				}
 				case DECK_STUN:
 				{
 					trSoundPlayFN("frostgiantattack.wav","1",-1,"","");
 					yVarToVector("p"+p+"cards","target");
-					dist = trQuestVarGet("deckRadius") * trQuestVarGet("p"+p+"spellRange");
+					dist = trQuestVarGet("deckRadius") * xGetFloat(dPlayerData, xPlayerSpellRange);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("targetx"),0,trQuestVarGet("targetz"),0,true);
 					trUnitSelectClear();
@@ -472,7 +472,7 @@ void gamblerAlways(int eventID = -1) {
 					trSoundPlayFN("ageadvance.wav","1",-1,"","");
 					target = yGetVar("p"+p+"cards","p"+p+"decktarget");
 					trQuestVarSet("player", target);
-					hit = trTimeMS() + trQuestVarGet("deckDuration") * trQuestVarGet("p"+p+"spellDuration");
+					hit = trTimeMS() + trQuestVarGet("deckDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration);
 					for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
 						if (yGetVar("p"+p+"relics","type") <= NORMAL_RELICS) {
 							yAddToDatabase("p"+p+"tempRelics", "player");

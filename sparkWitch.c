@@ -105,9 +105,9 @@ void sparkWitchAlways(int eventID = -1) {
 		yDatabaseNext("p"+p+"hexOrbs");
 		amt = trTimeMS() - yGetVar("p"+p+"hexOrbs", "next");
 		if (amt > 500) {
-			amt = 0.001 * amt * trQuestVarGet("hexBoltDamage") * trQuestVarGet("p"+p+"spellDamage");
+			amt = 0.001 * amt * trQuestVarGet("hexBoltDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			yVarToVector("p"+p+"hexOrbs", "pos");
-			dist = xsPow(trQuestVarGet("hexboltRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+			dist = xsPow(trQuestVarGet("hexboltRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
@@ -168,7 +168,7 @@ void sparkWitchAlways(int eventID = -1) {
 				if (trUnitAlive()) {
 					trUnitHighlight(0.2, false);
 					if ((1*yGetVar("p"+p+"zaps", "index") > 0) && ySetPointer("enemies", 1*yGetVar("p"+p+"zaps", "index"))) {
-						damageEnemy(p, 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+						damageEnemy(p, 100.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
 						if (yGetVar("p"+p+"zaps", "hex") > 0) {
 							trVectorSetUnitPos("pos", "enemies");
 							vectorSnapToGrid("pos");
@@ -181,7 +181,7 @@ void sparkWitchAlways(int eventID = -1) {
 								yAddUpdateVar("p"+p+"witchPigs", "magicResist", yGetVar("enemies","magicResist"));
 								yAddUpdateVar("p"+p+"witchPigs", "index", yGetVar("p"+p+"zaps", "index"));
 								yAddUpdateVar("p"+p+"witchPigs", "timeout",
-									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * trQuestVarGet("p"+p+"spellDuration"));
+									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 								ySetVar("enemies", "physicalResist", 0);
 								ySetVar("enemies", "magicResist", 0);
 								if (trQuestVarGet("p"+p+"zaps") == trQuestVarGet("bossUnit")) {
@@ -205,7 +205,7 @@ void sparkWitchAlways(int eventID = -1) {
 								trUnitOverrideAnimation(26,0,true,false,-1);
 								yAddToDatabase("p"+p+"hexOrbs", "next");
 								yAddUpdateVar("p"+p+"hexOrbs", "timeout",
-									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * trQuestVarGet("p"+p+"spellDuration"));
+									trTimeMS() + 1000 * trQuestVarGet("hexboltDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 								yAddUpdateVar("p"+p+"hexOrbs", "next", trTimeMS());
 								yAddUpdateVar("p"+p+"hexOrbs", "posx", trQuestVarGet("posx"));
 								yAddUpdateVar("p"+p+"hexOrbs", "posz", trQuestVarGet("posz"));
@@ -278,8 +278,8 @@ void sparkWitchAlways(int eventID = -1) {
 		trSetSelectedScale(0,0,0);
 		trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 		yAddToDatabase("p"+p+"thunderstrikes", "next");
-		dist = xsPow(trQuestVarGet("thunderstrikeRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
-		amt = trQuestVarGet("thunderstrikeDamage") * trQuestVarGet("p"+p+"spellDamage");
+		dist = xsPow(trQuestVarGet("thunderstrikeRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+		amt = trQuestVarGet("thunderstrikeDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 		hit = 0;
 		for(x=xGetDatabaseCount(dEnemies); >0) {
 			if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
@@ -309,12 +309,12 @@ void sparkWitchAlways(int eventID = -1) {
 			yDatabaseNext("p"+p+"characters");
 			ySetVar("p"+p+"characters", "bounces", 1 + yGetVar("p"+p+"characters", "bounces"));
 		}
-		gainFavor(p, 0.0 - trQuestVarGet("vortexCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("vortexCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trVectorSetUnitPos("center", "p"+p+"lureObject");
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trUnitDestroy();
-		dist = trQuestVarGet("vortexRange") * trQuestVarGet("p"+p+"spellRange");
+		dist = trQuestVarGet("vortexRange") * xGetFloat(dPlayerData, xPlayerSpellRange);
 		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch(""+p+",0","Dwarf",8,trQuestVarGet("centerx"),0,trQuestVarGet("centerz"),0,true);
 		trArmySelect(""+p+",0");
@@ -323,7 +323,7 @@ void sparkWitchAlways(int eventID = -1) {
 		trUnitSetAnimationPath("0,0,1,0,0,0,0");
 		yAddToDatabase("p"+p+"vortexObjects", "next");
 		yAddUpdateVar("p"+p+"vortexObjects", "last", trTimeMS());
-		yAddUpdateVar("p"+p+"vortexObjects", "radius", trQuestVarGet("vortexRadius") * trQuestVarGet("p"+p+"spellRange"));
+		yAddUpdateVar("p"+p+"vortexObjects", "radius", trQuestVarGet("vortexRadius") * xGetFloat(dPlayerData, xPlayerSpellRange));
 		yAddUpdateVar("p"+p+"vortexObjects", "centerx", trQuestVarGet("centerx"));
 		yAddUpdateVar("p"+p+"vortexObjects", "centerz", trQuestVarGet("centerz"));
 		yAddUpdateVar("p"+p+"vortexObjects", "dirx", 1);
@@ -359,10 +359,10 @@ void sparkWitchAlways(int eventID = -1) {
 			if (yGetVar("p"+p+"vortexObjects", "step") == 0) {
 				ySetVar("p"+p+"vortexObjects", "step", 1);
 				ySetVar("p"+p+"vortexObjects", "timeout",
-					trTimeMS() + trQuestVarGet("vortexMoveTime") * trQuestVarGet("p"+p+"spellRange"));
+					trTimeMS() + trQuestVarGet("vortexMoveTime") * xGetFloat(dPlayerData, xPlayerSpellRange));
 				trSoundPlayFN("suckup1.wav","1",-1,"","");
 				trSoundPlayFN("vortexstart.wav","1",-1,"","");
-				dist = xsPow(trQuestVarGet("vortexRadius") * trQuestVarGet("p"+p+"spellRange"), 2);
+				dist = xsPow(trQuestVarGet("vortexRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 				yVarToVector("p"+p+"vortexObjects", "center");
 				for(x=xGetDatabaseCount(dEnemies); >0) {
 					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
@@ -438,8 +438,8 @@ void chooseSparkWitch(int eventID = -1) {
 
 void sparkwitchModify(int eventID = -1) {
 	int p = eventID - 5000 - 12 * SPARKWITCH;
-	trQuestVarSet("p"+p+"baseAttack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
-	trQuestVarSet("p"+p+"Attack", 100.0 * trQuestVarGet("p"+p+"spellDamage"));
+	trQuestVarSet("p"+p+"baseAttack", 100.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
+	trQuestVarSet("p"+p+"Attack", 100.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
 }
 
 rule sparkWitch_init

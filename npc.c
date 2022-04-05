@@ -1984,8 +1984,8 @@ highFrequency
 		if (trUnitHasLOS(p)) {
 			xsDisableSelf();
 			xsEnableRule("relic_transporter_guy_always");
-			trArmyDispatch("1,0","Dwarf",1,
-				trQuestVarGet("relicTransporterGuyPosx"),0,trQuestVarGet("relicTransporterGuyPosz"),0,true);
+			vector pos = trVectorQuestVarGet("relicTransporterGuyPos");
+			trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
 			trUnitChangeProtoUnit("Revealer");
@@ -2005,9 +2005,8 @@ highFrequency
 		if (trUnitHasLOS(p)) {
 			xsDisableSelf();
 			xsEnableRule("boss_entrance_always");
-			trVectorSetUnitPos("pos", "bossEntranceStatue");
-			trArmyDispatch("1,0","Dwarf",1,
-				trQuestVarGet("Posx"),0,trQuestVarGet("Posz"),0,true);
+			vector pos = kbGetBlockPosition("bossEntranceStatue");
+			trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);
 			trUnitChangeProtoUnit("Revealer");

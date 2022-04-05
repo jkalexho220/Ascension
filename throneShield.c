@@ -169,7 +169,7 @@ void throneShieldAlways(int eventID = -1) {
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
 		trSoundPlayFN("gaiasparkle2.wav","1",-1,"","");
 		trQuestVarSet("p"+p+"shieldOfLightTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("shieldOfLightDuration") * trQuestVarGet("p"+p+"spellDuration") - 3000);
+			trTimeMS() + 1000 * trQuestVarGet("shieldOfLightDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration) - 3000);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters");
 			if (kbGetBlockID(""+1*yGetVar("p"+p+"characters", "shieldSFX")) == -1) {
@@ -181,7 +181,7 @@ void throneShieldAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Increase Prosperity Small");
 			}
 		}
-		gainFavor(p, 0.0 - trQuestVarGet("shieldOfLightCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("shieldOfLightCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trQuestVarSet("p"+p+"shieldOfLight", 4);
 	}
 	
@@ -218,7 +218,7 @@ void throneShieldAlways(int eventID = -1) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		xsSetContextPlayer(ENEMY_PLAYER);
 		yClearDatabase("justice");
-		dist = trQuestVarGet("justiceRadius") * trQuestVarGet("p"+p+"spellRange");
+		dist = trQuestVarGet("justiceRadius") * xGetFloat(dPlayerData, xPlayerSpellRange);
 		dist = dist * dist;
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			target = yDatabaseNext("p"+p+"characters", true);
@@ -293,8 +293,8 @@ void throneShieldAlways(int eventID = -1) {
 						yAddToDatabase("playerLasers", "next");
 						yAddUpdateVar("playerLasers", "timeout", trTimeMS() + 2500);
 						yAddUpdateVar("playerLasers", "range", 50);
-						dist = xsPow(trQuestVarGet("shieldOfLightWidth") * trQuestVarGet("p"+p+"spellRange"), 2);
-						amt = yGetVar("p"+p+"characters", "absorbed") * trQuestVarGet("p"+p+"spellDamage");
+						dist = xsPow(trQuestVarGet("shieldOfLightWidth") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+						amt = yGetVar("p"+p+"characters", "absorbed") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 						for(x=xGetDatabaseCount(dEnemies); >0) {
 							id = yDatabaseNext("enemies", true);
 							if (id == -1 || trUnitAlive() == false) {
@@ -330,7 +330,7 @@ void throneShieldAlways(int eventID = -1) {
 					} else if (hit == ON_HIT_SPECIAL) {
 						gainFavor(p, 3);
 						stunUnit("enemies", 2.0, p);
-						amt = 0.05 * trQuestVarGet("p"+p+"health");
+						amt = 0.05 * xGetFloat(dPlayerData, xPlayerHealth);
 						for(x=yGetDatabaseCount("playerCharacters"); >0) {
 							if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
 								removePlayerCharacter();
@@ -362,7 +362,7 @@ void chooseThroneShield(int eventID = -1) {
 		lureName = "(E) Shield of Light";
 		lureIsUltimate = true;
 	}
-	trQuestVarSet("p"+p+"damageReduction", 0.02 * trQuestVarGet("p"+p+"health") / 100);
+	trQuestVarSet("p"+p+"damageReduction", 0.02 * xGetFloat(dPlayerData, xPlayerHealth) / 100);
 	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("vowCooldown"));
 	trQuestVarSet("p"+p+"wellCost", 0);
 	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("shieldOfLightCooldown"));
@@ -373,7 +373,7 @@ void chooseThroneShield(int eventID = -1) {
 
 void modifyThroneShield(int eventID = -1) {
 	int p = eventID - 5000 - 12 * THRONESHIELD;
-	trQuestVarSet("p"+p+"damageReduction", 0.02 * trQuestVarGet("p"+p+"health") / 100);
+	trQuestVarSet("p"+p+"damageReduction", 0.02 * xGetFloat(dPlayerData, xPlayerHealth) / 100);
 }
 
 rule throneShield_init

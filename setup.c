@@ -357,13 +357,6 @@ runImmediately
 	Multiplayer = aiIsMultiplayer();
 	trSetUnitIdleProcessing(false);
 	
-	%
-	for(p=1; < cNumberNonGaiaPlayers) {
-		code("trStringQuestVarSet(\"p"+p+"name\", \""+rmGetPlayerName(p)+"\");");
-	}
-	code("map(\"esc\", \"ShowImageBox\", \"gadgetUnreal("+quote+"ShowImageBox"+quote+")\");");
-	%
-	
 	gadgetUnreal("GodPowers");
 	gadgetUnreal("tributedlg-sendButton");
 	gadgetUnreal("tributedlg-clearButton");
@@ -502,7 +495,12 @@ rule setup_classes
 active
 highFrequency
 {
-	
+	%
+	for(p=1; < cNumberNonGaiaPlayers) {
+		code("trStringQuestVarSet(\"p"+p+"name\", \""+rmGetPlayerName(p)+"\");");
+	}
+	code("map(\"esc\", \"ShowImageBox\", \"gadgetUnreal("+quote+"ShowImageBox"+quote+")\");");
+	%
 	setupClass("Militia", 17, 500, 1000);
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
 	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);

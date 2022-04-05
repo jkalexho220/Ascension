@@ -27,7 +27,7 @@ void castDeathSentence(int p = 0) {
 	yAddUpdateVar("p"+p+"sentences", "posx", trQuestVarGet("posx"));
 	yAddUpdateVar("p"+p+"sentences", "posz", trQuestVarGet("posz"));
 	yAddUpdateVar("p"+p+"sentences", "timeout",
-		trTimeMS() + 1000 * trQuestVarGet("deathSentenceDuration") * trQuestVarGet("p"+p+"spellDuration"));
+		trTimeMS() + 1000 * trQuestVarGet("deathSentenceDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 	
 	if (PvP) {
 		xsSetContextPlayer(1*yGetVarAtIndex("playerUnits", "player", 1*yGetVar("enemies", "doppelganger")));
@@ -184,7 +184,7 @@ void nightriderAlways(int eventID = -1) {
 		}
 	}
 	
-	dist = trQuestVarGet("abductRange") * trQuestVarGet("p"+p+"spellRange");
+	dist = trQuestVarGet("abductRange") * xGetFloat(dPlayerData, xPlayerSpellRange);
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
@@ -308,7 +308,7 @@ void nightriderAlways(int eventID = -1) {
 		{
 			dist = trTimeMS() - trQuestVarGet("p"+p+"nightfallNext");
 			dist = dist * 0.015;
-			if (dist > trQuestVarGet("nightfallRadius") * trQuestVarGet("p"+p+"spellRange")) {
+			if (dist > trQuestVarGet("nightfallRadius") * xGetFloat(dPlayerData, xPlayerSpellRange)) {
 				trQuestVarSet("p"+p+"nightfall", 0);
 				for(x=yGetDatabaseCount("p"+p+"nightfallClouds"); >0) {
 					yDatabaseNext("p"+p+"nightfallClouds", true);
@@ -338,7 +338,7 @@ void nightriderAlways(int eventID = -1) {
 		{
 			if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 				xSetBool(dPlayerData, xPlayerLureActivated, false);
-				gainFavor(p, 0.0 - trQuestVarGet("nightfallCost") * trQuestVarGet("p"+p+"ultimateCost"));
+				gainFavor(p, 0.0 - trQuestVarGet("nightfallCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 				trVectorSetUnitPos("p"+p+"nightfallCenter", "p"+p+"lureObject");
 				vectorSnapToGrid("p"+p+"nightfallCenter");
 				trUnitSelectClear();
@@ -399,10 +399,10 @@ void chooseNightrider(int eventID = -1) {
 
 void nightriderModify(int eventID = -1) {
 	int p = eventID - 5000 - 12 * NIGHTRIDER;
-	zSetProtoUnitStat("Minion", p, 0, 0.2 * trQuestVarGet("p"+p+"health"));
-	trQuestVarSet("p"+p+"attack", trQuestVarGet("p"+p+"baseAttack"));
-	zSetProtoUnitStat("Minion", p, 27, 0.2 * trQuestVarGet("p"+p+"Attack"));
-	zSetProtoUnitStat("Hero Greek Achilles", p, 27, trQuestVarGet("p"+p+"Attack"));
+	zSetProtoUnitStat("Minion", p, 0, 0.2 * xGetFloat(dPlayerData, xPlayerHealth));
+	trQuestVarSet("p"+p+"attack", xGetFloat(dPlayerData, xPlayerBaseAttack));
+	zSetProtoUnitStat("Minion", p, 27, 0.2 * xGetFloat(dPlayerData, xPlayerAttack));
+	zSetProtoUnitStat("Hero Greek Achilles", p, 27, xGetFloat(dPlayerData, xPlayerAttack));
 }
 
 rule nightrider_init

@@ -58,7 +58,7 @@ void starseerAlways(int eventID = -1) {
 			}
 			
 			if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-				amt = trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange") - 2.0;
+				amt = trQuestVarGet("realignRadius") * xGetFloat(dPlayerData, xPlayerSpellRange) - 2.0;
 				amt = (amt - yGetVar("p"+p+"characters", "currentRadius") + 2.0) / amt;
 				zSetProtoUnitStat("Oracle Hero", p, 1, trQuestVarGet("p"+p+"speed") * (0.5 + amt));
 			}
@@ -126,7 +126,7 @@ void starseerAlways(int eventID = -1) {
 				trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
 				trVectorSetUnitPos("center", "p"+p+"characters");
 				
-				amt = trQuestVarGet("starbaseDamage") * trQuestVarGet("p"+p+"spellDamage");
+				amt = trQuestVarGet("starbaseDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
 				target = 0;
 				for(x=xGetDatabaseCount(dEnemies); >0) {
 					id = yDatabaseNext("enemies", true);
@@ -173,7 +173,7 @@ void starseerAlways(int eventID = -1) {
 		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 			yDatabaseNext("p"+p+"characters", true);
 			trUnitSetStance("Passive");
-			amt = xsMin(trQuestVarGet("realignRadius") * trQuestVarGet("p"+p+"spellRange"),
+			amt = xsMin(trQuestVarGet("realignRadius") * xGetFloat(dPlayerData, xPlayerSpellRange),
 				zDistanceToVector("p"+p+"characters", "p"+p+"wellPos"));
 			amt = xsMax(2, amt);
 			ySetVar("p"+p+"characters", "targetRadius", amt);
@@ -186,7 +186,7 @@ void starseerAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"RepelTimeout", trQuestVarGet("p"+p+"RepelTimeout") + 1000);
 			trQuestVarSet("p"+p+"Repel", 2);
 			hit = 0;
-			dist = xsPow(trQuestVarGet("RepelRange") * trQuestVarGet("p"+p+"spellRange"), 2);
+			dist = xsPow(trQuestVarGet("RepelRange") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
 				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
 					removeStarseer(p);
@@ -201,7 +201,7 @@ void starseerAlways(int eventID = -1) {
 						} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
 							trVectorSetUnitPos("target", "enemies");
 							trVectorQuestVarSet("dir",
-								zGetUnitVector("pos", "target", trQuestVarGet("RepelRange") * trQuestVarGet("p"+p+"spellRange")));
+								zGetUnitVector("pos", "target", trQuestVarGet("RepelRange") * xGetFloat(dPlayerData, xPlayerSpellRange)));
 							trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
 							trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
 							launchUnit("enemies", "dest");
@@ -262,10 +262,10 @@ void starseerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		gainFavor(p, 0.0 - trQuestVarGet("eventHorizonCost") * trQuestVarGet("p"+p+"ultimateCost"));
+		gainFavor(p, 0.0 - trQuestVarGet("eventHorizonCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trQuestVarSet("p"+p+"eventHorizon", 1);
 		trQuestVarSet("p"+p+"eventHorizonTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("eventHorizonDuration") * trQuestVarGet("p"+p+"spellDuration"));
+			trTimeMS() + 1000 * trQuestVarGet("eventHorizonDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
 		trQuestVarSet("p"+p+"starAngularVelocity",
 			2.0 * trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
 		trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
