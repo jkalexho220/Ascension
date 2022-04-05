@@ -335,6 +335,7 @@ void processChests() {
 						pos = kbGetBlockPosition(""+xGetInt(dChests,xUnitName));
 						xSetPointer(dRainingRelics, xAddDatabaseBlock(dRainingRelics));
 						xSetInt(dRainingRelics,xUnitName,trGetNextUnitScenarioNameNumber());
+						xSetInt(dRainingRelics,xRainingRelicMorphed,1);
 						trQuestVarSetFromRand("heading",1,360,true);
 						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 						trQuestVarSetFromRand("speed", 2, 10);
@@ -362,6 +363,7 @@ void processChests() {
 						for(x=18; >0) {
 							xSetPointer(dRainingRelics,xAddDatabaseBlock(dRainingRelics));
 							xSetInt(dRainingRelics,xUnitName,trGetNextUnitScenarioNameNumber());
+							xSetInt(dRainingRelics,xRainingRelicMorphed,2);
 							trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 							trArmySelect("0,0");
 							trDamageUnitPercent(100);
