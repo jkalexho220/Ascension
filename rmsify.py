@@ -32,7 +32,7 @@ files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 's
 
 files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
-        'starseer.c', 'throneShield.c', 'gameplay.c', 'singleplayer.c']
+        'starseer.c', 'throneShield.c', 'thunderrider.c', 'gameplay.c', 'singleplayer.c']
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
@@ -119,6 +119,7 @@ def getKnownVariables():
 	global KNOWN_VARIABLES
 	global KNOWN_VARIABLES_RMS
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		return KNOWN_VARIABLES_RMS
 	else:
@@ -128,6 +129,7 @@ def getKnownDatatypes():
 	global KNOWN_TYPES
 	global KNOWN_TYPES_RMS
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		return KNOWN_TYPES_RMS
 	else:
@@ -137,6 +139,7 @@ def getKnownFor():
 	global KNOWN_FOR
 	global KNOWN_FOR_RMS
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		return KNOWN_FOR_RMS
 	else:
@@ -144,6 +147,7 @@ def getKnownFor():
 
 def setKnownVariables(newlist):
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		global KNOWN_VARIABLES_RMS
 		KNOWN_VARIABLES_RMS = newlist
@@ -153,6 +157,7 @@ def setKnownVariables(newlist):
 
 def setKnownDatatypes(newlist):
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		global KNOWN_TYPES_RMS
 		KNOWN_TYPES_RMS = newlist
@@ -162,6 +167,7 @@ def setKnownDatatypes(newlist):
 
 def setKnownFor(newlist):
 	global ESCAPE
+	global RESTORING
 	if ESCAPE and not RESTORING:
 		global KNOWN_FOR_RMS
 		KNOWN_FOR_RMS = newlist
@@ -347,6 +353,9 @@ class StackFrame(Job):
 					setKnownVariables(knownVars[:self.depth])
 					setKnownDatatypes(knownTypes[:self.depth])
 					self.state = STATE_CLOSED
+					if self.name != 'if':
+						self.resolve()
+						self.parent.children.pop()
 				elif self.name == 'switch' and not token == 'case':
 					accepted = False
 				elif token in LOGIC:
@@ -1097,6 +1106,7 @@ try:
 						ln = ln + 1
 			
 			BASE_JOB.resolve()
+			RMS_JOB.resolve()
 			# reformat the .c raw code
 			with open(FILE_1, 'w') as file_data_1:
 				for line in rewrite:

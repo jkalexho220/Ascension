@@ -973,7 +973,7 @@ highFrequency
 				if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 6) {
 					xAddDatabaseBlock(dMagicalJourney, true);
 					xSetInt(dMagicalJourney, xUnitName, xGetInt(dPlayerUnits, xUnitID));
-					if (xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()) == xGetInt(dPlayerData, xUnitName)) {
+					if (xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()) == xGetInt(dPlayerUnits, xUnitName)) {
 						uiLookAtUnitByName(""+xGetInt(dSkyPassages, xSkyPassageExit));
 						trQuestVarSet("sound", 1);
 					}

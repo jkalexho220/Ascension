@@ -948,4 +948,3 @@ void spawnRelicClosest(vector v = vector(0,0,0), int target = 0) {
 		xsMax(1, target - trQuestVarGet("rand")), xsMin(10, target + trQuestVarGet("rand")), true);
 	spawnRelicSpecific(v, 1*trQuestVarGet("rand"));
 }
-

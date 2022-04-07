@@ -121,9 +121,7 @@ float distanceTraveled(int last = 0, float speed = 0) {
 	return(dist);
 }
 
-vector vectorSetAsCurrentPosition(vector prev = vector(0,0,0),
-	vector dir = vector(0,0,0), int last = 0, float speed = 0) {
-	float dist = distanceTraveled(last, speed);
+vector vectorSetAsCurrentPosition(vector prev = vector(0,0,0),vector dir = vector(0,0,0), float dist = 0) {
 	vector v = xsVectorSet(xsVectorGetX(prev) + dist * xsVectorGetX(dir),0,xsVectorGetZ(prev) + dist * xsVectorGetZ(dir));
 	return(v);
 }
