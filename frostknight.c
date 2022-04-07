@@ -65,7 +65,7 @@ void castIcicle(int p = 0, string pos = "") {
 					damageEnemy(p, trQuestVarGet("icicleDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
 					if (current < amt) {
 						amt = current;
-						target = yGetPointer("enemies");
+						target = xGetPointer(dEnemies);
 					}
 				}
 			}
@@ -84,7 +84,7 @@ void castIcicle(int p = 0, string pos = "") {
 		int id = 0;
 		int hit = 0;
 		int target = 0;
-		int index = yGetPointer("enemies");
+		int index = xGetPointer(dEnemies);
 		float amt = 0;
 		float dist = 0;
 		float current = 0;
@@ -313,7 +313,7 @@ void castIcicle(int p = 0, string pos = "") {
 						}
 					}
 				}
-				ySetPointer("enemies", index);
+				xSetPointer(dEnemies, index);
 				poisonKillerBonus(p);
 				xsSetContextPlayer(old);
 			}

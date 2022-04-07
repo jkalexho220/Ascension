@@ -468,7 +468,6 @@ void sparkWitchAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
-	poisonKillerBonus(p);
 }
 
 void chooseSparkWitch(int eventID = -1) {

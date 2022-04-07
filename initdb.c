@@ -136,6 +136,8 @@ int xPlayerAnimation = 0;
 int xPlayerAction = 0;
 int xPlayerSilenced = 0;
 
+int xPlayerTether = 0;
+
 int xPlayerMonsterIndex = 0;
 int xPlayerMonsterProto = 0;
 int xPlayerMonsterName = 0;
@@ -359,6 +361,8 @@ highFrequency
 	xPlayerAnimation = xInitAddInt(dPlayerData,"animation");
 	xPlayerAction = xInitAddInt(dPlayerData,"action");
 	xPlayerSilenced = xInitAddBool(dPlayerData,"silenced");
+	
+	xPlayerTether = xInitAddInt(dPlayerData,"tether",-1);
 	
 	xPlayerMonsterIndex = xInitAddInt(dPlayerData,"monsterIndex");
 	xPlayerMonsterProto = xInitAddInt(dPlayerData,"monsterProto");

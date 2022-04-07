@@ -2005,7 +2005,7 @@ highFrequency
 		if (trUnitHasLOS(p)) {
 			xsDisableSelf();
 			xsEnableRule("boss_entrance_always");
-			vector pos = kbGetBlockPosition("bossEntranceStatue");
+			vector pos = kbGetBlockPosition(""+1*trQuestVarGet("bossEntranceStatue"));
 			trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect("1,0");
 			trUnitConvert(0);

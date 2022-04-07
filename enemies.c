@@ -310,10 +310,10 @@ void specialUnitsAlways() {
 				trQuestVarSet("sound", 1);
 				start = kbGetBlockPosition(""+xGetInt(dDelayLasers,xUnitName));
 				p = xGetInt(dDelayLasers,xPlayerOwner);
+				dir = xGetVector(dDelayLasers,xLaserDir);
 				db = opponentDatabaseName(p);
 				for(y=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
-					dir = xGetVector(db,xLaserDir);
 					xUnitSelectByID(db,xUnitID);
 					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
@@ -323,7 +323,7 @@ void specialUnitsAlways() {
 				}
 			}
 		} else {
-			amt = 0.012 * (xGetFloat(dDelayLasers, xLaserNext) - trTimeMS());
+			amt = 0.012 * (xGetInt(dDelayLasers, xLaserNext) - trTimeMS());
 			if (amt < 0) {
 				trUnitDestroy();
 				xFreeDatabaseBlock(dDelayLasers);

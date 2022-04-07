@@ -1,150 +1,150 @@
+float starBaseDamage = 60;
+
+int realignCooldown = 5;
+float realignRadius = 15;
+
+int RepelCooldown = 15;
+float RepelRange = 15;
+
+float eventHorizonCost = 60;
+float eventHorizonDuration = 10;
+
+float starAngularVelocity = 1.570796; // 6.283185 / 4.0
+
+int xStarseerStar = 0;
+int xStarseerMeteorite = 0;
+int xStarseerTargetRadius = 0;
+int xStarseerCurrentRadius = 0;
+int xStarseerAngle = 0;
+int xStarseerHitbox = 0;
+int xStarseerLast = 0;
+int xStarseerDir = 0;
+
 void removeStarseer(int p = 0) {
-	for(x=3; >0) {
-		trUnitSelectClear();
-		trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x), true);
+	int db = getCharactersDB(p);
+	for(x=0; <3) {
+		xUnitSelect(db, xStarseerStar + x);
 		trUnitChangeProtoUnit("Rocket");
-		trUnitSelectClear();
-		trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+		xUnitSelect(db, xStarseerMeteorite + x);
 		trUnitChangeProtoUnit("Rocket");
 	}
 	removePlayerSpecific(p);
-	/* the star units */
-	for(x=3; >0) {
-		yRemoveUpdateVar("p"+p+"characters", "star"+x);
-		yRemoveUpdateVar("p"+p+"characters", "Meteorite"+x);
-	}
-	yRemoveUpdateVar("p"+p+"characters", "targetRadius");
-	yRemoveUpdateVar("p"+p+"characters", "currentRadius");
-	yRemoveUpdateVar("p"+p+"characters", "angle");
-	yRemoveUpdateVar("p"+p+"characters", "hitbox");
-	yRemoveUpdateVar("p"+p+"characters", "last");
-	yRemoveUpdateVar("p"+p+"characters", "hitNext");
 }
 
 void starseerAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * STARSEER;
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int index = yGetPointer("enemies");
+	int index = xGetPointer(dEnemies);
+	int db = getCharactersDB(p);
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
+	float angleDiff = 0;
+	float outer = 0;
+	float inner = 0;
+	xSetPointer(dPlayerData, p);
 	
-	for (y=yGetDatabaseCount("p"+p+"characters"); > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
-		if (id == -1 || trUnitAlive() == false) {
+	vector pos = vector(0,0,0);
+	vector cur = vector(0,0,0);
+	vector prev = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	vector center = vector(0,0,0);
+	
+	for (y=xGetDatabaseCount(db); > 0) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeStarseer(p);
 		} else {
 			
-			current = trTimeMS() - yGetVar("p"+p+"characters", "last");
-			ySetVar("p"+p+"characters", "last", trTimeMS());
+			current = trTimeMS() - xGetInt(db, xStarseerLast);
+			xSetInt(db, xStarseerLast, trTimeMS());
 			
 			amt = trQuestVarGet("p"+p+"starAngularVelocity") * 0.001 * current;
-			ySetVar("p"+p+"characters", "angle", fModulo(6.283185, yGetVar("p"+p+"characters", "angle") - amt));
-			if (yGetVar("p"+p+"characters", "targetRadius") == 0) {
-				ySetVar("p"+p+"characters", "targetRadius", 2);
-				ySetVar("p"+p+"characters", "currentRadius", 2);
-			} else {
-				dist = yGetVar("p"+p+"characters", "targetRadius") - yGetVar("p"+p+"characters", "currentRadius");
-				if (xsAbs(dist) > 0.1) {
-					dist = 2.0 * dist * 0.001 * current;
-					ySetVar("p"+p+"characters", "currentRadius", yGetVar("p"+p+"characters", "currentRadius") + dist);
-				} else if (xsAbs(dist) > 0) {
-					ySetVar("p"+p+"characters", "currentRadius", yGetVar("p"+p+"characters", "targetRadius"));
-				}
+			xSetFloat(db, xStarseerAngle, fModulo(6.283185, xGetFloat(db, xStarseerAngle) - amt));
+			
+			dist = xGetFloat(db, xStarseerTargetRadius) - xGetFloat(db, xStarseerCurrentRadius);
+			if (xsAbs(dist) > 0.1) {
+				dist = 2.0 * dist * 0.001 * current;
+				xSetFloat(db, xStarseerCurrentRadius, xGetFloat(db, xStarseerCurrentRadius) + dist);
+			} else if (xsAbs(dist) > 0) {
+				xSetFloat(db, xStarseerCurrentRadius, xGetFloat(db, xStarseerTargetRadius));
 			}
 			
-			if (trQuestVarGet("p"+p+"characters") == trQuestVarGet("p"+p+"unit")) {
-				amt = trQuestVarGet("realignRadius") * xGetFloat(dPlayerData, xPlayerSpellRange) - 2.0;
-				amt = (amt - yGetVar("p"+p+"characters", "currentRadius") + 2.0) / amt;
-				zSetProtoUnitStat("Oracle Hero", p, 1, trQuestVarGet("p"+p+"speed") * (0.5 + amt));
+			/*
+			Adjust player speed
+			*/
+			if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+				amt = realignRadius * xGetFloat(dPlayerData, xPlayerSpellRange) - 2.0;
+				amt = (amt - xGetFloat(db, xStarseerCurrentRadius) + 2.0) / amt;
+				zSetProtoUnitStat("Oracle Hero", p, 1, xGetFloat(dPlayerData, xPlayerSpeed) * (0.5 + amt));
 			}
 			
-			hit = 0;
-			if (trTimeMS() > yGetVar("p"+p+"characters", "hitNext")) {
-				if (trTimeMS() > yGetVar("p"+p+"characters", "hitNext") + 1000) {
-					ySetVar("p"+p+"characters", "hitNext", trTimeMS());
-				} else {
-					ySetVar("p"+p+"characters", "hitNext", yGetVar("p"+p+"characters","hitNext") + 20 * ENEMY_PLAYER);
-				}
-				hit = 1 + yGetVar("p"+p+"characters", "hitbox");
-				if (hit > 3) {
-					hit = 1;
-				}
-				ySetVar("p"+p+"characters", "hitbox", hit);
+			hit = 1 + xGetInt(db, xStarseerHitbox);
+			if (hit >= 3) {
+				hit = 0;
 			}
+			xSetInt(db, xStarseerHitbox, hit);
 			
-			current = yGetVar("p"+p+"characters", "angle");
-			trVectorSetFromAngle("dir", current);
-			for(x=1; <=3) {
+			current = xGetFloat(db, xStarseerAngle);
+			dir = xsVectorSet(xsSin(current), 0, xsCos(current));
+			for(x=0; < 3) {
 				if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
-					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "Meteorite"+x));
-					if (id == -1 || yGetVar("p"+p+"characters", "Meteorite"+x) == 0) {
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-							kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "Meteorite"+x));
+					if (xGetInt(db, xStarseerMeteorite + x) <= 0) {
+						spyEffect(xGetInt(db, xUnitName),
+							kbGetProtoUnitID("Cinematic Block"),xsVectorSet(db, xStarseerMeteorite + x, xGetPointer(db)));
 					}
-					id = kbGetBlockID(""+1*yGetVar("p"+p+"characters", "star"+x));
-					if (id == -1 || yGetVar("p"+p+"characters", "star"+x) == 0) {
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-							kbGetProtoUnitID("Cinematic Block"),yGetVarName("p"+p+"characters", "star"+x));
+					if (xGetInt(db, xStarseerStar + x) <= 0) {
+						spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Outpost"),
+							xsVectorSet(db, xStarseerStar + x, xGetPointer(db)),vector(0,0,0));
 					}
 				}
 				if (x == hit) {
 					/* this is the hitbox for this iteration */
-					trQuestVarSet("curPosx", trQuestVarGet("dirx"));
-					trQuestVarSet("curPosz", trQuestVarGet("dirz"));
-					trQuestVarSet("prevPosx", yGetVar("p"+p+"characters", "last"+x+"x"));
-					trQuestVarSet("prevPosz", yGetVar("p"+p+"characters", "last"+x+"z"));
-					trQuestVarSet("angleDiff", dotProduct("curPos", "prevPos"));
+					cur = dir;
+					prev = xGetVector(db, xStarseerDir + x);
+					angleDiff = dotProduct(cur, prev);
 				}
-				trQuestVarSet("tempx", trQuestVarGet("dirx") * yGetVar("p"+p+"characters", "currentRadius"));
-				trQuestVarSet("tempz", trQuestVarGet("dirz") * yGetVar("p"+p+"characters", "currentRadius"));
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "star"+x));
-				if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Cinematic Block")) {
-					trMutateSelected(kbGetProtoUnitID("Outpost"));
-					trSetSelectedScale(0,0,0);
-				}
-				trSetSelectedUpVector(3.33 * trQuestVarGet("tempx"),0.2,3.33 * trQuestVarGet("tempz"));
+				pos = dir * xGetFloat(db, xStarseerCurrentRadius);
+				xUnitSelect(db, xStarseerStar + x);
+				trSetSelectedUpVector(3.33 * xsVectorGetX(pos),0.2,3.33 * xsVectorGetZ(pos));
 				if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
-					trSetSelectedUpVector(1.0 * trQuestVarGet("tempx"),0,1.0 * trQuestVarGet("tempz"));
+					xUnitSelect(db, xStarseerMeteorite + x);
+					trSetSelectedUpVector(1.0 * xsVectorGetX(pos),0,1.0 * xsVectorGetZ(pos));
 				}
 				
-				trVectorQuestVarSet("dir", rotationMatrix("dir", -0.5, -0.866025));
+				dir = rotationMatrix(dir, -0.5, -0.866025);
 			}
 			
 			if (hit > 0) {
-				ySetVarFromVector("p"+p+"characters", "last"+hit, "curPos");
+				xSetVector(db, xStarseerDir + hit, cur);
 				/* collision detection for one star */
+				outer = xsPow(xGetFloat(db, xStarseerCurrentRadius) + 1.5, 2);
+				inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
+				center = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 				
-				trQuestVarSet("outer", xsPow(yGetVar("p"+p+"characters", "currentRadius") + 1.5, 2));
-				trQuestVarSet("inner", xsPow(yGetVar("p"+p+"characters", "currentRadius") - 1.5, 2));
-				trVectorSetUnitPos("center", "p"+p+"characters");
-				
-				amt = trQuestVarGet("starbaseDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
+				amt = starBaseDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
 				target = 0;
 				for(x=xGetDatabaseCount(dEnemies); >0) {
-					id = yDatabaseNext("enemies", true);
-					if (id == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
 						removeEnemy();
 					} else {
-						trVectorSetUnitPos("pos", "enemies");
-						dist = zDistanceBetweenVectorsSquared("pos", "center");
-						if (dist < trQuestVarGet("outer") && dist > trQuestVarGet("inner")) {
+						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
+						dist = distanceBetweenVectors(pos, center);
+						if (dist < outer && dist > inner) {
 							/* enemy is within the donut */
-							trVectorQuestVarSet("dir", zGetUnitVector("center", "pos"));
+							dir = getUnitVector(center, pos);
 							/* if enemy is in between the old and new positions, that's a hit */
-							trQuestVarSet("curDiff", dotProduct("dir", "curPos"));
-							if (trQuestVarGet("curDiff") > trQuestVarGet("angleDiff")) {
-								if (dotProduct("dir", "prevPos") > trQuestVarGet("angleDiff")) {
+							if (dotProduct(dir, cur) > angleDiff) {
+								if (dotProduct(dir, prev) > angleDiff) {
 									/* HIT */
 									if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
-										stunUnit("enemies", 1.5, p);
+										stunUnit(dEnemies, 1.5, p);
 									} else {
 										gainFavor(p, 1);
 									}
@@ -170,13 +170,14 @@ void starseerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters", true);
+		pos = xGetVector(dPlayerData, xPlayerWellPos);
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db, true);
 			trUnitSetStance("Passive");
-			amt = xsMin(trQuestVarGet("realignRadius") * xGetFloat(dPlayerData, xPlayerSpellRange),
-				zDistanceToVector("p"+p+"characters", "p"+p+"wellPos"));
+			amt = xsMin(realignRadius * xGetFloat(dPlayerData, xPlayerSpellRange),
+				unitDistanceToVector(xGetInt(db, xUnitName), pos, false));
 			amt = xsMax(2, amt);
-			ySetVar("p"+p+"characters", "targetRadius", amt);
+			xSetFloat(db, xStarseerTargetRadius, amt);
 		}
 		trSoundPlayFN("suckup3.wav","1",-1,"","");
 	}
@@ -186,25 +187,26 @@ void starseerAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"RepelTimeout", trQuestVarGet("p"+p+"RepelTimeout") + 1000);
 			trQuestVarSet("p"+p+"Repel", 2);
 			hit = 0;
-			dist = xsPow(trQuestVarGet("RepelRange") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+			dist = xsPow(RepelRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
 					removeStarseer(p);
 				} else {
-					trVectorSetUnitPos("pos", "p"+p+"characters");
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Tremor");
 					for(y=xGetDatabaseCount(dEnemies); >0) {
-						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
 							removeEnemy();
-						} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
-							trVectorSetUnitPos("target", "enemies");
-							trVectorQuestVarSet("dir",
-								zGetUnitVector("pos", "target", trQuestVarGet("RepelRange") * xGetFloat(dPlayerData, xPlayerSpellRange)));
-							trQuestVarSet("destx", trQuestVarGet("posx") + trQuestVarGet("dirx"));
-							trQuestVarSet("destz", trQuestVarGet("posz") + trQuestVarGet("dirz"));
-							launchUnit("enemies", "dest");
+						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+							dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true),
+								RepelRange * xGetFloat(dPlayerData, xPlayerSpellRange));
+							launchUnit(dEnemies, pos + dir);
 							hit = hit + 1;
 						}
 					}
@@ -214,11 +216,12 @@ void starseerAlways(int eventID = -1) {
 		}
 	} else if (trQuestVarGet("p"+p+"Repel") == 2) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"RepelTimeout")) {
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
 					removeStarseer(p);
 				} else {
-					trVectorSetUnitPos("pos", "p"+p+"characters");
 					trUnitOverrideAnimation(-1, 0, false, true, -1);
 				}
 			}
@@ -232,8 +235,10 @@ void starseerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"RepelTimeout", trTimeMS() + 1200);
 		trSoundPlayFN("oracledone.wav","1",-1,"","");
 		trSoundPlayFN("implode reverse.wav","1",-1,"","");
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (yDatabaseNext("p"+p+"characters", true) == -1 || trUnitAlive() == false) {
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db, xUnitID);
+			if (trUnitAlive() == false) {
 				removeStarseer(p);
 			} else {
 				trMutateSelected(kbGetProtoUnitID("Oracle Hero"));
@@ -246,34 +251,32 @@ void starseerAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"eventHorizonTimeout")) {
 			trQuestVarSet("p"+p+"eventHorizon", 0);
-			for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-				yDatabaseNext("p"+p+"characters");
-				for(x=3; >0) {
-					trUnitSelectClear();
-					trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+			for(y=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				for(x=0; < 3) {
+					xUnitSelect(db, xStarseerMeteorite + x);
 					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 				}
 			}
 			trQuestVarSet("p"+p+"starAngularVelocity",
-				trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+				starAngularVelocity * (2.0 + xGetInt(dPlayerData, xPlayerProjectiles)) / 3.0);
 			trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 		}
 	}
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		gainFavor(p, 0.0 - trQuestVarGet("eventHorizonCost") * xGetFloat(dPlayerData, xPlayerUltimateCost));
+		gainFavor(p, 0.0 - eventHorizonCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		trQuestVarSet("p"+p+"eventHorizon", 1);
 		trQuestVarSet("p"+p+"eventHorizonTimeout",
-			trTimeMS() + 1000 * trQuestVarGet("eventHorizonDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration));
+			trTimeMS() + 1000 * eventHorizonDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 		trQuestVarSet("p"+p+"starAngularVelocity",
-			2.0 * trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+			2.0 * starAngularVelocity * (2.0 + xGetInt(dPlayerData, xPlayerProjectiles)) / 3.0);
 		trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
-		for(y=yGetDatabaseCount("p"+p+"characters"); >0) {
-			yDatabaseNext("p"+p+"characters");
-			for(x=3; >0) {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"characters", "Meteorite"+x), true);
+		for(y=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			for(x=0; < 3) {
+				xUnitSelect(db, xStarseerMeteorite + x);
 				trMutateSelected(kbGetProtoUnitID("Vortex Finish Linked"));
 				trSetSelectedScale(0,0,0);
 				trUnitSetAnimationPath("0,0,1,0,0,0,0");
@@ -282,12 +285,15 @@ void starseerAlways(int eventID = -1) {
 		trSoundPlayFN("cinematics\24_in\magic.mp3", "5", -1, "","");
 	}
 	
-	ySetPointer("enemies", index);
-	xsSetContextPlayer(old);
+	xSetPointer(dEnemies, index);
 }
 
 void chooseStarseer(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * STARSEER;
+	int db = getCharactersDB(p);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData, p);
 	if (trCurrentPlayer() == p) {
 		map("w", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
 		wellName = "(W) Realignment";
@@ -299,20 +305,37 @@ void chooseStarseer(int eventID = -1) {
 		lureName = "(E) Event Horizon";
 		lureIsUltimate = true;
 	}
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("realignCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", 1);
-	trQuestVarSet("p"+p+"lureCost", trQuestVarGet("eventHorizonCost"));
-	trQuestVarSet("p"+p+"rainCooldown", trQuestVarGet("RepelCooldown"));
-	trQuestVarSet("p"+p+"rainCost", 0);
+	xStarseerStar = xInitAddInt(db, "star0");
+	xInitAddInt(db, "star1");
+	xInitAddInt(db, "star2");
+	xStarseerMeteorite = xInitAddInt(db, "meteorite0");
+	xInitAddInt(db, "meteorite1");
+	xInitAddInt(db, "meteorite2");
+	xStarseerTargetRadius = xInitAddFloat(db, "targetRadius", 2.0);
+	xStarseerCurrentRadius = xInitAddFloat(db, "currentRadius", 2.0);
+	xStarseerAngle = xInitAddFloat(db, "angle");
+	xStarseerHitbox = xInitAddInt(db, "hitbox");
+	xStarseerLast = xInitAddInt(db, "last");
+	xStarseerDir = xInitAddVector(db, "dir0");
+	xInitAddVector(db, "dir1");
+	xInitAddVector(db, "dir2");
+	
+	xSetInt(dPlayerData,xPlayerWellCooldown, realignCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 1);
+	xSetFloat(dPlayerData,xPlayerLureCost, eventHorizonCost);
+	xSetInt(dPlayerData,xPlayerRainCooldown,RepelCooldown);
+	xSetFloat(dPlayerData,xPlayerRainCost, 0);
 }
 
 void starseerModify(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 5000 - 12 * STARSEER;
+	xSetPointer(dPlayerData, p);
 	/* no attack for u */
 	zSetProtoUnitStat("Oracle Hero", p, 27, 0);
 	trQuestVarSet("p"+p+"starAngularVelocity",
-		trQuestVarGet("starAngularVelocity") * (2.0 + trQuestVarGet("p"+p+"projectiles")) / 3.0);
+		starAngularVelocity * (2.0 + xGetInt(dPlayerData, xPlayerProjectiles)) / 3.0);
 	if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
 		trQuestVarSet("p"+p+"starAngularVelocity", 2.0 * trQuestVarGet("p"+p+"starAngularVelocity"));
 	}
@@ -324,24 +347,11 @@ active
 highFrequency
 {
 	xsDisableSelf();
-	trQuestVarSet("starAngularVelocity", 6.283185 / 4.0);
 	for(p=1; < ENEMY_PLAYER) {
 		trEventSetHandler(12 * STARSEER + p, "starseerAlways");
 		trEventSetHandler(1000 + 12 * STARSEER + p, "chooseStarseer");
 		trEventSetHandler(5000 + 12 * STARSEER + p, "starseerModify");
-		trQuestVarSet("p"+p+"starAngularVelocity", trQuestVarGet("starAngularVelocity"));
+		trQuestVarSet("p"+p+"starAngularVelocity", starAngularVelocity);
 		trQuestVarSet("p"+p+"starCosine", xsCos(trQuestVarGet("p"+p+"starAngularVelocity") * 0.3));
 	}
-	
-	trQuestVarSet("starBaseDamage", 60);
-	
-	
-	trQuestVarSet("realignCooldown", 5);
-	trQuestVarSet("realignRadius", 15);
-	
-	trQuestVarSet("RepelCooldown", 15);
-	trQuestVarSet("RepelRange", 15);
-	
-	trQuestVarSet("eventHorizonCost", 60);
-	trQuestVarSet("eventHorizonDuration", 10);
 }

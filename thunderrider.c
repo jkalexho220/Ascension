@@ -80,7 +80,7 @@ void refreshRideLightningTargets(int p = 0) {
 	for(x=xGetDatabaseCount(dEnemies); >0) {
 		xDatabaseNext(dEnemies);
 		yAddToDatabase("p"+p+"rideLightningTargets", "enemies");
-		yAddUpdateVar("p"+p+"rideLightningTargets", "index", yGetPointer("enemies"));
+		yAddUpdateVar("p"+p+"rideLightningTargets", "index", xGetPointer(dEnemies));
 	}
 }
 
@@ -120,7 +120,7 @@ void thunderRiderAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
-	int index = yGetPointer("enemies");
+	int index = xGetPointer(dEnemies);
 	float amt = 0;
 	float dist = 0;
 	float posX = 0;
@@ -432,7 +432,7 @@ void thunderRiderAlways(int eventID = -1) {
 						} else {
 							if ((id == target) == false) {
 								yAddToDatabase("p"+p+"thunderShockTargets", "enemies");
-								yAddUpdateVar("p"+p+"thunderShockTargets", "index", yGetPointer("enemies"));
+								yAddUpdateVar("p"+p+"thunderShockTargets", "index", xGetPointer(dEnemies));
 							}
 						}
 					}
@@ -498,7 +498,7 @@ void thunderRiderAlways(int eventID = -1) {
 		}
 	}
 	
-	ySetPointer("enemies", index);
+	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
 	xsSetContextPlayer(old);
 }

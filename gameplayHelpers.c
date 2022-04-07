@@ -32,7 +32,8 @@ int spyreset = 0;
 int spyProto = 0;
 int spyUnit = 1;
 int spyDest = 2;
-int spyActive = 3;
+int spyScale = 3;
+int spyActive = 4;
 
 int boss = 0;
 int bossUnit = 0;
@@ -53,6 +54,7 @@ highFrequency
 	spyProto = zNewArray(mInt,64,"spyProto");
 	spyUnit = zNewArray(mInt,64,"spyUnit");
 	spyDest = zNewArray(mVector,64,"spyDest");
+	spyScale = zNewArray(mVector,64,"spyScale");
 	spyActive = zNewArray(mBool,64,"spyActive");
 }
 
@@ -95,7 +97,7 @@ void gainFavor(int p = 0, float amt = 0) {
 	trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 }
 
-void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0)) {
+void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0), vector scale = vector(1,1,1)) {
 	if (peekModularCounterNext("spyFind") != trQuestVarGet("spyFound")) {
 		trUnitSelectClear();
 		trUnitSelect(""+unit, true);
@@ -105,6 +107,7 @@ void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0)) {
 			aiPlanSetUserVariableInt(ARRAYS,spyUnit,x,unit);
 			aiPlanSetUserVariableBool(ARRAYS,spyActive,x,true);
 			aiPlanSetUserVariableVector(ARRAYS,spyDest,x,dest);
+			aiPlanSetUserVariableVector(ARRAYS,spyScale,x,scale);
 			trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
 		}
 	} else {
@@ -295,13 +298,13 @@ void removePlayerCharacter() {
 
 void removePlayerSpecific(int p = 0) {
 	int db = getCharactersDB(p);
+	int relics = getRelicsDB(p);
 	if (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p)) {
 		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData,xPlayerUnit));
 		trVectorQuestVarSet("dead"+p+"pos",pos);
-		for(x=xGetDatabaseCount(1*trQuestVarGet("p"+p+"relics")); >0) {
-			xDatabaseNext(1*trQuestVarGet("p"+p+"relics"));
-			trUnitSelectClear();
-			trUnitSelect(""+xGetInt(1*trQuestVarGet("p"+p+"relics"),xRelicName),true);
+		for(x=xGetDatabaseCount(relics); >0) {
+			xDatabaseNext(relics);
+			xUnitSelect(relics, xRelicName);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 		}
 		xSetInt(dPlayerData,xPlayerDead,10);
@@ -321,10 +324,11 @@ void removePlayerSpecific(int p = 0) {
 		}
 		silencePlayer(p);
 		/* NOOOO MY QUEEEEN */
+		xSetInt(dPlayerData, xPlayerTether, 0);
 		if (xGetInt(dPlayerData,xPlayerSimp,p) > 0) {
 			int simp = xGetInt(dPlayerData,xPlayerSimp,p);
 			trUnitSelectClear();
-			trUnitSelectByQV("p"+simp+"tether");
+			trUnitSelect(""+xGetInt(dPlayerData, xPlayerTether, simp), true);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 			xSetInt(dPlayerData,xPlayerQueen,0,simp);
 			xSetInt(dPlayerData,xPlayerSimp,0,p);
@@ -1484,6 +1488,7 @@ highFrequency
 {
 	int x = 0;
 	int id = 0;
+	vector scale = vector(0,0,0);
 	vector dest = vector(0,0,0);
 	while(spysearch < trGetNextUnitScenarioNameNumber()) {
 		id = kbGetBlockID(""+spysearch, true);
@@ -1496,14 +1501,16 @@ highFrequency
 				dest = aiPlanGetUserVariableVector(ARRAYS,spyDest,x);
 				if (trUnitAlive() == false) {
 					if (aiPlanSetUserVariableInt(1*xsVectorGetX(dest),1*xsVectorGetY(dest),1*xsVectorGetZ(dest),-1) == false) {
-						debugLog("spy error: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
+						debugLog("spy error dead: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
 					}
 				} else {
 					trUnitSelectClear();
 					trUnitSelectByID(id);
 					trMutateSelected(aiPlanGetUserVariableInt(ARRAYS,spyProto,x));
+					scale = aiPlanGetUserVariableVector(ARRAYS,spyScale,x);
+					trSetSelectedScale(xsVectorGetX(scale),xsVectorGetY(scale),xsVectorGetZ(scale));
 					if (aiPlanSetUserVariableInt(1*xsVectorGetX(dest),1*xsVectorGetY(dest),1*xsVectorGetZ(dest),spysearch) == false) {
-						debugLog("spy error: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
+						debugLog("spy error N/A: " + 1*xsVectorGetX(dest) + "," + 1*xsVectorGetY(dest) + "," + 1*xsVectorGetZ(dest));
 					}
 				}
 			}

@@ -347,7 +347,7 @@ highFrequency
 {
 	if (trTime() > trQuestVarGet("bossStunRecoveryLast")) {
 		trQuestVarSet("bossStunRecoveryLast", trTime());
-		int pointer = yGetPointer("enemies");
+		int pointer = xGetPointer(dEnemies);
 		if (ySetPointer("enemies", 1*trQuestVarGet("bossPointer"))) {
 			if (yGetVar("enemies", "stunStatus") == 1) {
 				trQuestVarSet("bossStunResistance", 1 + trQuestVarGet("bossStunResistance"));
