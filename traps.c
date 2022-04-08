@@ -46,7 +46,7 @@ highFrequency
 		xDatabaseNext(dLaserRooms);
 		if (trTimeMS() > xGetInt(dLaserRooms, xLaserRoomNext)) {
 			if (xGetInt(dLaserRooms, xLaserRoomActive) == 0) {
-				xSetInt(dLaserRooms, xLaserNext, trTimeMS() + 3000);
+				xSetInt(dLaserRooms, xLaserRoomNext, trTimeMS() + 3000);
 				pos = xGetVector(dLaserRooms,xLaserRoomPos);
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);

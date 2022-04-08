@@ -6,58 +6,88 @@ const int DECK_BURN = 1;
 const int DECK_STUN = 2;
 const int DECK_RELICS = 3;
 
+int diceCooldown = 6;
+float diceRadius = 6;
+float diceDamage = 100;
+
+int deckCooldown = 12;
+float deckRadius = 6;
+float deckDuration = 6;
+float deckDamage = 20;
+
+float gambleCost = 30;
+
+int xGamblerAnimating = 0;
+int xGamblerTimeout = 0;
+int xGamblerSpy = 0;
+
+int GamblerNumberFlags = 0;
+int GamblerGambleSFX = 0;
+
+int xDicePrev = 0;
+int xDiceUnit = 0;
+int xDiceSFX = 0;
+int xDiceDir = 0;
+int xDiceType = 0;
+int xDiceCount = 0;
+
 void removeGambler(int p = 0) {
 	removePlayerSpecific(p);
-	yRemoveUpdateVar("p"+p+"characters", "animating");
 }
 
 void gamblerAlways(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 12 * GAMBLER;
 	int id = 0;
 	int action = 0;
 	int hit = 0;
 	int target = 0;
+	int next = 0;
 	int index = xGetPointer(dEnemies);
+	int db = getCharactersDB(p);
+	int dice = trQuestVarGet("p"+p+"dice");
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	int old = xsGetContextPlayer();
-	xsSetContextPlayer(p);
+	xSetPointer(dPlayerData, p);
+
+	vector pos = vector(0,0,0);
+	vector prev = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	
-	if (yGetDatabaseCount("p"+p+"characters") > 0) {
-		id = yDatabaseNext("p"+p+"characters", true);
-		if (id == -1 || trUnitAlive() == false) {
+	if (xGetDatabaseCount(db) > 0) {
+		xDatabaseNext(db);
+		if (trUnitAlive() == false) {
 			removeGambler(p);
-		} else if (yGetVar("p"+p+"characters", "animating") == 1) {
-			if (trTimeMS() > yGetVar("p"+p+"characters", "timeout")) {
+		} else if (xGetBool(db, xGamblerAnimating)) {
+			if (trTimeMS() > xGetInt(db, xGamblerTimeout)) {
 				trUnitOverrideAnimation(-1, 0, false, true, -1);
-				ySetVar("p"+p+"characters", "animating", 0);
+				xSetBool(db, xGamblerAnimating, false);
 			}
 		} else {
-			switch(1*yGetVar("p"+p+"characters","spy"))
+			switch(xGetInt(db, xGamblerSpy))
 			{
 				case 0:
 				{
-					if (yGetVarAtIndex("playerUnits","stunSFX",1*yGetVar("p"+p+"characters","index")) == 0) {
-						ySetPointer("playerUnits",1*yGetVar("p"+p+"characters","index"));
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"characters");
+					if (xGetInt(dPlayerUnits, xStunSFX, xGetInt(db, xCharIndex)) == 0) {
+						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+						xUnitSelectByID(db, xUnitID);
 						trMutateSelected(kbGetProtoUnitID("Hypaspist"));
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),kbGetProtoUnitID("Cinematic Block"),yGetVarName("playerUnits","stunSFX"));
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-							kbGetProtoUnitID("Cinematic Block"),yGetVarName("playerUnits","poisonSFX"));
-						spyEffect(1*trQuestVarGet("p"+p+"characters"),
-							kbGetProtoUnitID("Cinematic Block"),yGetVarName("playerUnits","silenceSFX"));
-						ySetVar("p"+p+"characters","spy", 1);
+						spyEffect(xGetInt(db, xUnitName),
+							kbGetProtoUnitID("Cinematic Block"),xsVectorSet(dPlayerUnits,xStunSFX,xGetPointer(dPlayerUnits)));
+						spyEffect(xGetInt(db, xUnitName),
+							kbGetProtoUnitID("Cinematic Block"),xsVectorSet(dPlayerUnits,xPoisonSFX,xGetPointer(dPlayerUnits)));
+						spyEffect(xGetInt(db, xUnitName),
+							kbGetProtoUnitID("Cinematic Block"),xsVectorSet(dPlayerUnits,xSilenceSFX,xGetPointer(dPlayerUnits)));
+						xSetInt(db, xGamblerSpy, 1);
 					}
 				}
 				case 1:
 				{
 					if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"characters");
+						xUnitSelectByID(db, xUnitID);
 						trMutateSelected(kbGetProtoUnitID("Regent"));
-						ySetVar("p"+p+"characters","spy", 2);
+						xSetInt(db, xGamblerSpy, 2);
 					}
 				}
 			}
@@ -68,15 +98,14 @@ void gamblerAlways(int eventID = -1) {
 	{
 		case 0:
 		{
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
+			xUnitSelect(dPlayerData, xPlayerUnit);
 			if (trUnitAlive()) {
-				if ((trQuestVarGet("p"+p+"numberFlag") == 0) || (kbGetBlockID(""+1*trQuestVarGet("p"+p+"numberFlag")) == -1)) {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
+				target = aiPlanGetUserVariableInt(ARRAYS, GamblerNumberFlags, p);
+				if ((target <= 0) || (kbGetBlockID(""+target) == -1)) {
+					xUnitSelect(dPlayerData, xPlayerUnit);
 					trMutateSelected(kbGetProtoUnitID("Hypaspist"));
-					spyEffect(1*trQuestVarGet("p"+p+"unit"),kbGetProtoUnitID("Cinematic Block"),"p"+p+"numberFlag");
-					spyEffect(1*trQuestVarGet("p"+p+"unit"),kbGetProtoUnitID("Cinematic Block"),"p"+p+"gambleSFX");
+					spyEffect(xGetInt(dPlayerData, xPlayerUnit),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS, GamblerNumberFlags, p));
+					spyEffect(xGetInt(dPlayerData, xPlayerUnit),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS, GamblerGambleSFX, p));
 					trQuestVarSet("p"+p+"gambleSpy", 1);
 				}
 			}
@@ -84,76 +113,75 @@ void gamblerAlways(int eventID = -1) {
 		case 1:
 		{
 			if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"unit");
+				xUnitSelect(dPlayerData, xPlayerUnit);
 				trMutateSelected(kbGetProtoUnitID("Regent"));
 				trQuestVarSet("p"+p+"gambleSpy", 2);
 			}
 		}
 		case 2:
 		{
-			if ((trQuestVarGet("p"+p+"numberFlag") != 0) && (kbGetBlockID(""+1*trQuestVarGet("p"+p+"numberFlag")) != -1)) {
+			target = aiPlanGetUserVariableInt(ARRAYS, GamblerNumberFlags, p);
+			if ((target <= 0) || (kbGetBlockID(""+target) == -1)) {
 				trQuestVarSet("p"+p+"gambleSpy", 0);
 			}
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"dice") > 0) {
-		yDatabaseNext("p"+p+"dice");
-		yVarToVector("p"+p+"dice", "prev");
-		trVectorSetUnitPos("pos", "p"+p+"dice");
-		dist = zDistanceBetweenVectors("pos", "prev");
+	if (xGetDatabaseCount(dice) > 0) {
+		xDatabaseNext(dice);
+		prev = xGetVector(dice, xDicePrev);
+		pos = kbGetBlockPosition(""+xGetInt(dice, xUnitName), true);
+		dist = distanceBetweenVectors(prev, pos, false);
 		if (dist > 2.0) {
-			yVarToVector("p"+p+"dice", "dir");
-			if (yGetVar("p"+p+"dice", "type") == DICE_HEAL) {
+			dir = xGetVector(dice, xDiceDir);
+			if (xGetInt(dice, xDiceType) == DICE_HEAL) {
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					if (yDatabaseNext("playerUnits",true) == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (rayCollision("playerUnits","prev","dir",dist + 2.0,4.0)) {
-						healUnit(p, dist * trQuestVarGet("diceDamage") * 0.25 * xGetFloat(dPlayerData, xPlayerSpellDamage));
+					} else if (rayCollision(dPlayerUnits,prev,dir,dist + 2.0,4.0)) {
+						healUnit(p, dist * diceDamage * 0.25 * xGetFloat(dPlayerData, xPlayerSpellDamage));
 						gainFavor(p, dist);
 					}
 				}
 			} else {
 				for(x=xGetDatabaseCount(dEnemies); >0) {
-					id = yDatabaseNext("enemies", true);
-					if (id == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (rayCollision("enemies","prev","dir",dist + 2.0, 4.0)) {
+					} else if (rayCollision(dEnemies,prev,dir,dist + 2.0, 4.0)) {
 						hit = 1;
 						break;
 					}
 				}
 			}
 			
-			vectorToGrid("pos", "loc");
 			if (hit == 1) {
 				gainFavor(p, 3.0);
-				switch(1*yGetVar("p"+p+"dice", "type"))
+				switch(xGetInt(dice, xDiceType))
 				{
 					case DICE_COPY:
 					{
-						if (trQuestVarGet("bossUnit") != trQuestVarGet("enemies")) {
-							id = kbGetUnitBaseTypeID(id);
+						if (bossUnit != xGetInt(dEnemies, xUnitName)) {
+							id = kbGetUnitBaseTypeID(xGetInt(dEnemies, xUnitID));
 							trSoundPlayFN("favordump.wav","1",-1,"","");
 							trSoundPlayFN("changeunit.wav","1",-1,"","");
-							for(x=yGetVar("p"+p+"dice","count"); >0) {
+							for(x=xGetInt(dice, xDiceCount); >0) {
 								trQuestVarSetFromRand("heading",1,360,true);
-								trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-								trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+								next = trGetNextUnitScenarioNameNumber();
+								trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 								trUnitSelectClear();
-								trUnitSelectByQV("next");
+								trUnitSelect(""+next, true);
 								trMutateSelected(id);
-								activatePlayerUnit("next", p, id, calculateDecay(p, 4.0));
+								activatePlayerUnit(next, p, id, calculateDecay(p, 4.0));
 							}
-							trUnitSelectClear();
-							trUnitSelect(""+1*yGetVar("p"+p+"dice", "dice"), true);
+							xUnitSelect(dice, xDiceUnit);
 							trUnitChangeProtoUnit("Osiris Box Glow");
-							trUnitSelectClear();
-							trUnitSelect(""+1*yGetVar("p"+p+"dice", "sfx"), true);
+							xUnitSelect(dice, xDiceSFX);
 							trUnitChangeProtoUnit("Tremor");
-							trUnitSelectClear();
-							trUnitSelectByQV("p"+p+"dice");
+							xUnitSelect(dice, xUnitName);
 							trUnitChangeProtoUnit("Dust Large");
 						}
 					}
@@ -161,46 +189,41 @@ void gamblerAlways(int eventID = -1) {
 					{
 						trSoundPlayFN("favordump.wav","1",-1,"","");
 						trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"dice", "dice"), true);
+						xUnitSelect(dice, xDiceUnit);
 						trUnitChangeProtoUnit("Meteor Impact Ground");
-						trUnitSelectClear();
-						trUnitSelect(""+1*yGetVar("p"+p+"dice", "sfx"), true);
+						xUnitSelect(dice, xDiceSFX);
 						trUnitChangeProtoUnit("Qilin Heal");
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"dice");
+						xUnitSelect(dice, xUnitName);
 						trDamageUnitPercent(100);
 						trUnitChangeProtoUnit("Meteorite");
 						
-						dist = xsPow(trQuestVarGet("diceRadius") * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
-						amt = trQuestVarGet("diceDamage") * xGetFloat(dPlayerData, xPlayerSpellDamage);
+						dist = xsPow(diceRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+						amt = diceDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
 						for(x=xGetDatabaseCount(dEnemies); >0) {
-							if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
 								removeEnemy();
-							} else if (zDistanceToVectorSquared("enemies", "pos") < dist) {
+							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
 								damageEnemy(p, amt);
 							}
 						}
 					}
 				}
-				yRemoveFromDatabase("p"+p+"dice");
-			} else if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"dice", "dice"), true);
+				xFreeDatabaseBlock(dice);
+			} else if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				xUnitSelect(dice, xDiceUnit);
 				trUnitChangeProtoUnit("Dust Small");
-				trUnitSelectClear();
-				trUnitSelect(""+1*yGetVar("p"+p+"dice", "sfx"), true);
+				xUnitSelect(dice, xDiceSFX);
 				trUnitChangeProtoUnit("Dust Small");
-				trUnitSelectClear();
-				trUnitSelectByQV("p"+p+"dice");
+				xUnitSelect(dice, xUnitName);
 				trUnitChangeProtoUnit("Dust Small");
-				yRemoveFromDatabase("p"+p+"dice");
+				xFreeDatabaseBlock(dice);
 			} else {
-				ySetVarFromVector("p"+p+"dice","prev","pos");
+				xSetVector(dice, xDicePrev, pos);
 				trQuestVarSetFromRand("sound", 1, 5, true);
 				if (trQuestVarGet("sound") <= 3) {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"dice");
+					xUnitSelect(dice, xUnitName);
 					if (trUnitVisToPlayer()) {
 						trSoundPlayFN("mine"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					}
@@ -215,17 +238,17 @@ void gamblerAlways(int eventID = -1) {
 		trSoundPlayFN("swing"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		amt = xsSqrt(trQuestVarGet("p"+p+"gamble")) * 0.5;
 		trModifyProtounit("Hero Greek Achilles", p, 5, 2);
-		for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-			if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
+		for(x=xGetDatabaseCount(db); >0) {
+			if (xDatabaseNext(db,true) == -1 || trUnitAlive() == false) {
 				removeGambler(p);
 			} else {
-				trVectorSetUnitPos("start", "p"+p+"characters");
+				trVectorSetUnitPos("start", db);
 				trVectorQuestVarSet("dir", zGetUnitVector("start","p"+p+"wellPos"));
 				trMutateSelected(kbGetProtoUnitID("Regent"));
 				trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 				trUnitOverrideAnimation(1,0,false,false,-1);
-				ySetVar("p"+p+"characters", "animating", 1);
-				ySetVar("p"+p+"characters", "timeout", trTimeMS() + 1100);
+				ySetVar(db, "animating", 1);
+				ySetVar(db, "timeout", trTimeMS() + 1100);
 				
 				vectorSetAsTargetVector("target","start","p"+p+"wellPos", 300.0);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -276,15 +299,15 @@ void gamblerAlways(int eventID = -1) {
 				trUnitMoveToPoint(trQuestVarGet("targetx"),0,trQuestVarGet("targetz"),-1,false);
 				trSetSelectedScale(0.5,0.01,0.5);
 				
-				yAddToDatabase("p"+p+"dice", "next");
-				yAddUpdateVar("p"+p+"dice","prevx",trQuestVarGet("startx"));
-				yAddUpdateVar("p"+p+"dice","prevz",trQuestVarGet("startz"));
-				yAddUpdateVar("p"+p+"dice", "dice", trQuestVarGet("dice"));
-				yAddUpdateVar("p"+p+"dice", "sfx", trQuestVarGet("sfx"));
-				yAddUpdateVar("p"+p+"dice", "dirx", trQuestVarGet("dirx"));
-				yAddUpdateVar("p"+p+"dice", "dirz", trQuestVarGet("dirz"));
-				yAddUpdateVar("p"+p+"dice", "type", trQuestVarGet("p"+p+"diceType"));
-				yAddUpdateVar("p"+p+"dice", "count", trQuestVarGet("p"+p+"gamble"));
+				yAddToDatabase(dice, "next");
+				yAddUpdateVar(dice,"prevx",trQuestVarGet("startx"));
+				yAddUpdateVar(dice,"prevz",trQuestVarGet("startz"));
+				yAddUpdateVar(dice, "dice", trQuestVarGet("dice"));
+				yAddUpdateVar(dice, "sfx", trQuestVarGet("sfx"));
+				yAddUpdateVar(dice, "dirx", trQuestVarGet("dirx"));
+				yAddUpdateVar(dice, "dirz", trQuestVarGet("dirz"));
+				yAddUpdateVar(dice, "type", trQuestVarGet("p"+p+"diceType"));
+				yAddUpdateVar(dice, "count", trQuestVarGet("p"+p+"gamble"));
 			}
 		}
 		trModifyProtounit("Hero Greek Achilles", p, 5, -2);
@@ -362,14 +385,14 @@ void gamblerAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"gambleStep", 1);
 	}
 	
-	if (yGetDatabaseCount("p"+p+"deckBurns") > 0) {
-		yDatabaseNext("p"+p+"deckBurns");
+	if (xGetDatabaseCount("p"+p+"deckBurns") > 0) {
+		xDatabaseNext("p"+p+"deckBurns");
 		if (trTimeMS() > yGetVar("p"+p+"deckBurns","next")) {
 			ySetVar("p"+p+"deckBurns","next", trTimeMS() + 500);
 			yVarToVector("p"+p+"deckBurns","pos");
 			amt = 2;
 			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-				if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+				if (xDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
 					removePlayerUnit();
 				} else if (zDistanceToVectorSquared("playerUnits", "pos") < yGetVar("p"+p+"deckBurns", "radius")) {
 					amt = 1 + amt;
@@ -377,7 +400,7 @@ void gamblerAlways(int eventID = -1) {
 			}
 			amt = amt * 0.5 * yGetVar("p"+p+"deckBurns","damage");
 			for(x=xGetDatabaseCount(dEnemies); >0) {
-				if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+				if (xDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 					removeEnemy();
 				} else if (zDistanceToVectorSquared("enemies", "pos") < yGetVar("p"+p+"deckBurns", "radius")) {
 					damageEnemy(p, amt);
@@ -394,15 +417,15 @@ void gamblerAlways(int eventID = -1) {
 		}
 	}
 	
-	if (yGetDatabaseCount("p"+p+"tempRelics") > 0) {
-		target = yDatabaseNext("p"+p+"tempRelics");
+	if (xGetDatabaseCount("p"+p+"tempRelics") > 0) {
+		target = xDatabaseNext("p"+p+"tempRelics");
 		if (trTimeMS() > yGetVar("p"+p+"tempRelics", "timeout")) {
 			relicEffect(1*yGetVar("p"+p+"tempRelics","type"),target,false);
 			yRemoveFromDatabase("p"+p+"tempRelics");
 		}
 	}
 	
-	for (y=xsMin(3, yGetDatabaseCount("p"+p+"cards")); > 0) {
+	for (y=xsMin(3, xGetDatabaseCount("p"+p+"cards")); > 0) {
 		action = processGenericProj("p"+p+"cards");
 		if (action == PROJ_BOUNCE) {
 			trSetSelectedScale(0.5,0.1,0.8);
@@ -459,7 +482,7 @@ void gamblerAlways(int eventID = -1) {
 					trSetSelectedScale(0.3 * dist,1,0.4*dist);
 					dist = xsPow(dist, 2);
 					for(x=xGetDatabaseCount(dEnemies); >0) {
-						if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+						if (xDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
 							removeEnemy();
 						} else if (zDistanceToVectorSquared("enemies","p"+p+"decktarget") < dist) {
 							stunUnit("enemies",2.5,p,false);
@@ -473,7 +496,7 @@ void gamblerAlways(int eventID = -1) {
 					target = yGetVar("p"+p+"cards","p"+p+"decktarget");
 					trQuestVarSet("player", target);
 					hit = trTimeMS() + trQuestVarGet("deckDuration") * xGetFloat(dPlayerData, xPlayerSpellDuration);
-					for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
+					for(x=xGetDatabaseCount("p"+p+"relics"); >0) {
 						if (yGetVar("p"+p+"relics","type") <= NORMAL_RELICS) {
 							yAddToDatabase("p"+p+"tempRelics", "player");
 							yAddUpdateVar("p"+p+"tempRelics", "type", yGetVar("p"+p+"relics","type"));
@@ -499,8 +522,8 @@ void gamblerAlways(int eventID = -1) {
 		hit = 0;
 		if (trQuestVarGet("p"+p+"deckType") == DECK_RELICS) {
 			dist = 100;
-			for(x=yGetDatabaseCount("playerCharacters"); >0) {
-				if (yDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount("playerCharacters"); >0) {
+				if (xDatabaseNext("playerCharacters", true) == -1 || trUnitAlive() == false) {
 					removePlayerCharacter();
 				} else if (yGetVar("playerCharacters", "player") != p) {
 					current = zDistanceToVectorSquared("playerCharacters", "p"+p+"decktarget");
@@ -524,17 +547,17 @@ void gamblerAlways(int eventID = -1) {
 			trSoundPlayFN("ui\scroll.wav","1",-1,"","");
 			trSoundPlayFN("skypassagein.wav","1",-1,"","");
 			
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount(db); >0) {
+				if (xDatabaseNext(db,true) == -1 || trUnitAlive() == false) {
 					removeGambler(p);
 				} else {
-					trVectorSetUnitPos("start", "p"+p+"characters");
+					trVectorSetUnitPos("start", db);
 					trVectorQuestVarSet("dir", zGetUnitVector("start","p"+p+"decktarget"));
 					trMutateSelected(kbGetProtoUnitID("Regent"));
 					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 					trUnitOverrideAnimation(1,0,false,false,-1);
-					ySetVar("p"+p+"characters", "animating", 1);
-					ySetVar("p"+p+"characters", "timeout", trTimeMS() + 1100);
+					ySetVar(db, "animating", 1);
+					ySetVar(db, "timeout", trTimeMS() + 1100);
 				}
 			}
 			
@@ -597,11 +620,11 @@ void gamblerAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"cardsLoaded") > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"deckNext")) {
 			trQuestVarSet("p"+p+"deckNext", 200 + trQuestVarGet("p"+p+"deckNext"));
-			for(x=yGetDatabaseCount("p"+p+"characters"); >0) {
-				if (yDatabaseNext("p"+p+"characters",true) == -1 || trUnitAlive() == false) {
+			for(x=xGetDatabaseCount(db); >0) {
+				if (xDatabaseNext(db,true) == -1 || trUnitAlive() == false) {
 					removeGambler(p);
 				} else {
-					trVectorSetUnitPos("start", "p"+p+"characters");
+					trVectorSetUnitPos("start", db);
 					trVectorQuestVarSet("dir", zGetUnitVector("start","p"+p+"decktarget"));
 					addGenericProj("p"+p+"cards","start","dir",kbGetProtoUnitID("Statue of Automaton Base"),2,30.0,4,0,p);
 					dist = xsMin(1000, zDistanceBetweenVectors("start","p"+p+"decktarget") / 0.03);
@@ -626,12 +649,14 @@ void gamblerAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
-	poisonKillerBonus(p);
-	xsSetContextPlayer(old);
 }
 
 void chooseGambler(int eventID = -1) {
+	xsSetContextPlayer(0);
 	int p = eventID - 1000 - 12 * GAMBLER;
+	int db = getCharactersDB(p);
+	resetCharacterCustomVars(p);
+	xSetPointer(dPlayerData, p);
 	if (trCurrentPlayer() == p) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
 		wellName = "(Q) Loaded Dice: COPY";
@@ -643,15 +668,31 @@ void chooseGambler(int eventID = -1) {
 		lureName = "(W) Gimmick Deck: BURN";
 		lureIsUltimate = false;
 	}
+	xGamblerAnimating = xInitAddBool(db, "animating");
+	xGamblerTimeout = xInitAddInt(db, "timeout");
+	xGamblerSpy = xInitAddInt(db, "spy");
 	trQuestVarSet("p"+p+"diceType", 1);
 	trQuestVarSet("p"+p+"deckType", 1);
 	trQuestVarSet("p"+p+"gamble", 1);
-	trQuestVarSet("p"+p+"wellCooldown", trQuestVarGet("diceCooldown"));
-	trQuestVarSet("p"+p+"wellCost", 0);
-	trQuestVarSet("p"+p+"lureCooldown", trQuestVarGet("deckCooldown"));
-	trQuestVarSet("p"+p+"lureCost", 0);
-	trQuestVarSet("p"+p+"rainCooldown", 1);
-	trQuestVarSet("p"+p+"rainCost", trQuestVarGet("gambleCost"));
+
+	xSetInt(dPlayerData,xPlayerWellCooldown, diceCooldown);
+	xSetFloat(dPlayerData,xPlayerWellCost,0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, deckCooldown);
+	xSetFloat(dPlayerData,xPlayerLureCost, 0);
+	xSetInt(dPlayerData,xPlayerRainCooldown,1);
+	xSetFloat(dPlayerData,xPlayerRainCost, gambleCost);
+
+	if (trQuestVarGet("p"+p+"dice") == 0) {
+		db = xInitDatabase("p"+p+"dice");
+		trQuestVarSet("p"+p+"dice", db);
+		xInitAddInt(db, "name");
+		xDicePrev = xInitAddVector(db, "prev");
+		xDiceUnit = xInitAddInt(db, "diceUnit");
+		xDiceSFX = xInitAddInt(db, "sfx");
+		xDiceDir = xInitAddVector(db, "dir");
+		xDiceType = xInitAddInt(db, "type");
+		xDiceCount = xInitAddInt(db, "count");
+	}
 }
 
 
@@ -664,15 +705,7 @@ highFrequency
 		trEventSetHandler(12 * GAMBLER + p, "gamblerAlways");
 		trEventSetHandler(1000 + 12 * GAMBLER + p, "chooseGambler");
 	}
-	
-	trQuestVarSet("diceCooldown", 6);
-	trQuestVarSet("diceRadius", 6);
-	trQuestVarSet("diceDamage", 100);
-	
-	trQuestVarSet("deckCooldown", 12);
-	trQuestVarSet("deckRadius", 6);
-	trQuestVarSet("deckDuration", 6);
-	trQuestVarSet("deckDamage", 20);
-	
-	trQuestVarSet("gambleCost", 30);
+
+	GamblerNumberFlags = zNewArray(mInt, ENEMY_PLAYER, "GamblerNumberFlags");
+	GamblerGambleSFX = zNewArray(mInt, ENEMY_PLAYER, "GamblerGambleSFX");
 }

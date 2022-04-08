@@ -1172,8 +1172,8 @@ void specialUnitsAlways() {
 		if (trUnitAlive() == false || checkEnemyDeactivated(dFireSiphons)) {
 			xFreeDatabaseBlock(dFireSiphons);
 		} else if ((kbUnitGetAnimationActionType(id) == 9) && (xGetInt(dFireSiphons,xPlayerOwner) == ENEMY_PLAYER)) {
-			if (trTimeMS() > xGetInt(dFireSiphons, xSpecialNext)) {
-				xSetInt(dFireSiphons, xSpecialNext, trTimeMS() + 3000);
+			if (trTimeMS() > xGetInt(dFireSiphons, xSpecialStep)) {
+				xSetInt(dFireSiphons, xSpecialStep, trTimeMS() + 3000);
 				xDatabaseNext(dPlayerUnits);
 				pos = xGetVector(dPlayerUnits,xUnitPos);
 				trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos),-1,true);

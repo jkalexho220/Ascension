@@ -2678,7 +2678,6 @@ highFrequency
 									questComplete(STARSTONE, -1);
 								} else {
 									trQuestVarSet("wrongAnswer", xGetInt(dQuestTargets, xRelicType) - RELIC_MATH_PROBLEM);
-									xClearDatabase(dQuestTargets);
 									xsDisableRule("gameplay_always");
 									xsDisableRule("town_always");
 									xsDisableRule("boss_entrance_always");
@@ -2697,6 +2696,7 @@ highFrequency
 									xsEnableRule("zenos_paradox_00");
 									trQuestVarSet("cinNext", 0);
 									trQuestVarSet("cinStep", 0);
+									xClearDatabase(dQuestTargets);
 								}
 							}
 						}

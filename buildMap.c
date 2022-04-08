@@ -583,6 +583,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				for(i=10; >0) {
 					xSetPointer(dWorthlessJunk, xAddDatabaseBlock(dWorthlessJunk));
 					xSetInt(dWorthlessJunk, xUnitName, trGetNextUnitScenarioNameNumber());
+					pos = randomNearEdge(x * 35 + 15, z * 35 + 15, x * 35 + 25, z * 35 + 25);
 					spawnRelicSpecific(pos, RELIC_WORTHLESS_JUNK);
 				}
 				xsEnableRule("yeeb_hit_list");
@@ -1857,6 +1858,7 @@ highFrequency
 		}
 		
 		if (trQuestVarGet("tile4") == TILE_FOUND) {
+			xAddDatabaseBlock(dFrontier, true);
 			xSetInt(dFrontier, xRoomNumber, 4);
 			xSetInt(dFrontier, xFrontierEdge, edgeName(0, 4));
 			xSetInt(dFrontier, xFrontierType, EDGE_NORMAL);
@@ -2251,6 +2253,17 @@ highFrequency
 			xsEnableRule("gameplay_start");
 			trUIFadeToColor(0,0,0,1000,0,false);
 			trLetterBox(false);
+		}
+
+		/*
+		If an enemy is not properly deployed, this can accidentally be assigned to a player
+		*/
+		for(x=xGetDatabaseCount(dEnemiesIncoming); >0) {
+			xDatabaseNext(dEnemiesIncoming);
+			if (kbGetBlockID(""+xGetInt(dEnemiesIncoming, xUnitName)) == -1) {
+				debugLog("Enemy " + xGetInt(dEnemiesIncoming, xUnitName) + " removed!");
+				xFreeDatabaseBlock(dEnemiesIncoming);
+			}
 		}
 		
 		/*

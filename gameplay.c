@@ -145,7 +145,7 @@ void checkResourceCheating(int p = 0) {
 	if (trPlayerResourceCount(p, "favor") > 1 + xGetFloat(dPlayerData, xPlayerFavor)) {
 		gainFavor(p, 0);
 		if (trCurrentPlayer() == p) {
-			trChatSendSpoofed(0, "Zenophobia: Did you really think I wouldn't catch that?");
+			trChatSendSpoofed(0, "Zenophobia: Nice try, buddy.");
 		}
 	}
 }
@@ -665,7 +665,7 @@ highFrequency
 								if (trPlayerResourceCount(p, "gold") >= 100) {
 									trPlayerGrantResources(p, "gold", -100);
 									trQuestVarSet("p"+p+"transporterPurchased", 1);
-									spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean"), pos);
+									spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), pos);
 									if (trCurrentPlayer() == p) {
 										trChatSend(0, "A Relic Transporter has been hired!");
 										trSoundPlayFN("favordump.wav","1",-1,"","");
