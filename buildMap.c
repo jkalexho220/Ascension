@@ -2254,7 +2254,7 @@ highFrequency
 			trUIFadeToColor(0,0,0,1000,0,false);
 			trLetterBox(false);
 		}
-
+		
 		/*
 		If an enemy is not properly deployed, this can accidentally be assigned to a player
 		*/
@@ -2288,14 +2288,6 @@ highFrequency
 	if (trTime() > cActivationTime + 5) {
 		trSoundPlayFN("default","1",-1,
 			"Zenophobia: I'll let you have the starter characters for free.", "icons\infantry g hoplite icon 64");
-		trUnitSelectClear();
-		trUnitSelectByQV("choice1", true);
-		trUnitSetStance("Passive");
-		trUnitHighlight(15.0, true);
-		trUnitSelectClear();
-		trUnitSelectByQV("choice2", true);
-		trUnitSetStance("Passive");
-		trUnitHighlight(15.0, true);
 		xsEnableRule("choose_stage_04");
 		xsDisableSelf();
 	}
@@ -2310,6 +2302,14 @@ highFrequency
 		trLetterBox(false);
 		xsEnableRule("gameplay_start");
 		xsDisableSelf();
+		trUnitSelectClear();
+		trUnitSelectByQV("choice1", true);
+		trUnitSetStance("Passive");
+		trUnitHighlight(30.0, true);
+		trUnitSelectClear();
+		trUnitSelectByQV("choice2", true);
+		trUnitSetStance("Passive");
+		trUnitHighlight(30.0, true);
 	}
 }
 

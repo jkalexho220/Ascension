@@ -264,7 +264,6 @@ inactive
 		}
 		xSetInt(dPlayerData,xPlayerGold,savedata);
 		trQuestVarSet("p1startinggold", savedata);
-		trPlayerGrantResources(1, "gold", savedata);
 		
 		/* equipped relics */
 		for(y=0; <2) {
