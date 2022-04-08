@@ -66,6 +66,7 @@ int dMagicalJourney = 0;
 
 int dCloudDeployStars = 0;
 
+
 rule initialize_map_databases
 active
 highFrequency

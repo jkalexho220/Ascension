@@ -759,10 +759,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			}
 			paintSecondary(x*35+20-size,z*35+20-size,x*35+20+size,z*35+20+size);
 			trVectorQuestVarSet("bossRoomCenter", xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
-			trQuestVarSet("bossRoomLocX", 0.5 * trQuestVarGet("bossRoomCenterX"));
-			trQuestVarSet("bossRoomLocZ", 0.5 * trQuestVarGet("bossRoomCenterZ"));
-			trQuestVarSet("bossRoomEntranceX", trQuestVarGet("bossRoomCenterX"));
-			trQuestVarSet("bossRoomEntranceZ", trQuestVarGet("bossRoomCenterZ"));
+			trVectorQuestVarSet("bossRoomLoc", vectorToGrid(trVectorQuestVarGet("bossRoomCenter")));
+			trVectorQuestVarSet("bossRoomEntrance", trVectorQuestVarGet("bossRoomCenter"));
+			
 			xsEnableRule("enter_boss_room");
 		}
 		case ROOM_NOTTUD:

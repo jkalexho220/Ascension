@@ -166,7 +166,8 @@ void spellstealerAlways(int eventID = -1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"bladeDanceNext")) {
 			trQuestVarSet("p"+p+"bladeDanceNext", trQuestVarGet("p"+p+"bladeDanceNext") + 300);
 			for(x=xGetDatabaseCount(bladeDanceTargets); >0) {
-				xDatabaseNext(bladeDanceTargets, true);
+				xDatabaseNext(bladeDanceTargets);
+				xUnitSelect(bladeDanceTargets, xUnitName);
 				if (trUnitAlive() == false) {
 					xFreeDatabaseBlock(bladeDanceTargets);
 				} else if (xSetPointer(dEnemies, xGetInt(bladeDanceTargets, xBladeDanceIndex))) {

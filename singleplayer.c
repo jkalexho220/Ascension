@@ -157,7 +157,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Sphinx");
 			trStringQuestVarSet("enemyProto4", "Petsuchos");
 			trStringQuestVarSet("enemyProto5", "Nemean Lion");
-			trQuestVarSet("bossScale", 2);
+			bossScale = 2;
 		}
 		case 2:
 		{
@@ -168,7 +168,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Medusa");
 			trStringQuestVarSet("enemyProto4", "Mountain Giant");
 			trStringQuestVarSet("enemyProto5", "Tamarisk Tree");
-			trQuestVarSet("bossScale", 0.8);
+			bossScale = 0.8;
 		}
 		case 3:
 		{
@@ -179,7 +179,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Ballista");
 			trStringQuestVarSet("enemyProto4", "Frost Giant");
 			trStringQuestVarSet("enemyProto5", "King Folstag");
-			trQuestVarSet("bossScale", 1.25);
+			bossScale = 1.25;
 		}
 		case 4:
 		{
@@ -190,7 +190,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Behemoth");
 			trStringQuestVarSet("enemyProto4", "Avenger");
 			trStringQuestVarSet("enemyProto5", "Chimera");
-			trQuestVarSet("bossScale", 1.5);
+			bossScale = 1.5;
 		}
 		case 5:
 		{
@@ -201,7 +201,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Scarab");
 			trStringQuestVarSet("enemyProto4", "Mummy");
 			trStringQuestVarSet("enemyProto5", "Shade of Hades");
-			trQuestVarSet("bossScale", 1.5);
+			bossScale = 1.5;
 		}
 		case 6:
 		{
@@ -212,7 +212,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Battle Boar");
 			trStringQuestVarSet("enemyProto4", "Colossus");
 			trStringQuestVarSet("enemyProto5", "Helepolis");
-			trQuestVarSet("bossScale", 0);
+			bossScale = 0;
 			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Dwarf",1,2*x+3,0,201,180,true);
 			trUnitSelectClear();
@@ -239,7 +239,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Kraken");
 			trStringQuestVarSet("enemyProto4", "Hydra");
 			trStringQuestVarSet("enemyProto5", "Scylla");
-			trQuestVarSet("bossScale", 1.3);
+			bossScale = 1.3;
 		}
 		case 8:
 		{
@@ -250,7 +250,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto3", "Statue of Lightning");
 			trStringQuestVarSet("enemyProto4", "Lampades");
 			trStringQuestVarSet("enemyProto5", "Nidhogg");
-			trQuestVarSet("bossScale", 1.0);
+			bossScale = 1.0;
 		}
 	}
 	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
@@ -275,7 +275,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 	}
 	trUnitSelectClear();
 	trUnitSelectByQV("next");
-	trSetSelectedScale(trQuestVarGet("bossScale"),trQuestVarGet("bossScale"),trQuestVarGet("bossScale"));
+	trSetSelectedScale(bossScale,bossScale,bossScale);
 }
 
 void answerQuestion(int eventID = -1) {

@@ -2971,7 +2971,8 @@ highFrequency
 		}
 		if (trQuestVarGet("nottudFound") == 1) {
 			trVectorSetUnitPos("pos", "nottud");
-			trArmyDispatch("1,0","Revealer to Player",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),225,true);
+			vector pos = kbGetBlockPosition(""+1*trQuestVarGet("nottud"), true);
+			trArmyDispatch("1,0","Revealer to Player",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
 			trSoundPlayFN("oracledone.wav","1",-1,"","");
 		}
 	} else {

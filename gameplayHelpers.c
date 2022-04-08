@@ -37,9 +37,14 @@ int spyActive = 4;
 
 int boss = 0;
 int bossUnit = 0;
+int bossID = 0;
+int bossPointer = 0;
 int bossCooldownTime = 0;
 float bossScale = 0;
+float bossAngle = 0;
 bool bossAnim = false;
+
+vector bossPos = vector(0,0,0);
 
 int nextproj = 0;
 
@@ -269,7 +274,7 @@ void removePlayerUnit() {
 	/*
 	if (PvP) {
 		if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
-			yRemoveFromDatabase("enemies");
+			xFreeDatabaseBlock(dEnemies)
 			yRemoveUpdateVar("enemies", "doppelganger");
 			yRemoveUpdateVar("enemies", "silenceSFX");
 			if (trQuestVarGet("detached") == 1) {

@@ -103,7 +103,7 @@ void stormcutterAlways(int eventID = -1) {
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
 		for(x=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
-			xUnitSelectByID(dEnemies, xUnitID);
+			xUnitSelectByID(db, xUnitID);
 			if (trUnitAlive() == false) {
 				removeStormcutter(p);
 			} else {

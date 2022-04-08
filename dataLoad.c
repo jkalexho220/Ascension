@@ -310,7 +310,6 @@ inactive
 		
 		xsEnableRule("singleplayer_init");
 		trDelayedRuleActivation("delayed_modify");
-		xPrintAll(dPlayerData, 1);
 	}
 	/*
 	Deploy an enemy Victory Marker so they don't lose the game

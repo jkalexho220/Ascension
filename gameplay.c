@@ -558,12 +558,13 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*
+	*/
 	
 	if (Multiplayer) {
+		pos = trVectorQuestVarGet("bossRoomCenter");
 		trUnitSelectClear();
-		trUnitSelectByQV("p1unit");
-		trUnitTeleport(trQuestVarGet("bossRoomCenterX")-10,0,trQuestVarGet("bossRoomCenterZ")-10);
+		trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, 1), true);
+		trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
 	}
 	/*
 	*/
