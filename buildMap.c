@@ -702,12 +702,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
 			trVectorQuestVarSet("startPosition", xsVectorSet(x*70 + 40,0,z*70+40));
 			if (trQuestVarGet("newPlayers") > 0) {
-				trVectorQuestVarSet("choice1", xsVectorSet(x*70+48,0,z*70+54));
-				trVectorQuestVarSet("choice2", xsVectorSet(x*70+54,0,z*70+48));
+				pos = xsVectorSet(x*70+48,0,z*70+54);
 				trQuestVarSet("choice1unit", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0", "Hero Greek Theseus", 1, trQuestVarGet("choice1x"),0,trQuestVarGet("choice1z"),225,true);
+				trArmyDispatch("1,0", "Hero Greek Theseus", 1, xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+				pos = xsVectorSet(x*70+54,0,z*70+48);
 				trQuestVarSet("choice2unit", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0", "Hero Greek Hippolyta", 1, trQuestVarGet("choice2x"),0,trQuestVarGet("choice2z"),225,false);
+				trArmyDispatch("1,0", "Hero Greek Hippolyta", 1, xsVectorGetX(pos),0,xsVectorGetZ(pos),225,false);
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
@@ -2313,11 +2313,11 @@ highFrequency
 		xsEnableRule("gameplay_start");
 		xsDisableSelf();
 		trUnitSelectClear();
-		trUnitSelectByQV("choice1", true);
+		trUnitSelectByQV("choice1unit", true);
 		trUnitSetStance("Passive");
 		trUnitHighlight(30.0, true);
 		trUnitSelectClear();
-		trUnitSelectByQV("choice2", true);
+		trUnitSelectByQV("choice2unit", true);
 		trUnitSetStance("Passive");
 		trUnitHighlight(30.0, true);
 	}

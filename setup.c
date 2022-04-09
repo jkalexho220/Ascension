@@ -501,7 +501,6 @@ highFrequency
 	}
 	code("map(\"esc\", \"ShowImageBox\", \"gadgetUnreal("+quote+"ShowImageBox"+quote+")\");");
 	%
-	setupClass("Militia", 17, 500, 1000);
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
 	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
 	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
@@ -537,6 +536,7 @@ highFrequency
 	
 	setupPlayerProto("Hero Boar", 1000, 0, 4.2, 0);
 	setupPlayerProto("Militia", 100, 10, 4.8);
+	setupPlayerProto("Prisoner", 100, 10, 4.8);
 	setupPlayerProto("Wolf", 200, 10, 5, 0.2);
 	setupPlayerProto("Dog", 300, 15, 5, 0.2);
 	setupPlayerProto("Minion", 240, 10, 5, 0.2);

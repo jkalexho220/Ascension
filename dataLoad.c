@@ -35,7 +35,9 @@ void saveAllData() {
 	}
 	
 	xSetPointer(dPlayerData,p);
-	
+	if (xGetInt(dPlayerData, xPlayerClass) == 17) {
+		xSetInt(dPlayerData, xPlayerClass, 0);
+	}
 	/* slot 0 */
 	savedata = 0;
 	savedata = savedata * 40 + xGetInt(dPlayerData,xPlayerMonsterIndex);
@@ -546,7 +548,7 @@ inactive
 			trSetCivAndCulture(p, 0, 0);
 		}
 		if (xGetInt(dPlayerData,xPlayerClass,p) == 0) {
-			xSetInt(dPlayerData,xPlayerClass,17,p);
+			xSetInt(dPlayerData,xPlayerClass,1,p);
 			trQuestVarSet("newPlayers", 1);
 			trQuestVarSet("p"+p+"noob", 1);
 		}
