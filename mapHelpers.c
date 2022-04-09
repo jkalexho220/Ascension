@@ -66,6 +66,9 @@ int dMagicalJourney = 0;
 
 int dCloudDeployStars = 0;
 
+int dMirrorTowerLasers = 0;
+int xMirrorTowerLaserLength = 0;
+int xMirrorTowerLaserTimeout = 0;
 
 rule initialize_map_databases
 active

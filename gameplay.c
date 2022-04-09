@@ -558,7 +558,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*/
+	*
 	
 	if (Multiplayer) {
 		pos = trVectorQuestVarGet("bossRoomCenter");

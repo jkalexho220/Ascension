@@ -4,6 +4,7 @@ inactive
 highFrequency
 {
 	if (trQuestVarGet("play") == 1) {
+		vector pos = vector(0,0,0);
 		trUnitSelect();
 		trUnitSelectByQV("temple");
 		for(p=1; < ENEMY_PLAYER) {
@@ -18,8 +19,8 @@ highFrequency
 				trUnitConvert(0);
 				trQuestVarSet("templeFound", 1);
 				trSoundPlayFN("temple.wav","1",-1,"","");
-				trVectorSetUnitPos("pos", "templeRevealer");
-				trArmyDispatch("1,0","Dwarf",2,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("templeRevealer"));
+				trArmyDispatch("1,0","Dwarf",2,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Vision SFX");
 				xsEnableRule("temple_always");
@@ -77,13 +78,14 @@ highFrequency
 				}
 				trUnitChangeProtoUnit("Shade XP");
 			}
-			activateEnemy("templeShadeTrue");
+			activateEnemy(1*trQuestVarGet("templeShadeTrue"));
 			trQuestVarSet("templeChallengeActive", 3);
 			for(p=1;<ENEMY_PLAYER) {
-				if (trQuestVarGet("p"+p+"dead") == 0) {
-					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 400) {
-						yAddToDatabase("applicants", "p"+p+"unit");
-						yAddUpdateVar("applicants", "player", p);
+				if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("templePos")) < 400) {
+						xAddDatabaseBlock(dApplicants, true);
+						xSetInt(dApplicants, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+						xSetInt(dApplicants, xPlayerOwner, p);
 					}
 				}
 			}
@@ -94,21 +96,23 @@ highFrequency
 			trModifyProtounit("Shade XP", ENEMY_PLAYER, 9, -99990);
 			trModifyProtounit("Shade XP", ENEMY_PLAYER, 9, 99999);
 		}
-		if (yGetDatabaseCount("applicants") > 0) {
-			yDatabaseNext("applicants", true);
+		if (xGetDatabaseCount(dApplicants) > 0) {
+			xDatabaseNext(dApplicants, true);
+			xUnitSelect(dApplicants, xUnitName);
 			if (trUnitAlive() == false) {
-				yRemoveFromDatabase("applicants");
-			} else if (zDistanceToVectorSquared("applicants", "templePos") > 400) {
-				if (trCurrentPlayer() == 1*yGetVar("applicants", "player")) {
+				xFreeDatabaseBlock(dApplicants);
+			} else if (unitDistanceToVector(xGetInt(dApplicants, xUnitName), trVectorQuestVarGet("templePos")) > 400) {
+				if (trCurrentPlayer() == xGetInt(dApplicants, xPlayerOwner)) {
 					uiMessageBox("You have left the room and failed the challenge.");
 				}
-				yRemoveFromDatabase("applicants");
+				xFreeDatabaseBlock(dApplicants);
 			}
 			trUnitSelectClear();
 			trUnitSelectByQV("templeShadeTrue");
 			if (trUnitAlive() == false) {
-				for(x=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants", true);
+				for(x=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					xUnitSelect(dApplicants, xUnitName);
 					if (trUnitAlive() && trUnitIsOwnedBy(trCurrentPlayer())) {
 						startNPCDialog(NPC_TEMPLE_COMPLETE + 2);
 						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
@@ -151,10 +155,11 @@ highFrequency
 			trRenderSnow(0.2);
 			trSoundPlayFN("wind.wav","1",-1,"","");
 			for(p=1; < ENEMY_PLAYER) {
-				if (trQuestVarGet("p"+p+"dead") == 0) {
-					if (zDistanceToVectorSquared("p"+p+"unit", "templePos") < 256) {
-						trQuestVarSet("player", p);
-						yAddToDatabase("applicants", "player");
+				if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("templePos")) < 256) {
+						xAddDatabaseBlock(dApplicants, true);
+						xSetInt(dApplicants, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+						xSetInt(dApplicants, xPlayerOwner, p);
 						if (trCurrentPlayer() == p) {
 							trMessageSetText("You may now exit the room. Complete the rest of the stage without dying.",-1);
 							trChatSend(0, "<color=1,0,0>You are losing 1 percent of your health each second!</color>");
@@ -168,19 +173,19 @@ highFrequency
 		if (trQuestVarGet("playersWon") == 1) {
 			trQuestVarSet("templeChallengeActive", 4);
 		}
-		if (yGetDatabaseCount("applicants") > 0) {
+		if (xGetDatabaseCount(dApplicants) > 0) {
 			if (trTime() > trQuestVarGet("templeChallengeNext")) {
 				trQuestVarSet("templeChallengeNext", trTime());
-				for(x=yGetDatabaseCount("applicants"); >0) {
-					p = yDatabaseNext("applicants");
-					if (trQuestVarGet("p"+p+"dead") > 0) {
-						yRemoveFromDatabase("applicants");
+				for(x=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					p = xGetInt(dApplicants, xPlayerOwner);
+					if (xGetInt(dPlayerData, xPlayerDead, p) > 0) {
+						xFreeDatabaseBlock(dApplicants);
 						if (trCurrentPlayer() == p) {
 							uiMessageBox("You have died and failed the Statue's challenge.");
 						}
 					} else {
-						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"unit");
+						xUnitSelect(dApplicants, xUnitName);
 						trDamageUnitPercent(1);
 					}
 				}
@@ -189,8 +194,9 @@ highFrequency
 			xsDisableSelf();
 		}
 	} else if (trQuestVarGet("templeChallengeActive") == 4) {
-		for(x=yGetDatabaseCount("applicants"); >0) {
-			p = yDatabaseNext("applicants");
+		for(x=xGetDatabaseCount(dApplicants); >0) {
+			xDatabaseNext(dApplicants);
+			p = xGetInt(dApplicants, xPlayerOwner);
 			if (trCurrentPlayer() == p) {
 				trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
 				trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
@@ -204,17 +210,19 @@ rule poison_temple_always
 inactive
 highFrequency
 {
-	int id = yDatabaseNext("poisonRelics", true);
+	xDatabaseNext(dPoisonRelics);
+	int id = kbGetBlockID(""+xGetInt(dPoisonRelics, xUnitName));
 	if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Jiangshi")) {
-		if (trQuestVarGet("poisonRelics") == trQuestVarGet("correctGoblet")) {
+		if (xGetInt(dPoisonRelics, xUnitName) == trQuestVarGet("correctGoblet")) {
 			trUnitChangeProtoUnit("Recreation");
 			trSoundPlayFN("recreation.wav","1",-1,"","");
 			xsDisableSelf();
-			for(x=yGetDatabaseCount("poisonRelics"); >1) {
-				yDatabaseNext("poisonRelics", true);
+			for(x=xGetDatabaseCount(dPoisonRelics); >1) {
+				xDatabaseNext(dPoisonRelics);
+				xUnitSelect(dPoisonRelics, xUnitName);
 				trUnitChangeProtoUnit("Hero Death");
-				ySetPointer("freeRelics", 1*yGetVar("poisonRelics","pointer"));
-				yRemoveFromDatabase("freeRelics");
+				xSetPointer(dFreeRelics, xGetInt(dPoisonRelics,xPoisonRelicIndex));
+				xFreeDatabaseBlock(dFreeRelics);
 			}
 			startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
 			trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
@@ -225,27 +233,29 @@ highFrequency
 			if (trQuestVarGet("poisonGuesses") > 0) {
 				trChatSend(0,"<color=0.8,0.2,0.8>Incorrect! Remaining guesses: " + 1*trQuestVarGet("poisonGuesses"));
 				if (trUnitIsOwnedBy(trCurrentPlayer())) {
-					if (trQuestVarGet("poisonRelics") < trQuestVarGet("correctGoblet")) {
+					if (xGetInt(dPoisonRelics, xUnitName) < trQuestVarGet("correctGoblet")) {
 						uiMessageBox("Incorrect. The lifeblood is somewhere to the right of this goblet.");
 					} else {
 						uiMessageBox("Incorrect. The lifeblood is somewhere to the left of this goblet.");
 					}
 				}
-				yRemoveFromDatabase("poisonRelics");
+				xFreeDatabaseBlock(dPoisonRelics);
 				trUnitChangeProtoUnit("Lampades Blood");
 			} else {
 				trSoundPlayFN("tartariangateselect.wav","1",-1,"","");
 				trMessageSetText("The death knell tolls. Thus, you have failed the challenge.",-1);
-				for(x=yGetDatabaseCount("poisonRelics"); >1) {
-					yDatabaseNext("poisonRelics", true);
+				for(x=xGetDatabaseCount(dPoisonRelics); >1) {
+					xDatabaseNext(dPoisonRelics);
+					xUnitSelect(dPoisonRelics, xUnitName);
 					trUnitChangeProtoUnit("Lampades Blood");
-					if (ySetPointer("freeRelics", 1*yGetVar("poisonRelics","pointer"))) {
-						yRemoveFromDatabase("freeRelics");
+					if (xSetPointer(dFreeRelics, xGetInt(dPoisonRelics,xPoisonRelicIndex))) {
+						xFreeDatabaseBlock(dFreeRelics);
 					}
 				}
-				for(x=yGetDatabaseCount("doomedPlayers"); >0) {
+				int doomed = trQuestVarGet("doomedPlayers");
+				for(x=0; < trQuestVarGet("doomedPlayerCount")) {
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+1*yDatabaseNext("doomedPlayers")+"unit");
+					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, aiPlanGetUserVariableInt(ARRAYS,doomed,x)), true);
 					trUnitDelete(false);
 				}
 				xsDisableSelf();
@@ -289,6 +299,7 @@ highFrequency
 	bool hit = false;
 	float amt = 0;
 	int p = 0;
+	vector pos = vector(0,0,0);
 	if (trQuestVarGet("templeChallengeActive") == 1) {
 		trSoundPlayFN("attackwarning.wav","1",-1,"","");
 		trMessageSetText("Stay in the room and survive for 47 seconds.", -1);
@@ -299,70 +310,76 @@ highFrequency
 		trQuestVarSet("templeChallengeTimeout", trTimeMS() + 6400);
 		trMusicPlay("music\fight\rot loaf.mp3","1",0.0);
 		for(p=1; < ENEMY_PLAYER) {
-			if (trQuestVarGet("p"+p+"dead") == 0) {
-				yAddToDatabase("applicants", "p"+p+"unit");
+			if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+				xAddDatabaseBlock(dApplicants, true);
+				xSetInt(dApplicants, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+				xSetInt(dApplicants, xPlayerOwner, p);
 			}
 		}
+		pos = trVectorQuestVarGet("templePos");
 		trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 		trQuestVarSet("lightningClouds", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("templePosX"),0,trQuestVarGet("templePosZ"),0,true);
+		trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 		trArmySelect("1,0");
 		trUnitChangeProtoUnit("Lightning Cloud");
 	} else {
-		if (yGetDatabaseCount("applicants") > 0) {
-			yDatabaseNext("applicants", true);
+		if (xGetDatabaseCount(dApplicants) > 0) {
+			xDatabaseNext(dApplicants);
+			xUnitSelect(dApplicants, xUnitName);
 			if (trUnitAlive() == false) {
-				yRemoveFromDatabase("applicants");
+				xFreeDatabaseBlock(dApplicants);
 			} else {
-				trVectorSetUnitPos("pos", "applicants");
-				if (vectorInRectangle("pos", "templeRoomLower", "templeRoomUpper") == false) {
+				pos = kbGetBlockPosition(""+xGetInt(dApplicants, xUnitName), true);
+				if (vectorInRectangle(pos, trVectorQuestVarGet("templeRoomLower"), trVectorQuestVarGet("templeRoomUpper")) == false) {
 					if (trUnitIsOwnedBy(trCurrentPlayer())) {
 						uiMessageBox("You have left the room and have been disqualified.");
 					}
-					yRemoveFromDatabase("applicants");
+					xFreeDatabaseBlock(dApplicants);
 				}
 			}
 		}
 		
-		if (yGetDatabaseCount("yeebLightningEnd") > 0) {
+		if (xGetDatabaseCount(dYeebLightningEnd) > 0) {
 			trQuestVarSetFromRand("sound", 1, 5, true);
 			hit = false;
-			for(y=yGetDatabaseCount("yeebLightningEnd"); >0) {
-				yDatabaseNext("yeebLightningEnd", true);
+			for(y=xGetDatabaseCount(dYeebLightningEnd); >0) {
+				xDatabaseNext(dYeebLightningEnd);
+				xUnitSelect(dYeebLightningEnd, xUnitName);
 				if (trUnitVisToPlayer()) {
 					hit = true;
 				}
-				trVectorSetUnitPos("pos", "yeebLightningEnd");
+				pos = kbGetBlockPosition(""+xGetInt(dYeebLightningEnd, xUnitName), true);
 				trUnitChangeProtoUnit("Lightning sparks");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 0.75) {
+					} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 0.75) {
 						trUnitDelete(false);
 					}
 				}
 			}
-			yClearDatabase("yeebLightningEnd");
+			xClearDatabase(dYeebLightningEnd);
 			if (hit) {
 				trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 			}
 		}
 		
-		for(x=xsMin(12, yGetDatabaseCount("yeebLightning")); >0) {
-			yDatabaseNext("yeebLightning");
-			if (trTimeMS() > yGetVar("yeebLightning", "timeout")) {
+		for(x=xsMin(10, xGetDatabaseCount(dYeebLightning)); >0) {
+			xDatabaseNext(dYeebLightning);
+			if (trTimeMS() > xGetInt(dYeebLightning, xTimeout)) {
 				hit = true;
 				trChatSetStatus(false);
 				trDelayedRuleActivation("enable_chat");
-				yAddToDatabase("yeebLightningEnd", "yeebLightning");
-				trUnitSelectClear();
-				trUnitSelectByQV("yeebLightning", true);
+				xSetPointer(dYeebLightningEnd,xAddDatabaseBlock(dYeebLightningEnd));
+				xSetInt(dYeebLightningEnd,xUnitName,xGetInt(dYeebLightning,xUnitName));
+				xUnitSelect(dYeebLightning,xUnitName);
 				trUnitChangeProtoUnit("Militia");
-				trUnitSelectClear();
-				trUnitSelectByQV("yeebLightning", true);
+				xUnitSelect(dYeebLightning,xUnitName);
 				trSetSelectedScale(0,0,0);
 				trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
-				yRemoveFromDatabase("yeebLightning");
+				xFreeDatabaseBlock(dYeebLightning);
 			}
 		}
 		
@@ -370,15 +387,13 @@ highFrequency
 		if (trQuestVarGet("templeChallengeActive") == 2) {
 			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 1000);
-				for(x=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants");
-					trVectorSetUnitPos("pos", "applicants");
-					spawnLightning("pos");
+				for(x=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					spawnLightning(kbGetBlockPosition(""+xGetInt(dApplicants, xUnitName)));
 				}
 				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 					trQuestVarSet("templeChallengeActive", 3);
 					trQuestVarSet("templeChallengeNext", 0);
 					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -387,14 +402,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 3) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(0,0,4);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartX", trQuestVarGet("lightningStartX") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,0));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 4);
@@ -409,15 +423,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 5) {
 			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 500);
-				for(x=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants");
-					trVectorSetUnitPos("pos", "applicants");
-					spawnLightning("pos");
+				for(x=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					spawnLightning(kbGetBlockPosition(""+xGetInt(dApplicants, xUnitName)));
 				}
 				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 					trQuestVarSet("templeChallengeActive", 6);
 					trQuestVarSet("templeChallengeNext", 0);
 					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -426,14 +438,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 6) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(4,0,0);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartZ", trQuestVarGet("lightningStartZ") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(0,0,2));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 7);
@@ -449,9 +460,9 @@ highFrequency
 			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 1000);
 				trQuestVarSetFromRand("shape", 0, 2, true);
-				for(y=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants");
-					trVectorSetUnitPos("center", "applicants");
+				for(y=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					pos = kbGetBlockPosition(""+xGetInt(dApplicants, xUnitName), true);
 					switch(1*trQuestVarGet("shape"))
 					{
 						case 0:
@@ -470,22 +481,17 @@ highFrequency
 							trVectorQuestVarSet("dir2", vector(2,0,0));
 						}
 					}
-					spawnLightning("center");
+					spawnLightning(pos);
 					for(x=4; >0) {
-						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir1x"));
-						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir1z"));
-						spawnLightning("pos");
-						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir2x"));
-						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir2z"));
-						spawnLightning("pos");
-						trVectorQuestVarSet("dir1", rotationMatrix("dir1", 0, 1));
-						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
+						spawnLightning(pos + trVectorQuestVarGet("dir1"));
+						spawnLightning(pos + trVectorQuestVarGet("dir2"));
+						trVectorQuestVarSet("dir1", rotationMatrix(trVectorQuestVarGet("dir1"), 0, 1));
+						trVectorQuestVarSet("dir2", rotationMatrix(trVectorQuestVarGet("dir2"), 0, 1));
 					}
 				}
 				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 					trQuestVarSet("templeChallengeActive", 9);
 					trQuestVarSet("templeChallengeNext", 0);
 					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -494,14 +500,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 9) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(0,0,4);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,0));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 10);
@@ -517,9 +522,9 @@ highFrequency
 			if (trTimeMS() > trQuestVarGet("templeChallengeNext")) {
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 500);
 				trQuestVarSetFromRand("shape", 0, 2, true);
-				for(y=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants");
-					trVectorSetUnitPos("center", "applicants");
+				for(y=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants);
+					pos = kbGetBlockPosition(""+xGetInt(dApplicants, xUnitName), true);
 					switch(1*trQuestVarGet("shape"))
 					{
 						case 0:
@@ -538,22 +543,17 @@ highFrequency
 							trVectorQuestVarSet("dir2", vector(2,0,0));
 						}
 					}
-					spawnLightning("center");
+					spawnLightning(pos);
 					for(x=4; >0) {
-						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir1x"));
-						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir1z"));
-						spawnLightning("pos");
-						trQuestVarSet("posx", trQuestVarGet("centerx") + trQuestVarGet("dir2x"));
-						trQuestVarSet("posz", trQuestVarGet("centerz") + trQuestVarGet("dir2z"));
-						spawnLightning("pos");
-						trVectorQuestVarSet("dir1", rotationMatrix("dir1", 0, 1));
-						trVectorQuestVarSet("dir2", rotationMatrix("dir2", 0, 1));
+						spawnLightning(pos + trVectorQuestVarGet("dir1"));
+						spawnLightning(pos + trVectorQuestVarGet("dir2"));
+						trVectorQuestVarSet("dir1", rotationMatrix(trVectorQuestVarGet("dir1"), 0, 1));
+						trVectorQuestVarSet("dir2", rotationMatrix(trVectorQuestVarGet("dir2"), 0, 1));
 					}
 				}
 				
 				if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-					trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-					trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+					trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 					trQuestVarSet("templeChallengeActive", 12);
 					trQuestVarSet("templeChallengeNext", 0);
 					trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -562,18 +562,16 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 12) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(4,0,0);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(0,0,2));
 			}
 			if (amt > 1600) {
-				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 				trQuestVarSet("templeChallengeActive", 13);
 				trQuestVarSet("templeChallengeNext", 0);
 				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -581,14 +579,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 13) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posx", trQuestVarGet("posx") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(4,0,0);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(0,0,2));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 14);
@@ -597,8 +594,7 @@ highFrequency
 			}
 		} else if (trQuestVarGet("templeChallengeActive") == 14) {
 			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 				trQuestVarSet("templeChallengeActive", 15);
 				trQuestVarSet("templeChallengeNext", 0);
 				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -606,14 +602,13 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 15) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
+					spawnLightning(pos);
+					pos = pos - vector(0,0,4);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,0));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 16);
@@ -622,8 +617,7 @@ highFrequency
 			}
 		} else if (trQuestVarGet("templeChallengeActive") == 16) {
 			if (trTimeMS() > trQuestVarGet("templeChallengeTimeout")) {
-				trQuestVarSet("lightningStartx", trQuestVarGet("templeRoomUpperx") - 3);
-				trQuestVarSet("lightningStartz", trQuestVarGet("templeRoomUpperz") - 3);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("templeRoomUpper") - vector(3,0,3));
 				trQuestVarSet("templeChallengeActive", 17);
 				trQuestVarSet("templeChallengeNext", 0);
 				trQuestVarSet("templeChallengeTimeout", trQuestVarGet("templeChallengeTimeout") + 1600);
@@ -631,26 +625,24 @@ highFrequency
 		} else if (trQuestVarGet("templeChallengeActive") == 17) {
 			amt = trTimeMS() - trQuestVarGet("templeChallengeTimeout") + 1600;
 			while(trQuestVarGet("templeChallengeNext") < amt) {
-				trQuestVarSet("posx", trQuestVarGet("lightningStartX"));
-				trQuestVarSet("posz", trQuestVarGet("lightningStartZ"));
+				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
-					spawnLightning("pos");
-					trQuestVarSet("posz", trQuestVarGet("posz") - 4);
-					if (trQuestVarGet("posz") < trQuestVarGet("templeRoomLowerZ")) {
-						trQuestVarSet("posZ", trQuestVarGet("posZ") + 32);
+					spawnLightning(pos);
+					pos = pos - vector(0,0,4);
+					if (xsVectorGetZ(pos) < trVectorQuestVarGetZ("templeRoomLower")) {
+						pos = pos + vector(0,0,32);
 					}
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trQuestVarSet("lightningStartx", trQuestVarGet("lightningStartx") - 2);
-				trQuestVarSet("lightningStartz", trQuestVarGet("lightningStartz") - 2);
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,2));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 18);
 			}
 		} else if (trQuestVarGet("templeChallengeActive") == 18) {
-			if (yGetDatabaseCount("yeebLightningEnd") + yGetDatabaseCount("yeebLightning") == 0) {
-				for(x=yGetDatabaseCount("applicants"); >0) {
-					yDatabaseNext("applicants", true);
+			if (xGetDatabaseCount(dYeebLightningEnd) + xGetDatabaseCount(dYeebLightning) == 0) {
+				for(x=xGetDatabaseCount(dApplicants); >0) {
+					xDatabaseNext(dApplicants, true);
 					if (trUnitAlive() && trUnitIsOwnedBy(trCurrentPlayer())) {
 						startNPCDialog(NPC_TEMPLE_COMPLETE + 6);
 						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
@@ -682,6 +674,8 @@ highFrequency
 {
 	int x = 0;
 	int z = 0;
+	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	if (trQuestVarGet("templeChallengeActive") == 1) {
 		trMessageSetText("The Statue's challenge will begin soon! Stay in the room if you wish to participate.",-1);
 		trQuestVarSet("templeChallengeActive", 2);
@@ -710,17 +704,18 @@ highFrequency
 				trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 			} else {
 				trQuestVarSet("monsterChallengeStart", trGetNextUnitScenarioNameNumber());
-				trVectorQuestVarSet("dir", vector(1,0,0));
+				dir = vector(1,0,0);
+				pos = trVectorQuestVarGet("templePos");
 				for(y=8; >0) {
-					x = trQuestVarGet("templePosx") - trQuestVarGet("dirx") * 14;
-					z = trQuestVarGet("templePosz") - trQuestVarGet("dirz") * 14;
+					x = xsVectorGetX(pos) - xsVectorGetX(dir) * 14;
+					z = xsVectorGetZ(pos) - xsVectorGetZ(dir) * 14;
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x,0,z,0,true);
 					trArmySelect(""+ENEMY_PLAYER+",0");
 					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
 					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+(1*trQuestVarGet("templeChallengeActive")-2)));
-					activateEnemy("next");
-					trVectorQuestVarSet("dir", rotationMatrix("dir",0.707107,0.707107));
+					activateEnemy(1*trQuestVarGet("next"));
+					dir = rotationMatrix(dir, 0.707107, 0.707107);
 				}
 				trQuestVarSet("monsterChallengeEnd", trGetNextUnitScenarioNameNumber());
 			}
@@ -728,31 +723,36 @@ highFrequency
 	}
 }
 
+
 rule zeno_temple_always
 inactive
 highFrequency
 {
 	float amt = 0;
+	vector pos = vector(0,0,0);
 	trUnitSelectClear();
 	trUnitSelectByQV("akard", true);
 	if (trUnitIsSelected()) {
 		reselectMyself();
 		startNPCDialog(NPC_ZENOS_PARADOX);
 	}
-	if (yGetDatabaseCount("zenoRelicsIncoming") >0) {
-		yDatabaseNext("zenoRelicsIncoming", true);
+	int db = trQuestVarGet("zenoRelicsIncoming");
+	if (xGetDatabaseCount(db) >0) {
+		xDatabaseNext(db);
+		xUnitSelect(db, xUnitName);
 		if (trUnitGetIsContained("Unit") == false) {
-			yAddToDatabase("freeRelics", "zenoRelicsIncoming");
-			yAddUpdateVar("freeRelics", "type", yGetVar("zenoRelicsIncoming", "type"));
-			if (yGetVar("zenoRelicsIncoming", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
-				trQuestVarSet("correctRelic", trQuestVarGet("zenoRelicsIncoming"));
-			} else if (yGetVar("zenoRelicsIncoming", "type") - RELIC_MATH_PROBLEM == trQuestVarGet("wrongAnswer")) {
-				trQuestVarSet("wrongRelic", trQuestVarGet("zenoRelicsIncoming"));
+			xAddDatabaseBlock(dFreeRelics, true);
+			xSetInt(dFreeRelics, xUnitName, xGetInt(db, xUnitName));
+			xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
+			if (xGetInt(db, xRelicType) - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
+				trQuestVarSet("correctRelic", xGetInt(db, xUnitName));
+			} else if (xGetInt(db, xRelicType) - RELIC_MATH_PROBLEM == trQuestVarGet("wrongAnswer")) {
+				trQuestVarSet("wrongRelic", xGetInt(db, xUnitName));
 			} else {
-				yAddToDatabase("zenoRelics", "zenoRelicsIncoming");
-				yAddUpdateVar("zenoRelics", "type", yGetVar("zenoRelicsIncoming", "type"));
+				xAddDatabaseBlock(dZenoRelics, true);
+				xSetInt(dZenoRelics, xUnitName, xGetInt(db, xUnitName));
 			}
-			yRemoveFromDatabase("zenoRelicsIncoming");
+			xFreeDatabaseBlock(db);
 		}
 	}
 	if (trQuestVarGet("templeFound") == 1) {
@@ -768,64 +768,68 @@ highFrequency
 			trUIFadeToColor(0,0,0,3000,0,true);
 			trQuestVarSet("boonUnlocked"+BOON_SPELL_ATTACK, 1);
 		}
-		if (yGetDatabaseCount("zenoRelics") > 0) {
-			yDatabaseNext("zenoRelics");
-			if (zDistanceToVectorSquared("zenoRelics", "templePos") < 400) {
+		if (xGetDatabaseCount(dZenoRelics) > 0) {
+			xDatabaseNext(dZenoRelics);
+			if (unitDistanceToVector(xGetInt(dZenoRelics, xUnitName), trVectorQuestVarGet("templePos")) < 400) {
 				trChatSendSpoofed(0, "Statue of Zeno: WRONG!");
-				trVectorSetUnitPos("pos", "zenoRelics");
-				vectorSnapToGrid("pos");
-				trUnitSelectClear();
-				trUnitSelectByQV("zenoRelics", true);
+				pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dZenoRelics, xUnitName)));
+				xUnitSelect(dZenoRelics, xUnitName);
 				if (trUnitVisToPlayer()) {
 					trCameraShake(0.5,0.5);
 				}
 				trUnitChangeProtoUnit("Meteor Impact Ground");
-				trVectorQuestVarSet("left", zGetUnitVector("pos", "templePos"));
-				trVectorQuestVarSet("left", rotationMatrix("left", 0.0, 1.0));
-				trVectorQuestVarSet("forward", zGetUnitVector3d("templePos", "pos"));
+				trVectorQuestVarSet("left", rotationMatrix(getUnitVector(pos, trVectorQuestVarGet("templePos")), 0.0, 1.0));
+				trVectorQuestVarSet("forward", getUnitVector3d(trVectorQuestVarGet("templePos"), pos));
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0", "Dwarf", 1, trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				trArmyDispatch("1,0", "Dwarf", 1, xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next", true);
 				trUnitSetStance("Passive");
 				trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 				trSetUnitOrientation(trVectorQuestVarGet("forward"),trVectorQuestVarGet("left"),true);
 				trUnitHighlight(3.0, false);
-				yAddToDatabase("mirrorTowerLasers", "next");
-				yAddUpdateVar("mirrorTowerLasers", "length", zDistanceBetweenVectors3d("pos", "templePos") * 1.25);
-				yAddUpdateVar("mirrorTowerLasers", "timeout", trTimeMS() + 1500);
+				xAddDatabaseBlock(dMirrorTowerLasers, true);
+				xSetInt(dMirrorTowerLasers, xUnitName, 1*trQuestVarGet("next"));
+				xSetFloat(dMirrorTowerLasers, xMirrorTowerLaserLength,
+					distanceBetweenVectors3d(pos, trVectorQuestVarGet("templePos"), false) * 1.25);
+				xSetInt(dMirrorTowerLasers, xMirrorTowerLaserTimeout, trTimeMS() + 1500);
 				
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Meteor Impact Ground");
 				trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
 				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					if (yDatabaseNext("playerUnits", true) == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (zDistanceToVectorSquared("playerUnits", "pos") < 25.0) {
+					} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 25.0) {
 						trUnitDelete(false);
 					}
 				}
 				for(x=xGetDatabaseCount(dEnemies); >0) {
-					if (yDatabaseNext("enemies", true) == -1 || trUnitAlive() == false) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (zDistanceToVectorSquared("enemies", "pos") < 25.0) {
+					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
 						trUnitDelete(false);
 					}
 				}
-				yRemoveFromDatabase("zenoRelics");
+				xFreeDatabaseBlock(dZenoRelics);
 			}
 		}
-		if (yGetDatabaseCount("mirrorTowerLasers") > 0) {
-			yDatabaseNext("mirrorTowerLasers", true);
-			amt = yGetVar("mirrorTowerLasers", "timeout") - trTimeMS();
+		if (xGetDatabaseCount(dMirrorTowerLasers) > 0) {
+			xDatabaseNext(dMirrorTowerLasers);
+			xUnitSelect(dMirrorTowerLasers, xUnitName);
+			amt = xGetInt(dMirrorTowerLasers, xMirrorTowerLaserTimeout) - trTimeMS();
 			if (amt < 0) {
 				trUnitDestroy();
-				yRemoveFromDatabase("mirrorTowerLasers");
+				xFreeDatabaseBlock(dMirrorTowerLasers);
 			} else {
 				amt = amt / 75;
-				trSetSelectedScale(amt, amt, yGetVar("mirrorTowerLasers", "length"));
+				trSetSelectedScale(amt, amt, xGetFloat(dMirrorTowerLasers, xMirrorTowerLaserLength));
 			}
 		}
 	} else if (trQuestVarGet("templeFound") > 1) {

@@ -213,6 +213,10 @@ int dPlayerCharacterArray = 0;
 int dPlayerRelicsArray = 0;
 int dPlayerWarehouseArray = 0;
 
+int dApplicants = 0;
+
+int dZenoRelics = 0;
+
 int getCharactersDB(int p = 0) {
 	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerCharacterArray,p));
 }
@@ -450,6 +454,10 @@ highFrequency
 	xInitAddInt(dPlayerLasers, "name");
 	xPlayerLaserRange = xInitAddFloat(dPlayerLasers, "range");
 	xPlayerLaserTimeout = xInitAddInt(dPlayerLasers, "timeout");
+	
+	dApplicants = xInitDatabase("applicants");
+	xInitAddInt(dApplicants, "name");
+	xInitAddInt(dApplicants, "player");
 }
 
 void resetCharacterCustomVars(int p = 0) {

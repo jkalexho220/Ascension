@@ -893,6 +893,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("poisonGuesses", 3);
 			trQuestVarSet("templeChallengeActive", 1);
 			xsEnableRule("poison_temple_always");
+			
+			trQuestVarSet("doomedPlayerCount", 0);
+			trQuestVarSet("doomedPlayers", zNewArray(mInt,3,"doomedPlayers"));
 		}
 		case ROOM_TEMPLE + 6:
 		{
@@ -943,6 +946,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_TEMPLE + 11:
 		{
+			dZenoRelics = xInitDatabase("zenoRelics");
+			xInitAddInt(dZenoRelics, "name");
+			
+			dMirrorTowerLasers = xInitDatabase("mirrorTowerLasers");
+			xInitAddInt(dMirrorTowerLasers, "name");
+			xMirrorTowerLaserLength = xInitAddFloat(dMirrorTowerLasers, "length");
+			xMirrorTowerLaserTimeout = xInitAddInt(dMirrorTowerLasers, "timeout");
+			
 			size = 12;
 			paintCircle(x, z, size, 0, 53, worldHeight);
 			placeTemple(x, z, 20);
