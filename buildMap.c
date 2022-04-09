@@ -1579,7 +1579,7 @@ highFrequency
 			case 8:
 			{
 				dCloudDeployStars = initGenericProj("cloudDeployStars",kbGetProtoUnitID("Lampades"),18,0.01,2.5,0.0,ENEMY_PLAYER);
-				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
+				xDeepDamageLast = xInitAddInt(dPlayerUnits, "tornadoDamageLast");
 				xsEnableRule("the_clouds_build_01");
 				xsEnableRule("the_clouds_build_02");
 				worldHeight = 5;

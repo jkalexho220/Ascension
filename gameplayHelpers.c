@@ -1230,8 +1230,8 @@ highFrequency
 	xInitAddInt(dYeebLightning,"timeout");
 	
 	dYeebLightningEnd = xInitDatabase("yeebLightningEnd");
-	xInitAddInt(dYeebLightning,"name");
-	xInitAddInt(dYeebLightning,"player");
+	xInitAddInt(dYeebLightningEnd,"name");
+	xInitAddInt(dYeebLightningEnd,"player");
 	
 	dYeebLightningBalls = initGenericProj("yeebLightningBalls",kbGetProtoUnitID("Arkantos God"),26,10.0,5.0,0.0,0,true);
 	xInitAddInt(dYeebLightningBalls,"bounces");

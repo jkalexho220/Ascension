@@ -692,6 +692,15 @@ highFrequency
 									}
 								}
 							}
+						} else if (xGetInt(db, xRelicType) == RELIC_SPARK) {
+							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < 25.0) {
+								relicReturned = false;
+								xUnitSelect(db, xUnitName);
+								trUnitChangeProtoUnit("Lightning Sparks Ground");
+								trQuestVarSet("bossSmite", 1 + trQuestVarGet("bossSmite"));
+							} else {
+								debugLog("what's going on here!");
+							}
 						} else if (1*trQuestVarGet("nottud") > 0) {
 							for(i=3; >0) {
 								xDatabaseNext(dNottudShop);
@@ -737,13 +746,6 @@ highFrequency
 										trSoundPlayFN("cantdothat.wav","1",-1,"","");
 									}
 								}
-							}
-						} else if (xGetInt(db, xRelicType) == RELIC_SPARK) {
-							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < 16.0) {
-								relicReturned = false;
-								xUnitSelect(db, xUnitName);
-								trUnitChangeProtoUnit("Lightning Sparks Ground");
-								trQuestVarSet("bossSmite", 1 + trQuestVarGet("bossSmite"));
 							}
 						}
 						if (relicReturned == false) {

@@ -247,7 +247,7 @@ void stormcutterAlways(int eventID = -1) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
 		trSoundPlayFN("ui\lightning4.wav","1",-1,"","");
-		end = kbGetBlockPosition(""+1*trQuestVarGet("p"+p+"lureObject"));
+		end = xGetVector(dPlayerData, xPlayerLurePos);
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"lureObject");
 		trUnitDestroy();

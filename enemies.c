@@ -139,7 +139,7 @@ highFrequency
 	
 	setupProtounitBounty("Griffon", 0.6, 6, 0.03);
 	setupProtounitBounty("Einheriar", 0.6, 7, 0.03);
-	setupProtounitBounty("Statue of Lightning", 0.8, 8, 0.05);
+	setupProtounitBounty("Statue of Lightning", 0.5, 8, 0.05);
 	setupProtounitBounty("Lampades", 0.8, 12, 0.1);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
@@ -1747,7 +1747,7 @@ void specialUnitsAlways() {
 				case 1:
 				{
 					end = xGetVector(dLampades,xSpecialTarget);
-					start = kbGetBlockPosition(""+dLampades);
+					start = kbGetBlockPosition(""+xGetInt(dLampades, xUnitName));
 					dir = getUnitVector(start,end);
 					addGenericProj(dYeebLightningBalls,start,dir,p);
 					xSetVector(dYeebLightningBalls,xProjPrev,start);
