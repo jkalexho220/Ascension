@@ -51,6 +51,7 @@ bool bossAnim = false;
 vector bossPos = vector(0,0,0);
 vector bossTargetPos = vector(0,0,0);
 vector bossDir = vector(0,0,0);
+vector bossPrev = vector(0,0,0);
 
 int nextproj = 0;
 

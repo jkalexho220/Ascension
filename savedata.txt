@@ -1417,14 +1417,14 @@ highFrequency
 				trQuestVarSet("posZ", trQuestVarGet("bossRoomCenterZ") + trQuestVarGet("zMod"));
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trQuestVarSetFromRand("heading", 1, 360, true);
-				trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posX"),0,trQuestVarGet("posZ"),trQuestVarGet("heading"),true);
+				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 				trUnitSelectClear();
 				trUnitSelectByQV("next");
 				trUnitConvert(0);
 				trMutateSelected(kbGetProtoUnitID("Ice Block"));
 				yAddToDatabase("frostGiantsIncoming", "next");
-				yAddUpdateVar("frostGiantsIncoming", "posX", trQuestVarGet("posX"));
-				yAddUpdateVar("frostGiantsIncoming", "posZ", trQuestVarGet("posZ"));
+				yAddUpdateVar("frostGiantsIncoming", "posX", xsVectorGetX(pos));
+				yAddUpdateVar("frostGiantsIncoming", "posZ", xsVectorGetZ(pos));
 				yAddUpdateVar("frostGiantsIncoming", "targetSize", 2);
 				yAddUpdateVar("frostGiantsIncoming", "targetTime", trTimeMS() + 1000);
 			}
@@ -1769,8 +1769,8 @@ highFrequency
 								removePlayerUnit();
 							} else {
 								trVectorSetUnitPos("end", dPlayerUnits);
-								if (xsAbs(trQuestVarGet("endx") - trQuestVarGet("posx")) < 1.0 ||
-									xsAbs(trQuestVarGet("endz") - trQuestVarGet("posz")) < 1.0) {
+								if (xsAbs(trQuestVarGet("endx") - xsVectorGetX(pos)) < 1.0 ||
+									xsAbs(trQuestVarGet("endz") - xsVectorGetZ(pos)) < 1.0) {
 									damagePlayerUnit(300);
 								}
 							}
@@ -2166,8 +2166,8 @@ highFrequency
 								xsSetContextPlayer(1*yGetVar(dPlayerUnits, "player"));
 								if (kbUnitGetCurrentHitpoints(id) > 0) {
 									trVectorSetUnitPos("pos", dPlayerUnits);
-									trQuestVarSet("endx", trQuestVarGet("posx") - trQuestVarGet("bossPosx") + trQuestVarGet("bossTargetPosx"));
-									trQuestVarSet("endz", trQuestVarGet("posz") - trQuestVarGet("bossPosz") + trQuestVarGet("bossTargetPosz"));
+									trQuestVarSet("endx", xsVectorGetX(pos) - trQuestVarGet("bossPosx") + trQuestVarGet("bossTargetPosx"));
+									trQuestVarSet("endz", xsVectorGetZ(pos) - trQuestVarGet("bossPosz") + trQuestVarGet("bossTargetPosz"));
 									launchUnit(dPlayerUnits, "end");
 								} else {
 									trSetSelectedUpVector(5.0*trQuestVarGet("bossDirx"),-0.5,5.0*trQuestVarGet("bossDirz"));
@@ -2201,18 +2201,18 @@ highFrequency
 					trVectorSetUnitPos("pos", dPlayerCharacters);
 					vectorSnapToGrid("pos");
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz")+2,180,true);
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz")-2,0,false);
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx")+2,0,trQuestVarGet("posz"),270,false);
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx")-2,0,trQuestVarGet("posz"),90,false);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos)+2,180,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos)-2,0,false);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos)+2,0,xsVectorGetZ(pos),270,false);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos)-2,0,xsVectorGetZ(pos),90,false);
 					trArmySelect("1,0");
 					trUnitSetStance("Passive");
 					trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 					trSetSelectedScale(3,0,60);
 					yAddToDatabase("bossLasers", "next");
 					yAddUpdateVar("bossLasers", "step", 1);
-					yAddUpdateVar("bossLasers", "posx", trQuestVarGet("posx"));
-					yAddUpdateVar("bossLasers", "posz", trQuestVarGet("posz"));
+					yAddUpdateVar("bossLasers", "posx", xsVectorGetX(pos));
+					yAddUpdateVar("bossLasers", "posz", xsVectorGetZ(pos));
 					yAddUpdateVar("bossLasers", "next", trTimeMS() + 2000);
 					trSoundPlayFN("skypassagein.wav","1",-1,"","");
 					bossCount = bossCount - 1;
@@ -2286,8 +2286,8 @@ highFrequency
 					}
 					ySetVarFromVector("bossClouds", "prev", "pos");
 				}
-				trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-				trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+				trQuestVarSet("nextx", xsVectorGetX(pos) + 2.0 * trQuestVarGet("dirx"));
+				trQuestVarSet("nextz", xsVectorGetZ(pos) + 2.0 * trQuestVarGet("dirz"));
 				vectorToGrid("next", "loc");
 				if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 					xFreeDatabaseBlock("bossClouds");
@@ -3083,8 +3083,8 @@ highFrequency
 				if (action == PROJ_FALLING) {
 					yVarToVector("bossCloud", "prev");
 					yVarToVector("bossCloud", "dir");
-					trQuestVarSet("nextx", trQuestVarGet("posx") + 2.0 * trQuestVarGet("dirx"));
-					trQuestVarSet("nextz", trQuestVarGet("posz") + 2.0 * trQuestVarGet("dirz"));
+					trQuestVarSet("nextx", xsVectorGetX(pos) + 2.0 * trQuestVarGet("dirx"));
+					trQuestVarSet("nextz", xsVectorGetZ(pos) + 2.0 * trQuestVarGet("dirz"));
 					vectorToGrid("next", "loc");
 					if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 						trVectorQuestVarSet("dir", getBounceDir("loc", "dir"));
@@ -3321,8 +3321,8 @@ highFrequency
 							trQuestVarSet("posz", trQuestVarGet("lightningLineStartz"));
 							for(x=trQuestVarGet("lightningLineCount"); >0) {
 								spawnLightning("pos", ENEMY_PLAYER);
-								trQuestVarSet("posx", trQuestVarGet("posx") + trQuestVarGet("linedirx"));
-								trQuestVarSet("posz", trQuestVarGet("posz") + trQuestVarGet("linedirz"));
+								trQuestVarSet("posx", xsVectorGetX(pos) + trQuestVarGet("linedirx"));
+								trQuestVarSet("posz", xsVectorGetZ(pos) + trQuestVarGet("linedirz"));
 							}
 							trQuestVarSet("lightningLineStartx", trQuestVarGet("lightningLineStartx") + trQuestVarGet("lineMovex"));
 							trQuestVarSet("lightningLineStartz", trQuestVarGet("lightningLineStartz") + trQuestVarGet("lineMovez"));
@@ -3355,7 +3355,7 @@ highFrequency
 					trQuestVarSet("posz", trQuestVarGet("hammerPosz") + trQuestVarGet("dirz"));
 					vectorToGrid("pos", "loc");
 					if (terrainIsType("loc", TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
-						trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 						trArmySelect("1,0");
 						trUnitChangeProtoUnit("UI Range Indicator Egypt SFX");
 					}
@@ -3416,7 +3416,7 @@ highFrequency
 						bossDir = rotationMatrix("bossDir", trQuestVarGet("cos"), trQuestVarGet("sin"));
 						trQuestVarSet("posx", trQuestVarGet("bossDirx") * trQuestVarGet("bossRadius") + trQuestVarGet("hammerPosx"));
 						trQuestVarSet("posz", trQuestVarGet("bossDirz") * trQuestVarGet("bossRadius") + trQuestVarGet("hammerPosz"));
-						trArmyDispatch("1,0","Meteor Impact Ground",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+						trArmyDispatch("1,0","Meteor Impact Ground",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					}
 					trQuestVarSet("bossRadius", trQuestVarGet("bossRadius") + 4);
 					dist = xsPow(trQuestVarGet("bossRadius"), 2);
@@ -3565,13 +3565,13 @@ highFrequency
 					dist = bossNext / 500;
 					trQuestVarSet("posx", dist * (trQuestVarGet("startx") - trQuestVarGet("endx")) + trQuestVarGet("endx"));
 					trQuestVarSet("posz", dist * (trQuestVarGet("startz") - trQuestVarGet("endz")) + trQuestVarGet("endz"));
-					trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Lightning sparks Ground");
 					if (bossNext <= 0) {
 						if (boss > 999) {
 							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch("1,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+							trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 							trArmySelect("1,0");
 							trUnitChangeProtoUnit("Relic");
 							yAddToDatabase("freeRelics", "next");
@@ -3759,7 +3759,7 @@ highFrequency
 			trVectorSetUnitPos("pos", dPlayerUnits);
 			trUnitSelectClear();
 			trUnitSelectByQV("yeebBird", true);
-			trUnitMoveToPoint(trQuestVarGet("posx"),0,trQuestVarGet("posz"),-1,true);
+			trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos),-1,true);
 		}
 	}
 	
@@ -3787,8 +3787,8 @@ highFrequency
 	while (yFindLatest("yeebLatestFeather", "Stymph Bird Feather", 0) > 0) {
 		trVectorSetUnitPos("pos", "yeebLatestFeather");
 		yAddToDatabase("yeebFeathers", "yeebLatestFeather");
-		yAddUpdateVar("yeebFeathers", "posx", trQuestVarGet("posx"));
-		yAddUpdateVar("yeebFeathers", "posz", trQuestVarGet("posz"));
+		yAddUpdateVar("yeebFeathers", "posx", xsVectorGetX(pos));
+		yAddUpdateVar("yeebFeathers", "posz", xsVectorGetZ(pos));
 		trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
 	}
 	
@@ -3798,8 +3798,8 @@ highFrequency
 			trQuestVarGet("yeebLightningNext") + 2.0 * zDistanceBetweenVectors("pos", "yeebDestination"));
 		trQuestVarSetFromRand("dist", 4, 20, false);
 		trVectorQuestVarSet("yeebDir", rotationMatrix("yeebDir", -0.757323, 0.653041));
-		trQuestVarSet("posx", trQuestVarGet("posx") + trQuestVarGet("yeebDirx") * trQuestVarGet("dist"));
-		trQuestVarSet("posz", trQuestVarGet("posz") + trQuestVarGet("yeebDirz") * trQuestVarGet("dist"));
+		trQuestVarSet("posx", xsVectorGetX(pos) + trQuestVarGet("yeebDirx") * trQuestVarGet("dist"));
+		trQuestVarSet("posz", xsVectorGetZ(pos) + trQuestVarGet("yeebDirz") * trQuestVarGet("dist"));
 		vectorSnapToGrid("pos");
 		spawnLightning("pos", ENEMY_PLAYER);
 	}
@@ -3872,7 +3872,7 @@ highFrequency
 					trQuestVarSetFromRand("heading", 1, 360, false);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand")),1,
-						trQuestVarGet("posx"),0,trQuestVarGet("posz"),trQuestVarGet("heading"),true);
+						xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 					activateEnemy("next",-1,0);
 				}
 			}
@@ -4097,13 +4097,13 @@ highFrequency
 						trSoundPlayFN("colossuseat.wav","1",-1,"","");
 						trDamageUnitPercent(-1);
 						trVectorSetUnitPos("pos", "bossUnit");
-						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trArmySelect("0,0");
 						trUnitChangeProtoUnit("Regeneration SFX");
 						if (trQuestVarGet("secondPhase") == 1) {
 							trQuestVarSetFromRand("rand", 1, 6, true);
 							trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-							trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),180,true);
+							trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),180,true);
 							trArmySelect(""+ENEMY_PLAYER+",0");
 							trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand")));
 							activateEnemy("next");
@@ -4354,7 +4354,7 @@ highFrequency
 				if (dotProduct("bossSplashDir", "bossDir") > dotProduct("bossSplashDir", "newDir")) {
 					trQuestVarSet("posx", trQuestVarGet("bossPosx") + 12.0 * trQuestVarGet("bossSplashDirx"));
 					trQuestVarSet("posz", trQuestVarGet("bossPosz") + 12.0 * trQuestVarGet("bossSplashDirz"));
-					trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("0,0");
 					trUnitChangeProtoUnit("Meteor Impact Water");
 					trVectorQuestVarSet("bossSplashDir", rotationMatrix("bossSplashDir", 0.866025, -0.5));
@@ -4424,7 +4424,7 @@ highFrequency
 						trQuestVarSet("bossDistance", 6 + trQuestVarGet("bossDistance"));
 						trQuestVarSet("posx", trQuestVarGet("bossPosx") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirx"));
 						trQuestVarSet("posz", trQuestVarGet("bossPosz") + trQuestVarGet("bossDistance") * trQuestVarGet("bossStartDirz"));
-						trArmyDispatch("0,0","Dwarf",1,trQuestVarGet("posx"),0,trQuestVarGet("posz"),0,true);
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trArmySelect("0,0");
 						trUnitChangeProtoUnit("Meteor Impact Water");
 						for(x=xGetDatabaseCount(dPlayerUnits); >0) {

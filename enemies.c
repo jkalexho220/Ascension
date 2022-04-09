@@ -280,7 +280,7 @@ void specialUnitsAlways() {
 		
 		loc = vectorToGrid(pos);
 		if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) || trTimeMS() > xGetInt(dBallistaShots, xTimeout)) {
-			ballistaShotPop();
+			ballistaShotPop(pos);
 		} else if ((xGetInt(dBallistaShots, xPlayerOwner) == ENEMY_PLAYER) || PvP) {
 			action = 0;
 			for(p=1; < ENEMY_PLAYER) {
@@ -290,10 +290,10 @@ void specialUnitsAlways() {
 				action = action + trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),p,"Unit",2);
 			}
 			if (action > 0) {
-				ballistaShotPop();
+				ballistaShotPop(pos);
 			}
 		} else if (trCountUnitsInArea(""+xGetInt(dBallistaShots,xUnitName),ENEMY_PLAYER,"Unit",2) > 0) {
-			ballistaShotPop();
+			ballistaShotPop(pos);
 		}
 	}
 	

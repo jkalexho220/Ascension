@@ -429,7 +429,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god power lightning icon 64";
-					msg = "Cost: 50 | Duration: 10 | Radius: 5 | Damage: Attack x Spell Power | Fire rate + 0.3x Projectiles";
+					msg = "Cost: 50 | Duration: 10 | Radius: 5 | Damage: Attack x Spell Power | Fire rate + 0.5x Projectiles";
 					next = 0;
 				}
 			}

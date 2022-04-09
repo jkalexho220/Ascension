@@ -238,6 +238,10 @@ float zDistanceToVector(string qv = "", string v = "") {
 	return(unitDistanceToVector(1*trQuestVarGet(qv),trVectorQuestVarGet(v),false));
 }
 
+vector vectorSetFromAngle(float angle = 0) {
+	return(xsVectorSet(xsSin(angle), 0, xsCos(angle)));
+}
+
 void trVectorSetFromAngle(string qv = "", float angle = 0) {
 	trVectorQuestVarSet(qv,xsVectorSet(xsSin(angle), 0, xsCos(angle)));
 }
