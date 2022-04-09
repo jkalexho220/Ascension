@@ -16,7 +16,6 @@ int xDeathSentenceTimeout = 0;
 int xDeathSentenceHealth = 0;
 int xDeathSentenceSFX = 0;
 
-int xAbductPrev = 0;
 int xAbductDest = 0;
 int xAbductTimeout = 0;
 int xAbductCurse = 0;
@@ -184,7 +183,7 @@ void nightriderAlways(int eventID = -1) {
 	
 	for (x=xGetDatabaseCount(abducts); > 0) {
 		if (processGenericProj(abducts) == PROJ_FALLING) {
-			prev = xGetVector(abducts, xAbductPrev);
+			prev = xGetVector(abducts, xProjPrev);
 			dir = xGetVector(abducts, xProjDir);
 			pos = kbGetBlockPosition(""+xGetInt(abducts, xUnitName), true);
 			dist = distanceBetweenVectors(pos, prev, false) + 3.0;
@@ -193,7 +192,7 @@ void nightriderAlways(int eventID = -1) {
 				trUnitChangeProtoUnit("Kronny Birth SFX");
 				xFreeDatabaseBlock(abducts);
 			} else {
-				xSetVector(abducts, xAbductPrev, pos);
+				xSetVector(abducts, xProjPrev, pos);
 				for(y=xGetDatabaseCount(dEnemies); >0) {
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies, xUnitID);
@@ -238,7 +237,7 @@ void nightriderAlways(int eventID = -1) {
 				prev = xsVectorSet(xsVectorGetX(pos) - dist * xsVectorGetX(dir), 0,
 					xsVectorGetZ(pos) - dist * xsVectorGetZ(dir));
 				addGenericProj(abducts,prev,dir);
-				xSetVector(abducts, xAbductPrev, prev);
+				xSetVector(abducts, xProjPrev, prev);
 				xSetVector(abducts, xAbductDest, pos);
 				xSetInt(abducts, xAbductTimeout, trTimeMS() + dist / 0.015);
 			}
@@ -401,6 +400,12 @@ void nightriderAlways(int eventID = -1) {
 					} else {
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+						xUnitSelect(dPlayerUnits, xStunSFX);
+						trUnitDestroy();
+						xUnitSelect(dPlayerUnits, xPoisonSFX);
+						trUnitDestroy();
+						xUnitSelect(dPlayerUnits, xSilenceSFX);
+						trUnitDestroy();
 						removePlayerUnit();
 					}
 				}
@@ -461,9 +466,8 @@ void chooseNightrider(int eventID = -1) {
 	}
 	
 	if (trQuestVarGet("p"+p+"abducts") == 0) {
-		db = initGenericProj("p"+p+"abducts",kbGetProtoUnitID("Kronny Birth SFX"),2,15.0,4.5,0,p);
+		db = initGenericProj("p"+p+"abducts",kbGetProtoUnitID("Kronny Birth SFX"),2,15.0,4.5,0,p,true);
 		trQuestVarSet("p"+p+"abducts", db);
-		xAbductPrev = xInitAddVector(db, "prev");
 		xAbductDest = xInitAddVector(db, "dest");
 		xAbductTimeout = xInitAddInt(db, "timeout");
 		xAbductCurse = xInitAddBool(db, "curse", true);

@@ -2094,7 +2094,6 @@ highFrequency
 {
 	xsDisableSelf();
 	dQuestLeaves = initGenericProj("questLeaves",kbGetProtoUnitID("Einheriar"),18,10.0,1.0);
-	xInitAddInt(dQuestLeaves, "name");
 	xLeafType = xInitAddInt(dQuestLeaves,"type");
 	
 	dQuestTargets = xInitDatabase("questTargets");

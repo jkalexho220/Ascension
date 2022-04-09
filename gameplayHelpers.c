@@ -43,6 +43,7 @@ int bossCooldownTime = 0;
 int bossNext = 0;
 int bossTimeout = 0;
 int bossCount = 0;
+int bossTarget = 0;
 float bossScale = 0;
 float bossAngle = 0;
 bool bossAnim = false;
@@ -1047,7 +1048,6 @@ int initGenericProj(string name = "", int proto = 0, int anim = 0, float speed =
 	xProjScale = xInitAddFloat(db, "scale", scale);
 	xProjDir = xInitAddVector(db, "dir");
 	if (hitbox) {
-		xProjDist = xInitAddFloat(db,"dist");
 		xProjPrev = xInitAddVector(db,"prev");
 	}
 	return(db);
@@ -1232,9 +1232,8 @@ highFrequency
 	xInitAddInt(dYeebLightning,"name");
 	xInitAddInt(dYeebLightning,"player");
 	
-	dYeebLightningBalls = initGenericProj("yeebLightningBalls",kbGetProtoUnitID("Arkantos God"),26,10.0,5.0,0.0);
+	dYeebLightningBalls = initGenericProj("yeebLightningBalls",kbGetProtoUnitID("Arkantos God"),26,10.0,5.0,0.0,0,true);
 	xInitAddInt(dYeebLightningBalls,"bounces");
-	xInitAddVector(dYeebLightningBalls,"prev");
 	
 	dAutomatonBombs = xInitDatabase("automatonBombs");
 	xInitAddInt(dAutomatonBombs,"name");
@@ -1246,6 +1245,7 @@ highFrequency
 	xMedusaBallBounces = xInitAddInt(dMedusaBalls,"bounces");
 	
 	dMummyBalls = initGenericProj("mummyBalls",kbGetProtoUnitID("Kronny Birth SFX"),2,8.0,4.5,0.0,ENEMY_PLAYER,true);
+	xProjDist = xInitAddFloat(dMummyBalls,"dist");
 	xProjType = xInitAddInt(dMummyBalls,"type");
 	
 	dBarrages = xInitDatabase("barrages");
@@ -1257,6 +1257,7 @@ highFrequency
 	xBarrageCount = xInitAddInt(dBarrages,"count");
 	
 	dAvengerProj = initGenericProj("avengerProj",kbGetProtoUnitID("Avenger"),39,10.0,4.5,1.0,ENEMY_PLAYER,true);
+	xProjDist = xInitAddFloat(dAvengerProj,"dist");
 	xAvengerProjDist = xInitAddFloat(dAvengerProj,"maxDist");
 	xAvengerProjUnit = xInitAddInt(dAvengerProj,"rider");
 	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");
