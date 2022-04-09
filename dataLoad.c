@@ -417,7 +417,7 @@ inactive
 					} else if (loadProgress == 8) {
 						xSetInt(dPlayerData,xPlayerGold,xGetInt(dPlayerData,xPlayerGold) + 32 * x);
 					} else if (loadProgress < 21) {
-						trQuestVarSet("p"+p+"relic"+(loadProgress - 5), x);
+						trQuestVarSet("p"+p+"relic"+(loadProgress - 8), x);
 					} else if (loadProgress == 21) {
 						currentdata = x;
 						trQuestVarSet("p"+p+"nickQuestProgress", iModulo(7, currentdata));

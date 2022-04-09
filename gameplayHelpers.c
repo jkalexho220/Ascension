@@ -40,11 +40,16 @@ int bossUnit = 0;
 int bossID = 0;
 int bossPointer = 0;
 int bossCooldownTime = 0;
+int bossNext = 0;
+int bossTimeout = 0;
+int bossCount = 0;
 float bossScale = 0;
 float bossAngle = 0;
 bool bossAnim = false;
 
 vector bossPos = vector(0,0,0);
+vector bossTargetPos = vector(0,0,0);
+vector bossDir = vector(0,0,0);
 
 int nextproj = 0;
 
@@ -521,8 +526,8 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 void growFrostGiantsIncoming(vector pos = vector(0,0,0)) {
 	for(x=xGetDatabaseCount(dFrostGiantsIncoming); >0) {
 		xDatabaseNext(dFrostGiantsIncoming);
-		if (unitDistanceToVector(xGetInt(dFrostGiantsIncoming,xUnitName), pos,true) < 100) {
-			xUnitSelectByID(dFrostGiantsIncoming,xUnitID);
+		if (unitDistanceToVector(xGetInt(dFrostGiantsIncoming,xUnitName), pos) < 100) {
+			xUnitSelect(dFrostGiantsIncoming,xUnitName);
 			trUnitHighlight(0.5, false);
 			if (xGetFloat(dFrostGiantsIncoming, xFrostTargetSize) < 5) {
 				trQuestVarSet("frostGiantIncomingSound", 1);
@@ -1322,11 +1327,11 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		}
 		case kbGetProtoUnitID("Behemoth"):
 		{
-			xSetInt(db,xMagicResist,-1,xGetNewestPointer(db));
+			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
 		}
 		case kbGetProtoUnitID("Scarab"):
 		{
-			xSetInt(db,xMagicResist,-1,xGetNewestPointer(db));
+			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
 			addSpecialToDatabase(dScarabs,name,db,p);
 		}
 		case kbGetProtoUnitID("Satyr"):

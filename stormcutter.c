@@ -63,7 +63,6 @@ void stormcutterAlways(int eventID = -1) {
 					xGetFloat(dPlayerData, xPlayerBaseAttack) * (1.0 + trQuestVarGet("p"+p+"stormbonus")));
 				zSetProtoUnitStat("Archer Atlantean Hero", p, 31, xGetFloat(dPlayerData, xPlayerAttack));
 				if (trQuestVarGet("p"+p+"rainOfLightning") == 1) {
-					gainFavor(p, 1);
 					trChatSetStatus(false);
 					trDelayedRuleActivation("enable_chat");
 					trUnitSelectClear();

@@ -299,7 +299,7 @@ void maintainStun() {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
 			xFreeDatabaseBlock(dStunnedUnits);
 		} else {
-			if ((xGetInt(dStunnedUnits, xUnitName) == bossUnit) ||
+			if ((xGetInt(dStunnedUnits, xUnitName) != bossUnit) ||
 				(bossAnim == false)) {
 				trMutateSelected(xGetInt(dStunnedUnits, xStunnedProto));
 				trUnitOverrideAnimation(2, 0, false, false, -1, 0);

@@ -120,7 +120,6 @@ void starseerAlways(int eventID = -1) {
 			}
 			
 			if (hit > 0) {
-				xSetVector(db, xStarseerDir + hit, cur);
 				/* collision detection for one star */
 				outer = xsPow(xGetFloat(db, xStarseerCurrentRadius) + 1.5, 2);
 				inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
@@ -161,7 +160,9 @@ void starseerAlways(int eventID = -1) {
 				if (target == 1) {
 					trQuestVarSetFromRand("sound", 1, 3, true);
 					trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-					
+					xSetVector(db, xStarseerDir + hit, cur);
+				} else if (angleDiff < trQuestVarGet("p"+p+"starCosine")) {
+					xSetVector(db, xStarseerDir + hit, cur);
 				}
 			}
 		}
