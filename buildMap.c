@@ -96,7 +96,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 						trArmyDispatch("1,0","Dwarf",1,x*70+41,0,z*70+41,0,true);
 						xSetPointer(dLaserRooms, xAddDatabaseBlock(dLaserRooms));
 						xSetInt(dLaserRooms,xUnitName,next);
-						xSetVector(dLaserRooms,xLaserRoomPos,xsVectorSet(x * 70 + 40, z * 70 + 40));
+						xSetVector(dLaserRooms,xLaserRoomPos,xsVectorSet(x * 70 + 40, 0, z * 70 + 40));
 						for(a=0; <8) {
 							/* z lasers */
 							trArmyDispatch("1,0","Dwarf",1,2*x0+4*a+3,0,2*z0+1,180,false);

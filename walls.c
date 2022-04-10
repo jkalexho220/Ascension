@@ -37,7 +37,7 @@ void processWalls() {
 			}
 			case WALL_FALLING:
 			{
-				float progress = (xGetInt(dUnlockWalls, xWallTimeout) - trTimeMS()) / 2500.0;
+				float progress = 0.0004 * (xGetInt(dUnlockWalls, xWallTimeout) - trTimeMS());
 				int x0 = (xsVectorGetX(wallpos) - xsVectorGetX(wallmod)) / 2;
 				int x1 = (xsVectorGetX(wallpos) + xsVectorGetX(wallmod)) / 2;
 				int z0 = (xsVectorGetZ(wallpos) - xsVectorGetZ(wallmod)) / 2;

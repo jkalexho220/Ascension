@@ -108,6 +108,22 @@ highFrequency
 							}
 						}
 					}
+					for(x=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies,xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else {
+							pos = kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName));
+							if (vectorInRectangle(pos, xGetVector(dLaserRooms,xLaserRoomXBottom + laser),
+									xGetVector(dLaserRooms,xLaserRoomXTop + laser))) {
+								trDamageUnit(300);
+							} else if (vectorInRectangle(pos, xGetVector(dLaserRooms,xLaserRoomZBottom + laser),
+									xGetVector(dLaserRooms,xLaserRoomZTop + laser))) {
+								trDamageUnit(300);
+							}
+						}
+					}
 				}
 				
 				
@@ -124,7 +140,7 @@ highFrequency
 						xUnitSelectByID(dPlayerUnits,xUnitID);
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (unitDistanceToVector(dPlayerUnits, pos) < 400) {
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 400) {
 							xSetInt(dLaserRooms, xLaserRoomActive, 1);
 							break;
 						}
@@ -140,12 +156,14 @@ highFrequency
 			scale = 0.012 * scale;
 		} else {
 			scale = 0;
-			xFreeDatabaseBlock(dShrinkingLasers);
 		}
 		for(x=0; <4) {
 			trUnitSelectClear();
 			trUnitSelect(""+(x+xGetInt(dShrinkingLasers,xUnitName)), true);
 			trSetSelectedScale(scale, scale, 21);
+		}
+		if (scale == 0) {
+			xFreeDatabaseBlock(dShrinkingLasers);
 		}
 	}
 }
