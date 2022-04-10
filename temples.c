@@ -214,6 +214,7 @@ highFrequency
 	int id = kbGetBlockID(""+xGetInt(dPoisonRelics, xUnitName));
 	if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Jiangshi")) {
 		if (xGetInt(dPoisonRelics, xUnitName) == trQuestVarGet("correctGoblet")) {
+			xUnitSelect(dPoisonRelics, xUnitName);
 			trUnitChangeProtoUnit("Recreation");
 			trSoundPlayFN("recreation.wav","1",-1,"","");
 			xsDisableSelf();
@@ -227,6 +228,7 @@ highFrequency
 			startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
 			trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 		} else {
+			xUnitSelect(dPoisonRelics, xUnitName);
 			trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
 			trSoundPlayFN("spybirth.wav","1",-1,"","");
 			trQuestVarSet("poisonGuesses", trQuestVarGet("poisonGuesses") - 1);
@@ -582,10 +584,10 @@ highFrequency
 				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
 					spawnLightning(pos);
-					pos = pos - vector(4,0,0);
+					pos = pos - vector(0,0,4);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(0,0,2));
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,0));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 14);
@@ -605,10 +607,10 @@ highFrequency
 				pos = trVectorQuestVarGet("lightningStart");
 				for(x=0; < 8) {
 					spawnLightning(pos);
-					pos = pos - vector(0,0,4);
+					pos = pos - vector(4,0,0);
 				}
 				trQuestVarSet("templeChallengeNext", trQuestVarGet("templeChallengeNext") + 100);
-				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(2,0,0));
+				trVectorQuestVarSet("lightningStart", trVectorQuestVarGet("lightningStart") - vector(0,0,2));
 			}
 			if (amt > 1600) {
 				trQuestVarSet("templeChallengeActive", 16);
@@ -648,6 +650,7 @@ highFrequency
 						trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 					}
 				}
+				xsDisableSelf();
 			}
 		}
 	}
@@ -712,7 +715,7 @@ highFrequency
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x,0,z,0,true);
 					trArmySelect(""+ENEMY_PLAYER+",0");
-					trSetUnitOrientation(trVectorQuestVarGet("dir"),vector(0,1,0),true);
+					trSetUnitOrientation(dir,vector(0,1,0),true);
 					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+(1*trQuestVarGet("templeChallengeActive")-2)));
 					activateEnemy(1*trQuestVarGet("next"));
 					dir = rotationMatrix(dir, 0.707107, 0.707107);

@@ -1224,12 +1224,12 @@ highFrequency
 	xBallistaShot1 = xInitAddInt(dBallistaShots,"shot1");
 	xBallistaShot2 = xInitAddInt(dBallistaShots,"shot2");
 	
-	dYeebLightning = xInitDatabase("yeebLightning");
+	dYeebLightning = xInitDatabase("yeebLightning", 150);
 	xInitAddInt(dYeebLightning,"name");
 	xInitAddInt(dYeebLightning,"player");
 	xInitAddInt(dYeebLightning,"timeout");
 	
-	dYeebLightningEnd = xInitDatabase("yeebLightningEnd");
+	dYeebLightningEnd = xInitDatabase("yeebLightningEnd", 150);
 	xInitAddInt(dYeebLightningEnd,"name");
 	xInitAddInt(dYeebLightningEnd,"player");
 	

@@ -1711,6 +1711,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 4:
@@ -1767,6 +1768,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
@@ -1815,11 +1817,12 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
 				{
-					uiMessageBox("You can equip this Blessing in singleplayer/");
+					uiMessageBox("You can equip this Blessing in singleplayer.");
 					dialog = 0;
 				}
 			}
@@ -1859,6 +1862,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")), boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
@@ -1899,6 +1903,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:
@@ -1939,6 +1944,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
 					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
 				}
 				case 3:

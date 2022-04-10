@@ -3795,6 +3795,7 @@ highFrequency
 		action = trQuestVarGet("yeebRelics");
 		for(x=xGetDatabaseCount(action); >0) {
 			xDatabaseNext(action);
+			xUnitSelect(action, xUnitName);
 			trUnitDestroy();
 		}
 		for(p=1; < ENEMY_PLAYER) {

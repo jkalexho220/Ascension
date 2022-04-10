@@ -901,10 +901,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		{
 			trQuestVarSet("templeSize", 16);
 			trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
-			trQuestVarSet("templeRoomUpperX", 70*x+56);
-			trQuestVarSet("templeRoomUpperZ", 70*z+56);
-			trQuestVarSet("templeRoomLowerX", 70*x+24);
-			trQuestVarSet("templeRoomLowerZ", 70*z+24);
+			trVectorQuestVarSet("templeRoomUpper", xsVectorSet(70*x+56,0,70*z+56));
+			trVectorQuestVarSet("templeRoomLower", xsVectorSet(70*x+24,0,70*z+24));
 			trPaintTerrain(x*35+12, z*35+12, x*35+28, z*35+28, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x*35+12, z*35+12, x*35+28, z*35+28, worldHeight, false);
 			placeTemple(x, z, 20);
