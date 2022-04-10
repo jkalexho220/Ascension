@@ -1122,7 +1122,7 @@ highFrequency
 		if ((trUnitAlive() == false) || (trQuestVarGet("play") == 0)) {
 			xsDisableSelf();
 			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
-			trUnitOverrideAnimation(-1,0,true,true,-1);
+			trUnitOverrideAnimation(6,0,false,true,-1);
 		} else if (xGetDatabaseCount(dPlayerUnits) > 0) {
 			int x = 0;
 			int z = 0;

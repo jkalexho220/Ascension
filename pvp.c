@@ -1,3 +1,10 @@
+/*
+we have an array of playerUnits databases. Each database corresponds to one player. Database context switches between players.
+
+enemies database: we loop through our playerUnits database and pull the doppelgangers out of the enemies database into a temporary cache
+at the end of the function, we return everything back
+*/
+
 int detachFromDatabase(string db = "", int p = 0) {
 	int start = 0;
 	int count = 1;
