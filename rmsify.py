@@ -26,13 +26,22 @@ import sys
 ####### CUSTOMIZE THESE #######
 ###############################
 FILENAME = 'Ascension MMORPG.xs'
-files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
         'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
+rmsFunc = ''
+rmsMain = 'main.c'
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
 #########################################
+additional = []
+if len(rmsFunc) > 0:
+	additional.append(rmsFunc)
+
+additional.append(rmsMain)
+
+files = additional + files
 
 VERBOSE = False
 for t in sys.argv:
@@ -985,8 +994,6 @@ def removeStrings(line):
 			inString = not inString
 		if not inString or token == '"':
 			retline = retline + token
-	if "//" in retline:
-		retline = retline[:retline.find("//")]
 	return retline
 
 print("Reading Command Viewer")
@@ -1010,14 +1017,15 @@ print("rmsification start!")
 ln = 1
 FILE_1 = None
 comment = False
-first = True
+ESCAPE = True
 try:
 	with open('XS/' + FILENAME, 'w') as file_data_2:
-		file_data_2.write('void code(string xs="") {\n')
-		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
-		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}\n')
-		file_data_2.write('void main(void) {\n')
 		for f in files:
+			if f == rmsMain:
+				file_data_2.write('void code(string xs="") {\n')
+				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}\n')
+				file_data_2.write('void main(void) {\n')
 			FILE_1 = f
 			ln = 1
 			pcount = 0 # parenthesis
@@ -1036,6 +1044,8 @@ try:
 					# Rewrite history
 					reline = line.strip()
 					nostrings = removeStrings(reline)
+					if "//" in nostrings:
+						nostrings = nostrings[:nostrings.find("//")]
 					if '}' in nostrings:
 						thedepth = thedepth - 1
 					if not RESTORING:
@@ -1048,7 +1058,7 @@ try:
 					bcount = bcount + nostrings.count('{') - nostrings.count('}')
 					
 					if not line.isspace():
-						if ('/*' in line):
+						if ('/*' in nostrings):
 							comment = True
 
 						if not comment:
@@ -1085,7 +1095,7 @@ try:
 													BASE_JOB.debug()
 								
 								templine = reline.strip()
-								if '//' in templine:
+								if '//' in removeStrings(templine):
 									templine = templine[:templine.find('//')].strip()
 
 								if (len(templine) > 120):
@@ -1097,13 +1107,13 @@ try:
 
 								if not RESTORING and len(templine) > 0:
 									# reWrite the line
-									if first or ESCAPE:
+									if ESCAPE:
 										file_data_2.write(templine + '\n')
 									else:
 										file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
 								else:
 									RESTORING = False
-						if ('*/' in line):
+						if ('*/' in nostrings):
 							comment = False
 					else:
 						file_data_2.write('\n')
@@ -1129,7 +1139,7 @@ try:
 				print("ERROR: Extra close brackets detected!\n")
 			elif bcount > 0:
 				print("ERROR: Missing close brackets detected!\n")
-			if first:
+			if f == rmsMain:
 				file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("zenowashere"));\n')
 				file_data_2.write('rmSetTriggerPriority(4);\n')
 				file_data_2.write('rmSetTriggerActive(false);\n')
@@ -1137,7 +1147,6 @@ try:
 				file_data_2.write('rmSetTriggerRunImmediately(true);\n')
 				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");}}/*");\n')
-				first = False
 				ESCAPE = False
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowashereagain inactive {if(true){xsDisableSelf();//");\n')

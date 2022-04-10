@@ -75,13 +75,7 @@ void rideLightningOff(int p = 0) {
 		xUnitSelect(balls, xUnitName);
 		trUnitDestroy();
 		xUnitSelectByID(db, xUnitID);
-		xSetInt(db, xCharIndex, activatePlayerUnit(xGetInt(db, xUnitName), p, kbGetProtoUnitID("Hero Greek Atalanta")));
-		xSetBool(dPlayerUnits, xIsHero, true);
-		xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist));
-		xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist));
-		if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
-			xSetInt(dPlayerData, xPlayerIndex, xGetNewestPointer(dPlayerUnits));
-		}
+		xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
 		healUnit(p, trQuestVarGet("p"+p+"rideLightningHeal"));
 	}
 	
@@ -415,8 +409,7 @@ void thunderRiderAlways(int eventID = -1) {
 									}
 								}
 							}
-							removePlayerUnit();
-							xSetInt(dPlayerData, xPlayerIndex, 0);
+							xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex), false);
 						}
 					}
 				}

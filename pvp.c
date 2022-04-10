@@ -3,94 +3,16 @@ we have an array of playerUnits databases. Each database corresponds to one play
 
 enemies database: we loop through our playerUnits database and pull the doppelgangers out of the enemies database into a temporary cache
 at the end of the function, we return everything back
+
+only the playerUnits database has doppelganger pointers
 */
-
-int detachFromDatabase(string db = "", int p = 0) {
-	int start = 0;
-	int count = 1;
-	if (ySetPointer(db, 1*trQuestVarGet(db+"DummyIndex"))) {
-		for(x=yGetDatabaseCount(db); >1) {
-			yDatabaseNext(db);
-			if (yGetVar(db, "player") == p) {
-				if (start == 0) {
-					start = yGetPointer(db);
-				}
-				count = count + 1;
-			} else if (start > 0) {
-				yDatabaseNext(db, false, true); // go back one
-				break;
-			}
-		}
-		trQuestVarSet(db+"leaveIndex", yAddToDatabase(db, "immortalDummy"));
-		if (start == 0) {
-			start = trQuestVarGet(db+"leaveIndex");
-		}
-		/* connecting the dummy ends */
-		ySetVarAtIndex(db, "xNextBlock",
-			yGetVarAtIndex(db, "xNextBlock", 1*trQuestVarGet(db + "leaveIndex")),
-			1*yGetVarAtIndex(db,"xPrevBlock",start));
-		ySetVarAtIndex(db, "xPrevBlock",
-			yGetVarAtIndex(db,"xPrevBlock",start),
-			1*yGetVarAtIndex(db, "xNextBlock", 1*trQuestVarGet(db + "leaveIndex")));
-		/* reconnecting the loose ends */
-		ySetVarAtIndex(db, "xPrevBlock", 1*trQuestVarGet(db+"leaveIndex"), start);
-		ySetVarAtIndex(db, "xNextBlock", start, 1*trQuestVarGet(db+"leaveIndex"));
-	} else {
-		debugLog("ERROR: DummyIndex for " + db + " not found!");
-	}
-	return(count);
-}
-
-void reAttachToDatabase(string db = "", int p = 0) {
-	int start = 0;
-	int end = 0;
-	int insertNext = 0;
-	int insertPrev = 0;
-	/* grab the dummy index */
-	if (ySetPointer(db, 1*trQuestVarGet(db+"DummyIndex"))) {
-		insertNext = 1*trQuestVarGet(db+"DummyIndex");
-		insertPrev = yGetVar(db, "xPrevBlock");
-	}
-	if (ySetPointer(db, 1*trQuestVarGet(db+"leaveIndex"))) {
-		end = yGetVar(db, "xPrevBlock");
-		start = 1*trQuestVarGet(db+"LeaveIndex");
-		/* connect my start to the insert prev */
-		ySetVarAtIndex(db, "xPrevBlock", insertPrev, start);
-		ySetVarAtIndex(db, "xNextBlock", start, insertPrev);
-		/* connect my end to the insert next */
-		ySetVarAtIndex(db, "xNextBlock", insertNext, end);
-		ySetVarAtIndex(db, "xPrevBlock", end, insertNext);
-		
-		ySetPointer(db, 1*trQuestVarGet(db+"leaveIndex"));
-		yRemoveFromDatabase(db);
-	}
-}
 
 void detachPlayer(int eventID = -1) {
 	int p = eventID - 10000;
-	trQuestVarSet("playerUnitsRemainingSize", 0);
-	trQuestVarSet("enemiesDetachedSize", 0);
-	trQuestVarSet("p"+p+"enemiesIndex", 1*yGetVarAtIndex("playerUnits", "doppelganger", 1*trQuestVarGet("p"+p+"index")));
-	trQuestVarSet("detached", 1);
-	trQuestVarSet("playerUnitsDetachedSize", detachFromDatabase("playerUnits", p));
-	trQuestVarSet("enemiesDetachedSize", detachFromDatabase("enemies", p));
-	
-	trQuestVarSet("playerUnitsRemainingSize", xGetDatabaseCount(dPlayerUnits) - trQuestVarGet("playerUnitsDetachedSize"));
-	trQuestVarSet("xdataplayerUnitscount", trQuestVarGet("playerUnitsDetachedSize"));
-	trQuestVarSet("xdataenemiescount", xGetDatabaseCount(dEnemies) - trQuestVarGet("enemiesDetachedSize"));
-	ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsLeaveIndex"));
-	ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
 }
 
 void reAttachPlayer(int eventID = -1) {
 	int p = eventID - 10100;
-	reAttachToDatabase("playerUnits", p);
-	reAttachToDatabase("enemies", p);
-	ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsDummyIndex"));
-	ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-	trQuestVarSet("xdataplayerUnitscount", xGetDatabaseCount(dPlayerUnits) + trQuestVarGet("playerUnitsRemainingSize"));
-	trQuestVarSet("xdataenemiescount", xGetDatabaseCount(dEnemies) + trQuestVarGet("enemiesDetachedSize"));
-	trQuestVarSet("detached", 0);
 }
 
 void deployStadiumEyecandy(int index = 0) {
@@ -997,8 +919,6 @@ highFrequency
 		}
 		trQuestVarSet("playerUnitsPrevPointer", yGetPointer("playerUnits"));
 	}
-	
-	specialUnitsAlways();
 	
 	maintainStun();
 	
