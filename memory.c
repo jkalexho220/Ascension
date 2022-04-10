@@ -31,7 +31,8 @@ const int mPointer = 0;
 const int mCount = 1;
 const int mNextFree = 2;
 const int mNewestBlock = 3;
-const int mVariableTypes = 3;
+const int mCacheHead = 4; // the cache stores items that you want to temporarily remove
+const int mVariableTypes = 4;
 /*
 subsequent items in the metadata will determine the datatypes of extra variables for the database
 */
@@ -272,9 +273,10 @@ int xInitDatabase(string name = "", int size = 0) {
 	aiPlanAddUserVariableBool(id,xDirtyBit,"DirtyBit",size+1);
 	aiPlanAddUserVariableInt(id,xNextBlock,"NextBlock",size+1);
 	aiPlanAddUserVariableInt(id,xPrevBlock,"PrevBlock",size+1);
-	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",4);
+	aiPlanAddUserVariableInt(id,xMetadata,"Metadata",5);
 	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
 	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
+	aiPlanSetUserVariableInt(id,xMetadata,mCacheHead,0);
 	
 	aiPlanSetUserVariableInt(id,xMetadata,mNextFree,size);
 	aiPlanSetUserVariableInt(id,xNextBlock,0,0);
