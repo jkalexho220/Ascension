@@ -16,3 +16,45 @@
 	<data>421080954</data>
 	<data>604397430</data>
 </scenariodata>
+
+noob
+
+<scenariodata name ="ascension mmorpg">
+			<data>4745</data>
+			<data>2106</data>
+			<data>157740</data>
+			<data>0</data>
+			<data>5</data>
+			<data>0</data>
+			<data>0</data>
+			<data>777</data>
+			<data>1409471</data>
+			<data>40310</data>
+			<data>136587837</data>
+			<data>1343</data>
+			<data>10058052</data>
+			<data>130754456</data>
+			<data>1</data>
+			<data>0</data>
+		</scenariodata>
+
+// yeeb hit
+
+<scenariodata name ="ascension mmorpg">
+			<data>10890478</data>
+			<data>1986</data>
+			<data>35750</data>
+			<data>0</data>
+			<data>19</data>
+			<data>0</data>
+			<data>0</data>
+			<data>4637</data>
+			<data>1453187</data>
+			<data>200051103</data>
+			<data>132024029</data>
+			<data>61353216</data>
+			<data>664332282</data>
+			<data>592134789</data>
+			<data>421085361</data>
+			<data>604397431</data>
+		</scenariodata>
