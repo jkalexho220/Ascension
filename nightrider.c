@@ -319,13 +319,7 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
-						xSetInt(db, xCharIndex, activatePlayerUnit(xGetInt(db, xUnitName), p, kbGetProtoUnitID("Hero Greek Achilles")));
-						xSetBool(dPlayerUnits,xIsHero,true);
-						xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
-						xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
-						if (xGetInt(dPlayerData, xPlayerUnit) == xGetInt(db, xUnitName)) {
-							xSetInt(dPlayerData, xPlayerIndex, xGetNewestPointer(dPlayerUnits));
-						}
+						xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
 					}
 				}
 				equipRelicsAgain(p);
@@ -398,15 +392,8 @@ void nightriderAlways(int eventID = -1) {
 					if (trUnitAlive() == false) {
 						removeNightrider(p);
 					} else {
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
-						xUnitSelect(dPlayerUnits, xStunSFX);
-						trUnitDestroy();
-						xUnitSelect(dPlayerUnits, xPoisonSFX);
-						trUnitDestroy();
-						xUnitSelect(dPlayerUnits, xSilenceSFX);
-						trUnitDestroy();
-						removePlayerUnit();
+						trMutateSelected(kbGetProtoUnitID("Victory Marker"));
+						xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
 					}
 				}
 				

@@ -76,7 +76,7 @@ void spAscendClass(int class = -1) {
 		trSetCivilizationNameOverride(1, "Level " + (1+xGetInt(dPlayerData, xPlayerLevel)));
 		if (xGetInt(dClass, xClassLevel) >= 5) {
 			if (xGetInt(dClass, xClassLevel, ALCHEMIST) == 0) {
-				xSetInt(dClass, xClassLevel, ALCHEMIST);
+				xSetInt(dClass, xClassLevel, 1, ALCHEMIST);
 				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, ALCHEMIST)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), ALCHEMIST);
@@ -88,7 +88,7 @@ void spAscendClass(int class = -1) {
 		}
 		if (xGetInt(dClass, xClassLevel) >= 7) {
 			if (xGetInt(dClass, xClassLevel, STARSEER) == 0) {
-				xSetInt(dClass, xClassLevel, STARSEER);
+				xSetInt(dClass, xClassLevel, 1, STARSEER);
 				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, STARSEER)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), STARSEER);
@@ -100,7 +100,7 @@ void spAscendClass(int class = -1) {
 		}
 		if (xGetInt(dClass, xClassLevel) >= 9) {
 			if (xGetInt(dClass, xClassLevel, SAVIOR) == 0) {
-				xSetInt(dClass, xClassLevel, SAVIOR);
+				xSetInt(dClass, xClassLevel, 1, SAVIOR);
 				trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, SAVIOR)),1,5,1);
 				trQuestVarSet("newClasses", trQuestVarGet("newClasses") + 1);
 				trQuestVarSet("newClass"+1*trQuestVarGet("newClasses"), SAVIOR);

@@ -192,6 +192,11 @@ void sunbowAlways(int eventID = -1) {
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"searing", 0);
 				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelect(db, xSearingSFX);
+					trMutateSelected(kbGetProtoUnitID("Rocket"));
+				}
 			}
 		}
 	}

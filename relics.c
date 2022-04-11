@@ -697,7 +697,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		/* certain classes have special interactions with stats */
 		trEventFire(5000 + 12 * xGetInt(dPlayerData,xPlayerClass) + p);
 	}
-	zSetProtoUnitStat("Cinematic Block", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
+	zSetProtoUnitStat("Victory Marker", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
 	xSetFloat(dPlayerData,xPlayerSpellRange,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellRangeTrue)));
 	xSetFloat(dPlayerData,xPlayerSpellDamage,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDamageTrue)));
 	xSetFloat(dPlayerData,xPlayerSpellDuration,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDurationTrue)));

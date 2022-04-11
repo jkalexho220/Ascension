@@ -75,8 +75,9 @@ void gardenerAlways(int eventID = -1) {
 	
 	xSetPointer(dPlayerData, p);
 	if (xGetDatabaseCount(db) > 0) {
-		id = xDatabaseNext(db, true);
-		if (id == -1 || trUnitAlive() == false) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeGardener(p);
 		} else {
 			hit = CheckOnHit(p);

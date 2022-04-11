@@ -272,8 +272,9 @@ void blastmageAlways(int eventID = -1) {
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
 		dest = xGetVector(dPlayerData, xPlayerLurePos);
 		for(x=xGetDatabaseCount(db); >0) {
-			id = xDatabaseNext(db, true);
-			if (id == -1 || trUnitAlive() == false) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db, xUnitID);
+			if (trUnitAlive() == false) {
 				removeBlastmage(p);
 			} else {
 				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);

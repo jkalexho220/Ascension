@@ -1835,7 +1835,7 @@ void enemiesAlways() {
 		xDatabaseNext(dAmbushRooms);
 		pos = xGetVector(dAmbushRooms,xAmbushRoomPos);
 		for(p=1; < ENEMY_PLAYER) {
-			if (unitDistanceToVector(xGetInt(dPlayerData,xUnitName,p), pos) < 100) {
+			if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), pos) < 100) {
 				trQuestVarSetFromRand("rand", 1, trQuestVarGet("enemyProtoCount"),true);
 				protoName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand"));
 				trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
@@ -1844,7 +1844,7 @@ void enemiesAlways() {
 				float cSin = 0.0 - xsSin(angle);
 				float cCos = xsCos(angle);
 				float heading = 0;
-				dir = xsVectorSet(0, 0, -1);
+				dir = xsVectorSet(0, 0, 1);
 				for(x=trQuestVarGet("count"); >0) {
 					trQuestVarSetFromRand("dist", 6, 18, true);
 					

@@ -104,9 +104,9 @@ highFrequency
 				
 				trVectorQuestVarSet("bossRoomUpper", xsVectorSet(60,0,60));
 				if (trQuestVarGet("mapType") == MAP_OPEN) {
-					trVectorQuestVarSet("bossRoomLower", xsVectorSet(10, 0, 20));
+					trVectorQuestVarSet("bossRoomLower", xsVectorSet(10, 0, 10));
 				} else {
-					trVectorQuestVarSet("bossRoomLower", xsVectorSet(20, 0, 10));
+					trVectorQuestVarSet("bossRoomLower", xsVectorSet(20, 0, 20));
 				}
 				
 				trQuestVarSet("yeebNextInvulnerabilityPhase", 30);
@@ -193,15 +193,18 @@ rule enter_boss_room
 inactive
 minInterval 2
 {
+	int count = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		trUnitSelectClear();
 		vector pos = trVectorQuestVarGet("bossRoomEntrance");
-		if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit), pos) < trQuestVarGet("bossEntranceRadius")) {
+		if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), pos) < trQuestVarGet("bossEntranceRadius")) {
 			if (trQuestVarGet("p"+p+"enteredBossRoom") == 0) {
 				trQuestVarSet("p"+p+"enteredBossRoom", 1);
 				trQuestVarSet("playersInBossRoom", 1 + trQuestVarGet("playersInBossRoom"));
 				trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has entered the boss room!");
-				trChatSend(0, "All players must be present to start the boss!");
+				trChatSend(0, "All living players must be present to start the boss!");
+				count = trQuestVarGet("activePlayerCount") - trQuestVarGet("deadPlayerCount");
+				trChatSend(0, "Players: (" + 1*trQuestVarGet("playersInBossRoom") + "/" + count + ")");
 			}
 		} else if (trQuestVarGet("p"+p+"enteredBossRoom") == 1) {
 			trQuestVarSet("p"+p+"enteredBossRoom", 0);
@@ -1056,6 +1059,7 @@ highFrequency
 					bossNext = trTimeMS();
 					trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, 12, true);
 					trQuestVarSetFromRand("bossCount", ENEMY_PLAYER, bossCount, true);
+					bossCount = trQuestVarGet("bossCount");
 				}
 				trCounterAbort("bosshealth");
 				trCounterAddTime("bosshealth",-1,-9999,
@@ -1072,7 +1076,7 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelect(""+bossUnit, true);
 					trMutateSelected(kbGetProtoUnitID("Tamarisk Tree"));
-					if (bossCount == 0) {
+					if (bossCount <= 0) {
 						bossCooldown(7, 12);
 					}
 				}
@@ -1683,9 +1687,8 @@ highFrequency
 				trOverlayText("Escaped Amalgam", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
 				
-				dChimeraClouds = initGenericProj("chimeraClouds",kbGetProtoUnitID("Lampades Blood"),2,10.0,4.5,1.0,ENEMY_PLAYER);
+				dChimeraClouds = initGenericProj("chimeraClouds",kbGetProtoUnitID("Lampades Blood"),2,10.0,4.5,1.0,ENEMY_PLAYER,true);
 				xChimeraCloudType = xInitAddInt(dChimeraClouds, "type");
-				xInitAddVector(dChimeraClouds, "prev");
 			}
 			case 1:
 			{
@@ -2837,7 +2840,7 @@ highFrequency
 				spyEffect(1*trQuestVarGet("yeebaagooon"),
 					kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS,bossInts,yeebShieldSFX));
 				
-				pos = xsVectorSet(trQuestVarGet("bossRoomSize"),0,trQuestVarGet("bossRoomSize"));
+				pos = xsVectorSet(2*trQuestVarGet("bossRoomSize"),0,2*trQuestVarGet("bossRoomSize"));
 				trVectorQuestVarSet("bossRoomUpper", trVectorQuestVarGet("bossRoomCenter") + pos);
 				trVectorQuestVarSet("bossRoomLower", trVectorQuestVarGet("bossRoomCenter") - pos);
 				
@@ -3468,6 +3471,9 @@ highFrequency
 						trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 24, -0.53);
 						trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 25, -0.53);
 						trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 26, -0.53);
+						trUnitSelectClear();
+						trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,yeebShieldSFX),true);
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 					}
 				}
 				if (trTimeMS() > bossNext) {
@@ -3753,7 +3759,7 @@ highFrequency
 						trUnitHighlight(0.2, false);
 						damagePlayerUnit(150, 1*trQuestVarGet("zappyIndex"));
 						p = trQuestVarGet("zappyTarget");
-						action = xGetInt(dPlayerData, xPlayerClass);
+						action = xGetInt(dPlayerData, xPlayerClass, p);
 						trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, action)));
 						trQuestVarSetFromRand("sound", 1, 5, true);
 						trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");

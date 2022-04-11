@@ -504,7 +504,7 @@ highFrequency
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
 	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
 	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
-	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
+	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 4);
 	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
 	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
 	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
@@ -600,7 +600,7 @@ highFrequency
 		zInitProtoUnitStat("Meteorite",p,1,100);
 		trModifyProtounit("Minion", p, 8, -999);
 		trModifyProtounit("Arkantos God Out", p, 8, 1);
-		zInitProtoUnitStat("Cinematic Block", p, 0, 300);
+		zInitProtoUnitStat("Victory Marker", p, 0, 300);
 		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
 		
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
@@ -778,6 +778,7 @@ highFrequency
 		if (xGetInt(dPlayerData,xPlayerProgress,1) <= 0) {
 			trQuestVarSet("stage", 1);
 			xsEnableRule("choose_stage_02");
+			xsEnableRule("delayed_modify");
 		} else {
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
 			xInitAddInt(dStageChoices,"name");

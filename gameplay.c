@@ -327,12 +327,11 @@ void relicTransporterGuy(int p = 0) {
 	int db = getWarehouseDB(p);
 	if (xGetDatabaseCount(db) > 0) {
 		xDatabaseNext(db);
-		id = xGetInt(db, xUnitID);
-		trUnitSelectClear();
-		trUnitSelectByID(id);
+		xUnitSelect(db, xUnitName);
 		if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
 			if (xGetInt(db, xRelicType) < KEY_RELICS ||
 				trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
+				id = kbGetBlockID(""+xGetInt(db, xUnitName));
 				if (kbGetUnitBaseTypeID(id) == relicProto(xGetInt(db, xRelicType))) {
 					trUnitChangeProtoUnit("Relic");
 					xAddDatabaseBlock(dFreeRelics, true);
@@ -588,6 +587,9 @@ highFrequency
 	if (xGetDatabaseCount(dPlayerUnits) > 0) {
 		xDatabaseNext(dPlayerUnits);
 		xUnitSelectByID(dPlayerUnits, xUnitID);
+		if (trCurrentPlayer() == 1) {
+			trUnitHighlight(0.1, false);
+		}
 		if (trUnitAlive() == false) {
 			removePlayerUnit();
 		} else {
@@ -623,6 +625,7 @@ highFrequency
 	if (trQuestVarGet("protectionCount") > 0) {
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			xDatabaseNext(dPlayerUnits);
+			id = xGetInt(dPlayerUnits, xUnitID);
 			xUnitSelectByID(dPlayerUnits, xUnitID);
 			trUnitHighlight(0.2, false);
 			xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner));
@@ -909,12 +912,14 @@ highFrequency
 				}
 				if (trQuestVarGet("playersReviving") == 1) {
 					if (count > 0) {
-						xSetInt(dPlayerData, xPlayerDead, 1*xsMax(0, xGetInt(dPlayerData, xPlayerDead) - count));
+						xSetInt(dPlayerData, xPlayerDead, 1*xsMax(0, xGetInt(dPlayerData, xPlayerDead) - 1));
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
 					}
 					if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
 						revivePlayer(p);
+						xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+						xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
 					}
 				}
 			}

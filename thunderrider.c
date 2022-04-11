@@ -28,6 +28,11 @@ void removeThunderRider(int p = 0) {
 	if (xSetPointer(balls, xGetInt(db, xThunderRiderIndex))) {
 		xFreeDatabaseBlock(balls);
 	}
+	if (trQuestVarGet("p"+p+"rideLightning") == 1) {
+		if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+			debugLog("Unable to restore database block for player " + p);
+		}
+	}
 	removePlayerSpecific(p);
 }
 
@@ -363,7 +368,8 @@ void thunderRiderAlways(int eventID = -1) {
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * xGetFloat(dPlayerData, xPlayerSpeed));
 				for(x=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
-					if (id == -1 || trUnitAlive() == false) {
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
 						removeThunderRider(p);
 					} else {
 						prev = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
@@ -389,7 +395,7 @@ void thunderRiderAlways(int eventID = -1) {
 						trDamageUnitPercent(100);
 						
 						xUnitSelectByID(db, xUnitID);
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+						trMutateSelected(kbGetProtoUnitID("Victory Marker"));
 						
 						if (xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex))) {
 							xUnitSelect(dPlayerUnits, xStunSFX);
@@ -409,7 +415,7 @@ void thunderRiderAlways(int eventID = -1) {
 									}
 								}
 							}
-							xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex), false);
+							xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex));
 						}
 					}
 				}

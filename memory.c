@@ -499,7 +499,7 @@ bool xFreeDatabaseBlock(int id = 0, int index = -1) {
 }
 
 // Detaches the block and saves it in the cache.
-bool xDetachDatabaseBlock(int id = 0, int index = -1, bool dirty = true) {
+bool xDetachDatabaseBlock(int id = 0, int index = -1) {
 	bool success = false;
 	if (index == -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
@@ -511,7 +511,7 @@ bool xDetachDatabaseBlock(int id = 0, int index = -1, bool dirty = true) {
 		aiPlanSetUserVariableInt(id,xNextBlock,before,after); // next block of before is after
 		aiPlanSetUserVariableInt(id,xPrevBlock,after,before); // prev block of after is before
 		
-		aiPlanSetUserVariableBool(id,xDirtyBit,index,dirty);
+		aiPlanSetUserVariableBool(id,xDirtyBit,index,false);
 		
 		/* set mPointer to my previous block and decrement count */
 		if (index == aiPlanGetUserVariableInt(id,xMetadata,mPointer)) {
@@ -551,50 +551,57 @@ bool xRestoreDatabaseBlock(int id = 0, int index = -1) {
 	if (index == -1) {
 		index = aiPlanGetUserVariableInt(id,xMetadata,mCacheHead);
 	}
-	/* connect next with prev */
-	int after = aiPlanGetUserVariableInt(id,xNextBlock,index);
-	int before = aiPlanGetUserVariableInt(id,xPrevBlock,index);
-	aiPlanSetUserVariableInt(id,xNextBlock,before,after); // next block of before is after
-	aiPlanSetUserVariableInt(id,xPrevBlock,after,before); // prev block of after is before
-	
-	aiPlanSetUserVariableBool(id,xDirtyBit,index,true);
-	
-	/* set mCacheHead to my previous block and decrement count */
-	if (index == aiPlanGetUserVariableInt(id,xMetadata,mCacheHead)) {
-		aiPlanSetUserVariableInt(id,xMetadata,mCacheHead,aiPlanGetUserVariableInt(id,xPrevBlock,index));
-	}
-	
-	/* insert myself into the detach cache */
-	if (aiPlanGetUserVariableInt(id,xMetadata,mCount) == 0) {
-		/*
-		If it's the only thing in the db, point it to itself and also set the database pointer to the new thing
-		*/
-		aiPlanSetUserVariableInt(id,xNextBlock,index,index);
-		aiPlanSetUserVariableInt(id,xPrevBlock,index,index);
-		aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
-	} else {
-		/*
-		otherwise, slide in between two links in the list at mPointer
-		*/
-		before = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
-		after = aiPlanGetUserVariableInt(id,xNextBlock,before);
+	if (aiPlanGetUserVariableBool(id,xDirtyBit,index) == false) {
+		/* connect next with prev */
+		int after = aiPlanGetUserVariableInt(id,xNextBlock,index);
+		int before = aiPlanGetUserVariableInt(id,xPrevBlock,index);
+		aiPlanSetUserVariableInt(id,xNextBlock,before,after); // next block of before is after
+		aiPlanSetUserVariableInt(id,xPrevBlock,after,before); // prev block of after is before
 		
-		aiPlanSetUserVariableInt(id,xNextBlock,index,after); // next of me is after
-		aiPlanSetUserVariableInt(id,xPrevBlock,index,before); // prev of me is before
-		aiPlanSetUserVariableInt(id,xNextBlock,before,index); // next of before is me
-		aiPlanSetUserVariableInt(id,xPrevBlock,after,index); // prev of after is me
+		aiPlanSetUserVariableBool(id,xDirtyBit,index,true);
+		
+		/* set mCacheHead to my previous block and decrement count */
+		if (index == aiPlanGetUserVariableInt(id,xMetadata,mCacheHead)) {
+			aiPlanSetUserVariableInt(id,xMetadata,mCacheHead,aiPlanGetUserVariableInt(id,xPrevBlock,index));
+		}
+		
+		/* insert myself into the detach cache */
+		if (aiPlanGetUserVariableInt(id,xMetadata,mCount) == 0) {
+			/*
+			If it's the only thing in the db, point it to itself and also set the database pointer to the new thing
+			*/
+			aiPlanSetUserVariableInt(id,xNextBlock,index,index);
+			aiPlanSetUserVariableInt(id,xPrevBlock,index,index);
+			aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
+		} else {
+			/*
+			otherwise, slide in between two links in the list at mPointer
+			*/
+			before = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
+			after = aiPlanGetUserVariableInt(id,xNextBlock,before);
+			
+			aiPlanSetUserVariableInt(id,xNextBlock,index,after); // next of me is after
+			aiPlanSetUserVariableInt(id,xPrevBlock,index,before); // prev of me is before
+			aiPlanSetUserVariableInt(id,xNextBlock,before,index); // next of before is me
+			aiPlanSetUserVariableInt(id,xPrevBlock,after,index); // prev of after is me
+		}
+		
+		aiPlanSetUserVariableInt(id,xMetadata,mCount, aiPlanGetUserVariableInt(id,xMetadata,mCount) + 1);
+		aiPlanSetUserVariableInt(id,xMetadata,mCacheCount, aiPlanGetUserVariableInt(id,xMetadata,mCacheCount) - 1);
+		success = true;
 	}
-	
-	aiPlanSetUserVariableInt(id,xMetadata,mCount, aiPlanGetUserVariableInt(id,xMetadata,mCount) + 1);
-	aiPlanSetUserVariableInt(id,xMetadata,mCacheCount, aiPlanGetUserVariableInt(id,xMetadata,mCacheCount) - 1);
-	success = true;
 	
 	return(success);
 }
 
 bool xRestoreCache(int id = 0) {
 	bool success = false;
-	if (aiPlanGetUserVariableInt(id,xMetadata,mCacheHead) > 0) {
+	if (aiPlanGetUserVariableInt(id,xMetadata,mCacheCount) > 0) {
+		int pointer = aiPlanGetUserVariableInt(id,xMetadata,mCacheHead);
+		for(i=aiPlanGetUserVariableInt(id,xMetadata,mCacheCount); >0) {
+			aiPlanSetUserVariableBool(id,xDirtyBit,pointer,true);
+			pointer = aiPlanGetUserVariableInt(id,xNextBlock,pointer);
+		}
 		/* insert the ends of the chain into the database */
 		if (aiPlanGetUserVariableInt(id,xMetadata,mCount) == 0) {
 			/*
@@ -650,6 +657,10 @@ void xClearDatabase(int id = 0) {
 	int pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 	aiPlanSetUserVariableInt(id,xMetadata,mNextFree,aiPlanGetUserVariableInt(id,xNextBlock,pointer));
 	aiPlanSetUserVariableInt(id,xNextBlock,pointer,next);
+
+	for(i=0; < aiPlanGetNumberUserVariableValues(id,xDirtyBit)) {
+		aiPlanSetUserVariableBool(id,xDirtyBit,i,false);
+	}
 	
 	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
 	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);

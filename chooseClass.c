@@ -208,7 +208,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 3:
 				{
-					msg = "Special Attack (5 attacks): Your attack chains to nearby enemies, damaging all of them.";
+					msg = "Special Attack (4 attacks): Your attack chains to nearby enemies, damaging all of them.";
 				}
 				case 4:
 				{

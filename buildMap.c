@@ -104,14 +104,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 							xSetVector(dLaserRooms,xLaserRoomXBottom + a,
 								xsVectorSet(2 * x0 + 4 * a + 2, 0, 2 * z0));
 							xSetVector(dLaserRooms,xLaserRoomXTop + a,
-								xsVectorSet(2 * x1 + 4 * a + 4, 0, 2 * z1));
+								xsVectorSet(2 * x0 + 4 * a + 4, 0, 2 * z1));
 							/* x lasers */
 							trArmyDispatch("1,0","Dwarf",1,2*x0+1,0,2*z0+4*a+3,270,false);
 							trArmyDispatch("1,0","Dwarf",1,2*x1-1,0,2*z0+4*a+3,90,false);
 							xSetVector(dLaserRooms,xLaserRoomZBottom + a,
 								xsVectorSet(2 * x0, 0, 2 * z0 + 4 * a + 2));
 							xSetVector(dLaserRooms,xLaserRoomZTop + a,
-								xsVectorSet(2 * x1, 0, 2 * z1 + 4 * a + 4));
+								xsVectorSet(2 * x1, 0, 2 * z0 + 4 * a + 4));
 						}
 						trArmySelect("1,0");
 						trUnitSetStance("Passive");
@@ -213,6 +213,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetInt(dAmbushRooms,xRoomNumber,room);
 			xSetInt(dAmbushRooms,xAmbushRoomType,1*trQuestVarGet("type"));
 			xSetVector(dAmbushRooms,xAmbushRoomPos, xsVectorSet(x * 70 + 40, 0, 70 * z + 40));
+			debugLog("ambush room: " + room);
 			
 			trQuestVarSetFromRand("spawnRelic", 0, 1, false);
 			if (trQuestVarGet("spawnRelic") < 0.5) {
@@ -538,6 +539,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Halberdier"));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+FETCH_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Hypaspist"));
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("Kastor"));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Kastor"));

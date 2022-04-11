@@ -93,6 +93,7 @@ void throneShieldAlways(int eventID = -1) {
 				xsSetContextPlayer(target);
 				amt = kbUnitGetCurrentHitpoints(id);
 				xsSetContextPlayer(0);
+				xSetFloat(dPlayerUnits, xCurrentHealth, amt, xGetInt(dPlayerData, xPlayerIndex, target));
 				trSoundPlayFN("militarycreate.wav","1",-1,"","");
 				trSoundPlayFN("herocreation.wav","1",-1,"","");
 				if (xGetInt(dPlayerData, xPlayerTether) <= 0) {
@@ -225,7 +226,7 @@ void throneShieldAlways(int eventID = -1) {
 					xDatabaseNext(db);
 					if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
 						if (trCurrentPlayer() == p) {
-							trChatSend(0,"<color=1,1,1>Shield of Light finished. Total damage: " + 1*xGetFloat(dPlayerData, xThroneShieldAbsorbed));
+							trChatSend(0,"<color=1,1,1>Shield of Light finished. Total damage: " + 1*xGetFloat(db, xThroneShieldAbsorbed));
 						}
 					}
 					xSetBool(db, xThroneShieldLaser, true);

@@ -133,8 +133,9 @@ vector randomNearEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
 vector randomNearEdgeOfRoom(int room = 0) {
 	trQuestVarSetFromRand("rand", 1, 2, true);
 	int i = trQuestVarGet("rand");
-	vector ans = randomNearEdge(1*trQuestVarGet("room"+room+"bottom"+i+"x"),1*trQuestVarGet("room"+room+"bottom"+i+"z"),
-		1*trQuestVarGet("room"+room+"top"+i+"x"),1*trQuestVarGet("room"+room+"top"+i+"z"));
+	vector bottom = trVectorQuestVarGet("room"+room+"bottom"+i);
+	vector top = trVectorQuestVarGet("room"+room+"top"+i);
+	vector ans = randomNearEdge(xsVectorGetX(bottom),xsVectorGetZ(bottom),xsVectorGetX(top),xsVectorGetZ(top));
 	return(ans);
 }
 

@@ -347,6 +347,7 @@ void fireknightAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(dest),0,xsVectorGetZ(dest),0,true);
 					trArmySelect(""+p+",0");
 					trUnitChangeProtoUnit("Ball of Fire Impact");
+					dir = rotationMatrix(dir, mCos, mSin);
 				}
 			}
 			amt = xGetFloat(infernos, xInfernoDamage) * 0.3;

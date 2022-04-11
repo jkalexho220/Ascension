@@ -228,7 +228,6 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 }
 
 void nightriderHarvest(vector pos = vector(0,0,0)) {
-	int index = xGetPointer(dPlayerUnits);
 	for(p=1; < ENEMY_PLAYER) {
 		xSetPointer(dPlayerData,p);
 		if ((xGetInt(dPlayerData,xPlayerClass) == NIGHTRIDER) &&
@@ -236,13 +235,12 @@ void nightriderHarvest(vector pos = vector(0,0,0)) {
 			if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit), pos) < 144) {
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
-				xSetPointer(dPlayerUnits, xGetInt(dPlayerData,xPlayerIndex));
-				healUnit(p, 0.05 * xGetFloat(dPlayerData,xPlayerHealth) * xGetFloat(dPlayerData,xPlayerSpellDamage));
+				healUnit(p, 0.05 * xGetFloat(dPlayerData,xPlayerHealth) * xGetFloat(dPlayerData,xPlayerSpellDamage),
+					xGetInt(dPlayerData,xPlayerIndex));
 				gainFavor(p, 1);
 			}
 		}
 	}
-	xSetPointer(dPlayerUnits,index);
 }
 
 void removeEnemy() {
@@ -1264,6 +1262,7 @@ highFrequency
 	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");
 	
 	dAmbushRooms = xInitDatabase("ambushRooms");
+	xAmbushRoomType = xInitAddInt(dAmbushRooms, "type");
 	xAmbushRoomPos = xInitAddVector(dAmbushRooms,"pos");
 	
 }
@@ -1444,6 +1443,7 @@ void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetInt(dPlayerData,xPlayerUnit,trGetNextUnitScenarioNameNumber(),p);
 	spawnPlayerClone(p, vdb);
 	xSetInt(dPlayerData,xPlayerIndex,xGetNewestPointer(dPlayerUnits),p);
+	xSetInt(dPlayerData,xPlayerTether,-1,p);
 	if (trCurrentPlayer() == p) {
 		int class = xGetInt(dPlayerData,xPlayerClass,p);
 		string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));

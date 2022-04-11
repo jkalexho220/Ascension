@@ -98,7 +98,7 @@ highFrequency
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
-							pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits,xUnitName));
+							pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits,xUnitName), true);
 							if (vectorInRectangle(pos, xGetVector(dLaserRooms,xLaserRoomXBottom + laser),
 									xGetVector(dLaserRooms,xLaserRoomXTop + laser))) {
 								damagePlayerUnit(300);

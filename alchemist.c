@@ -246,7 +246,7 @@ void alchemistAlways(int eventID = -1) {
 			xSetInt(duplicates, xUnitName, trGetNextUnitScenarioNameNumber());
 			
 			xSetInt(duplicates, xDuplicateIndex, spawnPlayerClone(xGetInt(dPlayerCharacters, xPlayerOwner), pos));
-			xSetFloat(duplicates, xDuplicateDecayNext, trTime());
+			xSetInt(duplicates, xDuplicateDecayNext, trTime());
 			trSoundPlayFN("changeunit.wav","1",-1,"","");
 			trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
 			if (trCurrentPlayer() == xGetInt(dPlayerCharacters, xPlayerOwner)) {
