@@ -1651,12 +1651,12 @@ void specialUnitsAlways() {
 			dir = xGetVector(dYeebLightningBalls,xProjDir);
 			start = xGetVector(dYeebLightningBalls,xProjPrev);
 			pos = kbGetBlockPosition(""+xGetInt(dYeebLightningBalls,xUnitName),true);
-			end = xsVectorSet(xsVectorGetX(start) + 3.0 * xsVectorGetX(dir),0,xsVectorGetZ(start) + 3.0 * xsVectorGetZ(dir));
+			end = start + (dir * 3.0);
 			loc = vectorToGrid(end);
 			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 				if (xGetInt(dYeebLightningBalls, xProjDist) > 0) {
 					xSetInt(dYeebLightningBalls, xProjDist, xGetInt(dYeebLightningBalls,xProjDist) - 1);
-					dir = getBounceDir(start,loc,dir);
+					dir = getBounceDir(end,loc,dir);
 					xSetInt(dYeebLightningBalls, xProjYeehaw, 99);
 					xSetVector(dYeebLightningBalls,xProjDir,dir);
 					trQuestVarSetFromRand("sound", 1, 2, true);
@@ -1683,7 +1683,7 @@ void specialUnitsAlways() {
 							}
 						}
 					}
-					xSetVector(dYeebLightningBalls,xProjPrev,start);
+					xSetVector(dYeebLightningBalls,xProjPrev,pos);
 				}
 			}
 		}

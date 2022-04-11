@@ -80,7 +80,9 @@ void rideLightningOff(int p = 0) {
 		xUnitSelect(balls, xUnitName);
 		trUnitDestroy();
 		xUnitSelectByID(db, xUnitID);
-		xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+		if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+			debugLog("Thunderstepper " + p + ": Unable to restore database block");
+		}
 		healUnit(p, trQuestVarGet("p"+p+"rideLightningHeal"));
 	}
 	

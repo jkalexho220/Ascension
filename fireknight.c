@@ -287,6 +287,7 @@ void fireknightAlways(int eventID = -1) {
 			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
+				xUnitSelectByID(db, xUnitID);
 				damagePlayerUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage), xGetInt(db, xCharIndex));
 				
 				next = trGetNextUnitScenarioNameNumber();

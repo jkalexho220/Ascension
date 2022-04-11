@@ -847,7 +847,7 @@ highFrequency
 			checkGodPowers(p);
 			/* no gold cheating */
 			checkResourceCheating(p);
-			if (xGetInt(dPlayerData, xPlayerDead) == 0) {
+			if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
 				xUnitSelect(dPlayerData, xPlayerUnit);
 				if (Multiplayer) {
 					if (trUnitIsSelected() && trCurrentPlayer() != p) {
@@ -912,7 +912,7 @@ highFrequency
 				}
 				if (trQuestVarGet("playersReviving") == 1) {
 					if (count > 0) {
-						xSetInt(dPlayerData, xPlayerDead, 1*xsMax(0, xGetInt(dPlayerData, xPlayerDead) - 1));
+						xSetInt(dPlayerData, xPlayerDead, xGetInt(dPlayerData, xPlayerDead) - 1);
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
 					}

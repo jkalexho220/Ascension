@@ -618,7 +618,7 @@ highFrequency
 			xsEnableRule("singleplayer_unlocks");
 			trEventSetHandler(6001, "answerQuestion");
 			trEventSetHandler(6002, "answerQuestion");
-			for(a=4 * (1 + xsFloor(xGetInt(dPlayerData, xPlayerProgress) / 2)); >2) {
+			for(a=4 * (1 + xsFloor(0.5 * xGetInt(dPlayerData, xPlayerProgress))); >2) {
 				classNewUnlock(a);
 			}
 			if (boons && (trQuestVarGet("boonUnlocked0") == 0)) {
@@ -1358,11 +1358,14 @@ highFrequency
 			xDatabaseNext(dSlotRelics);
 			xUnitSelect(dSlotRelics, xUnitName);
 			trMutateSelected(relicProto(1*trQuestVarGet("type")));
+			trDamageUnitPercent(-100);
 			if (trTimeMS() > trQuestVarGet("quantumSlotMachineNext")) {
 				trQuestVarSet("quantumSlotMachineNext", trTimeMS() + 1000);
 				trSoundPlayFN("plentyvaultstolen.wav","1",-1,"","");
 				trSoundPlayFN("skypassagein.wav","1",-1,"","");
 				trUnitChangeProtoUnit(kbGetProtoUnitName(relicProto(1*trQuestVarGet("quantumRelic"))));
+				xUnitSelect(dSlotRelics, xUnitName);
+				trDamageUnitPercent(-100);
 				xAddDatabaseBlock(dSlotUnits, true);
 				xSetInt(dSlotUnits, xUnitName, xGetInt(dSlotRelics, xUnitName));
 				xFreeDatabaseBlock(dSlotRelics);

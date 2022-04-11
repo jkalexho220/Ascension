@@ -209,6 +209,7 @@ minInterval 2
 		} else if (trQuestVarGet("p"+p+"enteredBossRoom") == 1) {
 			trQuestVarSet("p"+p+"enteredBossRoom", 0);
 			trQuestVarSet("playersInBossRoom", trQuestVarGet("playersInBossRoom") - 1);
+			trChatSend(0, "<color=1,1,1>{Playername("+p+")} has left the boss room!");
 		}
 	}
 	
@@ -3700,6 +3701,7 @@ highFrequency
 								trUnitChangeProtoUnit("Transport Ship Greek");
 								trUnitSelectClear();
 								trUnitSelectByQV("yeebBird", true);
+								trMutateSelected(kbGetProtoUnitID("Dwarf"));
 								trImmediateUnitGarrison(""+1*trQuestVarGet("boat"));
 								trUnitChangeProtoUnit("Dwarf");
 								trUnitSelectClear();
@@ -3876,10 +3878,10 @@ highFrequency
 				pos = trVectorQuestVarGet("yeebPos");
 				trQuestVarSet("yeebOverNext", trTime() + 6);
 				trQuestVarSet("yeebBird", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("1,0","Stymphalian Bird",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmyDispatch("0,0","Stymphalian Bird",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trUnitSelectClear();
 				trUnitSelectByQV("yeebBird", true);
-				trTechGodPower(ENEMY_PLAYER, "spy", 1);
+				trTechGodPower(ENEMY_PLAYER, "spy", 2);
 				trTechInvokeGodPower(ENEMY_PLAYER,"spy",vector(1,1,1),vector(1,1,1));
 				x = modularCounterNext("spyFind");
 				aiPlanSetUserVariableInt(ARRAYS,spyProto,x,kbGetProtoUnitID("Pharaoh of Osiris"));
@@ -3887,16 +3889,27 @@ highFrequency
 				aiPlanSetUserVariableBool(ARRAYS,spyActive,x,true);
 				aiPlanSetUserVariableVector(ARRAYS,spyDest,x,xsVectorSet(ARRAYS,bossInts,1));
 				aiPlanSetUserVariableVector(ARRAYS,spyScale,x,vector(1,1,1));
+				// thunderclouds
+				trTechInvokeGodPower(ENEMY_PLAYER,"spy",vector(1,1,1),vector(1,1,1));
+				x = modularCounterNext("spyFind");
+				aiPlanSetUserVariableInt(ARRAYS,spyProto,x,kbGetProtoUnitID("Cinematic Block"));
+				aiPlanSetUserVariableInt(ARRAYS,spyUnit,x,1*trQuestVarGet("yeebBird"));
+				aiPlanSetUserVariableBool(ARRAYS,spyActive,x,true);
+				aiPlanSetUserVariableVector(ARRAYS,spyDest,x,xsVectorSet(ARRAYS,bossInts,2));
+				aiPlanSetUserVariableVector(ARRAYS,spyScale,x,vector(1,1,1));
 			}
 			case 4:
 			{
 				trQuestVarSet("yeebBirdID", kbGetBlockID(""+1*trQuestVarGet("yeebBird")));
 				trUnitSelectClear();
+				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,2), true);
+				trUnitChangeProtoUnit("Lightning Cloud");
+				trQuestVarSet("yeebaagooon", aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
+				trUnitSelectClear();
 				trUnitSelectByQV("yeebaagooon", true);
 				trUnitOverrideAnimation(33,0,true,false,-1);
 				trUnitSelectClear();
 				trUnitSelectByQV("yeebBird", true);
-				trUnitConvert(0);
 				trSetSelectedScale(0,0,0);
 				trSetUnitIdleProcessing(true);
 				trLetterBox(false);
@@ -3904,10 +3917,9 @@ highFrequency
 				trSoundPlayFN("herorevived.wav","1",-1,"","");
 				uiLookAtUnitByName(""+1*trQuestVarGet("yeebBird"));
 				trQuestVarSet("yeebOverNext", trTime() + 3);
+
+
 				trChatSendSpoofed(ENEMY_PLAYER, "Yeebaagooon: Now, die!");
-			}
-			case 5:
-			{
 				bossUnit = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 				trArmySelect("1,0");
@@ -3920,15 +3932,24 @@ highFrequency
 				trQuestVarSet("yeebLightningNext", trTimeMS());
 				if (boss == 1) {
 					trQuestVarSet("yeebBossFight", 0);
-					trQuestVarSet("boss", 1000);
-					trMessageSetText("Reach the boss room to escape. You will get to keep the stolen relic.", 60);
+					boss = 1000;
 					trVectorQuestVarSet("yeebDestination", trVectorQuestVarGet("bossRoomCenter"));
 				} else {
-					trQuestVarSet("boss", 1001);
-					trMessageSetText("Return to the starting room to escape. You will get to keep the stolen relic.", 60);
+					boss = 1001;
 					trVectorQuestVarSet("yeebDestination", trVectorQuestVarGet("startPosition"));
+					trArmyDispatch("0,0","Gaia Forest effect",1,
+						trVectorQuestVarGetX("startPosition"),0,trVectorQuestVarGetZ("startPosition"),0,true);
 				}
 				trQuestVarSet("yeebLatestFeather", trGetNextUnitScenarioNameNumber() - 1);
+				
+			}
+			case 5:
+			{
+				if (boss == 1000) {
+					trMessageSetText("Reach the boss room to escape. You will get to keep the stolen relic.", 60);
+				} else {
+					trMessageSetText("Return to the starting room to escape. You will get to keep the stolen relic.", 60);
+				}
 				trMinimapFlare(trCurrentPlayer(), 60, trVectorQuestVarGet("yeebDestination"), true);
 				trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 				xsEnableRule("yeebaagooon_battle_2");
@@ -3989,7 +4010,7 @@ highFrequency
 	if (trTimeMS() > trQuestVarGet("yeebLightningNext")) {
 		pos = kbGetBlockPosition(""+1*trQuestVarGet("yeebaagooon"), true);
 		trQuestVarSet("yeebLightningNext",
-			trQuestVarGet("yeebLightningNext") + 2.0 * distanceBetweenVectors(pos, trVectorQuestVarGet("yeebDestination")));
+			trQuestVarGet("yeebLightningNext") + 2.0 * distanceBetweenVectors(pos, trVectorQuestVarGet("yeebDestination"), false));
 		trQuestVarSetFromRand("rand", 4, 20, false);
 		trVectorQuestVarSet("yeebDir", rotationMatrix(trVectorQuestVarGet("yeebDir"), -0.757323, 0.653041));
 		pos = vectorSnapToGrid(pos + (trVectorQuestVarGet("yeebDir") * trQuestVarGet("rand")));

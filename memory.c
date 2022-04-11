@@ -515,7 +515,7 @@ bool xDetachDatabaseBlock(int id = 0, int index = -1) {
 		
 		/* set mPointer to my previous block and decrement count */
 		if (index == aiPlanGetUserVariableInt(id,xMetadata,mPointer)) {
-			aiPlanSetUserVariableInt(id,xMetadata,mPointer,aiPlanGetUserVariableInt(id,xPrevBlock,index));
+			aiPlanSetUserVariableInt(id,xMetadata,mPointer,before);
 		}
 		
 		/* insert myself into the detach cache */

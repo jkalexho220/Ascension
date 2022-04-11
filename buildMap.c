@@ -185,7 +185,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("room"+room+"key", 0);
 		}
 	} else if (trQuestVarGet("room"+room+"key") > 0) {
-		debugLog("room was a special room.");
 		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
 		spawnRelicSpecific(xsVectorSet(70 * x + 36,0,70 * z + 36),1*trQuestVarGet("room"+room+"key"));
 		trQuestVarSet("room"+room+"key", 0);
@@ -213,7 +212,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetInt(dAmbushRooms,xRoomNumber,room);
 			xSetInt(dAmbushRooms,xAmbushRoomType,1*trQuestVarGet("type"));
 			xSetVector(dAmbushRooms,xAmbushRoomPos, xsVectorSet(x * 70 + 40, 0, 70 * z + 40));
-			debugLog("ambush room: " + room);
 			
 			trQuestVarSetFromRand("spawnRelic", 0, 1, false);
 			if (trQuestVarGet("spawnRelic") < 0.5) {
@@ -1078,8 +1076,9 @@ void buildEdge(int edge = 0, int type = 0) {
 				trQuestVarSetFromRand("rand", 1, 5, true);
 			}
 			if (trQuestVarGet("rand") == 5) {
-				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
+				trPaintTerrain(x0, z0, x1, z1, 0, 70, false);
 				paintEyecandy(x0, z0, x1, z1, "sparkles");
+				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
 			} else {
 				trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 				trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
@@ -1750,9 +1749,9 @@ highFrequency
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Cinematic Dead Bodies");
 				trQuestVarSet("sparklesDensity", 0.5);
-				trStringQuestVarSet("sparklesProto1", "Armor Glow Small");
-				trStringQuestVarSet("sparklesProto2", "Armor Glow Small");
-				trStringQuestVarSet("sparklesProto3", "Armor Glow Small");
+				trStringQuestVarSet("sparklesProto1", "Imperial Examination");
+				trStringQuestVarSet("sparklesProto2", "Imperial Examination");
+				trStringQuestVarSet("sparklesProto3", "Imperial Examination");
 				
 				trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
 				

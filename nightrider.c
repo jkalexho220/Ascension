@@ -319,7 +319,9 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
-						xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+						if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+							debugLog("Nightrider " + p + ": Unable to restore database block");
+						}
 					}
 				}
 				equipRelicsAgain(p);
