@@ -59,7 +59,7 @@ void noSpecials() {
 
 void processSilence(int p = 0) {
 	if (xGetBool(dPlayerData, xPlayerSilenced, p) && (xGetInt(dPlayerData, xPlayerDead, p) == 0)) {
-		if (xGetInt(dPlayerUnits, xSilenceStatus, xGetInt(dPlayerData, xPlayerIndex)) == 0) {
+		if (xGetInt(dPlayerUnits, xSilenceStatus, xGetInt(dPlayerData, xPlayerIndex, p)) == 0) {
 			xSetBool(dPlayerData, xPlayerSilenced, false, p);
 			if (xGetInt(dPlayerData, xPlayerWellCooldownStatus, p) == ABILITY_READY) {
 				trTechGodPower(p, "Underworld Passage", 1);
@@ -142,7 +142,7 @@ void checkResourceCheating(int p = 0) {
 	} else if (trPlayerResourceCount(p, "gold") < xGetInt(dPlayerData, xPlayerGold, p)) {
 		xSetInt(dPlayerData, xPlayerGold, trPlayerResourceCount(p, "gold"), p);
 	}
-	if (trPlayerResourceCount(p, "favor") > 1 + xGetFloat(dPlayerData, xPlayerFavor)) {
+	if (trPlayerResourceCount(p, "favor") > 1 + xGetFloat(dPlayerData, xPlayerFavor, p)) {
 		gainFavor(p, 0);
 		if (trCurrentPlayer() == p) {
 			trChatSendSpoofed(0, "Zenophobia: Nice try, buddy.");

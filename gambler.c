@@ -53,6 +53,7 @@ void removeGambler(int p = 0) {
 void gamblerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * GAMBLER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int action = 0;
 	int hit = 0;
@@ -685,6 +686,7 @@ void gamblerAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
+	pvpReattachPlayer();
 }
 
 void chooseGambler(int eventID = -1) {

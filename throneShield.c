@@ -32,6 +32,7 @@ void removeThroneShield(int p = 0) {
 void throneShieldAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * THRONESHIELD;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -376,6 +377,7 @@ void throneShieldAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseThroneShield(int eventID = -1) {

@@ -30,6 +30,7 @@ void removeMoonblade(int p = 0) {
 void moonbladeAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * MOONBLADE;
+	pvpDetachPlayer(p);
 	int db = getCharactersDB(p);
 	int moonbeams = trQuestVarGet("p"+p+"moonbeams");
 	xSetPointer(dPlayerData, p);
@@ -243,6 +244,7 @@ void moonbladeAlways(int eventID = -1) {
 	}
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseMoonblade(int eventID = -1) {

@@ -26,6 +26,7 @@ void removeSunbow(int p = 0) {
 void sunbowAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * SUNBOW;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -249,6 +250,7 @@ void sunbowAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseSunbow(int eventID = -1) {

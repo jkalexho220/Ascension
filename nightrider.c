@@ -68,6 +68,7 @@ void castDeathSentence(int p = 0) {
 void nightriderAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * NIGHTRIDER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -319,7 +320,15 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
-						if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+						if (PvP) {
+							xSetInt(db, xCharIndex,activatePlayerUnit(xGetInt(db, xUnitName),p,kbGetProtoUnitID("Hero Greek Achilles")));
+							xSetBool(dPlayerUnits, xIsHero, true);
+							xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist, p));
+							xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist, p));
+							if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+								xSetInt(dPlayerData, xPlayerIndex, xGetInt(db, xCharIndex));
+							}
+						} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
 							debugLog("Nightrider " + p + ": Unable to restore database block");
 						}
 					}
@@ -395,7 +404,14 @@ void nightriderAlways(int eventID = -1) {
 						removeNightrider(p);
 					} else {
 						trMutateSelected(kbGetProtoUnitID("Victory Marker"));
-						xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+						if (PvP) {
+							xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+							xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+							xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+							xFreeDatabaseBlock(dPlayerUnits);
+						} else {
+							xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+						}
 					}
 				}
 				
@@ -415,6 +431,7 @@ void nightriderAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseNightrider(int eventID = -1) {

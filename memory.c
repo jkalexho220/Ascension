@@ -412,10 +412,6 @@ bool xSetPointer(int id = 0, int index = 0) {
 	return(success);
 }
 
-void xSetPointerForce(int id = 0, int index = 0) {
-	aiPlanSetUserVariableInt(id,xMetadata,mPointer,index);
-}
-
 int xAddDatabaseBlock(int id = 0, bool setPointer = false) {
 	int next = aiPlanGetUserVariableInt(id,xMetadata,mNextFree);
 	if (next == 0) {
@@ -565,7 +561,7 @@ bool xRestoreDatabaseBlock(int id = 0, int index = -1) {
 			aiPlanSetUserVariableInt(id,xMetadata,mCacheHead,aiPlanGetUserVariableInt(id,xPrevBlock,index));
 		}
 		
-		/* insert myself into the detach cache */
+		/* insert myself into the database */
 		if (aiPlanGetUserVariableInt(id,xMetadata,mCount) == 0) {
 			/*
 			If it's the only thing in the db, point it to itself and also set the database pointer to the new thing
@@ -607,7 +603,7 @@ bool xRestoreCache(int id = 0) {
 			/*
 			If it's the only thing in the db, pointer now points to the cacheHead
 			*/
-			aiPlanSetUserVariableInt(id,xMetadata,mPointer,mCacheHead);
+			aiPlanSetUserVariableInt(id,xMetadata,mPointer,aiPlanGetUserVariableInt(id,xMetadata,mCacheHead));
 		} else {
 			/*
 			otherwise, slide in between two links in the list at mPointer
@@ -648,6 +644,9 @@ int xDatabaseNext(int id = 0, bool reverse = false) {
 	} else {
 		pointer = aiPlanGetUserVariableInt(id,xMetadata,mPointer);
 		debugLog("xDatabaseNext: " + aiPlanGetName(id) + " pointer is incorrect!");
+		debugLog("xNextBlock: " + aiPlanGetUserVariableInt(id,xNextBlock,pointer));
+		debugLog("Me: " + pointer);
+		debugLog("xPrevblock: " + aiPlanGetUserVariableInt(id,xPrevBlock,pointer));
 	}
 	return(pointer);
 }
@@ -664,6 +663,21 @@ void xClearDatabase(int id = 0) {
 	
 	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
 	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
+}
+
+void xResetDatabase(int id = 0) {
+	int size = aiPlanGetNumberUserVariableValues(id,xDirtyBit);
+	aiPlanSetUserVariableInt(id,xMetadata,mPointer,0);
+	aiPlanSetUserVariableInt(id,xMetadata,mCount,0);
+	aiPlanSetUserVariableInt(id,xMetadata,mCacheHead,0);
+	aiPlanSetUserVariableInt(id,xMetadata,mCacheCount,0);
+	
+	aiPlanSetUserVariableInt(id,xMetadata,mNextFree,size - 1);
+	aiPlanSetUserVariableInt(id,xNextBlock,0,0);
+	for(i=1; < size) { // connect all the free buffers together
+		aiPlanSetUserVariableBool(id,xDirtyBit,i,false);
+		aiPlanSetUserVariableInt(id,xNextBlock,i,i-1);
+	}
 }
 
 int xGetInt(int id = 0, int data = 0, int index = -1) {

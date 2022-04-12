@@ -77,6 +77,7 @@ void shootShotgun(int p = 0, vector start = vector(0,0,0), vector dir = vector(0
 void commandoAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * COMMANDO;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -505,6 +506,7 @@ void commandoAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseCommando(int eventID = -1) {

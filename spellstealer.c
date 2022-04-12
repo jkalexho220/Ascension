@@ -26,6 +26,7 @@ void removeSpellstealer(int p = 0) {
 void spellstealerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * SPELLSTEALER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -367,6 +368,7 @@ void spellstealerAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseSpellstealer(int eventID = -1) {

@@ -1,21 +1,4 @@
-/*
-we have an array of playerUnits databases. Each database corresponds to one player. Database context switches between players.
 
-enemies database: we loop through our playerUnits database and pull the doppelgangers out of the enemies database into a temporary cache
-at the end of the function, we return everything back
-
-only the playerUnits database has doppelganger pointers
-*/
-
-void detachPlayer(int eventID = -1) {
-	int p = eventID - 10000;
-}
-
-void reAttachPlayer(int eventID = -1) {
-	int p = eventID - 10100;
-	xRestoreCache(dPlayerUnits);
-	xRestoreCache(dEnemies);
-}
 
 void deployStadiumEyecandy(int index = 0) {
 	vector pos = trVectorQuestVarGet("center") - (trVectorQuestVarGet("dir") * trQuestVarGet("dist"+index));
@@ -152,6 +135,9 @@ void buildPvPSquare(int x = 0, int z = 0, int p = 0) {
 	}
 }
 
+int dParticipants = 0;
+int xParticipantPlayer = 0;
+
 rule pvp_build_map
 inactive
 highFrequency
@@ -161,6 +147,10 @@ highFrequency
 		dRelicDescriptors = xInitDatabase("relicDescriptors");
 		xInitAddInt(dRelicDescriptors, "name");
 		xInitAddInt(dRelicDescriptors, "type");
+
+		dParticipants = xInitDatabase("participants");
+		xParticipantPlayer = xInitAddInt(dParticipants, "player");
+
 		trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0","Odysseus",1,145,0,145,225,true);
 		trArmySelect("1,0");
@@ -303,7 +293,7 @@ highFrequency
 					"Nickonhawk: Welcome to Glory Stadium! (I forced Zenophobia to repurpose his stadium into a PvP arena)",
 					"icons\hero g odysseus icon 64");
 				trQuestVarSet("cinTime", trTime() + 6);
-				trQuestVarSet("cinStep", 14);
+				//trQuestVarSet("cinStep", 14);
 			}
 			case 2:
 			{
@@ -456,11 +446,6 @@ highFrequency
 				trUnitConvert(0);
 				trUnitChangeProtoUnit("Victory Marker");
 				
-				for(p=1; < ENEMY_PLAYER) {
-					trEventSetHandler(10000 + p, "detachPlayer");
-					trEventSetHandler(10100 + p, "reAttachPlayer");
-				}
-				
 				trQuestVarSet("pvpStep", 1);
 				trQuestVarSet("pvpTime", trTime() + 1);
 				trQuestVarSet("pvpRound", 1);
@@ -487,6 +472,9 @@ highFrequency
 	int p = 0;
 	int relic = 0;
 	int class = 0;
+	int relics = 0;
+	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
 	if (trTime() > trQuestVarGet("pvpTime")) {
 		switch(1*trQuestVarGet("pvpStep"))
 		{
@@ -536,21 +524,21 @@ highFrequency
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"rideLightning") == 1) {
 						trQuestVarSet("p"+p+"rideLightning", 0);
-						yClearDatabase("p"+p+"lightningBalls");
+						xClearDatabase(1*trQuestVarGet("p"+p+"lightningBalls"));
 					}
-					trQuestVarSet("p"+p+"launched", 0);
+					xSetBool(dPlayerData, xPlayerLaunched, false, p);
 					trPlayerKillAllGodPowers(p);
-					class = trQuestVarGet("p"+p+"class");
-					trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
+					class = xGetInt(dPlayerData, xPlayerClass, p);
+					xSetInt(dPlayerData, xPlayerUnit, trGetNextUnitScenarioNameNumber(), p);
+					pos = trVectorQuestVarGet("p"+p+"square");
+					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),45,true);
 					trArmySelect(""+p+",0");
-					trMutateSelected(1*trQuestVarGet("class"+class+"proto"));
-					yAddToDatabase("playerCharacters", "p"+p+"unit");
-					if (trCurrentPlayer() == p) {
-						uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
-					}
+					trMutateSelected(xGetInt(dClass, xClassProto, class));
+					xAddDatabaseBlock(dPlayerCharacters, true);
+					xSetInt(dPlayerCharacters, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
 					equipRelicsAgain(p);
 				}
+				uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
 				trQuestVarSet("pvpStep", 4);
 				trQuestVarSet("pvpTime", trTime() + 1);
 				trCounterAddTime("countdown",31,1,"Battle begins",-1);
@@ -577,33 +565,35 @@ highFrequency
 			}
 			case 6:
 			{
-				yClearDatabase("participants");
+				xClearDatabase(dParticipants);
 				for(p=1; < ENEMY_PLAYER) {
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
+					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 					if (trUnitGetIsContained("Sky Passage")) {
-						trQuestVarSet("p"+p+"regenerateFavorLast", trTimeMS());
-						trQuestVarSet("p"+p+"regenerateHealthLast", trTimeMS());
-						trQuestVarSet("temp", p);
-						yAddToDatabase("participants", "temp");
+						xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
+						xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+						xAddDatabaseBlock(dParticipants, true);
+						xSetInt(dParticipants, xParticipantPlayer, p);
 						trUnitSelectClear();
 						trUnitSelectByQV("p"+p+"passage");
 						trUnitEjectContained();
 						trUnitSelectClear();
-						trUnitSelectByQV("p"+p+"unit");
+						trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 						trUnitEjectContained();
-						for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-							yDatabaseNext("p"+p+"relics", true);
+						relics = getRelicsDB(p);
+						for(x=xGetDatabaseCount(relics); >0) {
+							xDatabaseNext(relics);
+							xUnitSelect(relics, xUnitName);
 							trUnitDestroy();
-							relic = yGetVar("p"+p+"relics", "type");
+							relic = xGetInt(relics, xRelicType);
 							if (trCurrentPlayer() == p) {
 								trQuestVarSet("myRelics"+relic, trQuestVarGet("myRelics"+relic) - 1);
 							}
 							if (trQuestVarGet("pvpRound") == 10) {
-								pvpGetRelic(p, 1*yGetVar("p"+p+"relics", "type"));
+								pvpGetRelic(p, relic);
 							}
 						}
-						trQuestVarSet("p"+p+"dead", 0);
+						xSetInt(dPlayerData, xPlayerDead, 0, p);
 					}
 					trUnitSelectClear();
 					trUnitSelectByQV("p"+p+"passage");
@@ -612,15 +602,16 @@ highFrequency
 					trMutateSelected(kbGetProtoUnitID("Sky Passage"));
 					
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"unit");
+					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 					trUnitDestroy();
 				}
-				if (yGetDatabaseCount("participants") == 0) {
+				if (xGetDatabaseCount(dParticipants) == 0) {
 					trQuestVarSet("pvpTime", trTime() + 2);
 					trQuestVarSet("pvpStep", 0);
 					trSoundPlayFN("","1",-1,"Nickonhawk: No participants!","icons\hero g odysseus icon 64");
-				} else if (yGetDatabaseCount("participants") == 1) {
-					p = yDatabaseNext("participants");
+				} else if (xGetDatabaseCount(dParticipants) == 1) {
+					xDatabaseNext(dParticipants);
+					p = xGetInt(dParticipants, xParticipantPlayer);
 					trQuestVarSet("pvpTime", trTime() + 2);
 					trQuestVarSet("pvpStep", 0);
 					trSoundPlayFN("","1",-1,"Nickonhawk: "+trStringQuestVarGet("p"+p+"name")+" was the only participant! Default victory!",
@@ -633,25 +624,22 @@ highFrequency
 						trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
 					}
 				} else {
-					float angle = 6.283185 / yGetDatabaseCount("participants");
-					trVectorQuestVarSet("dir", xsVectorSet(15,0,-15));
-					trQuestVarSet("cos", xsCos(angle));
-					trQuestVarSet("sin", xsSin(angle));
+					pvpDetached = false;
+					float angle = 6.283185 / xGetDatabaseCount(dParticipants);
+					dir = vector(15,0,-15);
+					float cos = xsCos(angle);
+					float sin = xsSin(angle);
 					trChatSend(0, "<color=1,1,1><u>Challengers</u></color>");
-					trQuestVarSet("playerUnitsDummyIndex", yAddToDatabase("playerUnits", "immortalDummy"));
-					trQuestVarSet("enemiesDummyIndex", yAddToDatabase("enemies", "immortalDummy"));
-					yAddUpdateVar("playerUnits", "doppelganger", trQuestVarGet("enemiesDummyIndex"));
-					yAddUpdateVar("enemies", "doppelganger", trQuestVarGet("playerUnitsDummyIndex"));
-					for (x=yGetDatabaseCount("participants"); >0) {
-						p = yDatabaseNext("participants");
-						trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")} - "+1*yGetDatabaseCount("p"+p+"relics")+" relics");
-						trQuestVarSet("posx", 145 + trQuestVarGet("dirx"));
-						trQuestVarSet("posz", 145 + trQuestVarGet("dirz"));
-						spawnPlayer(p, "pos");
-						trVectorQuestVarSet("dir", rotationMatrix("dir", trQuestVarGet("cos"), trQuestVarGet("sin")));
-						trQuestVarSet("p"+p+"wellCooldownStatus", ABILITY_COST);
-						trQuestVarSet("p"+p+"lureCooldownStatus", ABILITY_COST);
-						trQuestVarSet("p"+p+"rainCooldownStatus", ABILITY_COST);
+					for (x=xGetDatabaseCount(dParticipants); >0) {
+						xDatabaseNext(dParticipants);
+						p = xGetInt(dParticipants, xParticipantPlayer);
+						trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")} - "+1*xGetDatabaseCount(relics)+" relics");
+						pos = dir + vector(145,0,145);
+						spawnPlayer(p, pos);
+						dir = rotationMatrix(dir, cos, sin);
+						xSetInt(dPlayerData, xPlayerWellCooldownStatus, ABILITY_COST, p);
+						xSetInt(dPlayerData, xPlayerLureCooldownStatus, ABILITY_COST, p);
+						xSetInt(dPlayerData, xPlayerRainCooldownStatus, ABILITY_COST, p);
 					}
 					trQuestVarSet("pvpStep", 7);
 					trQuestVarSet("pvpTime", trTime() + 1);
@@ -673,37 +661,23 @@ highFrequency
 				*/
 				if (trTime() - trQuestVarGet("pvpTime") > 30) {
 					trQuestVarSet("pvpTime", trTime());
+					trQuestVarSet("burnNext", trTime());
+					trQuestVarSet("burnDamage", 1);
+					trQuestVarSet("burnTimeout", trTime() + 10);
 					trQuestVarSet("pvpStep", 9);
 					trMessageSetText("Players have started burning!", -1);
 				}
 			}
-			case 9:
-			{
-				for(x=yGetDatabaseCount("playerCharacters"); >0) {
-					yDatabaseNext("playerCharacters", true);
-					trDamageUnitPercent(1);
-				}
-				trQuestVarSet("pvpTime", trTime());
-			}
 			case 10:
 			{
 				trLetterBox(true);
-				debugLog("playerUnits count is " + 1*xGetDatabaseCount(dPlayerUnits));
-				ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsDummyIndex"));
-				ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-				for(x=xGetDatabaseCount(dPlayerUnits); >1) {
-					yDatabaseNext("playerUnits", true);
-					debugLog("player owner is " + 1*yGetVar("playerUnits", "player"));
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
 					trUnitDestroy();
 				}
-				yClearDatabase("playerUnits");
-				yClearDatabase("enemies");
-				if (yGetVarAtIndex("playerUnits", "xActive", 1*yGetVar("playerUnitsLeaveIndex")) == 1) {
-					debugLog("ERROR: playerUnits database is not empty!");
-				}
-				if (yGetVarAtIndex("enemies", "xActive", 1*yGetVar("enemiesLeaveIndex")) == 1) {
-					debugLog("ERROR: enemies database is not empty!");
-				}
+				xResetDatabase(dPlayerUnits);
+				xResetDatabase(dEnemies);
 				trQuestVarSet("pvpStep", 0);
 				trCounterAbort("well");
 				trCounterAbort("lure");
@@ -753,29 +727,29 @@ highFrequency
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"rideLightning") == 1) {
 						trQuestVarSet("p"+p+"rideLightning", 0);
-						yClearDatabase("p"+p+"lightningBalls");
+						xClearDatabase(1*trQuestVarGet("p"+p+"lightningBalls"));
 					}
-					trQuestVarSet("p"+p+"launched", 0);
+					xSetBool(dPlayerData, xPlayerLaunched, false, p);
 					trPlayerKillAllGodPowers(p);
-					class = trQuestVarGet("p"+p+"class");
-					trQuestVarSet("p"+p+"unit", trGetNextUnitScenarioNameNumber());
-					trArmyDispatch(""+p+",0","Dwarf",1,trQuestVarGet("p"+p+"squarex"),0,trQuestVarGet("p"+p+"squarez"),45,true);
+					class = xGetInt(dPlayerData, xPlayerClass, p);
+					xSetInt(dPlayerData, xPlayerUnit, trGetNextUnitScenarioNameNumber(), p);
+					pos = trVectorQuestVarGet("p"+p+"square");
+					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),45,true);
 					trArmySelect(""+p+",0");
-					trMutateSelected(1*trQuestVarGet("class"+class+"proto"));
-					yAddToDatabase("playerCharacters", "p"+p+"unit");
-					if (trCurrentPlayer() == p) {
-						uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
-					}
+					trMutateSelected(xGetInt(dClass, xClassProto, class));
+					xAddDatabaseBlock(dPlayerCharacters, true);
+					xSetInt(dPlayerCharacters, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
 					equipRelicsAgain(p);
 					if (trQuestVarGet("p"+p+"nickQuestProgress") == 6) {
 						trQuestVarSet("p"+p+"nickQuestProgress", 5);
 						trArmyDispatch(""+p+",0","Villager Atlantean Hero",1,
-							trQuestVarGet("p"+p+"squareX"),0,trQuestVarGet("p"+p+"squareZ"),0,true);
+							xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trModifyProtounit("Villager Atlantean Hero", p, 5, 2);
 						if (trCurrentPlayer() == p) {
 							trQuestVarSet("dreamGogglesCount", trQuestVarGet("dreamGogglesCount") - 1);
 						}
 					}
+					uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
 				}
 				trQuestVarSet("pvpStep", 22);
 				trQuestVarSet("pvpTime", trTime() + 6);
@@ -791,8 +765,9 @@ highFrequency
 					trMessageSetText("Your Golden Ticket has been consumed to get a Relic Transporter that can hold 5 relics.", -1);
 				}
 				for(p=1; < ENEMY_PLAYER) {
-					yAddToDatabase("playerUnits", "p"+p+"unit");
-					yAddUpdateVar("playerUnits", "player", p);
+					xAddDatabaseBlock(dPlayerUnits, true);
+					xSetInt(dPlayerUnits, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+					xSetInt(dPlayerUnits, xPlayerOwner, p);
 				}
 				xsEnableRule("pvp_save");
 				xsEnableRule("pvp_peace");
@@ -812,30 +787,32 @@ highFrequency
 	}
 	int p = trQuestVarGet("relicPlayer");
 	int id = 0;
+	int relics = getRelicsDB(p);
+	vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit), true);
 	trVectorSetUnitPos("pos", "p"+p+"unit");
-	for(x=yGetDatabaseCount("p"+p+"relics"); >0) {
-		id = yDatabaseNext("p"+p+"relics", true);
+	for(x=xGetDatabaseCount(relics); >0) {
+		xDatabaseNext(relics);
+		xUnitSelect(relics, xUnitName);
 		if (trUnitGetIsContained("Unit") == false) {
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"relics");
+			xUnitSelect(relics, xUnitName);
 			if (trCurrentPlayer() == p) {
 				trSoundPlayFN("backtowork.wav","1",-1,"","");
-				trChatSend(0, relicName(1*yGetVar("p"+p+"relics", "type")) + " dropped.");
+				trChatSend(0, relicName(xGetInt(relics, xRelicType)) + " dropped.");
 			}
-			relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+			relicEffect(xGetInt(relics, xRelicType), p, false);
 			
 			trUnitChangeProtoUnit("Relic");
-			yAddToDatabase("freeRelics", "p"+p+"relics");
-			yAddUpdateVar("freeRelics", "type", yGetVar("p"+p+"relics", "type"));
+			xAddDatabaseBlock(dFreeRelics, true);
+			xSetInt(dFreeRelics, xUnitName, xGetInt(relics, xUnitName));
+			xSetInt(dFreeRelics, xRelicType, xGetInt(relics, xRelicType));
 			
-			yRemoveFromDatabase("p"+p+"relics");
-			yRemoveUpdateVar("p"+p+"relics", "type");
+			xFreeDatabaseBlock(relics);
 		}
 	}
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
+	trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 	if (trUnitGetIsContained("Sky Passage")) {
-		if (yGetDatabaseCount("p"+p+"relics") == 0) {
+		if (xGetDatabaseCount(relics) == 0) {
 			trUnitSelectClear();
 			trUnitSelectByQV("p"+p+"passage");
 			trUnitEjectContained();
@@ -857,16 +834,17 @@ highFrequency
 	}
 	/* my relics */
 	trUnitSelectClear();
-	if (yGetDatabaseCount("relicDescriptors") > 0) {
-		yDatabaseNext("relicDescriptors", true);
+	if (xGetDatabaseCount(dRelicDescriptors) > 0) {
+		xDatabaseNext(dRelicDescriptors);
+		xUnitSelect(dRelicDescriptors, xUnitName);
 		if (trUnitIsSelected()) {
-			if (trQuestVarGet("selectedDescriptor") != trQuestVarGet("relicDescriptors")) {
-				trStringQuestVarSet("description", relicName(1*yGetVar("relicDescriptors","type")) + ":Count: ");
+			if (trQuestVarGet("selectedDescriptor") != xGetInt(dRelicDescriptors, xUnitName)) {
+				trStringQuestVarSet("description", relicName(xGetInt(dRelicDescriptors,xRelicType)) + ":Count: ");
 				trSoundPlayFN("","1",-1,
-					trStringQuestVarGet("description") + 1*trQuestVarGet("myRelics"+1*yGetVar("relicDescriptors","type")),"");
-				trQuestVarSet("selectedDescriptor", trQuestVarGet("relicDescriptors"));
+					trStringQuestVarGet("description") + 1*trQuestVarGet("myRelics"+xGetInt(dRelicDescriptors,xRelicType)),"");
+				trQuestVarSet("selectedDescriptor", xGetInt(dRelicDescriptors, xUnitName));
 			}
-		} else if (trQuestVarGet("selectedDescriptor") == trQuestVarGet("relicDescriptors")) {
+		} else if (trQuestVarGet("selectedDescriptor") == xGetInt(dRelicDescriptors, xUnitName)) {
 			trQuestVarSet("selectedDescriptor",0);
 			trLetterBox(false);
 		}
@@ -881,48 +859,53 @@ highFrequency
 	int old = xsGetContextPlayer();
 	int p = 0;
 	int id = 0;
-	if (xGetDatabaseCount(dPlayerUnits) > 1) {
-		if (ySetPointer("playerUnits", 1*trQuestVarGet("playerUnitsPrevPointer")) == false) {
-			debugLog("player units size is " + xGetDatabaseCount(dPlayerUnits));
-		}
-		id = yDatabaseNext("playerUnits", true);
-		if (yGetPointer("playerUnits") == trQuestVarGet("playerUnitsDummyIndex")) {
-			id = yDatabaseNext("playerUnits", true);
-		}
-		if ((id == -1) || (trUnitAlive() == false)) {
+	int relics = 0;
+	pvpDetached = false;
+	for (i=xGetDatabaseCount(dPlayerUnits); > 0) {
+		xDatabaseNext(dPlayerUnits);
+		xUnitSelectByID(dPlayerUnits, xUnitID);
+		if (trUnitAlive() == false) {
 			removePlayerUnit();
+			debugLog("dPlayerUnits size is " + xGetDatabaseCount(dPlayerUnits));
+			debugLog("dEnemies size is " + xGetDatabaseCount(dEnemies));
 		} else {
-			if (yGetVar("playerUnits", "decay") > 0) {
-				if (trTimeMS() > yGetVar("playerUnits", "decayNext")) {
-					ySetVar("playerUnits", "decayNext", 1000 + yGetVar("playerUnits", "decayNext"));
-					trDamageUnitPercent(yGetVar("playerUnits", "decay"));
+			if (xGetFloat(dPlayerUnits, xDecay) > 0) {
+				if (trTimeMS() > xGetInt(dPlayerUnits, xDecayNext)) {
+					xSetInt(dPlayerUnits, xDecayNext, 1000 + xGetInt(dPlayerUnits, xDecayNext));
+					trDamageUnitPercent(xGetFloat(dPlayerUnits, xDecay));
 				}
 			}
-			trVectorSetUnitPos("pos", "playerUnits");
-			ySetVarFromVector("playerUnits", "pos", "pos");
+			xSetVector(dPlayerUnits, xUnitPos, kbGetBlockPosition(""+xGetInt(dPlayerUnits,xUnitName), true));
 			
-			stunsAndPoisons("playerUnits");
-			if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
-				ySetVar("enemies", "physicalResist", yGetVar("playerUnits", "physicalResist"));
-				ySetVar("enemies", "magicResist", yGetVar("playerUnits", "magicResist"));
-				ySetVar("enemies", "stunStatus", yGetVar("playerUnits", "stunStatus"));
-				ySetVar("enemies", "poisonStatus", yGetVar("playerUnits", "poisonStatus"));
-				ySetVar("enemies", "launched", yGetVar("playerUnits", "launched"));
-			} else {
-				debugLog("playerUnit " + 1*trQuestVarGet("playerUnits") + " is missing a doppelganger!");
-				ySetVar("playerUnits", "doppelganger", yAddToDatabase("enemies", "playerUnits"));
-				yAddUpdateVar("enemies", "doppelganger", yGetPointer("playerUnits"));
-				yAddUpdateVar("enemies", "physicalResist", yGetVar("playerUnits", "physicalResist"));
-				yAddUpdateVar("enemies", "magicResist", yGetVar("playerUnits", "magicResist"));
-				yAddUpdateVar("enemies", "stunStatus", yGetVar("playerUnits", "stunStatus"));
-				yAddUpdateVar("enemies", "poisonStatus", yGetVar("playerUnits", "poisonStatus"));
-				yAddUpdateVar("enemies", "launched", yGetVar("playerUnits", "launched"));
+			stunsAndPoisons(dPlayerUnits);
+			if (xSetPointer(dEnemies, xGetInt(dPlayerUnits, xDoppelganger)) == false) {
+				debugLog("playerUnit " + xGetInt(dPlayerUnits, xUnitName) + " is missing a doppelganger!");
+				xSetInt(dPlayerUnits, xDoppelganger, xAddDatabaseBlock(dEnemies, true));
 			}
-			if (trCurrentPlayer() == 1) {
-				trUnitHighlight(0.1, false);
+			xSetInt(dEnemies, xUnitName, xGetInt(dPlayerUnits, xUnitName));
+			xSetInt(dEnemies, xPlayerOwner, xGetInt(dPlayerUnits, xPlayerOwner));
+			xSetInt(dEnemies, xUnitID, xGetInt(dPlayerUnits, xUnitID));
+			xSetInt(dEnemies, xStunStatus, xGetInt(dPlayerUnits, xStunStatus));
+			xSetInt(dEnemies, xPoisonStatus, xGetInt(dPlayerUnits, xPoisonStatus));
+			xSetInt(dEnemies, xSilenceStatus, xGetInt(dPlayerUnits, xSilenceStatus));
+			xSetInt(dEnemies, xDoppelganger, xGetPointer(dPlayerUnits));
+			xSetFloat(dEnemies, xPhysicalResist, xGetFloat(dPlayerUnits, xPhysicalResist));
+			xSetFloat(dEnemies, xMagicResist, xGetFloat(dPlayerUnits, xMagicResist));
+
+			if (trQuestVarGet("pvpStep") == 9) {
+				if (trTime() > trQuestVarGet("burnNext")) {
+					trDamageUnitPercent(trQuestVarGet("burnDamage"));
+				}
 			}
 		}
-		trQuestVarSet("playerUnitsPrevPointer", yGetPointer("playerUnits"));
+	}
+
+	if (trQuestVarGet("pvpStep") == 9) {
+		trQuestVarSet("burnNext", trTime());
+		if (trTime() > trQuestVarGet("burnTimeout")) {
+			trQuestVarSet("burnTimeout", trTime() + 10);
+			trQuestVarSet("burnDamage", trQuestVarGet("burnDamage") + 1);
+		}
 	}
 	
 	maintainStun();
@@ -945,14 +928,17 @@ highFrequency
 	}
 	
 	/* misc */
-	for(x=yGetDatabaseCount("participants"); > 0) {
-		p = yDatabaseNext("participants");
-		if (yGetDatabaseCount("participants") == 1) {
-			for(y=yGetDatabaseCount("p"+p+"relics"); >0) {
-				yDatabaseNext("p"+p+"relics");
-				relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+	for(x=xGetDatabaseCount(dParticipants); > 0) {
+		xDatabaseNext(dParticipants);
+		p = xGetInt(dParticipants, xParticipantPlayer);
+		relics = getRelicsDB(p);
+		if (xGetDatabaseCount(dParticipants) == 1) {
+			for(y=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				relicEffect(xGetInt(relics, xRelicType), p, false);
 			}
-			yClearDatabase("p"+p+"relics");
+			xClearDatabase(relics);
+			xClearDatabase(getCharactersDB(p));
 			trSoundPlayFN("favordump.wav","1",-1,"","");
 			trUIFadeToColor(0,0,0,1000,1000,true);
 			xsDisableRule("pvp_battle");
@@ -965,18 +951,20 @@ highFrequency
 			}
 			trQuestVarSet("pvpStep", 10);
 			trQuestVarSet("pvpTime", trTime() + 2);
-		} else if (trQuestVarGet("p"+p+"dead") > 0) {
-			for(y=yGetDatabaseCount("p"+p+"relics"); >0) {
-				yDatabaseNext("p"+p+"relics");
-				relicEffect(1*yGetVar("p"+p+"relics", "type"), p, false);
+		} else if (xGetInt(dPlayerData, xPlayerDead, p) > 0) {
+			for(y=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				relicEffect(xGetInt(relics, xRelicType), p, false);
 			}
-			yClearDatabase("p"+p+"relics");
-			yClearDatabase("p"+p+"characters");
-			yRemoveFromDatabase("participants");
+			xClearDatabase(relics);
+			xClearDatabase(getCharactersDB(p));
+			
+			xFreeDatabaseBlock(dParticipants);
 			trSoundPlayFN("townbell.wav","1",-1,"","");
 			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been knocked out!");
 			for(y=xGetDatabaseCount(dPlayerUnits); >0) {
-				yDatabaseNext("playerUnits", true);
+				xDatabaseNext(dPlayerUnits);
+				xUnitSelectByID(dPlayerUnits, xUnitID);
 				if (trUnitIsOwnedBy(p)) {
 					trUnitDelete(false);
 					removePlayerUnit();
@@ -984,46 +972,34 @@ highFrequency
 			}
 		}
 	}
-	if (yGetDatabaseCount("participants") > 1) {
-		for(x=yGetDatabaseCount("participants"); >0) {
-			p = yDatabaseNext("participants");
+	if (xGetDatabaseCount(dParticipants) > 1) {
+		for(x=xGetDatabaseCount(dParticipants); >0) {
+			xDatabaseNext(dParticipants);
+			p = xGetInt(dParticipants, xParticipantPlayer);
 			checkGodPowers(p);
 			checkResourceCheating(p);
 			
 			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"unit");
+			trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 			processLifesteal(p);
 			processSilence(p);
 			processRegen(p);
 			petDogs(p);
-			trEventFire(10000 + p);
-			trEventFire(12 * trQuestVarGet("p"+p+"class") + p);
-			trEventFire(10100 + p);
+			trEventFire(12 * xGetInt(dPlayerData, xPlayerClass, p) + p);
 		}
 	}
 	
 	
-	for(x=xsMin(5, yGetDatabaseCount("launchedUnits")); >0) {
+	for(x=xsMin(5, xGetDatabaseCount(dLaunchedUnits)); >0) {
 		processLaunchedUnit();
 	}
 	
-	if (yGetDatabaseCount("decayingWolves") > 0) {
-		yDatabaseNext("decayingWolves");
-		if (trTimeMS() > yGetVar("decayingWolves", "timeout")) {
-			trUnitSelectClear();
-			trUnitSelectByQV("decayingWolves", true);
-			trUnitChangeProtoUnit("Dust Small");
-			yRemoveFromDatabase("decayingWolves");
-		}
-	}
+	processWolves();
 	
 	/* No specials */
 	noSpecials();
 	
-	
-	
-	
-	xsSetContextPlayer(old);
+	pvpDetached = true;
 }
 
 
@@ -1033,7 +1009,7 @@ highFrequency
 {
 	int p = trCurrentPlayer();
 	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"unit");
+	trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 	if (trUnitGetIsContained("Sky Passage")) {
 		trUIFadeToColor(255,255,255,1000,0,true);
 		saveAllData();

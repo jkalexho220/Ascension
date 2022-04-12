@@ -27,6 +27,7 @@ void removeAlchemist(int p = 0) {
 void alchemistAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * ALCHEMIST;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -300,6 +301,7 @@ void alchemistAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseAlchemist(int eventID = -1) {

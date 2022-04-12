@@ -56,6 +56,7 @@ void plantSeed(int next = 0, int p = 0) {
 void gardenerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * GARDENER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -345,6 +346,7 @@ void gardenerAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseGardener(int eventID = -1) {

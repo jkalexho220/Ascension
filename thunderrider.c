@@ -29,8 +29,10 @@ void removeThunderRider(int p = 0) {
 		xFreeDatabaseBlock(balls);
 	}
 	if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-		if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
-			debugLog("Unable to restore database block for player " + p);
+		if (PvP == false) {
+			if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+				debugLog("Unable to restore database block for player " + p);
+			}
 		}
 	}
 	removePlayerSpecific(p);
@@ -80,7 +82,15 @@ void rideLightningOff(int p = 0) {
 		xUnitSelect(balls, xUnitName);
 		trUnitDestroy();
 		xUnitSelectByID(db, xUnitID);
-		if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+		if (PvP) {
+			xSetInt(db, xCharIndex,activatePlayerUnit(xGetInt(db, xUnitName),p,kbGetProtoUnitID("Hero Greek Atalanta")));
+			xSetBool(dPlayerUnits, xIsHero, true);
+			xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist, p));
+			xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist, p));
+			if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+				xSetInt(dPlayerData, xPlayerIndex, xGetInt(db, xCharIndex));
+			}
+		} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
 			debugLog("Thunderstepper " + p + ": Unable to restore database block");
 		}
 		healUnit(p, trQuestVarGet("p"+p+"rideLightningHeal"));
@@ -141,6 +151,7 @@ void lightningBallBounce(int p = 0, vector pos = vector(0,0,0)) {
 void thunderRiderAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * THUNDERRIDER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -401,9 +412,9 @@ void thunderRiderAlways(int eventID = -1) {
 						
 						if (xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex))) {
 							xUnitSelect(dPlayerUnits, xStunSFX);
-							trUnitDestroy();
+							trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 							xUnitSelect(dPlayerUnits, xPoisonSFX);
-							trUnitDestroy();
+							trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 							if (xGetInt(dPlayerUnits, xStunStatus) > 0) {
 								if (xSetPointer(dStunnedUnits, xGetInt(dPlayerUnits, xStunStatus))) {
 									xFreeDatabaseBlock(dStunnedUnits);
@@ -417,7 +428,14 @@ void thunderRiderAlways(int eventID = -1) {
 									}
 								}
 							}
-							xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex));
+							if (PvP) {
+								xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+								xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+								xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+								xFreeDatabaseBlock(dPlayerUnits);
+							} else if (xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex)) == false) {
+								debugLog("Unable to detach Thunderrider");
+							}
 						}
 					}
 				}
@@ -530,6 +548,7 @@ void thunderRiderAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseThunderRider(int eventID = -1) {

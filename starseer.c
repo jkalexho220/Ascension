@@ -34,6 +34,7 @@ void removeStarseer(int p = 0) {
 void starseerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * STARSEER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -285,6 +286,7 @@ void starseerAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
+	pvpReattachPlayer();
 }
 
 void chooseStarseer(int eventID = -1) {

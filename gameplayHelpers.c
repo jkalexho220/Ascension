@@ -54,6 +54,7 @@ vector bossDir = vector(0,0,0);
 vector bossPrev = vector(0,0,0);
 
 int nextproj = 0;
+bool pvpDetached = false;
 
 rule initialize_spy_database
 active
@@ -169,16 +170,18 @@ void silencePlayer(int p = 0) {
 
 void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 	xSetPointer(dPlayerData,p);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, 1*xGetInt(dEnemies, xDoppelganger))) {
-				silenceUnit(dPlayerUnits, duration);
-			}
+			int index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			silenceUnit(dPlayerUnits, duration);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -245,9 +248,9 @@ void nightriderHarvest(vector pos = vector(0,0,0)) {
 
 void removeEnemy() {
 	if (PvP == false) {
-		int bounty = xGetInt(dEnemies, xBounty);
 		vector pos = xGetVector(dEnemies,xUnitPos);
 		nightriderHarvest(pos);
+		int bounty = xGetInt(dEnemies, xBounty);
 		if (bounty > 0) {
 			trQuestVarSetFromRand("rand", 1, bounty, true);
 			for(p=1; <ENEMY_PLAYER) {
@@ -274,30 +277,18 @@ void removeEnemy() {
 }
 
 void removePlayerUnit() {
-	vector pos = xGetVector(dPlayerUnits,xUnitPos);
-	nightriderHarvest(pos);
-	/*
-	if (PvP) {
-		if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
-			xFreeDatabaseBlock(dEnemies)
-			yRemoveUpdateVar("enemies", "doppelganger");
-			yRemoveUpdateVar("enemies", "silenceSFX");
-			if (trQuestVarGet("detached") == 1) {
-				trQuestVarSet("xdataenemiescount", 1 + trQuestVarGet("xdataenemiescount"));
-				trQuestVarSet("enemiesDetachedSize", trQuestVarGet("enemiesDetachedSize") - 1);
+	if (pvpDetached == false) {
+		vector pos = xGetVector(dPlayerUnits,xUnitPos);
+		nightriderHarvest(pos);
+		if (PvP) {
+			if (xSetPointer(dEnemies, xGetInt(dPlayerUnits, xDoppelganger))) {
+				xFreeDatabaseBlock(dEnemies);
+			} else {
+				debugLog("Unable to restore doppelganger from playerUnits.");
 			}
 		}
-		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-		yVarToVector("playerUnits", "pos");
-		nightriderHarvest("pos");
-		if (trQuestVarGet("playerUnitsLeaveIndex") == yGetPointer("playerUnits")) {
-			debugLog("player units removed the wrong thing! Removed playerunitsLeaveIndex!");
-		} else if (trQuestVarGet("playerUnitsDummyIndex") == yGetPointer("playerUnits")) {
-			debugLog("player units removed the wrong thing! Removed playerUnitsDummyIndex");
-		}
+		xFreeDatabaseBlock(dPlayerUnits);
 	}
-	*/
-	xFreeDatabaseBlock(dPlayerUnits);
 }
 
 void removePlayerCharacter() {
@@ -470,8 +461,8 @@ vector vectorSetAsTargetVector(vector from = vector(0,0,0), vector to = vector(0
 }
 
 void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
-	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	bool targetPlayers = (db == dPlayerUnits);
+	if (db == dEnemies) {
 		xSetPointer(dPlayerData,p);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
@@ -480,9 +471,11 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 		damage = damage * xGetFloat(dPlayerData,xPlayerSpellDamage) * xsPow(2, xGetInt(dPlayerData,xPlayerPoisonSpeed));
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, xGetInt(dEnemies, xDoppelganger))) {
-				poisonUnit(dPlayerUnits, duration, damage, 0);
-			}
+			int index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			poisonUnit(dPlayerUnits, duration, damage, 0);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -588,7 +581,10 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 	}
 	xSetFloat(dPlayerData,xPlayerLifestealTotal,xGetFloat(dPlayerData,xPlayerLifestealTotal,p) + lifesteal,p);
 	if (PvP) {
-		damagePlayerUnit(dmg, xGetInt(dEnemies, xDoppelganger));
+		int index = xGetInt(dEnemies, xDoppelganger);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, true);
+		damagePlayerUnit(dmg, index);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, false);
 	} else {
 		trDamageUnit(dmg);
 	}
@@ -598,8 +594,8 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 
 void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
-	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	bool targetPlayers = (db == dPlayerUnits);
+	if (db == dEnemies) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}
@@ -610,9 +606,11 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 		}
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, xGetInt(dEnemies,xDoppelganger))) {
-				stunUnit(dPlayerUnits, duration, 0, sound);
-			}
+			index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			stunUnit(dPlayerUnits, duration, 0, sound);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -688,6 +686,9 @@ void processLaunchedUnit() {
 					xSetPointer(db, index);
 				}
 			}
+			if (PvP && (db == dEnemies)) {
+				xSetBool(dPlayerUnits, xLaunched, false, xGetInt(db, xDoppelganger));
+			}
 		} else {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dLaunchedUnits,xStunnedProto)));
 		}
@@ -699,14 +700,11 @@ void processLaunchedUnit() {
 
 void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 	bool hitWall = false;
-	int index = 0;
-	if (PvP && (db == dEnemies)) {
-		index = xGetPointer(dPlayerUnits);
-		db = dPlayerUnits;
-		xSetPointer(dPlayerUnits, xGetInt(dEnemies,xDoppelganger));
-	}
 	if (xGetBool(db, xLaunched) == false) {
 		xSetBool(db, xLaunched, true);
+		if (PvP && (db == dEnemies)) {
+			xSetBool(dPlayerUnits, xLaunched, true, xGetInt(dEnemies, xDoppelganger));
+		}
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(db,xUnitName)));
 		int p = xGetInt(db,xPlayerOwner);
 		xUnitSelectByID(db,xUnitID);
@@ -775,9 +773,6 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 			}
 		}
-	}
-	if (PvP) {
-		xSetPointer(dPlayerUnits, index);
 	}
 }
 
@@ -1391,18 +1386,16 @@ int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) 
 	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	if (PvP) {
-		if (trQuestVarGet("detached") == 1) {
-			xSetPointer(dEnemies, 1*trQuestVarGet("enemiesLeaveIndex"));
-		}
-		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies));
-		xSetPointer(dEnemies,xGetNewestPointer(dEnemies));
+		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies, true));
 		xSetInt(dEnemies,xDoppelganger,index);
 		xSetInt(dEnemies,xPlayerOwner,p);
 		xSetInt(dEnemies,xUnitName,name);
 		xSetInt(dEnemies,xUnitID,id);
 		xSetFloat(dEnemies,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 		xSetFloat(dEnemies,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
-		xSetPointer(dEnemies, 1*trQuestVarGet("enemiesDummyIndex"));
+		if (pvpDetached) {
+			xDetachDatabaseBlock(dEnemies);
+		}
 	}
 	activateSpecialUnit(name, dPlayerUnits, proto, p);
 	return(index);
@@ -1581,5 +1574,34 @@ void damageOpponentUnit(int p = 0, float amt = 0) {
 		damagePlayerUnit(amt);
 	} else {
 		damageEnemy(p, amt);
+	}
+}
+
+/*
+we have an array of playerUnits databases. Each database corresponds to one player. Database context switches between players.
+
+enemies database: we loop through our playerUnits database and pull the doppelgangers out of the enemies database into a temporary cache
+at the end of the function, we return everything back
+
+only the playerUnits database has doppelganger pointers
+*/
+
+void pvpDetachPlayer(int p = 0) {
+	if (PvP) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			if (xGetInt(dPlayerUnits, xPlayerOwner) != p) {
+				xDetachDatabaseBlock(dPlayerUnits);
+			} else if (xSetPointer(dEnemies, xGetInt(dPlayerUnits, xDoppelganger))) {
+				xDetachDatabaseBlock(dEnemies);
+			}
+		}
+	}
+}
+
+void pvpReattachPlayer() {
+	if (PvP) {
+		xRestoreCache(dPlayerUnits);
+		xRestoreCache(dEnemies);
 	}
 }
