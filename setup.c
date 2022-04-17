@@ -334,7 +334,7 @@ void chooseClass(int p = 0, int class = 0) {
 	int relics = getRelicsDB(p);
 	for(x=xGetDatabaseCount(relics); >0) {
 		xDatabaseNext(relics);
-		if (x > xGetInt(dPlayerData,xPlayerLevel,p)+1) {
+		if ((x > xGetInt(dPlayerData,xPlayerLevel,p)+1) || xGetInt(relics, xRelicType) > NORMAL_RELICS) {
 			int index = xAddDatabaseBlock(dFreeRelics);
 			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
 			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
@@ -342,6 +342,9 @@ void chooseClass(int p = 0, int class = 0) {
 			trUnitSelectClear();
 			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
+			if (xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) {
+				trQuestVarSet("p"+p+"nickEquipped", 0);
+			}
 		} else {
 			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
@@ -615,7 +618,7 @@ highFrequency
 
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, -9999999999999999999.0);
-	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 2000 * ENEMY_PLAYER);
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 3000 * ENEMY_PLAYER);
 	
 	trModifyProtounit("Minion", 0, 8, -999);
 	

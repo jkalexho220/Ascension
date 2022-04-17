@@ -1301,11 +1301,12 @@ highFrequency
 			trUnitHighlight(5.0, true);
 			uiLookAtUnitByName(""+1*trQuestVarGet("devil_do1"));
 			trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Pursuers from the Guild? Just try and catch me!");
-			trCounterAddTime("devilEscape",180,0,"devil_do1 escapes",-1);
-			trQuestVarSet("devilEscapeTime", trTime() + 180);
+			trCounterAddTime("devilEscape",150,0,"devil_do1 escapes",-1);
+			trQuestVarSet("devilEscapeTime", trTime() + 150);
 			trQuestVarSet("devilNextSummon", trTime() - 10 * trQuestVarGet("stage"));
 			xsEnableRule("devil_do1_battle");
 			xsDisableSelf();
+			break;
 		}
 	}
 }
@@ -1345,6 +1346,7 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("devil_do1");
 	if (trUnitAlive() == false) {
+		trCounterAbort("devilEscape");
 		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Noooo! How can this be?!");
 		xsDisableSelf();
 		trUnitChangeProtoUnit("Lampades Blood");

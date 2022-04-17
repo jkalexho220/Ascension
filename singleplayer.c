@@ -1456,7 +1456,10 @@ highFrequency
 		xsEnableRule("select_boon");
 		trEventSetHandler(8000, "spChooseBoon");
 		trPaintTerrain(71,71,87,73,0,53,false);
-		trPaintTerrain(88,69, 92,75, 4,15, false);
+		trPaintTerrain(88,69, 92,75, 4,15, true);
+		/* paint deployment square at the bottom of the map */
+		trPaintTerrain(0,0,5,5,0,70,true);
+		trPaintTerrain(0,0,5,5,2,13,false);
 		startNPCDialog(NPC_EXPLAIN_BOONS);
 	}
 	int x = 177 + 4 * iModulo(3, BOON_MONSTER_COMPANION - 1);

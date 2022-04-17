@@ -20,20 +20,20 @@
 noob
 
 <scenariodata name ="ascension mmorpg">
-			<data>4745</data>
-			<data>2106</data>
-			<data>157740</data>
-			<data>0</data>
+			<data>5653165</data>
+			<data>783</data>
+			<data>356908087</data>
+			<data>12</data>
 			<data>5</data>
 			<data>0</data>
 			<data>0</data>
-			<data>777</data>
-			<data>1409471</data>
-			<data>40310</data>
-			<data>136587837</data>
+			<data>905</data>
+			<data>2878499</data>
+			<data>706</data>
+			<data>138403326</data>
 			<data>1343</data>
-			<data>10058052</data>
-			<data>130754456</data>
+			<data>73267953</data>
+			<data>193129654</data>
 			<data>1</data>
 			<data>0</data>
 		</scenariodata>

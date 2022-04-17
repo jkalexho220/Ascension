@@ -1598,7 +1598,7 @@ highFrequency
 			}
 			case 8:
 			{
-				dCloudDeployStars = initGenericProj("cloudDeployStars",kbGetProtoUnitID("Lampades"),18,0.01,2.5,0.0,ENEMY_PLAYER);
+				dCloudDeployStars = initGenericProj("cloudDeployStars",kbGetProtoUnitID("Lampades"),18,0.01,-2.5,0.0,ENEMY_PLAYER);
 				xDeepDamageLast = xInitAddInt(dPlayerUnits, "tornadoDamageLast");
 				xsEnableRule("the_clouds_build_01");
 				xsEnableRule("the_clouds_build_02");
@@ -2265,7 +2265,6 @@ highFrequency
 			for(x=trQuestVarGet("rand"); >0) {
 				xDatabaseNext(dBasicRooms);
 			}
-			debugLog("devil_do1 room is " + xGetInt(dBasicRooms, xRoomNumber));
 			z = xGetInt(dBasicRooms, xRoomNumber) / 4;
 			x = iModulo(4, xGetInt(dBasicRooms, xRoomNumber));
 			trQuestVarSet("devil_do1", trGetNextUnitScenarioNameNumber());
