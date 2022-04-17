@@ -344,6 +344,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("pigpenUpperZ", 17 + trQuestVarGet("villageZ"));
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
 			
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Villager Chinese",23,19,315);
@@ -420,7 +423,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Shrine",35,15,270);
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
-			
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
 			
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Shade",25,35,180);
@@ -445,7 +450,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Dwarven Forge",11,11,0);
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
-			
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
+
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Throwing Axeman",21,9,270);
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -1522,6 +1530,7 @@ highFrequency
 			}
 			case 7:
 			{
+				trQuestVarSet("templeRoom", -1);
 				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
 				trSetLighting("fimbulwinter", 0.01);
@@ -2018,7 +2027,11 @@ highFrequency
 						} else {
 							xAddDatabaseBlock(dNpcTalk, true);
 							xSetInt(dNpcTalk, xUnitName, 1*trQuestVarGet("guy"+x));
-							xSetInt(dNpcTalk, xNpcDialog, 10 * x + trQuestVarGet("stage"));
+							if ((trQuestVarGet("stage") < 4) && (x == SHOP_GUY) && (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 1)) {
+								xSetInt(dNpcTalk, xNpcDialog, MONSTERPEDIA_NPC + trQuestVarGet("stage"));
+							} else {
+								xSetInt(dNpcTalk, xNpcDialog, 10 * x + trQuestVarGet("stage"));
+							}
 						}
 					}
 				} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
@@ -2246,6 +2259,21 @@ highFrequency
 			trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
 			spawnRelicSpecific(pos, RELIC_NICKONHAWK);
 		}
+
+		if (trQuestVarGet("monsterpediaQuestLocation") == trQuestVarGet("stage")) {
+			trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms));
+			for(x=trQuestVarGet("rand"); >0) {
+				xDatabaseNext(dBasicRooms);
+			}
+			debugLog("devil_do1 room is " + xGetInt(dBasicRooms, xRoomNumber));
+			z = xGetInt(dBasicRooms, xRoomNumber) / 4;
+			x = iModulo(4, xGetInt(dBasicRooms, xRoomNumber));
+			trQuestVarSet("devil_do1", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch(""+ENEMY_PLAYER+",0","Shaba Ka",1,70 * x + 37,0,70 * z + 37,0,true);
+			xAddDatabaseBlock(dEnemiesIncoming, true);
+			xSetInt(dEnemiesIncoming, xUnitName, trQuestVarGet("devil_do1"));
+			xsEnableRule("devil_do1_find");
+		}
 		
 		trUnblockAllSounds();
 		if (trQuestVarGet("newPlayers") > 0) {
@@ -2271,7 +2299,6 @@ highFrequency
 		for(x=xGetDatabaseCount(dEnemiesIncoming); >0) {
 			xDatabaseNext(dEnemiesIncoming);
 			if (kbGetBlockID(""+xGetInt(dEnemiesIncoming, xUnitName)) == -1) {
-				debugLog("Enemy " + xGetInt(dEnemiesIncoming, xUnitName) + " removed!");
 				xFreeDatabaseBlock(dEnemiesIncoming);
 			}
 		}

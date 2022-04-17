@@ -308,7 +308,7 @@ highFrequency
 					"Nickonhawk: First, I have given you ten basic relics here.",
 					"icons\hero g odysseus icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
-				uiLookAtUnitByName(""+1*trQuestVarGet("p"+p+"unit"));
+				uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, p));
 			}
 			case 4:
 			{
@@ -633,7 +633,8 @@ highFrequency
 					for (x=xGetDatabaseCount(dParticipants); >0) {
 						xDatabaseNext(dParticipants);
 						p = xGetInt(dParticipants, xParticipantPlayer);
-						trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")} - "+1*xGetDatabaseCount(relics)+" relics");
+						relics = getRelicsDB(p);
+						trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")} - "+xGetDatabaseCount(relics)+" relics");
 						pos = dir + vector(145,0,145);
 						spawnPlayer(p, pos);
 						dir = rotationMatrix(dir, cos, sin);
@@ -866,8 +867,6 @@ highFrequency
 		xUnitSelectByID(dPlayerUnits, xUnitID);
 		if (trUnitAlive() == false) {
 			removePlayerUnit();
-			debugLog("dPlayerUnits size is " + xGetDatabaseCount(dPlayerUnits));
-			debugLog("dEnemies size is " + xGetDatabaseCount(dEnemies));
 		} else {
 			if (xGetFloat(dPlayerUnits, xDecay) > 0) {
 				if (trTimeMS() > xGetInt(dPlayerUnits, xDecayNext)) {

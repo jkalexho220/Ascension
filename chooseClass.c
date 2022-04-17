@@ -669,29 +669,34 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power ragnarok icon 64";
-					msg = "Cooldown: 10 | Cannot target another Throne Shield or a player that already has a Vow.";
+					msg = "If you already have a partner, cast this on them to teleport next to them.";
 				}
 				case 7:
 				{
-					icon = "icons\god power thunder clap icons 64";
-					msg = "(W) Justice: Stun nearby enemies that are not attacking you. Silence the ones that are.";
+					icon = "icons\god power ragnarok icon 64";
+					msg = "Cooldown: 10 | Cannot target another Throne Shield or a player that already has a Vow.";
 				}
 				case 8:
 				{
 					icon = "icons\god power thunder clap icons 64";
-					msg = "Cooldown: 10 | Radius: 8 | Stun Duration: 2 | Silence Duration: 6";
+					msg = "(W) Justice: Stun nearby enemies that are not attacking you. Silence the ones that are.";
 				}
 				case 9:
 				{
-					icon = "icons\god power valor icons 64";
-					msg = "(E) Shield of Light: Absorb all the damage you receive for a short duration.";
+					icon = "icons\god power thunder clap icons 64";
+					msg = "Cooldown: 10 | Radius: 8 | Stun Duration: 2 | Silence Duration: 6";
 				}
 				case 10:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Then, your next attack will fire an enormous laser that deals all the absorbed damage.";
+					msg = "(E) Shield of Light: Absorb all the damage you receive for a short duration.";
 				}
 				case 11:
+				{
+					icon = "icons\god power valor icons 64";
+					msg = "Then, your next attack will fire an enormous laser that deals all the absorbed damage.";
+				}
+				case 12:
 				{
 					icon = "icons\god power valor icons 64";
 					msg = "Cost: 60 | Duration: 6 | Absorbed damage is calculated before your passive reduction";
@@ -744,22 +749,22 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					icon = "icons\god power cease fire icon 64";
 					msg = "You have 0.5x bonus attack for each ally in the aura.";
 				}
-				case 8:
+				case 9:
 				{
 					icon = "icons\god power cease fire icon 64";
 					msg = "Each time you attack, heal allies in the aura and grant them 2 favor.";
 				}
-				case 9:
+				case 10:
 				{
 					icon = "icons\god power cease fire icon 64";
 					msg = "Cooldown: 20 | Duration: 8 | Radius: 10 | Heal: 0.5x Attack";
 				}
-				case 10:
+				case 11:
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "(E) Intervention: Revive all dead allies. If you die while this is ready, it auto-activates.";
 				}
-				case 11:
+				case 12:
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "Cost: 100 | Cooldown: 10";
@@ -811,7 +816,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\world berry bush icon 64";
-					msg = "(E) Nature's Bounty: For a short duration, you plant Bery Bushes instead of seeds.";
+					msg = "(E) Nature's Bounty: For a short duration, you plant Berry Bushes instead of seeds.";
 				}
 				case 9:
 				{
@@ -889,7 +894,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power ancestors icon 64";
-					msg = "(W) Arise: When you attack an enemy with a Death Sentence, reduce the cooldown of this spell by 1";
+					msg = "When you attack an enemy with a Death Sentence, reduce the cooldown of this spell by 1";
 				}
 				case 12:
 				{

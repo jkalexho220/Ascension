@@ -150,6 +150,8 @@ highFrequency
 	setupProtounitBounty("Hero Boar 2", 0, 0, 0);
 	trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack
 	trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
+
+	setupProtounitBounty("Shaba Ka", 0.5, 30, 0);
 	
 	for(class = 1; <= 16) {
 		setupProtounitBounty(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),
@@ -1865,4 +1867,3 @@ void enemiesAlways() {
 		}
 	}
 }
-

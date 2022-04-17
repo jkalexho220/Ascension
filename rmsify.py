@@ -13,8 +13,7 @@ import sys
 # You can add -v to the command to see verbose output, though this will not be helpful to most people.
 
 # The syntax validator will stop after encountering the first error. After fixing that error, additional ones may be reported.
-# In files[], the very first file contains all the rms code in void main() that EXCLUDES trigger code.
-# The other files after the first file are parsed as raw trigger code.
+
 # If you wish to inject RMS code between the lines of trigger code, use the % character to escape trigger code and another % to return to trigger code.
 # The % characters must be placed on their own lines.
 # While in RMS code, you can write code(""); to create trigger code the old-fashioned nottud way.
@@ -1103,12 +1102,44 @@ try:
 								if '//' in stringless:
 									templine = templine[:templine.find('//')].strip()
 
-								if (len(templine) > 120):
-									print("Line length greater than 120! Length is " + str(len(templine)))
-									print("Line " + str(ln) + ":\n    " + line)
 								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch(' or templine[-1] == '%'):
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
+
+								if len(templine) > 120:
+									if ESCAPE:
+										print("Line length greater than 120! Length is " + str(len(templine)))
+										print("Line " + str(ln) + ":\n    " + line)
+									else:
+										templines = []
+										while (len(templine) > 120):
+											# attempt to separate the line into multiple
+											inString = False
+											ignoreNext = False
+											split = 0
+											for index in range(118):
+												if ignoreNext:
+													ignoreNext = False
+												elif templine[index] == '"':
+													inString = not inString
+												elif not inString:
+													if templine[index] == ',':
+														split = index + 1
+													elif templine[index:index+2] in ['&&', '||']:
+														split = index + 2
+												elif templine[index] == '\\':
+													ignoreNext = True
+											
+											if split > 0:
+												templines.append(templine[:split])
+												templine = templine[split:].strip()
+											else:
+												print("Line length greater than 120 and could not find a delimiter to split! Length is " + str(len(templine)))
+												print("Line " + str(ln) + ":\n    " + line)
+												break
+										for l in templines:
+											file_data_2.write(tabs + 'code("' + l.replace('"', '\\"') + '");\n')	
+
 
 								if not RESTORING and len(templine) > 0:
 									# reWrite the line
@@ -1127,7 +1158,7 @@ try:
 
 						if ('*/' in nostrings):
 							comment = False
-					else:
+					elif OUTPUT_TABS:
 						file_data_2.write('\n')
 
 					if '{' in nostrings:

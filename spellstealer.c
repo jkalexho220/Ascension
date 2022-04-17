@@ -118,6 +118,14 @@ void spellstealerAlways(int eventID = -1) {
 					removeSpellstealer(p);
 				} else {
 					trMutateSelected(kbGetProtoUnitID("Revealer to Player"));
+					if (PvP) {
+						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+						xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+						xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+						xFreeDatabaseBlock(dPlayerUnits);
+					} else {
+						xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+					}
 				}
 			}
 			xSetBool(dPlayerData, xPlayerLaunched, true);
@@ -213,6 +221,17 @@ void spellstealerAlways(int eventID = -1) {
 					trUnitChangeProtoUnit("Swordsman Hero");
 					xUnitSelectByID(db, xUnitID);
 					trMutateSelected(kbGetProtoUnitID("Swordsman Hero"));
+					if (PvP) {
+						xSetInt(db, xCharIndex,activatePlayerUnit(xGetInt(db, xUnitName),p,kbGetProtoUnitID("Swordsman Hero")));
+						xSetBool(dPlayerUnits, xIsHero, true);
+						xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist, p));
+						xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist, p));
+						if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+							xSetInt(dPlayerData, xPlayerIndex, xGetInt(db, xCharIndex));
+						}
+					} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+						debugLog("Spellstealer " + p + ": Unable to restore database block");
+					}
 				}
 				xSetBool(dPlayerData, xPlayerLaunched, false);
 				equipRelicsAgain(p);

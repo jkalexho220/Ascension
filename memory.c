@@ -1,3 +1,8 @@
+/*
+NOTE: In order for the database functionality to work, any database functions can only be called
+while the context player is 0. If you need to switch context players (such as for getting a unit's current health or current attack target)
+make sure to immediately switch back to context player 0 once you are done acquiring the information you need.
+*/
 
 rule context_change_always
 active
@@ -5,7 +10,7 @@ highFrequency
 {
 	/*
 	For whatever reason, the context player is set to -1 at the start of
-	every trigger loop, but only in random map scripts. So here we are
+	every trigger loop, but only in random map scripts. So here we are.
 	*/
 	xsSetContextPlayer(0);
 }

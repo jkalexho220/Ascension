@@ -587,9 +587,6 @@ highFrequency
 	if (xGetDatabaseCount(dPlayerUnits) > 0) {
 		xDatabaseNext(dPlayerUnits);
 		xUnitSelectByID(dPlayerUnits, xUnitID);
-		if (trCurrentPlayer() == 1) {
-			trUnitHighlight(0.1, false);
-		}
 		if (trUnitAlive() == false) {
 			removePlayerUnit();
 		} else {
@@ -1289,5 +1286,77 @@ highFrequency
 				trQuestVarSet("cloudDeployNext", trTime() + trQuestVarGet("rand"));
 			}
 		}
+	}
+}
+
+
+rule devil_do1_find
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("devil_do1");
+	for(p=1; < ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			trUnitHighlight(5.0, true);
+			uiLookAtUnitByName(""+1*trQuestVarGet("devil_do1"));
+			trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Pursuers from the Guild? Just try and catch me!");
+			trCounterAddTime("devilEscape",180,0,"devil_do1 escapes",-1);
+			trQuestVarSet("devilEscapeTime", trTime() + 180);
+			trQuestVarSet("devilNextSummon", trTime() - 10 * trQuestVarGet("stage"));
+			xsEnableRule("devil_do1_battle");
+			xsDisableSelf();
+		}
+	}
+}
+
+rule devil_do1_battle
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("devilNextSummon")) {
+		trSoundPlayFN("mythcreate.wav","1",-1,"","");
+		trQuestVarSet("devilNextSummon", trQuestVarGet("devilNextSummon") + 10);
+		trQuestVarSetFromRand("rand", 1, 19, true);
+		int proto = monsterPetProto(1*trQuestVarGet("rand"));
+		vector pos = kbGetBlockPosition(""+1*trQuestVarGet("devil_do1"));
+		trQuestVarSetFromRand("heading", 1, 360, true);
+		int next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+ENEMY_PLAYER+",0",kbGetProtoUnitName(proto),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
+		activateEnemy(next);
+		trQuestVarSetFromRand("rand", 1, 10);
+		switch(1*trQuestVarGet("rand"))
+		{
+			case 1:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Mwuahaha! This is fun!");
+			}
+			case 2:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Go forth, my pretties!");
+			}
+			case 3:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Behold the power of the Monsterpedia!");
+			}
+		}
+	}
+
+	trUnitSelectClear();
+	trUnitSelectByQV("devil_do1");
+	if (trUnitAlive() == false) {
+		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Noooo! How can this be?!");
+		xsDisableSelf();
+		trUnitChangeProtoUnit("Lampades Blood");
+		if (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 2) {
+			startNPCDialog(NPC_DEVIL_DIE);
+			trQuestVarSet("monsterpediaQuestComplete", 1);
+		}
+	} else if (trTime() > trQuestVarGet("devilEscapeTime")) {
+		xsDisableSelf();
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+		trSoundPlayFN("vortexstart.wav","1",-1,"","");
+		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: So long, suckers!");
+		trUnitChangeProtoUnit("Dust Large");
 	}
 }

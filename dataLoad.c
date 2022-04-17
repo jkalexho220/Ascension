@@ -109,6 +109,8 @@ void saveAllData() {
 	
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = trQuestVarGet("monsterpediaQuestComplete");
+	savedata = savedata * 2 + currentdata;
 	currentdata = xsMin(10, trQuestVarGet("chestCount"));
 	savedata = savedata * 11 + currentdata;
 	currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
@@ -133,8 +135,10 @@ void saveAllData() {
 	
 	/* Quest data */
 	savedata = 0;
-	currentdata = trQuestVarGet("p"+p+"relicsSacrificed");
-	savedata = savedata * 11 + currentdata;
+	currentdata = xsMin(2, trQuestVarGet("p"+p+"monsterpediaQuest"));
+	savedata = savedata * 3 + currentdata;
+	currentdata = xsMin(9, trQuestVarGet("p"+p+"relicsSacrificed"));
+	savedata = savedata * 10 + currentdata;
 	for(x=5; >0) {
 		currentdata = trQuestVarGet("p"+p+"runestone"+x);
 		savedata = savedata * 2 + currentdata;
@@ -199,6 +203,8 @@ inactive
 	savedata = savedata / 10;
 	trQuestVarSet("chestCount", iModulo(11, savedata));
 	savedata = savedata / 11;
+	trQuestVarSet("monsterpediaQuestComplete", iModulo(2, savedata));
+	savedata = savedata / 2;
 	
 	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);
@@ -307,8 +313,10 @@ inactive
 			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
-		trQuestVarSet("p1relicsSacrificed", iModulo(11, savedata));
-		savedata = savedata / 11;
+		trQuestVarSet("p1relicsSacrificed", iModulo(10, savedata));
+		savedata = savedata / 10;
+		trQuestVarSet("p1monsterpediaQuest", iModulo(3, savedata));
+		savedata = savedata / 3;
 		
 		xsEnableRule("singleplayer_init");
 		trDelayedRuleActivation("delayed_modify");
@@ -435,8 +443,10 @@ inactive
 						}
 					} else if (loadProgress == 23) {
 						currentdata = x;
-						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(11, currentdata));
-						currentdata = currentdata / 11;
+						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(10, currentdata));
+						currentdata = currentdata / 10;
+						trQuestVarSet("p"+p+"monsterpediaQuest", iModulo(3, currentdata));
+						currentdata = currentdata / 3;
 					}
 					trUnitSelectClear();
 					trUnitSelectByID(x + swordsmen);
@@ -536,7 +546,10 @@ inactive
 	*/
 	int class = 0;
 	int proto = 0;
+	trQuestVarSet("monsterpediaQuestInProgress", 0);
 	for(p=1; < ENEMY_PLAYER) {
+		trQuestVarSet("monsterpediaQuestInProgress", 
+			trQuestVarGet("monsterpediaQuestInProgress") + trQuestVarGet("p"+p+"monsterpediaQuest"));
 		trForbidProtounit(p, "Swordsman Hero");
 		trArmyDispatch(""+p+",0","Victory Marker",1,1,0,1,0,true);
 		class = xGetInt(dPlayerData,xPlayerClass,p);

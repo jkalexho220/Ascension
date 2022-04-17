@@ -543,14 +543,14 @@ highFrequency
 	setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
 	setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
 	setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
-	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
-	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
+	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.4);
+	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.3);
 	setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
 	setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
 	setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
 	setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
 	setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
-	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
+	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.4);
 	setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
 	setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
 	setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
@@ -612,6 +612,10 @@ highFrequency
 		
 		trModifyProtounit("Axe",p,1,-20);
 	}
+
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 2000 * ENEMY_PLAYER);
 	
 	trModifyProtounit("Minion", 0, 8, -999);
 	
@@ -767,6 +771,13 @@ void paintTowerSegment(int stage = 0) {
 	xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
 	xSetInt(dStageChoices,xUnitName,next);
 	xSetInt(dStageChoices,xStageChoicesStage,stage);
+
+	if (trQuestVarGet("monsterpediaQuestLocation") == stage) {
+		trUnitSelectClear();
+		trUnitSelect(""+next, true);
+		trMutateSelected(kbGetProtoUnitID("Shaba Ka"));
+		trUnitOverrideAnimation(2,0,true,false,-1);
+	}
 }
 
 rule Z_cin_02
@@ -814,7 +825,10 @@ highFrequency
 				trPaintTerrain(64,47,64,47,0,75);
 				trPaintTerrain(64,46,64,46,0,34);
 			}
-			
+
+			if (trQuestVarGet("p1monsterpediaQuest") == 2) {
+				trQuestVarSetFromRand("monsterpediaQuestLocation", 1, xGetInt(dPlayerData, xPlayerProgress, 1), true);
+			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black
 			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
 				paintTowerSegment(i+1);

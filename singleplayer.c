@@ -540,8 +540,10 @@ highFrequency
 			z = z - 2;
 		}
 		
-		/* monster-pedia */
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 3) {
+		/* 
+		monster-pedia will have a quest
+		*/
+		if (trQuestVarGet("monsterpediaQuestComplete") == 1) {
 			dMonsterpedia = xInitDatabase("monsterpedia");
 			xInitAddInt(dMonsterpedia, "name");
 			xMonsterIndex = xInitAddInt(dMonsterpedia, "index");
@@ -568,6 +570,13 @@ highFrequency
 				}
 			}
 			xsEnableRule("monsterpedia_always");
+		}
+
+		if ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2)) {
+			// quest is in progress
+			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Ajax",1,143,0,171,180,true);
+			xsEnableRule("monsterpedia_quest");
 		}
 		
 		dBoons = xInitDatabase("boonStatues",12);
@@ -631,11 +640,6 @@ highFrequency
 				trUnitSelectByQV("zenoUnit", true);
 				trUnitConvert(0);
 				xsEnableRule("zeno_quiz_start");
-				if (trQuestVarGet("zenoQuiz") == 2) {
-					/* introduce monsterpedia */
-					uiLookAtUnitByName(""+xGetInt(dMonsterpedia, xUnitName));
-					startNPCDialog(NPC_MONSTERPEDIA);
-				}
 			}
 			if (trQuestVarGet("p1nickQuestProgress") > 0) {
 				if (trQuestVarGet("p1nickQuestProgress") == 6) {
@@ -1408,5 +1412,67 @@ highFrequency
 				trQuestVarSet("quantumSlotMachine", 1);
 			}
 		}
+	}
+}
+
+
+rule monsterpedia_quest
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("beastmaster");
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		if (trQuestVarGet("monsterpediaQuestComplete") == 1) {
+			startNPCDialog(NPC_MONSTERPEDIA_COMPLETE);
+			xsDisableSelf();
+		} else if (trQuestVarGet("p1monsterpediaQuest") == 0) {
+			trQuestVarSet("p1monsterpediaQuest", 1);
+			startNPCDialog(NPC_MONSTER_TAMER_START);
+		} else {
+			startNPCDialog(NPC_MONSTER_TAMER_NEXT);
+		}
+	}
+}
+
+rule monsterpedia_complete
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	trQuestVarSet("p1monsterpediaQuest", 0);
+	trQuestVarSet("boonUnlocked"+BOON_MONSTER_COMPANION, 1);
+	trUnitSelectClear();
+	trUnitSelectByQV("beastmaster");
+	trUnitChangeProtoUnit("Arkantos God Out");
+	trSoundPlayFN("arrkantosleave.wav","1",-1,"","");
+
+	if (xGetDatabaseCount(dBoons) == 0) {
+		trQuestVarSet("boonSpotlight", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		trArmySelect("1,0");
+		trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+		xsEnableRule("select_boon");
+		trEventSetHandler(8000, "spChooseBoon");
+		trPaintTerrain(71,71,87,73,0,53,false);
+		trPaintTerrain(88,69, 92,75, 4,15, false);
+		startNPCDialog(NPC_EXPLAIN_BOONS);
+	}
+	int x = 177 + 4 * iModulo(3, BOON_MONSTER_COMPANION - 1);
+	int z = 139 + 4 * ((BOON_MONSTER_COMPANION-1) / 3);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0","Statue of Lightning",1,x,0,z,180,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("next");
+	trUnitConvert(0);
+	overrideStatue(BOON_MONSTER_COMPANION);
+	xAddDatabaseBlock(dBoons, true);
+	xSetInt(dBoons, xUnitName, 1*trQuestVarGet("next"));
+	xSetInt(dBoons, xBoonType, BOON_MONSTER_COMPANION);
+	if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_MONSTER_COMPANION) {
+		trUnitSelectClear();
+		trUnitSelectByQV("boonSpotlight", true);
+		trUnitTeleport(x,0,z);
 	}
 }
