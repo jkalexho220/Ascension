@@ -168,11 +168,13 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
-				trUnitSelectClear();
-				trUnitSelect(""+next,true);
-				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
-				xSetInt(dEnemiesIncoming,xUnitName,next);
+				if (trGetNextUnitScenarioNameNumber() > next) {
+					trUnitSelectClear();
+					trUnitSelect(""+next,true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
+					xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+					xSetInt(dEnemiesIncoming,xUnitName,next);
+				}
 			}
 		}
 	}
@@ -185,11 +187,13 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
-				trUnitSelectClear();
-				trUnitSelect(""+next,true);
-				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
-				xSetInt(dEnemiesIncoming,xUnitName,next);
+				if (trGetNextUnitScenarioNameNumber() > next) {
+					trUnitSelectClear();
+					trUnitSelect(""+next,true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
+					xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+					xSetInt(dEnemiesIncoming,xUnitName,next);
+				}
 			}
 		}
 	}

@@ -4321,7 +4321,7 @@ highFrequency
 				trImmediateUnitGarrison(""+1*trQuestVarGet("boat"));
 				trUnitChangeProtoUnit("Scylla");
 				trQuestVarSet("bossSpell", 22);
-				bossNext = trTimeMS() + 1400;
+				bossNext = trTimeMS() + 1500;
 				trUnitSelectClear();
 				trUnitSelectByQV("boat");
 				trUnitChangeProtoUnit("Meteor Impact Water");
@@ -4799,6 +4799,7 @@ highFrequency
 				trUnitChangeProtoUnit("Scylla");
 				boss = trQuestVarGet("stage");
 				activateEnemy(bossUnit);
+				bossID = kbGetBlockID(""+bossUnit, true);
 				bossPointer = xGetNewestPointer(dEnemies);
 				xSetBool(dEnemies, xLaunched, true);
 				bossCooldown(10, 15);
@@ -4859,9 +4860,7 @@ highFrequency
 			{
 				trModifyProtounit("Meteor", 0, 8, -12);
 				trPaintTerrain(0,0,5,5,0,70,true);
-				trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-				TERRAIN_WALL = 4;
-				TERRAIN_SUB_WALL = 15;
+				trPaintTerrain(0,0,5,5,4,15,false);
 				bossDir = vector(0,0,-1);
 				int db = trQuestVarGet("cloudTornados");
 				for(i=0; < 10) {
@@ -4910,10 +4909,14 @@ highFrequency
 				trQuestVarSet("bossSmiteLaser", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("0,0");
+				trUnitSetStance("Passive");
 				trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
 				trSetSelectedScale(0,0,0);
 				pos = trVectorQuestVarGet("bossSmitePos");
 				trUnitTeleport(xsVectorGetX(pos),xsVectorGetY(pos),xsVectorGetZ(pos));
+
+				trModifyProtounit("Statue of Lightning", 0, 0, 99999);
+				trModifyProtounit("Petosuchus Projectile", 0, 0, 99999);
 				
 				trMessageSetText("Bring Spark relics to the statue in the middle to damage the boss.", -1);
 				

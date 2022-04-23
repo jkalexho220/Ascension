@@ -329,15 +329,12 @@ void relicTransporterGuy(int p = 0) {
 		xDatabaseNext(db);
 		xUnitSelect(db, xUnitName);
 		if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
-			if (xGetInt(db, xRelicType) < KEY_RELICS ||
-				trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
-				id = kbGetBlockID(""+xGetInt(db, xUnitName));
-				if (kbGetUnitBaseTypeID(id) == relicProto(xGetInt(db, xRelicType))) {
-					trUnitChangeProtoUnit("Relic");
-					xAddDatabaseBlock(dFreeRelics, true);
-					xSetInt(dFreeRelics, xUnitName, xGetInt(db, xUnitName));
-					xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
-				}
+			id = kbGetBlockID(""+xGetInt(db, xUnitName));
+			if (kbGetUnitBaseTypeID(id) == relicProto(xGetInt(db, xRelicType))) {
+				trUnitChangeProtoUnit("Relic");
+				xAddDatabaseBlock(dFreeRelics, true);
+				xSetInt(dFreeRelics, xUnitName, xGetInt(db, xUnitName));
+				xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
 			} else {
 				trSoundPlayFN("storehouse.wav","1",-1,"","");
 			}

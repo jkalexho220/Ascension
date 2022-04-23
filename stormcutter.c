@@ -145,7 +145,11 @@ void stormcutterAlways(int eventID = -1) {
 			hit = xGetInt(dEnemies, xDoppelganger, xGetInt(spearedUnits, xSpearedIndex));
 			launched = xGetBool(dPlayerUnits, xLaunched, hit);
 		} else {
-			launched = xGetBool(dEnemies, xLaunched, xGetInt(spearedUnits, xSpearedIndex));
+			xUnitSelect(spearedUnits, xUnitName);
+			launched = trUnitAlive() && xGetBool(dEnemies, xLaunched, xGetInt(spearedUnits, xSpearedIndex));
+			if ((xGetInt(dEnemies, xUnitName, xGetInt(spearedUnits, xSpearedIndex)) == bossUnit) && trQuestVarGet("stage") > 5) {
+				launched = false;
+			}
 		}
 		if (launched == false) {
 			if (xGetInt(dEnemies, xStunStatus, xGetInt(spearedUnits, xSpearedIndex)) > 0) { // if they hit a wall, damage them
