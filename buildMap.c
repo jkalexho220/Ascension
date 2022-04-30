@@ -126,6 +126,31 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 							paintRelicEdge(x0, z0, x1, z1);
 						}
 					}
+					case TRAP_CAROUSEL:
+					{
+						paintCircle(x, z, 9, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+						pos = xsVectorSet(x * 70 + 41, 5, z * 70 + 41);
+						next = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch("1,0", "Dwarf", 3, x * 70 + 41, 5, z * 70 + 41, 225, true);
+						trArmySelect("1,0");
+						trUnitConvert(0);
+						trUnitSelectClear();
+						trUnitSelect(""+next, true);
+						trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+						trUnitOverrideAnimation(2,0,true,false,-1);
+						trUnitSelectClear();
+						trUnitSelect(""+(next+1), true);
+						trMutateSelected(kbGetProtoUnitID("Outpost"));
+						trUnitSelectClear();
+						trUnitSelect(""+(next+2), true);
+						trMutateSelected(kbGetProtoUnitID("Outpost"));
+
+						xAddDatabaseBlock(dCarouselRooms, true);
+						xSetInt(dCarouselRooms, xUnitName, next);
+						xSetVector(dCarouselRooms, xCarouselRoomPos, pos);
+
+						debugLog("trap room: " + room);
+					}
 				}
 			}
 		}
@@ -1667,24 +1692,31 @@ highFrequency
 			}
 			case 9:
 			{
+				xsEnableRule("carousel_rooms_always");
 				worldHeight = 5;
-				wallHeight = -3;
-				trQuestVarSet("stageTemple", -1);
+				wallHeight = 10;
+				trQuestVarSet("stageTemple", 10); // kronos
 				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 9, 3);
 				trSetCivAndCulture(ENEMY_PLAYER, 9, 3);
 				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
-				trQuestVarSet("bossRoomSize", 12);
+				trQuestVarSet("bossRoomSize", 15);
+				trSetLighting("hades", 0.1);
+
+				initializeCarouselTrapDatabase();
+
+				xsEnableRule("the_pit_build_01");
+
 				trQuestVarSet("wallEdges", 5);
 				trQuestVarSet("trapRooms", 3);
 				trQuestVarSet("trapType", TRAP_CAROUSEL);
-				TERRAIN_WALL = 2;
+				TERRAIN_WALL = 2; // hades cliff
 				TERRAIN_SUB_WALL = 11;
 				
-				TERRAIN_PRIMARY = 0;
+				TERRAIN_PRIMARY = 0; // hades buildable 1
 				TERRAIN_SUB_PRIMARY = 84;
 				
-				TERRAIN_SECONDARY = 0;
+				TERRAIN_SECONDARY = 0; // hades buildable 2
 				TERRAIN_SUB_SECONDARY = 85;
 				
 				trQuestVarSet("mapType", MAP_STANDARD);
@@ -1696,24 +1728,32 @@ highFrequency
 				trStringQuestVarSet("spriteProto1", "Skeleton");
 				trStringQuestVarSet("spriteProto2", "Rock Granite Small");
 				trStringQuestVarSet("spriteProto3", "Rock Limestone Small");
-				trQuestVarSet("rockDensity", 0.2);
+				trQuestVarSet("rockDensity", 0.3);
 				trStringQuestVarSet("rockProto1", "Stalagmite");
 				trStringQuestVarSet("rockProto2", "Rock Granite Big");
 				trStringQuestVarSet("rockProto3", "Stalagmite");
+
+				trQuestVarSet("columnDensity", 0.1);
 				
 				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
 				
 				trQuestVarSet("enemyProtoCount", 6);
-				trStringQuestVarSet("enemyProto1", "Tartarian Spawn");
+				trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
 				trStringQuestVarSet("enemyProto2", "Troll");
 				trStringQuestVarSet("enemyProto3", "Manticore");
 				trStringQuestVarSet("enemyProto4", "Mountain Giant");
 				trStringQuestVarSet("enemyProto5", "Frost Giant");
 				trStringQuestVarSet("enemyProto6", "Fire Giant");
+
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 				
+				/*
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				*/
 				
 				trStringQuestVarSet("bossProto", "Guardian");
 				bossScale = 1.2;
@@ -1793,6 +1833,11 @@ highFrequency
 		/* paint entire map cliff and raise it */
 		trChangeTerrainHeight(0,0,145,145,wallHeight,false);
 		trPaintTerrain(0,0,145,145,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
+
+		if (trQuestVarGet("stage") == 9) {
+			// on stage 9, walls are +10 but the lava is -3
+			trChangeTerrainHeight(0,0,145,145,-3,false);
+		}
 		
 		if (trQuestVarGet("mapType") == MAP_OPEN) {
 			trChangeTerrainHeight(5,5,140,140,worldHeight,false);
@@ -2535,7 +2580,46 @@ highFrequency
 	}
 }
 
+rule the_pit_build_01
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	xsEnableRule("the_pit_build_02");
+	bool paint = true;
+	for(x=0; < 146) {
+		for(z=0; < 146) {
+			paint = true;
+			for(i=2;>= -1) {
+				for(j=2;>= -1) {
+					if (trGetTerrainHeight(x+i,z+j) > -2.0) {
+						paint = false;
+						break;
+					}
+				}
+				if (paint == false) {
+					break;
+				}
+			}
+			if (paint) {
+				trPaintTerrain(x,z,x,z,2,12,false);
+			}
+		}
+	}
+	xsDisableSelf();
+}
 
+rule the_pit_build_02
+inactive
+highFrequency
+{
+	if (trQuestVarGet("play") == 1) {
+		xsDisableSelf();
+		startNPCDialog(NPC_EXPLAIN_PIT);
+		xsEnableRule("the_pit_damage");
+		trQuestVarSet("pitDamageNext", trTime());
+	}
+}
 
 rule rebuild_map
 inactive

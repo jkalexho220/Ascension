@@ -633,7 +633,7 @@ highFrequency
 			if (boons && (trQuestVarGet("boonUnlocked0") == 0)) {
 				startNPCDialog(NPC_EXPLAIN_BOONS);
 			}
-			if (xGetInt(dPlayerData, xPlayerProgress) > trQuestVarGet("zenoQuiz")) {
+			if ((xGetInt(dPlayerData, xPlayerProgress) > trQuestVarGet("zenoQuiz")) && (trQuestVarGet("zenoQuiz") < 6)) {
 				trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0", "Hoplite", 1, 131, 0, 161, 225, true);
 				trUnitSelectClear();
@@ -1037,15 +1037,15 @@ highFrequency
 					
 					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
 					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
-					
-					setupExplain("Congratulations on beating floor 6! The real challenge begins now!");
-					setupExplain("Each of the remaining floors is extremely difficult. You will need to coordinate with your friends!");
-				}
-				case 6:
-				{
+
 					setupQuestion("You can press Escape to close a relic image box.","True","False",1);
 					setupExplain("I painstakingly coded this myself. It's not a default AoM feature. So use it you bastards.");
 					setupExplain("No one appreciates the work I put into this... *sniffle*");
+					
+					setupExplain("It is sad to say this but my quizzes end here. I have taught you everything I know.");
+					setupExplain("The real challenge begins now. These final four floors will be extremely difficult.");
+					setupExplain("You will need to bring your best characters and also coordinate with your friends!");
+					setupExplain("Good luck! I know you can do it!");
 				}
 			}
 			trQuestVarSet("zenoReward", gem);

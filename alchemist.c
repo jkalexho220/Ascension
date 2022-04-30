@@ -329,7 +329,7 @@ void chooseAlchemist(int eventID = -1) {
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, elixirCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
-	xSetInt(dPlayerData,xPlayerLureCooldown, 0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 1);
 	xSetFloat(dPlayerData,xPlayerLureCost, duplicateCost);
 	xSetInt(dPlayerData,xPlayerRainCooldown,1);
 	xSetFloat(dPlayerData,xPlayerRainCost, 0);

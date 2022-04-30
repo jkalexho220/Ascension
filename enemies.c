@@ -97,7 +97,7 @@ highFrequency
 	setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
 	setupProtounitBounty("Helepolis", 0.25, 0, 0);
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
-	setupProtounitBounty("Guardian", 0.5, 0, 0);
+	setupProtounitBounty("Heka Gigantes", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);
@@ -141,6 +141,11 @@ highFrequency
 	setupProtounitBounty("Einheriar", 0.6, 7, 0.03);
 	setupProtounitBounty("Statue of Lightning", 0.5, 8, 0.05);
 	setupProtounitBounty("Lampades", 0.8, 12, 0.1);
+
+	setupProtounitBounty("Tartarian Gate Spawn", 0.7, 6, 0.03);
+	setupProtounitBounty("Troll", 0.7, 7, 0.03);
+	setupProtounitBounty("Manticore", 0.3, 8, 0.05);
+	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);

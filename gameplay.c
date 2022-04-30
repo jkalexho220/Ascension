@@ -1286,6 +1286,25 @@ highFrequency
 	}
 }
 
+rule the_pit_damage
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("pitDamageNext")) {
+		trQuestVarSet("pitDamageNext", trTime());
+		if (trQuestVarGet("play") == 1) {
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
+				xUnitSelectByID(dPlayerUnits, xUnitID);
+				if (trUnitAlive() == false) {
+					removePlayerUnit();
+				} else {
+					trDamageUnit(10);
+				}
+			}
+		}
+	}
+}
 
 rule devil_do1_find
 inactive

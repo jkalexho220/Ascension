@@ -1069,6 +1069,7 @@ int dLampades = 0;
 int dEinherjars = 0;
 int dLightningStatues = 0;
 int dManticores = 0;
+int dFireGiants = 0;
 
 int dAutomatonBombs = 0;
 
@@ -1111,6 +1112,9 @@ int xAvengerProjIndex = 0;
 
 int xMummyStart = 0;
 int xMummyDir = 0;
+
+int dManticoreProj = 0;
+int dFireGiantProj = 0;
 
 int dYeebLightningBalls = 0;
 
