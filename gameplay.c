@@ -125,7 +125,7 @@ void processRegen(int p = 0) {
 		amt = 0;
 		diff = trTimeMS() - xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p);
 		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_REGENERATE_HEALTH) {
-			amt = diff * 0.00003 * xGetFloat(dPlayerData, xPlayerHealth, p);
+			amt = diff * 0.00002 * xGetFloat(dPlayerData, xPlayerHealth, p);
 		}
 		if (xGetFloat(dPlayerData, xPlayerDefiance, p) > 0) {
 			amt = amt + 0.001 * diff * xGetFloat(dPlayerData, xPlayerDefiance, p) * xGetDatabaseCount(dEnemies);

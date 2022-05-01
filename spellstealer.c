@@ -1,7 +1,7 @@
 
 float spellstealerPassiveRadius = 6;
 
-float bladeDanceCost = 10;
+float bladeDanceCost = 20;
 float bladeDanceRadius = 15;
 
 float negationCloakDuration = 3;
@@ -158,8 +158,8 @@ void spellstealerAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"bladeDanceNext", trTimeMS() - 1);
 			xSetPointer(bladeDanceTargets, target);
 			
-			if (xGetDatabaseCount(bladeDanceTargets) > 1) {
-				amt = amt * 2;
+			if (xGetDatabaseCount(bladeDanceTargets) == 1) {
+				amt = amt * 0.5;
 			}
 			gainFavor(p, 0.0 - amt);
 		} else {
@@ -206,6 +206,10 @@ void spellstealerAlways(int eventID = -1) {
 					damageEnemy(p, amt, false, 1.0);
 					OnHit(p, xGetInt(bladeDanceTargets, xBladeDanceIndex), false);
 					xFreeDatabaseBlock(bladeDanceTargets);
+					for(y=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xSetInt(db,xCharSpecialAttack,xGetInt(db,xCharSpecialAttack) - 1);
+					}
 					break;
 				}
 			}
