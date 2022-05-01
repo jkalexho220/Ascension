@@ -468,25 +468,30 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 6:
 				{
-					icon = "icons\improvement temple of healing icon 64";
-					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
+					icon = "icons\god power restoration icon 64";
+					msg = "Additional projectiles will increase the healing by 1 percent.";
 				}
 				case 7:
 				{
 					icon = "icons\improvement temple of healing icon 64";
-					msg = "Cooldown: 12 | Heal: 200";
+					msg = "(Q) Elixir: Restore health to an ally and remove all status effects from them.";
 				}
 				case 8:
+				{
+					icon = "icons\improvement temple of healing icon 64";
+					msg = "Cooldown: 12 | Heal: 200";
+				}
+				case 9:
 				{
 					icon = "icons\improvement salt amphora icon 64";
 					msg = "(W) Swap Potion: Swap the type of potion you throw, cycling between the three options.";
 				}
-				case 9:
+				case 10:
 				{
 					icon = "icons\god power call to arms icon";
 					msg = "(E) Duplicate: Summon a perfect copy of an allied hero. It also casts spells with them.";
 				}
-				case 10:
+				case 11:
 				{
 					icon = "icons\god power call to arms icon";
 					msg = "Cost: 50 | Decay: 1 + 1 per second (percent max health)";

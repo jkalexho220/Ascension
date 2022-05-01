@@ -512,7 +512,7 @@ void gamblerAlways(int eventID = -1) {
 						if (trUnitAlive() == false) {
 							removeEnemy();
 						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName),pos) < dist) {
-							stunUnit(dEnemies,2.5,p,false);
+							stunUnit(dEnemies,3.0,p,false);
 						}
 					}
 				}

@@ -159,7 +159,7 @@ void processChests() {
 			}
 		}
 		xSetFloat(dChestHitbox,xChestHitboxDist,amt);
-		if (trTimeMS() - xGetInt(dChestHitbox,xChestHitboxStart) > 1.5) {
+		if (trTimeMS() - xGetInt(dChestHitbox,xChestHitboxStart) > 1500) {
 			xFreeDatabaseBlock(dChestHitbox);
 		}
 	}

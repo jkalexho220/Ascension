@@ -148,8 +148,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 						xAddDatabaseBlock(dCarouselRooms, true);
 						xSetInt(dCarouselRooms, xUnitName, next);
 						xSetVector(dCarouselRooms, xCarouselRoomPos, pos);
-
-						debugLog("trap room: " + room);
 					}
 				}
 			}
@@ -694,6 +692,27 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
 				xSetInt(dEnemiesIncoming, xUnitName, trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Statue of Lightning",1,
+					70.0 * x + 41.0 - 16.0 * xsVectorGetX(dir),0,70.0 * z + 41.0 - 16.0 * xsVectorGetZ(dir),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetUnitOrientation(dir,vector(0,1,0),true);
+				dir = rotationMatrix(dir, 0.707107, 0.707107);
+			}
+		}
+		case ROOM_VILLAGE + 9:
+		{
+			paintCircle(x, z, 12, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			trQuestVarSet("villageX", 70 * x + 16);
+			trQuestVarSet("villageZ", 70 * z + 16);
+			trQuestVarSet("stageWonder", trGetNextUnitScenarioNameNumber());
+			trUnitSelectClear();
+			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 25, 25, 225), true);
+			trUnitConvert(ENEMY_PLAYER);
+			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
+			dir = vector(0,0,-1);
+			for(i=0; < 8) {
+				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+				xSetInt(dEnemiesIncoming, xUnitName, trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Fire Giant",1,
 					70.0 * x + 41.0 - 16.0 * xsVectorGetX(dir),0,70.0 * z + 41.0 - 16.0 * xsVectorGetZ(dir),0,true);
 				trArmySelect(""+ENEMY_PLAYER+",0");
 				trSetUnitOrientation(dir,vector(0,1,0),true);

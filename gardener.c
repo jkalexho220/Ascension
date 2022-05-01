@@ -256,7 +256,7 @@ void gardenerAlways(int eventID = -1) {
 					if (trUnitAlive() == false) {
 						removeEnemy();
 					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-						stunUnit(dEnemies, 1.0, p, false);
+						stunUnit(dEnemies, 1.5, p, false);
 						damageEnemy(p, amt);
 					}
 				}

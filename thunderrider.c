@@ -185,7 +185,7 @@ void thunderRiderAlways(int eventID = -1) {
 				gainFavor(p, 3);
 				damageEnemy(p, blitzDamage * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
 				if (trUnitAlive()) {
-					stunUnit(dEnemies, 1.5, p);
+					stunUnit(dEnemies, 3.0, p);
 				}
 			}
 		}
@@ -285,6 +285,11 @@ void thunderRiderAlways(int eventID = -1) {
 		if (trQuestVarGet("p"+p+"rideLightning") == 0) {
 			trQuestVarSet("p"+p+"blitz", 1);
 			trQuestVarSet("p"+p+"blitzStart", trGetNextUnitScenarioNameNumber());
+			for(x=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				xUnitSelect(relics, xUnitName);
+				trUnitChangeProtoUnit("Relic");
+			}
 			/* dash */
 			for(x=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);

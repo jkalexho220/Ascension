@@ -37,6 +37,7 @@ void stormcutterAlways(int eventID = -1) {
 	int target = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
+	int relics = getRelicsDB(p);
 	int spearedUnits = trQuestVarGet("p"+p+"spearedUnits");
 	int shockArrows = trQuestVarGet("p"+p+"shockArrows");
 	float amt = 0;
@@ -96,11 +97,16 @@ void stormcutterAlways(int eventID = -1) {
 			if (trUnitAlive() == false) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+xGetInt(dEnemies, xUnitName),p,"Archer Atlantean Hero", dist) >0) {
-				stunUnit(dEnemies, 2.0, p);
+				stunUnit(dEnemies, 3.0, p);
 				gainFavor(p, 1.0);
 			}
 		}
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
+		for(x=xGetDatabaseCount(relics); >0) {
+			xDatabaseNext(relics);
+			xUnitSelect(relics, xUnitName);
+			trUnitChangeProtoUnit("Relic");
+		}
 		for(x=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
 			xUnitSelectByID(db, xUnitID);

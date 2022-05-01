@@ -255,7 +255,7 @@ void saviorAlways(int eventID = -1) {
 			} else if (xGetBool(db, xJumping)) {
 				xSetBool(db, xJumping, false);
 				if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
-					stunUnit(dEnemies, 1.5, p);
+					stunUnit(dEnemies, 3.0, p);
 				}
 			} else if (hit >= ON_HIT_NORMAL) {
 				target = 1;

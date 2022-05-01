@@ -58,7 +58,7 @@ void moonbladeAlways(int eventID = -1) {
 					xSetInt(db, xCrescentTimeout, trTimeMS() + 5000);
 					target = xGetPointer(dEnemies);
 					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 						xUnitSelectByID(dEnemies, xUnitID);
 						damageEnemy(p, crescentDamage * xGetFloat(dPlayerData,xPlayerSpellDamage), false);
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName));

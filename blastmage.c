@@ -79,6 +79,7 @@ void blastmageAlways(int eventID = -1) {
 	int next = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
+	int relics = getRelicsDB(p);
 	int stars = trQuestVarGet("p"+p+"stars");
 	int starfalls = trQuestVarGet("p"+p+"starfalls");
 	int starproj = trQuestVarGet("p"+p+"starproj");
@@ -271,6 +272,13 @@ void blastmageAlways(int eventID = -1) {
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
+
+		for(x=xGetDatabaseCount(relics); >0) {
+			xDatabaseNext(relics);
+			xUnitSelect(relics, xUnitName);
+			trUnitChangeProtoUnit("Relic");
+		}
+
 		dest = xGetVector(dPlayerData, xPlayerLurePos);
 		for(x=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);

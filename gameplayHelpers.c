@@ -75,27 +75,27 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 	int diff = 0;
 	xSetPointer(dPlayerData,p);
 	if (xGetInt(dPlayerData,xPlayerWellCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerWellCooldown, xGetInt(dPlayerData,xPlayerWellCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerWellCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerWellReadyTime, xGetInt(dPlayerData,xPlayerWellReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerWellReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("well");
-			trCounterAddTime("well",diff,0,wellName, -1);
+			trCounterAddTime("well",diff,1,wellName, -1);
 		}
 	}
 	if (xGetInt(dPlayerData,xPlayerRainCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerRainCooldown, xGetInt(dPlayerData,xPlayerRainCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerRainCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerRainReadyTime, xGetInt(dPlayerData,xPlayerRainReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerRainReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("rain");
-			trCounterAddTime("rain",diff,0,rainName, -1);
+			trCounterAddTime("rain",diff,1,rainName, -1);
 		}
 	}
 	if (xGetInt(dPlayerData,xPlayerLureCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerLureCooldown, xGetInt(dPlayerData,xPlayerLureCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerLureCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerLureReadyTime, xGetInt(dPlayerData,xPlayerLureReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerLureReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("lure");
-			trCounterAddTime("lure",diff,0,lureName, -1);
+			trCounterAddTime("lure",diff,1,lureName, -1);
 		}
 	}
 }
@@ -173,7 +173,9 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
-			advanceCooldowns(p, 1);
+			if ((xGetInt(dPlayerData,xPlayerClass) != MOONBLADE) || (xGetInt(db, xSilenceStatus) == 0)) {
+				advanceCooldowns(p, 1);
+			}
 		}
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);

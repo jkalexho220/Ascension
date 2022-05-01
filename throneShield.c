@@ -291,7 +291,7 @@ void throneShieldAlways(int eventID = -1) {
 					if (hit == target) {
 						silenceUnit(dEnemies,6.0, p);
 					} else {
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 					}
 					gainFavor(p, 1);
 				}
@@ -383,7 +383,7 @@ void throneShieldAlways(int eventID = -1) {
 						trSetSelectedScale(1,1,1);
 					} else if (hit == ON_HIT_SPECIAL) {
 						gainFavor(p, 3);
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 						amt = 0.05 * xGetFloat(dPlayerData, xPlayerHealth);
 						for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 							xDatabaseNext(dPlayerCharacters);

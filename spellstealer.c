@@ -193,7 +193,7 @@ void spellstealerAlways(int eventID = -1) {
 					}
 					if (hit >= xsPow(2, STATUS_STUN)) {
 						hit = hit - xsPow(2, STATUS_STUN);
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 					}
 					if (xGetInt(dEnemies, xStunStatus) > 0) {
 						amt = amt * 2;
@@ -269,7 +269,7 @@ void spellstealerAlways(int eventID = -1) {
 				}
 				if (hit >= xsPow(2, STATUS_STUN)) {
 					hit = hit - xsPow(2, STATUS_STUN);
-					stunUnit(dEnemies, 2.0, p);
+					stunUnit(dEnemies, 3.0, p);
 				}
 				if (xGetInt(dEnemies, xStunStatus) > 0) {
 					amt = amt * 2;
