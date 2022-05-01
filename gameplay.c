@@ -53,6 +53,8 @@ void noSpecials() {
 			trModifyProtounit("Lampades", p, 9, 99999);
 			trModifyProtounit("Einheriar", p, 9, -99990);
 			trModifyProtounit("Einheriar", p, 9, 99999);
+			trModifyProtounit("Fire Giant", p, 9, -99990);
+			trModifyProtounit("Fire Giant", p, 9, 99999);
 		}
 	}
 }

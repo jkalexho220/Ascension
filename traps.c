@@ -219,19 +219,28 @@ highFrequency
 			trSetSelectedUpVector(4.0 * xsVectorGetX(dir),-1,4.0 * xsVectorGetZ(dir));
 			
 			if (trTimeMS() > xGetInt(dCarouselRooms, xCarouselRoomNext)) {
-				xSetInt(dCarouselRooms, xCarouselRoomNext, trTimeMS() + 200);
+				xSetInt(dCarouselRooms, xCarouselRoomNext, xGetInt(dCarouselRooms, xCarouselRoomNext) + 200);
 				xSetBool(dCarouselRooms, xCarouselRoomHitbox, xGetBool(dCarouselRooms, xCarouselRoomHitbox) == false);
 				if (xGetBool(dCarouselRooms, xCarouselRoomHitbox)) {
 					dir = rotationMatrix(dir, 0, 1.0);
 				}
-				pos = xGetVector(dCarouselRooms, xCarouselRoomPos) - dir * 16.0;
+				pos = xGetVector(dCarouselRooms, xCarouselRoomPos) - dir * 12.0;
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);
 					xUnitSelectByID(dPlayerUnits, xUnitID);
 					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (rayCollision(dPlayerUnits, pos, dir, 32.0, 16.0)) {
+					} else if (rayCollision(dPlayerUnits, pos, dir, 24.0, 6.0)) {
 						damagePlayerUnit(200.0);
+					}
+				}
+				for(x=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (rayCollision(dEnemies, pos, dir, 24.0, 6.0)) {
+						trDamageUnit(200.0);
 					}
 				}
 				xUnitSelect(dCarouselRooms, xUnitName);
@@ -252,6 +261,7 @@ highFrequency
 			for(p=1; < ENEMY_PLAYER) {
 				if (trUnitHasLOS(p)) {
 					xSetBool(dCarouselRooms, xCarouselRoomActive, true);
+					xSetInt(dCarouselRooms, xCarouselRoomNext, trTimeMS());
 					trUnitSelectClear();
 					trUnitSelect(""+(xGetInt(dCarouselRooms, xUnitName) + 1), true);
 					trMutateSelected(kbGetProtoUnitID("Meteorite"));

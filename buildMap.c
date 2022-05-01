@@ -1270,6 +1270,7 @@ highFrequency
 				trStringQuestVarSet("rockProto3", "Rock Sandstone Small");
 				
 				trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+
 				trQuestVarSet("enemyProtoCount", 5);
 				trStringQuestVarSet("enemyProto1", "Golden Lion");
 				trStringQuestVarSet("enemyProto2", "Anubite");

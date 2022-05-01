@@ -1115,6 +1115,8 @@ int xMummyDir = 0;
 
 int dManticoreProj = 0;
 int dFireGiantProj = 0;
+int xFireGiantProjOwner = 0;
+int dFireGiantBalls = 0;
 
 int dYeebLightningBalls = 0;
 
@@ -1259,6 +1261,15 @@ highFrequency
 	xAvengerProjDist = xInitAddFloat(dAvengerProj,"maxDist");
 	xAvengerProjUnit = xInitAddInt(dAvengerProj,"rider");
 	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");
+
+	dFireGiants = initSpecialDatabase("fireGiants");
+	xInitAddVector(dFireGiants, "dir");
+
+	dManticoreProj = initGenericProj("manticoreProj",kbGetProtoUnitID("Thor Hammer"),2,20.0,5.0,0.3,ENEMY_PLAYER,true);
+	dFireGiantProj = initGenericProj("fireGiantProj",kbGetProtoUnitID("Meteorite death"),-1,20.0,4.0,0,0,true);
+	xFireGiantProjOwner = xInitAddInt(dFireGiantProj, "owner"); // for some reason, only p0 meteorite death works
+	dFireGiantBalls = initGenericProj("fireGiantBalls",kbGetProtoUnitID("Fire Giant"),19,10.0,4.5,0,ENEMY_PLAYER,true);
+	xProjDist = xInitAddFloat(dFireGiantBalls,"dist");
 	
 	dAmbushRooms = xInitDatabase("ambushRooms");
 	xAmbushRoomType = xInitAddInt(dAmbushRooms, "type");
@@ -1374,6 +1385,14 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Statue of Lightning"):
 		{
 			addSpecialToDatabase(dLightningStatues,name,db,p);
+		}
+		case kbGetProtoUnitID("Fire Giant"):
+		{
+			addSpecialToDatabase(dFireGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Manticore"):
+		{
+			addSpecialToDatabase(dManticores,name,db,p);
 		}
 	}
 }
