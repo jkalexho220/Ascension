@@ -68,6 +68,7 @@ void castDeathSentence(int p = 0) {
 void nightriderAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * NIGHTRIDER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -319,12 +320,16 @@ void nightriderAlways(int eventID = -1) {
 						trMutateSelected(kbGetProtoUnitID("Dwarf"));
 						trImmediateUnitGarrison(""+1*trQuestVarGet("next"));
 						trUnitChangeProtoUnit("Hero Greek Achilles");
-						xSetInt(db, xCharIndex, activatePlayerUnit(xGetInt(db, xUnitName), p, kbGetProtoUnitID("Hero Greek Achilles")));
-						xSetBool(dPlayerUnits,xIsHero,true);
-						xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
-						xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
-						if (xGetInt(dPlayerData, xPlayerUnit) == xGetInt(db, xUnitName)) {
-							xSetInt(dPlayerData, xPlayerIndex, xGetNewestPointer(dPlayerUnits));
+						if (PvP) {
+							xSetInt(db, xCharIndex,activatePlayerUnit(xGetInt(db, xUnitName),p,kbGetProtoUnitID("Hero Greek Achilles")));
+							xSetBool(dPlayerUnits, xIsHero, true);
+							xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist, p));
+							xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist, p));
+							if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+								xSetInt(dPlayerData, xPlayerIndex, xGetInt(db, xCharIndex));
+							}
+						} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+							debugLog("Nightrider " + p + ": Unable to restore database block");
 						}
 					}
 				}
@@ -385,7 +390,39 @@ void nightriderAlways(int eventID = -1) {
 			if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 				xSetBool(dPlayerData, xPlayerLureActivated, false);
 				gainFavor(p, 0.0 - nightfallCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
-				trVectorQuestVarSet("p"+p+"nightfallCenter", vectorSnapToGrid(xGetVector(dPlayerData, xPlayerLurePos)));
+
+				/* find the closest player unit and draw a line to the destination. stop on walls */
+				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true); // default to player unit
+				dest = xGetVector(dPlayerData, xPlayerLurePos);
+				dist = distanceBetweenVectors(pos, dest);
+				for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerUnit();
+					} else {
+						prev = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+						current = distanceBetweenVectors(prev, dest);
+						if (current < dist) {
+							pos = prev;
+							dist = current;
+						}
+					}
+				}
+
+				dist = xsSqrt(dist) / 2;
+				dir = getUnitVector(pos, dest, 2.0);
+				prev = pos;
+				for(i = dist; >0) {
+					pos = pos + dir;
+					if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+						break;
+					} else {
+						prev = pos;
+					}
+				}
+
+				trVectorQuestVarSet("p"+p+"nightfallCenter", vectorSnapToGrid(prev));
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"lureObject");
 				trUnitDestroy();
@@ -398,15 +435,15 @@ void nightriderAlways(int eventID = -1) {
 					if (trUnitAlive() == false) {
 						removeNightrider(p);
 					} else {
-						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
-						xUnitSelect(dPlayerUnits, xStunSFX);
-						trUnitDestroy();
-						xUnitSelect(dPlayerUnits, xPoisonSFX);
-						trUnitDestroy();
-						xUnitSelect(dPlayerUnits, xSilenceSFX);
-						trUnitDestroy();
-						removePlayerUnit();
+						trMutateSelected(kbGetProtoUnitID("Victory Marker"));
+						if (PvP) {
+							xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+							xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+							xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+							xFreeDatabaseBlock(dPlayerUnits);
+						} else {
+							xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+						}
 					}
 				}
 				
@@ -426,6 +463,7 @@ void nightriderAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseNightrider(int eventID = -1) {

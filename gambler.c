@@ -53,6 +53,7 @@ void removeGambler(int p = 0) {
 void gamblerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * GAMBLER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int action = 0;
 	int hit = 0;
@@ -511,7 +512,7 @@ void gamblerAlways(int eventID = -1) {
 						if (trUnitAlive() == false) {
 							removeEnemy();
 						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName),pos) < dist) {
-							stunUnit(dEnemies,2.5,p,false);
+							stunUnit(dEnemies,3.0,p,false);
 						}
 					}
 				}
@@ -685,6 +686,7 @@ void gamblerAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
+	pvpReattachPlayer();
 }
 
 void chooseGambler(int eventID = -1) {

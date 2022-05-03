@@ -104,14 +104,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 							xSetVector(dLaserRooms,xLaserRoomXBottom + a,
 								xsVectorSet(2 * x0 + 4 * a + 2, 0, 2 * z0));
 							xSetVector(dLaserRooms,xLaserRoomXTop + a,
-								xsVectorSet(2 * x1 + 4 * a + 4, 0, 2 * z1));
+								xsVectorSet(2 * x0 + 4 * a + 4, 0, 2 * z1));
 							/* x lasers */
 							trArmyDispatch("1,0","Dwarf",1,2*x0+1,0,2*z0+4*a+3,270,false);
 							trArmyDispatch("1,0","Dwarf",1,2*x1-1,0,2*z0+4*a+3,90,false);
 							xSetVector(dLaserRooms,xLaserRoomZBottom + a,
 								xsVectorSet(2 * x0, 0, 2 * z0 + 4 * a + 2));
 							xSetVector(dLaserRooms,xLaserRoomZTop + a,
-								xsVectorSet(2 * x1, 0, 2 * z1 + 4 * a + 4));
+								xsVectorSet(2 * x1, 0, 2 * z0 + 4 * a + 4));
 						}
 						trArmySelect("1,0");
 						trUnitSetStance("Passive");
@@ -125,6 +125,29 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 						for(j=randomLow(11) - 8; >0) {
 							paintRelicEdge(x0, z0, x1, z1);
 						}
+					}
+					case TRAP_CAROUSEL:
+					{
+						paintCircle(x, z, 9, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+						pos = xsVectorSet(x * 70 + 41, 5, z * 70 + 41);
+						next = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch("1,0", "Dwarf", 3, x * 70 + 41, 5, z * 70 + 41, 225, true);
+						trArmySelect("1,0");
+						trUnitConvert(0);
+						trUnitSelectClear();
+						trUnitSelect(""+next, true);
+						trMutateSelected(kbGetProtoUnitID("Statue of Lightning"));
+						trUnitOverrideAnimation(2,0,true,false,-1);
+						trUnitSelectClear();
+						trUnitSelect(""+(next+1), true);
+						trMutateSelected(kbGetProtoUnitID("Outpost"));
+						trUnitSelectClear();
+						trUnitSelect(""+(next+2), true);
+						trMutateSelected(kbGetProtoUnitID("Outpost"));
+
+						xAddDatabaseBlock(dCarouselRooms, true);
+						xSetInt(dCarouselRooms, xUnitName, next);
+						xSetVector(dCarouselRooms, xCarouselRoomPos, pos);
 					}
 				}
 			}
@@ -185,7 +208,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("room"+room+"key", 0);
 		}
 	} else if (trQuestVarGet("room"+room+"key") > 0) {
-		debugLog("room was a special room.");
 		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
 		spawnRelicSpecific(xsVectorSet(70 * x + 36,0,70 * z + 36),1*trQuestVarGet("room"+room+"key"));
 		trQuestVarSet("room"+room+"key", 0);
@@ -339,12 +361,13 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Fence Wood",25,17,270);
 			deployTownEyecandy("Fence Wood",27,15,180);
 			deployTownEyecandy("Fence Wood",27,11,180);
-			trQuestVarSet("pigpenLowerX", 19 + trQuestVarGet("villageX"));
-			trQuestVarSet("pigpenLowerZ", 9 + trQuestVarGet("villageZ"));
-			trQuestVarSet("pigpenUpperX", 27 + trQuestVarGet("villageX"));
-			trQuestVarSet("pigpenUpperZ", 17 + trQuestVarGet("villageZ"));
+			trVectorQuestVarSet("pigpenLower", xsVectorSet(trQuestVarGet("villageX") + 19,0,trQuestVarGet("villageZ") + 9));
+			trVectorQuestVarSet("pigpenUpper", xsVectorSet(trQuestVarGet("villageX") + 27,0,trQuestVarGet("villageZ") + 17));
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
 			
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Villager Chinese",23,19,315);
@@ -421,7 +444,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Shrine",35,15,270);
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
-			
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
 			
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Shade",25,35,180);
@@ -446,7 +471,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Dwarven Forge",11,11,0);
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
-			
+			if (trQuestVarGet("monsterpediaQuestInProgress") > 0) {
+				trQuestVarSetFromRand("localQuest", 1, 2, true);
+			}
+
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Throwing Axeman",21,9,270);
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -538,6 +566,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Halberdier"));
+			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+FETCH_GUY));
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Hypaspist"));
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("Kastor"));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Kastor"));
@@ -662,6 +692,27 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
 				xSetInt(dEnemiesIncoming, xUnitName, trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Statue of Lightning",1,
+					70.0 * x + 41.0 - 16.0 * xsVectorGetX(dir),0,70.0 * z + 41.0 - 16.0 * xsVectorGetZ(dir),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetUnitOrientation(dir,vector(0,1,0),true);
+				dir = rotationMatrix(dir, 0.707107, 0.707107);
+			}
+		}
+		case ROOM_VILLAGE + 9:
+		{
+			paintCircle(x, z, 12, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			trQuestVarSet("villageX", 70 * x + 16);
+			trQuestVarSet("villageZ", 70 * z + 16);
+			trQuestVarSet("stageWonder", trGetNextUnitScenarioNameNumber());
+			trUnitSelectClear();
+			trUnitSelect(""+deployTownEyecandy("Cinematic Block", 25, 25, 225), true);
+			trUnitConvert(ENEMY_PLAYER);
+			trMutateSelected(kbGetProtoUnitID("Wonder SPC"));
+			dir = vector(0,0,-1);
+			for(i=0; < 8) {
+				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+				xSetInt(dEnemiesIncoming, xUnitName, trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Fire Giant",1,
 					70.0 * x + 41.0 - 16.0 * xsVectorGetX(dir),0,70.0 * z + 41.0 - 16.0 * xsVectorGetZ(dir),0,true);
 				trArmySelect(""+ENEMY_PLAYER+",0");
 				trSetUnitOrientation(dir,vector(0,1,0),true);
@@ -1075,8 +1126,9 @@ void buildEdge(int edge = 0, int type = 0) {
 				trQuestVarSetFromRand("rand", 1, 5, true);
 			}
 			if (trQuestVarGet("rand") == 5) {
-				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
+				trPaintTerrain(x0, z0, x1, z1, 0, 70, false);
 				paintEyecandy(x0, z0, x1, z1, "sparkles");
+				trPaintTerrain(x0, z0, x1, z1, 5, 4, false);
 			} else {
 				trPaintTerrain(x0, z0, x1, z1, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 				trChangeTerrainHeight(x0, z0, x1 + 1, z1 + 1, worldHeight, false);
@@ -1237,6 +1289,7 @@ highFrequency
 				trStringQuestVarSet("rockProto3", "Rock Sandstone Small");
 				
 				trQuestVarSet("enemyDensity", 0.03 + 0.03 * ENEMY_PLAYER);
+
 				trQuestVarSet("enemyProtoCount", 5);
 				trStringQuestVarSet("enemyProto1", "Golden Lion");
 				trStringQuestVarSet("enemyProto2", "Anubite");
@@ -1520,6 +1573,7 @@ highFrequency
 			}
 			case 7:
 			{
+				trQuestVarSet("templeRoom", -1);
 				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
 				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
 				trSetLighting("fimbulwinter", 0.01);
@@ -1587,7 +1641,7 @@ highFrequency
 			}
 			case 8:
 			{
-				dCloudDeployStars = initGenericProj("cloudDeployStars",kbGetProtoUnitID("Lampades"),18,0.01,2.5,0.0,ENEMY_PLAYER);
+				dCloudDeployStars = initGenericProj("cloudDeployStars",kbGetProtoUnitID("Lampades"),18,0.01,-2.5,0.0,ENEMY_PLAYER);
 				xDeepDamageLast = xInitAddInt(dPlayerUnits, "tornadoDamageLast");
 				xsEnableRule("the_clouds_build_01");
 				xsEnableRule("the_clouds_build_02");
@@ -1658,24 +1712,31 @@ highFrequency
 			}
 			case 9:
 			{
+				xsEnableRule("carousel_rooms_always");
 				worldHeight = 5;
-				wallHeight = -3;
-				trQuestVarSet("stageTemple", -1);
+				wallHeight = 10;
+				trQuestVarSet("stageTemple", 10); // kronos
 				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 9, 3);
 				trSetCivAndCulture(ENEMY_PLAYER, 9, 3);
 				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
-				trQuestVarSet("bossRoomSize", 12);
+				trQuestVarSet("bossRoomSize", 15);
+				trSetLighting("hades", 0.1);
+
+				initializeCarouselTrapDatabase();
+
+				xsEnableRule("the_pit_build_01");
+
 				trQuestVarSet("wallEdges", 5);
 				trQuestVarSet("trapRooms", 3);
 				trQuestVarSet("trapType", TRAP_CAROUSEL);
-				TERRAIN_WALL = 2;
+				TERRAIN_WALL = 2; // hades cliff
 				TERRAIN_SUB_WALL = 11;
 				
-				TERRAIN_PRIMARY = 0;
+				TERRAIN_PRIMARY = 0; // hades buildable 1
 				TERRAIN_SUB_PRIMARY = 84;
 				
-				TERRAIN_SECONDARY = 0;
+				TERRAIN_SECONDARY = 0; // hades buildable 2
 				TERRAIN_SUB_SECONDARY = 85;
 				
 				trQuestVarSet("mapType", MAP_STANDARD);
@@ -1687,24 +1748,32 @@ highFrequency
 				trStringQuestVarSet("spriteProto1", "Skeleton");
 				trStringQuestVarSet("spriteProto2", "Rock Granite Small");
 				trStringQuestVarSet("spriteProto3", "Rock Limestone Small");
-				trQuestVarSet("rockDensity", 0.2);
+				trQuestVarSet("rockDensity", 0.3);
 				trStringQuestVarSet("rockProto1", "Stalagmite");
 				trStringQuestVarSet("rockProto2", "Rock Granite Big");
 				trStringQuestVarSet("rockProto3", "Stalagmite");
+
+				trQuestVarSet("columnDensity", 0.1);
 				
 				trQuestVarSet("enemyDensity", 0.04 + 0.04 * ENEMY_PLAYER);
 				
 				trQuestVarSet("enemyProtoCount", 6);
-				trStringQuestVarSet("enemyProto1", "Tartarian Spawn");
+				trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
 				trStringQuestVarSet("enemyProto2", "Troll");
 				trStringQuestVarSet("enemyProto3", "Manticore");
 				trStringQuestVarSet("enemyProto4", "Mountain Giant");
 				trStringQuestVarSet("enemyProto5", "Frost Giant");
 				trStringQuestVarSet("enemyProto6", "Fire Giant");
+
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 				
+				/*
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				*/
 				
 				trStringQuestVarSet("bossProto", "Guardian");
 				bossScale = 1.2;
@@ -1747,9 +1816,9 @@ highFrequency
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Cinematic Dead Bodies");
 				trQuestVarSet("sparklesDensity", 0.5);
-				trStringQuestVarSet("sparklesProto1", "Armor Glow Small");
-				trStringQuestVarSet("sparklesProto2", "Armor Glow Small");
-				trStringQuestVarSet("sparklesProto3", "Armor Glow Small");
+				trStringQuestVarSet("sparklesProto1", "Imperial Examination");
+				trStringQuestVarSet("sparklesProto2", "Imperial Examination");
+				trStringQuestVarSet("sparklesProto3", "Imperial Examination");
 				
 				trQuestVarSet("enemyDensity", 0.02 + 0.02 * ENEMY_PLAYER);
 				
@@ -1784,6 +1853,11 @@ highFrequency
 		/* paint entire map cliff and raise it */
 		trChangeTerrainHeight(0,0,145,145,wallHeight,false);
 		trPaintTerrain(0,0,145,145,TERRAIN_WALL, TERRAIN_SUB_WALL,false);
+
+		if (trQuestVarGet("stage") == 9) {
+			// on stage 9, walls are +10 but the lava is -3
+			trChangeTerrainHeight(0,0,145,145,-3,false);
+		}
 		
 		if (trQuestVarGet("mapType") == MAP_OPEN) {
 			trChangeTerrainHeight(5,5,140,140,worldHeight,false);
@@ -2016,7 +2090,11 @@ highFrequency
 						} else {
 							xAddDatabaseBlock(dNpcTalk, true);
 							xSetInt(dNpcTalk, xUnitName, 1*trQuestVarGet("guy"+x));
-							xSetInt(dNpcTalk, xNpcDialog, 10 * x + trQuestVarGet("stage"));
+							if ((trQuestVarGet("stage") < 4) && (x == SHOP_GUY) && (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 1)) {
+								xSetInt(dNpcTalk, xNpcDialog, MONSTERPEDIA_NPC + trQuestVarGet("stage"));
+							} else {
+								xSetInt(dNpcTalk, xNpcDialog, 10 * x + trQuestVarGet("stage"));
+							}
 						}
 					}
 				} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
@@ -2244,6 +2322,20 @@ highFrequency
 			trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
 			spawnRelicSpecific(pos, RELIC_NICKONHAWK);
 		}
+
+		if (trQuestVarGet("monsterpediaQuestLocation") == trQuestVarGet("stage")) {
+			trQuestVarSetFromRand("rand", 1, xGetDatabaseCount(dBasicRooms));
+			for(x=trQuestVarGet("rand"); >0) {
+				xDatabaseNext(dBasicRooms);
+			}
+			z = xGetInt(dBasicRooms, xRoomNumber) / 4;
+			x = iModulo(4, xGetInt(dBasicRooms, xRoomNumber));
+			trQuestVarSet("devil_do1", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch(""+ENEMY_PLAYER+",0","Shaba Ka",1,70 * x + 37,0,70 * z + 37,0,true);
+			xAddDatabaseBlock(dEnemiesIncoming, true);
+			xSetInt(dEnemiesIncoming, xUnitName, trQuestVarGet("devil_do1"));
+			xsEnableRule("devil_do1_find");
+		}
 		
 		trUnblockAllSounds();
 		if (trQuestVarGet("newPlayers") > 0) {
@@ -2269,7 +2361,6 @@ highFrequency
 		for(x=xGetDatabaseCount(dEnemiesIncoming); >0) {
 			xDatabaseNext(dEnemiesIncoming);
 			if (kbGetBlockID(""+xGetInt(dEnemiesIncoming, xUnitName)) == -1) {
-				debugLog("Enemy " + xGetInt(dEnemiesIncoming, xUnitName) + " removed!");
 				xFreeDatabaseBlock(dEnemiesIncoming);
 			}
 		}
@@ -2509,7 +2600,46 @@ highFrequency
 	}
 }
 
+rule the_pit_build_01
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	xsEnableRule("the_pit_build_02");
+	bool paint = true;
+	for(x=0; < 146) {
+		for(z=0; < 146) {
+			paint = true;
+			for(i=2;>= -1) {
+				for(j=2;>= -1) {
+					if (trGetTerrainHeight(x+i,z+j) > -2.0) {
+						paint = false;
+						break;
+					}
+				}
+				if (paint == false) {
+					break;
+				}
+			}
+			if (paint) {
+				trPaintTerrain(x,z,x,z,2,12,false);
+			}
+		}
+	}
+	xsDisableSelf();
+}
 
+rule the_pit_build_02
+inactive
+highFrequency
+{
+	if (trQuestVarGet("play") == 1) {
+		xsDisableSelf();
+		startNPCDialog(NPC_EXPLAIN_PIT);
+		xsEnableRule("the_pit_damage");
+		trQuestVarSet("pitDamageNext", trTime());
+	}
+}
 
 rule rebuild_map
 inactive

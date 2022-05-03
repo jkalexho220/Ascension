@@ -1,7 +1,7 @@
 
 float spellstealerPassiveRadius = 6;
 
-float bladeDanceCost = 10;
+float bladeDanceCost = 20;
 float bladeDanceRadius = 15;
 
 float negationCloakDuration = 3;
@@ -26,6 +26,7 @@ void removeSpellstealer(int p = 0) {
 void spellstealerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * SPELLSTEALER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -117,6 +118,14 @@ void spellstealerAlways(int eventID = -1) {
 					removeSpellstealer(p);
 				} else {
 					trMutateSelected(kbGetProtoUnitID("Revealer to Player"));
+					if (PvP) {
+						xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
+						xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+						xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
+						xFreeDatabaseBlock(dPlayerUnits);
+					} else {
+						xDetachDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex));
+					}
 				}
 			}
 			xSetBool(dPlayerData, xPlayerLaunched, true);
@@ -149,8 +158,8 @@ void spellstealerAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"bladeDanceNext", trTimeMS() - 1);
 			xSetPointer(bladeDanceTargets, target);
 			
-			if (xGetDatabaseCount(bladeDanceTargets) > 1) {
-				amt = amt * 2;
+			if (xGetDatabaseCount(bladeDanceTargets) == 1) {
+				amt = amt * 0.5;
 			}
 			gainFavor(p, 0.0 - amt);
 		} else {
@@ -184,7 +193,7 @@ void spellstealerAlways(int eventID = -1) {
 					}
 					if (hit >= xsPow(2, STATUS_STUN)) {
 						hit = hit - xsPow(2, STATUS_STUN);
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 					}
 					if (xGetInt(dEnemies, xStunStatus) > 0) {
 						amt = amt * 2;
@@ -197,6 +206,10 @@ void spellstealerAlways(int eventID = -1) {
 					damageEnemy(p, amt, false, 1.0);
 					OnHit(p, xGetInt(bladeDanceTargets, xBladeDanceIndex), false);
 					xFreeDatabaseBlock(bladeDanceTargets);
+					for(y=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xSetInt(db,xCharSpecialAttack,xGetInt(db,xCharSpecialAttack) - 1);
+					}
 					break;
 				}
 			}
@@ -212,6 +225,17 @@ void spellstealerAlways(int eventID = -1) {
 					trUnitChangeProtoUnit("Swordsman Hero");
 					xUnitSelectByID(db, xUnitID);
 					trMutateSelected(kbGetProtoUnitID("Swordsman Hero"));
+					if (PvP) {
+						xSetInt(db, xCharIndex,activatePlayerUnit(xGetInt(db, xUnitName),p,kbGetProtoUnitID("Swordsman Hero")));
+						xSetBool(dPlayerUnits, xIsHero, true);
+						xSetFloat(dPlayerUnits, xPhysicalResist, xGetFloat(dPlayerData, xPlayerPhysicalResist, p));
+						xSetFloat(dPlayerUnits, xMagicResist, xGetFloat(dPlayerData, xPlayerMagicResist, p));
+						if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
+							xSetInt(dPlayerData, xPlayerIndex, xGetInt(db, xCharIndex));
+						}
+					} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
+						debugLog("Spellstealer " + p + ": Unable to restore database block");
+					}
 				}
 				xSetBool(dPlayerData, xPlayerLaunched, false);
 				equipRelicsAgain(p);
@@ -249,7 +273,7 @@ void spellstealerAlways(int eventID = -1) {
 				}
 				if (hit >= xsPow(2, STATUS_STUN)) {
 					hit = hit - xsPow(2, STATUS_STUN);
-					stunUnit(dEnemies, 2.0, p);
+					stunUnit(dEnemies, 3.0, p);
 				}
 				if (xGetInt(dEnemies, xStunStatus) > 0) {
 					amt = amt * 2;
@@ -367,6 +391,7 @@ void spellstealerAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseSpellstealer(int eventID = -1) {

@@ -54,6 +54,7 @@ vector bossDir = vector(0,0,0);
 vector bossPrev = vector(0,0,0);
 
 int nextproj = 0;
+bool pvpDetached = false;
 
 rule initialize_spy_database
 active
@@ -74,27 +75,27 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 	int diff = 0;
 	xSetPointer(dPlayerData,p);
 	if (xGetInt(dPlayerData,xPlayerWellCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerWellCooldown, xGetInt(dPlayerData,xPlayerWellCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerWellCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerWellReadyTime, xGetInt(dPlayerData,xPlayerWellReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerWellReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("well");
-			trCounterAddTime("well",diff,0,wellName, -1);
+			trCounterAddTime("well",diff,1,wellName, -1);
 		}
 	}
 	if (xGetInt(dPlayerData,xPlayerRainCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerRainCooldown, xGetInt(dPlayerData,xPlayerRainCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerRainCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerRainReadyTime, xGetInt(dPlayerData,xPlayerRainReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerRainReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("rain");
-			trCounterAddTime("rain",diff,0,rainName, -1);
+			trCounterAddTime("rain",diff,1,rainName, -1);
 		}
 	}
 	if (xGetInt(dPlayerData,xPlayerLureCooldownStatus) == ABILITY_COOLDOWN) {
-		xSetInt(dPlayerData,xPlayerLureCooldown, xGetInt(dPlayerData,xPlayerLureCooldown) - 1000 * seconds);
-		diff = (xGetInt(dPlayerData,xPlayerLureCooldown) - trTimeMS()) / 1000;
+		xSetInt(dPlayerData,xPlayerLureReadyTime, xGetInt(dPlayerData,xPlayerLureReadyTime) - 1000 * seconds);
+		diff = (xGetInt(dPlayerData,xPlayerLureReadyTime) - trTimeMS()) / 1000;
 		if (diff > 0 && trCurrentPlayer() == p) {
 			trCounterAbort("lure");
-			trCounterAddTime("lure",diff,0,lureName, -1);
+			trCounterAddTime("lure",diff,1,lureName, -1);
 		}
 	}
 }
@@ -169,16 +170,20 @@ void silencePlayer(int p = 0) {
 
 void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 	xSetPointer(dPlayerData,p);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
-			advanceCooldowns(p, 1);
+			if ((xGetInt(dPlayerData,xPlayerClass) != MOONBLADE) || (xGetInt(db, xSilenceStatus) == 0)) {
+				advanceCooldowns(p, 1);
+			}
 		}
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, 1*xGetInt(dEnemies, xDoppelganger))) {
-				silenceUnit(dPlayerUnits, duration);
-			}
+			int index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			silenceUnit(dPlayerUnits, duration);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -228,7 +233,6 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 }
 
 void nightriderHarvest(vector pos = vector(0,0,0)) {
-	int index = xGetPointer(dPlayerUnits);
 	for(p=1; < ENEMY_PLAYER) {
 		xSetPointer(dPlayerData,p);
 		if ((xGetInt(dPlayerData,xPlayerClass) == NIGHTRIDER) &&
@@ -236,20 +240,19 @@ void nightriderHarvest(vector pos = vector(0,0,0)) {
 			if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit), pos) < 144) {
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
-				xSetPointer(dPlayerUnits, xGetInt(dPlayerData,xPlayerIndex));
-				healUnit(p, 0.05 * xGetFloat(dPlayerData,xPlayerHealth) * xGetFloat(dPlayerData,xPlayerSpellDamage));
+				healUnit(p, 0.05 * xGetFloat(dPlayerData,xPlayerHealth) * xGetFloat(dPlayerData,xPlayerSpellDamage),
+					xGetInt(dPlayerData,xPlayerIndex));
 				gainFavor(p, 1);
 			}
 		}
 	}
-	xSetPointer(dPlayerUnits,index);
 }
 
 void removeEnemy() {
 	if (PvP == false) {
-		int bounty = xGetInt(dEnemies, xBounty);
 		vector pos = xGetVector(dEnemies,xUnitPos);
 		nightriderHarvest(pos);
+		int bounty = xGetInt(dEnemies, xBounty);
 		if (bounty > 0) {
 			trQuestVarSetFromRand("rand", 1, bounty, true);
 			for(p=1; <ENEMY_PLAYER) {
@@ -276,30 +279,18 @@ void removeEnemy() {
 }
 
 void removePlayerUnit() {
-	vector pos = xGetVector(dPlayerUnits,xUnitPos);
-	nightriderHarvest(pos);
-	/*
-	if (PvP) {
-		if (ySetPointer("enemies", 1*yGetVar("playerUnits", "doppelganger"))) {
-			xFreeDatabaseBlock(dEnemies)
-			yRemoveUpdateVar("enemies", "doppelganger");
-			yRemoveUpdateVar("enemies", "silenceSFX");
-			if (trQuestVarGet("detached") == 1) {
-				trQuestVarSet("xdataenemiescount", 1 + trQuestVarGet("xdataenemiescount"));
-				trQuestVarSet("enemiesDetachedSize", trQuestVarGet("enemiesDetachedSize") - 1);
+	if (pvpDetached == false) {
+		vector pos = xGetVector(dPlayerUnits,xUnitPos);
+		nightriderHarvest(pos);
+		if (PvP) {
+			if (xSetPointer(dEnemies, xGetInt(dPlayerUnits, xDoppelganger))) {
+				xFreeDatabaseBlock(dEnemies);
+			} else {
+				debugLog("Unable to restore doppelganger from playerUnits.");
 			}
 		}
-		ySetPointer("enemies", 1*trQuestVarGet("enemiesDummyIndex"));
-		yVarToVector("playerUnits", "pos");
-		nightriderHarvest("pos");
-		if (trQuestVarGet("playerUnitsLeaveIndex") == yGetPointer("playerUnits")) {
-			debugLog("player units removed the wrong thing! Removed playerunitsLeaveIndex!");
-		} else if (trQuestVarGet("playerUnitsDummyIndex") == yGetPointer("playerUnits")) {
-			debugLog("player units removed the wrong thing! Removed playerUnitsDummyIndex");
-		}
+		xFreeDatabaseBlock(dPlayerUnits);
 	}
-	*/
-	xFreeDatabaseBlock(dPlayerUnits);
 }
 
 void removePlayerCharacter() {
@@ -472,8 +463,8 @@ vector vectorSetAsTargetVector(vector from = vector(0,0,0), vector to = vector(0
 }
 
 void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
-	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	bool targetPlayers = (db == dPlayerUnits);
+	if (db == dEnemies) {
 		xSetPointer(dPlayerData,p);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
@@ -482,9 +473,11 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 		damage = damage * xGetFloat(dPlayerData,xPlayerSpellDamage) * xsPow(2, xGetInt(dPlayerData,xPlayerPoisonSpeed));
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, xGetInt(dEnemies, xDoppelganger))) {
-				poisonUnit(dPlayerUnits, duration, damage, 0);
-			}
+			int index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			poisonUnit(dPlayerUnits, duration, damage, 0);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -590,7 +583,10 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 	}
 	xSetFloat(dPlayerData,xPlayerLifestealTotal,xGetFloat(dPlayerData,xPlayerLifestealTotal,p) + lifesteal,p);
 	if (PvP) {
-		damagePlayerUnit(dmg, xGetInt(dEnemies, xDoppelganger));
+		int index = xGetInt(dEnemies, xDoppelganger);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, true);
+		damagePlayerUnit(dmg, index);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, false);
 	} else {
 		trDamageUnit(dmg);
 	}
@@ -600,8 +596,8 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 
 void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
-	bool targetPlayers = (p == 0) || (p == ENEMY_PLAYER);
-	if (p > 0 && p < ENEMY_PLAYER) {
+	bool targetPlayers = (db == dPlayerUnits);
+	if (db == dEnemies) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
 		}
@@ -612,9 +608,11 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 		}
 		if (PvP) {
 			int old = xGetPointer(dPlayerUnits);
-			if (xSetPointer(dPlayerUnits, xGetInt(dEnemies,xDoppelganger))) {
-				stunUnit(dPlayerUnits, duration, 0, sound);
-			}
+			index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			stunUnit(dPlayerUnits, duration, 0, sound);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
 			xSetPointer(dPlayerUnits, old);
 			return;
 		}
@@ -690,6 +688,9 @@ void processLaunchedUnit() {
 					xSetPointer(db, index);
 				}
 			}
+			if (PvP && (db == dEnemies)) {
+				xSetBool(dPlayerUnits, xLaunched, false, xGetInt(db, xDoppelganger));
+			}
 		} else {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dLaunchedUnits,xStunnedProto)));
 		}
@@ -701,14 +702,11 @@ void processLaunchedUnit() {
 
 void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 	bool hitWall = false;
-	int index = 0;
-	if (PvP && (db == dEnemies)) {
-		index = xGetPointer(dPlayerUnits);
-		db = dPlayerUnits;
-		xSetPointer(dPlayerUnits, xGetInt(dEnemies,xDoppelganger));
-	}
 	if (xGetBool(db, xLaunched) == false) {
 		xSetBool(db, xLaunched, true);
+		if (PvP && (db == dEnemies)) {
+			xSetBool(dPlayerUnits, xLaunched, true, xGetInt(dEnemies, xDoppelganger));
+		}
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(db,xUnitName)));
 		int p = xGetInt(db,xPlayerOwner);
 		xUnitSelectByID(db,xUnitID);
@@ -777,9 +775,6 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 			}
 		}
-	}
-	if (PvP) {
-		xSetPointer(dPlayerUnits, index);
 	}
 }
 
@@ -1076,6 +1071,7 @@ int dLampades = 0;
 int dEinherjars = 0;
 int dLightningStatues = 0;
 int dManticores = 0;
+int dFireGiants = 0;
 
 int dAutomatonBombs = 0;
 
@@ -1118,6 +1114,11 @@ int xAvengerProjIndex = 0;
 
 int xMummyStart = 0;
 int xMummyDir = 0;
+
+int dManticoreProj = 0;
+int dFireGiantProj = 0;
+int xFireGiantProjOwner = 0;
+int dFireGiantBalls = 0;
 
 int dYeebLightningBalls = 0;
 
@@ -1262,8 +1263,18 @@ highFrequency
 	xAvengerProjDist = xInitAddFloat(dAvengerProj,"maxDist");
 	xAvengerProjUnit = xInitAddInt(dAvengerProj,"rider");
 	xAvengerProjIndex = xInitAddInt(dAvengerProj,"index");
+
+	dFireGiants = initSpecialDatabase("fireGiants");
+	xInitAddVector(dFireGiants, "dir");
+
+	dManticoreProj = initGenericProj("manticoreProj",kbGetProtoUnitID("Thor Hammer"),2,20.0,5.0,0.3,ENEMY_PLAYER,true);
+	dFireGiantProj = initGenericProj("fireGiantProj",kbGetProtoUnitID("Meteorite death"),-1,20.0,4.0,0,0,true);
+	xFireGiantProjOwner = xInitAddInt(dFireGiantProj, "owner"); // for some reason, only p0 meteorite death works
+	dFireGiantBalls = initGenericProj("fireGiantBalls",kbGetProtoUnitID("Fire Giant"),19,10.0,4.5,0,ENEMY_PLAYER,true);
+	xProjDist = xInitAddFloat(dFireGiantBalls,"dist");
 	
 	dAmbushRooms = xInitDatabase("ambushRooms");
+	xAmbushRoomType = xInitAddInt(dAmbushRooms, "type");
 	xAmbushRoomPos = xInitAddVector(dAmbushRooms,"pos");
 	
 }
@@ -1377,6 +1388,14 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		{
 			addSpecialToDatabase(dLightningStatues,name,db,p);
 		}
+		case kbGetProtoUnitID("Fire Giant"):
+		{
+			addSpecialToDatabase(dFireGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Manticore"):
+		{
+			addSpecialToDatabase(dManticores,name,db,p);
+		}
 	}
 }
 
@@ -1392,18 +1411,16 @@ int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) 
 	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	if (PvP) {
-		if (trQuestVarGet("detached") == 1) {
-			xSetPointer(dEnemies, 1*trQuestVarGet("enemiesLeaveIndex"));
-		}
-		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies));
-		xSetPointer(dEnemies,xGetNewestPointer(dEnemies));
+		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies, true));
 		xSetInt(dEnemies,xDoppelganger,index);
 		xSetInt(dEnemies,xPlayerOwner,p);
 		xSetInt(dEnemies,xUnitName,name);
 		xSetInt(dEnemies,xUnitID,id);
 		xSetFloat(dEnemies,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 		xSetFloat(dEnemies,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
-		xSetPointer(dEnemies, 1*trQuestVarGet("enemiesDummyIndex"));
+		if (pvpDetached) {
+			xDetachDatabaseBlock(dEnemies);
+		}
 	}
 	activateSpecialUnit(name, dPlayerUnits, proto, p);
 	return(index);
@@ -1444,6 +1461,7 @@ void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetInt(dPlayerData,xPlayerUnit,trGetNextUnitScenarioNameNumber(),p);
 	spawnPlayerClone(p, vdb);
 	xSetInt(dPlayerData,xPlayerIndex,xGetNewestPointer(dPlayerUnits),p);
+	xSetInt(dPlayerData,xPlayerTether,-1,p);
 	if (trCurrentPlayer() == p) {
 		int class = xGetInt(dPlayerData,xPlayerClass,p);
 		string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
@@ -1581,5 +1599,32 @@ void damageOpponentUnit(int p = 0, float amt = 0) {
 		damagePlayerUnit(amt);
 	} else {
 		damageEnemy(p, amt);
+	}
+}
+
+/*
+enemies database: we loop through our playerUnits database and pull the doppelgangers out of the enemies database into a temporary cache
+at the end of the function, we return everything back
+
+only the playerUnits database has doppelganger pointers
+*/
+
+void pvpDetachPlayer(int p = 0) {
+	if (PvP) {
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			if (xGetInt(dPlayerUnits, xPlayerOwner) != p) {
+				xDetachDatabaseBlock(dPlayerUnits);
+			} else if (xSetPointer(dEnemies, xGetInt(dPlayerUnits, xDoppelganger))) {
+				xDetachDatabaseBlock(dEnemies);
+			}
+		}
+	}
+}
+
+void pvpReattachPlayer() {
+	if (PvP) {
+		xRestoreCache(dPlayerUnits);
+		xRestoreCache(dEnemies);
 	}
 }

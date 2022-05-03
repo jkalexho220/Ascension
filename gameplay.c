@@ -53,13 +53,15 @@ void noSpecials() {
 			trModifyProtounit("Lampades", p, 9, 99999);
 			trModifyProtounit("Einheriar", p, 9, -99990);
 			trModifyProtounit("Einheriar", p, 9, 99999);
+			trModifyProtounit("Fire Giant", p, 9, -99990);
+			trModifyProtounit("Fire Giant", p, 9, 99999);
 		}
 	}
 }
 
 void processSilence(int p = 0) {
 	if (xGetBool(dPlayerData, xPlayerSilenced, p) && (xGetInt(dPlayerData, xPlayerDead, p) == 0)) {
-		if (xGetInt(dPlayerUnits, xSilenceStatus, xGetInt(dPlayerData, xPlayerIndex)) == 0) {
+		if (xGetInt(dPlayerUnits, xSilenceStatus, xGetInt(dPlayerData, xPlayerIndex, p)) == 0) {
 			xSetBool(dPlayerData, xPlayerSilenced, false, p);
 			if (xGetInt(dPlayerData, xPlayerWellCooldownStatus, p) == ABILITY_READY) {
 				trTechGodPower(p, "Underworld Passage", 1);
@@ -123,7 +125,7 @@ void processRegen(int p = 0) {
 		amt = 0;
 		diff = trTimeMS() - xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p);
 		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_REGENERATE_HEALTH) {
-			amt = diff * 0.00003 * xGetFloat(dPlayerData, xPlayerHealth, p);
+			amt = diff * 0.00002 * xGetFloat(dPlayerData, xPlayerHealth, p);
 		}
 		if (xGetFloat(dPlayerData, xPlayerDefiance, p) > 0) {
 			amt = amt + 0.001 * diff * xGetFloat(dPlayerData, xPlayerDefiance, p) * xGetDatabaseCount(dEnemies);
@@ -142,7 +144,7 @@ void checkResourceCheating(int p = 0) {
 	} else if (trPlayerResourceCount(p, "gold") < xGetInt(dPlayerData, xPlayerGold, p)) {
 		xSetInt(dPlayerData, xPlayerGold, trPlayerResourceCount(p, "gold"), p);
 	}
-	if (trPlayerResourceCount(p, "favor") > 1 + xGetFloat(dPlayerData, xPlayerFavor)) {
+	if (trPlayerResourceCount(p, "favor") > 1 + xGetFloat(dPlayerData, xPlayerFavor, p)) {
 		gainFavor(p, 0);
 		if (trCurrentPlayer() == p) {
 			trChatSendSpoofed(0, "Zenophobia: Nice try, buddy.");
@@ -327,18 +329,14 @@ void relicTransporterGuy(int p = 0) {
 	int db = getWarehouseDB(p);
 	if (xGetDatabaseCount(db) > 0) {
 		xDatabaseNext(db);
-		id = xGetInt(db, xUnitID);
-		trUnitSelectClear();
-		trUnitSelectByID(id);
+		xUnitSelect(db, xUnitName);
 		if ((trUnitGetIsContained("Villager Atlantean Hero") || trUnitGetIsContained("Cinematic Block")) == false) {
-			if (xGetInt(db, xRelicType) < KEY_RELICS ||
-				trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
-				if (kbGetUnitBaseTypeID(id) == relicProto(xGetInt(db, xRelicType))) {
-					trUnitChangeProtoUnit("Relic");
-					xAddDatabaseBlock(dFreeRelics, true);
-					xSetInt(dFreeRelics, xUnitName, xGetInt(db, xUnitName));
-					xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
-				}
+			id = kbGetBlockID(""+xGetInt(db, xUnitName));
+			if (kbGetUnitBaseTypeID(id) == relicProto(xGetInt(db, xRelicType))) {
+				trUnitChangeProtoUnit("Relic");
+				xAddDatabaseBlock(dFreeRelics, true);
+				xSetInt(dFreeRelics, xUnitName, xGetInt(db, xUnitName));
+				xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
 			} else {
 				trSoundPlayFN("storehouse.wav","1",-1,"","");
 			}
@@ -623,6 +621,7 @@ highFrequency
 	if (trQuestVarGet("protectionCount") > 0) {
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			xDatabaseNext(dPlayerUnits);
+			id = xGetInt(dPlayerUnits, xUnitID);
 			xUnitSelectByID(dPlayerUnits, xUnitID);
 			trUnitHighlight(0.2, false);
 			xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner));
@@ -844,7 +843,7 @@ highFrequency
 			checkGodPowers(p);
 			/* no gold cheating */
 			checkResourceCheating(p);
-			if (xGetInt(dPlayerData, xPlayerDead) == 0) {
+			if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
 				xUnitSelect(dPlayerData, xPlayerUnit);
 				if (Multiplayer) {
 					if (trUnitIsSelected() && trCurrentPlayer() != p) {
@@ -909,12 +908,14 @@ highFrequency
 				}
 				if (trQuestVarGet("playersReviving") == 1) {
 					if (count > 0) {
-						xSetInt(dPlayerData, xPlayerDead, 1*xsMax(0, xGetInt(dPlayerData, xPlayerDead) - count));
+						xSetInt(dPlayerData, xPlayerDead, xGetInt(dPlayerData, xPlayerDead) - 1);
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
 					}
 					if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
 						revivePlayer(p);
+						xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+						xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
 					}
 				}
 			}
@@ -1284,5 +1285,98 @@ highFrequency
 				trQuestVarSet("cloudDeployNext", trTime() + trQuestVarGet("rand"));
 			}
 		}
+	}
+}
+
+rule the_pit_damage
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("pitDamageNext")) {
+		trQuestVarSet("pitDamageNext", trTime());
+		if (trQuestVarGet("play") == 1) {
+			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
+				xUnitSelectByID(dPlayerUnits, xUnitID);
+				if (trUnitAlive() == false) {
+					removePlayerUnit();
+				} else {
+					trDamageUnit(10);
+				}
+			}
+		}
+	}
+}
+
+rule devil_do1_find
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("devil_do1");
+	for(p=1; < ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			trUnitHighlight(5.0, true);
+			uiLookAtUnitByName(""+1*trQuestVarGet("devil_do1"));
+			trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Pursuers from the Guild? Just try and catch me!");
+			trCounterAddTime("devilEscape",150,0,"devil_do1 escapes",-1);
+			trQuestVarSet("devilEscapeTime", trTime() + 150);
+			trQuestVarSet("devilNextSummon", trTime() - 10 * trQuestVarGet("stage"));
+			xsEnableRule("devil_do1_battle");
+			xsDisableSelf();
+			break;
+		}
+	}
+}
+
+rule devil_do1_battle
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("devilNextSummon")) {
+		trSoundPlayFN("mythcreate.wav","1",-1,"","");
+		trQuestVarSet("devilNextSummon", trQuestVarGet("devilNextSummon") + 10);
+		trQuestVarSetFromRand("rand", 1, 19, true);
+		int proto = monsterPetProto(1*trQuestVarGet("rand"));
+		vector pos = kbGetBlockPosition(""+1*trQuestVarGet("devil_do1"));
+		trQuestVarSetFromRand("heading", 1, 360, true);
+		int next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch(""+ENEMY_PLAYER+",0",kbGetProtoUnitName(proto),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
+		activateEnemy(next);
+		trQuestVarSetFromRand("rand", 1, 10);
+		switch(1*trQuestVarGet("rand"))
+		{
+			case 1:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Mwuahaha! This is fun!");
+			}
+			case 2:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Go forth, my pretties!");
+			}
+			case 3:
+			{
+				trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Behold the power of the Monsterpedia!");
+			}
+		}
+	}
+
+	trUnitSelectClear();
+	trUnitSelectByQV("devil_do1");
+	if (trUnitAlive() == false) {
+		trCounterAbort("devilEscape");
+		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Noooo! How can this be?!");
+		xsDisableSelf();
+		trUnitChangeProtoUnit("Lampades Blood");
+		if (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 2) {
+			startNPCDialog(NPC_DEVIL_DIE);
+			trQuestVarSet("monsterpediaQuestComplete", 1);
+		}
+	} else if (trTime() > trQuestVarGet("devilEscapeTime")) {
+		xsDisableSelf();
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+		trSoundPlayFN("vortexstart.wav","1",-1,"","");
+		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: So long, suckers!");
+		trUnitChangeProtoUnit("Dust Large");
 	}
 }

@@ -651,14 +651,21 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 				trQuestVarSet("p"+p+"nickEquipped", trQuestVarGet("p"+p+"nickEquipped") - 1);
 				db = getRelicsDB(p);
 				xSetPointer(db, xGetNewestPointer(db));
-				trUnitSelectClear();
-				trUnitSelect(""+xGetInt(db),true);
-				trUnitChangeProtoUnit("Relic");
-				xAddDatabaseBlock(dFreeRelics);
-				xSetPointer(dFreeRelics,xGetNewestPointer(dFreeRelics));
-				xSetInt(dFreeRelics,xRelicName,xGetInt(db,xRelicName));
-				xSetInt(dFreeRelics,xRelicType,RELIC_NICKONHAWK);
-				xFreeDatabaseBlock(db);
+				for(x=xGetDatabaseCount(db); > 0) {
+					if (xGetInt(db, xRelicType) == RELIC_NICKONHAWK) {
+						trUnitSelectClear();
+						trUnitSelect(""+xGetInt(db, xUnitName),true);
+						trUnitChangeProtoUnit("Relic");
+						xAddDatabaseBlock(dFreeRelics);
+						xSetPointer(dFreeRelics,xGetNewestPointer(dFreeRelics));
+						xSetInt(dFreeRelics,xRelicName,xGetInt(db,xRelicName));
+						xSetInt(dFreeRelics,xRelicType,RELIC_NICKONHAWK);
+						xFreeDatabaseBlock(db);
+						break;
+					} else {
+						xDatabaseNext(db);
+					}
+				}
 			} else if (trQuestVarGet("p"+p+"nickQuestProgress") == 0) {
 				trQuestVarSet("p"+p+"nickQuestProgress", 1);
 			}
@@ -697,7 +704,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		/* certain classes have special interactions with stats */
 		trEventFire(5000 + 12 * xGetInt(dPlayerData,xPlayerClass) + p);
 	}
-	zSetProtoUnitStat("Cinematic Block", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
+	zSetProtoUnitStat("Victory Marker", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
 	xSetFloat(dPlayerData,xPlayerSpellRange,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellRangeTrue)));
 	xSetFloat(dPlayerData,xPlayerSpellDamage,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDamageTrue)));
 	xSetFloat(dPlayerData,xPlayerSpellDuration,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDurationTrue)));

@@ -36,6 +36,7 @@ void removeFireKnight(int p = 0) {
 void fireknightAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * FIREKNIGHT;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -287,6 +288,7 @@ void fireknightAlways(int eventID = -1) {
 			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
+				xUnitSelectByID(db, xUnitID);
 				damagePlayerUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage), xGetInt(db, xCharIndex));
 				
 				next = trGetNextUnitScenarioNameNumber();
@@ -347,6 +349,7 @@ void fireknightAlways(int eventID = -1) {
 					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(dest),0,xsVectorGetZ(dest),0,true);
 					trArmySelect(""+p+",0");
 					trUnitChangeProtoUnit("Ball of Fire Impact");
+					dir = rotationMatrix(dir, mCos, mSin);
 				}
 			}
 			amt = xGetFloat(infernos, xInfernoDamage) * 0.3;
@@ -377,6 +380,7 @@ void fireknightAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseFireKnight(int eventID = -1) {

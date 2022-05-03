@@ -34,6 +34,7 @@ void removeStarseer(int p = 0) {
 void starseerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * STARSEER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -119,7 +120,6 @@ void starseerAlways(int eventID = -1) {
 				dir = rotationMatrix(dir, -0.5, -0.866025);
 			}
 			
-			if (hit > 0) {
 				/* collision detection for one star */
 				outer = xsPow(xGetFloat(db, xStarseerCurrentRadius) + 1.5, 2);
 				inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
@@ -164,7 +164,6 @@ void starseerAlways(int eventID = -1) {
 				} else if (angleDiff < trQuestVarGet("p"+p+"starCosine")) {
 					xSetVector(db, xStarseerDir + hit, cur);
 				}
-			}
 		}
 	}
 	
@@ -287,6 +286,7 @@ void starseerAlways(int eventID = -1) {
 	}
 	
 	xSetPointer(dEnemies, index);
+	pvpReattachPlayer();
 }
 
 void chooseStarseer(int eventID = -1) {

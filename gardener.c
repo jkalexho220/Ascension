@@ -56,6 +56,7 @@ void plantSeed(int next = 0, int p = 0) {
 void gardenerAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * GARDENER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -75,8 +76,9 @@ void gardenerAlways(int eventID = -1) {
 	
 	xSetPointer(dPlayerData, p);
 	if (xGetDatabaseCount(db) > 0) {
-		id = xDatabaseNext(db, true);
-		if (id == -1 || trUnitAlive() == false) {
+		xDatabaseNext(db);
+		xUnitSelectByID(db, xUnitID);
+		if (trUnitAlive() == false) {
 			removeGardener(p);
 		} else {
 			hit = CheckOnHit(p);
@@ -254,7 +256,7 @@ void gardenerAlways(int eventID = -1) {
 					if (trUnitAlive() == false) {
 						removeEnemy();
 					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-						stunUnit(dEnemies, 1.0, p, false);
+						stunUnit(dEnemies, 1.5, p, false);
 						damageEnemy(p, amt);
 					}
 				}
@@ -344,6 +346,7 @@ void gardenerAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseGardener(int eventID = -1) {

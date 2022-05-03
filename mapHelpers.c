@@ -133,8 +133,9 @@ vector randomNearEdge(int x1 = 0 , int z1 = 0, int x2 = 0, int z2 = 0) {
 vector randomNearEdgeOfRoom(int room = 0) {
 	trQuestVarSetFromRand("rand", 1, 2, true);
 	int i = trQuestVarGet("rand");
-	vector ans = randomNearEdge(1*trQuestVarGet("room"+room+"bottom"+i+"x"),1*trQuestVarGet("room"+room+"bottom"+i+"z"),
-		1*trQuestVarGet("room"+room+"top"+i+"x"),1*trQuestVarGet("room"+room+"top"+i+"z"));
+	vector bottom = trVectorQuestVarGet("room"+room+"bottom"+i);
+	vector top = trVectorQuestVarGet("room"+room+"top"+i);
+	vector ans = randomNearEdge(xsVectorGetX(bottom),xsVectorGetZ(bottom),xsVectorGetX(top),xsVectorGetZ(top));
 	return(ans);
 }
 
@@ -167,11 +168,13 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*a,0,2*trQuestVarGet("z"),trQuestVarGet("heading"),true);
-				trUnitSelectClear();
-				trUnitSelect(""+next,true);
-				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
-				xSetInt(dEnemiesIncoming,xUnitName,next);
+				if (trGetNextUnitScenarioNameNumber() > next) {
+					trUnitSelectClear();
+					trUnitSelect(""+next,true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
+					xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+					xSetInt(dEnemiesIncoming,xUnitName,next);
+				}
 			}
 		}
 	}
@@ -184,11 +187,13 @@ void paintEnemies(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0) {
 				trQuestVarSetFromRand("heading", 0, 360, true);
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,2*trQuestVarGet("x"),0,2*b,trQuestVarGet("heading"),true);
-				trUnitSelectClear();
-				trUnitSelect(""+next,true);
-				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
-				xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
-				xSetInt(dEnemiesIncoming,xUnitName,next);
+				if (trGetNextUnitScenarioNameNumber() > next) {
+					trUnitSelectClear();
+					trUnitSelect(""+next,true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+randomLow(1*trQuestVarGet("enemyProtoCount"))));
+					xSetPointer(dEnemiesIncoming, xAddDatabaseBlock(dEnemiesIncoming));
+					xSetInt(dEnemiesIncoming,xUnitName,next);
+				}
 			}
 		}
 	}

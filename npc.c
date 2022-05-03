@@ -8,8 +8,6 @@ const int NPC_ZENO_QUIZ_END = 4;
 
 const int NPC_BOSS_ENTRANCE = 5;
 
-const int NPC_MONSTERPEDIA = 6;
-
 const int NPC_NOTTUD = 7;
 
 const int NPC_ZENOS_PARADOX = 8;
@@ -62,6 +60,15 @@ const int NPC_EXPLAIN_DEEP = 416;
 const int NPC_EXPLAIN_CLOUDS = 417;
 const int NPC_EXPLAIN_PIT = 418;
 const int NPC_EXPLAIN_SPACE = 419;
+
+const int NPC_MONSTER_TAMER_START = 420;
+const int NPC_MONSTER_TAMER_NEXT = 421;
+const int MONSTERPEDIA_NPC = 421;
+/*
+reserved to 424
+*/
+const int NPC_DEVIL_DIE = 425;
+const int NPC_MONSTERPEDIA_COMPLETE = 426;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -121,13 +128,30 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-		case NPC_MONSTERPEDIA:
+		case NPC_MONSTERPEDIA_COMPLETE:
 		{
 			switch(dialog)
 			{
 				case 1:
 				{
-					uiMessageBox("The Monsterpedia is now open! You can see monster stats and abilities by clicking on them!");
+					uiMessageBox("Thank you for saving the Monsterpedia, adventurer!");
+				}
+				case 2:
+				{
+					uiMessageBox("The Monsterpedia will reveal to you detailed information about monsters you have encountered.");
+				}
+				case 3:
+				{
+					uiMessageBox("In addition, I grant you this power as a reward...");
+				}
+				case 4:
+				{
+					trShowImageDialog(boonIcon(BOON_MONSTER_COMPANION), boonName(BOON_MONSTER_COMPANION));
+				}
+				case 5:
+				{
+					uiMessageBox("Thank you again, and good luck on your journey, adventurer!");
+					xsEnableRule("monsterpedia_complete");
 					dialog = 0;
 				}
 			}
@@ -583,6 +607,131 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("Destroy the Flame Palace to make the attacks stop.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_MONSTER_TAMER_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("This is terrible! The Monsterpedia has been stolen!");
+				}
+				case 2:
+				{
+					uiMessageBox("That nefarious thief devil_do1 stole it and escaped into the tower!");
+				}
+				case 3:
+				{
+					uiMessageBox("Adventurer! Please retrieve the Monsterpedia! It is a dangerous artifact in the wrong hands!");
+				}
+				case 4:
+				{
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
+					trMessageSetText("Find devil_do1 and retrieve the Monsterpedia.", -1);
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_MONSTER_TAMER_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Please catch devil_do1 and retrieve our lost artifact!");
+				}
+				case 2:
+				{
+					trShowImageDialog("icons\scenario kemsyt icon 64", "This is his last known appearance.");
+				}
+				case 3:
+				{
+					uiMessageBox("Try talking to the people in the tower. They might have seen something.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case MONSTERPEDIA_NPC + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You're looking for a criminal who stole something from the Guild? Do you have a picture?");
+				}
+				case 2:
+				{
+					uiMessageBox("Ooh, who's this handsome devil? Unfortunately, I haven't seen him on this floor.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case MONSTERPEDIA_NPC + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You're looking for the dastardly thief devil_do1?");
+				}
+				case 2:
+				{
+					uiMessageBox("Too bad, haven't seen him... Wait a minute!");
+				}
+				case 3:
+				{
+					uiMessageBox("Dammit! I should've charged you for that information!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case MONSTERPEDIA_NPC + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You're looking for a thief? Oh, this guy!");
+				}
+				case 2:
+				{
+					uiMessageBox("This bastard stole from me too! Fortunately, I place a tracker in all my goods.");
+				}
+				case 3:
+				{
+					uiMessageBox("Here, use this device to find him. He's not on this floor anymore.");
+				}
+				case 4:
+				{
+					if (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 1) {
+						trQuestVarSet("p"+trCurrentPlayer()+"monsterpediaQuest", 2);
+						trMessageSetText("Rehost the map and catch devil_do1.",-1);
+						trSoundPlayFN("xnew_objective.wav","1",-1,"","");
+					}
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_DEVIL_DIE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("devil_do1 has been defeated. You have retrieved the Monsterpedia");
+				}
+				case 2:
+				{
+					uiMessageBox("Return to singleplayer to complete the quest.");
 					dialog = 0;
 				}
 			}
@@ -1752,7 +1901,8 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("Relics sacrificed: ("+1*trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed")+"/10)");
+					dialog = trQuestVarGet("p"+trCurrentPlayer()+"relicsSacrificed") + trQuestVarGet("boonUnlocked"+BOON_MORE_GOLD);
+					uiMessageBox("Relics sacrificed: ("+dialog+"/10)");
 					dialog = 0;
 				}
 			}
@@ -2145,7 +2295,6 @@ highFrequency
 			z = x / 4;
 			x = trQuestVarGet("village") - 4 * z;
 			trVectorQuestVarSet("townCenter", xsVectorSet(70*x + 40, 0, 70*z + 40));
-			trQuestVarSet("townCenter", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Revealer to Player",1,70*x+40,0,70*z+40,225,true);
 			trSoundPlayFN("settlement.wav","1",-1,"","");
 		}

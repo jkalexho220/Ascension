@@ -334,7 +334,7 @@ void chooseClass(int p = 0, int class = 0) {
 	int relics = getRelicsDB(p);
 	for(x=xGetDatabaseCount(relics); >0) {
 		xDatabaseNext(relics);
-		if (x > xGetInt(dPlayerData,xPlayerLevel,p)+1) {
+		if ((x > xGetInt(dPlayerData,xPlayerLevel,p)+1) || xGetInt(relics, xRelicType) > NORMAL_RELICS) {
 			int index = xAddDatabaseBlock(dFreeRelics);
 			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
 			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
@@ -342,6 +342,9 @@ void chooseClass(int p = 0, int class = 0) {
 			trUnitSelectClear();
 			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
+			if (xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) {
+				trQuestVarSet("p"+p+"nickEquipped", 0);
+			}
 		} else {
 			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
@@ -504,7 +507,7 @@ highFrequency
 	/* Proto , Enumeration , First delay , Next delay , special attack cooldown */
 	setupClass("Hero Greek Theseus", MOONBLADE, 460, 1000, STARSTONE, 7);
 	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
-	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 5);
+	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 4);
 	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
 	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
 	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
@@ -543,14 +546,14 @@ highFrequency
 	setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
 	setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
 	setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
-	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.5);
-	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.4);
+	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.4);
+	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.3);
 	setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
 	setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
 	setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
 	setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
 	setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
-	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.3);
+	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.4);
 	setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);
 	setupPlayerProto("Priest", 1000, 10, 3.6, 0, 16);
 	setupPlayerProto("Oracle Hero", 1000, 0, 4.0, 0.3);
@@ -600,7 +603,7 @@ highFrequency
 		zInitProtoUnitStat("Meteorite",p,1,100);
 		trModifyProtounit("Minion", p, 8, -999);
 		trModifyProtounit("Arkantos God Out", p, 8, 1);
-		zInitProtoUnitStat("Cinematic Block", p, 0, 300);
+		zInitProtoUnitStat("Victory Marker", p, 0, 300);
 		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
 		
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
@@ -612,6 +615,10 @@ highFrequency
 		
 		trModifyProtounit("Axe",p,1,-20);
 	}
+
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 3000 * ENEMY_PLAYER);
 	
 	trModifyProtounit("Minion", 0, 8, -999);
 	
@@ -767,6 +774,13 @@ void paintTowerSegment(int stage = 0) {
 	xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
 	xSetInt(dStageChoices,xUnitName,next);
 	xSetInt(dStageChoices,xStageChoicesStage,stage);
+
+	if (trQuestVarGet("monsterpediaQuestLocation") == stage) {
+		trUnitSelectClear();
+		trUnitSelect(""+next, true);
+		trMutateSelected(kbGetProtoUnitID("Shaba Ka"));
+		trUnitOverrideAnimation(2,0,true,false,-1);
+	}
 }
 
 rule Z_cin_02
@@ -778,6 +792,7 @@ highFrequency
 		if (xGetInt(dPlayerData,xPlayerProgress,1) <= 0) {
 			trQuestVarSet("stage", 1);
 			xsEnableRule("choose_stage_02");
+			xsEnableRule("delayed_modify");
 		} else {
 			dStageChoices = xInitDatabase("stageChoices",xGetInt(dPlayerData,xPlayerProgress,1));
 			xInitAddInt(dStageChoices,"name");
@@ -813,7 +828,10 @@ highFrequency
 				trPaintTerrain(64,47,64,47,0,75);
 				trPaintTerrain(64,46,64,46,0,34);
 			}
-			
+
+			if (trQuestVarGet("p1monsterpediaQuest") == 2) {
+				trQuestVarSetFromRand("monsterpediaQuestLocation", 1, xGetInt(dPlayerData, xPlayerProgress, 1), true);
+			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black
 			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
 				paintTowerSegment(i+1);

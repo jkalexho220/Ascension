@@ -34,6 +34,26 @@ void initializeLaserTrapDatabase() {
 	xShrinkingLaserTimeout = xInitAddInt(dShrinkingLasers,"timeout");
 }
 
+int CarouselRoomLast = 0;
+int CarouselRoomLastSound = 0;
+
+int dCarouselRooms = 0;
+int xCarouselRoomAngle = 0;
+int xCarouselRoomNext = 0;
+int xCarouselRoomActive = 0;
+int xCarouselRoomHitbox = 0;
+int xCarouselRoomPos = 0;
+
+void initializeCarouselTrapDatabase() {
+	dCarouselRooms = xInitDatabase("carouselRooms");
+	xInitAddInt(dCarouselRooms, "name");
+	xCarouselRoomAngle = xInitAddFloat(dCarouselRooms, "angle");
+	xCarouselRoomNext = xInitAddInt(dCarouselRooms, "next");
+	xCarouselRoomActive = xInitAddBool(dCarouselRooms, "active", false);
+	xCarouselRoomHitbox = xInitAddBool(dCarouselRooms, "hitbox", false);
+	xCarouselRoomPos = xInitAddVector(dCarouselRooms, "pos");
+}
+
 /* laser field trap */
 rule laser_rooms_always
 inactive
@@ -98,7 +118,7 @@ highFrequency
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
 						} else {
-							pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits,xUnitName));
+							pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits,xUnitName), true);
 							if (vectorInRectangle(pos, xGetVector(dLaserRooms,xLaserRoomXBottom + laser),
 									xGetVector(dLaserRooms,xLaserRoomXTop + laser))) {
 								damagePlayerUnit(300);
@@ -168,3 +188,91 @@ highFrequency
 	}
 }
 
+rule carousel_rooms_always
+inactive
+highFrequency
+{
+	vector dir = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	float angle = 0;
+	float diff = trTimeMS() - CarouselRoomLast;
+	CarouselRoomLast = trTimeMS();
+	for (y=xGetDatabaseCount(dCarouselRooms); >0) {
+		xDatabaseNext(dCarouselRooms);
+		if (xGetBool(dCarouselRooms, xCarouselRoomActive)) {
+			xUnitSelect(dCarouselRooms, xUnitName);
+			if (trUnitVisToPlayer()) {
+				if (trTime() > CarouselRoomLastSound) {
+					trSoundPlayFN("inferno_loop.wav","1",-1,"","");
+					CarouselRoomLastSound = trTime() + 5;
+				}
+			}
+			angle = fModulo(6.283185, xGetFloat(dCarouselRooms, xCarouselRoomAngle) + 0.0004 * diff + 3.141592);
+			xSetFloat(dCarouselRooms, xCarouselRoomAngle, angle);
+			dir = xsVectorSet(xsCos(angle),0,xsSin(angle));
+			trUnitSelectClear();
+			trUnitSelect(""+(xGetInt(dCarouselRooms, xUnitName) + 1), true);
+			trSetSelectedUpVector(4.0 * xsVectorGetX(dir),-1,4.0 * xsVectorGetZ(dir));
+			dir = rotationMatrix(dir, 0, 1.0);
+			trUnitSelectClear();
+			trUnitSelect(""+(xGetInt(dCarouselRooms, xUnitName) + 2), true);
+			trSetSelectedUpVector(4.0 * xsVectorGetX(dir),-1,4.0 * xsVectorGetZ(dir));
+			
+			if (trTimeMS() > xGetInt(dCarouselRooms, xCarouselRoomNext)) {
+				xSetInt(dCarouselRooms, xCarouselRoomNext, xGetInt(dCarouselRooms, xCarouselRoomNext) + 200);
+				xSetBool(dCarouselRooms, xCarouselRoomHitbox, xGetBool(dCarouselRooms, xCarouselRoomHitbox) == false);
+				if (xGetBool(dCarouselRooms, xCarouselRoomHitbox)) {
+					dir = rotationMatrix(dir, 0, 1.0);
+				}
+				pos = xGetVector(dCarouselRooms, xCarouselRoomPos) - dir * 12.0;
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (rayCollision(dPlayerUnits, pos, dir, 24.0, 6.0)) {
+						damagePlayerUnit(200.0);
+					}
+				}
+				for(x=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerUnit();
+					} else if (rayCollision(dEnemies, pos, dir, 24.0, 6.0)) {
+						trDamageUnit(200.0);
+					}
+				}
+				xUnitSelect(dCarouselRooms, xUnitName);
+				bool deactivate = true;
+				xUnitSelect(dCarouselRooms, xUnitName);
+				for(p=1; < ENEMY_PLAYER) {
+					if (trUnitHasLOS(p)) {
+						deactivate = false;
+						break;
+					}
+				}
+				if (deactivate) {
+					xSetBool(dCarouselRooms, xCarouselRoomActive, false);
+				}
+			}
+		} else {
+			xUnitSelect(dCarouselRooms, xUnitName);
+			for(p=1; < ENEMY_PLAYER) {
+				if (trUnitHasLOS(p)) {
+					xSetBool(dCarouselRooms, xCarouselRoomActive, true);
+					xSetInt(dCarouselRooms, xCarouselRoomNext, trTimeMS());
+					trUnitSelectClear();
+					trUnitSelect(""+(xGetInt(dCarouselRooms, xUnitName) + 1), true);
+					trMutateSelected(kbGetProtoUnitID("Meteorite"));
+					trUnitOverrideAnimation(6,0,true,false,-1);
+					trUnitSelectClear();
+					trUnitSelect(""+(xGetInt(dCarouselRooms, xUnitName) + 2), true);
+					trMutateSelected(kbGetProtoUnitID("Meteorite"));
+					trUnitOverrideAnimation(6,0,true,false,-1);
+					break;
+				}
+			}
+		}
+	}
+}

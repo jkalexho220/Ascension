@@ -31,11 +31,13 @@ void removeStormcutter(int p = 0) {
 void stormcutterAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * STORMCUTTER;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
+	int relics = getRelicsDB(p);
 	int spearedUnits = trQuestVarGet("p"+p+"spearedUnits");
 	int shockArrows = trQuestVarGet("p"+p+"shockArrows");
 	float amt = 0;
@@ -95,11 +97,16 @@ void stormcutterAlways(int eventID = -1) {
 			if (trUnitAlive() == false) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+xGetInt(dEnemies, xUnitName),p,"Archer Atlantean Hero", dist) >0) {
-				stunUnit(dEnemies, 2.0, p);
+				stunUnit(dEnemies, 3.0, p);
 				gainFavor(p, 1.0);
 			}
 		}
 		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
+		for(x=xGetDatabaseCount(relics); >0) {
+			xDatabaseNext(relics);
+			xUnitSelect(relics, xUnitName);
+			trUnitChangeProtoUnit("Relic");
+		}
 		for(x=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
 			xUnitSelectByID(db, xUnitID);
@@ -144,7 +151,11 @@ void stormcutterAlways(int eventID = -1) {
 			hit = xGetInt(dEnemies, xDoppelganger, xGetInt(spearedUnits, xSpearedIndex));
 			launched = xGetBool(dPlayerUnits, xLaunched, hit);
 		} else {
-			launched = xGetBool(dEnemies, xLaunched, xGetInt(spearedUnits, xSpearedIndex));
+			xUnitSelect(spearedUnits, xUnitName);
+			launched = trUnitAlive() && xGetBool(dEnemies, xLaunched, xGetInt(spearedUnits, xSpearedIndex));
+			if ((xGetInt(dEnemies, xUnitName, xGetInt(spearedUnits, xSpearedIndex)) == bossUnit) && trQuestVarGet("stage") > 5) {
+				launched = false;
+			}
 		}
 		if (launched == false) {
 			if (xGetInt(dEnemies, xStunStatus, xGetInt(spearedUnits, xSpearedIndex)) > 0) { // if they hit a wall, damage them
@@ -335,6 +346,7 @@ void stormcutterAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseStormcutter(int eventID = -1) {

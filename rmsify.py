@@ -13,8 +13,7 @@ import sys
 # You can add -v to the command to see verbose output, though this will not be helpful to most people.
 
 # The syntax validator will stop after encountering the first error. After fixing that error, additional ones may be reported.
-# In files[], the very first file contains all the rms code in void main() that EXCLUDES trigger code.
-# The other files after the first file are parsed as raw trigger code.
+
 # If you wish to inject RMS code between the lines of trigger code, use the % character to escape trigger code and another % to return to trigger code.
 # The % characters must be placed on their own lines.
 # While in RMS code, you can write code(""); to create trigger code the old-fashioned nottud way.
@@ -26,18 +25,36 @@ import sys
 ####### CUSTOMIZE THESE #######
 ###############################
 FILENAME = 'Ascension MMORPG.xs'
-files = ['main.c', 'memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
+files = ['memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
-        'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c']
+        'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
+rmsFunc = ''
+rmsMain = 'main.c'
 
 #########################################
 ####### CODE BELOW (DO NOT TOUCH) #######
 #########################################
+additional = []
+if len(rmsFunc) > 0:
+	additional.append(rmsFunc)
 
+additional.append(rmsMain)
+
+files = additional + files
+
+OUTPUT_COMMENTS = False
+OUTPUT_TABS = False
+REFORMAT = False
 VERBOSE = False
 for t in sys.argv:
 	if t == '-v':
 		VERBOSE = True
+	elif t == '-r':
+		REFORMAT = True
+	elif t == '-t':
+		OUTPUT_TABS = True
+	elif t == '-c':
+		OUTPUT_COMMENTS = True
 
 # Stack Frame states
 STATE_NEED_NAME = 0
@@ -985,8 +1002,6 @@ def removeStrings(line):
 			inString = not inString
 		if not inString or token == '"':
 			retline = retline + token
-	if "//" in retline:
-		retline = retline[:retline.find("//")]
 	return retline
 
 print("Reading Command Viewer")
@@ -1010,14 +1025,15 @@ print("rmsification start!")
 ln = 1
 FILE_1 = None
 comment = False
-first = True
+ESCAPE = True
 try:
 	with open('XS/' + FILENAME, 'w') as file_data_2:
-		file_data_2.write('void code(string xs="") {\n')
-		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
-		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}\n')
-		file_data_2.write('void main(void) {\n')
 		for f in files:
+			if f == rmsMain:
+				file_data_2.write('void code(string xs="") {\n')
+				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
+				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/"+xs+"/*");}\n')
+				file_data_2.write('void main(void) {\n')
 			FILE_1 = f
 			ln = 1
 			pcount = 0 # parenthesis
@@ -1035,20 +1051,18 @@ try:
 				while line:
 					# Rewrite history
 					reline = line.strip()
-					nostrings = removeStrings(reline)
+					stringless = removeStrings(reline)
+					nostrings = stringless
+					if "//" in nostrings:
+						nostrings = nostrings[:nostrings.find("//")]
 					if '}' in nostrings:
 						thedepth = thedepth - 1
 					if not RESTORING:
 						reline = "\t" * thedepth + reline
 						rewrite.append(reline)
-					if '{' in nostrings:
-						thedepth = thedepth + 1
-					thedepth = thedepth + nostrings.count('(') - nostrings.count(')')
-					pcount = pcount + nostrings.count('(') - nostrings.count(')')
-					bcount = bcount + nostrings.count('{') - nostrings.count('}')
 					
 					if not line.isspace():
-						if ('/*' in line):
+						if ('/*' in nostrings):
 							comment = True
 
 						if not comment:
@@ -1085,29 +1099,73 @@ try:
 													BASE_JOB.debug()
 								
 								templine = reline.strip()
-								if '//' in templine:
+								if '//' in stringless:
 									templine = templine[:templine.find('//')].strip()
 
-								if (len(templine) > 120):
-									print("Line length greater than 120! Length is " + str(len(templine)))
-									print("Line " + str(ln) + ":\n    " + line)
 								if len(templine) > 0 and not (templine[-1] == ';' or templine[-1] == '{' or templine[-1] == '}' or templine[-2:] == '||' or templine[-2:] == '&&' or templine[-1] == ',' or templine[-4:] == 'else' or templine[0:4] == 'rule' or templine == 'highFrequency' or templine == 'runImmediately' or templine[-1] == '/' or templine[-6:] == 'active' or templine[0:11] == 'minInterval' or templine[0:4] == 'case' or templine[0:7] == 'switch(' or templine[-1] == '%'):
 									print("Missing semicolon")
 									print("Line " + str(ln) + ":\n    " + line)
 
+								if len(templine) > 120:
+									if ESCAPE:
+										print("Line length greater than 120! Length is " + str(len(templine)))
+										print("Line " + str(ln) + ":\n    " + line)
+									else:
+										templines = []
+										while (len(templine) > 120):
+											# attempt to separate the line into multiple
+											inString = False
+											ignoreNext = False
+											split = 0
+											for index in range(118):
+												if ignoreNext:
+													ignoreNext = False
+												elif templine[index] == '"':
+													inString = not inString
+												elif not inString:
+													if templine[index] == ',':
+														split = index + 1
+													elif templine[index:index+2] in ['&&', '||']:
+														split = index + 2
+												elif templine[index] == '\\':
+													ignoreNext = True
+											
+											if split > 0:
+												templines.append(templine[:split])
+												templine = templine[split:].strip()
+											else:
+												print("Line length greater than 120 and could not find a delimiter to split! Length is " + str(len(templine)))
+												print("Line " + str(ln) + ":\n    " + line)
+												break
+										for l in templines:
+											file_data_2.write(tabs + 'code("' + l.replace('"', '\\"') + '");\n')	
+
+
 								if not RESTORING and len(templine) > 0:
 									# reWrite the line
-									if first or ESCAPE:
-										file_data_2.write(templine + '\n')
+									tabs = ''
+									if OUTPUT_TABS:
+										tabs = "\t" * thedepth
+									if ESCAPE:
+										file_data_2.write(tabs + templine + '\n')
 									else:
-										file_data_2.write('code("' + templine.replace('"', '\\"') + '");\n')
+										file_data_2.write(tabs + 'code("' + templine.replace('"', '\\"') + '");\n')
 								else:
 									RESTORING = False
-						if ('*/' in line):
+						
+						elif OUTPUT_COMMENTS and not RESTORING:
+							file_data_2.write(reline + '\n')
+
+						if ('*/' in nostrings):
 							comment = False
-					else:
+					elif OUTPUT_TABS:
 						file_data_2.write('\n')
 
+					if '{' in nostrings:
+						thedepth = thedepth + 1
+					thedepth = thedepth + nostrings.count('(') - nostrings.count(')')
+					pcount = pcount + nostrings.count('(') - nostrings.count(')')
+					bcount = bcount + nostrings.count('{') - nostrings.count('}')
 					if ESCAPE and 'code("' in line:
 						line = restoreCode(line)
 						RESTORING = True
@@ -1118,9 +1176,10 @@ try:
 			BASE_JOB.resolve()
 			RMS_JOB.resolve()
 			# reformat the .c raw code
-			with open(FILE_1, 'w') as file_data_1:
-				for line in rewrite:
-					file_data_1.write(line + '\n')
+			if REFORMAT:
+				with open(FILE_1, 'w') as file_data_1:
+					for line in rewrite:
+						file_data_1.write(line + '\n')
 			if pcount < 0:
 				print("ERROR: Extra close parenthesis detected!\n")
 			elif pcount > 0:
@@ -1129,7 +1188,7 @@ try:
 				print("ERROR: Extra close brackets detected!\n")
 			elif bcount > 0:
 				print("ERROR: Missing close brackets detected!\n")
-			if first:
+			if f == rmsMain:
 				file_data_2.write('rmSwitchToTrigger(rmCreateTrigger("zenowashere"));\n')
 				file_data_2.write('rmSetTriggerPriority(4);\n')
 				file_data_2.write('rmSetTriggerActive(false);\n')
@@ -1137,7 +1196,6 @@ try:
 				file_data_2.write('rmSetTriggerRunImmediately(true);\n')
 				file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 				file_data_2.write('rmSetTriggerEffectParam("IdleProc",");}}/*");\n')
-				first = False
 				ESCAPE = False
 		file_data_2.write('rmAddTriggerEffect("SetIdleProcessing");\n')
 		file_data_2.write('rmSetTriggerEffectParam("IdleProc",");*/rule _zenowashereagain inactive {if(true){xsDisableSelf();//");\n')

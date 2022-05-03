@@ -27,6 +27,7 @@ void removeAlchemist(int p = 0) {
 void alchemistAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * ALCHEMIST;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -55,7 +56,7 @@ void alchemistAlways(int eventID = -1) {
 					xSetInt(db, xNextPotion, 0);
 					if (trQuestVarGet("p"+p+"potion") == POTION_HEAL) {
 						amt = potionHeal * xGetFloat(dPlayerData, xPlayerSpellDamage) * xGetFloat(dPlayerData, xPlayerHealBoost);
-						amt = amt * xGetInt(dPlayerData, xPlayerProjectiles);
+						amt = amt * (1.0 + 0.2 * xGetInt(dPlayerData, xPlayerProjectiles));
 						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							xDatabaseNext(dPlayerUnits);
 							xUnitSelectByID(dPlayerUnits, xUnitID);
@@ -95,7 +96,7 @@ void alchemistAlways(int eventID = -1) {
 						if (trUnitAlive() == false) {
 							removeEnemy();
 						} else if (xGetInt(dEnemies, xUnitName) == xGetInt(potions, xUnitName)) {
-							stunUnit(dEnemies, 2.0, p);
+							stunUnit(dEnemies, 3.0, p);
 							break;
 						}
 					}
@@ -106,7 +107,7 @@ void alchemistAlways(int eventID = -1) {
 							if (trUnitAlive() == false) {
 								removeEnemy();
 							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
-								stunUnit(dEnemies, 2.0, p);
+								stunUnit(dEnemies, 3.0, p);
 								hit = hit - 1;
 								if (hit == 0) {
 									break;
@@ -246,7 +247,7 @@ void alchemistAlways(int eventID = -1) {
 			xSetInt(duplicates, xUnitName, trGetNextUnitScenarioNameNumber());
 			
 			xSetInt(duplicates, xDuplicateIndex, spawnPlayerClone(xGetInt(dPlayerCharacters, xPlayerOwner), pos));
-			xSetFloat(duplicates, xDuplicateDecayNext, trTime());
+			xSetInt(duplicates, xDuplicateDecayNext, trTime());
 			trSoundPlayFN("changeunit.wav","1",-1,"","");
 			trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
 			if (trCurrentPlayer() == xGetInt(dPlayerCharacters, xPlayerOwner)) {
@@ -300,6 +301,7 @@ void alchemistAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseAlchemist(int eventID = -1) {
@@ -327,7 +329,7 @@ void chooseAlchemist(int eventID = -1) {
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, elixirCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
-	xSetInt(dPlayerData,xPlayerLureCooldown, 0);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 1);
 	xSetFloat(dPlayerData,xPlayerLureCost, duplicateCost);
 	xSetInt(dPlayerData,xPlayerRainCooldown,1);
 	xSetFloat(dPlayerData,xPlayerRainCost, 0);

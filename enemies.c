@@ -97,7 +97,7 @@ highFrequency
 	setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
 	setupProtounitBounty("Helepolis", 0.25, 0, 0);
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
-	setupProtounitBounty("Guardian", 0.5, 0, 0);
+	setupProtounitBounty("Heka Gigantes", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);
@@ -141,6 +141,11 @@ highFrequency
 	setupProtounitBounty("Einheriar", 0.6, 7, 0.03);
 	setupProtounitBounty("Statue of Lightning", 0.5, 8, 0.05);
 	setupProtounitBounty("Lampades", 0.8, 12, 0.1);
+
+	setupProtounitBounty("Tartarian Gate Spawn", 0.7, 6, 0.03);
+	setupProtounitBounty("Troll", 0.7, 7, 0.03);
+	setupProtounitBounty("Manticore", 0.3, 8, 0.05);
+	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);
@@ -150,6 +155,8 @@ highFrequency
 	setupProtounitBounty("Hero Boar 2", 0, 0, 0);
 	trModifyProtounit("Hero Boar", ENEMY_PLAYER, 27, -999); // attack
 	trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 27, -999); // attack
+
+	setupProtounitBounty("Shaba Ka", 0.5, 30, 0);
 	
 	for(class = 1; <= 16) {
 		setupProtounitBounty(kbGetProtoUnitName(xGetInt(dClass,xClassProto,class)),
@@ -657,7 +664,7 @@ void specialUnitsAlways() {
 					xSetInt(dMedusaBalls, xMedusaBallTarget, xGetInt(dMedusas, xSpecialTarget));
 					xSetInt(dMedusaBalls, xMedusaBallBounces, 10);
 					xSetInt(dMedusas, xSpecialStep, 2);
-					xSetInt(dMedusas, xSpecialNext, xGetInt(dMedusas, xSpecialNext) + 800);
+					xSetInt(dMedusas, xSpecialNext, xGetInt(dMedusas, xSpecialNext) + 900);
 				}
 				case 2:
 				{
@@ -1651,12 +1658,12 @@ void specialUnitsAlways() {
 			dir = xGetVector(dYeebLightningBalls,xProjDir);
 			start = xGetVector(dYeebLightningBalls,xProjPrev);
 			pos = kbGetBlockPosition(""+xGetInt(dYeebLightningBalls,xUnitName),true);
-			end = xsVectorSet(xsVectorGetX(start) + 3.0 * xsVectorGetX(dir),0,xsVectorGetZ(start) + 3.0 * xsVectorGetZ(dir));
+			end = start + (dir * 3.0);
 			loc = vectorToGrid(end);
 			if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
 				if (xGetInt(dYeebLightningBalls, xProjDist) > 0) {
 					xSetInt(dYeebLightningBalls, xProjDist, xGetInt(dYeebLightningBalls,xProjDist) - 1);
-					dir = getBounceDir(start,loc,dir);
+					dir = getBounceDir(end,loc,dir);
 					xSetInt(dYeebLightningBalls, xProjYeehaw, 99);
 					xSetVector(dYeebLightningBalls,xProjDir,dir);
 					trQuestVarSetFromRand("sound", 1, 2, true);
@@ -1683,7 +1690,7 @@ void specialUnitsAlways() {
 							}
 						}
 					}
-					xSetVector(dYeebLightningBalls,xProjPrev,start);
+					xSetVector(dYeebLightningBalls,xProjPrev,pos);
 				}
 			}
 		}
@@ -1773,6 +1780,184 @@ void specialUnitsAlways() {
 			}
 		}
 	}
+
+	for(i=xsMin(5, xGetDatabaseCount(dFireGiantBalls)); >0) {
+		if (processGenericProj(dFireGiantBalls) == PROJ_FALLING) {
+			p = xGetInt(dFireGiantBalls, xPlayerOwner);
+			pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);
+			start = xGetVector(dFireGiantBalls, xProjPrev);
+			dir = xGetVector(dFireGiantBalls, xProjDir);
+			dist = distanceBetweenVectors(pos, start);
+			if (dist > 4.0) {
+				dist = xsSqrt(dist);
+				xSetVector(dFireGiantBalls, xProjPrev, pos);
+				if (xGetFloat(dFireGiantBalls, xProjDist) > 6.0) { // only start collision detection 6 meters away from start
+					db = opponentDatabaseName(p);
+					hit = false;
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db, xUnitID);
+						if (trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (rayCollision(db, start, dir, dist + 1.0, 2.0)) {
+							damageOpponentUnit(p, 100.0);
+							hit = true;
+						}
+					}
+					if (hit) {
+						xUnitSelectByID(dFireGiantBalls, xUnitID);
+						trUnitChangeProtoUnit("Meteorite");
+						trQuestVarSetFromRand("sound", 1, 2, true);
+						trSoundPlayFN("fireball fall " + 1*trQuestVarGet("sound") + ".wav","1",-1,"","");
+						xFreeDatabaseBlock(dFireGiantBalls);
+					}
+				} else {
+					xSetFloat(dFireGiantBalls, xProjDist, xGetFloat(dFireGiantBalls, xProjDist) + dist);
+				}
+			}
+			start = pos;
+			pos = vectorToGrid(pos + (dir * 2.0));
+			if (trGetTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos)) < worldHeight - 1.0) {
+				xFreeDatabaseBlock(dFireGiantBalls);
+			} else if (terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				xUnitSelectByID(dFireGiantBalls, xUnitID);
+				trUnitChangeProtoUnit("Dust Large");
+				xUnitSelectByID(dFireGiantBalls, xUnitID);
+				trDamageUnitPercent(-100);
+				xFreeDatabaseBlock(dFireGiantBalls);
+			}
+		}
+	}
+
+	if (xGetDatabaseCount(dFireGiantProj) > 0) {
+		if (processGenericProj(dFireGiantProj) == PROJ_FALLING) {
+			p = xGetInt(dFireGiantProj, xFireGiantProjOwner);
+			pos = kbGetBlockPosition(""+xGetInt(dFireGiantProj, xUnitName), true);
+			start = xGetVector(dFireGiantProj, xProjPrev);
+			dir = xGetVector(dFireGiantProj, xProjDir);
+			dist = distanceBetweenVectors(pos, start, false);
+			amt = dist * 50.0;
+			db = opponentDatabaseName(p);
+			for (x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
+					removeOpponentUnit(p);
+				} else if (rayCollision(db, start, dir, dist + 3.0, 9.0)) {
+					damageOpponentUnit(p, amt);
+				}
+			}
+			xSetVector(dFireGiantProj, xProjPrev, pos);
+			
+			start = pos;
+			pos = vectorToGrid(pos + (dir * 2.0));
+			if (terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL) || trGetTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos)) < (worldHeight - 1.0)) {
+				xUnitSelectByID(dFireGiantProj, xUnitID);
+				if (trUnitVisToPlayer()) {
+					trCameraShake(0.5, 0.5);
+					trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
+				}
+				trUnitChangeProtoUnit("Meteor Impact Ground");
+				xUnitSelectByID(dFireGiantProj, xUnitID);
+				trDamageUnitPercent(-100);
+				trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+				trQuestVarSetFromRand("rand", 0, 3.14, false);
+				
+				dir = vectorSetFromAngle(trQuestVarGet("rand"));
+				for(i=16; >0) {
+					addGenericProj(dFireGiantBalls,start,dir,p);
+					xSetVector(dFireGiantBalls, xProjPrev, start);
+					dir = rotationMatrix(dir, 0.92388, 0.382683);
+				}
+
+				db = opponentDatabaseName(p);
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeOpponentUnit();
+					} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
+						damageOpponentUnit(p, 200.0);
+					}
+				}
+
+				xFreeDatabaseBlock(dFireGiantProj);
+			}
+		}
+	}
+	
+	if (xGetDatabaseCount(dFireGiants) >0) {
+		xDatabaseNext(dFireGiants);
+		id = xGetInt(dFireGiants,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dFireGiants, xPlayerOwner);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
+			trQuestVarSet("giantKills", 1 + trQuestVarGet("giantKills"));
+			trUnitChangeProtoUnit("Fire Giant");
+			xFreeDatabaseBlock(dFireGiants);
+		} if (checkEnemyDeactivated(dFireGiants)) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			xFreeDatabaseBlock(dFireGiants);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dFireGiants, xSpecialIndex)) == 1) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			xSetInt(dFireGiants, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dFireGiants, xSpecialNext)) {
+			switch(xGetInt(dFireGiants, xSpecialStep))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 12) {
+						xsSetContextPlayer(p);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						end = kbGetBlockPosition(""+target);
+						start = kbGetBlockPosition(""+xGetInt(dFireGiants, xUnitName));
+						dir = getUnitVector(start, end);
+
+						xSetVector(dFireGiants, xSpecialTarget, dir);
+						xSetInt(dFireGiants, xSpecialStep, 1);
+						xSetInt(dFireGiants, xSpecialNext, trTimeMS() + 1200);
+						trMutateSelected(kbGetProtoUnitID("Fire Giant"));
+						trUnitOverrideAnimation(19,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					if (trUnitVisToPlayer()) {
+						trSoundPlayFN("inferno.wav","1",-1,"","");
+					}
+					start = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dFireGiants, xUnitName), true));
+					dir = xGetVector(dFireGiants, xSpecialTarget);
+					addGenericProj(dFireGiantProj,start,dir);
+					xSetVector(dFireGiantProj, xProjPrev, start);
+					xSetInt(dFireGiantProj, xFireGiantProjOwner, p);
+					xSetInt(dFireGiants, xSpecialStep, 2);
+					xSetInt(dFireGiants, xSpecialNext, xGetInt(dFireGiants, xSpecialNext) + 400);
+				}
+				case 2:
+				{
+					xSetInt(dFireGiants, xSpecialStep, 0);
+					xSetInt(dFireGiants, xSpecialNext, trTimeMS() + 10000);
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+				}
+			}
+		} else {
+			action = xGetInt(db, xStunStatus, xGetInt(dFireGiants, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dFireGiants, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (xGetInt(dFireGiants, xSpecialStep) == 1) {
+				if (action > 0) {
+					xSetInt(dFireGiants, xSpecialStep, 0);
+					xSetInt(dFireGiants, xSpecialNext, trTimeMS() + 10000);
+				} else {
+					trSetUnitOrientation(xGetVector(dFireGiants, xSpecialTarget), vector(0,1,0), true);
+				}
+			}
+		}
+	}
 }
 
 void enemiesAlways() {
@@ -1835,7 +2020,7 @@ void enemiesAlways() {
 		xDatabaseNext(dAmbushRooms);
 		pos = xGetVector(dAmbushRooms,xAmbushRoomPos);
 		for(p=1; < ENEMY_PLAYER) {
-			if (unitDistanceToVector(xGetInt(dPlayerData,xUnitName,p), pos) < 100) {
+			if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), pos) < 100) {
 				trQuestVarSetFromRand("rand", 1, trQuestVarGet("enemyProtoCount"),true);
 				protoName = trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand"));
 				trQuestVarSetFromRand("count", trQuestVarGet("stage"), 11, true);
@@ -1844,7 +2029,7 @@ void enemiesAlways() {
 				float cSin = 0.0 - xsSin(angle);
 				float cCos = xsCos(angle);
 				float heading = 0;
-				dir = xsVectorSet(0, 0, -1);
+				dir = xsVectorSet(0, 0, 1);
 				for(x=trQuestVarGet("count"); >0) {
 					trQuestVarSetFromRand("dist", 6, 18, true);
 					
@@ -1865,4 +2050,3 @@ void enemiesAlways() {
 		}
 	}
 }
-

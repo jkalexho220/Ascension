@@ -32,6 +32,7 @@ void removeThroneShield(int p = 0) {
 void throneShieldAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * THRONESHIELD;
+	pvpDetachPlayer(p);
 	int id = 0;
 	int hit = 0;
 	int target = 0;
@@ -48,16 +49,43 @@ void throneShieldAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
+		start = xGetVector(dPlayerData, xPlayerWellPos);
 		target = 0;
-		dist = 100;
-		for(x=1; < ENEMY_PLAYER) {
-			if (x == p) {
-				continue;
-			} else if (xGetInt(dPlayerData, xPlayerDead, x) == 0) {
-				current = unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, x), xGetVector(dPlayerData, xPlayerWellPos));
-				if (current < dist) {
-					target = x;
-					dist = current;
+		if (xGetInt(dPlayerData, xPlayerQueen) > 0) {
+			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, xGetInt(dPlayerData, xPlayerQueen)), start) < 16) {
+				target = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),225,true);
+				trArmySelect(""+p+",0");
+				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeThroneShield();
+					} else {
+						trImmediateUnitGarrison(""+target);
+						trUnitChangeProtoUnit("Trident Soldier Hero");
+					}
+				}
+				equipRelicsAgain(p);
+				trUnitSelectClear();
+				trUnitSelect(""+target, true);
+				trUnitChangeProtoUnit("Fimbulwinter SFX");
+				trSoundPlayFN("skypassageout.wav","1",-1,"","");
+				target = -1;
+			}
+		}
+		if (target == 0) {
+			dist = 100;
+			for(x=1; < ENEMY_PLAYER) {
+				if (x == p) {
+					continue;
+				} else if (xGetInt(dPlayerData, xPlayerDead, x) == 0) {
+					current = unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, x), start);
+					if (current < dist) {
+						target = x;
+						dist = current;
+					}
 				}
 			}
 		}
@@ -93,6 +121,7 @@ void throneShieldAlways(int eventID = -1) {
 				xsSetContextPlayer(target);
 				amt = kbUnitGetCurrentHitpoints(id);
 				xsSetContextPlayer(0);
+				xSetFloat(dPlayerUnits, xCurrentHealth, amt, xGetInt(dPlayerData, xPlayerIndex, target));
 				trSoundPlayFN("militarycreate.wav","1",-1,"","");
 				trSoundPlayFN("herocreation.wav","1",-1,"","");
 				if (xGetInt(dPlayerData, xPlayerTether) <= 0) {
@@ -117,11 +146,9 @@ void throneShieldAlways(int eventID = -1) {
 					trQuestVarSet("p"+target+"tetherReady", 1);
 				}
 			}
-		} else if (trCurrentPlayer() == p) {
-			trChatSend(0, "You must target an ally!");
-		}
-		if (target == 0) {
+		} else if (target == 0) {
 			if (trCurrentPlayer() == p) {
+				trChatSend(0, "You must target an ally!");
 				trCounterAbort("well");
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
 			}
@@ -225,7 +252,7 @@ void throneShieldAlways(int eventID = -1) {
 					xDatabaseNext(db);
 					if (xGetInt(db, xUnitName) == xGetInt(dPlayerData, xPlayerUnit)) {
 						if (trCurrentPlayer() == p) {
-							trChatSend(0,"<color=1,1,1>Shield of Light finished. Total damage: " + 1*xGetFloat(dPlayerData, xThroneShieldAbsorbed));
+							trChatSend(0,"<color=1,1,1>Shield of Light finished. Total damage: " + 1*xGetFloat(db, xThroneShieldAbsorbed));
 						}
 					}
 					xSetBool(db, xThroneShieldLaser, true);
@@ -264,7 +291,7 @@ void throneShieldAlways(int eventID = -1) {
 					if (hit == target) {
 						silenceUnit(dEnemies,6.0, p);
 					} else {
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 					}
 					gainFavor(p, 1);
 				}
@@ -356,7 +383,7 @@ void throneShieldAlways(int eventID = -1) {
 						trSetSelectedScale(1,1,1);
 					} else if (hit == ON_HIT_SPECIAL) {
 						gainFavor(p, 3);
-						stunUnit(dEnemies, 2.0, p);
+						stunUnit(dEnemies, 3.0, p);
 						amt = 0.05 * xGetFloat(dPlayerData, xPlayerHealth);
 						for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 							xDatabaseNext(dPlayerCharacters);
@@ -375,6 +402,7 @@ void throneShieldAlways(int eventID = -1) {
 	
 	xSetPointer(dEnemies, index);
 	poisonKillerBonus(p);
+	pvpReattachPlayer();
 }
 
 void chooseThroneShield(int eventID = -1) {

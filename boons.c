@@ -9,14 +9,14 @@ const int BOON_STATUS_COOLDOWNS = 5; // ra
 const int BOON_IMMUNE_TO_STATUS = 6; // set
 
 /* norse boons */
-const int BOON_FROSTY_SPELLS = 7; // odin
+const int BOON_MONSTER_COMPANION = 7; // odin
 const int BOON_REGENERATE_HEALTH = 8; // thor
 const int BOON_DECAY_HALVED = 9; // loki
 
 /* atlantean boons */
 const int BOON_EXCESS_FAVOR = 10; // kronos
 const int BOON_TWO_RELICS = 11; // oranos
-const int BOON_MONSTER_COMPANION = 12; // gaia
+const int BOON_FROSTY_SPELLS = 12; // gaia
 
 int statueCiv(int boon = 0) {
 	return(boon - 1);
@@ -139,12 +139,12 @@ string boonIcon(int boon = 0) {
 }
 
 string boonName(int boon = 0) {
-	string name = "WTF that's not a boon!";
+	string name = "(This blessing has not been implemented yet)";
 	switch(boon)
 	{
 		case BOON_REGENERATE_HEALTH:
 		{
-			name = "Regenerate 3 percent health per second.";
+			name = "Regenerate 2 percent health per second.";
 		}
 		case BOON_MORE_GOLD:
 		{
@@ -162,21 +162,9 @@ string boonName(int boon = 0) {
 		{
 			name = "Your maximum favor is doubled.";
 		}
-		case BOON_IMMUNE_TO_STATUS:
-		{
-			name = "You are immune to status effects.";
-		}
 		case BOON_SPELL_ATTACK:
 		{
 			name = "Your attack is multiplied by your spell power.";
-		}
-		case BOON_FROSTY_SPELLS:
-		{
-			name = "Your spell damage will stun enemies at full health.";
-		}
-		case BOON_EXCESS_FAVOR:
-		{
-			name = "When your favor exceeds your Ultimate cost, your basic spells cost 10 favor and have no cooldown.";
 		}
 		case BOON_TWO_RELICS:
 		{
