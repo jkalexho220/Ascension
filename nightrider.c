@@ -390,7 +390,39 @@ void nightriderAlways(int eventID = -1) {
 			if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 				xSetBool(dPlayerData, xPlayerLureActivated, false);
 				gainFavor(p, 0.0 - nightfallCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
-				trVectorQuestVarSet("p"+p+"nightfallCenter", vectorSnapToGrid(xGetVector(dPlayerData, xPlayerLurePos)));
+
+				/* find the closest player unit and draw a line to the destination. stop on walls */
+				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true); // default to player unit
+				dest = xGetVector(dPlayerData, xPlayerLurePos);
+				dist = distanceBetweenVectors(pos, dest);
+				for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerUnit();
+					} else {
+						prev = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+						current = distanceBetweenVectors(prev, dest);
+						if (current < dist) {
+							pos = prev;
+							dist = current;
+						}
+					}
+				}
+
+				dist = xsSqrt(dist) / 2;
+				dir = getUnitVector(pos, dest, 2.0);
+				prev = pos;
+				for(i = dist; >0) {
+					pos = pos + dir;
+					if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+						break;
+					} else {
+						prev = pos;
+					}
+				}
+
+				trVectorQuestVarSet("p"+p+"nightfallCenter", vectorSnapToGrid(prev));
 				trUnitSelectClear();
 				trUnitSelectByQV("p"+p+"lureObject");
 				trUnitDestroy();

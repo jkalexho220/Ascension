@@ -664,7 +664,7 @@ void specialUnitsAlways() {
 					xSetInt(dMedusaBalls, xMedusaBallTarget, xGetInt(dMedusas, xSpecialTarget));
 					xSetInt(dMedusaBalls, xMedusaBallBounces, 10);
 					xSetInt(dMedusas, xSpecialStep, 2);
-					xSetInt(dMedusas, xSpecialNext, xGetInt(dMedusas, xSpecialNext) + 800);
+					xSetInt(dMedusas, xSpecialNext, xGetInt(dMedusas, xSpecialNext) + 900);
 				}
 				case 2:
 				{
