@@ -602,7 +602,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("In addition, the Flame Palace will occasionally rain fireballs upon you.");
+					uiMessageBox("In addition, the Flame Palace will occasionally summon Tartarian Gates to attack you.");
 				}
 				case 4:
 				{

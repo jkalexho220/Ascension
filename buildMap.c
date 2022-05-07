@@ -1712,6 +1712,13 @@ highFrequency
 			}
 			case 9:
 			{
+				dPitGates = xInitDatabase("pitGates");
+				xInitAddInt(dPitGates, "name");
+
+				dPitSpawn = xInitDatabase("pitSpawn");
+				xInitAddInt(dPitSpawn, "name");
+				xPitSpawnNext = xInitAddInt(dPitSpawn, "next");
+
 				xsEnableRule("carousel_rooms_always");
 				worldHeight = 5;
 				wallHeight = 10;
@@ -2634,10 +2641,13 @@ inactive
 highFrequency
 {
 	if (trQuestVarGet("play") == 1) {
+		pitLatest = trGetNextUnitScenarioNameNumber();
 		xsDisableSelf();
 		startNPCDialog(NPC_EXPLAIN_PIT);
 		xsEnableRule("the_pit_damage");
 		trQuestVarSet("pitDamageNext", trTime());
+		trQuestVarSetFromRand("pitDeployNext", 30, 90, true);
+		trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("pitDeployNext"));
 	}
 }
 

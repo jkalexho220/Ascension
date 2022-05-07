@@ -1122,6 +1122,11 @@ int dFireGiantBalls = 0;
 
 int dYeebLightningBalls = 0;
 
+int dTartarianSpawns = 0;
+
+int dTartarianEggs = 0;
+int xTartarianEggTimeout = 0;
+
 int dAmbushRooms = 0;
 int xAmbushRoomType = 0;
 int xAmbushRoomPos = 0;
@@ -1209,6 +1214,14 @@ highFrequency
 	dLightningStatues = initSpecialDatabase("LightningStatues");
 	
 	dManticores = initSpecialDatabase("Manticores");
+
+	dTartarianSpawns = initSpecialDatabase("TartarianSpawns", false);
+	xInitAddVector(dTartarianSpawns,"pos");
+
+	dTartarianEggs = xInitDatabase("TartarianEggs");
+	xInitAddInt(dTartarianEggs, "name");
+	xInitAddInt(dTartarianEggs, "player");
+	xTartarianEggTimeout = xInitAddInt(dTartarianEggs, "timeout");
 	
 	dDelayLasers = xInitDatabase("delayLasers");
 	xInitAddInt(dDelayLasers,"name");
@@ -1267,7 +1280,6 @@ highFrequency
 	dFireGiants = initSpecialDatabase("fireGiants");
 	xInitAddVector(dFireGiants, "dir");
 
-	dManticoreProj = initGenericProj("manticoreProj",kbGetProtoUnitID("Thor Hammer"),2,20.0,5.0,0.3,ENEMY_PLAYER,true);
 	dFireGiantProj = initGenericProj("fireGiantProj",kbGetProtoUnitID("Meteorite death"),-1,20.0,4.0,0,0,true);
 	xFireGiantProjOwner = xInitAddInt(dFireGiantProj, "owner"); // for some reason, only p0 meteorite death works
 	dFireGiantBalls = initGenericProj("fireGiantBalls",kbGetProtoUnitID("Fire Giant"),19,10.0,4.5,0,ENEMY_PLAYER,true);
@@ -1395,6 +1407,10 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Manticore"):
 		{
 			addSpecialToDatabase(dManticores,name,db,p);
+		}
+		case kbGetProtoUnitID("Tartarian Gate Spawn"):
+		{
+			addSpecialToDatabase(dTartarianSpawns,name,db,p);
 		}
 	}
 }

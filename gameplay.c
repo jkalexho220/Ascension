@@ -1281,7 +1281,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("cloudDeployLanding");
 				trUnitDestroy();
-				trQuestVarSetFromRand("rand", 30, 90, true);
+				trQuestVarSetFromRand("rand", 60, 90, true);
 				trQuestVarSet("cloudDeployNext", trTime() + trQuestVarGet("rand"));
 			}
 		}
@@ -1292,9 +1292,58 @@ rule the_pit_damage
 inactive
 highFrequency
 {
-	if (trTime() > trQuestVarGet("pitDamageNext")) {
-		trQuestVarSet("pitDamageNext", trTime());
-		if (trQuestVarGet("play") == 1) {
+	if (trQuestVarGet("play") == 1) {
+		int id = 0;
+		for(i=trGetNextUnitScenarioNameNumber() - 1; > pitLatest) {
+			id = kbGetBlockID(""+i, true);
+			switch(kbGetUnitBaseTypeID(id))
+			{
+				case kbGetProtoUnitID("Tartarian Gate"):
+				{
+					xAddDatabaseBlock(dPitGates, true);
+					xSetInt(dPitGates, xUnitName, i);
+					trQuestVarSetFromRand("angle", 0, 6.283185, false);
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					trSetUnitOrientation(xsVectorSet(xsCos(trQuestVarGet("angle")),0,xsSin(trQuestVarGet("angle"))), vector(0,1,0), true);
+				}
+				case kbGetProtoUnitID("Tartarian Gate Spawn"):
+				{
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					if (trUnitIsOwnedBy(0)) {
+						trSetSelectedScale(0.5,0.5,0.5);
+						xAddDatabaseBlock(dPitSpawn, true);
+						xSetInt(dPitSpawn, xUnitName, i);
+						xSetInt(dPitSpawn, xPitSpawnNext, trTimeMS() + 500);
+					}
+				}
+				case kbGetProtoUnitID("Tartarian Gate birth"):
+				{
+					trQuestVarSet("noGates", 0);
+				}
+			}
+		}
+		pitLatest = trGetNextUnitScenarioNameNumber() - 1;
+
+		if (xGetDatabaseCount(dPitSpawn) >0) {
+			xDatabaseNext(dPitSpawn);
+			if (trTimeMS() > xGetInt(dPitSpawn, xPitSpawnNext)) {
+				if (xsVectorGetY(kbGetBlockPosition(""+xGetInt(dPitSpawn, xUnitName), true)) <= worldHeight) {
+					xUnitSelect(dPitSpawn, xUnitName);
+					trUnitConvert(ENEMY_PLAYER);
+					trQuestVarSetFromRand("rand", 1, trQuestVarGet("enemyProtoCount"), true);
+					trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand")));
+					activateEnemy(xGetInt(dPitSpawn, xUnitName));
+					xFreeDatabaseBlock(dPitSpawn);
+				}
+			}
+		}
+
+		if (trTime() > trQuestVarGet("pitDamageNext")) {
+			trQuestVarSet("pitDamageNext", trTime());
+			
+			vector pos = vector(0,0,0);
 			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				xDatabaseNext(dPlayerUnits);
 				xUnitSelectByID(dPlayerUnits, xUnitID);
@@ -1303,6 +1352,42 @@ highFrequency
 				} else {
 					trDamageUnit(10);
 				}
+			}
+			
+			trUnitSelectClear();
+			trUnitSelectByQV("stageWonder");
+			if (trUnitAlive() && ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1))) {
+				trQuestVarSetFromRand("rand", 30, 90, true);
+				trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("rand"));
+
+				for (i=xGetDatabaseCount(dPlayerCharacters); >0) {
+					xDatabaseNext(dPlayerCharacters);
+					xUnitSelect(dPlayerCharacters, xUnitName);
+					if (trUnitAlive()) {
+						pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true);
+						break;
+					} else {
+						xFreeDatabaseBlock(dPlayerCharacters);
+					}
+				}
+
+				trQuestVarSetFromRand("modx", -10, 10, true);
+				trQuestVarSetFromRand("modz", -10, 10, true);
+				pos = xsVectorSet(1 * (xsVectorGetX(pos) - 10) / 70, 0, 1 * (xsVectorGetZ(pos) - 10) / 70);
+				pos = pos * 70 + vector(39,0,39) + xsVectorSet(trQuestVarGet("modx"), 0, trQuestVarGet("modz")); // center of whatever room we're standing in
+
+				trPlayerKillAllGodPowers(ENEMY_PLAYER);
+				trTechGodPower(ENEMY_PLAYER, "tartarian gate", 1);
+				trUnitSelectClear();
+				trTechInvokeGodPower(ENEMY_PLAYER, "tartarian gate", pos, vector(0,0,0));
+
+				trQuestVarSet("noGates", 1);
+			}
+
+			for(i=xGetDatabaseCount(dPitGates); >0) {
+				xDatabaseNext(dPitGates);
+				xUnitSelect(dPitGates, xUnitName);
+				trDamageUnitPercent(5);
 			}
 		}
 	}

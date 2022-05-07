@@ -66,6 +66,13 @@ int dMagicalJourney = 0;
 
 int dCloudDeployStars = 0;
 
+int dPitGates = 0;
+
+int dPitSpawn = 0;
+int xPitSpawnNext = 0;
+
+int pitLatest = 0;
+
 int dMirrorTowerLasers = 0;
 int xMirrorTowerLaserLength = 0;
 int xMirrorTowerLaserTimeout = 0;

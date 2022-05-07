@@ -766,7 +766,7 @@ void specialUnitsAlways() {
 		id = xGetInt(dScarabs,xUnitID);
 		trUnitSelectClear();
 		trUnitSelectByID(id);
-		if (trUnitAlive() == false || checkEnemyDeactivated(dScarabs)) {
+		if (trUnitAlive() == false) {
 			if (xGetInt(dScarabs, xSpecialStep) == 0) {
 				pos = xGetVector(dScarabs,xSpecialNext);
 				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -776,6 +776,7 @@ void specialUnitsAlways() {
 				trArmySelect("1,0");
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Victory Marker");
+				trSoundPlayFN("argusfreezeattack.wav","1",-1,"","");
 			}
 			xFreeDatabaseBlock(dScarabs);
 		} else if (checkEnemyDeactivated(dScarabs)) {
@@ -1956,6 +1957,140 @@ void specialUnitsAlways() {
 					trSetUnitOrientation(xGetVector(dFireGiants, xSpecialTarget), vector(0,1,0), true);
 				}
 			}
+		}
+	}
+
+	if (xGetDatabaseCount(dManticores) >0) {
+		xDatabaseNext(dManticores);
+		id = xGetInt(dManticores,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		p = xGetInt(dManticores, xPlayerOwner);
+		db = databaseName(p);
+		if ((trUnitAlive() == false) || (checkEnemyDeactivated(dManticores))) {
+			xFreeDatabaseBlock(dManticores);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dManticores, xSpecialIndex)) == 0) {
+			if (trTimeMS() > xGetInt(dManticores, xSpecialNext)) {
+				if (kbUnitGetAnimationActionType(id) == 12) {
+					xsSetContextPlayer(p);
+					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					xsSetContextPlayer(0);
+					end = kbGetBlockPosition(""+target);
+					start = kbGetBlockPosition(""+xGetInt(dManticores, xUnitName));
+					if (distanceBetweenVectors(start, end) < 36.0) {
+						dir = getUnitVector(end, start, 2.0);
+						xSetInt(dManticores, xSpecialNext, trTimeMS() + 10000);
+						pos = start;
+						for(x=4; >0) {
+							end = pos + dir;
+							if (terrainIsType(vectorToGrid(end), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+								break;
+							} else {
+								pos = end;
+							}
+						}
+						action = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						trArmySelect(""+p+",0");
+						trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
+						trSetUnitOrientation(dir * (-0.5), vector(0,1,0), true);
+
+						trUnitSelectClear();
+						trUnitSelectByID(id);
+						trImmediateUnitGarrison(""+action);
+						trUnitChangeProtoUnit("Dwarf");
+						trUnitSelectClear();
+						trUnitSelectByID(id);
+						trMutateSelected(kbGetProtoUnitID("Manticore"));
+						trUnitDoWorkOnUnit(""+target, -1);
+
+						trUnitSelectClear();
+						trUnitSelect(""+action, true);
+						trUnitChangeProtoUnit("Kronny Birth SFX");
+
+						trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
+						trArmySelect(""+p+",0");
+						trUnitChangeProtoUnit("Kronny Birth SFX");
+
+						trSoundPlayFN("spybirth.wav","1",-1,"","");
+						trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
+					}
+				}
+			}
+		}
+	}
+
+	if (xGetDatabaseCount(dTartarianEggs) > 0) {
+		xDatabaseNext(dTartarianEggs);
+		amt = xGetInt(dTartarianEggs, xTartarianEggTimeout) - trTimeMS();
+		xUnitSelect(dTartarianEggs, xUnitName);
+		if (amt < 0) {
+			start = kbGetBlockPosition(""+xGetInt(dTartarianEggs, xUnitName), true);
+			p = xGetInt(dTartarianEggs, xPlayerOwner);
+
+			if (trUnitVisToPlayer()) {
+				trCameraShake(0.5, 0.5);
+				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
+			}
+
+			trUnitChangeProtoUnit("Meteor Impact Ground");
+
+			trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+			trQuestVarSetFromRand("rand", 0, 3.14, false);
+			
+			dir = vectorSetFromAngle(trQuestVarGet("rand"));
+			for(i=16; >0) {
+				addGenericProj(dFireGiantBalls,start,dir,p);
+				xSetVector(dFireGiantBalls, xProjPrev, start);
+				dir = rotationMatrix(dir, 0.92388, 0.382683);
+			}
+
+			db = opponentDatabaseName(p);
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
+					removeOpponentUnit();
+				} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
+					damageOpponentUnit(p, 200.0);
+				}
+			}
+			xFreeDatabaseBlock(dTartarianEggs);
+		} else {
+			amt = xsSqrt((3000.0 - amt) * 0.001);
+			trSetSelectedScale(amt, amt, amt);
+		}
+	}
+
+	if (xGetDatabaseCount(dTartarianSpawns) > 0) {
+		xDatabaseNext(dTartarianSpawns);
+		id = xGetInt(dTartarianSpawns,xUnitID);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		if (trUnitAlive() == false) {
+			if (xGetInt(dTartarianSpawns, xSpecialStep) == 0) {
+				trUnitHighlight(3.0, true);
+				trSoundPlayFN("gatherpoint.wav","1",-1,"","");
+				pos = xGetVector(dTartarianSpawns, xSpecialNext);
+				target = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Phoenix Egg");
+				trUnitSelectClear();
+				trUnitSelect(""+target, true);
+				trUnitHighlight(3.0, true);
+				xAddDatabaseBlock(dTartarianEggs, true);
+				xSetInt(dTartarianEggs, xUnitName, target);
+				xSetInt(dTartarianEggs, xPlayerOwner, p);
+				xSetInt(dTartarianEggs, xTartarianEggTimeout, trTimeMS() + 3000);
+			} 
+			xFreeDatabaseBlock(dTartarianSpawns);
+		} else if (checkEnemyDeactivated(dTartarianSpawns)) {
+			xFreeDatabaseBlock(dTartarianSpawns);
+		} else {
+			db = databaseName(xGetInt(dTartarianSpawns,xPlayerOwner));
+			xSetVector(dTartarianSpawns,xSpecialNext,kbGetBlockPosition(""+xGetInt(dTartarianSpawns,xUnitName)));
+			xSetInt(dTartarianSpawns, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dTartarianSpawns, xSpecialIndex)));
 		}
 	}
 }
