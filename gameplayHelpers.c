@@ -308,7 +308,7 @@ void removePlayerSpecific(int p = 0) {
 			xUnitSelect(relics, xRelicName);
 			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 		}
-		xSetInt(dPlayerData,xPlayerDead,10);
+		xSetInt(dPlayerData,xPlayerDead,10 + trQuestVarGet("stage"));
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
 		trUnitSelectClear();
 		trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);

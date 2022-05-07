@@ -2057,7 +2057,7 @@ void specialUnitsAlways() {
 			}
 			xFreeDatabaseBlock(dTartarianEggs);
 		} else {
-			amt = xsSqrt((3000.0 - amt) * 0.001);
+			amt = xsSqrt((3000.0 - amt) * 0.001) + 1.0;
 			trSetSelectedScale(amt, amt, amt);
 		}
 	}

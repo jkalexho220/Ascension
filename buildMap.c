@@ -1733,6 +1733,7 @@ highFrequency
 				initializeCarouselTrapDatabase();
 
 				xsEnableRule("the_pit_build_01");
+				xsEnableRule("the_pit_build_02");
 
 				trQuestVarSet("wallEdges", 5);
 				trQuestVarSet("trapRooms", 3);
@@ -2612,7 +2613,6 @@ inactive
 highFrequency
 {
 	xsDisableSelf();
-	xsEnableRule("the_pit_build_02");
 	bool paint = true;
 	for(x=0; < 146) {
 		for(z=0; < 146) {
