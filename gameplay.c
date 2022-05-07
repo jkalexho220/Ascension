@@ -55,6 +55,8 @@ void noSpecials() {
 			trModifyProtounit("Einheriar", p, 9, 99999);
 			trModifyProtounit("Fire Giant", p, 9, -99990);
 			trModifyProtounit("Fire Giant", p, 9, 99999);
+			trModifyProtounit("Heka Gigantes", p, 9, -99990);
+			trModifyProtounit("Heka Gigantes", p, 9, 99999);
 		}
 	}
 }

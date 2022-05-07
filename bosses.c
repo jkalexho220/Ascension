@@ -5691,7 +5691,77 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			
 		} else if (trQuestVarGet("bossSpell") > 10) {
-			
+			if (trQuestVarGet("bossSpell") == 11) {
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Eruption!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Watch your feet!");
+				} else if (trQuestVarGet("rand") == 3) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Are you ready to rumble?!");
+				}
+				bossNext = trTimeMS() + 1100;
+				trQuestVarSet("bossSpell", 12);
+				bossAnim = true;
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 2);
+				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				trUnitOverrideAnimation(26, 0, false, false, -1);
+			} else if (trQuestVarGet("bossSpell") == 12) {
+				if (trTimeMS() > bossNext) {
+					bossNext = bossNext + 1200;
+					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
+					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
+						xDatabaseNext(dPlayerCharacters);
+						xUnitSelectByID(dPlayerCharacters, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerCharacter();
+						} else {
+							pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true));
+							trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+							trArmySelect("1,0");
+							trMutateSelected(kbGetProtoUnitID("Ball of Fire"));
+						}
+					}
+					trQuestVarSet("bossSpell", 13);
+					trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
+					trCameraShake(0.7, 0.3);
+					trSoundPlayFN("implode reverse.wav","1",-1,"","");
+				}
+			} else if (trQuestVarGet("bossSpell") == 13) {
+				if (trTimeMS() > bossNext) {
+					trCameraShake(0.5, 0.8);
+					trSoundPlayFN("cinematics\32_out\explosion.mp3","1",-1,"","");
+					bossCooldown(8, 12);
+					bossAnim = false;
+					trUnitOverrideAnimation(-1, 0, false, true, -1);
+					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 1);
+					for(x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
+						trUnitSelectClear();
+						trUnitSelect(""+x, true);
+						if (trUnitAlive()) {
+							pos = kbGetBlockPosition(""+x, true);
+							trUnitChangeProtoUnit("Volcano");
+							for(y=xGetDatabaseCount(dPlayerUnits); >0) {
+								xDatabaseNext(dPlayerUnits);
+								xUnitSelectByID(dPlayerUnits, xUnitID);
+								if (trUnitAlive() == false) {
+									removePlayerUnit();
+								} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
+									damagePlayerUnit(1000.0);
+								}
+							}
+							if (trQuestVarGet("secondPhase") == 1) {
+								paintLava(pos);
+								dir = vector(2,0,0);
+								for(y=4; >0) {
+									paintLava(pos + dir);
+									dir = rotationMatrix(dir, 0.0, 1.0);
+								}
+							}
+						}
+					}
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 0) {
 			if (trQuestVarGet("bossSpell") == 1) {
 				trQuestVarSetFromRand("rand", 1, 5, true);
@@ -5764,6 +5834,7 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			trQuestVarSet("bossSpell", 11);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
