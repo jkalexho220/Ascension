@@ -756,8 +756,8 @@ void paintTowerSegment(int stage = 0) {
 		}
 		case 9:
 		{
-			tPrimary = 5;
-			tSubPrimary = 7;
+			tPrimary = 2;
+			tSubPrimary = 12;
 		}
 	}
 	trPaintTerrain(68,43 + 3 * stage,76,46 + 3 * stage, tPrimary, tSubPrimary, false);

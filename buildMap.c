@@ -1780,10 +1780,10 @@ highFrequency
 				/*
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
 				*/
 				
-				trStringQuestVarSet("bossProto", "Guardian");
+				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				bossScale = 1.2;
 			}
 			case 11:

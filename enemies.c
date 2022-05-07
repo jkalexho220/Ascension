@@ -172,7 +172,13 @@ highFrequency
 	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
 	trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
 	
-	
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 0, 30);
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 26, 1);
+
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 47);
@@ -1783,50 +1789,49 @@ void specialUnitsAlways() {
 	}
 
 	for(i=xsMin(5, xGetDatabaseCount(dFireGiantBalls)); >0) {
-		if (processGenericProj(dFireGiantBalls) == PROJ_FALLING) {
-			p = xGetInt(dFireGiantBalls, xPlayerOwner);
-			pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);
-			start = xGetVector(dFireGiantBalls, xProjPrev);
-			dir = xGetVector(dFireGiantBalls, xProjDir);
-			dist = distanceBetweenVectors(pos, start);
-			if (dist > 4.0) {
-				dist = xsSqrt(dist);
-				xSetVector(dFireGiantBalls, xProjPrev, pos);
-				if (xGetFloat(dFireGiantBalls, xProjDist) > 6.0) { // only start collision detection 6 meters away from start
-					db = opponentDatabaseName(p);
-					hit = false;
-					for (x=xGetDatabaseCount(db); >0) {
-						xDatabaseNext(db);
-						xUnitSelectByID(db, xUnitID);
-						if (trUnitAlive() == false) {
-							removeOpponentUnit(p);
-						} else if (rayCollision(db, start, dir, dist + 1.0, 2.0)) {
-							damageOpponentUnit(p, 100.0);
-							hit = true;
-						}
+		processGenericProj(dFireGiantBalls);
+		p = xGetInt(dFireGiantBalls, xPlayerOwner);
+		pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);
+		start = xGetVector(dFireGiantBalls, xProjPrev);
+		dir = xGetVector(dFireGiantBalls, xProjDir);
+		dist = distanceBetweenVectors(pos, start);
+		if (dist > 4.0) {
+			dist = xsSqrt(dist);
+			xSetVector(dFireGiantBalls, xProjPrev, pos);
+			if (xGetFloat(dFireGiantBalls, xProjDist) > 6.0) { // only start collision detection 6 meters away from start
+				db = opponentDatabaseName(p);
+				hit = false;
+				for (x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeOpponentUnit(p);
+					} else if (rayCollision(db, start, dir, dist + 1.0, 2.0)) {
+						damageOpponentUnit(p, 20.0 * trQuestVarGet("stage"));
+						hit = true;
 					}
-					if (hit) {
-						xUnitSelectByID(dFireGiantBalls, xUnitID);
-						trUnitChangeProtoUnit("Meteorite");
-						trQuestVarSetFromRand("sound", 1, 2, true);
-						trSoundPlayFN("fireball fall " + 1*trQuestVarGet("sound") + ".wav","1",-1,"","");
-						xFreeDatabaseBlock(dFireGiantBalls);
-					}
-				} else {
-					xSetFloat(dFireGiantBalls, xProjDist, xGetFloat(dFireGiantBalls, xProjDist) + dist);
 				}
+				if (hit) {
+					xUnitSelectByID(dFireGiantBalls, xUnitID);
+					trUnitChangeProtoUnit("Meteorite");
+					trQuestVarSetFromRand("sound", 1, 2, true);
+					trSoundPlayFN("fireball fall " + 1*trQuestVarGet("sound") + ".wav","1",-1,"","");
+					xFreeDatabaseBlock(dFireGiantBalls);
+				}
+			} else {
+				xSetFloat(dFireGiantBalls, xProjDist, xGetFloat(dFireGiantBalls, xProjDist) + dist);
 			}
-			start = pos;
-			pos = vectorToGrid(pos + (dir * 2.0));
-			if (trGetTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos)) < worldHeight - 1.0) {
-				xFreeDatabaseBlock(dFireGiantBalls);
-			} else if (terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				xUnitSelectByID(dFireGiantBalls, xUnitID);
-				trUnitChangeProtoUnit("Dust Large");
-				xUnitSelectByID(dFireGiantBalls, xUnitID);
-				trDamageUnitPercent(-100);
-				xFreeDatabaseBlock(dFireGiantBalls);
-			}
+		}
+		start = pos;
+		pos = vectorToGrid(pos + (dir * 2.0));
+		if (trGetTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos)) < worldHeight - 1.0) {
+			xFreeDatabaseBlock(dFireGiantBalls);
+		} else if (terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			xUnitSelectByID(dFireGiantBalls, xUnitID);
+			trUnitChangeProtoUnit("Dust Large");
+			xUnitSelectByID(dFireGiantBalls, xUnitID);
+			trDamageUnitPercent(-100);
+			xFreeDatabaseBlock(dFireGiantBalls);
 		}
 	}
 
@@ -1878,7 +1883,7 @@ void specialUnitsAlways() {
 					if (trUnitAlive() == false) {
 						removeOpponentUnit();
 					} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
-						damageOpponentUnit(p, 200.0);
+						damageOpponentUnit(p, 50.0 * trQuestVarGet("stage"));
 					}
 				}
 
@@ -1979,7 +1984,7 @@ void specialUnitsAlways() {
 					start = kbGetBlockPosition(""+xGetInt(dManticores, xUnitName));
 					if (distanceBetweenVectors(start, end) < 36.0) {
 						dir = getUnitVector(end, start, 2.0);
-						xSetInt(dManticores, xSpecialNext, trTimeMS() + 10000);
+						xSetInt(dManticores, xSpecialNext, trTimeMS() + 5000);
 						pos = start;
 						for(x=4; >0) {
 							end = pos + dir;

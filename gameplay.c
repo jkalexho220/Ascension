@@ -556,7 +556,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*
+	*/
 	
 	if (Multiplayer) {
 		pos = trVectorQuestVarGet("bossRoomCenter");
@@ -1356,7 +1356,7 @@ highFrequency
 			
 			trUnitSelectClear();
 			trUnitSelectByQV("stageWonder");
-			if (trUnitAlive() && ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1))) {
+			if (trUnitAlive() && (boss == 0) && ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1))) {
 				trQuestVarSetFromRand("rand", 30, 90, true);
 				trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("rand"));
 

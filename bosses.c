@@ -98,9 +98,7 @@ highFrequency
 				spyEffect(1*trQuestVarGet("yeebaagooon"),
 					kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS,bossInts,yeebShieldSFX));
 				
-				activateEnemy(bossUnit);
-				xSetBool(dEnemies, xLaunched, true);
-				bossPointer = xGetNewestPointer(dEnemies);
+				xSetBool(dEnemies, xLaunched, true, bossPointer);
 				
 				trVectorQuestVarSet("bossRoomUpper", xsVectorSet(60,0,60));
 				if (trQuestVarGet("mapType") == MAP_OPEN) {
@@ -2468,6 +2466,7 @@ highFrequency
 					for(x=trQuestVarGet("rand"); >0) {
 						xDatabaseNext(dPlayerCharacters);
 					}
+					trModifyProtounit("Shade Of Hades", ENEMY_PLAYER, 55, 2);
 					bossTargetPos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters,xUnitName),true));
 					dir = getUnitVector(bossPos, bossTargetPos);
 					bossDir = vector(0,0,0) - dir;
@@ -2533,6 +2532,7 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 14) {
 				if (trTimeMS() > bossNext) {
+					trModifyProtounit("Shade Of Hades", ENEMY_PLAYER, 55, 4);
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 					bossCooldown(10, 16);
 					bossAnim = false;
@@ -5478,6 +5478,16 @@ highFrequency
 	}
 }
 
+int dLavaTileDB = 0;
+int xLavaTilePos = 0;
+int lavaTiles = 0;
+int lavaTileStartX = 0;
+int lavaTileStartZ = 0;
+
+int dHekaProj = 0;
+
+int lavaDamageNext = 0;
+int lavaDamagePointer = 0;
 
 rule boss9_init
 inactive
@@ -5490,15 +5500,30 @@ highFrequency
 			{
 				trOverlayText("Hellkeeper", 3.0, -1, -1, -1);
 				trQuestVarSet("cinTime", trTime() + 2);
-				xsDisableRule("the_pit_damage");
 				xsEnableRule("the_pit_build_01");
+				dHekaProj = initGenericProj("hekaProj",kbGetProtoUnitID("Meteorite death"),-1,15.0,4.5,0,0,true);
+
+				dLavaTileDB = xInitDatabase("lavaTileDB");
+				xLavaTilePos = xInitAddVector(dLavaTileDB, "pos");
+
+				vector center = trVectorQuestVarGet("bossRoomCenter");
+				lavaTileStartX = xsVectorGetX(center) / 2 - trQuestVarGet("bossRoomSize") - 1;
+				lavaTileStartZ = xsVectorGetZ(center) / 2 - trQuestVarGet("bossRoomSize") - 1;
+				lavaTiles = aiPlanCreate("lavaTiles", 8);
+				if (lavaTiles < 0) {
+					debugLog("Unable to allocate lavaTiles plan");
+				}
+				for (x=trQuestVarGet("bossRoomSize") * 2 + 2; >=0) {
+					aiPlanAddUserVariableInt(lavaTiles,x,"row"+x,2*trQuestVarGet("bossRoomSize"));
+				}
 			}
 			case 1:
 			{
-				trModifyProtounit("Meteor", 0, 8, -12);
 				trPaintTerrain(0,0,5,5,0,70,true);
 				trPaintTerrain(0,0,5,5,4,15,false);
 				bossDir = vector(0,0,-1);
+
+				xSetBool(dEnemies, xLaunched, true, bossPointer);
 
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
@@ -5511,15 +5536,28 @@ highFrequency
 				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
 				xsEnableRule("boss_music");
+
+				bossCooldown(8, 12);
+
+				lavaDamageNext = trTimeMS();
 				
-				trStringQuestVarSet("advice",
-					"Wait how did you even get here? This boss is still under maintenance!");
+				trQuestVarSet("secondPhase", 1);
+				trStringQuestVarSet("advice","Wait how did you even get here? This boss is still under maintenance!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
 	}
 }
 
+void paintLava(vector pos = vector(0,0,0)) {
+	vector grid = vectorToGrid(pos);
+	if (trGetTerrainHeight(xsVectorGetX(grid),xsVectorGetZ(grid)) > worldHeight - 1.0) {
+		trPaintTerrain(xsVectorGetX(grid),xsVectorGetZ(grid),xsVectorGetX(grid),xsVectorGetZ(grid),5,7,false);
+		aiPlanSetUserVariableInt(lavaTiles,xsVectorGetX(grid) - lavaTileStartX, xsVectorGetZ(grid) - lavaTileStartZ, trTimeMS() + 20000);
+		xAddDatabaseBlock(dLavaTileDB, true);
+		xSetVector(dLavaTileDB, xLavaTilePos, grid);
+	}
+}
 
 rule boss9_battle
 inactive
@@ -5534,32 +5572,114 @@ highFrequency
 	int id = 0;
 	float amt = 0;
 	float angle = 0;
-	float sVal = 0;
-	float cVal = 0;
-	float m = 0;
 	float dist = 0;
 	bool hit = false;
 	
+	vector hitbox = vector(0,0,0);
+	vector start = vector(0,0,0);
 	vector pos = vector(0,0,0);
 	vector prev = vector(0,0,0);
 	vector dir = vector(0,0,0);
 	
 	if (trUnitAlive() == true) {
 		if (trQuestVarGet("secondPhase") == 1) {
-			if (trTime() > trQuestVarGet("bossSpawnNext")) {
-				trQuestVarSet("bossSpawnNext", trTime() + 30);
-				trQuestVarSetFromRand("rand", 1, trQuestVarGet("enemyProtoCount"), true);
-				trQuestVarSetFromRand("count", 3, 5, true);
-				pos = kbGetBlockPosition(""+bossUnit);
-				for(i=trQuestVarGet("count"); >0) {
-					trQuestVarSetFromRand("heading", 1, 360, false);
-					action = trGetNextUnitScenarioNameNumber();
-					trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("rand")),1,
-						xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
-					activateEnemy(action,-1,0);
+			// tartarian gates
+		}
+
+		// lava tiles vanish
+		for (x=xsMin(5, xGetDatabaseCount(dLavaTileDB)); > 0) {
+			xDatabaseNext(dLavaTileDB);
+			pos = xGetVector(dLavaTileDB, xLavaTilePos);
+			if (trTimeMS() > aiPlanGetUserVariableInt(lavaTiles,xsVectorGetX(pos) - lavaTileStartX, xsVectorGetZ(pos) - lavaTileStartZ)) {
+				trPaintTerrain(xsVectorGetX(pos),xsVectorGetZ(pos),xsVectorGetX(pos),xsVectorGetZ(pos),TERRAIN_PRIMARY,TERRAIN_SUB_PRIMARY,false);
+				xFreeDatabaseBlock(dLavaTileDB);
+			}
+		}
+
+		if (trTimeMS() > lavaDamageNext) {
+			if (xGetDatabaseCount(dPlayerUnits) > 0) {
+				lavaDamageNext = lavaDamageNext + 500 / xGetDatabaseCount(dPlayerUnits);
+				action = xGetPointer(dPlayerUnits);
+				xSetPointer(dPlayerUnits, lavaDamagePointer);
+				lavaDamagePointer = xDatabaseNext(dPlayerUnits);
+				pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+				if (terrainIsType(vectorToGrid(pos), 5, 7)) {
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					damagePlayerUnit(100.0);
+				}
+
+				xSetPointer(dPlayerUnits, action);
+			}
+		}
+
+		for (y=xsMin(2, xGetDatabaseCount(dHekaProj)); > 0) {
+			if (processGenericProj(dHekaProj) == PROJ_FALLING) {
+				start = kbGetBlockPosition(""+xGetInt(dHekaProj, xUnitName), true);
+				prev = xGetVector(dHekaProj, xProjPrev);
+				dir = xGetVector(dHekaProj, xProjDir);
+				dist = distanceBetweenVectors(prev, start, false);
+				if (dist > 2.0) {
+					for (x=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (xGetBool(dPlayerUnits, xLaunched) == false) {
+							pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+							amt = distanceBetweenVectors(pos, prev, false);
+							if (amt < dist + 4.0) {
+								hitbox = prev + (dir * amt);
+								if (distanceBetweenVectors(pos, hitbox) < 16.0) {
+									launchUnit(dPlayerUnits, pos + (dir * 60.0));
+								}
+							}
+						}
+					}
+					xSetVector(dHekaProj, xProjPrev, start);
+
+					if (trQuestVarGet("secondPhase") == 1) {
+						pos = prev;
+						for(x=(1 + dist) / 2; >0) {
+							paintLava(pos);
+							pos = pos + (dir * 2.0);
+						}
+					}
+				}
+				
+				if (distanceBetweenVectors(start, trVectorQuestVarGet("bossRoomCenter"), false) > (2.0 * trQuestVarGet("bossRoomSize") - 4.0)) {
+					xUnitSelectByID(dHekaProj, xUnitID);
+					if (trUnitVisToPlayer()) {
+						trCameraShake(0.5, 0.5);
+						trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
+					}
+					trUnitChangeProtoUnit("Meteor Impact Ground");
+					xUnitSelectByID(dHekaProj, xUnitID);
+					trDamageUnitPercent(-100);
+					trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+					trQuestVarSetFromRand("rand", 0, 3.14, false);
+					
+					dir = vectorSetFromAngle(trQuestVarGet("rand"));
+					for(i=16; >0) {
+						addGenericProj(dFireGiantBalls,start,dir,ENEMY_PLAYER);
+						xSetVector(dFireGiantBalls, xProjPrev, start);
+						dir = rotationMatrix(dir, 0.92388, 0.382683);
+					}
+
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), start) < 36.0) {
+							damageOpponentUnit(p, 500.0);
+						}
+					}
+
+					xFreeDatabaseBlock(dHekaProj);
 				}
 			}
 		}
+		
 		
 		trUnitSelectClear();
 		trUnitSelect(""+bossUnit, true);
@@ -5573,7 +5693,70 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			
 		} else if (trQuestVarGet("bossSpell") > 0) {
-			
+			if (trQuestVarGet("bossSpell") == 1) {
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Crossfire!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Welcome to hell!");
+				} else if (trQuestVarGet("rand") == 3) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Smash!");
+				}
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 2);
+				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				bossPos = vectorSnapToGrid(kbGetBlockPosition(""+bossUnit, true));
+				trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
+				trQuestVarSetFromRand("rand", 0, 1, true);
+				if (trQuestVarGet("rand") == 0) {
+					dir = vector(-2,0,0);
+				} else {
+					dir = vector(-2,0,-2);
+				}
+				bossDir = xsVectorNormalize(dir);
+				for(x=4; >0) {
+					pos = bossPos + dir;
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("0,0");
+					trSetUnitOrientation(bossDir, vector(0,1,0), true);
+					trUnitChangeProtoUnit("UI Range Indicator Atlantean SFX");
+					bossDir = rotationMatrix(bossDir, 0.0, 1.0);
+					dir = rotationMatrix(dir, 0.0, 1.0);
+				}
+				trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
+
+				trQuestVarSet("bossSpell", 2);
+				bossNext = trTimeMS() + 1200;
+			} else if (trQuestVarGet("bossSpell") == 2) {
+				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				if (trTimeMS() > bossNext) {
+					bossAnim = true;
+					trQuestVarSet("bossSpell", 3);
+					bossNext = trTimeMS() + 1100;
+					trUnitOverrideAnimation(26, 0, false, false, -1);
+				}
+			} else if (trQuestVarGet("bossSpell") == 3) {
+				if (trTimeMS() > bossNext) {
+					bossNext = bossNext + 1200;
+					for (x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
+						trUnitSelectClear();
+						trUnitSelect(""+x, true);
+						trUnitDestroy();
+					}
+					for(x=4; >0) {
+						addGenericProj(dHekaProj,bossPos,bossDir);
+						xSetVector(dHekaProj, xProjPrev, bossPos);
+						bossDir = rotationMatrix(bossDir, 0.0, 1.0);
+					}
+					trQuestVarSet("bossSpell", 4);
+				}
+			} else if (trQuestVarGet("bossSpell") == 4) {
+				if (trTimeMS() > bossNext) {
+					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 1);
+					bossAnim = false;
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					bossCooldown(6, 12);
+				}
+			}
 		} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
 			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
 			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
