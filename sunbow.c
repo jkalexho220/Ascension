@@ -230,7 +230,7 @@ void sunbowAlways(int eventID = -1) {
 					xUnitSelectByID(dEnemies, xUnitID);
 					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (unitDistanceToVector(dPlayerUnits, pos) < dist) {
+					} else if (unitDistanceToVector(dEnemies, pos) < dist) {
 						damageEnemy(p, amt);
 					}
 				}

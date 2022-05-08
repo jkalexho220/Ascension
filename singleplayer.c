@@ -1174,6 +1174,18 @@ highFrequency
 			{
 				desc("Regenerates 1 percent health each second. (Nullified by Poison)");
 			}
+			case kbGetProtoUnitID("Lampades"):
+			{
+				desc("Launches balls of electricity that stun and damage units. The balls bounce off walls.");
+			}
+			case kbGetProtoUnitID("Statue of Lightning"):
+			{
+				desc("Calls down lightning that deals high damage in a small area.");
+			}
+			case kbGetProtoUnitID("Einheriar"):
+			{
+				desc("When it blows its horn, it heals nearby allies.");
+			}
 			case kbGetProtoUnitID("Tartarian Gate spawn"):
 			{
 				desc("On death, drops an egg that explodes after three seconds and releases fireballs.");

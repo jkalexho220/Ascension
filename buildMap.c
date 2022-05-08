@@ -2328,6 +2328,11 @@ highFrequency
 			pos = randomNearEdgeOfRoom(xGetInt(dBasicRooms, xRoomNumber));
 			trQuestVarSet("nickonhawkRelicObject", trGetNextUnitScenarioNameNumber());
 			spawnRelicSpecific(pos, RELIC_NICKONHAWK);
+			if (trQuestVarGet("nickonhawkRelicObject") == trGetNextUnitScenarioNameNumber()) {
+				// somehow he didn't spawn
+				trQuestVarSet("nickonhawkRelicObject", -1);
+				xFreeDatabaseBlock(dFreeRelics);
+			}
 		}
 
 		if (trQuestVarGet("monsterpediaQuestLocation") == trQuestVarGet("stage")) {

@@ -384,8 +384,9 @@ void sparkWitchAlways(int eventID = -1) {
 		trSetSelectedScale(0,0,0);
 		trUnitSetAnimationPath("0,0,1,0,0,0,0");
 		xAddDatabaseBlock(vortexObjects, true);
+		xSetInt(vortexObjects, xUnitName, next);
 		xSetInt(vortexObjects, xVortexLast, trTimeMS());
-		xSetInt(vortexObjects, xVortexRadius, vortexRadius * xGetFloat(dPlayerData, xPlayerSpellRange));
+		xSetFloat(vortexObjects, xVortexRadius, vortexRadius * xGetFloat(dPlayerData, xPlayerSpellRange));
 		xSetVector(vortexObjects, xVortexCenter, pos);
 		xSetInt(vortexObjects, xVortexTimeout, trTimeMS() + 1000);
 		trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");

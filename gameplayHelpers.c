@@ -311,8 +311,8 @@ void removePlayerSpecific(int p = 0) {
 		trVectorQuestVarSet("dead"+p+"pos",pos);
 		for(x=xGetDatabaseCount(relics); >0) {
 			xDatabaseNext(relics);
-			xUnitSelect(relics, xRelicName);
-			trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			xUnitSelect(relics, xUnitName);
+			trUnitDestroy();
 		}
 		xSetInt(dPlayerData,xPlayerDead,10 + trQuestVarGet("stage"));
 		trQuestVarSet("deadPlayerCount", 1 + trQuestVarGet("deadPlayerCount"));
@@ -1523,6 +1523,12 @@ void revivePlayer(int p = 0) {
 	xUnitSelect(dPlayerData,xPlayerUnit);
 	trDamageUnitPercent(50);
 	trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+	int db = getRelicsDB(p);
+	for(x=xGetDatabaseCount(db); >0) {
+		xDatabaseNext(db);
+		xSetInt(db, xUnitName, trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+	}
 	equipRelicsAgain(p);
 	if (trCurrentPlayer() == p) {
 		uiLookAtUnitByName(""+xGetInt(dPlayerData,xPlayerUnit));
