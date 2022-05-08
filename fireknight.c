@@ -316,14 +316,16 @@ void fireknightAlways(int eventID = -1) {
 				amt = amt + xsMax(0, xGetFloat(dPlayerUnits, xCurrentHealth, xGetInt(db, xCharIndex)) - current);
 			}
 			xSetFloat(dPlayerUnits, xCurrentHealth, current, xGetInt(db, xCharIndex));
-			dist = xsPow(overheatRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
-			for(x=xGetDatabaseCount(dEnemies); >0) {
-				xDatabaseNext(dEnemies);
-				xUnitSelectByID(dEnemies, xUnitID);
-				if (trUnitAlive() == false) {
-					removeEnemy();
-				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
+			if (amt > 0) {
+				dist = xsPow(overheatRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+				for(x=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+						damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerSpellDamage), true);
+					}
 				}
 			}
 		}

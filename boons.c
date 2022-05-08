@@ -6,7 +6,7 @@ const int BOON_SPELL_ATTACK = 3; // hades
 /* egyptian boons */
 const int BOON_SPELL_POISON = 4; // isis
 const int BOON_STATUS_COOLDOWNS = 5; // ra
-const int BOON_IMMUNE_TO_STATUS = 6; // set
+const int BOON_HEALTH_ATTACK = 6; // set
 
 /* norse boons */
 const int BOON_MONSTER_COMPANION = 7; // odin
@@ -14,9 +14,9 @@ const int BOON_REGENERATE_HEALTH = 8; // thor
 const int BOON_DECAY_HALVED = 9; // loki
 
 /* atlantean boons */
-const int BOON_EXCESS_FAVOR = 10; // kronos
+const int BOON_ATTACK_PROLONGS_STUN = 10; // kronos
 const int BOON_TWO_RELICS = 11; // oranos
-const int BOON_FROSTY_SPELLS = 12; // gaia
+const int BOON_HEAL_FAVOR = 12; // gaia
 
 int statueCiv(int boon = 0) {
 	return(boon - 1);
@@ -177,6 +177,18 @@ string boonName(int boon = 0) {
 		case BOON_STATUS_COOLDOWNS:
 		{
 			name = "When you inflict a status effect, advance your spell cooldowns by 1 second.";
+		}
+		case BOON_HEAL_FAVOR:
+		{
+			name = "Each time you heal an ally, gain 1 favor. (Maximum of 5 per second)";
+		}
+		case BOON_HEALTH_ATTACK:
+		{
+			name = "Add 5 percent of your health to your attack.";
+		}
+		case BOON_ATTACK_PROLONGS_STUN:
+		{
+			name = "When you attack an enemy with a status effect, increase its duration by 1 second.";
 		}
 	}
 	return(name);

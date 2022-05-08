@@ -1788,7 +1788,7 @@ void specialUnitsAlways() {
 		}
 	}
 
-	for(i=xsMin(5, xGetDatabaseCount(dFireGiantBalls)); >0) {
+	for(i=xsMin(8, xGetDatabaseCount(dFireGiantBalls)); >0) {
 		processGenericProj(dFireGiantBalls);
 		p = xGetInt(dFireGiantBalls, xPlayerOwner);
 		pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);

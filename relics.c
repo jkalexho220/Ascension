@@ -709,12 +709,23 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	xSetFloat(dPlayerData,xPlayerSpellDamage,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDamageTrue)));
 	xSetFloat(dPlayerData,xPlayerSpellDuration,xsMax(0.1,xGetFloat(dPlayerData,xPlayerSpellDurationTrue)));
 	
-	if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_SPELL_ATTACK) {
-		xSetFloat(dPlayerData,xPlayerBaseAttack,
-			xGetFloat(dPlayerData,xPlayerSpellDamage) * xGetFloat(dPlayerData,xPlayerBaseAttackTrue));
-		xSetFloat(dPlayerData,xPlayerAttack,xGetFloat(dPlayerData,xPlayerBaseAttack));
-		zSetProtoUnitStat(proto, p, 27, xGetFloat(dPlayerData,xPlayerBaseAttack));
-		zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
+	switch(xGetInt(dPlayerData,xPlayerGodBoon))
+	{
+		case BOON_SPELL_ATTACK:
+		{
+			xSetFloat(dPlayerData,xPlayerBaseAttack,
+				xGetFloat(dPlayerData,xPlayerSpellDamage) * xGetFloat(dPlayerData,xPlayerBaseAttackTrue));
+			xSetFloat(dPlayerData,xPlayerAttack,xGetFloat(dPlayerData,xPlayerBaseAttack));
+			zSetProtoUnitStat(proto, p, 27, xGetFloat(dPlayerData,xPlayerBaseAttack));
+			zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
+		}
+		case BOON_HEALTH_ATTACK:
+		{
+			xSetFloat(dPlayerData, xPlayerBaseAttack, xGetFloat(dPlayerData,xPlayerBaseAttackTrue) + 0.05 * xGetFloat(dPlayerData,xPlayerHealth));
+			xSetFloat(dPlayerData,xPlayerAttack,xGetFloat(dPlayerData,xPlayerBaseAttack));
+			zSetProtoUnitStat(proto, p, 27, xGetFloat(dPlayerData,xPlayerBaseAttack));
+			zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
+		}
 	}
 }
 

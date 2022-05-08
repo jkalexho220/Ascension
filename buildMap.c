@@ -1573,9 +1573,8 @@ highFrequency
 			}
 			case 7:
 			{
-				trQuestVarSet("templeRoom", -1);
 				xDeepDamageLast = xInitAddInt(dPlayerUnits, "deepDamageLast");
-				trQuestVarSet("stageTemple", BOON_MONSTER_COMPANION);
+				trQuestVarSet("stageTemple", BOON_HEAL_FAVOR);
 				trSetLighting("fimbulwinter", 0.01);
 				wallHeight = worldHeight + 3;
 				trSetCivAndCulture(0, 11, 3);
@@ -1722,7 +1721,7 @@ highFrequency
 				xsEnableRule("carousel_rooms_always");
 				worldHeight = 5;
 				wallHeight = 10;
-				trQuestVarSet("stageTemple", 10); // kronos
+				trQuestVarSet("stageTemple", BOON_ATTACK_PROLONGS_STUN); // kronos
 				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 9, 3);
 				trSetCivAndCulture(ENEMY_PLAYER, 9, 3);
@@ -2645,6 +2644,7 @@ highFrequency
 		xsDisableSelf();
 		startNPCDialog(NPC_EXPLAIN_PIT);
 		xsEnableRule("the_pit_damage");
+		xsEnableRule("the_pit_deploy");
 		trQuestVarSet("pitDamageNext", trTime());
 		trQuestVarSetFromRand("pitDeployNext", 30, 90, true);
 		trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("pitDeployNext"));

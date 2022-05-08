@@ -230,6 +230,12 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 		}
 		xSetPointer(dPlayerUnits, old);
 	}
+	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_HEAL_FAVOR) {
+		if (xGetInt(dPlayerData, xPlayerHealFavorCharges, p) > 0) {
+			xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges, p) - 1, p);
+			gainFavor(p, 1.0);
+		}
+	}
 }
 
 void nightriderHarvest(vector pos = vector(0,0,0)) {
@@ -811,6 +817,21 @@ void stunsAndPoisons(int db = 0) {
 
 void OnHit(int p = 0, int index = 0, bool magic = false) {
 	gainFavor(p, xGetInt(dPlayerData,xPlayerFavorFromAttacks,p));
+	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_ATTACK_PROLONGS_STUN) {
+		int pid = 0;
+		if (PvP) {
+			pid = xGetInt(dEnemies, xDoppelganger, index);
+		}
+		for(x=xStunStatus; <= xSilenceStatus) {
+			if (xGetInt(dEnemies, x, index) > 0) {
+				if (PvP) {
+					xSetInt(dPlayerUnits, x + 3, xGetInt(dPlayerUnits, x + 3, pid) + 1000, pid);
+				} else {
+					xSetInt(dEnemies, x + 3, xGetInt(dEnemies, x + 3, index) + 1000, index);
+				}
+			}
+		}
+	}
 	if (xGetFloat(dPlayerData,xPlayerCleave) > 0) {
 		int prev = xGetPointer(dEnemies);
 		if (index != prev) {
@@ -1411,6 +1432,11 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Tartarian Gate Spawn"):
 		{
 			addSpecialToDatabase(dTartarianSpawns,name,db,p);
+		}
+		case kbGetProtoUnitID("Troll"):
+		{
+			addSpecialToDatabase(dHydras,name,db,p);
+			xSetInt(dHydras,xSpecialStep,trTime());
 		}
 	}
 }

@@ -135,6 +135,16 @@ void processRegen(int p = 0) {
 		xSetFloat(dPlayerData, xPlayerLifestealTotal, xGetFloat(dPlayerData, xPlayerLifestealTotal, p) + amt, p);
 		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
 	}
+	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_HEAL_FAVOR) {
+		if (xGetInt(dPlayerData, xPlayerHealFavorCharges, p) < 5) {
+			if (trTimeMS() > xGetInt(dPlayerData, xPlayerHealFavorNext, p)) {
+				xSetInt(dPlayerData, xPlayerHealFavorNext, xGetInt(dPlayerData, xPlayerHealFavorNext, p) + 200, p);
+				xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges, p) + 1, p);
+			}
+		} else {
+			xSetInt(dPlayerData, xPlayerHealFavorNext, trTimeMS() + 200, p);
+		}
+	}
 }
 
 void checkResourceCheating(int p = 0) {
@@ -558,7 +568,7 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*/
+	*
 	
 	if (Multiplayer) {
 		pos = trVectorQuestVarGet("bossRoomCenter");
@@ -694,7 +704,7 @@ highFrequency
 								}
 							}
 						} else if (xGetInt(db, xRelicType) == RELIC_SPARK) {
-							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < 25.0) {
+							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < 36.0) {
 								relicReturned = false;
 								xUnitSelect(db, xUnitName);
 								trUnitChangeProtoUnit("Lightning Sparks Ground");
@@ -1345,7 +1355,6 @@ highFrequency
 		if (trTime() > trQuestVarGet("pitDamageNext")) {
 			trQuestVarSet("pitDamageNext", trTime());
 			
-			vector pos = vector(0,0,0);
 			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				xDatabaseNext(dPlayerUnits);
 				xUnitSelectByID(dPlayerUnits, xUnitID);
@@ -1355,43 +1364,53 @@ highFrequency
 					trDamageUnit(10);
 				}
 			}
-			
-			trUnitSelectClear();
-			trUnitSelectByQV("stageWonder");
-			if (trUnitAlive() && (boss == 0) && ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1))) {
-				trQuestVarSetFromRand("rand", 30, 90, true);
-				trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("rand"));
 
-				for (i=xGetDatabaseCount(dPlayerCharacters); >0) {
-					xDatabaseNext(dPlayerCharacters);
-					xUnitSelect(dPlayerCharacters, xUnitName);
-					if (trUnitAlive()) {
-						pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true);
-						break;
-					} else {
-						xFreeDatabaseBlock(dPlayerCharacters);
-					}
+			if (boss == 0) {
+				for(i=xGetDatabaseCount(dPitGates); >0) {
+					xDatabaseNext(dPitGates);
+					xUnitSelect(dPitGates, xUnitName);
+					trDamageUnitPercent(5);
 				}
-
-				trQuestVarSetFromRand("modx", -10, 10, true);
-				trQuestVarSetFromRand("modz", -10, 10, true);
-				pos = xsVectorSet(1 * (xsVectorGetX(pos) - 10) / 70, 0, 1 * (xsVectorGetZ(pos) - 10) / 70);
-				pos = pos * 70 + vector(39,0,39) + xsVectorSet(trQuestVarGet("modx"), 0, trQuestVarGet("modz")); // center of whatever room we're standing in
-
-				trPlayerKillAllGodPowers(ENEMY_PLAYER);
-				trTechGodPower(ENEMY_PLAYER, "tartarian gate", 1);
-				trUnitSelectClear();
-				trTechInvokeGodPower(ENEMY_PLAYER, "tartarian gate", pos, vector(0,0,0));
-
-				trQuestVarSet("noGates", 1);
-			}
-
-			for(i=xGetDatabaseCount(dPitGates); >0) {
-				xDatabaseNext(dPitGates);
-				xUnitSelect(dPitGates, xUnitName);
-				trDamageUnitPercent(5);
 			}
 		}
+	}
+}
+
+rule the_pit_deploy
+inactive
+highFrequency
+{
+	vector pos = vector(0,0,0);
+	trUnitSelectClear();
+	trUnitSelectByQV("stageWonder");
+	if ((trUnitAlive() == false) || (boss > 0)) {
+		xsDisableSelf();
+	} else if (trTime() > trQuestVarGet("pitDeployNext")) {
+		trQuestVarSetFromRand("rand", 30, 90, true);
+		trQuestVarSet("pitDeployNext", trTime() + trQuestVarGet("rand"));
+
+		for (i=xGetDatabaseCount(dPlayerCharacters); >0) {
+			xDatabaseNext(dPlayerCharacters);
+			xUnitSelect(dPlayerCharacters, xUnitName);
+			if (trUnitAlive()) {
+				pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true);
+				break;
+			} else {
+				xFreeDatabaseBlock(dPlayerCharacters);
+			}
+		}
+
+		trQuestVarSetFromRand("modx", -10, 10, true);
+		trQuestVarSetFromRand("modz", -10, 10, true);
+		pos = xsVectorSet(1 * (xsVectorGetX(pos) - 10) / 70, 0, 1 * (xsVectorGetZ(pos) - 10) / 70);
+		pos = pos * 70 + vector(39,0,39) + xsVectorSet(trQuestVarGet("modx"), 0, trQuestVarGet("modz")); // center of whatever room we're standing in
+
+		trPlayerKillAllGodPowers(ENEMY_PLAYER);
+		trTechGodPower(ENEMY_PLAYER, "tartarian gate", 1);
+		trUnitSelectClear();
+		trTechInvokeGodPower(ENEMY_PLAYER, "tartarian gate", pos, vector(0,0,0));
+
+		trQuestVarSet("noGates", 1);
 	}
 }
 

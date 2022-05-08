@@ -4743,6 +4743,7 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			debugLog("bossSpell: " + 1*trQuestVarGet("bossSpell"));
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -5503,6 +5504,10 @@ highFrequency
 				xsEnableRule("the_pit_build_01");
 				dHekaProj = initGenericProj("hekaProj",kbGetProtoUnitID("Meteorite death"),-1,15.0,4.5,0,0,true);
 
+				dLionMeteors = xInitDatabase("lionMeteors");
+				xInitAddInt(dLionMeteors, "name");
+				xLionMeteorYeehaw = xInitAddInt(dLionMeteors, "yeehaw", 1);
+
 				dLavaTileDB = xInitDatabase("lavaTileDB");
 				xLavaTilePos = xInitAddVector(dLavaTileDB, "pos");
 
@@ -5516,11 +5521,19 @@ highFrequency
 				for (x=trQuestVarGet("bossRoomSize") * 2 + 2; >=0) {
 					aiPlanAddUserVariableInt(lavaTiles,x,"row"+x,2*trQuestVarGet("bossRoomSize"));
 				}
+
+				vector pos = trVectorQuestVarGet("startPosition");
+				trQuestVarSet("bossEscape", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trUnitChangeProtoUnit("Cinematic Block");
+				trUnitSelectClear();
+				trUnitSelectByQV("bossEscape");
+				trSetSelectedScale(0,0,0);
 			}
 			case 1:
 			{
-				trPaintTerrain(0,0,5,5,0,70,true);
-				trPaintTerrain(0,0,5,5,4,15,false);
+				trPaintTerrain(0,0,5,5,5,7,false);
 				bossDir = vector(0,0,-1);
 
 				xSetBool(dEnemies, xLaunched, true, bossPointer);
@@ -5537,11 +5550,12 @@ highFrequency
 				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
 				xsEnableRule("boss_music");
 
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
+
 				bossCooldown(8, 12);
 
 				lavaDamageNext = trTimeMS();
-				
-				trQuestVarSet("secondPhase", 1);
+
 				trStringQuestVarSet("advice","Wait how did you even get here? This boss is still under maintenance!");
 			}
 		}
@@ -5583,7 +5597,22 @@ highFrequency
 	
 	if (trUnitAlive() == true) {
 		if (trQuestVarGet("secondPhase") == 1) {
-			// tartarian gates
+			if ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1)) {
+				// tartarian gates
+				dir = trVectorQuestVarGet("gateSpawnDir");
+				pos = trVectorQuestVarGet("bossRoomCenter") - (dir * 15.0);
+				trPlayerKillAllGodPowers(ENEMY_PLAYER);
+				trTechGodPower(ENEMY_PLAYER, "tartarian gate", 1);
+				trUnitSelectClear();
+				trTechInvokeGodPower(ENEMY_PLAYER, "tartarian gate", pos, vector(0,0,0));
+
+				trQuestVarSet("noGates", 1);
+				trVectorQuestVarSet("gateSpawnDir", rotationMatrix(dir, -0.757322, 0.653041));
+				trQuestVarSet("pitDeployNext", trTime() + 30);
+			} else if (trUnitPercentDamaged() > trQuestVarGet("pitDeployDamage")) {
+				trQuestVarSet("pitDeployNext", trQuestVarGet("pitDeployNext") - trUnitPercentDamaged() + trQuestVarGet("pitDeployDamage"));
+				trQuestVarSet("pitDeployDamage", trUnitPercentDamaged());
+			}
 		}
 
 		// lava tiles vanish
@@ -5593,6 +5622,48 @@ highFrequency
 			if (trTimeMS() > aiPlanGetUserVariableInt(lavaTiles,xsVectorGetX(pos) - lavaTileStartX, xsVectorGetZ(pos) - lavaTileStartZ)) {
 				trPaintTerrain(xsVectorGetX(pos),xsVectorGetZ(pos),xsVectorGetX(pos),xsVectorGetZ(pos),TERRAIN_PRIMARY,TERRAIN_SUB_PRIMARY,false);
 				xFreeDatabaseBlock(dLavaTileDB);
+			}
+		}
+
+		for(i=xsMin(3, xGetDatabaseCount(dLionMeteors)); >0) {
+			xDatabaseNext(dLionMeteors);
+			if (xGetInt(dLionMeteors, xLionMeteorYeehaw) == 1) {
+				xSetInt(dLionMeteors, xLionMeteorYeehaw, 0);
+				xUnitSelect(dLionMeteors, xUnitName);
+				trMutateSelected(kbGetProtoUnitID("Fire Giant"));
+				trUnitOverrideAnimation(19,0,true,false,-1);
+				trSetSelectedScale(0,0,0);
+			} else {
+				pos = kbGetBlockPosition(""+xGetInt(dLionMeteors, xUnitName), true);
+				if (xsVectorGetY(pos) <= worldHeight + 0.5) {
+					if (trQuestVarGet("secondPhase") == 1) {
+						paintLava(pos);
+					}
+					trQuestVarSetFromRand("heading", 0, 360, true);
+					action = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trQuestVarSetFromRand("rand", 1, 5, true);
+					if (trQuestVarGet("rand") + trQuestVarGet("secondPhase") >= 5) {
+						trUnitChangeProtoUnit("Fire Giant");
+						activateEnemy(action);
+					} else {
+						trUnitHighlight(3.0, true);
+						trUnitChangeProtoUnit("Phoenix Egg");
+						xAddDatabaseBlock(dTartarianEggs, true);
+						xSetInt(dTartarianEggs, xUnitName, action);
+						xSetInt(dTartarianEggs, xPlayerOwner, ENEMY_PLAYER);
+						xSetInt(dTartarianEggs, xTartarianEggTimeout, trTimeMS() + 3000);
+					}
+					trQuestVarSetFromRand("sound", 1, 2, true);
+					trSoundPlayFN("fireball fall " + 1*trQuestVarGet("sound") + ".wav", "1", -1, "", "");
+					xUnitSelect(dLionMeteors, xUnitName);
+					trUnitChangeProtoUnit("Tartarian Gate Flame");
+					xUnitSelect(dLionMeteors, xUnitName);
+					trDamageUnitPercent(-100);
+					trSetSelectedScale(0,0,0);
+					xFreeDatabaseBlock(dLionMeteors);
+				}
 			}
 		}
 
@@ -5687,9 +5758,160 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
-			
+			if (trQuestVarGet("bossSpell") == 31) {
+				trQuestVarSet("bossUsedUltimate", 1);
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trSetLighting("night", 1.0);
+				trOverlayText("Doomsday",3.0,-1,-1,-1);
+				trUnitSelectClear();
+				trUnitSelectByQV("bossEscape");
+				trUnitChangeProtoUnit("Transport Ship Greek");
+				trUnitSelectClear();
+				trUnitSelect(""+bossUnit, true);
+				trImmediateUnitGarrison(""+1*trQuestVarGet("bossEscape"));
+				trUnitChangeProtoUnit("Heka Gigantes");
+				bossNext = trTimeMS();
+				bossTimeout = trTimeMS() + 8000 + 4000 * trQuestVarGet("secondPhase");
+				trQuestVarSet("bossSpell", 32);
+			} else if (trQuestVarGet("bossSpell") == 32) {
+				if (trTimeMS() > bossNext) {
+					bossNext = bossNext + 800;
+					trQuestVarSetFromRand("modx", 4.0 - 2 * trQuestVarGet("bossRoomSize"), 2 * trQuestVarGet("bossRoomSize") - 4.0, true);
+					dist = xsSqrt(xsPow(2.0 * trQuestVarGet("bossRoomSize") - 8.0, 2) - xsPow(trQuestVarGet("modx"), 2));
+					trQuestVarSetFromRand("modz", 0.0 - dist, dist, true);
+					pos = vectorSnapToGrid(xsVectorSet(trQuestVarGet("modx"),0,trQuestVarGet("modz")) + trVectorQuestVarGet("bossRoomCenter"));
+					zSetProtoUnitStat("Kronny Flying", ENEMY_PLAYER, 1, 0.00001);
+					xAddDatabaseBlock(dLionMeteors, true);
+					xSetInt(dLionMeteors, xUnitName, trGetNextUnitScenarioNameNumber());
+					zSetProtoUnitStat("Kronny Flying", 0, 1, 0.00001);
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+					trSetSelectedScale(0,10.0,0);
+					trDamageUnitPercent(100);
+				}
+				if (trTimeMS() > bossTimeout) {
+					trQuestVarSet("bossSpell", 33);
+					trQuestVarSet("fallingSun", trGetNextUnitScenarioNameNumber());
+					pos = vectorSnapToGrid(trVectorQuestVarGet("bossRoomCenter"));
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("0,0");
+					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+					trSetSelectedScale(0,5.0,0);
+					trDamageUnitPercent(100);
+				}
+			} else if (trQuestVarGet("bossSpell") == 33) {
+				trSetLighting("hades", 3.0);
+				trSoundPlayFN("inferno_loop.wav","1",-1,"","");
+				trUnitSelectClear();
+				trUnitSelectByQV("fallingSun");
+				trMutateSelected(kbGetProtoUnitID("Meteorite Death"));
+				trQuestVarSet("bossSpell", 34);
+			} else if (trQuestVarGet("bossSpell") == 34) {
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("fallingSun"), true);
+				if (xsVectorGetY(pos) < worldHeight + 1.0) {
+					trUnitSelectClear();
+					trUnitSelectByQV("fallingSun");
+					trUnitChangeProtoUnit("Meteor Impact Ground");
+					trUnitSelectClear();
+					trUnitSelectByQV("fallingSun");
+					trDamageUnitPercent(-100);
+					trCameraShake(1.0, 0.5);
+					trSoundPlayFN("cinematics\32_out\explosion.wav","1",-1,"","");
+					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
+					dir = vector(0,0,3);
+					for(x=16; >0) {
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						trArmySelect("0,0");
+						trMutateSelected(kbGetProtoUnitID("Meteorite"));
+						trUnitOverrideAnimation(6,0,true,false,-1);
+						trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
+						dir = rotationMatrix(dir, 0.92388, 0.382683);
+					}
+					trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
+					trQuestVarSet("bossSpell", 35);
+					bossTimeout = trTimeMS() + 200;
+					action = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trUnitChangeProtoUnit("Transport Ship Greek");
+					trUnitSelectClear();
+					trUnitSelect(""+bossUnit, true);
+					trUnitChangeProtoUnit("Heka Gigantes");
+					trUnitSelectClear();
+					trUnitSelect(""+bossUnit, true);
+					trImmediateUnitGarrison(""+action);
+					trUnitChangeProtoUnit("Heka Gigantes");
+					trUnitSelectClear();
+					trUnitSelect(""+action, true);
+					trUnitChangeProtoUnit("Meteor Impact Ground");
+				}
+			} else if (trQuestVarGet("bossSpell") == 35) {
+				if (trTimeMS() > bossTimeout) {
+					bossCooldown(8, 12);
+					trQuestVarSet("bossUltimate", 3);
+					for(x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
+						trUnitSelectClear();
+						trUnitSelect(""+x, true);
+						trUnitDestroy();
+					}
+					pos = trVectorQuestVarGet("bossRoomCenter");
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName),pos) < 100.0) {
+							damagePlayerUnit(1000.0);
+						}
+					}
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
-			
+			if (trQuestVarGet("bossSpell") == 21) {
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				if (trQuestVarGet("rand") == 1) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Hellpath!");
+				} else if (trQuestVarGet("rand") == 2) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Who wants a piece of this?");
+				} else if (trQuestVarGet("rand") == 3) {
+					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: These hands are rated E for everyone!");
+				}
+				trSoundPlayFN("wild.wav","1",-1,"","");
+				trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, 3.0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 27, 200.0);
+				trUnitSelectClear();
+				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
+				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+				trUnitOverrideAnimation(6,0,false,false,-1);
+				trSetSelectedScale(0,0,0);
+
+				bossPos = kbGetBlockPosition(""+bossUnit);
+				trQuestVarSet("bossSpell", 22);
+				bossTimeout = trTimeMS() + 12000;
+			} else if (trQuestVarGet("bossSpell") == 22) {
+				pos = kbGetBlockPosition(""+bossUnit);
+				dist = distanceBetweenVectors(bossPos, pos);
+				if (dist > 0) {
+					dist = xsSqrt(dist);
+					dir = getUnitVector(bossPos, pos, 2.0);
+					for (i = 1 + dist / 2; > 0) {
+						paintLava(bossPos);
+						bossPos = bossPos + dir;
+					}
+					bossPos = pos;
+				}
+				if (trTimeMS() > bossTimeout) {
+					bossCooldown(8, 12);
+					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, -3.0);
+					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 27, -200.0);
+					trUnitSelectClear();
+					trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
+					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
 				trQuestVarSetFromRand("rand", 1, 5, true);
@@ -5708,7 +5930,7 @@ highFrequency
 				trUnitOverrideAnimation(26, 0, false, false, -1);
 			} else if (trQuestVarGet("bossSpell") == 12) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 1200;
+					bossNext = bossNext + 1300;
 					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
 					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 						xDatabaseNext(dPlayerCharacters);
@@ -5806,7 +6028,7 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 3) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 1200;
+					bossNext = bossNext + 1300;
 					for (x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
 						trUnitSelectClear();
 						trUnitSelect(""+x, true);
@@ -5834,7 +6056,6 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
-			trQuestVarSet("bossSpell", 11);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -5854,7 +6075,7 @@ highFrequency
 			trLetterBox(true);
 		}
 		boss = 0;
-		trSetLighting("Fimbulwinter", 1.0);
+		trSetLighting("hades", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
 		for(x=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
@@ -5876,42 +6097,34 @@ highFrequency
 		{
 			case 1:
 			{
-				trSoundPlayFN("","1",-1,"Mother of the Depths:Don't you dare think this is over!");
+				trSoundPlayFN("","1",-1,"Hellkeeper: Foolish mortals. I will never let you reach the final floor!");
 				trQuestVarSet("cinTime", trTime() + 4);
 			}
 			case 2:
 			{
-				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"Mother of the Depths:Children of the depths, heed my call!");
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"Hellkeeper: The Pit shall be your grave!");
 				trQuestVarSet("cinTime", trTime() + 4);
 			}
 			case 3:
 			{
-				xsEnableRule("boss7_battle");
+				xsEnableRule("boss9_battle");
 				bossUnit = trGetNextUnitScenarioNameNumber();
 				vector pos = trVectorQuestVarGet("bossRoomCenter");
 				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,
 					xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
 				trArmySelect(""+ENEMY_PLAYER+",0");
-				trUnitChangeProtoUnit("Scylla");
+				trUnitChangeProtoUnit("Heka Gigantes");
 				boss = trQuestVarGet("stage");
 				activateEnemy(bossUnit);
 				bossID = kbGetBlockID(""+bossUnit, true);
 				bossPointer = xGetNewestPointer(dEnemies);
 				xSetBool(dEnemies, xLaunched, true);
-				bossCooldown(10, 15);
+				bossCooldown(8, 12);
 				xsEnableRule("boss_music");
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trQuestVarSet("musicTime", 0);
-				
-				int next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Hydra",1,
-					xsVectorGetX(pos) + 6.0,0,xsVectorGetZ(pos) - 6.0,225,true);
-				activateEnemy(next);
-				next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Hydra",1,
-					xsVectorGetX(pos) - 6.0,0,xsVectorGetZ(pos) + 6.0,225,true);
-				activateEnemy(next);
+				trVectorQuestVarSet("gateSpawnDir", vector(1,0,0));
 			}
 		}
 	}

@@ -138,11 +138,11 @@ string stageName(int stage = 0) {
 		}
 		case 9:
 		{
-			name = "The Pit (UNDER CONSTRUCTION)";
+			name = "The Pit";
 		}
 		case 10:
 		{
-			name = "The Unknown";
+			name = "The Unknown (UNDER CONSTRUCTION)";
 		}
 		case 0:
 		{
@@ -396,12 +396,6 @@ runImmediately
 	aiSetAttackResponseDistance(0.0);
 	xsSetContextPlayer(0);
 	
-	/*
-	trQuestVarSet("p"+ENEMY_PLAYER+"stunResistance", 1);
-	trQuestVarSet("p"+ENEMY_PLAYER+"poisonResistance", 1);
-	trQuestVarSet("p0stunResistance", 1);
-	trQuestVarSet("p0poisonResistance", 1);
-	*/
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Wonder SPC", ENEMY_PLAYER, 26, 1);
@@ -978,6 +972,22 @@ int monsterPetProto(int i = 0) {
 		case 31:
 		{
 			proto = kbGetProtoUnitID("Lampades");
+		}
+		case 32:
+		{
+			proto = kbGetProtoUnitID("Tartarian Gate spawn");
+		}
+		case 33:
+		{
+			proto = kbGetProtoUnitID("Troll");
+		}
+		case 34:
+		{
+			proto = kbGetProtoUnitID("Manticore");
+		}
+		case 35:
+		{
+			proto = kbGetProtoUnitID("Fire Giant");
 		}
 	}
 	return(proto);

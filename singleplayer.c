@@ -252,6 +252,17 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto5", "Nidhogg");
 			bossScale = 1.0;
 		}
+		case 9:
+		{
+			tPrimary = 5;
+			tSubPrimary = 7;
+			trStringQuestVarSet("enemyProto1", "Tartarian Gate spawn");
+			trStringQuestVarSet("enemyProto2", "Troll");
+			trStringQuestVarSet("enemyProto3", "Manticore");
+			trStringQuestVarSet("enemyProto4", "Fire Giant");
+			trStringQuestVarSet("enemyProto5", "Heka Gigantes");
+			bossScale = 1.2;
+		}
 	}
 	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -1149,11 +1160,11 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Fire Siphon"):
 			{
-				desc("It fires a high-powered laser");
+				desc("It fires a high-powered laser.");
 			}
 			case kbGetProtoUnitID("Nereid"):
 			{
-				desc("Its special attack will launch players a great distance and deal damage.");
+				desc("Its special attack will launch units a great distance and deal damage.");
 			}
 			case kbGetProtoUnitID("Kraken"):
 			{
@@ -1161,7 +1172,23 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Hydra"):
 			{
-				desc("Regenerates 1 percent health each second. (interrupted by Poison)");
+				desc("Regenerates 1 percent health each second. (Nullified by Poison)");
+			}
+			case kbGetProtoUnitID("Tartarian Gate spawn"):
+			{
+				desc("On death, drops an egg that explodes after three seconds and releases fireballs.");
+			}
+			case kbGetProtoUnitID("Troll"):
+			{
+				desc("Regenerates 1 percent health each second. (Nullified by Poison)");
+			}
+			case kbGetProtoUnitID("Manticore"):
+			{
+				desc("Teleports backwards when enemies get too close.");
+			}
+			case kbGetProtoUnitID("Fire Giant"):
+			{
+				desc("Fires a massive fireball that explodes on contact with walls, releasing smaller fireballs.");
 			}
 			case kbGetProtoUnitID("Nemean Lion"):
 			{
@@ -1217,7 +1244,23 @@ highFrequency
 				desc("She has powerful area attacks using her massive body.");
 				desc("She can also eat a player, incapacitating them for ten seconds.");
 				desc("During this time, she heals for 1 percent of her health each second.");
-				desc("If she is poisoned, the eating time is halved and her healing is prevented.");
+				desc("If she is poisoned, the eating time is halved and her healing is nullified.");
+			}
+			case kbGetProtoUnitID("Nidhogg"):
+			{
+				name = "Lord of the Heavens";
+				desc("Drops: Starstone");
+				desc("Common Relic: " + relicName(18));
+				desc("He can only be damaged by dropping Spark Relics at the base of the statue.");
+				desc("Spark Relics are dropped by enemies that spawn during the fight.");
+			}
+			case kbGetProtoUnitID("Heka Gigantes"):
+			{
+				name = "Hellkeeper";
+				desc("Drops: Manastone");
+				desc("Common Relic: " + relicName(19));
+				desc("He releases devastating fire attacks. Make sure to dodge them!");
+				desc("Tartarian Gates will also appear and spawn enemies. Destroy them with haste.");
 			}
 		}
 		uiClearSelection();

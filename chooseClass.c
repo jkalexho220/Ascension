@@ -394,7 +394,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 2:
 				{
 					icon = "icons\building archery range icon 64";
-					msg = "(Q) Shock Arrow: Fire an arrow at your cursor that damages and launches the first enemy hit.";
+					msg = "(Q) Stormbolt: Fire an arrow at your cursor that damages and launches the first enemy hit.";
 				}
 				case 3:
 				{

@@ -66,6 +66,11 @@ void alchemistAlways(int eventID = -1) {
 								trDamageUnitPercent(0.0 - amt);
 							}
 						}
+						if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_HEAL_FAVOR) {
+							hit = xsMin(xGetInt(dPlayerData, xPlayerHealFavorCharges), xGetDatabaseCount(dPlayerUnits));
+							gainFavor(p, hit);
+							xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges) - hit);
+						}
 					} else {
 						xAddDatabaseBlock(potions, true);
 						xSetInt(potions, xUnitName, trGetUnitScenarioNameNumber(target));

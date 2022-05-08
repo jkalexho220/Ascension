@@ -153,6 +153,9 @@ int xPlayerPetDogNext = 0;
 int xPlayerPetMonsterReady = 0;
 int xPlayerPetMonsterNext = 0;
 
+int xPlayerHealFavorCharges = 0;
+int xPlayerHealFavorNext = 0;
+
 int dClass = 0;
 int xClassProto = 0;
 int xClassFirstDelay = 0;
@@ -249,15 +252,15 @@ highFrequency
 		xDoppelganger = xInitAddInt(db,"doppelganger");
 		xCurrentHealth = xInitAddFloat(db,"currentHP");
 		xStunStatus = xInitAddInt(db,"stunStatus");
-		xStunTimeout = xInitAddInt(db,"stunTimeout");
-		xStunSFX = xInitAddInt(db,"stunSFX");
 		xPoisonStatus = xInitAddInt(db,"poisonStatus");
+		xSilenceStatus = xInitAddInt(db,"silenceStatus");
+		xStunTimeout = xInitAddInt(db,"stunTimeout");
 		xPoisonTimeout = xInitAddInt(db,"poisonTimeout");
+		xSilenceTimeout = xInitAddInt(db,"silenceTimeout");
+		xStunSFX = xInitAddInt(db,"stunSFX");
 		xPoisonLast = xInitAddInt(db,"poisonLast");
 		xPoisonDamage = xInitAddFloat(db,"poisonDamage");
 		xPoisonSFX = xInitAddInt(db,"poisonSFX");
-		xSilenceStatus = xInitAddInt(db,"silenceStatus");
-		xSilenceTimeout = xInitAddInt(db,"silenceTimeout");
 		xSilenceSFX = xInitAddInt(db,"silenceSFX");
 		xLaunched = xInitAddBool(db,"launched");
 	}
@@ -377,6 +380,9 @@ highFrequency
 	xPlayerPetDogNext = xInitAddInt(dPlayerData, "petDogNext");
 	xPlayerPetMonsterReady = xInitAddBool(dPlayerData, "petMonsterReady", true);
 	xPlayerPetMonsterNext = xInitAddInt(dPlayerData, "petMonsterNext");
+
+	xPlayerHealFavorCharges = xInitAddInt(dPlayerData, "healFavorCharges");
+	xPlayerHealFavorNext = xInitAddInt(dPlayerData, "healFavorNext");
 	
 	dStunnedUnits = xInitDatabase("stunnedUnits", 10);
 	xInitAddInt(dStunnedUnits,"name");

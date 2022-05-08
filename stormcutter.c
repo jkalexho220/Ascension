@@ -363,7 +363,7 @@ void chooseStormcutter(int eventID = -1) {
 		rainName = "(E) Rain of Lightning";
 		rainIsUltimate = true;
 		map("q", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(Q) Shock Arrow";
+		lureName = "(Q) Stormbolt";
 		lureIsUltimate = false;
 	}
 	xRainStormSFX = xInitAddInt(db, "rainSFX");
