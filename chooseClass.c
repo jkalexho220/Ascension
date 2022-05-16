@@ -321,7 +321,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will grant you 3 favor, deal damage in an area, and create a Mage Fire.";
+					msg = "It will grant you 1 favor, deal damage in an area, and create a Star.";
 				}
 				case 3:
 				{
@@ -334,44 +334,49 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Mage Fires remain on the ground for several seconds, damaging nearby enemies.";
+					msg = "Stars remain on the ground for several seconds and grant you 0.2 favor per second.";
 				}
 				case 6:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Duration: 10 | Radius: 4 | Damage: 10 per second";
+					msg = "Duration: 10";
 				}
 				case 7:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Mage Fire.";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Star.";
 				}
 				case 8:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Enemies hit by the blast will have their magic resist reduced permanently.";
+					msg = "Enemies hit by the blast will be stunned.";
 				}
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 120 | Resist Reduction: 0.1";
+					msg = "Cooldown: 8 | Radius: 5 | Damage: 120";
 				}
 				case 10:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Mage Fire.";
+					icon = "icons\building outpost icon 64";
+					msg = "(W) Magic Missiles: Generate three stars that follow you for a duration and lock-on to enemies.";
 				}
 				case 11:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "Cooldown: 6 | Range: 8";
+					icon = "icons\building outpost icon 64";
+					msg = "Each missile deals damage and creates a Star.";
 				}
 				case 12:
 				{
-					icon = "icons\building tower mirror icons 64";
-					msg = "(E) Solar Flare: Fire a laser through each of your Mage Fires, dealing damage to enemies.";
+					icon = "icons\building outpost icon 64";
+					msg = "Cooldown: 12 | Lock-on Range: 12 | Duration: 9 | Damage: 60";
 				}
 				case 13:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "(E) Solar Flare: Create a Star at your cursor. Then fire a laser through all your Stars.";
+				}
+				case 14:
 				{
 					icon = "icons\building tower mirror icons 64";
 					msg = "Cost: 40 | Range: 40 | Damage: 90";

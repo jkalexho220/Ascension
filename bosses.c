@@ -4331,9 +4331,6 @@ highFrequency
 				trUnitChangeProtoUnit("Meteor Impact Water");
 				trUnitSelectClear();
 				trUnitSelect(""+bossUnit, true);
-				if (kbGetBlockID(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1)) == -1) {
-					spyEffect(1*bossUnit,kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS,bossInts,1));
-				}
 				trSetSelectedScale(bossScale,bossScale,bossScale);
 			} else if (trQuestVarGet("bossSpell") == 22) {
 				if (trTimeMS() > bossNext) {
@@ -4348,16 +4345,9 @@ highFrequency
 					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), bossTargetPos) < 16) {
 						silenceUnit(dPlayerUnits, 9999, xGetInt(dPlayerData, xPlayerIndex, p));
 						trUnitSelectClear();
-						trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1),true);
-						trUnitChangeProtoUnit("Roc");
-						trUnitSelectClear();
-						trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1),true);
-						trUnitConvert(p);
-						trSetSelectedScale(0,0,0);
-						trUnitSelectClear();
 						trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
-						trImmediateUnitGarrison(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
-						trUnitOverrideAnimation(2,0,true,true,-1);
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+						xDetachDatabaseBlock(dPlayerUnits,xGetInt(dPlayerData, xPlayerIndex, p));
 						trSoundPlayFN("changeunit.wav","1",-1,"","");
 						trSoundPlayFN("titanpunch1.wav","1",-1,"","");
 						trQuestVarSet("bossSpell", 24);
@@ -4370,9 +4360,6 @@ highFrequency
 						trUnitSelect(""+bossUnit, true);
 						trSetSelectedScale(bossScale,bossScale,bossScale);
 						trUnitOverrideAnimation(-1,0,false,true,-1);
-						if (trCurrentPlayer() == p) {
-							trSetCurrentPlayerStatus(false);
-						}
 					} else {
 						bossCooldown(3, 6);
 					}
@@ -4405,17 +4392,22 @@ highFrequency
 						bossScale = 1.3;
 						trSetSelectedScale(bossScale,bossScale,bossScale);
 						p = bossTarget;
-						if (trCurrentPlayer() == p) {
-							trSetCurrentPlayerStatus(true);
-						}
+						xRestoreDatabaseBlock(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, bossTarget));
 						xSetPointer(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, bossTarget));
 						xSetInt(dPlayerUnits, xSilenceTimeout, 0);
+						pos = kbGetBlockPosition(""+bossUnit, true);
+						x = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch(""+bossTarget+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 						trUnitSelectClear();
-						trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1), true);
-						trUnitChangeProtoUnit("Cinematic Block");
+						trUnitSelect(""+x, true);
+						trUnitChangeProtoUnit("Transport Ship Greek");
+						xUnitSelect(dPlayerData, xPlayerUnit);
+						trImmediateUnitGarrison(""+x);
+						trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, bossTarget))));
 						trUnitSelectClear();
-						trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, bossTarget), true);
-						trUnitOverrideAnimation(-1,0,false,true,-1);
+						trUnitSelect(""+x, true);
+						trUnitChangeProtoUnit("Meteor Impact Water");
+						equipRelicsAgain(bossTarget);
 						damagePlayerUnit(trQuestVarGet("bossDamage"));
 						bossCooldown(3, 6);
 					} else {

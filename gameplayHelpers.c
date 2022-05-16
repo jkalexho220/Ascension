@@ -1523,6 +1523,11 @@ void revivePlayer(int p = 0) {
 	xUnitSelect(dPlayerData,xPlayerUnit);
 	trDamageUnitPercent(50);
 	trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+	if (trQuestVarGet("deadPlayerCount") < 0) {
+		trQuestVarSet("deadPlayerCount", 0);
+		debugLog("deadPlayerCount was negative!");
+	}
+	trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been revived!");
 	int db = getRelicsDB(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);

@@ -1023,6 +1023,8 @@ def parseFile(fn):
 	global ESCAPE
 	global RESTORING
 	global comment
+	global ln
+	global line
 	ln = 1
 	pcount = 0 # parenthesis
 	bcount = 0 # brackets
