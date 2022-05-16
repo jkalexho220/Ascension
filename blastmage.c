@@ -351,6 +351,7 @@ void blastmageAlways(int eventID = -1) {
 								xUnitSelect(missiles, xUnitName);
 								trUnitDestroy();
 								xFreeDatabaseBlock(missiles);
+								missileHitbox = xGetPointer(missiles);
 								break;
 							}
 						}

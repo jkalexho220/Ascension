@@ -101,7 +101,7 @@ void alchemistAlways(int eventID = -1) {
 						if (trUnitAlive() == false) {
 							removeEnemy();
 						} else if (xGetInt(dEnemies, xUnitName) == xGetInt(potions, xUnitName)) {
-							stunUnit(dEnemies, 3.0, p);
+							stunUnit(dEnemies, 2.0, p);
 							break;
 						}
 					}
@@ -112,7 +112,7 @@ void alchemistAlways(int eventID = -1) {
 							if (trUnitAlive() == false) {
 								removeEnemy();
 							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
-								stunUnit(dEnemies, 3.0, p);
+								stunUnit(dEnemies, 2.0, p);
 								hit = hit - 1;
 								if (hit == 0) {
 									break;
