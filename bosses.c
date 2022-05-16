@@ -2668,6 +2668,7 @@ highFrequency
 					trUnitSelect(""+action, true);
 					trUnitChangeProtoUnit("Kronny Birth SFX");
 					bossCooldown(10, 15);
+					bossAnim = false;
 					xSetBool(dEnemies, xLaunched, false, bossPointer);
 				}
 			}

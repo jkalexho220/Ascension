@@ -1,5 +1,5 @@
 
-float empoweredDamage = 60;
+float empoweredDamage = 90;
 float empoweredRadius = 4;
 
 float starDuration = 10;
@@ -7,12 +7,12 @@ float starRadius = 4;
 float starDamage = 10;
 
 int starfallCooldown = 8;
-float starfallRadius = 5;
+float starfallRadius = 4;
 float starfallDamage = 120;
 
-float solarFlareDamage = 90;
+float solarFlareDamage = 100;
 float solarFlareRange = 40;
-float solarFlareCost = 40;
+float solarFlareCost = 50;
 
 float missileDamage = 60;
 float missileAcquireRange = 12;
@@ -224,7 +224,7 @@ void blastmageAlways(int eventID = -1) {
 					removeEnemy();
 				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
 					damageEnemy(p, amt, true);
-					stunUnit(dEnemies, 3.0, p);
+					stunUnit(dEnemies, 2.0, p);
 					hit = hit + 1;
 				}
 			}
@@ -296,19 +296,21 @@ void blastmageAlways(int eventID = -1) {
 				xSetVector(missiles, xMissilePos, pos);
 				if (xGetPointer(missiles) == missileHitbox) {
 					if (distanceBetweenVectors(pos, xGetVector(missiles, xMissileCenter)) > 400.0) {
-						xUnitSelect(missiles, xUnitName);
-						trUnitDestroy();
 						next = trGetNextUnitScenarioNameNumber();
 						dest = vectorSnapToGrid(pos);
 						xSetVector(missiles, xMissileCenter, dest);
 						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(dest),0,xsVectorGetZ(dest),0,true);
-						trArmySelect("1,0");
-						trUnitChangeProtoUnit("Spy Eye");
-						trUnitSelectClear();
-						trUnitSelect(""+next, true);
-						trMutateSelected(kbGetProtoUnitID("Outpost"));
-						trSetSelectedScale(0,0,0);
-						xSetInt(missiles, xUnitName, next);
+						if (next < trGetNextUnitScenarioNameNumber()) {
+							xUnitSelect(missiles, xUnitName);
+							trUnitDestroy();
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Spy Eye");
+							trUnitSelectClear();
+							trUnitSelect(""+next, true);
+							trMutateSelected(kbGetProtoUnitID("Outpost"));
+							trSetSelectedScale(0,0,0);
+							xSetInt(missiles, xUnitName, next);
+						}
 					}
 					if (xGetBool(missiles, xMissileTargetFound) == false) {
 						// ACQUIRING TARGETS

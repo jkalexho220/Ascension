@@ -321,7 +321,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will grant you 1 favor, deal damage in an area, and create a Star.";
+					msg = "It will grant you 1 favor, deal magic damage in an area, and create a Star.";
 				}
 				case 3:
 				{
@@ -329,7 +329,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					msg = "Damage: 60 | Radius: 4 (Increased by Projectiles)";
+					msg = "Damage: 90 | Radius: 4 (Increased by Projectiles)";
 				}
 				case 5:
 				{
@@ -354,7 +354,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 120";
+					msg = "Cooldown: 8 | Radius: 4 | Damage: 120";
 				}
 				case 10:
 				{
@@ -379,7 +379,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 14:
 				{
 					icon = "icons\building tower mirror icons 64";
-					msg = "Cost: 40 | Range: 40 | Damage: 90";
+					msg = "Cost: 50 | Range: 40 | Damage: 100";
 					next = 0;
 				}
 			}

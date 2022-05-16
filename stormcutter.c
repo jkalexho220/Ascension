@@ -97,7 +97,7 @@ void stormcutterAlways(int eventID = -1) {
 			if (trUnitAlive() == false) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+xGetInt(dEnemies, xUnitName),p,"Archer Atlantean Hero", dist) >0) {
-				stunUnit(dEnemies, 3.0, p);
+				stunUnit(dEnemies, 2.0, p);
 				gainFavor(p, 1.0);
 			}
 		}
