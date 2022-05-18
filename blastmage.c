@@ -263,13 +263,18 @@ void blastmageAlways(int eventID = -1) {
 	trQuestVarSet("p"+p+"missilesLast", trTimeMS());
 	
 	if (xGetDatabaseCount(missiles) > 0) {
-		trQuestVarSet("p"+p+"missileHitbox", aiPlanGetUserVariableInt(missiles, xNextBlock, missileHitbox));
+		if (aiPlanGetUserVariableBool(missiles, xDirtyBit, missileHitbox)) {
+			trQuestVarSet("p"+p+"missileHitbox", aiPlanGetUserVariableInt(missiles, xNextBlock, missileHitbox));
+		} else {
+			trQuestVarSet("p"+p+"missileHitbox", xGetPointer(missiles));
+		}
 		for(y=xGetDatabaseCount(missiles); >0) {
 			xDatabaseNext(missiles);
 			if (trTimeMS() > xGetInt(missiles, xMissileTimeout)) {
 				xUnitSelect(missiles, xUnitName);
 				trUnitDestroy();
 				xFreeDatabaseBlock(missiles);
+				missileHitbox = xGetPointer(missiles);
 			} else {
 				pos = xGetVector(missiles, xMissilePos);
 				target = 0;
@@ -351,7 +356,6 @@ void blastmageAlways(int eventID = -1) {
 								xUnitSelect(missiles, xUnitName);
 								trUnitDestroy();
 								xFreeDatabaseBlock(missiles);
-								missileHitbox = xGetPointer(missiles);
 								break;
 							}
 						}

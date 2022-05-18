@@ -62,9 +62,9 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\special g circe icon 64";
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
-			icon = "icons\infantry g hypaspist icon 64";
+			icon = "icons\hero n hersir icon 64";
 		}
 	}
 	return(icon);
@@ -259,7 +259,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Fire Knight: A character that charges in and sacrifices health for damage.";
+					msg = "Dragon Knight: A character that charges in and sacrifices health for damage.";
 				}
 				case 1:
 				{
@@ -359,7 +359,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\building outpost icon 64";
-					msg = "(W) Magic Missiles: Generate three stars that follow you for a duration and lock-on to enemies.";
+					msg = "(W) Magic Missiles: Generate three missiles that follow you for a duration and lock-on to enemies";
 				}
 				case 11:
 				{
@@ -369,7 +369,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 12:
 				{
 					icon = "icons\building outpost icon 64";
-					msg = "Cooldown: 12 | Lock-on Range: 12 | Duration: 9 | Damage: 60";
+					msg = "Cooldown: 12 | Lock-on Range: 12 | Duration: 8 | Damage: 60";
 				}
 				case 13:
 				{
@@ -1050,13 +1050,13 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
 			switch(tooltip)
 			{
 				case 0:
 				{
-					msg = "Gambler: A luck-based caster with a wide variety of spells.";
+					msg = "Frost Hammer: A luck-based caster with a wide variety of spells.";
 				}
 				case 1:
 				{
@@ -1157,7 +1157,7 @@ string className(int class = 0) {
 		}
 		case FIREKNIGHT:
 		{
-			name = "Fire Knight";
+			name = "Dragon Knight";
 		}
 		case BLASTMAGE:
 		{
@@ -1203,9 +1203,9 @@ string className(int class = 0) {
 		{
 			name = "Spark Witch";
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
-			name = "Gambler";
+			name = "FROSTHAMMER";
 		}
 	}
 	return(name);

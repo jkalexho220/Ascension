@@ -375,7 +375,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case GAMBLER:
+			case FROSTHAMMER:
 			{
 				if (trPlayerResourceCount(1, "Gold") >= 3000) {
 					unlocked = true;
@@ -923,7 +923,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 7");
 			}
-			case GAMBLER:
+			case FROSTHAMMER:
 			{
 				uiMessageBox("To unlock this class, acquire 3000 gold.");
 			}
