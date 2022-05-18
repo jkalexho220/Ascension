@@ -1056,80 +1056,74 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Frost Hammer: A luck-based caster with a wide variety of spells.";
+					msg = "Frost Hammer: A tanky fighter whose damage scales with health.";
 				}
 				case 1:
 				{
-					msg = "Passive: You cannot attack. Your basic spells have three variations.";
+					msg = "Passive: Each time you stun an enemy, grow in size and gain 10 attack.";
 				}
 				case 2:
 				{
-					msg = "After you cast a basic spell, it will randomly switch to one of its other variations.";
+					msg = "Bonus decays by 3 percent per second.";
 				}
 				case 3:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "(Q) Loaded Dice: Throw a dice at your cursor with a special effect.";
+					msg = "Special Attack (5 attacks): Stun your target.";
 				}
 				case 4:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: COPY: Summon a copy of the first enemy hit by the dice. (excluding bosses)";
+					icon = "icons\god power frost icon 64";
+					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage in a small area.";
 				}
 				case 5:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: EXPLODE: The dice explodes and deals damage in an area.";
+					icon = "icons\god power frost icon 64";
+					msg = "The enemy closest to the center is stunned.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: HEAL: The dice heals allies that it passes through and grants them favor.";
+					icon = "icons\god power frost icon 64";
+					msg = "The icicle remains for a short duration and heals you when you stand near it.";
 				}
 				case 7:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Cooldown: 6 | Decay: 4 | Radius: 6 | Damage: 100 | Heal: 100 | Favor: 4";
+					icon = "icons\god power frost icon 64";
+					msg = "Cooldown: 5 | Radius: 2, 5 | Duration: 10 | Damage: 80 | Heal: 1 percent health per second";
 				}
 				case 8:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "(W) Gimmick Deck: Play a card with a special effect.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "(W) Titanic Smash: A large hammer appears above you and smashes towards your cursor.";
 				}
 				case 9:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: BURN: Create a circle of fire that damages enemies each second.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "It deals magic damage in a rectangle. If it hits an icicle, the icicle explodes and deals damage";
 				}
 				case 10:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: BURN: Damage is increased by the number of allies in the circle.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "The hammer size and damage scales with your size.";
 				}
 				case 11:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: FREEZE: Stun enemies at the target location.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "Cooldown: 15 | Range: 6 | Damage: 0.003 x Attack x Health | Icicle Bonus Damage: 0.2x";
 				}
 				case 12:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: RELICS: Give an allied player bonuses from all your relics.";
+					icon = "ui\god minor icon norse skadi";
+					msg = "(E) Blizzard: For a short duration, you release a snowstorm that silences nearby enemies.";
 				}
 				case 13:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Cooldown: 12 | Radius: 6 | Duration: 6 | Damage: 20 + 10 per ally";
+					icon = "ui\god minor icon norse skadi";
+					msg = "The snowstorm stuns a random nearby enemy every 0.5 seconds.";
 				}
 				case 14:
 				{
-					icon = "icons\god power plenty icon 64";
-					msg = "(E) Gamble: Get a random number from 1-6. Your next spell is multiplied by that amount.";
-				}
-				case 15:
-				{
-					icon = "icons\god power plenty icon 64";
-					msg = "Cost: 30";
+					icon = "ui\god minor icon norse skadi";
+					msg = "Cost: 80 | Duration: 8 | Radius: 8";
 					next = 0;
 				}
 			}

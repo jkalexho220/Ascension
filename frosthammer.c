@@ -22,7 +22,7 @@ int xSmashDir = 0;
 int xSmashTimeout = 0;
 
 int blizzardCost = 80;
-float blizzardDuration = 12;
+float blizzardDuration = 8;
 float blizzardRadius = 10;
 
 int xBlizzardSFX = 0;
@@ -119,6 +119,8 @@ void frosthammerAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerWellActivated)) {
 		xSetBool(dPlayerData, xPlayerWellActivated, false);
+		trQuestVarSetFromRand("sound", 1, 3, true);
+		trSoundPlayFN("piercemetal"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		trQuestVarSetFromRand("heading", 0, 360, true);
 		next = trGetNextUnitScenarioNameNumber();
 		pos = vectorSnapToGrid(xGetVector(dPlayerData, xPlayerWellPos));
@@ -182,7 +184,7 @@ void frosthammerAlways(int eventID = -1) {
 			trSetUnitOrientation(dir * xsSin(amt) - xsVectorSet(0,xsCos(amt),0), dir * xsCos(amt) + xsVectorSet(0,xsSin(amt),0), true);
 			if (xGetFloat(smashes, xSmashAngle) < 0.2) {
 				dir = xGetVector(smashes, xSmashDir);
-				pos = kbGetBlockPosition(""+xGetInt(smashes, xUnitName));
+				start = kbGetBlockPosition(""+xGetInt(smashes, xUnitName));
 				xSetInt(smashes, xSmashTimeout, trTimeMS() + 1000);
 				trUnitHighlight(0.2, false);
 				amt = xGetFloat(smashes, xSmashScale);
@@ -194,15 +196,17 @@ void frosthammerAlways(int eventID = -1) {
 					xUnitSelectByID(dEnemies, xUnitID);
 					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (rayCollision(dEnemies,pos,dir,dist,current)) {
+					} else if (rayCollision(dEnemies,start,dir,dist,current)) {
 						damageEnemy(p, amt);
 						gainFavor(p, 1.0);
 					}
 				}
 				radius = xsPow(icicleHealRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+				trQuestVarSet("sound", 0);
 				for(y=xGetDatabaseCount(icicles); >0) {
 					xDatabaseNext(icicles);
-					if (rayCollision(icicles,pos,dir,dist,current)) {
+					if (rayCollision(icicles,start,dir,dist,current)) {
+						trQuestVarSetFromRand("sound", 1, 3, true);
 						trUnitSelectClear();
 						trUnitSelect(""+(1+xGetInt(icicles, xUnitName)), true);
 						trUnitDestroy();
@@ -222,17 +226,20 @@ void frosthammerAlways(int eventID = -1) {
 						xFreeDatabaseBlock(icicles);
 					}
 				}
+				if (trQuestVarGet("sound") > 0) {
+					trSoundPlayFN("crushmetal"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				}
 				for(y=1 + xGetFloat(smashes, xSmashScale) * smashRange / 2; >0) {
-					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
 					trArmySelect("1,0");
 					trUnitChangeProtoUnit("Dust Large");
-					pos = pos + dir * 2.0;
+					start = start + dir * 2.0;
 				}
 				amt = xGetFloat(smashes, xSmashScale);
 				trCameraShake(0.5, amt * 0.25);
-				if (amt > 4.0) {
+				if (amt > 2.0) {
 					trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
-				} else if (amt > 2.0) {
+				} else if (amt > 1.5) {
 					trSoundPlayFN("meteorbighit.wav","1",-1,"","");
 				} else {
 					trSoundPlayFN("meteorsmallhit.wav","1",-1,"","");

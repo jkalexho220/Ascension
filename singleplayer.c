@@ -339,7 +339,7 @@ void classNewUnlock(int class = 0) {
 			{
 				unlocked = true;
 			}
-			case NIGHTRIDER:
+			case FROSTHAMMER:
 			{
 				unlocked = true;
 			}
@@ -375,7 +375,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case FROSTHAMMER:
+			case NIGHTRIDER:
 			{
 				if (trPlayerResourceCount(1, "Gold") >= 3000) {
 					unlocked = true;
@@ -903,10 +903,6 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, collect 100 relics. Current: " + 1*trQuestVarGet("relicCount"));
 			}
-			case STORMCUTTER:
-			{
-				uiMessageBox("To unlock this class, clear stage 2.");
-			}
 			case SPELLSTEALER:
 			{
 				uiMessageBox("To unlock this class, open ten chests. Current: " + 1*trQuestVarGet("chestCount"));
@@ -923,7 +919,7 @@ highFrequency
 			{
 				uiMessageBox("To unlock this class, ascend a character to level 7");
 			}
-			case FROSTHAMMER:
+			case NIGHTRIDER:
 			{
 				uiMessageBox("To unlock this class, acquire 3000 gold.");
 			}

@@ -19,10 +19,10 @@ const int STARSEER = 10;
 const int COMMANDO = 11;
 const int SPELLSTEALER = 12;
 
-const int NIGHTRIDER = 13;
+const int FROSTHAMMER = 13;
 const int SPARKWITCH = 14;
 const int SAVIOR = 15;
-const int FROSTHAMMER = 16;
+const int NIGHTRIDER = 16;
 
 const int CLASS_COUNT = 16;
 
