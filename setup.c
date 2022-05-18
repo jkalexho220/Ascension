@@ -514,7 +514,7 @@ highFrequency
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
-	setupClass("Hero Norse", FROSTHAMMER, 600, 1200, MANASTONE);
+	setupClass("Hero Norse", FROSTHAMMER, 500, 1200, MANASTONE, 5);
 	//setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	xsDisableSelf();
 }

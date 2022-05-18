@@ -1,8 +1,8 @@
 int icicleCooldown = 5;
 float icicleDuration = 8;
 float icicleDamage = 80;
-float icicleRadius = 1.5;
-float icicleHealRange = 4;
+float icicleRadius = 2;
+float icicleHealRange = 5;
 float icicleRange = 4;
 
 int xIciclePos = 0;
@@ -19,14 +19,25 @@ int xSmashAngle = 0;
 int xSmashVelocity = 0;
 int xSmashScale = 0;
 int xSmashDir = 0;
+int xSmashTimeout = 0;
 
 int blizzardCost = 80;
 float blizzardDuration = 12;
 float blizzardRadius = 10;
 
+int xBlizzardSFX = 0;
+
 void removeFrostHammer(int p = 0) {
 	removePlayerSpecific(p);
 	
+}
+
+void frostHammerGrow(int p = 0) {
+	float amt = 10;
+	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_SPELL_ATTACK) {
+		amt = amt * xGetFloat(dPlayerData, xPlayerSpellDamage, p);
+	}
+	trQuestVarSet("p"+p+"frostHammerBonus", trQuestVarGet("p"+p+"frostHammerBonus") + amt);
 }
 
 void frosthammerAlways(int eventID = -1) {
@@ -44,11 +55,24 @@ void frosthammerAlways(int eventID = -1) {
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
+	float radius = 0;
 	xSetPointer(dPlayerData, p);
 	
 	vector start = vector(0,0,0);
 	vector pos = vector(0,0,0);
 	vector dir = vector(0,0,0);
+
+	float scale = xsSqrt(1.0 + 0.03 * trQuestVarGet("p"+p+"frostHammerBonus"));
+
+	float tdiff = 0.001 * (trTimeMS() - trQuestVarGet("p"+p+"frostHammerLast"));
+	trQuestVarSet("p"+p+"frostHammerLast", trTimeMS());
+
+	trQuestVarSet("p"+p+"frostHammerBonus", trQuestVarGet("p"+p+"frostHammerBonus") - tdiff * xsMax(1.0, 0.03 * trQuestVarGet("p"+p+"frostHammerBonus")));
+	if (trQuestVarGet("p"+p+"frostHammerBonus") < 0) {
+		trQuestVarSet("p"+p+"frostHammerBonus", 0);
+	}
+	xSetFloat(dPlayerData, xPlayerAttack, xGetFloat(dPlayerData, xPlayerBaseAttack) + trQuestVarGet("p"+p+"frostHammerBonus"));
+	zSetProtoUnitStat("Hero Norse", p, 27, xGetFloat(dPlayerData, xPlayerAttack));
 
 	for (x=xsMin(3, xGetDatabaseCount(icicles)); > 0) {
 		xDatabaseNext(icicles);
@@ -65,7 +89,7 @@ void frosthammerAlways(int eventID = -1) {
 				amt = trTimeMS() - xGetInt(icicles, xIcicleLast);
 				if (amt > 500) {
 					xSetInt(icicles, xIcicleLast, trTimeMS());
-					amt = amt * 0.000005 * xGetFloat(dPlayerData, xPlayerHealth);
+					amt = amt * 0.00001 * xGetFloat(dPlayerData, xPlayerHealth);
 					dist = icicleHealRange * xGetFloat(icicles, xIcicleRadius);
 					pos = xGetVector(icicles, xIciclePos);
 					for(y=xGetDatabaseCount(db); >0) {
@@ -135,6 +159,7 @@ void frosthammerAlways(int eventID = -1) {
 			gainFavor(p, hit);
 			xSetPointer(dEnemies, target);
 			stunUnit(dEnemies, 2, p);
+			frostHammerGrow(p);
 			trQuestVarSetFromRand("sound", 1, 2, true);
 			trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 		}
@@ -145,6 +170,79 @@ void frosthammerAlways(int eventID = -1) {
 		xSetFloat(icicles, xIcicleRadius, xGetFloat(dPlayerData, xPlayerSpellRange));
 		xSetVector(icicles, xIciclePos, pos);
 	}
+
+	for(x=xGetDatabaseCount(smashes); >0) {
+		xDatabaseNext(smashes);
+		xUnitSelect(smashes, xUnitName);
+		if (xGetInt(smashes, xSmashTimeout) == 0) {
+			xSetFloat(smashes, xSmashVelocity, xGetFloat(smashes, xSmashVelocity) - tdiff * 5.0);
+			xSetFloat(smashes, xSmashAngle, xGetFloat(smashes, xSmashAngle) + xGetFloat(smashes, xSmashVelocity) * tdiff);
+			dir = xGetVector(smashes, xSmashDir);
+			amt = xGetFloat(smashes, xSmashAngle);
+			trSetUnitOrientation(dir * xsSin(amt) - xsVectorSet(0,xsCos(amt),0), dir * xsCos(amt) + xsVectorSet(0,xsSin(amt),0), true);
+			if (xGetFloat(smashes, xSmashAngle) < 0.2) {
+				dir = xGetVector(smashes, xSmashDir);
+				pos = kbGetBlockPosition(""+xGetInt(smashes, xUnitName));
+				xSetInt(smashes, xSmashTimeout, trTimeMS() + 1000);
+				trUnitHighlight(0.2, false);
+				amt = xGetFloat(smashes, xSmashScale);
+				dist = amt * smashRange;
+				current = xsPow(amt * smashWidth, 2);
+				amt = amt * 0.003 * xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerAttack);
+				for(y=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (rayCollision(dEnemies,pos,dir,dist,current)) {
+						damageEnemy(p, amt);
+						gainFavor(p, 1.0);
+					}
+				}
+				radius = xsPow(icicleHealRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+				for(y=xGetDatabaseCount(icicles); >0) {
+					xDatabaseNext(icicles);
+					if (rayCollision(icicles,pos,dir,dist,current)) {
+						trUnitSelectClear();
+						trUnitSelect(""+(1+xGetInt(icicles, xUnitName)), true);
+						trUnitDestroy();
+						xUnitSelect(icicles, xUnitName);
+						trDamageUnitPercent(100);
+						trUnitChangeProtoUnit("Implode Sphere Effect");
+						pos = xGetVector(icicles, xIciclePos);
+						for(z=xGetDatabaseCount(dEnemies); >0) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
+								removeEnemy();
+							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < radius) {
+								damageEnemy(p, amt * 0.2);
+							}
+						}
+						xFreeDatabaseBlock(icicles);
+					}
+				}
+				for(y=1 + xGetFloat(smashes, xSmashScale) * smashRange / 2; >0) {
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("1,0");
+					trUnitChangeProtoUnit("Dust Large");
+					pos = pos + dir * 2.0;
+				}
+				amt = xGetFloat(smashes, xSmashScale);
+				trCameraShake(0.5, amt * 0.25);
+				if (amt > 4.0) {
+					trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
+				} else if (amt > 2.0) {
+					trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+				} else {
+					trSoundPlayFN("meteorsmallhit.wav","1",-1,"","");
+				}
+			}
+		} else if (trTimeMS() > xGetInt(smashes, xSmashTimeout)) {
+			trUnitDestroy();
+			xFreeDatabaseBlock(smashes);
+		}
+	}
 	
 	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
 		xSetBool(dPlayerData, xPlayerLureActivated, false);
@@ -152,13 +250,96 @@ void frosthammerAlways(int eventID = -1) {
 		trUnitSelectByQV("p"+p+"lureObject", true);
 		trMutateSelected(kbGetProtoUnitID("Rocket"));
 		trUnitDestroy();
-		
-		
+		pos = xGetVector(dPlayerData, xPlayerLurePos);
+
+		trSoundPlayFN("cinematics\32_out\hammerconnect.mp3","1",-1,"","");
+
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db, xUnitID);
+			if (trUnitAlive() == false) {
+				removeFrostHammer();
+			} else {
+				start = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName), true));
+				dir = getUnitVector(start, pos);
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(start),0,xsVectorGetZ(start),0,true);
+				trUnitSelectClear();
+				trUnitSelect(""+next, true);
+				trUnitChangeProtoUnit("Spy Eye");
+				trUnitSelectClear();
+				trUnitSelect(""+next, true);
+				trMutateSelected(kbGetProtoUnitID("Thor Hammer"));
+				trUnitSetAnimationPath("0,0,0,0,0,0,0");
+				trSetUnitOrientation(dir, vector(0,1,0), true);
+				trSetSelectedScale(scale, scale, scale);
+				xAddDatabaseBlock(smashes, true);
+				xSetInt(smashes, xUnitName, next);
+				xSetFloat(smashes, xSmashScale, scale);
+				xSetVector(smashes, xSmashDir, dir);
+			}
+		}
+	}
+
+	if (trQuestVarGet("p"+p+"blizzard") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"blizzardNext")) {
+			trQuestVarSet("p"+p+"blizzardNext", trQuestVarGet("p"+p+"blizzardNext") + 500 / xGetDatabaseCount(db));
+			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+			if (xGetDatabaseCount(dEnemies) > 0) {
+				dist = xsPow(blizzardRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+				bool stunActive = true;
+				xSetPointer(dEnemies, 1 * trQuestVarGet("p"+p+"blizzardPointer"));
+				for(x=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+						silenceUnit(dEnemies, 1.0, p);
+						if (stunActive) {
+							trQuestVarSet("p"+p+"blizzardPointer", xGetPointer(dEnemies));
+							stunUnit(dEnemies, 3.0, p);
+							frostHammerGrow(p);
+							stunActive = false;
+						}
+					}
+				}
+			}
+			if (trTimeMS() > trQuestVarGet("p"+p+"blizzardTimeout")) {
+				trQuestVarSet("p"+p+"blizzard", 0);
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeFrostHammer();
+					} else {
+						xUnitSelect(db, xBlizzardSFX);
+						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+					}
+				}
+			}
+		}
 	}
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
-		
+		gainFavor(p, 0.0 - blizzardCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
+		trQuestVarSet("p"+p+"blizzard", 1);
+		trQuestVarSet("p"+p+"blizzardNext", trTimeMS() + 1000);
+		trQuestVarSet("p"+p+"blizzardTimeout", trTimeMS() + 1000 * blizzardDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xUnitSelectByID(db, xUnitID);
+			if (trUnitAlive() == false) {
+				removeFrostHammer();
+			} else if (kbGetBlockID(""+xGetInt(db, xBlizzardSFX)) == -1) {
+				spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Ice Sheet"),xsVectorSet(db,xBlizzardSFX,xGetPointer(db)));
+			} else {
+				xUnitSelect(db, xBlizzardSFX);
+				trMutateSelected(kbGetProtoUnitID("Ice Sheet"));
+			}
+		}
+		trSoundPlayFN("frostgiantattack.wav","1",-1,"","");
 	}
 	
 	
@@ -170,9 +351,12 @@ void frosthammerAlways(int eventID = -1) {
 		if (trUnitAlive() == false) {
 			removeFrostHammer(p);
 		} else {
+			trSetSelectedScale(scale, scale, scale);
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
-
+				xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex));
+				stunUnit(dEnemies, 3.0, p);
+				frostHammerGrow(p);
 			}
 		}
 	}
@@ -200,6 +384,7 @@ void chooseFrostHammer(int eventID = -1) {
 		lureName = "(W) Titanic Impact";
 		lureIsUltimate = false;
 	}
+	xBlizzardSFX = xInitAddInt(db, "blizzardSFX", -1);
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, icicleCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
@@ -223,10 +408,11 @@ void chooseFrostHammer(int eventID = -1) {
 		db = xInitDatabase("p"+p+"titanicSmashes");
 		trQuestVarSet("p"+p+"titanicSmashes", db);
 		xInitAddInt(db, "name");
-		xSmashAngle = xInitAddFloat(db, "angle");
-		xSmashVelocity = xInitAddFloat(db, "velocity");
+		xSmashAngle = xInitAddFloat(db, "angle", 1.5708);
+		xSmashVelocity = xInitAddFloat(db, "velocity", 2.0);
 		xSmashScale = xInitAddFloat(db, "scale");
 		xSmashDir = xInitAddVector(db, "dir");
+		xSmashTimeout = xInitAddInt(db, "timeout");
 	}
 }
 

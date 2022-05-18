@@ -1205,7 +1205,7 @@ string className(int class = 0) {
 		}
 		case FROSTHAMMER:
 		{
-			name = "FROSTHAMMER";
+			name = "Frost Hammer";
 		}
 	}
 	return(name);

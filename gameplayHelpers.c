@@ -173,7 +173,7 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration);
 		if (xGetInt(dPlayerData,xPlayerGodBoon) == BOON_STATUS_COOLDOWNS) {
-			if ((xGetInt(dPlayerData,xPlayerClass) != MOONBLADE) || (xGetInt(db, xSilenceStatus) == 0)) {
+			if ((xGetInt(dPlayerData,xPlayerClass) != MOONBLADE && xGetInt(dPlayerData,xPlayerClass) != FROSTHAMMER) || (xGetInt(db, xSilenceStatus) == 0)) {
 				advanceCooldowns(p, 1);
 			}
 		}
