@@ -11,7 +11,7 @@ int xIcicleLast = 0;
 int xIcicleStep = 0;
 int xIcicleRadius = 0;
 
-int titanicImpactCooldown = 15;
+int titanicImpactCooldown = 18;
 float smashRange = 6;
 float smashWidth = 2;
 

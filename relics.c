@@ -145,7 +145,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_ALL:
 			{
-				msg = "Spell Power, Duration, Range +0.15";
+				msg = "Spell Power, Duration, Range +0.12";
 			}
 			case RELIC_ULTIMATE_COST:
 			{
@@ -568,9 +568,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ALL:
 		{
-			xSetFloat(dPlayerData,xPlayerSpellRangeTrue,xGetFloat(dPlayerData,xPlayerSpellRangeTrue) + 0.15 * m);
-			xSetFloat(dPlayerData,xPlayerSpellDamageTrue,xGetFloat(dPlayerData,xPlayerSpellDamageTrue) + 0.15 * m);
-			xSetFloat(dPlayerData,xPlayerSpellDurationTrue,xGetFloat(dPlayerData,xPlayerSpellDurationTrue) + 0.15 * m);
+			xSetFloat(dPlayerData,xPlayerSpellRangeTrue,xGetFloat(dPlayerData,xPlayerSpellRangeTrue) + 0.12 * m);
+			xSetFloat(dPlayerData,xPlayerSpellDamageTrue,xGetFloat(dPlayerData,xPlayerSpellDamageTrue) + 0.12 * m);
+			xSetFloat(dPlayerData,xPlayerSpellDurationTrue,xGetFloat(dPlayerData,xPlayerSpellDurationTrue) + 0.12 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{

@@ -1093,7 +1093,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "(W) Titanic Smash: A large hammer appears above you and smashes towards your cursor.";
+					msg = "(W) Titanic Impact: A large hammer appears above you and smashes towards your cursor.";
 				}
 				case 9:
 				{
@@ -1108,7 +1108,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "Cooldown: 15 | Range: 6 | Damage: 0.003 x Attack x Health | Icicle Bonus Damage: 0.2x";
+					msg = "Cooldown: 18 | Range: 6 | Damage: 0.003 x Attack x Health | Icicle Bonus Damage: 0.2x";
 				}
 				case 12:
 				{
@@ -1123,7 +1123,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 14:
 				{
 					icon = "ui\god minor icon norse skadi";
-					msg = "Cost: 80 | Duration: 8 | Radius: 8";
+					msg = "Cost: 80 | Duration: 8 | Radius: 10";
 					next = 0;
 				}
 			}

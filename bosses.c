@@ -341,7 +341,9 @@ highFrequency
 				for(x=xGetDatabaseCount(relics); >0) {
 					xDatabaseNext(relics);
 					xUnitSelect(relics, xUnitName);
-					trUnitChangeProtoUnit("Relic");
+					trUnitDestroy();
+					xSetInt(relics, xUnitName, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 				}
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
@@ -3093,7 +3095,7 @@ highFrequency
 				if (trTimeMS() > bossNext) {
 					trUnitSelectClear();
 					trUnitSelectByQV("bossBarrel");
-					trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+					trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
 					trUnitSelectClear();
 					trUnitSelectByQV("volcano1", true);
 					trUnitChangeProtoUnit("Cinematic Block");
@@ -3103,7 +3105,8 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("volcano1", true);
 					trMutateSelected(kbGetProtoUnitID("Volcano"));
-					trSetSelectedUpVector(xsVectorGetX(bossDir),-0.5,xsVectorGetZ(bossDir));
+					trSetUnitOrientation(vector(0,1,0), bossDir, true);
+					trSetSelectedUpVector(xsVectorGetX(bossDir),0,xsVectorGetZ(bossDir));
 					trUnitOverrideAnimation(18,0,false,false,-1);
 					trMutateSelected(kbGetProtoUnitID("Relic"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("bossBarrel"));
@@ -3114,7 +3117,8 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelectByQV("volcano2", true);
 					trMutateSelected(kbGetProtoUnitID("Volcano"));
-					trSetSelectedUpVector(xsVectorGetX(bossDir),-0.5,xsVectorGetZ(bossDir));
+					trSetUnitOrientation(vector(0,1,0), bossDir, true);
+					trSetSelectedUpVector(xsVectorGetX(bossDir),0,xsVectorGetZ(bossDir));
 					trUnitOverrideAnimation(18,0,false,false,-1);
 					trMutateSelected(kbGetProtoUnitID("Relic"));
 					trImmediateUnitGarrison(""+1*trQuestVarGet("bossBarrel"));
