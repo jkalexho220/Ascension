@@ -566,6 +566,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+BOUNTY_GUY));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Halberdier"));
+			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
 			xSetInt(dStunnedUnits, xUnitName, 1*trQuestVarGet("guy"+FETCH_GUY));
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Hypaspist"));
 			xSetPointer(dStunnedUnits, xAddDatabaseBlock(dStunnedUnits));
@@ -993,6 +994,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetInt(dChests, xChestRoom, room);
 			xSetInt(dChests, xChestKey, 1);
 		}
+		case ROOM_TEMPLE + 9:
+		{
+			size = 9;
+			paintCircle(x, z, size, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			placeTemple(x, z, 18);
+		}
 		case ROOM_TEMPLE + 11:
 		{
 			dZenoRelics = xInitDatabase("zenoRelics");
@@ -1150,7 +1157,7 @@ void buildEdge(int edge = 0, int type = 0) {
 					xSetVector(dUnlockWalls, xWallMod, xsVectorSet(0, 0, z1 - z0));
 					x0 = (x0 + x1);
 					for(z=z0; <= z1) {
-						trArmyDispatch("1,0","Dwarf",1,x0+2,0,2*z,0,true);
+						trArmyDispatch("1,0","Dwarf",1,x0,0,2*z,0,true);
 						trArmySelect("1,0");
 						trMutateSelected(kbGetProtoUnitID("UI Range Indicator Greek SFX"));
 					}
@@ -1722,7 +1729,6 @@ highFrequency
 				worldHeight = 5;
 				wallHeight = 10;
 				trQuestVarSet("stageTemple", BOON_ATTACK_PROLONGS_STUN); // kronos
-				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 9, 3);
 				trSetCivAndCulture(ENEMY_PLAYER, 9, 3);
 				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
@@ -1768,8 +1774,8 @@ highFrequency
 				trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
 				trStringQuestVarSet("enemyProto2", "Troll");
 				trStringQuestVarSet("enemyProto3", "Manticore");
-				trStringQuestVarSet("enemyProto4", "Mountain Giant");
-				trStringQuestVarSet("enemyProto5", "Frost Giant");
+				trStringQuestVarSet("enemyProto4", "Frost Giant");
+				trStringQuestVarSet("enemyProto5", "Mummy");
 				trStringQuestVarSet("enemyProto6", "Fire Giant");
 
 				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 9999999999999999999.0);

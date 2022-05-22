@@ -147,7 +147,7 @@ void processChests() {
 			xDatabaseNext(dEnemies);
 			xUnitSelectByID(dEnemies,xUnitID);
 			if (trUnitAlive() == false) {
-				removePlayerUnit();
+				removeEnemy();
 			} else {
 				angle = unitDistanceToVector(xGetInt(dEnemies,xUnitName),pos);
 				if (angle > xGetFloat(dChestHitbox,xChestHitboxDist) && angle < dist) {

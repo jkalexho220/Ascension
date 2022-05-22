@@ -2,11 +2,11 @@ float rainOfLightningCost = 50;
 float rainOfLightningDuration = 10;
 float rainOfLightningRadius = 5;
 
-int disengageCooldown = 8;
+int disengageCooldown = 10;
 float disengageRadius = 4;
 float disengageRange = 12;
 
-int shockArrowCooldown = 10;
+int shockArrowCooldown = 8;
 float shockArrowRange = 30;
 float shockArrowDamage = 100;
 
@@ -97,7 +97,7 @@ void stormcutterAlways(int eventID = -1) {
 			if (trUnitAlive() == false) {
 				removeEnemy();
 			} else if (trCountUnitsInArea(""+xGetInt(dEnemies, xUnitName),p,"Archer Atlantean Hero", dist) >0) {
-				stunUnit(dEnemies, 3.0, p);
+				stunUnit(dEnemies, 2.0, p);
 				gainFavor(p, 1.0);
 			}
 		}

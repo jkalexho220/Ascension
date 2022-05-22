@@ -877,3 +877,76 @@ highFrequency
 		}
 	}
 }
+
+void setupTempleQuestion(string question = "", string first = "", string second = "", int answer = 0) {
+	trStringQuestVarSet("question", question);
+	trStringQuestVarSet("questionfirst", first);
+	trStringQuestVarSet("questionsecond", second);
+	trQuestVarSet("questionanswer", answer);
+}
+
+void quizTempleQuestion(int eventID = -1) {
+	int answer = eventID - 6000;
+	if (answer != trQuestVarGet("questionanswer")) {
+		uiMessageBox("Incorrect! Come back when you have studied up more.");
+		trQuestVarSet("templefailed", 1);
+		trSoundPlayFN("cantdothat.wav","1",-1,"","");
+	} else {
+		trQuestVarSet("currentQuestion", 1 + trQuestVarGet("currentQuestion"));
+		if (trQuestVarGet("currentQuestion") < 9) {
+			trDelayedRuleActivation("status_effect_temple_always");
+			
+			switch(1*trQuestVarGet("currentQuestion"))
+			{
+				case 1:
+				{
+					setupTempleQuestion("Enemies cannot cast spells when stunned.", "True", "False", 1);
+				}
+				case 2:
+				{
+					setupTempleQuestion("What does the Stun Resistance stat give you?", "Grants a percentage chance to ignore a stun.",
+						"Reduces the duration of stuns on you by a percentage", 2);
+				}
+				case 3:
+				{
+					setupTempleQuestion("Being poisoned prevents you from healing.", "True", "False", 1);
+				}
+				case 4:
+				{
+					setupTempleQuestion("Spell Duration affects the duration of Stuns and Poisons that you inflict on enemies.",
+						"True", "False", 1);
+				}
+				case 5:
+				{
+					setupTempleQuestion("Spell Power affects the damage of Poisons that you inflict on enemies.",
+						"True", "False", 1);
+				}
+				case 6:
+				{
+					setupTempleQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
+						"True", "False", 1);
+				}
+				case 7:
+				{
+					setupTempleQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
+				}
+				case 8:
+				{
+					setupTempleQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
+				}
+			} 
+		} else {
+			startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
+		}
+	}
+}
+
+rule status_effect_temple_always
+inactive
+highFrequency
+{
+	trShowChoiceDialog(trStringQuestVarGet("question"),
+	trStringQuestVarGet("questionfirst"), 6001,
+	trStringQuestVarGet("questionsecond"), 6002);
+	xsDisableSelf();
+}

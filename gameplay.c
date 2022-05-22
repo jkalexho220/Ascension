@@ -122,6 +122,8 @@ void processRegen(int p = 0) {
 			gainFavor(p, amt);
 			xSetInt(dPlayerData, xPlayerRegenerateFavorLast,trTimeMS(),p);
 		}
+	} else {
+		xSetInt(dPlayerData, xPlayerRegenerateFavorLast,trTimeMS(),p);
 	}
 	if (trTimeMS() > xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p) + 1000) {
 		amt = 0;
@@ -310,7 +312,9 @@ void maintainStun() {
 		xDatabaseNext(dStunnedUnits);
 		xUnitSelect(dStunnedUnits, xUnitName);
 		if (trUnitAlive() == false) {
-			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
+			if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
+				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
+			}
 			xFreeDatabaseBlock(dStunnedUnits);
 		} else {
 			if ((xGetInt(dStunnedUnits, xUnitName) != bossUnit) ||
@@ -592,6 +596,7 @@ highFrequency
 	int db = 0;
 	float amt = 0;
 	bool relicReturned = true;
+	bool reviving = false;
 	
 	vector pos = vector(0,0,0);
 	
@@ -849,8 +854,8 @@ highFrequency
 	}
 	
 	/* misc */
-	for(p=1; < ENEMY_PLAYER) {
-		xSetPointer(dPlayerData, p);
+	for(i=1; < ENEMY_PLAYER) {
+		p = xDatabaseNext(dPlayerData);
 		if (xGetBool(dPlayerData, xPlayerResigned) == false) {
 			checkGodPowers(p);
 			/* no gold cheating */
@@ -897,9 +902,9 @@ highFrequency
 					}
 				}
 				xSetInt(dPlayerData, xPlayerReviveNext, trTimeMS() + 1000);
-				trQuestVarSet("playersReviving", 0);
+				reviving = false;
 				if (Multiplayer == false) {
-					trQuestVarSet("playersReviving", 1);
+					reviving = true;
 					count = 1;
 				} else {
 					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
@@ -914,20 +919,24 @@ highFrequency
 								}
 							}
 							count = count + 1;
-							trQuestVarSet("playersReviving", 1);
+							reviving = true;
 						}
 					}
 				}
-				if (trQuestVarGet("playersReviving") == 1) {
+				if (reviving) {
 					if (count > 0) {
+						if (xGetPointer(dPlayerData) != p) {
+							debugLog("data pointer wrong in if statement");
+						}
 						xSetInt(dPlayerData, xPlayerDead, xGetInt(dPlayerData, xPlayerDead) - 1);
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
-					}
-					if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
-						revivePlayer(p);
-						xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
-						xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
+						if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
+							debugLog("dPlayerData pointer: " + xGetPointer(dPlayerData));
+							revivePlayer(p);
+							xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+							xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
+						}
 					}
 				}
 			}

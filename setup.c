@@ -19,10 +19,10 @@ const int STARSEER = 10;
 const int COMMANDO = 11;
 const int SPELLSTEALER = 12;
 
-const int NIGHTRIDER = 13;
+const int FROSTHAMMER = 13;
 const int SPARKWITCH = 14;
 const int SAVIOR = 15;
-const int GAMBLER = 16;
+const int NIGHTRIDER = 16;
 
 const int CLASS_COUNT = 16;
 
@@ -309,6 +309,8 @@ void chooseClass(int p = 0, int class = 0) {
 	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	
+	zSetProtoUnitStat("Victory Marker", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
+	
 	trUnitSelectClear();
 	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
 	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit) > 0) {
@@ -504,7 +506,7 @@ highFrequency
 	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 4);
 	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
 	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
-	setupClass("Priest", BLASTMAGE, 500, 800, MANASTONE);
+	setupClass("Priest", BLASTMAGE, 500, 800, STARSTONE);
 	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
 	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
 	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
@@ -514,7 +516,8 @@ highFrequency
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
-	setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
+	setupClass("Hero Norse", FROSTHAMMER, 500, 1200, MANASTONE, 5);
+	//setupClass("Regent", GAMBLER, 500, 1100, SOULSTONE);
 	xsDisableSelf();
 }
 
@@ -554,7 +557,7 @@ highFrequency
 	setupPlayerProto("Circe", 1000, 100, 3.7, 0, 15);
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
-	setupPlayerProto("Regent", 1000, 0, 4.2, 0.3);
+	setupPlayerProto("Hero Norse", 1200, 50, 4.3, 0.3);
 	setupPlayerProto("Flying Medic", 1000, 0, 6.0, 0.25);
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);

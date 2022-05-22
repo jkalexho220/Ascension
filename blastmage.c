@@ -1,5 +1,5 @@
 
-float empoweredDamage = 60;
+float empoweredDamage = 90;
 float empoweredRadius = 4;
 
 float starDuration = 10;
@@ -7,22 +7,23 @@ float starRadius = 4;
 float starDamage = 10;
 
 int starfallCooldown = 8;
-float starfallRadius = 5;
+float starfallRadius = 4;
 float starfallDamage = 120;
 
-float solarFlareDamage = 90;
+float solarFlareDamage = 100;
 float solarFlareRange = 40;
-float solarFlareCost = 40;
+float solarFlareCost = 50;
 
-float warpRange = 8;
-int warpCooldown = 6;
+float missileDamage = 60;
+float missileAcquireRange = 12;
+int missileCooldown = 12;
+int missileLifespan = 8000;
 
 int xStarfire = 0;
 
 
 int xStarPos = 0;
 int xStarTimeout = 0;
-int xStarLast = 0;
 
 int xStarProjPos = 0;
 int xStarProjTimeout = 0;
@@ -30,6 +31,14 @@ int xStarProjTimeout = 0;
 int xStarfallTimeout = 0;
 int xStarfallYeehaw = 0;
 int xStarfallPos = 0;
+
+int xMissileCenter = 0;
+int xMissilePos = 0;
+int xMissileDir = 0;
+int xMissileTarget = 0;
+int xMissileTimeout = 0;
+int xMissilePrev = 0;
+int xMissileTargetFound = 0;
 
 int xSolarFlarePos = 0;
 
@@ -66,7 +75,7 @@ void spawnStar(int p = 0, vector pos = vector(0,0,0)) {
 	xSetInt(stars, xUnitName, next);
 	xSetVector(stars, xStarPos, pos);
 	xSetInt(stars, xStarTimeout, trTimeMS() + 1000 * starDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
-	xSetInt(stars, xStarLast, trTimeMS());
+	xSetFloat(dPlayerData, xPlayerFavorRegen, xGetFloat(dPlayerData, xPlayerFavorRegen, p) + 0.2, p);
 }
 
 void blastmageAlways(int eventID = -1) {
@@ -84,6 +93,8 @@ void blastmageAlways(int eventID = -1) {
 	int starfalls = trQuestVarGet("p"+p+"starfalls");
 	int starproj = trQuestVarGet("p"+p+"starproj");
 	int solarflare = trQuestVarGet("p"+p+"solarFlare");
+	int missiles = trQuestVarGet("p"+p+"missiles");
+	int missileHitbox = trQuestVarGet("p"+p+"missileHitbox");
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
@@ -92,6 +103,7 @@ void blastmageAlways(int eventID = -1) {
 	vector pos = vector(0,0,0);
 	vector dest = vector(0,0,0);
 	vector dir = vector(0,0,0);
+	vector prev = vector(0,0,0);
 	
 	if (xGetDatabaseCount(db) > 0) {
 		xDatabaseNext(db);
@@ -105,25 +117,9 @@ void blastmageAlways(int eventID = -1) {
 	
 	if (xGetDatabaseCount(stars) > 0) {
 		xDatabaseNext(stars);
-		amt = 0.001 * (trTimeMS() - xGetInt(stars, xStarLast));
-		
-		if (amt >= 1) {
-			amt = amt * starDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
-			xSetInt(stars, xStarLast, trTimeMS());
-			pos = xGetVector(stars, xStarPos);
-			
-			dist = starRadius * xGetFloat(dPlayerData, xPlayerSpellRange);
-			dist = xsPow(dist, 2);
-			for(x=xGetDatabaseCount(dEnemies); >0) {
-				xDatabaseNext(dEnemies);
-				if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-					xUnitSelectByID(dEnemies, xUnitID);
-					damageEnemy(p, amt);
-				}
-			}
-		}
 		
 		if (trTimeMS() > xGetInt(stars, xStarTimeout)) {
+			xSetFloat(dPlayerData, xPlayerFavorRegen, xGetFloat(dPlayerData, xPlayerFavorRegen) - 0.2);
 			xUnitSelect(stars, xUnitName);
 			trUnitChangeProtoUnit("Arkantos Boost SFX");
 			trUnitSelectClear();
@@ -156,7 +152,7 @@ void blastmageAlways(int eventID = -1) {
 				}
 			}
 			
-			gainFavor(p, 3);
+			gainFavor(p, 1.0);
 			spawnStar(p, pos);
 			xFreeDatabaseBlock(starproj);
 			trQuestVarSetFromRand("sound", 1, 5, true);
@@ -228,7 +224,7 @@ void blastmageAlways(int eventID = -1) {
 					removeEnemy();
 				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
 					damageEnemy(p, amt, true);
-					xSetFloat(dEnemies, xMagicResist, xGetFloat(dEnemies, xMagicResist) - 0.1);
+					stunUnit(dEnemies, 2.0, p);
 					hit = hit + 1;
 				}
 			}
@@ -262,57 +258,154 @@ void blastmageAlways(int eventID = -1) {
 		xSetBool(starfalls, xStarfallYeehaw, true);
 		xSetVector(starfalls, xStarfallPos, pos);
 	}
+
+	amt = 0.001 * (trTimeMS() - trQuestVarGet("p"+p+"missilesLast"));
+	trQuestVarSet("p"+p+"missilesLast", trTimeMS());
 	
-	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
-		xSetBool(dPlayerData, xPlayerLureActivated, false);
-		trUnitSelectClear();
-		trUnitSelectByQV("p"+p+"lureObject", true);
-		trUnitDestroy();
+	if (xGetDatabaseCount(missiles) > 0) {
+		if (aiPlanGetUserVariableBool(missiles, xDirtyBit, missileHitbox)) {
+			trQuestVarSet("p"+p+"missileHitbox", aiPlanGetUserVariableInt(missiles, xNextBlock, missileHitbox));
+		} else {
+			trQuestVarSet("p"+p+"missileHitbox", xGetPointer(missiles));
+		}
+		for(y=xGetDatabaseCount(missiles); >0) {
+			xDatabaseNext(missiles);
+			if (trTimeMS() > xGetInt(missiles, xMissileTimeout)) {
+				xUnitSelect(missiles, xUnitName);
+				trUnitDestroy();
+				xFreeDatabaseBlock(missiles);
+				missileHitbox = xGetPointer(missiles);
+			} else {
+				pos = xGetVector(missiles, xMissilePos);
+				target = 0;
+				if (xGetInt(missiles, xMissileTarget) > 0) {
+					target = xGetInt(missiles, xMissileTarget);
+					trUnitSelectClear();
+					trUnitSelect(""+target, true);
+					if (trUnitAlive()) {
+						dest = kbGetBlockPosition(""+target);
+						if (xGetBool(missiles, xMissileTargetFound)) {
+							xSetVector(missiles, xMissileDir, xsVectorNormalize(xGetVector(missiles, xMissileDir) + getUnitVector(pos, dest, amt * 100)) * 15.0);
+						} else {
+							xSetVector(missiles, xMissileDir, xGetVector(missiles, xMissileDir) + getUnitVector(pos, dest, amt * 20.0));
+						}
+					} else {
+						xSetBool(missiles, xMissileTargetFound, false);
+						xSetInt(missiles, xMissileTarget, 0);
+					}
+				}
+				pos = pos + xGetVector(missiles, xMissileDir) * amt;
+				dir = (pos - xGetVector(missiles, xMissileCenter)) * 3.33;
+				xUnitSelect(missiles, xUnitName);
+				trSetSelectedUpVector(xsVectorGetX(dir),0.2,xsVectorGetZ(dir));
+				xSetVector(missiles, xMissilePos, pos);
+				if (xGetPointer(missiles) == missileHitbox) {
+					if (distanceBetweenVectors(pos, xGetVector(missiles, xMissileCenter)) > 400.0) {
+						next = trGetNextUnitScenarioNameNumber();
+						dest = vectorSnapToGrid(pos);
+						xSetVector(missiles, xMissileCenter, dest);
+						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(dest),0,xsVectorGetZ(dest),0,true);
+						if (next < trGetNextUnitScenarioNameNumber()) {
+							xUnitSelect(missiles, xUnitName);
+							trUnitDestroy();
+							trArmySelect("1,0");
+							trUnitChangeProtoUnit("Spy Eye");
+							trUnitSelectClear();
+							trUnitSelect(""+next, true);
+							trMutateSelected(kbGetProtoUnitID("Outpost"));
+							trSetSelectedScale(0,0,0);
+							xSetInt(missiles, xUnitName, next);
+						}
+					}
+					if (xGetBool(missiles, xMissileTargetFound) == false) {
+						// ACQUIRING TARGETS
+						dist = xsPow(missileAcquireRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+						if (xGetPointer(missiles) == missileHitbox) {
+							for(x=xGetDatabaseCount(dEnemies); >0) {
+								xDatabaseNext(dEnemies);
+								xUnitSelectByID(dEnemies, xUnitID);
+								if (trUnitAlive() == false) {
+									removeEnemy();
+								} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+									xSetInt(missiles, xMissileTimeout, trTimeMS() + 3000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
+									xSetInt(missiles, xMissileTarget, xGetInt(dEnemies, xUnitName));
+									xSetBool(missiles, xMissileTargetFound, true);
+									break;
+								}
+							}
+						}
+					} else {
+						dir = getUnitVector(xGetVector(missiles, xMissilePrev), pos);
+						dist = distanceBetweenVectors(pos, xGetVector(missiles, xMissilePrev), false) + 1.0;
+						prev = xGetVector(missiles, xMissilePrev);
+						xSetVector(missiles, xMissilePrev, pos);
+						for(x=xGetDatabaseCount(dEnemies); >0) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
+								removeEnemy();
+							} else if (rayCollision(dEnemies, prev, dir, dist, 2.0)) {
+								gainFavor(p, 1.0);
+								damageEnemy(p, missileDamage * xGetFloat(dPlayerData, xPlayerSpellDamage));
+								spawnStar(p, pos);
+								trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+								trArmySelect("1,0");
+								trUnitChangeProtoUnit("Lightning Sparks");
+								trQuestVarSetFromRand("sound", 1, 5, true);
+								trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+								xUnitSelect(missiles, xUnitName);
+								trUnitDestroy();
+								xFreeDatabaseBlock(missiles);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
+		xSetBool(dPlayerData, xPlayerRainActivated, false);
 		blastmageSpell(p);
 		trQuestVarSetFromRand("sound", 1, 3, true);
 		trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-		trSoundPlayFN("sphinxteleportout.wav","1",-1,"","");
+		trSoundPlayFN("lapadesconvert.wav","1",-1,"","");
 
-		for(x=xGetDatabaseCount(relics); >0) {
-			xDatabaseNext(relics);
-			xUnitSelect(relics, xUnitName);
-			trUnitChangeProtoUnit("Relic");
-		}
-
-		dest = xGetVector(dPlayerData, xPlayerLurePos);
-		for(x=xGetDatabaseCount(db); >0) {
+		for(y=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
 			xUnitSelectByID(db, xUnitID);
 			if (trUnitAlive() == false) {
-				removeBlastmage(p);
+				removeBlastmage();
 			} else {
-				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
-				spawnStar(p, pos);
-				target = 1 + xsMin(warpRange * xGetFloat(dPlayerData, xPlayerSpellRange),
-					distanceBetweenVectors(pos, dest, false)) / 2;
-				dir = getUnitVector(pos, dest);
-				for(i=target; >0) {
-					pos = pos + (dir * 2.0);
-					if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-						break;
-					}
+				pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName), true));
+				trQuestVarSetFromRand("angle", 0, 3.14, false);
+				dir = xsVectorSet(12.0 * xsCos(trQuestVarGet("angle")),0,12.0 * xsSin(trQuestVarGet("angle")));
+				for(x=3; >0) {
+					next = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("1,0");
+					trUnitChangeProtoUnit("Spy Eye");
+					trUnitSelectClear();
+					trUnitSelect(""+next, true);
+					trMutateSelected(kbGetProtoUnitID("Outpost"));
+					trSetSelectedScale(0,0,0);
+					xAddDatabaseBlock(missiles, true);
+					xSetInt(missiles, xUnitName, next);
+					xSetVector(missiles, xMissileCenter, pos);
+					xSetVector(missiles, xMissilePos, pos);
+					xSetVector(missiles, xMissilePrev, pos);
+					xSetVector(missiles, xMissileDir, dir);
+					xSetInt(missiles, xMissileTimeout, trTimeMS() + missileLifespan * xGetFloat(dPlayerData, xPlayerSpellDuration));
+					xSetInt(missiles, xMissileTarget, xGetInt(db, xUnitName));
+
+					target = target + 100;
+					dir = rotationMatrix(dir, -0.5, 0.866025);
 				}
-				next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch(""+p+",0", "Transport Ship Greek", 1, xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				xUnitSelectByID(db, xUnitID);
-				trImmediateUnitGarrison(""+next);
-				trMutateSelected(kbGetProtoUnitID("Siege Tower"));
-				trUnitChangeProtoUnit("Priest");
-				xUnitSelectByID(db, xUnitID);
-				trSetUnitOrientation(dir, vector(0,1,0), true);
-				trMutateSelected(kbGetProtoUnitID("Priest"));
-				trUnitSelectClear();
-				trUnitSelect(""+next, true);
-				trUnitChangeProtoUnit("Lightning Sparks");
 			}
 		}
-		/* reload relics */
-		equipRelicsAgain(p);
+
+		trQuestVarSet("p"+p+"missileHitbox", xGetNewestPointer(missiles));
 	}
 	
 	if (xGetDatabaseCount(solarflare) > 0) {
@@ -354,8 +447,12 @@ void blastmageAlways(int eventID = -1) {
 	}
 	
 	
-	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
-		xSetBool(dPlayerData, xPlayerRainActivated, false);
+	if (xGetBool(dPlayerData, xPlayerLureActivated)) {
+		xSetBool(dPlayerData, xPlayerLureActivated, false);
+		spawnStar(p, xGetVector(dPlayerData, xPlayerLurePos));
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"lureObject", true);
+		trUnitDestroy();
 		gainFavor(p, 0.0 - solarFlareCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 		blastmageSpell(p);
 		trQuestVarSet("p"+p+"solarFlareNext", trTimeMS());
@@ -383,22 +480,22 @@ void chooseBlastmage(int eventID = -1) {
 		map("q", "game", "uiSetSpecialPower(133) uiSpecialPowerAtPointer");
 		wellName = "(Q) Starfall";
 		wellIsUltimate = false;
-		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-		rainName = "(E) Solar Flare";
-		rainIsUltimate = true;
-		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
-		lureName = "(W) Warp";
-		lureIsUltimate = false;
+		map("w", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
+		rainName = "(W) Magic Missiles";
+		rainIsUltimate = false;
+		map("e", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
+		lureName = "(E) Solar Flare";
+		lureIsUltimate = true;
 	}
 	xStarfire = xInitAddInt(db, "starfire");
 	zSetProtoUnitStat("Priest Projectile", p, 8, 0.0001);
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, starfallCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
-	xSetInt(dPlayerData,xPlayerLureCooldown, warpCooldown);
-	xSetFloat(dPlayerData,xPlayerLureCost, 0);
-	xSetInt(dPlayerData,xPlayerRainCooldown,1);
-	xSetFloat(dPlayerData,xPlayerRainCost, solarFlareCost);
+	xSetInt(dPlayerData,xPlayerLureCooldown, 1);
+	xSetFloat(dPlayerData,xPlayerLureCost, solarFlareCost);
+	xSetInt(dPlayerData,xPlayerRainCooldown, missileCooldown);
+	xSetFloat(dPlayerData,xPlayerRainCost, 0);
 	
 	if (trQuestVarGet("p"+p+"stars") == 0) {
 		db = xInitDatabase("p"+p+"stars");
@@ -406,7 +503,19 @@ void chooseBlastmage(int eventID = -1) {
 		xInitAddInt(db, "name");
 		xStarPos = xInitAddVector(db, "pos");
 		xStarTimeout = xInitAddInt(db, "timeout");
-		xStarLast = xInitAddInt(db, "last");
+	}
+
+	if (trQuestVarGet("p"+p+"missiles") == 0) {
+		db = xInitDatabase("p"+p+"missiles");
+		trQuestVarSet("p"+p+"missiles", db);
+		xInitAddInt(db, "name");
+		xMissileCenter = xInitAddVector(db, "center");
+		xMissilePos = xInitAddVector(db, "pos");
+		xMissileDir = xInitAddVector(db, "dir");
+		xMissilePrev = xInitAddVector(db, "prev");
+		xMissileTarget = xInitAddInt(db, "targetIndex");
+		xMissileTimeout = xInitAddInt(db, "timeout");
+		xMissileTargetFound = xInitAddBool(db, "targetFound", false);
 	}
 	
 	if (trQuestVarGet("p"+p+"starproj") == 0) {

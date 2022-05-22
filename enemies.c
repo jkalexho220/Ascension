@@ -171,6 +171,7 @@ highFrequency
 	trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
 	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
 	trModifyProtounit("Hero Greek Achilles", ENEMY_PLAYER, 5, 99);
+	trModifyProtounit("Lancer Hero", ENEMY_PLAYER, 5, 99);
 	
 	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Tartarian Gate", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -812,7 +813,7 @@ void specialUnitsAlways() {
 				id = xGetInt(db,xUnitID);
 				xUnitSelectByID(db,xUnitID);
 				if (trUnitAlive() == false) {
-					removePlayerUnit();
+					removeOpponentUnit(p);
 				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 					damageOpponentUnit(p, 200);
 				}

@@ -27,7 +27,7 @@ import sys
 FILENAME = 'Ascension MMORPG.xs'
 files = ['memory.c', 'shared.c', 'initdb.c', 'boons.c', 'relics.c', 'setup.c', 'dataLoad.c', 'chooseClass.c', 'gameplayHelpers.c', 'enemies.c', 'mapHelpers.c', 'npc.c', 'walls.c', 'chests.c', 'traps.c',
         'buildMap.c', 'moonblade.c', 'sunbow.c', 'stormcutter.c', 'alchemist.c', 'spellstealer.c', 'commando.c', 'savior.c', 'gardener.c', 'nightrider.c', 'sparkwitch.c',
-        'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'gambler.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
+        'starseer.c', 'throneShield.c', 'thunderrider.c', 'fireknight.c', 'blastmage.c', 'frosthammer.c', 'bosses.c', 'temples.c', 'gameplay.c', 'singleplayer.c', 'pvp.c']
 rmsFunc = 'rmsfunc.c'
 rmsMain = 'main.c'
 
@@ -1023,6 +1023,8 @@ def parseFile(fn):
 	global ESCAPE
 	global RESTORING
 	global comment
+	global ln
+	global line
 	ln = 1
 	pcount = 0 # parenthesis
 	bcount = 0 # brackets

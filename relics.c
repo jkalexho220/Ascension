@@ -145,7 +145,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_ALL:
 			{
-				msg = "Spell Power, Duration, Range +0.15";
+				msg = "Spell Power, Duration, Range +0.12";
 			}
 			case RELIC_ULTIMATE_COST:
 			{
@@ -469,6 +469,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	if (equip == false) {
 		m = -1.0;
 	}
+	int index = xGetPointer(dPlayerData);
 	xSetPointer(dPlayerData,p);
 	int class = xGetInt(dPlayerData,xPlayerClass);
 	string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
@@ -568,9 +569,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_ALL:
 		{
-			xSetFloat(dPlayerData,xPlayerSpellRangeTrue,xGetFloat(dPlayerData,xPlayerSpellRangeTrue) + 0.15 * m);
-			xSetFloat(dPlayerData,xPlayerSpellDamageTrue,xGetFloat(dPlayerData,xPlayerSpellDamageTrue) + 0.15 * m);
-			xSetFloat(dPlayerData,xPlayerSpellDurationTrue,xGetFloat(dPlayerData,xPlayerSpellDurationTrue) + 0.15 * m);
+			xSetFloat(dPlayerData,xPlayerSpellRangeTrue,xGetFloat(dPlayerData,xPlayerSpellRangeTrue) + 0.12 * m);
+			xSetFloat(dPlayerData,xPlayerSpellDamageTrue,xGetFloat(dPlayerData,xPlayerSpellDamageTrue) + 0.12 * m);
+			xSetFloat(dPlayerData,xPlayerSpellDurationTrue,xGetFloat(dPlayerData,xPlayerSpellDurationTrue) + 0.12 * m);
 		}
 		case RELIC_ULTIMATE_COST:
 		{
@@ -727,6 +728,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
 		}
 	}
+
+	xSetPointer(dPlayerData,index);
 }
 
 int relicProto(int relic = 0) {
@@ -874,7 +877,7 @@ int relicProto(int relic = 0) {
 			}
 			case RELIC_BERRY_BUSH:
 			{
-				proto = kbGetProtoUnitID("Walking Berry Bush");
+				proto = kbGetProtoUnitID("Berry Bush");
 			}
 			case RELIC_POISON_BUCKET:
 			{

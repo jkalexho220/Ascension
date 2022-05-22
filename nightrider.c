@@ -162,7 +162,7 @@ void nightriderAlways(int eventID = -1) {
 					xSetVector(sentences, xDeathSentencePos, xGetVector(dEnemies, xUnitPos));
 					id = xGetInt(dEnemies, xUnitID);
 					if (PvP) {
-						xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner, xGetInt(dEnemies, xDoppelganger)));
+						xsSetContextPlayer(kbUnitGetOwner(id));
 					} else {
 						xsSetContextPlayer(ENEMY_PLAYER);
 					}

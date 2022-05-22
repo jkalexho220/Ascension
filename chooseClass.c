@@ -62,9 +62,9 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\special g circe icon 64";
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
-			icon = "icons\infantry g hypaspist icon 64";
+			icon = "icons\hero n hersir icon 64";
 		}
 	}
 	return(icon);
@@ -259,7 +259,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 			{
 				case 0:
 				{
-					msg = "Fire Knight: A character that charges in and sacrifices health for damage.";
+					msg = "Dragon Knight: A character that charges in and sacrifices health for damage.";
 				}
 				case 1:
 				{
@@ -321,7 +321,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "It will grant you 3 favor, deal damage in an area, and create a Mage Fire.";
+					msg = "It will grant you 1 favor, deal magic damage in an area, and create a Star.";
 				}
 				case 3:
 				{
@@ -329,52 +329,57 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					msg = "Damage: 60 | Radius: 4 (Increased by Projectiles)";
+					msg = "Damage: 90 | Radius: 4 (Increased by Projectiles)";
 				}
 				case 5:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Mage Fires remain on the ground for several seconds, damaging nearby enemies.";
+					msg = "Stars remain on the ground for several seconds and grant you 0.2 favor per second.";
 				}
 				case 6:
 				{
 					icon = "sfx a implode lighting flair";
-					msg = "Duration: 10 | Radius: 4 | Damage: 10 per second";
+					msg = "Duration: 10";
 				}
 				case 7:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Mage Fire.";
+					msg = "(Q) Starfall: A star falls from the sky and damages enemies in an area. This creates a Star.";
 				}
 				case 8:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Enemies hit by the blast will have their magic resist reduced permanently.";
+					msg = "Enemies hit by the blast will be stunned.";
 				}
 				case 9:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cooldown: 8 | Radius: 5 | Damage: 120 | Resist Reduction: 0.1";
+					msg = "Cooldown: 8 | Radius: 4 | Damage: 120";
 				}
 				case 10:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "(W) Warp: Teleport a short distance towards your cursor and leave behind a Mage Fire.";
+					icon = "icons\building outpost icon 64";
+					msg = "(W) Magic Missiles: Generate three missiles that follow you for a duration and lock-on to enemies";
 				}
 				case 11:
 				{
-					icon = "icons\god power vortex icons 64";
-					msg = "Cooldown: 6 | Range: 8";
+					icon = "icons\building outpost icon 64";
+					msg = "Each missile deals damage and creates a Star.";
 				}
 				case 12:
 				{
-					icon = "icons\building tower mirror icons 64";
-					msg = "(E) Solar Flare: Fire a laser through each of your Mage Fires, dealing damage to enemies.";
+					icon = "icons\building outpost icon 64";
+					msg = "Cooldown: 12 | Lock-on Range: 12 | Duration: 8 | Damage: 60";
 				}
 				case 13:
 				{
 					icon = "icons\building tower mirror icons 64";
-					msg = "Cost: 40 | Range: 40 | Damage: 90";
+					msg = "(E) Solar Flare: Create a Star at your cursor. Then fire a laser through all your Stars.";
+				}
+				case 14:
+				{
+					icon = "icons\building tower mirror icons 64";
+					msg = "Cost: 50 | Range: 40 | Damage: 100";
 					next = 0;
 				}
 			}
@@ -404,7 +409,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\building archery range icon 64";
-					msg = "Cooldown: 10 | Range: 30 | Damage: 100";
+					msg = "Cooldown: 8 | Range: 30 | Damage: 100";
 				}
 				case 5:
 				{
@@ -414,7 +419,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power shifting sand icon 64";
-					msg = "Cooldown: 8 | Stun Radius: 4 | Teleport Range: 12";
+					msg = "Cooldown: 10 | Stun Radius: 4 | Teleport Range: 12";
 				}
 				case 7:
 				{
@@ -704,7 +709,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 12:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Cost: 60 | Duration: 6 | Absorbed damage is calculated before your passive reduction";
+					msg = "Cost: 60 | Duration: 9 | Absorbed damage is calculated before your passive reduction";
 					next = 0;
 				}
 			}
@@ -1045,86 +1050,80 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
 			switch(tooltip)
 			{
 				case 0:
 				{
-					msg = "Gambler: A luck-based caster with a wide variety of spells.";
+					msg = "Frost Hammer: A tanky fighter whose damage scales with health.";
 				}
 				case 1:
 				{
-					msg = "Passive: You cannot attack. Your basic spells have three variations.";
+					msg = "Passive: Each time you stun an enemy, grow in size and gain 10 attack.";
 				}
 				case 2:
 				{
-					msg = "After you cast a basic spell, it will randomly switch to one of its other variations.";
+					msg = "Bonus decays by 3 percent per second.";
 				}
 				case 3:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "(Q) Loaded Dice: Throw a dice at your cursor with a special effect.";
+					msg = "Special Attack (5 attacks): Stun your target.";
 				}
 				case 4:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: COPY: Summon a copy of the first enemy hit by the dice. (excluding bosses)";
+					icon = "icons\god power frost icon 64";
+					msg = "(Q) Icicle: Summon an icicle at the target location, dealing damage in a small area.";
 				}
 				case 5:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: EXPLODE: The dice explodes and deals damage in an area.";
+					icon = "icons\god power frost icon 64";
+					msg = "The enemy closest to the center is stunned.";
 				}
 				case 6:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Loaded Dice: HEAL: The dice heals allies that it passes through and grants them favor.";
+					icon = "icons\god power frost icon 64";
+					msg = "The icicle remains for a short duration and heals you when you stand near it.";
 				}
 				case 7:
 				{
-					icon = "icons\improvement engineers icon 64";
-					msg = "Cooldown: 6 | Decay: 4 | Radius: 6 | Damage: 100 | Heal: 100 | Favor: 4";
+					icon = "icons\god power frost icon 64";
+					msg = "Cooldown: 5 | Radius: 2, 5 | Duration: 10 | Damage: 80 | Heal: 1 percent health per second";
 				}
 				case 8:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "(W) Gimmick Deck: Play a card with a special effect.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "(W) Titanic Impact: A large hammer appears above you and smashes towards your cursor.";
 				}
 				case 9:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: BURN: Create a circle of fire that damages enemies each second.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "It deals magic damage in a rectangle. If it hits an icicle, the icicle explodes and deals damage";
 				}
 				case 10:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: BURN: Damage is increased by the number of allies in the circle.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "The hammer size and damage scales with your size.";
 				}
 				case 11:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: FREEZE: Stun enemies at the target location.";
+					icon = "icons\scenario thors hammer icon 64";
+					msg = "Cooldown: 18 | Range: 6 | Damage: 0.003 x Attack x Health | Icicle Bonus Damage: 0.2x";
 				}
 				case 12:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Gimmick Deck: RELICS: Give an allied player bonuses from all your relics.";
+					icon = "ui\god minor icon norse skadi";
+					msg = "(E) Blizzard: For a short duration, you release a snowstorm that silences nearby enemies.";
 				}
 				case 13:
 				{
-					icon = "icons\improvement architects icon 64";
-					msg = "Cooldown: 12 | Radius: 6 | Duration: 6 | Damage: 20 + 10 per ally";
+					icon = "ui\god minor icon norse skadi";
+					msg = "The snowstorm stuns a random nearby enemy every 0.5 seconds.";
 				}
 				case 14:
 				{
-					icon = "icons\god power plenty icon 64";
-					msg = "(E) Gamble: Get a random number from 1-6. Your next spell is multiplied by that amount.";
-				}
-				case 15:
-				{
-					icon = "icons\god power plenty icon 64";
-					msg = "Cost: 30";
+					icon = "ui\god minor icon norse skadi";
+					msg = "Cost: 80 | Duration: 8 | Radius: 10";
 					next = 0;
 				}
 			}
@@ -1152,7 +1151,7 @@ string className(int class = 0) {
 		}
 		case FIREKNIGHT:
 		{
-			name = "Fire Knight";
+			name = "Dragon Knight";
 		}
 		case BLASTMAGE:
 		{
@@ -1198,9 +1197,9 @@ string className(int class = 0) {
 		{
 			name = "Spark Witch";
 		}
-		case GAMBLER:
+		case FROSTHAMMER:
 		{
-			name = "Gambler";
+			name = "Frost Hammer";
 		}
 	}
 	return(name);
