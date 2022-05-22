@@ -309,6 +309,8 @@ void chooseClass(int p = 0, int class = 0) {
 	xSetFloat(dPlayerData,xPlayerPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerData,xPlayerMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	
+	zSetProtoUnitStat("Victory Marker", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
+	
 	trUnitSelectClear();
 	trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit),true);
 	if (trUnitAlive() && xGetInt(dPlayerData,xPlayerUnit) > 0) {

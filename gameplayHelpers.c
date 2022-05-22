@@ -299,7 +299,6 @@ void removePlayerUnit() {
 }
 
 void removePlayerCharacter() {
-	debugLog("Player character removed for player " + xGetInt(dPlayerCharacters, xPlayerOwner));
 	xFreeDatabaseBlock(dPlayerCharacters);
 }
 
