@@ -1098,17 +1098,17 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "It deals magic damage in a rectangle. If it hits an icicle, the icicle explodes and deals damage";
+					msg = "It deals magic damage in a rectangle. The hammer size and damage scales with your size.";
 				}
 				case 10:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "The hammer size and damage scales with your size.";
+					msg = "If it hits an icicle, the icicle explodes and deals 0.2x bonus damage.";
 				}
 				case 11:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "Cooldown: 18 | Range: 6 | Damage: 0.003 x Attack x Health | Icicle Bonus Damage: 0.2x";
+					msg = "Cooldown: 18 | Range: 6 | Damage: 3 percent of your health for every 10 attack";
 				}
 				case 12:
 				{
