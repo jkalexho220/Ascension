@@ -1588,6 +1588,7 @@ highFrequency
 		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Spy Eye")) {
 			x = modularCounterNext("spyfound");
 			if (aiPlanGetUserVariableBool(ARRAYS,spyActive,x)) {
+				spyreset = 0;
 				aiPlanSetUserVariableBool(ARRAYS,spyActive,x,false);
 				trUnitSelectClear();
 				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,spyUnit,x),true);

@@ -53,6 +53,7 @@ void rideLightningOff(int p = 0) {
 		xUnitSelect(relics, xUnitName);
 		trUnitChangeProtoUnit("Relic");
 	}
+	
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
 		index = xGetInt(db, xThunderRiderIndex);
@@ -93,7 +94,7 @@ void rideLightningOff(int p = 0) {
 		} else if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(db, xCharIndex)) == false) {
 			debugLog("Thunderstepper " + p + ": Unable to restore database block");
 		}
-		healUnit(p, trQuestVarGet("p"+p+"rideLightningHeal"));
+		healUnit(p, trQuestVarGet("p"+p+"rideLightningHeal"), xGetInt(db, xCharIndex));
 	}
 	
 	trQuestVarSet("p"+p+"rideLightningHeal", 0);
@@ -432,15 +433,17 @@ void thunderRiderAlways(int eventID = -1) {
 										xFreeDatabaseBlock(dLaunchedUnits);
 									}
 								}
+								xSetBool(dPlayerUnits, xLaunched, false);
 							}
 							if (PvP) {
-								xSetPointer(dPlayerUnits, xGetInt(db, xCharIndex));
 								xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
 								xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
 								xFreeDatabaseBlock(dPlayerUnits);
 							} else if (xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex)) == false) {
 								debugLog("Unable to detach Thunderrider");
 							}
+						} else {
+							debugLog("Could not set Thunderrider pointer");
 						}
 					}
 				}
@@ -495,12 +498,16 @@ void thunderRiderAlways(int eventID = -1) {
 				}
 				prev = xGetVector(db, xThunderRiderPrev);
 				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
-				dist = distanceBetweenVectors(prev, pos, false);
-				if (dist == 0) {
-					trQuestVarSet("p"+p+"thunderRiderBonus", trQuestVarGet("p"+p+"thunderRiderBonus") - amt);
+				if (xsVectorGetX(prev) + xsVectorGetZ(prev) > 0) {
+					dist = distanceBetweenVectors(prev, pos, false);
+					if (dist == 0) {
+						trQuestVarSet("p"+p+"thunderRiderBonus", trQuestVarGet("p"+p+"thunderRiderBonus") - amt);
+					} else {
+						trQuestVarSet("p"+p+"thunderRiderBonus",
+							trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack));
+						xSetVector(db, xThunderRiderPrev, pos);
+					}
 				} else {
-					trQuestVarSet("p"+p+"thunderRiderBonus",
-						trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack));
 					xSetVector(db, xThunderRiderPrev, pos);
 				}
 			}

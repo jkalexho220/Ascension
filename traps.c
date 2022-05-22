@@ -132,7 +132,7 @@ highFrequency
 						xDatabaseNext(dEnemies);
 						xUnitSelectByID(dEnemies,xUnitID);
 						if (trUnitAlive() == false) {
-							removePlayerUnit();
+							removeEnemy();
 						} else {
 							pos = kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName));
 							if (vectorInRectangle(pos, xGetVector(dLaserRooms,xLaserRoomXBottom + laser),
@@ -238,7 +238,7 @@ highFrequency
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies, xUnitID);
 					if (trUnitAlive() == false) {
-						removePlayerUnit();
+						removeEnemy();
 					} else if (rayCollision(dEnemies, pos, dir, 24.0, 6.0)) {
 						trDamageUnit(200.0);
 					}

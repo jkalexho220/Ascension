@@ -813,7 +813,7 @@ void specialUnitsAlways() {
 				id = xGetInt(db,xUnitID);
 				xUnitSelectByID(db,xUnitID);
 				if (trUnitAlive() == false) {
-					removePlayerUnit();
+					removeOpponentUnit(p);
 				} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
 					damageOpponentUnit(p, 200);
 				}

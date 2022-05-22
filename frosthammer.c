@@ -236,7 +236,7 @@ void frosthammerAlways(int eventID = -1) {
 					start = start + dir * 2.0;
 				}
 				amt = xGetFloat(smashes, xSmashScale);
-				trCameraShake(0.5, amt * 0.25);
+				trCameraShake(amt * 0.5, amt * 0.25);
 				if (amt > 2.0) {
 					trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
 				} else if (amt > 1.5) {
