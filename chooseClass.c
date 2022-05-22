@@ -409,7 +409,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\building archery range icon 64";
-					msg = "Cooldown: 10 | Range: 30 | Damage: 100";
+					msg = "Cooldown: 8 | Range: 30 | Damage: 100";
 				}
 				case 5:
 				{
@@ -419,7 +419,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power shifting sand icon 64";
-					msg = "Cooldown: 8 | Stun Radius: 4 | Teleport Range: 12";
+					msg = "Cooldown: 10 | Stun Radius: 4 | Teleport Range: 12";
 				}
 				case 7:
 				{
@@ -709,7 +709,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 12:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Cost: 60 | Duration: 6 | Absorbed damage is calculated before your passive reduction";
+					msg = "Cost: 60 | Duration: 9 | Absorbed damage is calculated before your passive reduction";
 					next = 0;
 				}
 			}

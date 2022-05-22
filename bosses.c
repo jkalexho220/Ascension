@@ -94,6 +94,9 @@ highFrequency
 				trUnitSelectByQV("yeebaagooon", true);
 				trUnitConvert(ENEMY_PLAYER);
 				trUnitChangeProtoUnit("Pharaoh of Osiris XP");
+
+				activateEnemy(bossUnit);
+				bossPointer = xGetNewestPointer(dEnemies);
 				
 				spyEffect(1*trQuestVarGet("yeebaagooon"),
 					kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS,bossInts,yeebShieldSFX));
@@ -130,8 +133,6 @@ highFrequency
 			{
 				trMessageSetText("Yeebaagooon's spells will drain your favor if they hit you!", -1);
 				xsDisableSelf();
-				trQuestVarSet("yeebRelics", xInitDatabase("yeebRelics"));
-				xInitAddInt(1*trQuestVarGet("yeebRelics"),"name");
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 						found = false;
@@ -140,8 +141,11 @@ highFrequency
 							xDatabaseNext(relics);
 							if (xGetInt(relics, xRelicType) == RELIC_YEEBAAGOOON) {
 								found = true;
-								xAddDatabaseBlock(1*trQuestVarGet("yeebRelics"), true);
-								xSetInt(1*trQuestVarGet("yeebRelics"), xUnitName, xGetInt(relics, xUnitName));
+								trUnitDestroy();
+								xFreeDatabaseBlock(relics);
+								if (trCurrentPlayer() == p) {
+									trQuestVarSet("yeebRelicRetrieved", 1);
+								}
 								break;
 							}
 						}
@@ -274,6 +278,7 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
 		xsDisableSelf();
+		xRestoreCache(dPlayerUnits);
 		int id = 0;
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			xDatabaseNext(dPlayerUnits);
@@ -2720,19 +2725,27 @@ highFrequency
 				if (trQuestVarGet("yeebBossFight") == 1) {
 					dYeebObelisks = xInitDatabase("yeebObelisks");
 					xInitAddInt(dYeebObelisks, "name");
-					xAddDatabaseBlock(1*trQuestVarGet("yeebRelics"), true);
-					xSetInt(1*trQuestVarGet("yeebRelics"), xUnitName, 1*trQuestVarGet("yeebRelic"));
+
 					trQuestVarSet("cinTime", trTime() + 6);
-					trUnitSelectClear();
-					trUnitSelectByQV("yeebRelic", true);
-					for(p=1; < ENEMY_PLAYER) {
-						if (trUnitIsOwnedBy(p)) {
-							trSoundPlayFN("","1",-1,
-								"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + ". Did you really think I wouldn't notice you stealing my relic?",
-								"icons\special e son of osiris icon 64");
-							break;
+					int p = trQuestVarGet("yeebTarget");
+					if (trCurrentPlayer() == p) {
+						trQuestVarSet("yeebRelicRetrieved", 1);
+					}
+					int relics = getRelicsDB(p);
+					for(x=xGetDatabaseCount(relics); >0) {
+						xDatabaseNext(relics);
+						if (xGetInt(relics, xUnitName) == trQuestVarGet("yeebRelic")) {
+							xFreeDatabaseBlock(relics);
 						}
 					}
+					trUnitSelectClear();
+					trUnitSelectByQV("yeebRelic");
+					trUnitDestroy();
+					
+					trSoundPlayFN("","1",-1,
+						"Yeebaagooon:" + trStringQuestVarGet("p"+p+"name") + ". Did you really think I wouldn't notice you stealing my relic?",
+						"icons\special e son of osiris icon 64");
+			
 					trQuestVarSet("cinStep", 1);
 				} else {
 					dBossLasers = xInitDatabase("bossLasers");
@@ -3392,8 +3405,7 @@ rule yeebaagooon_battle
 inactive
 highFrequency
 {
-	trUnitSelectClear();
-	trUnitSelect(""+bossUnit, true);
+	
 	int p = 0;
 	int x = 0;
 	int z = 0;
@@ -3405,6 +3417,9 @@ highFrequency
 	bool hit = false;
 	vector pos = vector(0,0,0);
 	vector dir = vector(0,0,0);
+
+	trUnitSelectClear();
+	trUnitSelect(""+bossUnit, true);
 	if (trUnitAlive() == true) {
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			processBossCooldown();
@@ -3809,21 +3824,6 @@ highFrequency
 	if (trQuestVarGet("gameOverStep") > 0) {
 		trQuestVarSet("gameOverStep", 7);
 		trQuestVarSet("yeebhit", 0);
-		action = trQuestVarGet("yeebRelics");
-		for(x=xGetDatabaseCount(action); >0) {
-			xDatabaseNext(action);
-			xUnitSelect(action, xUnitName);
-			trUnitDestroy();
-		}
-		for(p=1; < ENEMY_PLAYER) {
-			action = getRelicsDB(p);
-			for(x=xGetDatabaseCount(action); >0) {
-				xDatabaseNext(action);
-				if (kbGetBlockID(""+xGetInt(action, xUnitName)) == -1) {
-					xFreeDatabaseBlock(action);
-				}
-			}
-		}
 		xsDisableSelf();
 	}
 }

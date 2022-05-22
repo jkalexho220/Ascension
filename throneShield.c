@@ -6,7 +6,7 @@ float justiceRadius = 8;
 
 float shieldOfLightCost = 60;
 int shieldOfLightCooldown = 20;
-float shieldOfLightDuration = 6;
+float shieldOfLightDuration = 9;
 float shieldOfLightWidth = 3;
 
 int xThroneShieldSFX = 0;

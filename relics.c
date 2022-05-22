@@ -469,6 +469,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	if (equip == false) {
 		m = -1.0;
 	}
+	int index = xGetPointer(dPlayerData);
 	xSetPointer(dPlayerData,p);
 	int class = xGetInt(dPlayerData,xPlayerClass);
 	string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
@@ -727,6 +728,8 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));
 		}
 	}
+
+	xSetPointer(dPlayerData,index);
 }
 
 int relicProto(int relic = 0) {
@@ -874,7 +877,7 @@ int relicProto(int relic = 0) {
 			}
 			case RELIC_BERRY_BUSH:
 			{
-				proto = kbGetProtoUnitID("Walking Berry Bush");
+				proto = kbGetProtoUnitID("Berry Bush");
 			}
 			case RELIC_POISON_BUCKET:
 			{

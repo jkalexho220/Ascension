@@ -122,6 +122,8 @@ void processRegen(int p = 0) {
 			gainFavor(p, amt);
 			xSetInt(dPlayerData, xPlayerRegenerateFavorLast,trTimeMS(),p);
 		}
+	} else {
+		xSetInt(dPlayerData, xPlayerRegenerateFavorLast,trTimeMS(),p);
 	}
 	if (trTimeMS() > xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p) + 1000) {
 		amt = 0;
@@ -923,6 +925,9 @@ highFrequency
 				}
 				if (reviving) {
 					if (count > 0) {
+						if (xGetPointer(dPlayerData) != p) {
+							debugLog("data pointer wrong in if statement");
+						}
 						xSetInt(dPlayerData, xPlayerDead, xGetInt(dPlayerData, xPlayerDead) - 1);
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));

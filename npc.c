@@ -2104,6 +2104,56 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+
+		case NPC_TEMPLE + 9:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					if (trQuestVarGet("templefailed") == 0) {
+						uiMessageBox("Your journey has been long. You have learned much in reaching here.");
+					} else {
+						uiMessageBox("Better luck next time, foolish one.");
+						dialog = 0;
+					}
+				}
+				case 2:
+				{
+					uiMessageBox("It is time for your ultimate test. Ready? Let's begin.");
+					dialog = 0;
+					xsEnableRule("status_effect_temple_always");
+					trQuestVarSet("currentQuestion", 0);
+					trQuestVarSet("currentAnswer", 1);
+					trStringQuestVarSet("question", "You cannot cast spells when stunned.");
+					trStringQuestVarSet("questionfirst", "True");
+					trStringQuestVarSet("questionsecond", "False");
+					trEventSetHandler(6001, "quizTempleQuestion");
+					trEventSetHandler(6002, "quizTempleQuestion");
+				}
+			}
+		}
+
+		case NPC_TEMPLE_COMPLETE + 9:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You have successfully passed the exam. Here is your reward.");
+				}
+				case 2:
+				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+					trShowImageDialog(boonIcon(1*trQuestVarGet("stageTemple")),boonName(1*trQuestVarGet("stageTemple")));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
 		
 		case NPC_TEMPLE + 11:
 		{
@@ -3181,13 +3231,28 @@ highFrequency
 {
 	trUnitSelectClear();
 	trUnitSelectByQV("yeebRelic", true);
-	if (trUnitIsOwnedBy(0)) {
-		trQuestVarSet("yeebHit", 0);
-		trQuestVarSet("yeebBossFight", 0);
+	if (trUnitAlive()) {
+		trQuestVarSet("yeebTarget", kbUnitGetOwner(kbGetBlockID(""+1*trQuestVarGet("yeebRelic"))));
+		if (trQuestVarGet("yeebTarget") == 0) {
+			trQuestVarSet("yeebHit", 0);
+			trQuestVarSet("yeebBossFight", 0);
+		} else {
+			trQuestVarSet("yeebBossFight", 1);
+			if (trUnitIsOwnedBy(trCurrentPlayer())) {
+				trQuestVarSet("yeebHit", 1);
+			}
+		}
 	} else {
-		trQuestVarSet("yeebBossFight", 1);
-		if (trUnitIsOwnedBy(trCurrentPlayer())) {
-			trQuestVarSet("yeebHit", 1);
+		int p = trQuestVarGet("yeebTarget");
+		if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+			int relics = getRelicsDB(p);
+			for(x=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				if (xGetInt(relics, xRelicType) == RELIC_YEEBAAGOOON) {
+					trQuestVarSet("yeebRelic", xGetInt(relics, xUnitName));
+					break;
+				}
+			}
 		}
 	}
 }

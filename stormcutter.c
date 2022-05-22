@@ -2,11 +2,11 @@ float rainOfLightningCost = 50;
 float rainOfLightningDuration = 10;
 float rainOfLightningRadius = 5;
 
-int disengageCooldown = 8;
+int disengageCooldown = 10;
 float disengageRadius = 4;
 float disengageRange = 12;
 
-int shockArrowCooldown = 10;
+int shockArrowCooldown = 8;
 float shockArrowRange = 30;
 float shockArrowDamage = 100;
 
