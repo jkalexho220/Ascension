@@ -1445,6 +1445,13 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 			addSpecialToDatabase(dHydras,name,db,p);
 			xSetInt(dHydras,xSpecialStep,trTime());
 		}
+		case kbGetProtoUnitID("Hippocampus"):
+		{
+			if (p == ENEMY_PLAYER) {
+				xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+				xSetFloat(db,xPhysicalResist,1,xGetNewestPointer(db));
+			}
+		}
 	}
 }
 

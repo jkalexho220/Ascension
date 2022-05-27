@@ -2354,6 +2354,15 @@ highFrequency
 			xSetInt(dEnemiesIncoming, xUnitName, trQuestVarGet("devil_do1"));
 			xsEnableRule("devil_do1_find");
 		}
+
+		if (trQuestVarGet("hippocampusQuestLocation") == trQuestVarGet("stage")) {
+			trModifyProtounit("Hawk",ENEMY_PLAYER,1,10.2); // hawk goes zoom
+			trQuestVarSet("hippocampusHawk", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,270,0,270,0,true);
+			trQuestVarSet("hippocampusUnit", mNewInt());
+			spyEffect(1*trQuestVarGet("hippocampusHawk"),kbGetProtoUnitID("Hippocampus"),xsVectorSet(MALLOC, mInt * 3 + xData - 1, 1*trQuestVarGet("hippocampusUnit")));
+			xsEnableRule("hippocampus_next");
+		}
 		
 		trUnblockAllSounds();
 		if (trQuestVarGet("newPlayers") > 0) {
@@ -2532,11 +2541,19 @@ highFrequency
 			trModifyProtounit("Audrey", p, 2, -999);
 			trModifyProtounit("Walking Berry Bush", p, 2, -999);
 			
-			trModifyProtounit("Flying Medic", p, 55, 1);
-			zSetProtoUnitStat("Flying Medic", p, 2, 25.0);
+			trModifyProtounit("Hippocampus", p, 55, 1);
+			zSetProtoUnitStat("Hippocampus", p, 2, 25.0);
 			
-			trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch(""+p+",0","Flying Medic",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+			if (trQuestVarGet("p"+p+"hippocampus") == 1) {
+				trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch(""+p+",0","Hippocampus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				if (trCurrentPlayer() == p) {
+					startNPCDialog(NPC_EXPLAIN_DEEP);
+				}
+			} else if (trCurrentPlayer() == p) {
+				startNPCDialog(NPC_EXPLAIN_DEEP_DEAD);
+				trStringQuestVarSet("advice", "You need a Hippocampus in order to survive on this floor. Go and find one!");
+			}
 		}
 		for (i=1; < 40) {
 			proto = kbGetProtoUnitName(monsterPetProto(i));
@@ -2545,7 +2562,34 @@ highFrequency
 			}
 		}
 		xsEnableRule("the_deep_damage");
-		startNPCDialog(NPC_EXPLAIN_DEEP);
+		xsDisableSelf();
+	}
+}
+
+
+rule hippocampus_next
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+		int target = aiPlanGetUserVariableInt(MALLOC,mInt * 3 + xData - 1,1*trQuestVarGet("hippocampusUnit"));
+		trQuestVarSet("hippocampusUnit", target);
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusHawk");
+		trMutateSelected(kbGetProtoUnitID("Hawk"));
+		trSetSelectedScale(0,0,0);
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusUnit");
+		trUnitChangeProtoUnit("Hippocampus");
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusUnit");
+		trMutateSelected(kbGetProtoUnitID("Hippocampus"));
+		trUnitOverrideAnimation(15,0,true,false,-1);
+		activateEnemy(target);
+		trQuestVarSet("hippocampusIndex", xGetNewestPointer(dEnemies));
+		xSetBool(dEnemies, xLaunched, true);
+		debugLog("hippocampus index is " + 1*trQuestVarGet("hippocampusIndex"));
+		xsEnableRule("hippocampus_always");
 		xsDisableSelf();
 	}
 }

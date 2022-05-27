@@ -435,7 +435,7 @@ runImmediately
 		trModifyProtounit("Phoenix", p, 55, 1);
 		trModifyProtounit("Sea Turtle", p, 55, 1);
 		trModifyProtounit("Pegasus", p, 55, 1);
-		trModifyProtounit("Flying Medic", p, 55, 1);
+		trModifyProtounit("Hippocampus", p, 55, 1);
 		trModifyProtounit("Junk", p, 55, 1);
 		
 		trModifyProtounit("Statue of Lightning", p, 1, 3.5);
@@ -558,7 +558,7 @@ highFrequency
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
 	setupPlayerProto("Hero Norse", 1200, 50, 4.3, 0.3);
-	setupPlayerProto("Flying Medic", 1000, 0, 6.0, 0.25);
+	setupPlayerProto("Hippocampus", 1200, 0, 6.0, 0.5);
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
 	
@@ -616,6 +616,10 @@ highFrequency
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, -9999999999999999999.0);
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 3000 * ENEMY_PLAYER);
+
+	trModifyProtounit("Hippocampus", 0, 0, 9999999999999999999.0);
+	trModifyProtounit("Hippocampus", 0, 0, -9999999999999999999.0);
+	trModifyProtounit("Hippocampus", 0, 0, 1200);
 	
 	trModifyProtounit("Minion", 0, 8, -999);
 	
@@ -777,6 +781,10 @@ void paintTowerSegment(int stage = 0) {
 		trUnitSelect(""+next, true);
 		trMutateSelected(kbGetProtoUnitID("Shaba Ka"));
 		trUnitOverrideAnimation(2,0,true,false,-1);
+	} else if (trQuestVarGet("hippocampusQuestLocation") == stage) {
+		trUnitSelectClear();
+		trUnitSelect(""+next, true);
+		trMutateSelected(kbGetProtoUnitID("Hippocampus"));
 	}
 }
 
@@ -828,6 +836,9 @@ highFrequency
 
 			if (trQuestVarGet("p1monsterpediaQuest") == 2) {
 				trQuestVarSetFromRand("monsterpediaQuestLocation", 1, xGetInt(dPlayerData, xPlayerProgress, 1), true);
+			}
+			if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
+				trQuestVarSetFromRand("hippocampusQuestLocation", 1, 5, true);
 			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black
 			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {

@@ -139,10 +139,12 @@ void saveAllData() {
 	savedata = savedata * 3 + currentdata;
 	currentdata = xsMin(9, trQuestVarGet("p"+p+"relicsSacrificed"));
 	savedata = savedata * 10 + currentdata;
-	for(x=5; >0) {
+	for(x=4; >0) {
 		currentdata = trQuestVarGet("p"+p+"runestone"+x);
 		savedata = savedata * 2 + currentdata;
 	}
+	currentdata = trQuestVarGet("p"+p+"hippocampus");
+	savedata = savedata * 2 + trQuestVarGet("p"+p+"hippocampus");
 	currentdata = trQuestVarGet("yeebHit");
 	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("p"+p+"nickEquipped");
@@ -309,7 +311,9 @@ inactive
 		trQuestVarSet("p1yeebHit", iModulo(2, savedata));
 		trQuestVarSet("yeebHit", trQuestVarGet("p1yeebHit"));
 		savedata = savedata / 2;
-		for(x=5; >0) {
+		trQuestVarSet("p1hippocampus", iModulo(2, savedata));
+		savedata = savedata / 2;
+		for(x=4; >0) {
 			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
@@ -437,7 +441,9 @@ inactive
 						trQuestVarSet("p"+p+"yeebHit", iModulo(2, currentdata));
 					} else if (loadProgress == 22) {
 						currentdata = x;
-						for(i=5; >0) {
+						trQuestVarSet("p"+p+"hippocampus", iModulo(2, currentdata));
+						currentdata = currentdata / 2;
+						for(i=4; >0) {
 							trQuestVarSet("p"+p+"runestone"+i, iModulo(2, currentdata));
 							currentdata = currentdata / 2;
 						}
@@ -616,7 +622,7 @@ inactive
 		xsDisableSelf();
 		xsEnableRule("data_load_emergency_exit_02");
 		trSoundPlayFN("default","1",-1,
-			"Zenophobia:Host, make sure all spots are filled and the last player is a CPU.",
+			"Zenophobia:Host, make sure all spots are filled with humans and the last player is a CPU.",
 			"icons\infantry g hoplite icon 64");
 	}
 }

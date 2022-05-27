@@ -1495,3 +1495,26 @@ highFrequency
 		trUnitChangeProtoUnit("Dust Large");
 	}
 }
+
+rule hippocampus_always
+inactive
+highFrequency
+{
+	if (xGetInt(dEnemies, xStunStatus, 1*trQuestVarGet("hippocampusIndex")) > 0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusUnit");
+		trUnitChangeProtoUnit("Meteor Impact Water");
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusHawk");
+		trUnitChangeProtoUnit("Meteor Impact Water");
+		trSoundPlayFN("hippocampusdeath.wav","1",-1,"","");
+		int p = trCurrentPlayer();
+		if (xGetInt(dPlayerData, xPlayerProgress, p) >= 6 && trQuestVarGet("p"+p+"hippocampus") == 0) {
+			startNPCDialog(NPC_HIPPOCAMPUS_QUEST_DONE);
+			trQuestVarSet("p"+p+"hippocampus", 1);
+		}
+		xsDisableSelf();
+	} else if (aiPlanGetUserVariableBool(dEnemies, xDirtyBit, 1*trQuestVarGet("hippocampusIndex")) == false) {
+		debugLog("Hippocampus ejected from the database!");
+	}
+}

@@ -583,6 +583,13 @@ highFrequency
 			xsEnableRule("monsterpedia_always");
 		}
 
+		// start the hippocampus quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
+			xsEnableRule("milkman_matty_always");
+			trQuestVarSet("milkmanMatty", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
+		}
+
 		if ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2)) {
 			// quest is in progress
 			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
@@ -1528,5 +1535,22 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("boonSpotlight", true);
 		trUnitTeleport(x,0,z);
+	}
+}
+
+rule milkman_matty_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("milkmanMatty", true);
+	if (trUnitIsSelected()) {
+		if (trQuestVarGet("mattyTalked") == 0) {
+			startNPCDialog(NPC_HIPPOCAMPUS_QUEST);
+			trQuestVarSet("mattyTalked", 1);
+		} else {
+			startNPCDialog(NPC_HIPPOCAMPUS_QUEST_AGAIN);
+		}
+		reselectMyself();
 	}
 }

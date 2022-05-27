@@ -70,6 +70,12 @@ reserved to 424
 const int NPC_DEVIL_DIE = 425;
 const int NPC_MONSTERPEDIA_COMPLETE = 426;
 
+const int NPC_HIPPOCAMPUS_QUEST = 427;
+const int NPC_HIPPOCAMPUS_QUEST_AGAIN = 428;
+const int NPC_HIPPOCAMPUS_QUEST_DONE = 429;
+
+const int NPC_EXPLAIN_DEEP_DEAD = 430;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -542,15 +548,15 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("However, you are protected in a bubble created by your Caladria.");
+					uiMessageBox("However, you are protected in a bubble created by your Hippocampus.");
 				}
 				case 3:
 				{
-					uiMessageBox("If you exit the bubble, you will take massive damage! (The bubble is the Line of Sight of the Caladria)");
+					uiMessageBox("If you exit the bubble, you take damage! (The bubble is the Line of Sight of the Hippocampus)");
 				}
 				case 4:
 				{
-					uiMessageBox("You only get one Caladria, so keep her safe!");
+					uiMessageBox("You only get one Hippocampus, so keep her safe!");
 				}
 				case 5:
 				{
@@ -559,6 +565,22 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 6:
 				{
 					uiMessageBox("Find and destroy the Palace to make the attacks stop.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_EXPLAIN_DEEP_DEAD:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Here in the ocean depths, the pressure of water will crush you into a pancake.");
+				}
+				case 2:
+				{
+					uiMessageBox("If you do not have a Hippocampus companion, well... rest in peace. ^_^");
 					dialog = 0;
 				}
 			}
@@ -1641,6 +1663,58 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					uiMessageBox("AaaAaAhHhhHH!!1!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_HIPPOCAMPUS_QUEST:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey! Are you headed to the seventh floor? You'll need something special!");
+				}
+				case 2:
+				{
+					uiMessageBox("The seventh floor resembles the bottom of the ocean! Without oxygen, you will suffocate!");
+				}
+				case 3:
+				{
+					uiMessageBox("You will need the help of a Hippocampus, but they are elusive and difficult to catch!");
+				}
+				case 4:
+				{
+					uiMessageBox("They reside within the tower. Catch one to have it assist you!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_HIPPOCAMPUS_QUEST_AGAIN:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You can likely find a Hippocampus on any floor below 6");
+				}
+				case 2:
+				{
+					uiMessageBox("You must stun it in order to capture it!");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_HIPPOCAMPUS_QUEST_DONE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You have captured the Hippocampus. It will assist you on floor 7");
 					dialog = 0;
 				}
 			}
