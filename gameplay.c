@@ -1185,7 +1185,7 @@ highFrequency
 	if (amt > 500) {
 		xSetInt(dPlayerUnits, xDeepDamageLast, trTimeMS() + 500);
 		for(p=1; < ENEMY_PLAYER) {
-			if (trCountUnitsInArea(""+xGetInt(dPlayerUnits, xUnitName),p,"Flying Medic", 25) > 0) {
+			if (trCountUnitsInArea(""+xGetInt(dPlayerUnits, xUnitName),p,"Hippocampus", 25) > 0) {
 				found = true;
 				break;
 			}
@@ -1503,7 +1503,7 @@ highFrequency
 	if (xGetInt(dEnemies, xStunStatus, 1*trQuestVarGet("hippocampusIndex")) > 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("hippocampusUnit");
-		trUnitChangeProtoUnit("Meteor Impact Water");
+		trUnitDestroy();
 		trUnitSelectClear();
 		trUnitSelectByQV("hippocampusHawk");
 		trUnitChangeProtoUnit("Meteor Impact Water");

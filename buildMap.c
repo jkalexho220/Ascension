@@ -2546,7 +2546,7 @@ highFrequency
 			
 			if (trQuestVarGet("p"+p+"hippocampus") == 1) {
 				trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch(""+p+",0","Hippocampus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				spawnPlayerUnit(p, kbGetProtoUnitID("Hippocampus"), pos, -1.0);
 				if (trCurrentPlayer() == p) {
 					startNPCDialog(NPC_EXPLAIN_DEEP);
 				}
