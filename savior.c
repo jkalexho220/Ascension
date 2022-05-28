@@ -171,13 +171,6 @@ void saviorAlways(int eventID = -1) {
 			zSetProtoUnitStat("Hero Greek Bellerophon", p, 27, xGetFloat(dPlayerData, xPlayerBaseAttack));
 			xSetFloat(dPlayerData, xPlayerAttack, xGetFloat(dPlayerData, xPlayerBaseAttack));
 			trQuestVarSet("p"+p+"unity", 0);
-			for (x=xGetDatabaseCount(dPlayerUnits); >0) {
-				xDatabaseNext(dPlayerUnits);
-				if (getBit(p, xGetInt(dPlayerUnits, xUnity)) == true) {
-					xSetInt(dPlayerUnits, xUnity, xGetInt(dPlayerUnits, xUnity) - xsPow(2, p));
-					xSetFloat(dPlayerUnits, xMagicResist, calculateArmor(xGetFloat(dPlayerUnits, xMagicResist), -1.0));
-				}
-			}
 		} else {
 			dist = trTimeMS() - trQuestVarGet("p"+p+"unitylast");
 			amt = trQuestVarGet("p"+p+"unityangle");
@@ -203,13 +196,6 @@ void saviorAlways(int eventID = -1) {
 					xDatabaseNext(dPlayerUnits);
 					if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < dist) {
 						hit = hit + 1;
-						if (getBit(p, xGetInt(dPlayerUnits, xUnity)) == false) {
-							xSetInt(dPlayerUnits, xUnity, xGetInt(dPlayerUnits, xUnity) + xsPow(2, p));
-							xSetFloat(dPlayerUnits, xMagicResist, calculateArmor(xGetFloat(dPlayerUnits, xMagicResist), 0.5));
-						}
-					} else if (getBit(p, xGetInt(dPlayerUnits, xUnity)) == true) {
-						xSetInt(dPlayerUnits, xUnity, xGetInt(dPlayerUnits, xUnity) - xsPow(2, p));
-						xSetFloat(dPlayerUnits, xMagicResist, calculateArmor(xGetFloat(dPlayerUnits, xMagicResist), -1.0));
 					}
 				}
 				
@@ -303,7 +289,7 @@ void saviorAlways(int eventID = -1) {
 						} else if (unitDistanceToVector(dPlayerUnits, pos) < dist) {
 							healUnit(p, amt);
 							if (xGetBool(dPlayerUnits, xIsHero)) {
-								gainFavor(xGetInt(dPlayerUnits, xPlayerOwner), 2.0);
+								gainFavor(xGetInt(dPlayerUnits, xPlayerOwner), 3.0);
 							}
 						}
 					}

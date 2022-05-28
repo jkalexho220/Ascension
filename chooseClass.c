@@ -22,7 +22,7 @@ string classIcon(int class = 0) {
 		{
 			icon = "icons\special e priest icon 64";
 		}
-		case STORMCUTTER:
+		case STORMPIERCER:
 		{
 			icon = "icons\archer x arcus hero icons 64";
 		}
@@ -248,7 +248,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power implode icons 64";
-					msg = "Cost: 8 favor per second | Radius: 5 | Damage: 100 + 50 per bounce";
+					msg = "Cost: 8 favor per second | Radius: 5 | Damage: 100 + 50 per bounce | Velocity: 2 x Speed";
 					next = 0;
 				}
 			}
@@ -384,13 +384,13 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 			}
 		}
-		case STORMCUTTER:
+		case STORMPIERCER:
 		{
 			switch(tooltip)
 			{
 				case 0:
 				{
-					msg = "Stormcutter: An archer who commands the power of storms.";
+					msg = "Stormpiercer: An archer who commands the power of storms.";
 				}
 				case 1:
 				{
@@ -752,29 +752,24 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 7:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "(W) Unity: Create an aura at your cursor. Allies in the aura have 0.5x bonus magic resistance.";
+					msg = "(W) Unity: Create an aura at your cursor. You have 0.5x bonus attack for each ally in the aura.";
 				}
 				case 8:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "You have 0.5x bonus attack for each ally in the aura.";
+					msg = "Each time you attack, heal allies in the aura and grant them 3 favor.";
 				}
 				case 9:
 				{
 					icon = "icons\god power cease fire icon 64";
-					msg = "Each time you attack, heal allies in the aura and grant them 2 favor.";
-				}
-				case 10:
-				{
-					icon = "icons\god power cease fire icon 64";
 					msg = "Cooldown: 20 | Duration: 8 | Radius: 10 | Heal: 0.5x Attack";
 				}
-				case 11:
+				case 10:
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "(E) Intervention: Revive all dead allies. If you die while this is ready, it auto-activates.";
 				}
-				case 12:
+				case 11:
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "Cost: 100 | Cooldown: 10";
@@ -1157,9 +1152,9 @@ string className(int class = 0) {
 		{
 			name = "Blastmage";
 		}
-		case STORMCUTTER:
+		case STORMPIERCER:
 		{
-			name = "Stormcutter";
+			name = "Stormpiercer";
 		}
 		case ALCHEMIST:
 		{

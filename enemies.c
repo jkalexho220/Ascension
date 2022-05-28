@@ -97,7 +97,7 @@ highFrequency
 	setupProtounitBounty("Shade of Hades", 0.25, 0, 0);
 	setupProtounitBounty("Helepolis", 0.25, 0, 0);
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
-	setupProtounitBounty("Heka Gigantes", 0.5, 0, 0);
+	setupProtounitBounty("Titan Atlantean", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);

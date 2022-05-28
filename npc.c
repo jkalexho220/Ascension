@@ -74,8 +74,6 @@ const int NPC_HIPPOCAMPUS_QUEST = 427;
 const int NPC_HIPPOCAMPUS_QUEST_AGAIN = 428;
 const int NPC_HIPPOCAMPUS_QUEST_DONE = 429;
 
-const int NPC_EXPLAIN_DEEP_DEAD = 430;
-
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -569,22 +567,6 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
-
-		case NPC_EXPLAIN_DEEP_DEAD:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Here in the ocean depths, the pressure of water will crush you into a pancake.");
-				}
-				case 2:
-				{
-					uiMessageBox("If you do not have a Hippocampus companion, well... rest in peace. ^_^");
-					dialog = 0;
-				}
-			}
-		}
 		
 		case NPC_EXPLAIN_CLOUDS:
 		{
@@ -869,7 +851,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("Hey, do you have a Resurrection Stone? I'll buy it for 9000 gold.");
+					uiMessageBox("Hey, do you have a Resurrection Stone? I'll buy it for 1000 gold.");
 					dialog = 0;
 				}
 			}

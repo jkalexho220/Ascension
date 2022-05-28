@@ -923,16 +923,16 @@ void quizTempleQuestion(int eventID = -1) {
 				}
 				case 6:
 				{
-					setupTempleQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
-						"True", "False", 1);
+					setupTempleQuestion("Poison damage ignores armor and magic resist.", "True", "False", 1);
 				}
 				case 7:
 				{
-					setupTempleQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
+					setupTempleQuestion("Inflicting Silence on an enemy will prevent them from using their special attack.",
+						"True", "False", 1);
 				}
 				case 8:
 				{
-					setupTempleQuestion("Launching an enemy into a wall will stun them.", "True", "False",1);
+					setupTempleQuestion("Inflicting Silence on a boss will prevent it from casting spells.", "True", "False", 2);
 				}
 			} 
 		} else {

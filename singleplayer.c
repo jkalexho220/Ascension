@@ -260,7 +260,7 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto2", "Troll");
 			trStringQuestVarSet("enemyProto3", "Manticore");
 			trStringQuestVarSet("enemyProto4", "Fire Giant");
-			trStringQuestVarSet("enemyProto5", "Heka Gigantes");
+			trStringQuestVarSet("enemyProto5", "Titan Atlantean");
 			bossScale = 1.2;
 		}
 	}
@@ -331,7 +331,7 @@ void classNewUnlock(int class = 0) {
 					unlocked = true;
 				}
 			}
-			case STORMCUTTER:
+			case STORMPIERCER:
 			{
 				unlocked = true;
 			}
@@ -1269,7 +1269,7 @@ highFrequency
 				desc("He can only be damaged by dropping Spark Relics at the base of the statue.");
 				desc("Spark Relics are dropped by enemies that spawn during the fight.");
 			}
-			case kbGetProtoUnitID("Heka Gigantes"):
+			case kbGetProtoUnitID("Titan Atlantean"):
 			{
 				name = "Hellkeeper";
 				desc("Drops: Manastone");

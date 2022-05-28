@@ -55,8 +55,8 @@ void noSpecials() {
 			trModifyProtounit("Einheriar", p, 9, 99999);
 			trModifyProtounit("Fire Giant", p, 9, -99990);
 			trModifyProtounit("Fire Giant", p, 9, 99999);
-			trModifyProtounit("Heka Gigantes", p, 9, -99990);
-			trModifyProtounit("Heka Gigantes", p, 9, 99999);
+			trModifyProtounit("Titan Atlantean", p, 9, -99990);
+			trModifyProtounit("Titan Atlantean", p, 9, 99999);
 		}
 	}
 }
@@ -314,6 +314,8 @@ void maintainStun() {
 		if (trUnitAlive() == false) {
 			if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
 				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
+			} else {
+				debugLog("Stunned boar dead");
 			}
 			xFreeDatabaseBlock(dStunnedUnits);
 		} else {
@@ -932,7 +934,6 @@ highFrequency
 						trChatSend(0,
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
 						if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
-							debugLog("dPlayerData pointer: " + xGetPointer(dPlayerData));
 							revivePlayer(p);
 							xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
 							xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
@@ -1199,6 +1200,16 @@ highFrequency
 	}
 	
 	xSetPointer(dPlayerUnits, index);
+	if (trTime() > trQuestVarGet("hippocampusHealNext")) {
+		for(p=1; < ENEMY_PLAYER) {
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"medic");
+			if (trUnitAlive()) {
+				trDamageUnitPercent(-1);
+			}
+		}
+		trQuestVarSet("hippocampusHealNext", trTime());
+	}
 }
 
 rule the_cloud_damage

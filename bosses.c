@@ -280,18 +280,6 @@ highFrequency
 		xsDisableSelf();
 		xRestoreCache(dPlayerUnits);
 		int id = 0;
-		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-			xDatabaseNext(dPlayerUnits);
-			id = xGetInt(dPlayerUnits, xUnitID);
-			trUnitSelectClear();
-			trUnitSelectByID(id);
-			if (trUnitAlive() == false) {
-				removePlayerUnit();
-			} else if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Villager Atlantean Hero")) {
-				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-				removePlayerUnit();
-			}
-		}
 		trQuestVarSet("deadPlayerCount", 0);
 		int level = trQuestVarGet("stage") / 3;
 		trQuestVarSet("bossRelicCount", randomLow(2 + level));
@@ -353,11 +341,24 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 				trUnitDestroy();
-				spawnPlayer(p, pos);
-				equipRelicsAgain(p);
 				trPlayerKillAllGodPowers(p);
-				xSetInt(dPlayerData, xPlayerDead, 0);
-				xSetBool(dPlayerData, xPlayerSilenced, true); // the un-silence will grant the right god powers
+				xSetInt(dPlayerData, xPlayerDead, 0, p);
+				xSetBool(dPlayerData, xPlayerSilenced, true, p); // the un-silence will grant the right god powers
+				spawnPlayer(p, pos);
+				equipRelicsAgain(p);		
+			}
+		}
+
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			id = xGetInt(dPlayerUnits, xUnitID);
+			trUnitSelectClear();
+			trUnitSelectByID(id);
+			if (trUnitAlive() == false) {
+				removePlayerUnit();
+			} else if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Villager Atlantean Hero")) {
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				removePlayerUnit();
 			}
 		}
 		
@@ -3163,7 +3164,7 @@ highFrequency
 							removePlayerUnit();
 						} else if (rayCollision(dPlayerUnits,bossPos,bossDir,100.0,10.0) ||
 							unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName),pos) < 25.0) {
-							damagePlayerUnit(1000);
+							damagePlayerUnit(2000);
 						}
 					}
 					trSoundPlayFN("ui\thunder1.wav","1",-1,"","");
@@ -5518,15 +5519,6 @@ highFrequency
 				for (x=trQuestVarGet("bossRoomSize") * 2 + 2; >=0) {
 					aiPlanAddUserVariableInt(lavaTiles,x,"row"+x,2*trQuestVarGet("bossRoomSize"));
 				}
-
-				vector pos = trVectorQuestVarGet("startPosition");
-				trQuestVarSet("bossEscape", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trArmySelect(""+ENEMY_PLAYER+",0");
-				trUnitChangeProtoUnit("Cinematic Block");
-				trUnitSelectClear();
-				trUnitSelectByQV("bossEscape");
-				trSetSelectedScale(0,0,0);
 			}
 			case 1:
 			{
@@ -5553,7 +5545,12 @@ highFrequency
 
 				lavaDamageNext = trTimeMS();
 
-				trStringQuestVarSet("advice","Wait how did you even get here? This boss is still under maintenance!");
+				for(i=xStunSFX; <= xSilenceSFX) {
+					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
+				}
+				xsEnableRule("boss9_ready");
+
+				trStringQuestVarSet("advice","You can do this! I believe in you!");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -5761,17 +5758,19 @@ highFrequency
 				trSoundPlayFN("godpower.wav","1",-1,"","");
 				trSetLighting("night", 1.0);
 				trOverlayText("Doomsday",3.0,-1,-1,-1);
-				trUnitSelectClear();
-				trUnitSelectByQV("bossEscape");
-				trUnitChangeProtoUnit("Transport Ship Greek");
-				trUnitSelectClear();
-				trUnitSelect(""+bossUnit, true);
-				trImmediateUnitGarrison(""+1*trQuestVarGet("bossEscape"));
-				trUnitChangeProtoUnit("Heka Gigantes");
-				bossNext = trTimeMS();
-				bossTimeout = trTimeMS() + 8000 + 4000 * trQuestVarGet("secondPhase");
+				trUnitOverrideAnimation(25,0,false,false,-1);
+				bossAnim = true;
+				bossTimeout = trTimeMS() + 4000;
 				trQuestVarSet("bossSpell", 32);
 			} else if (trQuestVarGet("bossSpell") == 32) {
+				if (trTimeMS() > bossTimeout) {
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					bossAnim = false;
+					bossNext = trTimeMS();
+					bossTimeout = trTimeMS() + 8000 + 4000 * trQuestVarGet("secondPhase");
+					trQuestVarSet("bossSpell", 33);
+				}
+			} else if (trQuestVarGet("bossSpell") == 33) {
 				if (trTimeMS() > bossNext) {
 					bossNext = bossNext + 800;
 					trQuestVarSetFromRand("modx", 4.0 - 2 * trQuestVarGet("bossRoomSize"), 2 * trQuestVarGet("bossRoomSize") - 4.0, true);
@@ -5789,80 +5788,8 @@ highFrequency
 					trDamageUnitPercent(100);
 				}
 				if (trTimeMS() > bossTimeout) {
-					trQuestVarSet("bossSpell", 33);
-					trQuestVarSet("fallingSun", trGetNextUnitScenarioNameNumber());
-					pos = vectorSnapToGrid(trVectorQuestVarGet("bossRoomCenter"));
-					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-					trArmySelect("0,0");
-					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
-					trSetSelectedScale(0,5.0,0);
-					trDamageUnitPercent(100);
-				}
-			} else if (trQuestVarGet("bossSpell") == 33) {
-				trSetLighting("hades", 3.0);
-				trSoundPlayFN("inferno_loop.wav","1",-1,"","");
-				trUnitSelectClear();
-				trUnitSelectByQV("fallingSun");
-				trMutateSelected(kbGetProtoUnitID("Meteorite Death"));
-				trQuestVarSet("bossSpell", 34);
-			} else if (trQuestVarGet("bossSpell") == 34) {
-				pos = kbGetBlockPosition(""+1*trQuestVarGet("fallingSun"), true);
-				if (xsVectorGetY(pos) < worldHeight + 1.0) {
-					trUnitSelectClear();
-					trUnitSelectByQV("fallingSun");
-					trUnitChangeProtoUnit("Meteor Impact Ground");
-					trUnitSelectClear();
-					trUnitSelectByQV("fallingSun");
-					trDamageUnitPercent(-100);
-					trCameraShake(1.0, 0.5);
-					trSoundPlayFN("cinematics\32_out\explosion.wav","1",-1,"","");
-					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
-					dir = vector(0,0,3);
-					for(x=16; >0) {
-						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-						trArmySelect("0,0");
-						trMutateSelected(kbGetProtoUnitID("Meteorite"));
-						trUnitOverrideAnimation(6,0,true,false,-1);
-						trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
-						dir = rotationMatrix(dir, 0.92388, 0.382683);
-					}
-					trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
-					trQuestVarSet("bossSpell", 35);
-					bossTimeout = trTimeMS() + 200;
-					action = trGetNextUnitScenarioNameNumber();
-					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-					trArmySelect(""+ENEMY_PLAYER+",0");
-					trUnitChangeProtoUnit("Transport Ship Greek");
-					trUnitSelectClear();
-					trUnitSelect(""+bossUnit, true);
-					trUnitChangeProtoUnit("Heka Gigantes");
-					trUnitSelectClear();
-					trUnitSelect(""+bossUnit, true);
-					trImmediateUnitGarrison(""+action);
-					trUnitChangeProtoUnit("Heka Gigantes");
-					trUnitSelectClear();
-					trUnitSelect(""+action, true);
-					trUnitChangeProtoUnit("Meteor Impact Ground");
-				}
-			} else if (trQuestVarGet("bossSpell") == 35) {
-				if (trTimeMS() > bossTimeout) {
 					bossCooldown(8, 12);
 					trQuestVarSet("bossUltimate", 3);
-					for(x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
-						trUnitSelectClear();
-						trUnitSelect(""+x, true);
-						trUnitDestroy();
-					}
-					pos = trVectorQuestVarGet("bossRoomCenter");
-					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-						xDatabaseNext(dPlayerUnits);
-						xUnitSelectByID(dPlayerUnits, xUnitID);
-						if (trUnitAlive() == false) {
-							removePlayerUnit();
-						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName),pos) < 100.0) {
-							damagePlayerUnit(1000.0);
-						}
-					}
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
@@ -5877,8 +5804,8 @@ highFrequency
 				}
 				trSoundPlayFN("wild.wav","1",-1,"","");
 				trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, 3.0);
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 27, 200.0);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 1, 3.0);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 27, 200.0);
 				trUnitSelectClear();
 				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
 				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
@@ -5902,8 +5829,8 @@ highFrequency
 				}
 				if (trTimeMS() > bossTimeout) {
 					bossCooldown(8, 12);
-					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, -3.0);
-					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 27, -200.0);
+					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 1, -3.0);
+					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 27, -200.0);
 					trUnitSelectClear();
 					trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
 					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
@@ -5919,15 +5846,15 @@ highFrequency
 				} else if (trQuestVarGet("rand") == 3) {
 					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Are you ready to rumble?!");
 				}
-				bossNext = trTimeMS() + 1100;
+				bossNext = trTimeMS() + 1800;
 				trQuestVarSet("bossSpell", 12);
 				bossAnim = true;
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 2);
-				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 55, 2);
+				trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
 				trUnitOverrideAnimation(26, 0, false, false, -1);
 			} else if (trQuestVarGet("bossSpell") == 12) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 1300;
+					bossNext = bossNext + 1100;
 					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
 					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 						xDatabaseNext(dPlayerCharacters);
@@ -5953,7 +5880,7 @@ highFrequency
 					bossCooldown(8, 12);
 					bossAnim = false;
 					trUnitOverrideAnimation(-1, 0, false, true, -1);
-					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 1);
+					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 55, 1);
 					for(x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
 						trUnitSelectClear();
 						trUnitSelect(""+x, true);
@@ -5991,8 +5918,8 @@ highFrequency
 				} else if (trQuestVarGet("rand") == 3) {
 					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Smash!");
 				}
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 2);
-				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 55, 2);
+				trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
 				bossPos = vectorSnapToGrid(kbGetBlockPosition(""+bossUnit, true));
 				trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
 				trQuestVarSetFromRand("rand", 0, 1, true);
@@ -6016,16 +5943,16 @@ highFrequency
 				trQuestVarSet("bossSpell", 2);
 				bossNext = trTimeMS() + 1200;
 			} else if (trQuestVarGet("bossSpell") == 2) {
-				trMutateSelected(kbGetProtoUnitID("Heka Gigantes"));
+				trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
 				if (trTimeMS() > bossNext) {
 					bossAnim = true;
 					trQuestVarSet("bossSpell", 3);
-					bossNext = trTimeMS() + 1100;
+					bossNext = trTimeMS() + 1800;
 					trUnitOverrideAnimation(26, 0, false, false, -1);
 				}
 			} else if (trQuestVarGet("bossSpell") == 3) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 1300;
+					bossNext = bossNext + 1100;
 					for (x=trQuestVarGet("bossWarnStart"); < trQuestVarGet("bossWarnEnd")) {
 						trUnitSelectClear();
 						trUnitSelect(""+x, true);
@@ -6040,7 +5967,7 @@ highFrequency
 				}
 			} else if (trQuestVarGet("bossSpell") == 4) {
 				if (trTimeMS() > bossNext) {
-					trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 1);
+					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 55, 1);
 					bossAnim = false;
 					trUnitOverrideAnimation(-1,0,false,true,-1);
 					bossCooldown(6, 12);
@@ -6116,6 +6043,10 @@ highFrequency
 				bossID = kbGetBlockID(""+bossUnit, true);
 				bossPointer = xGetNewestPointer(dEnemies);
 				xSetBool(dEnemies, xLaunched, true);
+				for(i=xStunSFX; <= xSilenceSFX) {
+					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
+				}
+				xsEnableRule("boss9_ready");
 				bossCooldown(8, 12);
 				xsEnableRule("boss_music");
 				trLetterBox(false);
@@ -6124,6 +6055,18 @@ highFrequency
 				trVectorQuestVarSet("gateSpawnDir", vector(1,0,0));
 			}
 		}
+	}
+}
+
+rule boss9_ready
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
+		xsDisableSelf();
+		trUnitSelectClear();
+		trUnitSelect(""+bossUnit, true);
+		trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
 	}
 }
 

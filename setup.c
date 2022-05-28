@@ -9,7 +9,7 @@ const int SUNBOW = 2;
 const int FIREKNIGHT = 3;
 const int THRONESHIELD = 4;
 
-const int STORMCUTTER = 5;
+const int STORMPIERCER = 5;
 const int BLASTMAGE = 6;
 const int THUNDERRIDER = 7;
 const int ALCHEMIST = 8;
@@ -508,7 +508,7 @@ highFrequency
 	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
 	setupClass("Priest", BLASTMAGE, 500, 800, STARSTONE);
 	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
-	setupClass("Archer Atlantean Hero", STORMCUTTER, 400, 1000, MANASTONE);
+	setupClass("Archer Atlantean Hero", STORMPIERCER, 400, 1000, MANASTONE);
 	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
 	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
 	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
@@ -837,7 +837,7 @@ highFrequency
 			if (trQuestVarGet("p1monsterpediaQuest") == 2) {
 				trQuestVarSetFromRand("monsterpediaQuestLocation", 1, xGetInt(dPlayerData, xPlayerProgress, 1), true);
 			}
-			if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
+			if (xGetInt(dPlayerData, xPlayerProgress, 1) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
 				trQuestVarSetFromRand("hippocampusQuestLocation", 1, 5, true);
 			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black

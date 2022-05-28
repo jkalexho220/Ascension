@@ -30,7 +30,6 @@ int xDatabaseIndex = 0;
 /* playerUnits specific */
 int xDecay = 0;
 int xDecayNext = 0;
-int xUnity = 0;
 int xDeepDamageLast = 0;
 
 /* enemies specific */
@@ -257,16 +256,15 @@ highFrequency
 		xStunTimeout = xInitAddInt(db,"stunTimeout");
 		xPoisonTimeout = xInitAddInt(db,"poisonTimeout");
 		xSilenceTimeout = xInitAddInt(db,"silenceTimeout");
-		xStunSFX = xInitAddInt(db,"stunSFX");
 		xPoisonLast = xInitAddInt(db,"poisonLast");
 		xPoisonDamage = xInitAddFloat(db,"poisonDamage");
+		xStunSFX = xInitAddInt(db,"stunSFX");
 		xPoisonSFX = xInitAddInt(db,"poisonSFX");
 		xSilenceSFX = xInitAddInt(db,"silenceSFX");
 		xLaunched = xInitAddBool(db,"launched");
 	}
 	xDecay = xInitAddFloat(dPlayerUnits,"decay");
 	xDecayNext = xInitAddInt(dPlayerUnits,"decayNext");
-	xUnity = xInitAddInt(dPlayerUnits,"unity");
 	
 	xBounty = xInitAddInt(dEnemies,"bounty");
 	xDropRelic = xInitAddInt(dEnemies,"relic");

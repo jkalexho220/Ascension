@@ -1778,9 +1778,9 @@ highFrequency
 				trStringQuestVarSet("enemyProto5", "Mummy");
 				trStringQuestVarSet("enemyProto6", "Fire Giant");
 
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 				
 				/*
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
@@ -1789,7 +1789,7 @@ highFrequency
 				*/
 				
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
-				bossScale = 1.2;
+				bossScale = 1.0;
 			}
 			case 11:
 			{
@@ -2404,6 +2404,8 @@ highFrequency
 			aiPlanDestroy(dEdgeFrontier);
 		}
 		aiPlanDestroy(dFrontier);
+
+		spysearch = trGetNextUnitScenarioNameNumber();
 	}
 }
 
@@ -2546,12 +2548,11 @@ highFrequency
 			
 			if (trQuestVarGet("p"+p+"hippocampus") == 1) {
 				trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
-				spawnPlayerUnit(p, kbGetProtoUnitID("Hippocampus"), pos, -1.0);
+				spawnPlayerUnit(p, kbGetProtoUnitID("Hippocampus"), pos);
 				if (trCurrentPlayer() == p) {
 					startNPCDialog(NPC_EXPLAIN_DEEP);
 				}
 			} else if (trCurrentPlayer() == p) {
-				startNPCDialog(NPC_EXPLAIN_DEEP_DEAD);
 				trStringQuestVarSet("advice", "You need a Hippocampus in order to survive on this floor. Go and find one!");
 			}
 		}
