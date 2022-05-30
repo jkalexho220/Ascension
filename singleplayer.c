@@ -1412,6 +1412,9 @@ highFrequency
 				xDatabaseNext(dSlotRelics);
 				xUnitSelect(dSlotRelics, xUnitName);
 				if (trUnitIsOwnedBy(1)) {
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, xGetInt(dSlotRelics, xUnitName));
+					xSetInt(dFreeRelics, xRelicType, xGetInt(dSlotRelics, xRelicType));
 					xFreeDatabaseBlock(dSlotRelics);
 				} else if (trUnitIsSelected()) {
 					relicDescription(xGetInt(dSlotRelics, xRelicType));

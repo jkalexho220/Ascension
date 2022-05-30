@@ -3641,7 +3641,7 @@ highFrequency
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < dist) {
-							damagePlayerUnit(999);
+							trDamageUnitPercent(100);
 						}
 					}
 					
@@ -3652,8 +3652,7 @@ highFrequency
 							if (trUnitAlive() == false) {
 								removeEnemy();
 							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-								damageEnemy(0, 999);
-								damageEnemy(0, 999, false);
+								trDamageUnitPercent(100);
 							}
 						}
 					}
@@ -5075,7 +5074,7 @@ highFrequency
 						xUnitSelectByID(dPlayerUnits, xUnitID);
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 25.0) {
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 16.0) {
 							damagePlayerUnit(2000.0);
 						}
 					}
@@ -5096,7 +5095,7 @@ highFrequency
 					prev = xGetVector(dDragonFireballs, xProjPrev);
 					dist = distanceBetweenVectors(pos, prev);
 					hit = false;
-					if (dist > 1.0) {
+					if (dist > 4.0) {
 						dist = xsSqrt(dist);
 						dir = xGetVector(dDragonFireballs, xProjDir);
 						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
