@@ -314,8 +314,6 @@ void maintainStun() {
 		if (trUnitAlive() == false) {
 			if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
 				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
-			} else {
-				debugLog("Stunned boar dead");
 			}
 			xFreeDatabaseBlock(dStunnedUnits);
 		} else {
@@ -574,13 +572,15 @@ highFrequency
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
-	*
+	*/
 	
 	if (Multiplayer) {
 		pos = trVectorQuestVarGet("bossRoomCenter");
-		trUnitSelectClear();
-		trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, 1), true);
-		trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
+		for(p=1; < ENEMY_PLAYER) {
+			trUnitSelectClear();
+			trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
+			trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
+		}
 	}
 	/*
 	*/
@@ -709,15 +709,6 @@ highFrequency
 										trChatSend(0, "<color=1,1,1>Relic sacrificed! ("+1*trQuestVarGet("p"+p+"relicsSacrificed")+"/10)</color>");
 									}
 								}
-							}
-						} else if (xGetInt(db, xRelicType) == RELIC_SPARK) {
-							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < 36.0) {
-								relicReturned = false;
-								xUnitSelect(db, xUnitName);
-								trUnitChangeProtoUnit("Lightning Sparks Ground");
-								trQuestVarSet("bossSmite", 1 + trQuestVarGet("bossSmite"));
-							} else {
-								debugLog("what's going on here!");
 							}
 						} else if (1*trQuestVarGet("nottud") > 0) {
 							for(i=3; >0) {

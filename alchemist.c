@@ -299,7 +299,7 @@ void alchemistAlways(int eventID = -1) {
 			xFreeDatabaseBlock(duplicates);
 		} else if (trTime() > xGetInt(duplicates, xDuplicateDecayNext)) {
 			xSetInt(duplicates, xDuplicateDecayNext, 1 + xGetInt(duplicates, xDuplicateDecayNext));
-			xSetFloat(duplicates, xDuplicateDecay, xGetFloat(duplicates, xDuplicateDecay) + calculateDecay(p, 1.0));
+			xSetFloat(duplicates, xDuplicateDecay, xGetFloat(duplicates, xDuplicateDecay) + calculateDecay(p, 0.5));
 			trDamageUnitPercent(xGetFloat(duplicates, xDuplicateDecay));
 		}
 	}

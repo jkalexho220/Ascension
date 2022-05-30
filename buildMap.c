@@ -1414,6 +1414,10 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
+
+				trModifyProtounit("King Folstag", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("King Folstag", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("King Folstag", 0, 0, 8000 * ENEMY_PLAYER);
 			}
 			case 4:
 			{
@@ -1516,6 +1520,10 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Shade of Hades", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("Shade of Hades", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("Shade of Hades", 0, 0, 16000 * ENEMY_PLAYER);
 				
 				trQuestVarSet("pestilenceStart", trGetNextUnitScenarioNameNumber());
 			}
@@ -1575,6 +1583,10 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Helepolis", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("Helepolis", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("Helepolis", 0, 0, 20000 * ENEMY_PLAYER);
 				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
 			}
@@ -1693,12 +1705,12 @@ highFrequency
 				
 				trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.0);
 				
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 24, 1);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 25, 1);
-				trModifyProtounit("Nidhogg", ENEMY_PLAYER, 26, 1);
+				trModifyProtounit("Nidhogg", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("Nidhogg", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("Nidhogg", 0, 0, 24000 * ENEMY_PLAYER);
+				trModifyProtounit("Nidhogg", 0, 24, 1);
+				trModifyProtounit("Nidhogg", 0, 25, 1);
+				trModifyProtounit("Nidhogg", 0, 26, 1);
 				
 				trStringQuestVarSet("bossProto", "Nidhogg");
 				bossScale = 1.0;
@@ -1781,12 +1793,10 @@ highFrequency
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
-				
-				/*
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
-				*/
+
+				trModifyProtounit("Titan Atlantean", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("Titan Atlantean", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("Titan Atlantean", 0, 0, 32000 * ENEMY_PLAYER);
 				
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				bossScale = 1.0;
@@ -2600,8 +2610,8 @@ inactive
 highFrequency
 {
 	bool paint = true;
-	for(x=0; < 146) {
-		for(z=0; < 146) {
+	for(x=1; < 145) {
+		for(z=1; < 145) {
 			paint = true;
 			for(i=2;>= -1) {
 				for(j=2;>= -1) {
@@ -2616,9 +2626,15 @@ highFrequency
 			}
 			if (paint) {
 				trPaintTerrain(x,z,x,z,4,15,false);
+			} else if (trGetTerrainHeight(x, z) < worldHeight - 0.1 && trGetTerrainHeight(x - 1, z - 1) > worldHeight - 0.1) {
+				trPaintTerrain(x - 1, z - 1, x, z, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 			}
 		}
 	}
+	trPaintTerrain(0,0,0,146,4,15,false);
+	trPaintTerrain(0,0,146,0,4,15,false);
+	trPaintTerrain(0,146,146,146,4,15,false);
+	trPaintTerrain(146,0,146,146,4,15,false);
 	xsDisableSelf();
 }
 
@@ -2669,8 +2685,8 @@ highFrequency
 {
 	xsDisableSelf();
 	bool paint = true;
-	for(x=0; < 146) {
-		for(z=0; < 146) {
+	for(x=1; < 145) {
+		for(z=1; < 145) {
 			paint = true;
 			for(i=2;>= -1) {
 				for(j=2;>= -1) {
@@ -2685,9 +2701,15 @@ highFrequency
 			}
 			if (paint) {
 				trPaintTerrain(x,z,x,z,2,12,false);
+			} else if (trGetTerrainHeight(x, z) < worldHeight - 0.1 && trGetTerrainHeight(x - 1, z - 1) > worldHeight - 0.1) {
+				trPaintTerrain(x - 1, z - 1, x, z, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 			}
 		}
 	}
+	trPaintTerrain(0,0,0,146,2,12,false);
+	trPaintTerrain(0,0,146,0,2,12,false);
+	trPaintTerrain(0,146,146,146,2,12,false);
+	trPaintTerrain(146,0,146,146,2,12,false);
 	xsDisableSelf();
 }
 

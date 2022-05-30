@@ -928,6 +928,32 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 				if (onhit) {
 					OnHit(p, xGetInt(db,xCharAttackTargetIndex));
 				}
+
+				if (xGetFloat(db, xCharSmiteDamage) > 0) {
+					vector pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName)));
+					vector dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName, xGetInt(db, xCharAttackTargetIndex))));
+					float dist = xsMax(16.0, xGetFloat(dPlayerData, xPlayerRange, p) + 4.0);
+					int next = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("1,0");
+					trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+					trUnitHighlight(2.0, false);
+					trSetUnitOrientation(vector(0,0,0) - dir, vector(0,1,0), true);
+					xAddDatabaseBlock(dPlayerLasers, true);
+					xSetInt(dPlayerLasers, xUnitName, next);
+					xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 500);
+					xSetFloat(dPlayerLasers, xPlayerLaserRange, dist * 1.4);
+					for(x=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive()) {
+							if (rayCollision(dEnemies, pos, dir, dist, 3.0)) {
+								damageEnemy(p, xGetFloat(db, xCharSmiteDamage));
+								OnHit(p, xGetPointer(dEnemies));
+							}
+						}
+					}
+				}
 			} else {
 				xsSetContextPlayer(p);
 				target = kbUnitGetTargetUnitID(id);

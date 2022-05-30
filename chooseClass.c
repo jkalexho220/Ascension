@@ -159,33 +159,56 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					icon = "icons\god power restoration icon 64";
 					msg = "(Q) Sunlight: Create a circle that heals allies for several seconds.";
 					if (Multiplayer == false) {
-						next = 5;
+						next = 7;
 					}
 				}
 				case 3:
 				{
 					icon = "icons\improvement sun ray icon 64";
-					msg = "(W) Healing Rays: For a short duration, your attacks fire rays that heal allies.";
+					msg = "(W) Smiting Rays: Give an allied player laser attacks for a short duration.";
 					if (Multiplayer == false) {
-						next = 6;
+						next = 8;
 					}
 				}
 				case 4:
 				{
-					icon = "icons\improvement flames of typhon icon";
-					msg = "(E) Searing Light (Toggle): Your heals also deal damage to enemies. Costs 5 favor per second.";
-					next = 0;
+					icon = "icons\special e phoenix icon 64";
+					msg = "(E) Lightwing (Toggle): Transform into a phoenix that deals magic damage for a short duration.";
+					if (Multiplayer) {
+						next = 0;
+					}
 				}
 				case 5:
+				{
+					icon = "icons\special e phoenix icon 64";
+					msg = "During this time, your heals damage enemies instead. Costs 5 favor per second";
+				}
+				case 6:
+				{
+					icon = "icons\special e phoenix icon 64";
+					msg = "Cost: 6 per second | Radius: 5 | Damage: 240";
+					next = 0;
+				}
+				case 7:
 				{
 					icon = "icons\god power restoration icon 64";
 					msg = "Cooldown: 18 | Duration: 6 | Radius: 6 | Heal: 60";
 					next = 3;
 				}
-				case 6:
+				case 8:
 				{
 					icon = "icons\improvement sun ray icon 64";
-					msg = "Cooldown: 12 | Duration: 6 | Heal: 100 | Fire rate + 0.5x Projectiles";
+					msg = "Their attacks will deal bonus damage in a line and they heal each second.";
+				}
+				case 9:
+				{
+					icon = "icons\improvement sun ray icon 64";
+					msg = "If Lightwing is active, this sets an enemy on fire instead and you auto-attack them when in range";
+				}
+				case 10:
+				{
+					icon = "icons\improvement sun ray icon 64";
+					msg = "Cooldown: 12 | Duration: 9 | Damage/Heal: 60";
 					next = 4;
 				}
 			}
@@ -499,7 +522,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power call to arms icon";
-					msg = "Cost: 50 | Decay: 1 + 1 per second (percent max health)";
+					msg = "Cost: 50 | Decay: 0.5 + 0.5 per second (percent max health)";
 					next = 0;
 				}
 			}

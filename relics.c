@@ -65,8 +65,6 @@ const int RELIC_MAGIC_DETECTOR = 66;
 
 const int RELIC_BINARY_POISON = 67;
 
-const int RELIC_SPARK = 68;
-
 const int KEY_RELICS = 100;
 const int RELIC_KEY_GREEK = 101;
 const int RELIC_KEY_NORSE = 102;
@@ -248,10 +246,6 @@ string relicName(int relic = 0) {
 			case RELIC_BINARY_POISON:
 			{
 				msg = "Mysterious goblet";
-			}
-			case RELIC_SPARK:
-			{
-				msg = "Spark";
 			}
 		}
 	}
@@ -440,10 +434,6 @@ string relicIcon(int relic = 0) {
 			case RELIC_BINARY_POISON:
 			{
 				icon = "icons\improvement life drain icon";
-			}
-			case RELIC_SPARK:
-			{
-				icon = "sfx a implode lighting flair";
 			}
 		}
 	}
@@ -914,10 +904,6 @@ int relicProto(int relic = 0) {
 			case RELIC_BINARY_POISON:
 			{
 				proto = kbGetProtoUnitID("Jiangshi");
-			}
-			case RELIC_SPARK:
-			{
-				proto = kbGetProtoUnitID("Statue of Lightning");
 			}
 		}
 	}

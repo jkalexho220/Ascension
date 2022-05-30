@@ -173,7 +173,7 @@ minInterval 2
 		reselectMyself();
 	}
 	vector pos = kbGetBlockPosition(""+1*trQuestVarGet("bossKey"), true);
-	if (unitDistanceToVector(1*trQuestVarGet("bossEntranceStatue"), pos) < 25) {
+	if (unitDistanceToVector(1*trQuestVarGet("bossEntranceStatue"), pos) < 36) {
 		trUnitSelectClear();
 		trUnitSelectByQV("bossKey");
 		trUnitChangeProtoUnit("Osiris Box Glow");
@@ -4307,6 +4307,7 @@ highFrequency
 				} else if (trQuestVarGet("rand") == 3) {
 					trChatSendSpoofed(ENEMY_PLAYER, "Mother of the Depths: Delicious!");
 				}
+				trSoundPlayFN("scyllamove2.wav","1",-1,"","");
 				for(i=xGetDatabaseCount(dPlayerCharacters); >0) {
 					xDatabaseNext(dPlayerCharacters);
 					p = xGetInt(dPlayerCharacters, xPlayerOwner);
@@ -4348,8 +4349,11 @@ highFrequency
 			} else if (trQuestVarGet("bossSpell") == 23) {
 				if (trTimeMS() > bossNext) {
 					p = bossTarget;
-					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), bossTargetPos) < 16) {
-						silenceUnit(dPlayerUnits, 9999, xGetInt(dPlayerData, xPlayerIndex, p));
+					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), bossTargetPos) < 16 && aiPlanGetUserVariableBool(dPlayerUnits, xDirtyBit, xGetInt(dPlayerData, xPlayerIndex, p))) {
+						xSetInt(dPlayerUnits, xSilenceStatus, 1, xGetInt(dPlayerData, xPlayerIndex, p));
+						xSetBool(dPlayerData, xPlayerSilenced, true, p);
+						xSetBool(dPlayerData, xPlayerLaunched, true, p);
+						trPlayerKillAllGodPowers(p);
 						trUnitSelectClear();
 						trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 						trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
@@ -4398,23 +4402,31 @@ highFrequency
 						bossScale = 1.3;
 						trSetSelectedScale(bossScale,bossScale,bossScale);
 						p = bossTarget;
-						xRestoreDatabaseBlock(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, bossTarget));
-						xSetPointer(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, bossTarget));
-						xSetInt(dPlayerUnits, xSilenceTimeout, 0);
-						pos = kbGetBlockPosition(""+bossUnit, true);
-						x = trGetNextUnitScenarioNameNumber();
-						trArmyDispatch(""+bossTarget+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-						trUnitSelectClear();
-						trUnitSelect(""+x, true);
-						trUnitChangeProtoUnit("Transport Ship Greek");
-						xUnitSelect(dPlayerData, xPlayerUnit);
-						trImmediateUnitGarrison(""+x);
-						trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, bossTarget))));
-						trUnitSelectClear();
-						trUnitSelect(""+x, true);
-						trUnitChangeProtoUnit("Meteor Impact Water");
-						equipRelicsAgain(bossTarget);
-						damagePlayerUnit(trQuestVarGet("bossDamage"));
+						if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, p)) == false) {
+							debugLog("Could not restore playerUnits block");
+						} else if (xSetPointer(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, p)) == false) {
+							debugLog("Could not set pointer for eat target");
+						} else {
+							xSetInt(dPlayerUnits, xSilenceStatus, 0, xGetInt(dPlayerData, xPlayerIndex, p));
+							xSetBool(dPlayerData, xPlayerLaunched, false, p);
+							pos = kbGetBlockPosition(""+bossUnit, true);
+							x = trGetNextUnitScenarioNameNumber();
+							trArmyDispatch(""+bossTarget+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+							trUnitSelectClear();
+							trUnitSelect(""+x, true);
+							trUnitChangeProtoUnit("Transport Ship Greek");
+							xUnitSelect(dPlayerUnits, xUnitName);
+							trUnitChangeProtoUnit("Militia");
+							xUnitSelect(dPlayerUnits, xUnitName);
+							trImmediateUnitGarrison(""+x);
+							trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))));
+							trUnitSelectClear();
+							trUnitSelect(""+x, true);
+							trUnitChangeProtoUnit("Meteor Impact Water");
+							xUnitSelect(dPlayerUnits, xUnitName);
+							damagePlayerUnit(trQuestVarGet("bossDamage"));
+						}
+						equipRelicsAgain(p);
 						bossCooldown(3, 6);
 					} else {
 						bossScale = 1.3 + 0.0001 * (bossTimeout - trTimeMS());
@@ -4876,7 +4888,6 @@ highFrequency
 				xsDisableSelf();
 				trUnitSelectClear();
 				trUnitSelect(""+bossUnit, true);
-				trUnitConvert(ENEMY_PLAYER);
 				trUnitSetStance("Passive");
 				trSetSelectedScale(bossScale, bossScale, bossScale);
 				xsEnableRule("boss8_battle");
@@ -4885,18 +4896,11 @@ highFrequency
 				xsEnableRule("boss_music");
 				
 				vector pos = trVectorQuestVarGet("bossRoomCenter");
-				trQuestVarSet("bossStatue", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos)+1,0,xsVectorGetZ(pos)+1,225,true);
-				trArmySelect("0,0");
-				trUnitChangeProtoUnit("Statue of Lightning");
-				trArmySelect("0,0");
-				trUnitOverrideAnimation(2,0,true,false,-1);
 				
 				xSetPointer(dEnemies, bossPointer);
 				xFreeDatabaseBlock(dEnemies);
-				
-				trVectorQuestVarSet("bossSmitePos", trVectorQuestVarGet("bossRoomCenter") + xsVectorSet(1, 6 + worldHeight, 1));
-				
+
+				bossDir = vector(1,0,0);
 				
 				trQuestVarSet("bossBreath1", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -4908,23 +4912,11 @@ highFrequency
 				trArmySelect("0,0");
 				trSetSelectedScale(0,0,0);
 				trMutateSelected(kbGetProtoUnitID("Meteorite"));
-				
-				trQuestVarSet("bossSmiteLaser", trGetNextUnitScenarioNameNumber());
-				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trArmySelect("0,0");
-				trUnitSetStance("Passive");
-				trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
-				trSetSelectedScale(0,0,0);
-				pos = trVectorQuestVarGet("bossSmitePos");
-				trUnitTeleport(xsVectorGetX(pos),xsVectorGetY(pos),xsVectorGetZ(pos));
 
-				trModifyProtounit("Statue of Lightning", 0, 0, 99999);
-				trModifyProtounit("Petosuchus Projectile", 0, 0, 99999);
-				
-				trMessageSetText("Bring Spark relics to the statue in the middle to damage the boss.", -1);
+				trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "neutral");
 				
 				trStringQuestVarSet("advice",
-					"You need to bring Spark Relics to the statue in the middle in order to deal damage to him.");
+					"You need to lure the dragon over the spotlights to damage him.");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -4969,43 +4961,67 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelect(""+bossUnit, true);
 	if (trUnitAlive()) {
-		switch(1*trQuestVarGet("bossSmiteStep"))
+		switch(1*trQuestVarGet("dragonSpotlightStep"))
 		{
 			case 0:
 			{
-				if (trQuestVarGet("bossSmite") > 0) {
-					trQuestVarSet("bossSmite", trQuestVarGet("bossSmite") - 1);
-					bossPos = kbGetBlockPosition(""+bossUnit, true);
-					vector up = rotationMatrix(getUnitVector(trVectorQuestVarGet("bossSmitePos"), bossPos), 0, 1.0);
-					dir = getUnitVector3d(bossPos, trVectorQuestVarGet("bossSmitePos"));
-					trUnitSelectClear();
-					trUnitSelectByQV("bossSmiteLaser");
-					trSetSelectedScale(5.0, 5.0, 40.0);
-					trUnitHighlight(10.0, false);
-					trSetUnitOrientation(dir,up,true);
-					trQuestVarSet("bossSmiteStep", 1);
-					trQuestVarSet("bossSmiteNext", trTimeMS() + 500);
-					trQuestVarSetFromRand("sound", 1, 5, true);
-					trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-					trUnitSelectClear();
-					trUnitSelect(""+bossUnit, true);
-					trDamageUnitPercent(1);
-				}
+				trQuestVarSet("dragonSpotlightStep", 1);
+				trQuestVarSet("dragonSpotlightNext", trTime() + 10);
 			}
 			case 1:
 			{
-				trUnitSelectClear();
-				trUnitSelectByQV("bossSmiteLaser");
-				amt = trQuestVarGet("bossSmiteNext") - trTimeMS();
-				if (amt > 0) {
-					amt = amt * 0.01;
-					trSetSelectedScale(amt, amt, 40.0);
-				} else {
-					trSetSelectedScale(0,0,0);
-					trQuestVarSet("bossSmiteStep", 0);
+				if (trTime() > trQuestVarGet("dragonSpotlightNext")) {
+					pos = trVectorQuestVarGet("bossRoomCenter") + (bossDir * 10.0);
+					trQuestVarSet("dragonSpotlight", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					if (trQuestVarGet("dragonSpotlight") < trGetNextUnitScenarioNameNumber()) {
+						trQuestVarSet("dragonSpotlightStep", 2);
+						trUnitSelectClear();
+						trUnitSelectByQV("dragonSpotlight");
+						trUnitChangeProtoUnit("Spy Eye");
+						trUnitSelectClear();
+						trUnitSelectByQV("dragonSpotlight");
+						trMutateSelected(kbGetProtoUnitID("Outpost"));
+						trSetSelectedScale(0,0,0);
+						trUnitSetAnimationPath("1,0,0,0,0,0,0");
+						trMessageSetText("A spotlight has appeared! Lure the boss over it to damage him!", -1);
+						trVectorQuestVarSet("dragonSpotlightPos", pos);
+					}
+				}
+			}
+			case 2:
+			{
+				bossPos = kbGetBlockPosition(""+bossUnit);
+				if (distanceBetweenVectors(trVectorQuestVarGet("dragonSpotlightPos"), bossPos) < 4.0) {
+					trDamageUnitPercent(5);
+					trUnitSelectClear();
+					trUnitSelectByQV("dragonSpotlight");
+					trUnitChangeProtoUnit("Dwarf");
+					trUnitSelectClear();
+					trUnitSelectByQV("dragonSpotlight");
+					trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+					trSetUnitOrientation(vector(0,-1,0), vector(1,0,0), true);
+					trUnitHighlight(2.0, false);
+					xAddDatabaseBlock(dPlayerLasers, true);
+					xSetInt(dPlayerLasers, xUnitName, trQuestVarGet("dragonSpotlight"));
+					xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 1000);
+					xSetFloat(dPlayerLasers, xPlayerLaserRange, 28);
+					trSoundPlayFN("petsuchosattack.wav", "1", -1, "", "");
+					trQuestVarSet("dragonSpotlightStep", 0);
 				}
 			}
 		}
+
+		xsSetContextPlayer(0);
+		id = kbUnitGetTargetUnitID(bossID);
+
+		if (kbUnitGetOwner(id) == ENEMY_PLAYER) {
+			xDatabaseNext(dPlayerUnits);
+			trUnitSelectClear();
+			trUnitSelect(""+bossUnit);
+			trUnitDoWorkOnUnit(""+xGetInt(dPlayerUnits, xUnitName));
+		}
+
 		if (xGetDatabaseCount(dFallingFireballs) > 0) {
 			for(i=xsMin(3, xGetDatabaseCount(dFallingFireballs)); >0) {
 				if (PROJ_GROUND == processGenericProj(dFallingFireballs)) {
@@ -5064,7 +5080,7 @@ highFrequency
 		}
 		
 		if (xGetDatabaseCount(dDragonFireballs) > 0) {
-			for(i=xsMin(5, xGetDatabaseCount(dDragonFireballs)); >0) {
+			for(i=1 + xGetDatabaseCount(dDragonFireballs) / 2; >0) {
 				action = processGenericProj(dDragonFireballs);
 				if (action == PROJ_FALLING) {
 					pos = kbGetBlockPosition(""+xGetInt(dDragonFireballs, xUnitName), true);
@@ -5095,7 +5111,8 @@ highFrequency
 						xSetVector(dDragonFireballs, xProjPrev, pos);
 					}
 				} else if (action == PROJ_GROUND) {
-					if (terrainIsType(vectorToGrid(pos), 4, 15)) {
+					pos = vectorToGrid(kbGetBlockPosition(""+xGetInt(dDragonFireballs, xUnitName), true));
+					if (trGetTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos)) < worldHeight - 1.0) {
 						xSetBool(dDragonFireballs,xDragonFireballRemove,true);
 					}
 				} else if (action == PROJ_BOUNCE) {
@@ -5111,7 +5128,7 @@ highFrequency
 				trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+1*trQuestVarGet("cloudDeployProto")));
 				xUnitSelectByID(dCloudDeployStars, xUnitID);
 				trDamageUnitPercent(-100);
-				activateEnemy(xGetInt(dCloudDeployStars, xUnitName), -1, RELIC_SPARK);
+				activateEnemy(xGetInt(dCloudDeployStars, xUnitName), -1, 0);
 				xFreeDatabaseBlock(dCloudDeployStars);
 				trQuestVarSetFromRand("sound", 1, 2, true);
 				trSoundPlayFN("vortexland"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
@@ -5126,28 +5143,32 @@ highFrequency
 			}
 		} else if (trQuestVarGet("bossSpell") > 40) {
 			if (trQuestVarGet("bossSpell") == 41) {
-				trQuestVarSetFromRand("rand", 3, 6, true);
-				bossCount = trQuestVarGet("rand");
-				trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
-				if (bossCount + xGetDatabaseCount(dEnemies) > ENEMY_PLAYER) {
-					bossCount = ENEMY_PLAYER - xGetDatabaseCount(dEnemies);
-				}
-				trQuestVarSet("bossSpell", 42);
-				bossNext = trTimeMS();
-				if (bossCount > 0) {
-					trQuestVarSet("bCos", xsCos(6.283185 / bossCount));
-					trQuestVarSet("bSin", xsSin(6.283185 / bossCount));
+				if (trUnitPercentDamaged() < 10) {
+					bossCooldown(10, 15);
+				} else {
+					trQuestVarSetFromRand("rand", 1, trUnitPercentDamaged() / 10, true);
+					bossCount = trQuestVarGet("rand");
+					trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
+					if (bossCount + xGetDatabaseCount(dEnemies) > ENEMY_PLAYER) {
+						bossCount = ENEMY_PLAYER - xGetDatabaseCount(dEnemies);
+					}
+					trQuestVarSet("bossSpell", 42);
+					bossNext = trTimeMS();
+					if (bossCount > 0) {
+						trQuestVarSet("bCos", xsCos(6.283185 / bossCount));
+						trQuestVarSet("bSin", xsSin(6.283185 / bossCount));
+					}
 				}
 			} else if (trQuestVarGet("bossSpell") == 42) {
 				if (bossCount <= 0) {
 					bossCooldown(5, 10);
 				} else if (trTimeMS() > bossNext) {
+					bossDir = rotationMatrix(bossDir,trQuestVarGet("bCos"),trQuestVarGet("bSin"));
 					trQuestVarSetFromRand("sound", 1, 3, true);
 					trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					bossNext = bossNext + 200;
 					pos = trVectorQuestVarGet("bossRoomCenter") - (bossDir * 16.0);
 					addGenericProj(dCloudDeployStars,pos,bossDir);
-					bossDir = rotationMatrix(bossDir,trQuestVarGet("bCos"),trQuestVarGet("bSin"));
 					bossCount = bossCount - 1;
 				}
 			}
@@ -5249,53 +5270,7 @@ highFrequency
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
-			if (trQuestVarGet("bossSpell") == 21) {
-				bossPos = vectorSnapToGrid(trVectorQuestVarGet("bossRoomCenter") - (bossDir * 24.0) - vector(1,0,1));
-				action = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(bossPos),0,xsVectorGetZ(bossPos),0,true);
-				trArmySelect(""+ENEMY_PLAYER+",0");
-				trSetUnitOrientation(bossDir,vector(0,1,0),true);
-				trUnitChangeProtoUnit("Helepolis");
-				trUnitSelectClear();
-				trUnitSelect(""+bossUnit, true);
-				trMutateSelected(kbGetProtoUnitID("Dwarf"));
-				trImmediateUnitGarrison(""+action);
-				trUnitChangeProtoUnit("Nidhogg");
-				trUnitSelectClear();
-				trUnitSelect(""+bossUnit, true);
-				trUnitSetStance("Passive");
-				trUnitSelectClear();
-				trUnitSelect(""+action, true);
-				trUnitChangeProtoUnit("Rocket");
-				trQuestVarSet("bossSpell", 22);
-				bossNext = trTimeMS() + 5000;
-			} else if (trQuestVarGet("bossSpell") == 22) {
-				if (trTimeMS() > bossNext) {
-					trSoundPlayFN("nidhoggflame2.wav","1",-1,"","");
-					bossDir = rotationMatrix(bossDir, 0.34202, 0.939693);
-					bossAngle = angleBetweenVectors(vector(0,0,0), bossDir);
-					trQuestVarSet("bossSpell", 23);
-					bossNext = trTimeMS();
-					bossTimeout = trTimeMS() + 2000;
-				}
-			} else if (trQuestVarGet("bossSpell") == 23) {
-				while (trTimeMS() > bossNext) {
-					addGenericProj(dDragonFireballs,bossPos,bossDir);
-					xSetVector(dDragonFireballs, xProjPrev, bossPos);
-					trSetSelectedScale(0,2,0);
-					bossNext = bossNext + 100;
-					bossDir = rotationMatrix(bossDir, 0.992546, -0.121869);
-					trUnitSelectClear();
-					trUnitSelect(""+bossUnit, true);
-					trSetUnitOrientation(bossDir,vector(0,1,0),true);
-				}
-				if (trTimeMS() > bossTimeout) {
-					trQuestVarSet("bossSpell", 41);
-					trUnitSetStance("Aggressive");
-					pos = trVectorQuestVarGet("bossRoomCenter");
-					trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos),-1,true);
-				}
-			}
+			
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
 				trSoundPlayFN("nidhoggflame1.wav","1",-1,"","");
@@ -5424,7 +5399,6 @@ highFrequency
 				trQuestVarSet("bossSpell", 2);
 				bossTimeout = trTimeMS() + 10000;
 				bossNext = trTimeMS();
-				bossDir = vector(1,0,0);
 			} else if (trQuestVarGet("bossSpell") == 2) {
 				if (trTimeMS() > bossNext) {
 					if (trQuestVarGet("secondPhase") == 1) {

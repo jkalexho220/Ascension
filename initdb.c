@@ -42,6 +42,7 @@ int xMissingTimeout = 0;
 /* playerCharacters */
 int dPlayerCharacters = 0;
 int xCharIndex = 0;
+int xCharSmiteDamage = 0;
 int xCharAttacking = 0;
 int xCharAttackNext = 0;
 int xCharAttackTarget = 0;
@@ -441,6 +442,7 @@ highFrequency
 		xCharSpecialAttack = xInitAddInt(db,"specialAttack");
 		xInitAddInt(db,"id");
 		xInitAddInt(db,"index");
+		xCharSmiteDamage = xInitAddFloat(db, "smiteDamage");
 		xCharAttacking = xInitAddBool(db,"attacking");
 		xCharAttackNext = xInitAddInt(db,"attackNext");
 		xCharAttackTarget = xInitAddInt(db,"attackTarget");

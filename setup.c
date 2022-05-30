@@ -433,6 +433,7 @@ runImmediately
 		
 		trModifyProtounit("Servant", p, 55, 1);
 		trModifyProtounit("Phoenix", p, 55, 1);
+		trModifyProtounit("Phoenix From Egg", p, 55, 1);
 		trModifyProtounit("Sea Turtle", p, 55, 1);
 		trModifyProtounit("Pegasus", p, 55, 1);
 		trModifyProtounit("Hippocampus", p, 55, 1);
@@ -542,6 +543,7 @@ highFrequency
 	setupPlayerProto("Minion", 240, 10, 5, 0.2);
 	setupPlayerProto("Hero Greek Theseus", 1000, 50, 4.3, 0.3);
 	setupPlayerProto("Hero Greek Hippolyta", 1000, 50, 4.3, 0, 16);
+	setupPlayerProto("Phoenix From Egg", 1000, 0, 6.3, 0, 0);
 	setupPlayerProto("Hero Greek Atalanta", 800, 30, 6.0, 0);
 	setupPlayerProto("Lancer Hero", 1100, 55, 6.05, 0.4);
 	setupPlayerProto("Hero Greek Achilles", 1200, 50, 5.5, 0.3);
@@ -602,6 +604,10 @@ highFrequency
 		trModifyProtounit("Arkantos God Out", p, 8, 1);
 		zInitProtoUnitStat("Victory Marker", p, 0, 300);
 		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
+
+		trModifyProtounit("Phoenix From Egg", p, 29, 9999999999999999999.0);
+		trModifyProtounit("Phoenix From Egg", p, 29, -9999999999999999999.0);
+		trModifyProtounit("Phoenix From Egg", p, 29, 0);
 		
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
 		

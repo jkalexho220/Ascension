@@ -154,6 +154,9 @@ void sparkWitchAlways(int eventID = -1) {
 			if (xSetPointer(dEnemies, xGetInt(pigs, xWitchPigTimeout))) {
 				xSetFloat(dEnemies, xPhysicalResist, xGetFloat(pigs, xPhysicalResist));
 				xSetFloat(dEnemies, xMagicResist, xGetFloat(pigs, xMagicResist));
+				if (xGetInt(dEnemies, xStunStatus) > 0) {
+					xSetInt(dStunnedUnits, xStunnedProto, xGetInt(pigs, xWitchPigProto), xGetInt(dEnemies, xStunStatus));
+				}
 			}
 			xFreeDatabaseBlock(pigs);
 		}
