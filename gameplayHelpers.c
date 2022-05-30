@@ -1080,7 +1080,7 @@ int addGenericProj(int db = 0, vector start = vector(0,0,0), vector dir = vector
 	trSetUnitOrientation(dir, vector(0,1,0), true);
 	trSetSelectedScale(0, 0.0 - height, 0);
 	trDamageUnitPercent(100);
-	xSetInt(db, xUnitID, kbGetBlockID(""+next));
+	xSetInt(db, xUnitID, kbGetBlockID(""+next, true));
 	return(index);
 }
 

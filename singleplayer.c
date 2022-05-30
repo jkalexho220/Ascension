@@ -420,6 +420,11 @@ rule singleplayer_init
 inactive
 highFrequency
 {
+	if (cNumberPlayers == 2) {
+		uiMessageBox("You must have at least one AI opponent!","leaveGame()");
+		trLetterBox(false);
+		xsDisableSelf();
+	}
 	if (trTime() > cActivationTime + 2) {
 		xsSetContextPlayer(0);
 		bool boons = false;
