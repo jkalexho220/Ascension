@@ -1707,7 +1707,7 @@ highFrequency
 				
 				trModifyProtounit("Nidhogg", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Nidhogg", 0, 0, -9999999999999999999.0);
-				trModifyProtounit("Nidhogg", 0, 0, 24000 * ENEMY_PLAYER);
+				trModifyProtounit("Nidhogg", 0, 0, 100000);
 				trModifyProtounit("Nidhogg", 0, 24, 1);
 				trModifyProtounit("Nidhogg", 0, 25, 1);
 				trModifyProtounit("Nidhogg", 0, 26, 1);

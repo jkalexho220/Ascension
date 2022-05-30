@@ -582,6 +582,8 @@ highFrequency
 	for(p=ENEMY_PLAYER; >0) {
 		zInitProtoUnitStat("Revealer to Player", p, 2, 12);
 		zSetProtoUnitStat("Revealer to Player", p, 2, 32);
+		trModifyProtounit("Revealer to Player", p, 0, 999999);
+		trModifyProtounit("Revealer", p, 0, 999999);
 		trModifyProtounit("Circe", p, 9, -99);
 		trModifyProtounit("Ox Cart", p, 0, 120);
 		trModifyProtounit("Spy Eye", p, 2, -99);
