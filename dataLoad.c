@@ -13,11 +13,11 @@ int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
 const int VERSION_NUMBER = 6;
-const int TOTAL_LOAD = 24;
+const int TOTAL_LOAD = 25;
 
 void saveAllData() {
 	xsSetContextPlayer(0);
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 0);
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
@@ -139,12 +139,19 @@ void saveAllData() {
 	savedata = savedata * 3 + currentdata;
 	currentdata = xsMin(9, trQuestVarGet("p"+p+"relicsSacrificed"));
 	savedata = savedata * 10 + currentdata;
+
+	currentdata = 0; // 3 placeholder bits
+	savedata = savedata * 8 + currentdata;
+	currentdata = xsMin(4, trQuestVarGet("p"+p+"runestoneQuest"));
+	savedata = savedata * 4 + currentdata;
+
 	for(x=4; >0) {
-		currentdata = trQuestVarGet("p"+p+"runestone"+x);
+		currentdata = trQuestVarGet("p"+p+"swordpiece"+x);
 		savedata = savedata * 2 + currentdata;
 	}
 	currentdata = trQuestVarGet("p"+p+"hippocampus");
-	savedata = savedata * 2 + trQuestVarGet("p"+p+"hippocampus");
+	savedata = savedata * 2 + currentdata;
+	
 	currentdata = trQuestVarGet("yeebHit");
 	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("p"+p+"nickEquipped");
@@ -164,6 +171,20 @@ inactive
 {
 	int proto = 0;
 	/* only the local client needs this info */
+	/*
+	VERSION CHANGE
+	v1. Added a new block under relics sacrificed/monsterpedia quest. Shift old block up by 1
+	*/
+	if (trGetScenarioUserData(VERSION_NUMBER) == 0) {
+		savedata = trGetScenarioUserData(4);
+		currentdata = savedata / 896;
+		savedata = iModulo(896, savedata) + 32 * currentdata * 896;
+		trSetCurrentScenarioUserData(4, savedata);
+		trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
+	}
+	
+
+
 	/* owned relics */
 	for(y=0; < 4) {
 		savedata = trGetScenarioUserData(12 + y);
@@ -311,12 +332,18 @@ inactive
 		trQuestVarSet("p1yeebHit", iModulo(2, savedata));
 		trQuestVarSet("yeebHit", trQuestVarGet("p1yeebHit"));
 		savedata = savedata / 2;
+
 		trQuestVarSet("p1hippocampus", iModulo(2, savedata));
 		savedata = savedata / 2;
 		for(x=4; >0) {
-			trQuestVarSet("p1runestone"+x, iModulo(2, savedata));
+			trQuestVarSet("p1swordpiece"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
+
+		trQuestVarSet("p1runestoneQuest", iModulo(4, savedata));
+		savedata = savedata / 4;
+		savedata = savedata / 8;
+
 		trQuestVarSet("p1relicsSacrificed", iModulo(10, savedata));
 		savedata = savedata / 10;
 		trQuestVarSet("p1monsterpediaQuest", iModulo(3, savedata));
@@ -444,10 +471,15 @@ inactive
 						trQuestVarSet("p"+p+"hippocampus", iModulo(2, currentdata));
 						currentdata = currentdata / 2;
 						for(i=4; >0) {
-							trQuestVarSet("p"+p+"runestone"+i, iModulo(2, currentdata));
+							trQuestVarSet("p"+p+"swordpiece"+i, iModulo(2, currentdata));
 							currentdata = currentdata / 2;
 						}
 					} else if (loadProgress == 23) {
+						currentdata = x;
+						trQuestVarSet("p"+p+"runestoneQuest", iModulo(4, currentdata));
+						currentdata = currentdata / 4;
+						// placeholder 3 bits
+					} else if (loadProgress == 24) {
 						currentdata = x;
 						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(10, currentdata));
 						currentdata = currentdata / 10;
@@ -505,7 +537,7 @@ inactive
 			if (loadProgress < 2) { // progress and level
 				currentdata = iModulo(10, savedata);
 				savedata = savedata / 10;
-			} else if (loadProgress == 21) {
+			} else if (loadProgress == 21) { // nick quest, yeeb quest, etc.
 				currentdata = iModulo(28, savedata);
 				savedata = savedata / 28;
 			} else if (loadProgress >= 9 && loadProgress <= 20) { // relics

@@ -74,6 +74,18 @@ const int NPC_HIPPOCAMPUS_QUEST = 427;
 const int NPC_HIPPOCAMPUS_QUEST_AGAIN = 428;
 const int NPC_HIPPOCAMPUS_QUEST_DONE = 429;
 
+const int NPC_VENLESH_START = 430;
+const int NPC_VENLESH_NEXT = 431;
+const int NPC_VENLESH_FIRST = 432;
+const int NPC_VENLESH_SECOND = 433;
+
+const int NPC_RUNESTONE_FIRST = 434;
+const int NPC_RUNESTONE_SECOND = 435;
+
+const int NPC_RUNESTONE_DWARF = 436;
+
+const int NPC_RUNESTONE_FINAL = 437;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -93,6 +105,248 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_RUNESTONE_FIRST:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Once upon a time, there was a horrific entity known as The Void that threatened the world.");
+				}
+				case 2:
+				{
+					uiMessageBox("The gods fought against The Void, but found that their attacks could not touch it.");
+				}
+				case 3:
+				{
+					uiMessageBox("They asked the legendary blacksmith nottud to craft them a mighty weapon that could harm The Void.");
+				}
+				case 4:
+				{
+					uiMessageBox("He granted their wish, and thus, the Starsword was born.");
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 1) {
+						dialog = 0;
+					}
+				}
+				case 5:
+				{
+					uiMessageBox("...");
+				}
+				case 6:
+				{
+					uiMessageBox("You feel a shiver run down your spine.");
+				}
+				case 7:
+				{
+					uiMessageBox("The Keeper has taken notice of you.");
+					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 2);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_VENLESH_FIRST:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("So it's a tale of something that happened in the past.");
+				}
+				case 2:
+				{
+					uiMessageBox("The Starsword... The Void... a blacksmith named nottud... Hmm...");
+				}
+				case 3:
+				{
+					uiMessageBox("Thank you for your help, adventurer. The second runestone has also long since been discovered.");
+				}
+				case 4:
+				{
+					uiMessageBox("It's on the fifth floor of the Tower.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RUNESTONE_SECOND:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("With the Starsword, the gods were able to drive off The Void, but at a terrible price.");
+				}
+				case 2:
+				{
+					uiMessageBox("The Starsword was far too powerful for any god to handle alone.");
+				}
+				case 3:
+				{
+					uiMessageBox("One by one, they wielded the sword and fought until its power overwhelmed them.");
+				}
+				case 4:
+				{
+					uiMessageBox("As one god fell, the next would take up the blade to continue the fight.");
+				}
+				case 5:
+				{
+					uiMessageBox("In the end, only one god remained. The rest had succumbed to madness.");
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 2) {
+						dialog = 0;
+					}
+				}
+				case 6:
+				{
+					uiMessageBox("...");
+				}
+				case 7:
+				{
+					uiMessageBox("You sense a presence from beyond. The Keeper has decided that you have learned too much.");
+					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 3);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_VENLESH_SECOND:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh my, what a horrific tale. Just who is that last god?");
+				}
+				case 2:
+				{
+					uiMessageBox("Thank you for your help, adventurer. I know you are taking on a terrible risk.");
+				}
+				case 3:
+				{
+					uiMessageBox("Unfortunately, no one knows where the final Runestone is.");
+				}
+				case 4:
+				{
+					uiMessageBox("Perhaps the indigenous people of the Tower know something?");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RUNESTONE_DWARF:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You're looking for the final Runestone?");
+				}
+				case 2:
+				{
+					uiMessageBox("How are you still alive after reading the first two?!");
+				}
+				case 3:
+				{
+					uiMessageBox("Anyway, it is taboo to speak of it, for it resides in a place of madness.");
+				}
+				case 4:
+				{
+					uiMessageBox("It is a place of logical fallacies and mathematical errors. Most terrifying.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RUNESTONE_FINAL:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("With all his compatriots going mad, the last god knew what he had to do.");
+				}
+				case 2:
+				{
+					uiMessageBox("He sealed them all within a tower of marble and sunk it into the ocean depths.");
+				}
+				case 3:
+				{
+					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting each other.");
+				}
+				case 4:
+				{
+					uiMessageBox("As for the Starsword, it was split into three pieces and sealed within the tower as well.");
+				}
+				case 5:
+				{
+					uiMessageBox("Should The Void ever return, the tower would rise from the ground and beckon challengers to come forth.");
+				}
+				case 6:
+				{
+					uiMessageBox("Perhaps this time, a worthy champion can wield the Starsword and defeat The Void for good...");
+					if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+						dialog = 0;
+					}
+				}
+				case 7:
+				{
+					uiMessageBox("Blessing acquired!");
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+				}
+				case 8:
+				{
+					trShowImageDialog(boonIcon(BOON_HEALTH_ATTACK), boonName(BOON_HEALTH_ATTACK));
+				}
+				case 9:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					trQuestVarSet("boonUnlocked"+BOON_HEALTH_ATTACK, 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_VENLESH_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hello! Any high-level adventurers here? I need help!");
+				}
+				case 2:
+				{
+					uiMessageBox("Ah, you! I need your help! I'm Venlesh, an archaeologist researching the Tower.");
+				}
+				case 3:
+				{
+					uiMessageBox("Inside the Tower, there's fabled to be three Runestones that hold incredible truths.");
+				}
+				case 4:
+				{
+					uiMessageBox("However, anyone who reads these Runestones will be hunted by a horrific creature.");
+				}
+				case 5:
+				{
+					uiMessageBox("Many have tried and failed, which is why I'm looking for a high-level adventurer to help.");
+				}
+				case 6:
+				{
+					uiMessageBox("Can you help me read the Runestones?");
+					trQuestVarSet("p1runestoneQuest", 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_VENLESH_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The first Runestone has long since been discovered on the second floor of the Tower.");
+				}
+				case 2:
+				{
+					uiMessageBox("It's surrounded by ghosts and should be pretty hard to miss.");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_RELIC_TRANSPORTER:
 		{
 			switch(dialog)
@@ -847,11 +1101,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("But I'm hoping an adventurer will come by and sell me a Resurrection Stone.");
-				}
-				case 3:
-				{
-					uiMessageBox("Hey, do you have a Resurrection Stone? I'll buy it for 1000 gold.");
+					uiMessageBox("Such horrific beings reside within the Tower. If you're not ready, turn back now.");
 					dialog = 0;
 				}
 			}
@@ -863,7 +1113,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("I never knew there could be native peoples living in this tower.");
+					uiMessageBox("I never knew there could be native peoples living in the Tower.");
 				}
 				case 2:
 				{
@@ -3368,5 +3618,46 @@ highFrequency
 		xsDisableSelf();
 		startNPCDialog(NPC_NICK_NEXT + trQuestVarGet("p"+p+"nickQuestProgress") - 2);
 		trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+p+"nickQuestProgress"));
+	}
+}
+
+void readTheRunestone(int eventID = -1) {
+	switch(1*trQuestVarGet("stage"))
+	{
+		case 2:
+		{
+			startNPCDialog(NPC_RUNESTONE_FIRST);
+		}
+		case 5:
+		{
+			startNPCDialog(NPC_RUNESTONE_SECOND);
+		}
+		case 11:
+		{
+			startNPCDialog(NPC_RUNESTONE_FINAL);
+		}
+	}
+}
+
+rule runestone_read
+inactive
+minInterval 3
+{
+	int p = trCurrentPlayer();
+	switch(1*trQuestVarGet("readRunestone"))
+	{
+		case 0:
+		{
+			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 25.0) {
+				trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10000, "No", -1);
+				trQuestVarSet("readRunestone", 1);
+			}
+		}
+		case 1:
+		{
+			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) > 25.0) {
+				trQuestVarSet("readRunestone", 0);
+			}
+		}
 	}
 }

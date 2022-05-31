@@ -434,11 +434,17 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trUnitSelect(""+a, true);
 				trSetSelectedScale(2,2,2);
 			}
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+			trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Runestone", 35,35,225);
 			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
+			trUnitSelectByQV("runestone", true);
 			trSetSelectedScale(2.5,2.5,2.5);
+			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 1) {
+				xsEnableRule("runestone_read");
+			}
+
+
 			deployTownEyecandy("Shrine",15,31,90);
 			deployTownEyecandy("Shrine",17,11,0);
 			deployTownEyecandy("Shrine",35,15,270);
@@ -540,11 +546,16 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			deployTownEyecandy("Columns", 33, 13, 0);
 			deployTownEyecandy("Columns", 27, 7, 0);
 			deployTownEyecandy("Campfire", 9, 7, 0);
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+			trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Runestone", 33,7,315);
 			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
+			trUnitSelectByQV("runestone", true);
 			trSetSelectedScale(2.5,2.5,2.5);
+			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
+
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2) {
+				xsEnableRule("runestone_read");
+			}
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
 			

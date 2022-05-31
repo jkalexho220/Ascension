@@ -133,6 +133,9 @@ highFrequency
 			{
 				trMessageSetText("Yeebaagooon's spells will drain your favor if they hit you!", -1);
 				xsDisableSelf();
+				if (trQuestVarGet("p"+trCurrentPlayer()+"yeebHit") == 1) {
+					trQuestVarSet("yeebRelicRetrieved", 1);
+				}
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 						found = false;
@@ -143,16 +146,12 @@ highFrequency
 								found = true;
 								trUnitDestroy();
 								xFreeDatabaseBlock(relics);
-								if (trCurrentPlayer() == p) {
-									trQuestVarSet("yeebRelicRetrieved", 1);
-								}
 								break;
 							}
 						}
 						if (found == false) {
 							if (trCurrentPlayer() == p) {
 								trQuestVarSet("ownedRelics"+RELIC_YEEBAAGOOON, trQuestVarGet("ownedRelics"+RELIC_YEEBAAGOOON) - 1);
-								trQuestVarSet("yeebRelicRetrieved", 1);
 							}
 						}
 					}

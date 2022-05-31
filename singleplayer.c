@@ -727,6 +727,13 @@ highFrequency
 				}
 			}
 		}
+
+		// runestone quest
+		if ((trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
+			xsEnableRule("venlesh_always");
+			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
+		}
 		
 		if (xGetInt(dPlayerData, xPlayerClass) == 0) {
 			xSetInt(dPlayerData, xPlayerClass, MOONBLADE);
@@ -1559,6 +1566,18 @@ highFrequency
 		} else {
 			startNPCDialog(NPC_HIPPOCAMPUS_QUEST_AGAIN);
 		}
+		reselectMyself();
+	}
+}
+
+rule venlesh_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("venlesh", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_VENLESH_START + trQuestVarGet("p1runestoneQuest"));
 		reselectMyself();
 	}
 }
