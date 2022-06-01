@@ -77,6 +77,9 @@ int dMirrorTowerLasers = 0;
 int xMirrorTowerLaserLength = 0;
 int xMirrorTowerLaserTimeout = 0;
 
+int dKeeperTargets = 0;
+int xKeeperTargetPlayer = 0;
+
 rule initialize_map_databases
 active
 highFrequency

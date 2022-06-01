@@ -481,6 +481,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trQuestVarSetFromRand("localQuest", 1, 2, true);
 			}
 
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
+				xsEnableRule("runestone_dwarf_talk");
+			}
+
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			deployTownEyecandy("Throwing Axeman",21,9,270);
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -2425,6 +2429,18 @@ highFrequency
 			aiPlanDestroy(dEdgeFrontier);
 		}
 		aiPlanDestroy(dFrontier);
+
+		if (trQuestVarGet("stage") < 10) {
+			dKeeperTargets = xInitDatabase("keeperTargets");
+			xKeeperTargetPlayer = xInitAddInt(dKeeperTargets, "player");
+			for(p=1; < ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"runestoneQuest") == 3) {
+					xAddDatabaseBlock(dKeeperTargets, true);
+					xSetInt(dKeeperTargets, xKeeperTargetPlayer, p);
+					xsEnableRule("the_keeper_hunt_start");
+				}
+			}
+		}
 
 		spysearch = trGetNextUnitScenarioNameNumber();
 	}

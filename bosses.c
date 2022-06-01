@@ -198,7 +198,7 @@ minInterval 2
 	for(p=1; < ENEMY_PLAYER) {
 		trUnitSelectClear();
 		vector pos = trVectorQuestVarGet("bossRoomEntrance");
-		if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), pos) < trQuestVarGet("bossEntranceRadius")) {
+		if ((unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), pos) < trQuestVarGet("bossEntranceRadius")) && trUnitAlive()) {
 			if (trQuestVarGet("p"+p+"enteredBossRoom") == 0) {
 				trQuestVarSet("p"+p+"enteredBossRoom", 1);
 				trQuestVarSet("playersInBossRoom", 1 + trQuestVarGet("playersInBossRoom"));
@@ -6374,5 +6374,313 @@ highFrequency
 			}
 		}
 		gadgetUnreal("ShowImageBox-CloseButton");
+	}
+}
+
+int dKeeperPaint = 0;
+int xKeeperPaintTimeout = 0;
+int xKeeperPaintPrimary = 0;
+int xKeeperPaintSecondary = 0;
+int xKeeperPaintPos = 0;
+
+/*
+void keeperWrongAnswer(int eventID = -1) {
+	trCameraShake(5.0, 2.5);
+	trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+	uiMessageBox("WRONG");
+}
+*/
+
+rule the_keeper_hunt_start
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	//trEventSetHandler(10001, "keeperWrongAnswer");
+	vector pos = trVectorQuestVarGet("bossRoomCenter");
+	trVectorQuestVarSet("keeperPos", vectorToGrid(pos));
+	trQuestVarSet("keeperHawk", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	spyEffect(1*trQuestVarGet("keeperHawk"), kbGetProtoUnitID("Tartarian Gate"), xsVectorSet(ARRAYS, bossInts, 1));
+	xsEnableRule("the_keeper_hunt_sfx");
+}
+
+rule the_keeper_hunt_sfx
+inactive
+highFrequency
+{
+	if (trQuestVarGet("play") == 1) {
+		dKeeperPaint = xInitDatabase("keeperPaint");
+		xKeeperPaintTimeout = xInitAddInt(dKeeperPaint, "timeout");
+		xKeeperPaintPrimary = xInitAddInt(dKeeperPaint, "primary");
+		xKeeperPaintSecondary = xInitAddInt(dKeeperPaint, "secondary");
+		xKeeperPaintPos = xInitAddVector(dKeeperPaint, "pos");
+		trQuestVarSet("keeperTartarianGate", aiPlanGetUserVariableInt(ARRAYS, bossInts, 1));
+
+		xsDisableSelf();
+		trModifyProtounit("Parrot", ENEMY_PLAYER, 1, 1.2);
+		trUnitSelectClear();
+		trUnitSelectByQV("keeperHawk");
+		trMutateSelected(kbGetProtoUnitID("Parrot"));
+		trSetSelectedScale(0,0,0);
+		trUnitSelectClear();
+		trUnitSelectByQV("keeperTartarianGate");
+		trUnitChangeProtoUnit("Tartarian Gate");
+		trUnitSelectClear();
+		trUnitSelectByQV("keeperTartarianGate");
+		trUnitOverrideAnimation(6,0,true,false,-1);
+		trSetSelectedScale(0,0,0);
+
+		xsEnableRule("the_keeper_hunt");
+		xsEnableRule("the_keeper_hunt_warn");
+		if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
+			trMessageSetText("The Crawling Shadow is hunting you. If it touches you, you will LOSE A LEVEL!", -1);
+		}
+	}
+}
+
+int dFingers = 0;
+int xFingerDir = 0;
+
+rule the_keeper_hunt
+inactive
+highFrequency
+{
+	vector pos = vectorToGrid(kbGetBlockPosition(""+1*trQuestVarGet("keeperHawk")));
+	vector prev = trVectorQuestVarGet("keeperPos");
+	int primary = 0;
+	int secondary = 0;
+	int x = 0;
+	int z = 0;
+	int p = 0;
+	if (xsAbs(xsVectorGetX(pos) - xsVectorGetX(prev)) + xsAbs(xsVectorGetZ(pos) - xsVectorGetZ(prev)) > 0) {
+		for(x=xsVectorGetX(pos) - 2; <= xsVectorGetX(pos) + 2) {
+			for(z=xsVectorGetZ(pos) - 2; <= xsVectorGetZ(pos) + 2) {
+				primary = trGetTerrainType(x, z);
+				secondary = trGetTerrainSubType(x, z);
+				if (primary != 5 || secondary != 4) {
+					trQuestVarSetFromRand("rand", 2000, 3000, true);
+					xAddDatabaseBlock(dKeeperPaint, true);
+					xSetInt(dKeeperPaint, xKeeperPaintTimeout, trTimeMS() + trQuestVarGet("rand"));
+					xSetInt(dKeeperPaint, xKeeperPaintPrimary, primary);
+					xSetInt(dKeeperPaint, xKeeperPaintSecondary, secondary);
+					xSetVector(dKeeperPaint, xKeeperPaintPos, xsVectorSet(x, 0, z));
+					trPaintTerrain(x, z, x, z, 5, 4, false);
+				}
+			}
+		}
+		trVectorQuestVarSet("keeperPos", pos);
+		trUnitSelectClear();
+		trUnitSelectByQV("keeperTartarianGate");
+		if (trUnitVisToPlayer()) {
+			if (trTime() > trQuestVarGet("keeperSoundTime")) {
+				trSoundPlayFN("cinematics\32_out\kronosbehinddorrshort.mp3","1",-1,"","");
+				trQuestVarSet("keeperSoundTime", trTime() + 3);
+			}
+		}
+		/*
+		trQuestVarSetFromRand("rand1", 10, 20, true);
+		trQuestVarSetFromRand("rand2", 1, trQuestVarGet("rand1") - 1, true);
+		trQuestVarSetFromRand("rand", 0, 1, true);
+		trUnitSelectClear();
+		trUnitSelectByQV("keeperTartarianGate");
+		if (trUnitVisToPlayer()) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 0) {
+				if (trIsGadgetVisible("ShowChoiceBox") == false) {
+					trSoundPlayFN("spybirth.wav","1",-1,"","");
+					trQuestVarSet("answer1", trQuestVarGet("rand1") + trQuestVarGet("rand2"));
+					trQuestVarSet("answer0", trQuestVarGet("rand1") - trQuestVarGet("rand2"));
+					trShowChoiceDialog(""+1*trQuestVarGet("rand1") + " + " + 1*trQuestVarGet("rand2") + " = ?", 
+						"" + 1*trQuestVarGet("answer"+1*trQuestVarGet("rand")), 10001 - trQuestVarGet("rand"),
+						"" + 1*trQuestVarGet("answer"+(1 - trQuestVarGet("rand"))), 10000 + trQuestVarGet("rand"));
+				}
+			}
+		}
+		*/
+		for(x=xGetDatabaseCount(dKeeperTargets); >0) {
+			xDatabaseNext(dKeeperTargets);
+			p = xGetInt(dKeeperTargets, xKeeperTargetPlayer);
+			if ((xGetBool(dPlayerData, xPlayerLaunched, p) == false) && (xGetInt(dPlayerData, xPlayerDead, p) == 0)) {
+				pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p)));
+				if (terrainIsType(vectorToGrid(pos), 5, 4)) {
+					dFingers = xInitDatabase("fingers");
+					xInitAddInt(dFingers, "name");
+					xFingerDir = xInitAddVector(dFingers, "dir");
+					gadgetUnreal("ShowChoiceBox");
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitDestroy();
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperHawk");
+					trUnitDestroy();
+					// uh oh... 
+					xsDisableSelf();
+					trPlayerKillAllGodPowers(p);
+					xSetBool(dPlayerData, xPlayerSilenced, false, p); // can't escape now buddy
+					xAddDatabaseBlock(dStunnedUnits, true);
+					xSetInt(dStunnedUnits, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+					xSetInt(dStunnedUnits, xStunnedProto, xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p)));
+					uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, p));
+					trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
+					trSoundPlayFN("cinematics\31_in\swipenew.mp3","1",-1,"","");
+					trSoundPlayFN("xpack\xcinematics\6_out\music.mp","1",-1,"","");
+					trCameraShake(10.0, 0.1);
+					trVectorQuestVarSet("keeperPos", pos);
+					trQuestVarSet("keeperTartarianGate", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitChangeProtoUnit("Tartarian Gate");
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitOverrideAnimation(6,0,true,false,-1);
+					trSetSelectedScale(0,0,0);
+					trQuestVarSet("keeperGrabStep", 0);
+					trQuestVarSet("keeperGrabTime", trTimeMS());
+					xsEnableRule("keeper_grab");
+					trQuestVarSet("keeperTarget", p);
+					trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has been captured by The Crawling Shadow!", -1);
+					break;
+				}
+			}
+		}
+	}
+
+	if (xGetDatabaseCount(dKeeperPaint) > 0) {
+		xDatabaseNext(dKeeperPaint);
+		if (trTimeMS() > xGetInt(dKeeperPaint, xKeeperPaintTimeout)) {
+			pos = xGetVector(dKeeperPaint, xKeeperPaintPos);
+			x = xsVectorGetX(pos);
+			z = xsVectorGetZ(pos);
+			trPaintTerrain(x, z, x, z, xGetInt(dKeeperPaint, xKeeperPaintPrimary), xGetInt(dKeeperPaint, xKeeperPaintSecondary), false);
+			xFreeDatabaseBlock(dKeeperPaint);
+		}
+	}
+}
+
+void spawnFinger(vector center = vector(0,0,0), vector offset = vector(0,0,0), vector dest = vector(0,0,0), float scale = 0) {
+	vector pos = center + offset;
+	vector dir = rotationMatrix(dest - offset, 0, -1.0);
+	xAddDatabaseBlock(dFingers, true);
+	xSetInt(dFingers, xUnitName, trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	xUnitSelect(dFingers, xUnitName);
+	trMutateSelected(kbGetProtoUnitID("Taproot Small"));
+	trSetSelectedScale(0.0 - scale, scale, 0.0 - scale);
+	trUnitSetAnimationPath("0,0,0,0,0,0,0");
+	trSetUnitOrientation(dir, vector(0,-1,0), true);
+	xSetVector(dFingers, xFingerDir, dir);
+}
+
+rule keeper_grab
+inactive
+highFrequency
+{
+	int x = 0;
+	int z = 0;
+	int primary = 0;
+	int secondary = 0;
+	int p = trQuestVarGet("keeperTarget");
+	int dist = 0;
+	vector pos = vector(0,0,0);
+	vector center = vector(0,0,0);
+	vector test = vector(0,0,0);
+	switch(1*trQuestVarGet("keeperGrabStep"))
+	{
+		case 0:
+		{
+			if (trTimeMS() > trQuestVarGet("keeperGrabTime")) {
+				trQuestVarSet("keeperGrabTime", trQuestVarGet("keeperGrabTime") + 200);
+				trQuestVarSet("keeperGrabRadius", 1 + trQuestVarGet("keeperGrabRadius"));
+				pos = vectorToGrid(trVectorQuestVarGet("keeperPos"));
+				dist = xsPow(trQuestVarGet("keeperGrabRadius"), 2);
+				for(a=0-trQuestVarGet("keeperGrabRadius"); <= trQuestVarGet("keeperGrabRadius")) {
+					for(b=0-trQuestVarGet("keeperGrabRadius"); <= trQuestVarGet("keeperGrabRadius")) {
+						test = pos + xsVectorSet(a, 0, b);
+						if (distanceBetweenVectors(pos, test) < dist) {
+							x = xsVectorGetX(test);
+							z = xsVectorGetZ(test);
+							primary = trGetTerrainType(x, z);
+							secondary = trGetTerrainSubType(x, z);
+							if ((primary != 5) || (secondary != 4)) {
+								xAddDatabaseBlock(dKeeperPaint, true);
+								xSetInt(dKeeperPaint, xKeeperPaintPrimary, primary);
+								xSetInt(dKeeperPaint, xKeeperPaintSecondary, secondary);
+								xSetVector(dKeeperPaint, xKeeperPaintPos, xsVectorSet(x, 0, z));
+								trPaintTerrain(x, z, x, z, 5, 4, false);
+								trChangeTerrainHeight(x, z, x, z, worldHeight, false);
+							}
+						}
+					}
+				}
+				if (trQuestVarGet("keeperGrabRadius") >= 8) {
+					trQuestVarSet("keeperGrabStep", 1);
+				}
+			}
+		}
+		case 1:
+		{
+			center = trVectorQuestVarGet("keeperPos");
+			test = vector(-10, 0, -10);
+			trQuestVarSet("keeperGrabStep", 2);
+			// thumb
+			spawnFinger(center, vector(-6, 0, 2), vector(-1,0,-1), 3.5);
+			// other fingers
+			spawnFinger(center, vector(0, 0, 4), test, 4.5);
+			spawnFinger(center, vector(2, 0, 2), test, 5.5);
+			spawnFinger(center, vector(4, 0, 0), test, 4.5);
+			spawnFinger(center, vector(4, 0, -2), test, 3.5);
+
+			trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+			trQuestVarSet("keeperGrabStep", 2);
+			trQuestVarSet("keeperAngle", 3.141592);
+			trQuestVarSet("keeperGrabTime", trTimeMS());
+
+			trCameraShake(3.0, 0.3);
+		}
+		case 2:
+		{
+			float diff = trTimeMS() - trQuestVarGet("keeperGrabTime");
+			trQuestVarSet("keeperAngle", 3.141592 - 0.001 * diff);
+
+			for(i=5; >0) {
+				xDatabaseNext(dFingers);
+				xUnitSelect(dFingers, xUnitName);
+				pos = xsVectorSetY(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0) * xsSin(trQuestVarGet("keeperAngle")), xsCos(trQuestVarGet("keeperAngle")));
+				trSetUnitOrientation(xGetVector(dFingers, xFingerDir), pos, true);
+			}
+			if (trQuestVarGet("keeperAngle") < 0) {
+				trQuestVarSet("keeperGrabStep", 3);
+				trSoundPlayFN("xpack\xcinematics\7_in\krioschange.mp3","1",-1,"","");
+				trUnitSelectClear();
+				trUnitSelectByQV("keeperTartarianGate");
+				trUnitChangeProtoUnit("Tartarian Gate birth");
+				trUnitSelectClear();
+				trUnitSelectByQV("keeperTartarianGate");
+				trSetSelectedScale(0,0,0);
+				trCameraShake(3.0, 0.5);
+				for(x=xGetDatabaseCount(getRelicsDB(p)); >0) {
+					xDatabaseNext(getRelicsDB(p));
+					xUnitSelect(getRelicsDB(p), xUnitName);
+					trUnitDestroy();
+				}
+				xSetInt(dPlayerData, xPlayerDead, 10, p);
+				trUnitSelectClear();
+				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p));
+				trUnitDelete(false);
+				trQuestVarSet("keeperGrabTime", trTimeMS() + 1000);
+				if (xGetInt(dPlayerData, xPlayerLevel, p) > 0) {
+					if (trCurrentPlayer() == p) {
+						xSetInt(dClass, xClassLevel, xGetInt(dPlayerData, xPlayerLevel, p), p);
+					}
+					xSetInt(dPlayerData, xPlayerLevel, xGetInt(dPlayerData, xPlayerLevel, p) - 1, p);
+					trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))), p, 5, -1);
+				}
+			}
+		}
+		case 3:
+		{
+
+		}
 	}
 }

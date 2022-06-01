@@ -138,7 +138,8 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 7:
 				{
-					uiMessageBox("The Keeper has taken notice of you.");
+					uiMessageBox("The Crawling Shadow has taken notice of you.");
+					trSoundPlayFN("spybirth.wav","1",-1,"","");
 					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 2);
 					dialog = 0;
 				}
@@ -200,7 +201,8 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 7:
 				{
-					uiMessageBox("You sense a presence from beyond. The Keeper has decided that you have learned too much.");
+					uiMessageBox("You sense a presence from beyond. The Crawling Shadow knows where you are.");
+					trSoundPlayFN("spybirth.wav","1",-1,"","");
 					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 3);
 					dialog = 0;
 				}
@@ -2620,6 +2622,18 @@ highFrequency
 	xNpcDialog = xInitAddInt(dNpcTalk,"dialog");
 }
 
+rule runestone_dwarf_talk
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("guy"+SHOP_GUY);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_RUNESTONE_DWARF);
+		reselectMyself();
+	}
+}
+
 rule town_always
 inactive
 highFrequency
@@ -3649,7 +3663,7 @@ minInterval 3
 		case 0:
 		{
 			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 25.0) {
-				trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10000, "No", -1);
+				trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10002, "No", -1);
 				trQuestVarSet("readRunestone", 1);
 			}
 		}

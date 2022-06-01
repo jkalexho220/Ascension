@@ -487,7 +487,7 @@ runImmediately
 	trQuestVarSet("rotZ2", -1);
 	trQuestVarSet("rotZ3", 1);
 
-	trEventSetHandler(10000, "readTheRunestone");
+	trEventSetHandler(10002, "readTheRunestone");
 	
 	xsEnableRule("data_load_00");
 	xsDisableSelf();
