@@ -763,12 +763,17 @@ highFrequency
 			trUnitSelectClear();
 			trUnitSelectByQV("correctRelic", true);
 			trUnitChangeProtoUnit("Implode Sphere Effect");
-			trQuestVarSet("templeFound", 2);
 			trQuestVarSet("templeNext", trTime() + 4);
 			trSoundPlayFN("wonder.wav","1",-1,"","");
 			trSoundPlayFN("xpack\xcinematics\8_in\pyramidscrape.mp3","1",-1,"","");
 			uiLookAtUnitByName(""+1*trQuestVarGet("temple"));
-			trUIFadeToColor(0,0,0,3000,0,true);
+			if (trQuestVarGet("keeperQuestActive") == 0) {
+				trUIFadeToColor(0,0,0,3000,0,true);
+				trQuestVarSet("templeFound", 2);
+			} else {
+				xsDisableSelf();
+				startNPCDialog(NPC_TEMPLE_COMPLETE + 11);
+			}
 			trQuestVarSet("boonUnlocked"+BOON_SPELL_ATTACK, 1);
 		}
 		if (xGetDatabaseCount(dZenoRelics) > 0) {

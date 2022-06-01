@@ -220,6 +220,12 @@ int dApplicants = 0;
 
 int dZenoRelics = 0;
 
+int dKeeperPaint = 0;
+int xKeeperPaintTimeout = 0;
+int xKeeperPaintPrimary = 0;
+int xKeeperPaintSecondary = 0;
+int xKeeperPaintPos = 0;
+
 int getCharactersDB(int p = 0) {
 	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerCharacterArray,p));
 }

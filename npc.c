@@ -82,9 +82,10 @@ const int NPC_VENLESH_SECOND = 433;
 const int NPC_RUNESTONE_FIRST = 434;
 const int NPC_RUNESTONE_SECOND = 435;
 
-const int NPC_RUNESTONE_DWARF = 436;
+const int NPC_RUNESTONE_FINAL = 436;
 
-const int NPC_RUNESTONE_FINAL = 437;
+const int NPC_RUNESTONE_DWARF = 437;
+const int NPC_RUNESTONE_AKARD = 438;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -250,6 +251,33 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("If you wish to know more, then speak with the wizard Akard on the fourth floor.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RUNESTONE_AKARD:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("What?! You've read the Runestones?! Get away from me! Before the Creeping Shadow strikes!");
+				}
+				case 2:
+				{
+					uiMessageBox("Wait, perhaps... If you read the final one... Fine! I'll tell you where it is!");
+				}
+				case 3:
+				{
+					uiMessageBox("It's locked away in Zeno's Paradox! If you go there, you will find it!");
+				}
+				case 4:
+				{
+					uiMessageBox("How to get to that dimension? I'm not saying!");
+				}
+				case 5:
+				{
+					uiMessageBox("It's a land of mathematical errors, and I hate math errors!");
 					dialog = 0;
 				}
 			}
@@ -2482,6 +2510,27 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+
+		case NPC_TEMPLE_COMPLETE + 11:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("So you solved the math problem. Congratulations. Here is your reward.");
+				}
+				case 2:
+				{
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+					trShowImageDialog(boonIcon(BOON_SPELL_ATTACK),boonName(BOON_SPELL_ATTACK));
+				}
+				case 3:
+				{
+					uiMessageBox("You can equip this Blessing in singleplayer.");
+					dialog = 0;
+				}
+			}
+		}
 	}
 	return(dialog);
 }
@@ -2631,6 +2680,21 @@ highFrequency
 	if (trUnitIsSelected()) {
 		startNPCDialog(NPC_RUNESTONE_DWARF);
 		reselectMyself();
+	}
+}
+
+rule akard_runestone_dialog
+inactive
+highFrequency
+{
+	int p = trCurrentPlayer();
+	trUnitSelectClear();
+	trUnitSelectByQV("guy"+FETCH_GUY);
+	if (trQuestVarGet("p"+p+"runestoneQuest") == 3) {
+		if (trUnitIsSelected()) {
+			startNPCDialog(NPC_RUNESTONE_AKARD);
+			reselectMyself();
+		}
 	}
 }
 
@@ -3210,6 +3274,8 @@ highFrequency
 									xsDisableRule("class_shop_always");
 									xsDisableRule("relic_transporter_guy_always");
 									xsDisableRule("relic_transporter_guy_found");
+									xsDisableRule("the_keeper_hunt");
+									xClearDatabase(dKeeperPaint);
 									trUnitChangeProtoUnit("Dwarf");
 									xUnitSelect(dQuestTargets,xUnitName);
 									trUnitConvert(0);
@@ -3531,15 +3597,10 @@ highFrequency
 			case 2:
 			{
 				trChatHistoryClear();
-				trQuestVarSet("cinNext", trTime() + 3);
+				xsDisableSelf();
 				trQuestVarSet("stage", 11);
 				xsEnableRule("rebuild_map");
 				trOverlayText("Zeno's Paradox",3,-1,-1,-1);
-			}
-			case 3:
-			{
-				xsDisableRule("enter_boss_room");
-				xsDisableSelf();
 			}
 		}
 	}

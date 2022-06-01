@@ -524,6 +524,13 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trQuestVarSet("akardTowerEnd", trGetNextUnitScenarioNameNumber());
 			
 			trQuestVarSetFromRand("localQuest", 1, 2, true);
+
+			for(p=1; < ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"runestoneQuest") == 3) {
+					trQuestVarSet("localQuest", FETCH_GUY);
+					xsEnableRule("akard_runestone_dialog");
+				}
+			}
 			
 			trQuestVarSet("guy"+FETCH_GUY, trGetNextUnitScenarioNameNumber());
 			trQuestVarSet("guy"+BOUNTY_GUY, trGetNextUnitScenarioNameNumber());
@@ -734,33 +741,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trSetUnitOrientation(dir,vector(0,1,0),true);
 				dir = rotationMatrix(dir, 0.707107, 0.707107);
 			}
-		}
-		case ROOM_VILLAGE + 11:
-		{
-			// another runestone
-			trPaintTerrain(x * 35 + 13, z * 35 + 13, x * 35 + 27, z * 35 + 27, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-			trChangeTerrainHeight(x * 35 + 13, z * 35 + 13, x * 35 + 28, z * 35 + 28, worldHeight, false);
-			
-			trQuestVarSet("villageX", 70 * x + 26);
-			trQuestVarSet("villageZ", 70 * z + 26);
-			
-			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-			deployTownEyecandy("Runestone", 15, 15, 225);
-			trUnitSelectClear();
-			trUnitSelectByQV("next", true);
-			trSetSelectedScale(2.5, 2.5, 2.5);
-			
-			deployTownEyecandy("Columns", 23, 19);
-			deployTownEyecandy("Columns", 23, 11);
-			
-			deployTownEyecandy("Columns", 19, 23);
-			deployTownEyecandy("Columns", 11, 23);
-			
-			deployTownEyecandy("Columns", 7, 19);
-			deployTownEyecandy("Columns", 7, 11);
-			
-			deployTownEyecandy("Columns", 19, 7);
-			deployTownEyecandy("Columns", 11, 7);
 		}
 		case ROOM_STARTER:
 		{
@@ -1819,14 +1799,15 @@ highFrequency
 			case 11:
 			{
 				trQuestVarSet("stageTemple", BOON_SPELL_ATTACK);
+				trQuestVarSet("village", -1);
 				trStringQuestVarSet("advice", "And then there were none...");
 				xsEnableRule("laser_rooms_always");
 				initializeLaserTrapDatabase();
 				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
 				worldHeight = 0;
 				wallHeight = 0;
-				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
-				trQuestVarSet("bossRoomSize", 11);
+				trQuestVarSet("bossRoomShape", ROOM_CIRCLE);
+				trQuestVarSet("bossRoomSize", 12);
 				trSetLighting("eclipse", 0.1);
 				
 				trQuestVarSet("trapRooms", 3);
@@ -1885,6 +1866,9 @@ highFrequency
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trUnitChangeProtoUnit("Oracle Scout");
+
+				trModifyProtounit("Revealer", ENEMY_PLAYER, 0, 9999999);
+				trStringQuestVarSet("bossProto", "Revealer");
 			}
 		}
 		
@@ -2435,9 +2419,11 @@ highFrequency
 			xKeeperTargetPlayer = xInitAddInt(dKeeperTargets, "player");
 			for(p=1; < ENEMY_PLAYER) {
 				if (trQuestVarGet("p"+p+"runestoneQuest") == 3) {
+					trQuestVarSet("keeperQuestActive", 1);
 					xAddDatabaseBlock(dKeeperTargets, true);
 					xSetInt(dKeeperTargets, xKeeperTargetPlayer, p);
 					xsEnableRule("the_keeper_hunt_start");
+					xsEnableRule("the_keeper_hunt_sfx");
 				}
 			}
 		}
@@ -2515,6 +2501,23 @@ highFrequency
 			xAddDatabaseBlock(db, true);
 			xSetInt(db, xUnitName, 1*trQuestVarGet("next"));
 			xSetInt(db, xRelicType, RELIC_MATH_PROBLEM + x);
+		}
+
+		if (trQuestVarGet("keeperQuestActive") == 1) {
+			trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
+			vector pos = trVectorQuestVarGet("bossRoomCenter");
+			trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+			trUnitSelectClear();
+			trUnitSelectByQV("runestone");
+			trUnitChangeProtoUnit("Runestone");
+			trUnitSelectClear();
+			trUnitSelectByQV("runestone");
+			trSetSelectedScale(2.5,2.5,2.5);
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
+				uiMessageBox("The Crawling Shadow welcomes you to its home.");
+			}
+		} else {
+			xsDisableRule("enter_boss_room");
 		}
 	}
 }
