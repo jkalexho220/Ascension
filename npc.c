@@ -237,19 +237,19 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("You're looking for the final Runestone?");
+					uiMessageBox("You're looking for the final Runestone? How are you still alive after reading the first two?!");
 				}
 				case 2:
 				{
-					uiMessageBox("How are you still alive after reading the first two?!");
+					uiMessageBox("Anyway, it is dangerous to speak of it, for it resides in a place of madness.");
 				}
 				case 3:
 				{
-					uiMessageBox("Anyway, it is taboo to speak of it, for it resides in a place of madness.");
+					uiMessageBox("It resides in a place of logical fallacies and mathematical errors. Most terrifying.");
 				}
 				case 4:
 				{
-					uiMessageBox("It is a place of logical fallacies and mathematical errors. Most terrifying.");
+					uiMessageBox("If you wish to know more, then speak with the wizard Akard on the fourth floor.");
 					dialog = 0;
 				}
 			}

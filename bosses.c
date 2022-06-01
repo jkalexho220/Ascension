@@ -6560,7 +6560,7 @@ highFrequency
 
 void spawnFinger(vector center = vector(0,0,0), vector offset = vector(0,0,0), vector dest = vector(0,0,0), float scale = 0) {
 	vector pos = center + offset;
-	vector dir = rotationMatrix(dest - offset, 0, -1.0);
+	vector dir = xsVectorNormalize(rotationMatrix(dest - offset, 0, -1.0));
 	xAddDatabaseBlock(dFingers, true);
 	xSetInt(dFingers, xUnitName, trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -6642,11 +6642,12 @@ highFrequency
 		{
 			float diff = trTimeMS() - trQuestVarGet("keeperGrabTime");
 			trQuestVarSet("keeperAngle", 3.141592 - 0.001 * diff);
-
+			float mCos = xsCos(trQuestVarGet("keeperAngle"));
+			float mSin = xsSin(trQuestVarGet("keeperAngle"));
 			for(i=5; >0) {
 				xDatabaseNext(dFingers);
 				xUnitSelect(dFingers, xUnitName);
-				pos = xsVectorSetY(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0) * xsSin(trQuestVarGet("keeperAngle")), xsCos(trQuestVarGet("keeperAngle")));
+				pos = xsVectorSetY(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0) * mSin, mCos);
 				trSetUnitOrientation(xGetVector(dFingers, xFingerDir), pos, true);
 			}
 			if (trQuestVarGet("keeperAngle") < 0) {
@@ -6671,7 +6672,26 @@ highFrequency
 				trQuestVarSet("keeperGrabTime", trTimeMS() + 1000);
 				if (xGetInt(dPlayerData, xPlayerLevel, p) > 0) {
 					if (trCurrentPlayer() == p) {
-						xSetInt(dClass, xClassLevel, xGetInt(dPlayerData, xPlayerLevel, p), p);
+						/* class levels */
+						for(a=0; <2) {
+							savedata = trGetScenarioUserData(10 + a);
+							if (savedata < 0) {
+								savedata = 0;
+							}
+							for(b=1; <9) {
+								xSetInt(dClass, xClassLevel, iModulo(11, savedata), b + 8 * a);
+								savedata = savedata / 11;
+							}
+						}
+						xSetInt(dClass, xClassLevel, xGetInt(dPlayerData, xPlayerLevel, p), xGetInt(dPlayerData, xPlayerClass, p));
+						for(a=0; <2) {
+							savedata = 0;
+							for(b=8; >0) {
+								currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, b + 8 * a));
+								savedata = savedata * 11 + currentdata;
+							}
+							trSetCurrentScenarioUserData(10 + a, savedata);
+						}
 					}
 					xSetInt(dPlayerData, xPlayerLevel, xGetInt(dPlayerData, xPlayerLevel, p) - 1, p);
 					trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))), p, 5, -1);
@@ -6680,7 +6700,38 @@ highFrequency
 		}
 		case 3:
 		{
-
+			if (trTimeMS() > trQuestVarGet("keeperGrabTime")) {
+				trQuestVarSet("keeperGrabTime", trTimeMS() + 500);
+				trQuestVarSet("keeperGrabRadius", trQuestVarGet("keeperGrabRadius") - 1);
+				dist = xsPow(trQuestVarGet("keeperGrabRadius"), 2);
+				center = vectorToGrid(trVectorQuestVarGet("keeperPos"));
+				for(i=xGetDatabaseCount(dKeeperPaint); >0) {
+					xDatabaseNext(dKeeperPaint);
+					pos = xGetVector(dKeeperPaint, xKeeperPaintPos);
+					if (distanceBetweenVectors(center, pos) >= dist) {
+						x = xsVectorGetX(pos);
+						z = xsVectorGetZ(pos);
+						trPaintTerrain(x, z, x, z, xGetInt(dKeeperPaint, xKeeperPaintPrimary), xGetInt(dKeeperPaint, xKeeperPaintSecondary), false);
+						xFreeDatabaseBlock(dKeeperPaint);
+					}
+				}
+				if (xGetDatabaseCount(dKeeperPaint) == 0) {
+					if (trCurrentPlayer() == trQuestVarGet("keeperTarget")) {
+						uiMessageBox("You have lost a level.");
+					}
+					xsDisableSelf();
+					trSoundPlayFN("spybirth.wav","1",-1,"","");
+					trCameraShake(3.0, 1.0);
+					for(i=xGetDatabaseCount(dFingers); >0) {
+						xDatabaseNext(dFingers);
+						xUnitSelect(dFingers, xUnitName);
+						trUnitChangeProtoUnit("Hero Death");
+					}
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitDestroy();
+				}
+			}
 		}
 	}
 }
