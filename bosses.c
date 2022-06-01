@@ -234,10 +234,56 @@ rule boss_music
 minInterval 3
 inactive
 {
-	if (boss > 0 && trTime() > trQuestVarGet("musicTime")) {
-		if (boss == 11) {
-			trMusicPlay("music\interface\if you can use a doorknob.mp3", "1",0.2);
-			trQuestVarSet("musicTime", trTime() + 60);
+	if (boss > 0 && trTime() >= trQuestVarGet("musicTime")) {
+		if (customContent && (trQuestVarGet("stage") > 1)) {
+			switch(1*trQuestVarGet("stage"))
+			{
+				case 2:
+				{
+					trMusicPlay("Zenophobia\To Overcome This Crisis.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 119);
+				}
+				case 3:
+				{
+					trMusicPlay("Zenophobia\Aim for the Top of the Crucible.mp3", "1", 0.2);
+					trQuestVarSet("musicTime", trTime() + 121);
+				}
+				case 4:
+				{
+					trMusicPlay("Zenophobia\Onslaught.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 145);
+				}
+				case 5:
+				{
+					trMusicPlay("Zenophobia\Mad Flowers In Bloom.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 175);
+				}
+				case 6:
+				{
+					trMusicPlay("Zenophobia\Death's Embrace.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 120);
+				}
+				case 7:
+				{
+					trMusicPlay("Zenophobia\A Fearful Existence.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 201);
+				}
+				case 8:
+				{
+					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 360);
+				}
+				case 9:
+				{
+					trMusicPlay("Zenophobia\The Hellion's Assault.mp3", "1", 0.2);
+					trQuestVarSet("musicTime", trTime() + 138);
+				}
+				case 11:
+				{
+					trMusicPlay("Zenophobia\True Origin.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 89);
+				}
+			}
 		} else {
 			trQuestVarSet("musicTime", trTime() + 50);
 			trQuestVarSetFromRand("music", 1, 6, true);
@@ -6385,19 +6431,17 @@ void keeperWrongAnswer(int eventID = -1) {
 	uiMessageBox("WRONG");
 }
 
-void keeperQuestion(int p = 0) {
+void keeperQuestion() {
 	trQuestVarSetFromRand("rand1", 10, 20, true);
 	trQuestVarSetFromRand("rand2", 1, trQuestVarGet("rand1") - 1, true);
 	trQuestVarSetFromRand("rand", 0, 1, true);
-	if (trCurrentPlayer() == p) {
-		if (trIsGadgetVisible("ShowChoiceBox") == false) {
-			trSoundPlayFN("spybirth.wav","1",-1,"","");
-			trQuestVarSet("answer1", trQuestVarGet("rand1") + trQuestVarGet("rand2"));
-			trQuestVarSet("answer0", trQuestVarGet("rand1") - trQuestVarGet("rand2"));
-			trShowChoiceDialog(""+1*trQuestVarGet("rand1") + " + " + 1*trQuestVarGet("rand2") + " = ?", 
-				"" + 1*trQuestVarGet("answer"+1*trQuestVarGet("rand")), 10001 - trQuestVarGet("rand"),
-				"" + 1*trQuestVarGet("answer"+(1 - trQuestVarGet("rand"))), 10000 + trQuestVarGet("rand"));
-		}
+	if (trIsGadgetVisible("ShowChoiceBox") == false) {
+		trSoundPlayFN("spybirth.wav","1",-1,"","");
+		trQuestVarSet("answer1", trQuestVarGet("rand1") + trQuestVarGet("rand2"));
+		trQuestVarSet("answer0", trQuestVarGet("rand1") - trQuestVarGet("rand2"));
+		trShowChoiceDialog(""+1*trQuestVarGet("rand1") + " + " + 1*trQuestVarGet("rand2") + " = ?", 
+			"" + 1*trQuestVarGet("answer"+1*trQuestVarGet("rand")), 10001 - trQuestVarGet("rand"),
+			"" + 1*trQuestVarGet("answer"+(1 - trQuestVarGet("rand"))), 10000 + trQuestVarGet("rand"));
 	}
 }
 
@@ -6412,12 +6456,14 @@ inactive
 highFrequency
 {
 	xsDisableSelf();
-	//trEventSetHandler(10001, "keeperWrongAnswer");
-	vector pos = trVectorQuestVarGet("bossRoomCenter");
-	trVectorQuestVarSet("keeperPos", vectorToGrid(pos));
-	trQuestVarSet("keeperHawk", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-	spyEffect(1*trQuestVarGet("keeperHawk"), kbGetProtoUnitID("Tartarian Gate"), xsVectorSet(ARRAYS, bossInts, 1));
+
+	if (Multiplayer) {
+		vector pos = trVectorQuestVarGet("bossRoomCenter");
+		trVectorQuestVarSet("keeperPos", vectorToGrid(pos));
+		trQuestVarSet("keeperHawk", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch(""+ENEMY_PLAYER+",0","Militia",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+		spyEffect(1*trQuestVarGet("keeperHawk"), kbGetProtoUnitID("Tartarian Gate"), xsVectorSet(ARRAYS, bossInts, 1));
+	}
 
 	dKeeperPaint = xInitDatabase("keeperPaint");
 	xKeeperPaintTimeout = xInitAddInt(dKeeperPaint, "timeout");
@@ -6518,8 +6564,7 @@ highFrequency
 					uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, p));
 					trSoundPlayFN("Zenophobia\True Origin shortened.mp3","1",-1,"","");
 					trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
-					trSoundPlayFN("cinematics\31_in\swipenew.mp3","1",-1,"","");
-					//trSoundPlayFN("xpack\xcinematics\6_out\music.mp","1",-1,"","");
+					trSoundPlayFN("xpack\xcinematics\8_in\guardianawaken.mp3","1",-1,"","");
 					trCameraShake(10.0, 0.1);
 					trVectorQuestVarSet("keeperPos", pos);
 					trQuestVarSet("keeperTartarianGate", trGetNextUnitScenarioNameNumber());
@@ -6627,7 +6672,7 @@ highFrequency
 			spawnFinger(center, vector(4, 0, 0), test, 4.5);
 			spawnFinger(center, vector(4, 0, -2), test, 3.5);
 
-			trSoundPlayFN("pestilencebirth.wav","1",-1,"","");
+			trSoundPlayFN("cinematics\31_in\swipenew.mp3","1",-1,"","");
 			trQuestVarSet("keeperGrabStep", 2);
 			trQuestVarSet("keeperAngle", 3.141592);
 			trQuestVarSet("keeperGrabTime", trTimeMS());
@@ -6656,41 +6701,48 @@ highFrequency
 				trUnitSelectByQV("keeperTartarianGate");
 				trSetSelectedScale(0,0,0);
 				trCameraShake(3.0, 0.5);
-				for(x=xGetDatabaseCount(getRelicsDB(p)); >0) {
-					xDatabaseNext(getRelicsDB(p));
-					xUnitSelect(getRelicsDB(p), xUnitName);
-					trUnitDestroy();
-				}
-				xSetInt(dPlayerData, xPlayerDead, 10, p);
-				trUnitSelectClear();
-				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p));
-				trUnitDelete(false);
-				trQuestVarSet("keeperGrabTime", trTimeMS() + 1000);
-				if (xGetInt(dPlayerData, xPlayerLevel, p) > 0) {
-					if (trCurrentPlayer() == p) {
-						/* class levels */
-						for(a=0; <2) {
-							savedata = trGetScenarioUserData(10 + a);
-							if (savedata < 0) {
-								savedata = 0;
-							}
-							for(b=1; <9) {
-								xSetInt(dClass, xClassLevel, iModulo(11, savedata), b + 8 * a);
-								savedata = savedata / 11;
-							}
-						}
-						xSetInt(dClass, xClassLevel, xGetInt(dPlayerData, xPlayerLevel, p), xGetInt(dPlayerData, xPlayerClass, p));
-						for(a=0; <2) {
-							savedata = 0;
-							for(b=8; >0) {
-								currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, b + 8 * a));
-								savedata = savedata * 11 + currentdata;
-							}
-							trSetCurrentScenarioUserData(10 + a, savedata);
-						}
+				if (Multiplayer) {
+					for(x=xGetDatabaseCount(getRelicsDB(p)); >0) {
+						xDatabaseNext(getRelicsDB(p));
+						xUnitSelect(getRelicsDB(p), xUnitName);
+						trUnitDestroy();
 					}
-					xSetInt(dPlayerData, xPlayerLevel, xGetInt(dPlayerData, xPlayerLevel, p) - 1, p);
-					trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))), p, 5, -1);
+					xSetInt(dPlayerData, xPlayerDead, 10, p);
+					trUnitSelectClear();
+					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p));
+					trUnitDelete(false);
+					trQuestVarSet("keeperGrabTime", trTimeMS() + 1000);
+					if (xGetInt(dPlayerData, xPlayerLevel, p) > 0) {
+						if (trCurrentPlayer() == p) {
+							/* class levels */
+							for(a=0; <2) {
+								savedata = trGetScenarioUserData(10 + a);
+								if (savedata < 0) {
+									savedata = 0;
+								}
+								for(b=1; <9) {
+									xSetInt(dClass, xClassLevel, iModulo(11, savedata), b + 8 * a);
+									savedata = savedata / 11;
+								}
+							}
+							xSetInt(dClass, xClassLevel, xGetInt(dPlayerData, xPlayerLevel, p), xGetInt(dPlayerData, xPlayerClass, p));
+							for(a=0; <2) {
+								savedata = 0;
+								for(b=8; >0) {
+									currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, b + 8 * a));
+									savedata = savedata * 11 + currentdata;
+								}
+								trSetCurrentScenarioUserData(10 + a, savedata);
+							}
+						}
+						xSetInt(dPlayerData, xPlayerLevel, xGetInt(dPlayerData, xPlayerLevel, p) - 1, p);
+						trModifyProtounit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))), p, 5, -1);
+					}
+				} else {
+					trUnitSelectClear();
+					trUnitSelectByQV("venlesh");
+					trUnitChangeProtoUnit("Kronny Birth SFX");
+					trSoundPlayPaused("dialog\ko\genr122m.mp3","1",-1,"","");
 				}
 			}
 		}
@@ -6712,8 +6764,8 @@ highFrequency
 					}
 				}
 				if (xGetDatabaseCount(dKeeperPaint) == 0) {
-					trSoundPlayFN("tartariangateselect.wav","1",-1,"","");
 					if (trCurrentPlayer() == trQuestVarGet("keeperTarget")) {
+						trSoundPlayFN("tartariangateselect.wav","1",-1,"","");
 						uiMessageBox("You have lost a level.");
 					}
 					xsDisableSelf();
@@ -6822,10 +6874,11 @@ highFrequency
 			}
 			case 5:
 			{
+				trEventSetHandler(10001, "keeperWrongAnswer");
 				xFingerStep = xInitAddInt(dFingers, "step");
 				xFingerTimeout = xInitAddInt(dFingers, "timeout");
 
-				bossDir = vector(4,0,0);
+				bossDir = vector(1,0,0);
 
 				pos = trVectorQuestVarGet("keeperPos");
 				zSetProtoUnitStat("Revealer", 1, 2, 32);
@@ -6836,6 +6889,10 @@ highFrequency
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				xsDisableSelf();
+
+				trQuestVarSet("keeperClawAttack", trTime() + 20);
+				trQuestVarSet("keeperMathQuestionTime", trTime() + 30);
+				trQuestVarSet("runestoneSpawnTime", trTime() + 15);
 				
 				xsEnableRule("boss11_battle");
 				
@@ -6884,8 +6941,11 @@ highFrequency
 	float diff = 0;
 	float mSin = 0;
 	float mCos = 0;
+	int count = 0;
+	int next = 0;
 	vector pos = vector(0,0,0);
 	vector dir = vector(0,0,0);
+	trQuestVarSet("sound", 0);
 	for(i=xGetDatabaseCount(dFingers); >0) {
 		xDatabaseNext(dFingers);
 		xUnitSelect(dFingers, xUnitName);
@@ -6900,6 +6960,8 @@ highFrequency
 				} else {
 					xSetInt(dFingers, xFingerStep, 1);
 					xSetInt(dFingers, xFingerTimeout, trTimeMS());
+					trQuestVarSetFromRand("sound", 1, 3, true);
+					trSoundPlayFN("tartarianspawngrunt"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 				}
 			}
 			case 1:
@@ -6949,16 +7011,160 @@ highFrequency
 	}
 
 	if (trTimeMS() > bossNext) {
-		trQuestVarSetFromRand("rand", 100, 3000);
-		bossNext = bossNext + trQuestVarGet("rand");
+		trQuestVarSetFromRand("rand", 100, 3000, true);
+		trQuestVarSetFromRand("rand2", 100, 3000, true);
+		if (trQuestVarGet("rand2") < trQuestVarGet("rand")) {
+			trQuestVarSet("rand", trQuestVarGet("rand2"));
+		}
+		bossNext = bossNext + trQuestVarGet("rand") * (50 + trQuestVarGet("bossHealth")) / 100; // as boss health goes down, it gets faster
+		trQuestVarSetFromRand("rand", 1, 3, true);
 		xDatabaseNext(dPlayerCharacters);
 		xUnitSelectByID(dPlayerCharacters, xUnitID);
 		if (trUnitAlive()) {
-			pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)) + bossDir);
+			pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)) + bossDir * 4.0);
 			dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)));
 			spawnAttackFinger(pos, dir);
 		}
 
 		bossDir = rotationMatrix(bossDir, -0.740544, -0.672008);
+	}
+
+	if (trTime() > trQuestVarGet("keeperMathQuestionTime")) {
+		trQuestVarSetFromRand("rand", 10, 30, true);
+		trQuestVarSet("keeperMathQuestionTime", trTime() + trQuestVarGet("rand") * (50 + trQuestVarGet("bossHealth")) / 100);
+		keeperQuestion();
+	}
+
+	if (trTime() > trQuestVarGet("keeperClawAttack")) {
+		trSoundPlayFN("changeunit.wav","1",-1,"","");
+		trQuestVarSetFromRand("rand", 10, 30, true);
+		trQuestVarSet("keeperClawAttack", trTime() + trQuestVarGet("rand") * (50 + trQuestVarGet("bossHealth")) / 100);
+		pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)));
+		spawnAttackFinger(pos + vector(-6, 0, 2), xsVectorNormalize(vector(6, 0, -2)));
+		spawnAttackFinger(pos + vector(0, 0, 4), vector(-0.707107, 0, -0.707107));
+		spawnAttackFinger(pos + vector(2, 0, 2), vector(-0.707107, 0, -0.707107));
+		spawnAttackFinger(pos + vector(4, 0, 0), vector(-0.707107, 0, -0.707107));
+		spawnAttackFinger(pos + vector(4, 0, -2), vector(-0.707107, 0, -0.707107));
+	}
+
+	if (trQuestVarGet("runestoneActive") == 1) {
+		pos = trVectorQuestVarGet("runestonePos");
+		for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
+			xDatabaseNext(dPlayerCharacters);
+			xUnitSelectByID(dPlayerCharacters, xUnitID);
+			if (trUnitAlive() == false) {
+				removePlayerCharacter();
+			} else if (unitDistanceToVector(xGetInt(dPlayerCharacters, xUnitName), pos) < 36.0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("runestone");
+				trUnitChangeProtoUnit("Osiris SFX");
+				trSoundPlayFN("recreation.wav","1",-1,"","");
+				trQuestVarSet("bossHealth", trQuestVarGet("bossHealth") - 10);
+				if (trQuestVarGet("bossHealth") > 0) {
+					trCounterAbort("bossHealth");
+					trCounterAddTime("bossHealth", -1, -9999, "<color={Playercolor(2)}>Crawling Shadow: " + 1*trQuestVarGet("bossHealth") + "</color>", -1);
+					trQuestVarSet("runestoneActive", 0);
+					trQuestVarSetFromRand("rand", 15, 30, true);
+					trQuestVarSet("runestoneSpawnTime", trTime() + trQuestVarGet("rand"));
+					dir = bossDir;
+					count = (100 - trQuestVarGet("bossHealth")) * 0.1;
+					diff = 6.283185 / count;
+					mCos = xsCos(diff);
+					mSin = xsSin(diff);
+					for(y=count; >0) {
+						pos = vectorSnapToGrid(trVectorQuestVarGet("bossRoomCenter") - dir * 20.0);
+						next = trGetNextUnitScenarioNameNumber();
+						trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						if (next < trGetNextUnitScenarioNameNumber()) {
+							trArmySelect(""+ENEMY_PLAYER+",0");
+							trUnitChangeProtoUnit("Argus");
+							activateEnemy(next);
+							trUnitSelectClear();
+							trUnitSelect(""+next, true);
+							trSetUnitOrientation(dir, vector(0,1,0), true);
+						}
+						dir = rotationMatrix(dir, mCos, mSin);
+					}
+					trCameraShake(3.0, 0.1 * count);
+					trSoundPlayFN("cinematics\32_out\kronosbehinddorrshort.mp3","1",-1,"","");
+				} else {
+					xsDisableSelf();
+					for(y=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						trUnitDelete(false);
+					}
+					xsDisableRule("boss_music");
+					xsDisableRule("gameplay_always");
+					xsEnableRule("boss11_dead");
+					trQuestVarSet("gameOverNext", 0);
+					trQuestVarSet("gameOverStep", 0);
+				}
+				break;
+			}
+		}
+	} else if (trTime() > trQuestVarGet("runestoneSpawnTime")) {
+		trQuestVarSet("runestoneActive", 1);
+		pos = vectorSnapToGrid(trVectorQuestVarGet("bossRoomCenter") - bossDir * 20.0);
+		trVectorQuestVarSet("runestonePos", pos);
+		trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+		trArmySelect("0,0");
+		trUnitChangeProtoUnit("Runestone");
+		trUnitSelectClear();
+		trUnitSelectByQV("runestone");
+		trSetUnitOrientation(bossDir, vector(0,1,0), true);
+		trSetSelectedScale(2.5, 2.5, 2.5);
+		trUnitHighlight(5.0, true);
+		trMessageSetText("The Runestone has surfaced! You must touch it!", -1);
+		trSoundPlayFN("cinematics\13_out\prayshort.mp3","1",-1,"","");
+	}
+}
+
+rule boss11_dead
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("gameOverNext")) {
+		trQuestVarSet("gameOverStep", 1 + trQuestVarGet("gameOverStep"));
+		switch(1*trQuestVarGet("gameOverStep"))
+		{
+			case 1:
+			{
+				trQuestVarSet("playersWon", 1);
+				trLetterBox(true);
+				trUIFadeToColor(0,0,0, 2000,0,true);
+				trQuestVarSet("gameOverNext", trTime() + 4);
+				trSoundPlayFN("default","1",-1,
+					"Zenophobia: The Crawling Shadow has been vanquished, for now...","icons\infantry g hoplite icon 64");
+			}
+			case 2:
+			{
+				trQuestVarSet("gameOverNext", trTime() + 7);
+				trQuestVarSet("boonUnlocked"+BOON_HEALTH_ATTACK, 1);
+				trShowImageDialog(boonIcon(BOON_HEALTH_ATTACK), boonName(BOON_HEALTH_ATTACK));
+			}
+			case 4:
+			{
+				gadgetUnreal("ShowImageBox");
+				trQuestVarSet("gameOverNext", trTime() + 7);
+				if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
+					trSoundPlayFN("default","1",-1,
+						"Zenophobia: You have completed the quest. Return to singleplayer to read the final Runestone.", "icons\infantry g hoplite icon 64");
+				} else {
+					trSoundPlayFN("default.wav","1",-1,
+						"Zenophobia: Rewards have been sent to your warehouse. You can access them by playing this map in singleplayer.",
+						"icons\infantry g hoplite icon 64");
+				}
+				trQuestVarSet("gameOverStep", 1);
+				if (trQuestVarGet("newPlayers") == 0) {
+					trQuestVarSet("gameOverStep", 4);
+				}
+				xsDisableSelf();
+				xsEnableRule("game_over");
+				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));
+			}
+		}
+		gadgetUnreal("ShowImageBox-CloseButton");
 	}
 }

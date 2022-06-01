@@ -2464,12 +2464,23 @@ highFrequency
 	}
 }
 
+rule zenos_paradox_ambience
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("ambienceNext")) {
+		trQuestVarSet("ambienceNext", trTime() + 50);
+		trSoundPlayFN("cinematics\13_out\penguins.mp3","1",-1,"","");
+	}
+}
+
 rule zenos_paradox_build_01
 inactive
 highFrequency
 {
 	int db = trQuestVarGet("timeshiftHawks");
 	if (trQuestVarGet("spyfound") == trQuestVarGet("spyfind")) {
+		xsEnableRule("zenos_paradox_ambience");
 		for(x=0; < 20) {
 			trUnitSelectClear();
 			trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,db,x),true);
@@ -2503,16 +2514,20 @@ highFrequency
 			xSetInt(db, xRelicType, RELIC_MATH_PROBLEM + x);
 		}
 
+		trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
+		vector pos = trVectorQuestVarGet("bossRoomCenter");
+		trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+		trUnitSelectClear();
+		trUnitSelectByQV("runestone");
+		trUnitChangeProtoUnit("Runestone");
+		trUnitSelectClear();
+		trUnitSelectByQV("runestone");
+		trSetSelectedScale(2.5,2.5,2.5);
+		if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+			xsEnableRule("runestone_read");
+		}
+
 		if (trQuestVarGet("keeperQuestActive") == 1) {
-			trQuestVarSet("runestone", trGetNextUnitScenarioNameNumber());
-			vector pos = trVectorQuestVarGet("bossRoomCenter");
-			trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
-			trUnitSelectClear();
-			trUnitSelectByQV("runestone");
-			trUnitChangeProtoUnit("Runestone");
-			trUnitSelectClear();
-			trUnitSelectByQV("runestone");
-			trSetSelectedScale(2.5,2.5,2.5);
 			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
 				uiMessageBox("The Crawling Shadow welcomes you to its home.");
 			}

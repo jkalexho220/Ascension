@@ -146,6 +146,8 @@ highFrequency
 	setupProtounitBounty("Troll", 0.7, 7, 0.03);
 	setupProtounitBounty("Manticore", 0.3, 8, 0.05);
 	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
+
+	setupProtounitBounty("Argus", 0.5, 10, 0);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);
@@ -2099,6 +2101,82 @@ void specialUnitsAlways() {
 			xSetInt(dTartarianSpawns, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dTartarianSpawns, xSpecialIndex)));
 		}
 	}
+
+
+	if(xGetDatabaseCount(dArgus) >0) {
+		xDatabaseNext(dArgus);
+		id = xGetInt(dArgus,xUnitID);
+		p = xGetInt(dArgus,xPlayerOwner);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
+			trUnitChangeProtoUnit("Argus");
+			xFreeDatabaseBlock(dArgus);
+		} else if (checkEnemyDeactivated(dArgus)) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			xFreeDatabaseBlock(dArgus);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dArgus, xSpecialIndex)) == 1) {
+			xSetInt(dArgus, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dArgus, xSpecialNext)) {
+			switch(xGetInt(dArgus, xSpecialStep))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 6) {
+						xsSetContextPlayer(p);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetInt(dArgus, xSpecialTarget, target);
+						xSetInt(dArgus, xSpecialStep, 1);
+						xSetInt(dArgus, xSpecialNext, trTimeMS() + 1200);
+						trUnitOverrideAnimation(40,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					action = 0;
+					db = opponentDatabaseName(p);
+					for (x=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						if (xGetInt(dArgus, xSpecialTarget) == xGetInt(db,xUnitName)) {
+							xUnitSelectByID(db,xUnitID);
+							stunUnit(db, 6.0, p);
+							poisonUnit(db, 6.0, 5.0 * trQuestVarGet("stage"), p);
+							silenceUnit(db, 6.0, p);
+							action = 1;
+							break;
+						}
+					}
+					xSetInt(dArgus, xSpecialStep, 2);
+					xSetInt(dArgus, xSpecialNext, xGetInt(dArgus, xSpecialNext) + 1300);
+					if (action == 0) {
+						xSetInt(dArgus, xSpecialTarget, -1);
+					}
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					xSetInt(dArgus, xSpecialStep, 0);
+					if (xGetInt(dArgus, xSpecialTarget) == -1) {
+						xSetInt(dArgus, xSpecialNext, trTimeMS());
+					} else {
+						xSetInt(dArgus, xSpecialNext, trTimeMS() + 15000);
+					}
+				}
+			}
+		} else {
+			action = xGetInt(db, xStunStatus, xGetInt(dArgus, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dArgus, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dArgus, xSpecialStep) == 1) {
+				xSetInt(dArgus, xSpecialStep, 0);
+				xSetInt(dArgus, xSpecialNext, trTimeMS() + 18000);
+			}
+		}
+	}
+	
 }
 
 void enemiesAlways() {

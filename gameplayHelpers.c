@@ -1126,6 +1126,7 @@ int dEinherjars = 0;
 int dLightningStatues = 0;
 int dManticores = 0;
 int dFireGiants = 0;
+int dArgus = 0;
 
 int dAutomatonBombs = 0;
 
@@ -1224,6 +1225,9 @@ highFrequency
 	
 	dFrostGiants = initSpecialDatabase("FrostGiants");
 	xInitAddInt(dFrostGiants,"target");
+
+	dArgus = initSpecialDatabase("Argus");
+	xInitAddInt(dArgus, "target");
 	
 	dValkyries = initSpecialDatabase("Valkyries",false);
 	xInitAddInt(dValkyries,"sfx");
@@ -1373,6 +1377,10 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Frost Giant"):
 		{
 			addSpecialToDatabase(dFrostGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Argus"):
+		{
+			addSpecialToDatabase(dArgus,name,db,p);
 		}
 		case kbGetProtoUnitID("Valkyrie"):
 		{

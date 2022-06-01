@@ -57,6 +57,8 @@ void noSpecials() {
 			trModifyProtounit("Fire Giant", p, 9, 99999);
 			trModifyProtounit("Titan Atlantean", p, 9, -99990);
 			trModifyProtounit("Titan Atlantean", p, 9, 99999);
+			trModifyProtounit("Argus", p, 9, -99990);
+			trModifyProtounit("Argus", p, 9, 99999);
 		}
 	}
 }

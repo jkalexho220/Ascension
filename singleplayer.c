@@ -729,7 +729,7 @@ highFrequency
 		}
 
 		// runestone quest
-		if ((trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
+		if ((trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
 			xsEnableRule("venlesh_always");
 			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
@@ -1577,7 +1577,36 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("venlesh", true);
 	if (trUnitIsSelected()) {
-		startNPCDialog(NPC_VENLESH_START + trQuestVarGet("p1runestoneQuest"));
+		startNPCDialog(NPC_VENLESH_START + trQuestVarGet("p1runestoneQuest") +trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK));
 		reselectMyself();
 	}
+}
+
+rule keeper_grab_singleplayer
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	xsDisableRule("venlesh_always");
+	xsEnableRule("keeper_grab");
+	trQuestVarSet("p1runestoneQuest", 0);
+	trSoundPlayFN("Zenophobia\True Origin shortened.mp3","1",-1,"","");
+	trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
+	trSoundPlayFN("xpack\xcinematics\8_in\guardianawaken.mp3","1",-1,"","");
+	trCameraShake(10.0, 0.1);
+	vector pos = kbGetBlockPosition(""+1*trQuestVarGet("venlesh"));
+	trVectorQuestVarSet("keeperPos", pos);
+	trQuestVarSet("keeperTartarianGate", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("keeperTartarianGate");
+	trUnitChangeProtoUnit("Tartarian Gate");
+	trUnitSelectClear();
+	trUnitSelectByQV("keeperTartarianGate");
+	trUnitOverrideAnimation(6,0,true,false,-1);
+	trSetSelectedScale(0,0,0);
+	trQuestVarSet("keeperGrabStep", 0);
+	trQuestVarSet("keeperGrabTime", trTimeMS());
+	xsEnableRule("keeper_grab");
+	trQuestVarSet("keeperTarget", 0);
 }

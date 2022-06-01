@@ -78,14 +78,15 @@ const int NPC_VENLESH_START = 430;
 const int NPC_VENLESH_NEXT = 431;
 const int NPC_VENLESH_FIRST = 432;
 const int NPC_VENLESH_SECOND = 433;
+const int NPC_VENLESH_FINAL = 434;
 
-const int NPC_RUNESTONE_FIRST = 434;
-const int NPC_RUNESTONE_SECOND = 435;
+const int NPC_RUNESTONE_FIRST = 435;
+const int NPC_RUNESTONE_SECOND = 436;
 
-const int NPC_RUNESTONE_FINAL = 436;
+const int NPC_RUNESTONE_FINAL = 437;
 
-const int NPC_RUNESTONE_DWARF = 437;
-const int NPC_RUNESTONE_AKARD = 438;
+const int NPC_RUNESTONE_DWARF = 438;
+const int NPC_RUNESTONE_AKARD = 439;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -232,6 +233,87 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+		case NPC_VENLESH_FINAL:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Amazing. So this is the true tale...");
+				}
+				case 2:
+				{
+					uiMessageBox("Once upon a time, there was a horrific entity known as The Void that threatened the world.");
+				}
+				case 3:
+				{
+					uiMessageBox("The gods fought against The Void, but found that their attacks could not touch it.");
+				}
+				case 4:
+				{
+					uiMessageBox("They asked the legendary blacksmith nottud to craft them a mighty weapon that could harm The Void.");
+				}
+				case 5:
+				{
+					uiMessageBox("He granted their wish, and thus, the Starsword was born.");
+				}
+				case 6:
+				{
+					uiMessageBox("With the Starsword, the gods were able to drive off The Void, but at a terrible price.");
+				}
+				case 7:
+				{
+					uiMessageBox("The Starsword was far too powerful for any god to handle alone.");
+				}
+				case 8:
+				{
+					uiMessageBox("One by one, they wielded the sword and fought until its power overwhelmed them.");
+				}
+				case 9:
+				{
+					uiMessageBox("As one god fell, the next would take up the blade to continue the fight.");
+				}
+				case 10:
+				{
+					uiMessageBox("In the end, only one god remained. The rest had succumbed to madness.");
+				}
+				case 11:
+				{
+					uiMessageBox("With all his compatriots going mad, the last god knew what he had to do.");
+				}
+				case 12:
+				{
+					uiMessageBox("He sealed them all within a tower of marble and sunk it into the ocean depths.");
+				}
+				case 13:
+				{
+					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting each other.");
+				}
+				case 14:
+				{
+					uiMessageBox("As for the Starsword, it was split into three pieces and sealed within the tower as well.");
+				}
+				case 15:
+				{
+					uiMessageBox("Should The Void ever return, the tower would rise from the ground and beckon challengers to come forth.");
+				}
+				case 16:
+				{
+					uiMessageBox("Perhaps this time, a worthy champion can wield the Starsword and defeat The Void for good...");
+				}
+				case 17:
+				{
+					uiMessageBox("So I guess you've gotta find these three sword pieces now, huh?");
+				}
+				case 18:
+				{
+					uiMessageBox("Wait, what's that?! OH GOD!");
+					dialog = 0;
+					xsEnableRule("the_keeper_hunt_start");
+					xsEnableRule("keeper_grab_singleplayer");
+				}
+			}
+		}
 		case NPC_RUNESTONE_DWARF:
 		{
 			switch(dialog)
@@ -309,23 +391,6 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 6:
 				{
 					uiMessageBox("Perhaps this time, a worthy champion can wield the Starsword and defeat The Void for good...");
-					if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
-						dialog = 0;
-					}
-				}
-				case 7:
-				{
-					uiMessageBox("Blessing acquired!");
-					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
-				}
-				case 8:
-				{
-					trShowImageDialog(boonIcon(BOON_HEALTH_ATTACK), boonName(BOON_HEALTH_ATTACK));
-				}
-				case 9:
-				{
-					uiMessageBox("You can equip this Blessing in singleplayer.");
-					trQuestVarSet("boonUnlocked"+BOON_HEALTH_ATTACK, 1);
 					dialog = 0;
 				}
 			}
@@ -3723,14 +3788,14 @@ minInterval 3
 	{
 		case 0:
 		{
-			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 25.0) {
+			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 36.0) {
 				trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10002, "No", -1);
 				trQuestVarSet("readRunestone", 1);
 			}
 		}
 		case 1:
 		{
-			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) > 25.0) {
+			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) > 36.0) {
 				trQuestVarSet("readRunestone", 0);
 			}
 		}

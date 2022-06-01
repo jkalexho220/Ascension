@@ -36,6 +36,8 @@ int ENEMY_PLAYER = 0;
 bool Multiplayer = false;
 bool PvP = false;
 
+bool customContent = false;
+
 /*
 Chasm terrain is black
 */
@@ -355,12 +357,20 @@ void chooseClass(int p = 0, int class = 0) {
 	zSetProtoUnitStat("Cinematic Block", p, 0, xGetFloat(dPlayerData,xPlayerHealth));
 }
 
+void customContentEnabled(int eventID = -1) {
+	customContent = true;
+}
+
 rule setup
 active
 runImmediately
 {
 	Multiplayer = aiIsMultiplayer();
 	trSetUnitIdleProcessing(false);
+
+	// If this plays, you got the goods
+	trEventSetHandler(998, "customContentEnabled");
+	trSoundPlayFN("Zenophobia\Test sound.mp3", "1", 998, "", "");
 	
 	gadgetUnreal("GodPowers");
 	gadgetUnreal("tributedlg-sendButton");
