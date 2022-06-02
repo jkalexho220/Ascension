@@ -33,6 +33,10 @@ void saveAllData() {
 	if ((trQuestVarGet("p"+p+"nickQuestProgress") < 5) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
 		trQuestVarSet("p"+p+"nickQuestProgress", 0);
 	}
+
+	if (Multiplayer) {
+		trQuestVarSet("nottudTicketsCount", trQuestVarGet("nottudTicketsCount") + trQuestVarGet("ownedRelics"+RELIC_NOTTUD_TICKET));
+	}
 	
 	xSetPointer(dPlayerData,p);
 	if (xGetInt(dPlayerData, xPlayerClass) == 17) {
@@ -88,8 +92,10 @@ void saveAllData() {
 	}
 	
 	/* gemstones */
-	savedata = 1*xsMin(10, 1*trQuestVarGet("dreamGogglesCount"));
-	for(x=3; >=0) {
+	savedata = xsMin(9, trQuestVarGet("nottudTicketsCount"));
+	currentdata = xsMin(9, trQuestVarGet("dreamGogglesCount"));
+	savedata = savedata * 10 + currentdata;
+	for(x=2; >=0) {
 		currentdata = 1*xsMin(99, 1*trQuestVarGet("gemstone"+x));
 		savedata = savedata * 100 + currentdata;
 	}
@@ -145,10 +151,12 @@ void saveAllData() {
 	currentdata = xsMin(4, trQuestVarGet("p"+p+"runestoneQuest"));
 	savedata = savedata * 4 + currentdata;
 
-	for(x=4; >0) {
+	for(x=3; >0) {
 		currentdata = trQuestVarGet("p"+p+"swordpiece"+x);
 		savedata = savedata * 2 + currentdata;
 	}
+	currentdata = xsMin(trQuestVarGet("p"+p+"gladiatorWorlds"), 1);
+	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("p"+p+"hippocampus");
 	savedata = savedata * 2 + currentdata;
 	
@@ -207,8 +215,10 @@ inactive
 		trQuestVarSet("gemstone"+x, iModulo(100, savedata));
 		savedata = savedata / 100;
 	}
-	trQuestVarSet("dreamGogglesCount", iModulo(11, savedata));
-	savedata = savedata / 11;
+	trQuestVarSet("dreamGogglesCount", iModulo(10, savedata));
+	savedata = savedata / 10;
+	trQuestVarSet("nottudTicketsCount", iModulo(10, savedata));
+	savedata = savedata / 10;
 	/* class unlock progress */
 	savedata = trGetScenarioUserData(8);
 	if (savedata < 0) {
@@ -335,14 +345,16 @@ inactive
 
 		trQuestVarSet("p1hippocampus", iModulo(2, savedata));
 		savedata = savedata / 2;
-		for(x=4; >0) {
+		trQuestVarSet("p1gladiatorWorlds", iModulo(2, savedata));
+		savedata = savedata / 2;
+		for(x=1; <= 3) {
 			trQuestVarSet("p1swordpiece"+x, iModulo(2, savedata));
 			savedata = savedata / 2;
 		}
 
 		trQuestVarSet("p1runestoneQuest", iModulo(4, savedata));
 		savedata = savedata / 4;
-		savedata = savedata / 8;
+		savedata = savedata / 8; // spare data
 
 		trQuestVarSet("p1relicsSacrificed", iModulo(10, savedata));
 		savedata = savedata / 10;
@@ -470,7 +482,9 @@ inactive
 						currentdata = x;
 						trQuestVarSet("p"+p+"hippocampus", iModulo(2, currentdata));
 						currentdata = currentdata / 2;
-						for(i=4; >0) {
+						trQuestVarSet("p"+p+"gladiatorWorlds", iModulo(2, currentdata));
+						currentdata = currentdata / 2;
+						for(i=1; <= 3) {
 							trQuestVarSet("p"+p+"swordpiece"+i, iModulo(2, currentdata));
 							currentdata = currentdata / 2;
 						}

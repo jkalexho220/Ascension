@@ -240,13 +240,13 @@ inactive
 			{
 				case 2:
 				{
-					trMusicPlay("Zenophobia\To Overcome This Crisis.mp3", "1", 1.0);
-					trQuestVarSet("musicTime", trTime() + 119);
+					trMusicPlay("Zenophobia\Enlightenment is Found Within.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 100);
 				}
 				case 3:
 				{
-					trMusicPlay("Zenophobia\Aim for the Top of the Crucible.mp3", "1", 0.2);
-					trQuestVarSet("musicTime", trTime() + 121);
+					trMusicPlay("Zenophobia\To Overcome This Crisis.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 119);
 				}
 				case 4:
 				{
@@ -275,8 +275,13 @@ inactive
 				}
 				case 9:
 				{
-					trMusicPlay("Zenophobia\The Hellion's Assault.mp3", "1", 0.2);
-					trQuestVarSet("musicTime", trTime() + 138);
+					trMusicPlay("Zenophobia\Aim for the Top of the Crucible.mp3", "1", 0);
+					trQuestVarSet("musicTime", trTime() + 121);
+				}
+				case 10:
+				{
+					trMusicPlay("Zenophobia\Apex of the World.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 540);
 				}
 				case 11:
 				{
@@ -6500,7 +6505,7 @@ highFrequency
 		xsEnableRule("the_keeper_hunt");
 		xsEnableRule("the_keeper_hunt_warn");
 		if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
-			trMessageSetText("The Crawling Shadow is hunting you.", -1);
+			trMessageSetText("Something ominous is searching for you.", -1);
 		}
 	}
 }
@@ -6580,7 +6585,7 @@ highFrequency
 					trQuestVarSet("keeperGrabTime", trTimeMS());
 					xsEnableRule("keeper_grab");
 					trQuestVarSet("keeperTarget", p);
-					trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has been captured by The Crawling Shadow!", -1);
+					trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has been devoured and lost a level!", -1);
 					break;
 				}
 			}
@@ -6870,7 +6875,7 @@ highFrequency
 					bossDir = rotationMatrix(bossDir, 0.980785, 0.19509);
 				}
 				trQuestVarSet("cinTime", trTime() + 3);
-				trOverlayText("The Crawling Shadow", 3.0, -1, -1, -1);
+				trOverlayText("The Shadow That Crawls", 3.0, -1, -1, -1);
 			}
 			case 5:
 			{
@@ -6905,7 +6910,7 @@ highFrequency
 				trQuestVarSet("bossHealth", 100);
 				trCounterAddTime("bossHealth", -1, -9999, "<color={Playercolor(2)}>Crawling Shadow: " + 1*trQuestVarGet("bossHealth") + "</color>", -1);
 
-				trStringQuestVarSet("advice","The Crawling Shadow's hunt continues.");
+				trStringQuestVarSet("advice","The Shadow's hunt continues.");
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -6956,7 +6961,7 @@ highFrequency
 				diff = xGetInt(dFingers, xFingerTimeout) - trTimeMS();
 				if (diff > 0) {
 					diff = 3.5 - 0.002 * diff;
-					trSetSelectedScale(0.0 - diff, diff, -2.0);
+					trSetSelectedScale(0.0 - diff, 0.5 * diff, -2.0);
 				} else {
 					xSetInt(dFingers, xFingerStep, 1);
 					xSetInt(dFingers, xFingerTimeout, trTimeMS());
@@ -6971,7 +6976,7 @@ highFrequency
 				mCos = xsCos(diff);
 				dir = xsVectorSetY(xGetVector(dFingers, xFingerDir) * mSin, mCos);
 				trSetUnitOrientation(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0), vector(0,0,0) - dir, true);
-				if (diff > 3.6) {
+				if (diff > 3.5) {
 					trQuestVarSet("sound", 0);
 					xSetInt(dFingers,xFingerStep, 2);
 					xSetInt(dFingers, xFingerTimeout, trTimeMS() + 1000);
@@ -7136,7 +7141,7 @@ highFrequency
 				trUIFadeToColor(0,0,0, 2000,0,true);
 				trQuestVarSet("gameOverNext", trTime() + 4);
 				trSoundPlayFN("default","1",-1,
-					"Zenophobia: The Crawling Shadow has been vanquished, for now...","icons\infantry g hoplite icon 64");
+					"Zenophobia: The Shadow That Crawls has been vanquished, for now...","icons\infantry g hoplite icon 64");
 			}
 			case 2:
 			{

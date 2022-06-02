@@ -43,6 +43,8 @@ const int RELIC_POISON_FASTER = 30;
 const int NORMAL_RELICS = 30;
 /* key relics */
 
+const int RELIC_NOTTUD_TICKET = 35;
+
 const int RELIC_NICKONHAWK = 36;
 const int RELIC_NICKONHAWK_TICKET = 37;
 
@@ -213,6 +215,10 @@ string relicName(int relic = 0) {
 			case RELIC_NICKONHAWK_TICKET:
 			{
 				msg = "Golden Ticket";
+			}
+			case RELIC_NOTTUD_TICKET:
+			{
+				msg = "A signed copy of Gladiator Worlds";
 			}
 			
 			case RELIC_LITERAL_FECES:
@@ -418,6 +424,10 @@ string relicIcon(int relic = 0) {
 			case RELIC_NICKONHAWK_TICKET:
 			{
 				icon = "icons\hero g odysseus icon 64";
+			}
+			case RELIC_NOTTUD_TICKET:
+			{
+				icon = "icons\infantry x oracle hero icons 64";
 			}
 			case RELIC_PET_DOG:
 			{
@@ -665,6 +675,10 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			trQuestVarSet("p"+p+"equippedGoggles", trQuestVarGet("p"+p+"equippedGoggles") + m);
 		}
+		case RELIC_NOTTUD_TICKET:
+		{
+			trQuestVarSet("p"+p+"gladiatorWorlds", trQuestVarGet("p"+p+"gladiatorWorlds") + m);
+		}
 		case RELIC_PET_DOG:
 		{
 			xSetInt(dPlayerData,xPlayerPetDogs,xGetInt(dPlayerData,xPlayerPetDogs) + m);
@@ -888,6 +902,10 @@ int relicProto(int relic = 0) {
 			case RELIC_NICKONHAWK_TICKET:
 			{
 				proto = kbGetProtoUnitID("Hero Greek Odysseus");
+			}
+			case RELIC_NOTTUD_TICKET:
+			{
+				proto = kbGetProtoUnitID("Oracle Scout");
 			}
 			case RELIC_PET_DOG:
 			{

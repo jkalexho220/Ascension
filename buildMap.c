@@ -32,8 +32,8 @@ highFrequency
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 3 x stage */
-				for(j=3; >0) {
+				/* bacchanalia 4 x stage */
+				for(j=4; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
 			}
@@ -46,16 +46,20 @@ highFrequency
 			}
 		}
 		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 7 x stage */
-			for(j=7; >0) {
+			/* bacchanalia 4 x stage */
+			for(j=4; >0) {
 				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
 		}
 		xsEnableRule("delayed_modify");
 	} else if (trUnitIsSelected()) {
 		uiClearSelection();
-		trShowImageDialog(stageIcon(xGetInt(dStageChoices,xStageChoicesStage)),
-			"Stage " + xGetInt(dStageChoices,xStageChoicesStage) + ": " + stageName(xGetInt(dStageChoices,xStageChoicesStage)));
+		if (xGetInt(dStageChoices, xStageChoicesStage) > 0 && xGetInt(dStageChoices, xStageChoicesStage) <= 10) {
+			trShowImageDialog(stageIcon(xGetInt(dStageChoices,xStageChoicesStage)),
+				"Floor " + xGetInt(dStageChoices,xStageChoicesStage) + ": " + stageName(xGetInt(dStageChoices,xStageChoicesStage)));
+		} else {
+			trShowImageDialog(stageIcon(xGetInt(dStageChoices,xStageChoicesStage)), stageName(xGetInt(dStageChoices,xStageChoicesStage)));
+		}
 	}
 }
 
@@ -832,6 +836,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			for(i=0; <5) {
 				trQuestVarSet("choice"+i, RELIC_CURSED_RANGE + i);
 			}
+			trQuestVarSet("choice5", RELIC_NOTTUD_TICKET);
 			trQuestVarSet("obeliskx0", 70*x+46);
 			trQuestVarSet("obeliskz0", 70*z+46);
 			trQuestVarSet("obeliskx1", 70*x+46);
@@ -853,12 +858,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				trArmySelect("1,0");
 				trUnitConvert(0);
 				trMutateSelected(kbGetProtoUnitID("Outpost"));
-				trQuestVarSetFromRand("rand", 0, 4 - i, true);
+				trQuestVarSetFromRand("rand", 0, 5 - i, true);
 				xSetPointer(dNottudShop, xAddDatabaseBlock(dNottudShop));
 				xSetInt(dNottudShop, xUnitName, 1*trQuestVarGet("next"));
 				xSetInt(dNottudShop, xRelicType, 1*trQuestVarGet("choice"+1*trQuestVarGet("rand")));
 				xSetVector(dNottudShop, xNottudShopPos, xsVectorSet(trQuestVarGet("obeliskx"+i),0,trQuestVarGet("obeliskz"+i)));
-				trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(4-i)));
+				trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(5-i)));
 			}
 		}
 		case ROOM_TEMPLE + 2:

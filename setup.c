@@ -150,6 +150,10 @@ string stageName(int stage = 0) {
 		{
 			name = "Glory Stadium";
 		}
+		case 12:
+		{
+			name = "Gladiator Worlds v" + 1*trQuestVarGet("gladiatorWorldsVersion") + " by nottud";
+		}
 	}
 	return(name);
 }
@@ -201,6 +205,10 @@ string stageIcon(int stage = 0) {
 		case 0:
 		{
 			img = "icons\god power valor icons 64";
+		}
+		case 12:
+		{
+			img = "icons\infantry x oracle hero icons 64";
 		}
 	}
 	return(img);
@@ -812,6 +820,7 @@ rule Z_cin_02
 inactive
 highFrequency
 {
+	int next = 0;
 	if (trTime() > cActivationTime + 5) {
 		trModifyProtounit("Curse SFX", 1, 8, -8);
 		if (xGetInt(dPlayerData,xPlayerProgress,1) <= 0) {
@@ -836,13 +845,14 @@ highFrequency
 			trPaintTerrain(0,0,195,45,0,34,false); // sand A
 			
 			if ((trQuestVarGet("p1nickQuestProgress") == 6) && (trQuestVarGet("newPlayers") == 0) && ENEMY_PLAYER > 2) {
-				int next = trGetNextUnitScenarioNameNumber();
+				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch("0,0","Dwarf",1,129,0,93,180,true);
 				trArmySelect("0,0");
 				trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
 				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
 				xSetInt(dStageChoices,xUnitName,next);
 				xSetInt(dStageChoices,xStageChoicesStage,0);
+				
 				trPaintTerrain(65,47,65,47,0,80);
 				trPaintTerrain(65,46,65,46,0,74);
 				trPaintTerrain(65,45,65,45,0,81);
@@ -852,6 +862,27 @@ highFrequency
 				trPaintTerrain(63,47,63,47,0,83);
 				trPaintTerrain(64,47,64,47,0,75);
 				trPaintTerrain(64,46,64,46,0,34);
+			}
+
+			if (trQuestVarGet("p1gladiatorWorlds") == 1) {
+				trQuestVarSetFromRand("gladiatorWorldsVersion", 100, 1100, true);
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Dwarf",1,161,0,93,180,true);
+				trArmySelect("0,0");
+				trMutateSelected(kbGetProtoUnitID("Minotaur"));
+				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+				xSetInt(dStageChoices,xUnitName,next);
+				xSetInt(dStageChoices,xStageChoicesStage,12);
+				trPaintTerrain(81,47,81,47,0,80);
+				trPaintTerrain(81,46,81,46,0,74);
+				trPaintTerrain(81,45,81,45,0,81);
+				trPaintTerrain(80,45,80,45,0,75);
+				trPaintTerrain(79,45,79,45,0,82);
+				trPaintTerrain(79,46,79,46,0,74);
+				trPaintTerrain(79,47,79,47,0,83);
+				trPaintTerrain(80,47,80,47,0,75);
+				trPaintTerrain(80,46,80,46,0,34);
+
 			}
 
 			if (trQuestVarGet("p1monsterpediaQuest") == 2) {

@@ -734,6 +734,27 @@ highFrequency
 			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
+
+		if (trQuestVarGet("nottudTicketsCount") > 0) {
+			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Minotaur",1,127,0,167,225,true);
+			int start = trGetNextUnitScenarioNameNumber();
+			trArmyDispatch("0,0","Dwarf",trQuestVarGet("nottudTicketsCount"),125,0,165,225,true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Relic");
+			for(i = start; < trGetNextUnitScenarioNameNumber()) {
+				if (kbGetBlockID(""+i) > 0) {
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, i);
+					xSetInt(dFreeRelics, xRelicType, RELIC_NOTTUD_TICKET);
+				}
+			}
+			xsEnableRule("nottud_singleplayer_always");
+		}
+
+		if (trQuestVarGet("p1gladiatorWorlds") == 1) {
+			trQuestVarSet("p1gladiatorWorlds", 0);
+		}
 		
 		if (xGetInt(dPlayerData, xPlayerClass) == 0) {
 			xSetInt(dPlayerData, xPlayerClass, MOONBLADE);
@@ -1609,4 +1630,16 @@ highFrequency
 	trQuestVarSet("keeperGrabTime", trTimeMS());
 	xsEnableRule("keeper_grab");
 	trQuestVarSet("keeperTarget", 0);
+}
+
+rule nottud_singleplayer_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("nottudUnit", true);
+	if (trUnitIsSelected()) {
+		uiMessageBox("Would you like to play Gladiator Worlds? You have " + 1*trQuestVarGet("nottudTicketsCount") + " copies.");
+		reselectMyself();
+	}
 }

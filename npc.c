@@ -140,7 +140,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 7:
 				{
-					uiMessageBox("The Crawling Shadow has taken notice of you.");
+					uiMessageBox("Something has taken notice of you.");
 					trSoundPlayFN("spybirth.wav","1",-1,"","");
 					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 2);
 					dialog = 0;
@@ -203,7 +203,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 7:
 				{
-					uiMessageBox("You sense a presence from beyond. The Crawling Shadow knows where you are.");
+					uiMessageBox("You sense a presence from beyond. Something knows where you are.");
 					trSoundPlayFN("spybirth.wav","1",-1,"","");
 					trQuestVarSet("p"+trCurrentPlayer()+"runestoneQuest", 3);
 					dialog = 0;
@@ -283,11 +283,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 12:
 				{
-					uiMessageBox("He sealed them all within a tower of marble and sunk it into the ocean depths.");
+					uiMessageBox("He sealed them all within a massive tower and sunk it into the ocean depths.");
 				}
 				case 13:
 				{
-					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting each other.");
+					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting the others.");
 				}
 				case 14:
 				{
@@ -328,7 +328,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("It resides in a place of logical fallacies and mathematical errors. Most terrifying.");
+					uiMessageBox("It's in a place of logical fallacies and mathematical errors. Most terrifying.");
 				}
 				case 4:
 				{
@@ -343,7 +343,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("What?! You've read the Runestones?! Get away from me! Before the Creeping Shadow strikes!");
+					uiMessageBox("What?! You've read the Runestones?! Get away from me! Before that thing strikes!");
 				}
 				case 2:
 				{
@@ -374,11 +374,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("He sealed them all within a tower of marble and sunk it into the ocean depths.");
+					uiMessageBox("He sealed them all within a massive tower and sunk it into the ocean depths.");
 				}
 				case 3:
 				{
-					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting each other.");
+					uiMessageBox("Each god was imprisoned on a separate floor to prevent them from hurting the others.");
 				}
 				case 4:
 				{
@@ -413,7 +413,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					uiMessageBox("However, anyone who reads these Runestones will be hunted by a horrific creature.");
+					uiMessageBox("However, anyone who reads these Runestones will be hunted by an unknown horror.");
 				}
 				case 5:
 				{

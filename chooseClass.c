@@ -1023,7 +1023,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 4:
 				{
-					msg = "Bounce Range: 10 | Damage: 100 | Bounces: Projectiles + Spells Cast";
+					msg = "Bounce Range: 10 | Damage: 100 (Scales with Spell Power) | Bounces: Projectiles + Spells Cast";
 				}
 				case 5:
 				{

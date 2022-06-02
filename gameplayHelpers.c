@@ -356,6 +356,10 @@ void equipRelicsAgain(int p = 0) {
 	int db = getRelicsDB(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
+		if (kbGetBlockID(""+xGetInt(db, xUnitName)) == -1) {
+			xSetInt(db, xUnitName, trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		}
 		trUnitSelectClear();
 		trUnitSelect(""+xGetInt(db,xRelicName),true);
 		trUnitChangeProtoUnit("Relic");
