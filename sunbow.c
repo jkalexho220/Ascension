@@ -86,7 +86,7 @@ void sunbowAlways(int eventID = -1) {
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
-	bool alternate = false;
+	bool alternate = true;
 	xSetPointer(dPlayerData, p);
 	
 	vector end = vector(0,0,0);

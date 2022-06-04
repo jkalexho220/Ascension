@@ -288,10 +288,18 @@ inactive
 					trMusicPlay("Zenophobia\True Origin.mp3", "1", 1.0);
 					trQuestVarSet("musicTime", trTime() + 89);
 				}
+				case 12:
+				{
+					trMusicPlay("Zenophobia\God Shattering Star.mp3", "1", 1.0);
+					trQuestVarSet("musicTime", trTime() + 474);
+				}
 			}
 		} else {
 			trQuestVarSet("musicTime", trTime() + 50);
-			trQuestVarSetFromRand("music", 1, 6, true);
+			trQuestVarSet("music", 1 + trQuestVarGet("music"));
+			if (trQuestVarGet("music") > 6) {
+				trQuestVarSet("music", 1);
+			}
 			switch(1*trQuestVarGet("music"))
 			{
 				case 1:
@@ -329,6 +337,7 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
 		xsDisableSelf();
+		trQuestVarSetFromRand("music", 1, 6, true);
 		xRestoreCache(dPlayerUnits);
 		int id = 0;
 		trQuestVarSet("deadPlayerCount", 0);
@@ -7171,5 +7180,62 @@ highFrequency
 			}
 		}
 		gadgetUnreal("ShowImageBox-CloseButton");
+	}
+}
+
+rule white_tiger_boss
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelect(""+bossUnit, true);
+	int p = 0;
+	int x = 0;
+	int z = 0;
+	int action = 0;
+	int id = 0;
+	float amt = 0;
+	float angle = 0;
+	float dist = 0;
+	bool hit = false;
+	
+	vector hitbox = vector(0,0,0);
+	vector start = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector prev = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	
+	if (trUnitAlive() == true) {
+		
+		trUnitSelectClear();
+		trUnitSelect(""+bossUnit, true);
+		
+		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
+			processBossCooldown();
+		} else if (trQuestVarGet("bossSpell") > 30) {
+			
+		} else if (trQuestVarGet("bossSpell") > 20) {
+			
+		} else if (trQuestVarGet("bossSpell") > 10) {
+			
+		} else if (trQuestVarGet("bossSpell") > 0) {
+			if (trQuestVarGet("bossSpell") == 1) {
+				bossNext = trTimeMS() + 1000;
+				trUnitSelectClear();
+				trUnitSelect(""+bossUnit, true);
+			}
+		} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
+			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
+			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
+				trQuestVarSetFromRand("bossSpell", 0, 2, true);
+				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+			}
+		}
+	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
+		xsDisableSelf();
+		xsDisableRule("boss_music");
+		boss = 0;
 	}
 }

@@ -9,8 +9,12 @@ highFrequency
 	xUnitSelect(dStageChoices,xUnitName);
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", xGetInt(dStageChoices,xStageChoicesStage));
-		if (trQuestVarGet("stage") == 0) {
+		if (trQuestVarGet("stage") == 10) {
+			xsEnableRule("final_build_map");
+		} else if (trQuestVarGet("stage") == 0) {
 			xsEnableRule("pvp_build_map");
+		} else if (trQuestVarGet("stage") == 12) {
+			xsEnableRule("gladiator_worlds_build_map");
 		} else {
 			xsEnableRule("choose_stage_02");
 			trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
@@ -32,8 +36,8 @@ highFrequency
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
 		for(p=ENEMY_PLAYER; >0) {
 			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 4 x stage */
-				for(j=4; >0) {
+				/* bacchanalia 3 x stage */
+				for(j=3; >0) {
 					trTechSetStatus(p, 78, 4);
 				}
 			}
@@ -46,8 +50,8 @@ highFrequency
 			}
 		}
 		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 4 x stage */
-			for(j=4; >0) {
+			/* bacchanalia 7 x stage */
+			for(j=7; >0) {
 				trTechSetStatus(ENEMY_PLAYER, 78, 4);
 			}
 		}
@@ -444,7 +448,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitSelectByQV("runestone", true);
 			trSetSelectedScale(2.5,2.5,2.5);
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 1) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") + trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) >= 1) {
 				xsEnableRule("runestone_read");
 			}
 
@@ -568,7 +572,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trSetSelectedScale(2.5,2.5,2.5);
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
 
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
 				xsEnableRule("runestone_read");
 			}
 			
@@ -865,6 +869,25 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				xSetVector(dNottudShop, xNottudShopPos, xsVectorSet(trQuestVarGet("obeliskx"+i),0,trQuestVarGet("obeliskz"+i)));
 				trQuestVarSet("choice"+1*trQuestVarGet("rand"), trQuestVarGet("choice"+(5-i)));
 			}
+		}
+		case ROOM_TIGER:
+		{
+			paintCircle(x, z, 10, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
+			bossUnit = trGetNextUnitScenarioNameNumber();
+			trArmyDispatch("1,0", "Victory Marker", 1, 70*x+40, 0, 70*z+40,225,true);
+			trUnitSelectClear();
+			trUnitSelect(""+bossUnit, true);
+			trUnitConvert(ENEMY_PLAYER);
+			trUnitChangeProtoUnit("White Tiger");
+			xAddDatabaseBlock(dEnemiesIncoming,true);
+			xSetInt(dEnemiesIncoming, xUnitName, bossUnit);
+			xsEnableRule("white_tiger_boss");
+
+			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 9999999999999999999.0);
+			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, -9999999999999999999.0);
+			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+
+			trModifyProtounit("Victory Marker", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
 		}
 		case ROOM_TEMPLE + 2:
 		{
@@ -2082,6 +2105,16 @@ highFrequency
 		if (trQuestVarGet("nottudSpawn") < trQuestVarGet("stage")) {
 			nottudSpawn = true;
 		}
+
+		bool tigerSpawn = false;
+		/*
+		if (trQuestVarGet("stage") > 1 && trQuestVarGet("stage") < 7) {
+			trQuestVarSetFromRand("tigerSpawn", 1, 10, true);
+			if (trQuestVarGet("tigerSpawn") < trQuestVarGet("stage")) {
+				tigerSpawn = true;
+			}
+		}
+		*/
 		
 		if (trQuestVarGet("stage") > 10) {
 			trQuestVarSet("relicTransporterGuy", -1);
@@ -2124,12 +2157,15 @@ highFrequency
 							}
 						}
 					}
-				} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
-					buildRoom(x, z, ROOM_NOTTUD);
-					nottudSpawn = false;
 				} else if (trQuestVarGet("templeRoom") == i) {
 					xsEnableRule("find_temple");
 					buildRoom(x, z, ROOM_TEMPLE + trQuestVarGet("stage"));
+				} else if (nottudSpawn && (countRoomEntrances(x, z) == 1)) {
+					buildRoom(x, z, ROOM_NOTTUD);
+					nottudSpawn = false;
+				} else if (tigerSpawn && (countRoomEntrances(x, z) == 1)) {
+					buildRoom(x, z, ROOM_TIGER);
+					tigerSpawn = false;
 				} else if (trQuestVarGet("chestRand") == 1) {
 					chests = chests - 1;
 					buildRoom(x, z, ROOM_CHEST);
@@ -2532,11 +2568,7 @@ highFrequency
 			xsEnableRule("runestone_read");
 		}
 
-		if (trQuestVarGet("keeperQuestActive") == 1) {
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") == 3) {
-				uiMessageBox("The Crawling Shadow welcomes you to its home.");
-			}
-		} else {
+		if (trQuestVarGet("keeperQuestActive") == 0) {
 			xsDisableRule("enter_boss_room");
 		}
 	}
@@ -2817,4 +2849,72 @@ highFrequency
 		}
 	}
 	xsEnableRule("choose_stage_02");
+}
+
+rule final_build_map
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	int x = 0;
+	int z = 0;
+
+	trSetCivAndCulture(0, 0, 3);
+
+
+	trPaintTerrain(0, 0, 145, 145, 2, 13, false);
+
+	for(x=0; < 145) {
+		trPaintTerrain(x, x-5, x, x+5, 5, 4, false);
+	}
+	/* center island */
+	for(x=0; <15) {
+		for(b=0; < 15) {
+			if (x*x + z*z <= 225) {
+				trPaintTerrain(72-x,72-z,72+x,72+z,0,50,false);
+				break;
+			} else {
+				z = z - 1;
+			}
+		}
+	}
+	
+	/* pathways */
+	trPaintTerrain(57,71,87,73,0,53,false);
+	trPaintTerrain(71,57,73,87,0,53,false);
+
+	/* eyecandy - candy for the eyes */
+	for(x=0; < 145) {
+		trQuestVarSetFromRand("rand", 0, 145, true);
+		if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
+			trQuestVarSetFromRand("heading", 0, 360, true);
+			trArmyDispatch("0,0","Ruins",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
+		}
+		trQuestVarSetFromRand("rand", 0, 145, true);
+		if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
+			trQuestVarSetFromRand("heading", 0, 360, true);
+			trArmyDispatch("0,0","Columns Broken",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
+		}
+	}
+
+	for(z=0; < 145) {
+		trQuestVarSetFromRand("rand", 0, 145, true);
+		if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
+			trQuestVarSetFromRand("heading", 0, 360, true);
+			trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
+		}
+		trQuestVarSetFromRand("rand", 0, 145, true);
+		if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
+			trQuestVarSetFromRand("heading", 0, 360, true);
+			trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
+		}
+	}
+
+	bossUnit = trGetNextUnitScenarioNameNumber();
+	trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 225, true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Guardian Sleeping");
+
+	xsEnableRule("guardian_dialog");
+	xsEnableRule("gameplay_start");
 }

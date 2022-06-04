@@ -1,5 +1,3 @@
-
-
 const int CHEST_KEY = 1;
 const int CHEST_ENCOUNTER = 2;
 const int CHEST_STATUES = 3;
@@ -144,7 +142,7 @@ string stageName(int stage = 0) {
 		}
 		case 10:
 		{
-			name = "The Unknown (UNDER CONSTRUCTION)";
+			name = "The Apex";
 		}
 		case 0:
 		{
@@ -787,6 +785,11 @@ void paintTowerSegment(int stage = 0) {
 		{
 			tPrimary = 2;
 			tSubPrimary = 12;
+		}
+		case 10:
+		{
+			tPrimary = 5;
+			tSubPrimary = 4;
 		}
 	}
 	trPaintTerrain(68,43 + 3 * stage,76,46 + 3 * stage, tPrimary, tSubPrimary, false);

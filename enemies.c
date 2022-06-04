@@ -99,6 +99,7 @@ highFrequency
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
 	setupProtounitBounty("Titan Atlantean", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
+	setupProtounitBounty("White Tiger", 0.4, 0, 0);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);
 	setupProtounitBounty("Anubite", 0.3, 4, 0.03);

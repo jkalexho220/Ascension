@@ -1133,13 +1133,7 @@ inactive
 highFrequency
 {
 	if (trTime() > trQuestVarGet("deepDeployNext")) {
-		trUnitSelectClear();
-		trUnitSelectByQV("stageWonder");
-		if ((trUnitAlive() == false) || (trQuestVarGet("play") == 0)) {
-			xsDisableSelf();
-			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
-			trUnitOverrideAnimation(6,0,false,true,-1);
-		} else if (xGetDatabaseCount(dPlayerUnits) > 0) {
+		if (xGetDatabaseCount(dPlayerUnits) > 0) {
 			int x = 0;
 			int z = 0;
 			trQuestVarSet("deepDeployNext", trTime() + 60);
@@ -1162,6 +1156,15 @@ highFrequency
 				dir = rotationMatrix(dir, 0, -1);
 				heading = heading + 90;
 			}
+		}
+	} else {
+		trUnitSelectClear();
+		trUnitSelectByQV("stageWonder");
+		if (trUnitAlive() == false) {
+			xsDisableSelf();
+			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
+			trUnitSetAnimationPath("3,1,0,0,0,0,0");
+			trUnitOverrideAnimation(6,0,false,false,-1);
 		}
 	}
 }

@@ -85,8 +85,15 @@ const int NPC_RUNESTONE_SECOND = 436;
 
 const int NPC_RUNESTONE_FINAL = 437;
 
+const int NPC_RUNESTONE_STOP = 440;
+
 const int NPC_RUNESTONE_DWARF = 438;
 const int NPC_RUNESTONE_AKARD = 439;
+
+const int NPC_HUNT_THE_TIGER_START = 441;
+const int NPC_HUNT_THE_TIGER_NEXT = 442;
+const int NPC_EXCALIBUR_START = 443;
+const int NPC_EXCALIBUR_NEXT = 444;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -107,6 +114,102 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_EXCALIBUR_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey you, have you heard? They found something incredible on the first floor.");
+				}
+				case 2:
+				{
+					uiMessageBox("There's a sword stuck in a rock! All sorts of adventurers have been trying to pull it out!");
+				}
+				case 3:
+				{
+					uiMessageBox("But so far, no one's been able to. The stone around it regenerates too.");
+				}
+				case 4:
+				{
+					uiMessageBox("Maybe if we damage the stone faster than it can regenerate, we can pull the sword out?");
+				}
+				case 5:
+				{
+					trMessageSetText("Uncover the sword on the first floor.", -1);
+					trQuestVarSet("p1excaliburQuest", 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_EXCALIBUR_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("People have been trying to pull out the sword in the first floor.");
+				}
+				case 2:
+				{
+					uiMessageBox("Maybe we can damage the stone around it enough to free it.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_HUNT_THE_TIGER_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers! Can anyone lend a hand?");
+				}
+				case 2:
+				{
+					uiMessageBox("A vicious beast has been spotted roaming the Tower! It has already devoured two parties!");
+				}
+				case 3:
+				{
+					uiMessageBox("There will be more casualties if it isn't hunted down now! If anyone can assist, please lend a hand!");
+				}
+				case 4:
+				{
+					uiMessageBox("The creature is a large white tiger! You can't miss it!");
+				}
+				case 5:
+				{
+					trMessageSetText("Find and kill the White Tiger.", -1);
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_HUNT_THE_TIGER_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The White Tiger has been hunting within the tower! It occasionally appears in the middle floors!");
+				}
+				case 5:
+				{
+					uiMessageBox("We need to put a stop to its rampage!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RUNESTONE_STOP:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Whoa there buddy! I wouldn't do that if I were you!");
+				}
+			}
+		}
 		case NPC_RUNESTONE_FIRST:
 		{
 			switch(dialog)
@@ -328,7 +431,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("It's in a place of logical fallacies and mathematical errors. Most terrifying.");
+					uiMessageBox("It's in a fractured dimension filled with logical fallacies. Most terrifying.");
 				}
 				case 4:
 				{
@@ -422,6 +525,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 6:
 				{
 					uiMessageBox("Can you help me read the Runestones?");
+				}
+				case 7:
+				{
+					trMessageSetText("Read the first Runestone.", -1);
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trQuestVarSet("p1runestoneQuest", 1);
 					dialog = 0;
 				}
@@ -438,6 +546,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("It's surrounded by ghosts and should be pretty hard to miss.");
+				}
+				case 3:
+				{
+					trMessageSetText("Read the first Runestone.", -1);
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
 				}
 			}
@@ -3799,5 +3912,17 @@ minInterval 3
 				trQuestVarSet("readRunestone", 0);
 			}
 		}
+	}
+}
+
+rule guardian_dialog
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelect(""+bossUnit, true);
+	if (trUnitIsSelected()) {
+		uiMessageBox("The statue stands alone on the platform. Something is missing from his hand.");
+		reselectMyself();
 	}
 }

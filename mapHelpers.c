@@ -21,6 +21,7 @@ const int ROOM_CHEST = 5;
 const int ROOM_STARTER = 6;
 const int ROOM_BOSS = 7;
 const int ROOM_NOTTUD = 8;
+const int ROOM_TIGER = 9;
 
 const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;
