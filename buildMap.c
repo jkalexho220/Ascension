@@ -370,7 +370,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xAddDatabaseBlock(dStunnedUnits, true);
 			xSetInt(dStunnedUnits, xUnitName, trGetNextUnitScenarioNameNumber());
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Axeman"));
-			trArmyDispatch("0,0","Axeman",1, x * 70 + 31, 0, z * 70 + 35, 90, true);
+			trArmyDispatch("0,0","Axeman",1, x * 70 + 31, 0, z * 70 + 37, 90, true);
 
 			xAddDatabaseBlock(dNpcTalk, true);
 			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
@@ -380,7 +380,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xAddDatabaseBlock(dNpcTalk, true);
 			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
 			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER + 3);
-			trArmyDispatch("0,0","Villager Egyptian",1, x * 70 + 35, 0, z * 70 + 31, 270, true);
+			trArmyDispatch("0,0","Villager Egyptian",1, x * 70 + 37, 0, z * 70 + 31, 0, true);
 
 			xAddDatabaseBlock(dNpcTalk, true);
 			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
@@ -388,7 +388,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			xAddDatabaseBlock(dStunnedUnits, true);
 			xSetInt(dStunnedUnits, xUnitName, trGetNextUnitScenarioNameNumber());
 			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Militia"));
-			trArmyDispatch("0,0","Militia",1, x * 70 + 41, 0, z * 70 + 31, 270, true);
+			trArmyDispatch("0,0","Militia",1, x * 70 + 41, 0, z * 70 + 31, 0, true);
 
 			trQuestVarSet("DPSCheckObject", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41, 0, true);

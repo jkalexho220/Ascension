@@ -850,7 +850,11 @@ highFrequency
 	
 	/* misc */
 	for(i=1; < ENEMY_PLAYER) {
-		p = xDatabaseNext(dPlayerData);
+		if (Multiplayer) {
+			p = xDatabaseNext(dPlayerData);
+		} else {
+			p = 1;
+		}
 		if (xGetBool(dPlayerData, xPlayerResigned) == false) {
 			checkGodPowers(p);
 			/* no gold cheating */
@@ -1525,7 +1529,7 @@ highFrequency
 		debugLog("Hippocampus ejected from the database!");
 	}
 }
-/*
+
 rule excalibur_find
 inactive
 highFrequency
@@ -1553,8 +1557,8 @@ highFrequency
 	trQuestVarSet("DPSCheckLast", trTimeMS());
 	trUnitSelectClear();
 	trUnitSelectByQV("DPSCheckObject");
-	if (trUnitAlive()) {
-		trDamageUnit(amt * 0.001);
+	if (trUnitPercentDamaged() < 100) {
+		trDamageUnit(amt);
 	} else {
 		for(x=xGetDatabaseCount(dNpcTalk); >0) {
 			xDatabaseNext(dNpcTalk);
@@ -1567,4 +1571,3 @@ highFrequency
 		xsDisableSelf();
 	}
 }
-*/
