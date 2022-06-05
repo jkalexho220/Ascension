@@ -850,7 +850,11 @@ highFrequency
 	
 	/* misc */
 	for(i=1; < ENEMY_PLAYER) {
-		p = xDatabaseNext(dPlayerData);
+		if (Multiplayer) {
+			p = xDatabaseNext(dPlayerData);
+		} else {
+			p = 1;
+		}
 		if (xGetBool(dPlayerData, xPlayerResigned) == false) {
 			checkGodPowers(p);
 			/* no gold cheating */
@@ -1523,5 +1527,47 @@ highFrequency
 		xsDisableSelf();
 	} else if (aiPlanGetUserVariableBool(dEnemies, xDirtyBit, 1*trQuestVarGet("hippocampusIndex")) == false) {
 		debugLog("Hippocampus ejected from the database!");
+	}
+}
+
+rule excalibur_find
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("DPSCheckObject");
+	for(p=1; < ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			xsDisableSelf();
+			xsEnableRule("excalibur_always");
+			trUnitSelectClear();
+			trUnitSelectByQV("excaliburRevealer");
+			trUnitConvert(1);
+			trUnitChangeProtoUnit("Revealer to Player");
+			break;
+		}
+	}
+}
+
+rule excalibur_always
+inactive
+highFrequency
+{
+	float amt = trQuestVarGet("DPSCheckLast") - trTimeMS();
+	trQuestVarSet("DPSCheckLast", trTimeMS());
+	trUnitSelectClear();
+	trUnitSelectByQV("DPSCheckObject");
+	if (trUnitPercentDamaged() < 100) {
+		trDamageUnit(amt);
+	} else {
+		for(x=xGetDatabaseCount(dNpcTalk); >0) {
+			xDatabaseNext(dNpcTalk);
+			if (xGetInt(dNpcTalk, xNpcDialog) >= NPC_EXCALIBUR_BYSTANDER) {
+				xSetInt(dNpcTalk, xNpcDialog, 5 + xGetInt(dNpcTalk, xNpcDialog));
+			}
+		}
+		trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HANDLE, 1);
+		startNPCDialog(NPC_EXCALIBUR_BREAK);
+		xsDisableSelf();
 	}
 }

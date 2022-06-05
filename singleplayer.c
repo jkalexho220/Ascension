@@ -735,6 +735,13 @@ highFrequency
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
+		if (xGetInt(dPlayerData, xPlayerProgress, 1) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
+			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
+			xsEnableRule("rogers_always");
+		}
+
+
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Minotaur",1,127,0,167,225,true);
@@ -1640,6 +1647,19 @@ highFrequency
 	trUnitSelectByQV("nottudUnit", true);
 	if (trUnitIsSelected()) {
 		uiMessageBox("Would you like to play Gladiator Worlds? You have " + 1*trQuestVarGet("nottudTicketsCount") + " copies.");
+		reselectMyself();
+	}
+}
+
+rule rogers_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("phdorogers4");
+	if (trUnitIsSelected()) {
+		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) + trQuestVarGet("p1swordpiece"+SWORD_HANDLE);
+		startNPCDialog(NPC_EXCALIBUR_START + i);
 		reselectMyself();
 	}
 }
