@@ -92,8 +92,17 @@ const int NPC_RUNESTONE_AKARD = 439;
 
 const int NPC_HUNT_THE_TIGER_START = 441;
 const int NPC_HUNT_THE_TIGER_NEXT = 442;
+
+
 const int NPC_EXCALIBUR_START = 443;
 const int NPC_EXCALIBUR_NEXT = 444;
+const int NPC_EXCALIBUR_END = 445;
+
+const int NPC_EXCALIBUR_BYSTANDER = 446;
+/*
+RESERVED TO 455
+*/
+const int NPC_EXCALIBUR_BREAK = 456;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -137,7 +146,8 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					trMessageSetText("Uncover the sword on the first floor.", -1);
-					trQuestVarSet("p1excaliburQuest", 1);
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 1);
 					dialog = 0;
 				}
 			}
@@ -156,6 +166,85 @@ int npcDiag(int npc = 0, int dialog = 0) {
 					dialog = 0;
 				}
 			}
+		}
+		case NPC_EXCALIBUR_BREAK:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You uncovered the sword, only to discover...");
+				}
+				case 2:
+				{
+					uiMessageBox("...it was actually just the handle of a sword!");
+				}
+				case 3:
+				{
+					uiMessageBox("Acquired: Handle of an unknown sword");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_EXCALIBUR_END:
+		{
+			uiMessageBox("What? So it was just the handle of a sword? Haha! Sucks to be you!");
+			xsDisableRule("rogers_always");
+			trUnitSelectClear();
+			trUnitSelectByQV("phdorogers4");
+			trUnitChangeProtoUnit("Hero Birth");
+			trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER:
+		{
+			uiMessageBox("Come on! Put some back into it!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 1:
+		{
+			uiMessageBox("Man, can anyone pull this sword out?");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 2:
+		{
+			uiMessageBox("Ha! Back in my day, we used to pull swords out of rocks all the time!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 3:
+		{
+			uiMessageBox("Whoever pulls it out first gets a kiss from me!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 4:
+		{
+			uiMessageBox("Have you tried morbing it?");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 5:
+		{
+			uiMessageBox("What? That's it?");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 6:
+		{
+			uiMessageBox("Lame!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 7:
+		{
+			uiMessageBox("Hahahaha! You young'uns couldn't even pull out a real sword! Ahahahaha!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 8:
+		{
+			uiMessageBox("Ew, just a hilt won't satisfy me! I'm not kissing you!");
+			dialog = 0;
+		}
+		case NPC_EXCALIBUR_BYSTANDER + 9:
+		{
+			uiMessageBox("Looks like you didn't morb hard enough.");
+			dialog = 0;
 		}
 		case NPC_HUNT_THE_TIGER_START:
 		{
@@ -229,7 +318,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("He granted their wish, and thus, the Starsword was born.");
-					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 1) {
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 1 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
 						dialog = 0;
 					}
 				}
@@ -296,7 +385,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					uiMessageBox("In the end, only one god remained. The rest had succumbed to madness.");
-					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 2) {
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 2 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
 						dialog = 0;
 					}
 				}
@@ -1088,7 +1177,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("That nefarious thief devil_do1 stole it and escaped into the tower!");
+					uiMessageBox("That nefarious thief devil_do1 stole it and escaped into the Tower!");
 				}
 				case 3:
 				{
@@ -2892,6 +2981,14 @@ highFrequency
 	vector pos = vector(0,0,0);
 	vector loc = vector(0,0,0);
 	vector dir = vector(0,0,0);
+
+	xDatabaseNext(dNpcTalk);
+	xUnitSelect(dNpcTalk,xUnitName);
+	if (trUnitIsSelected()) {
+		startNPCDialog(xGetInt(dNpcTalk,xNpcDialog));
+		reselectMyself();
+	}
+
 	if (trQuestVarGet("townFound") == 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("guy1");
@@ -2911,12 +3008,6 @@ highFrequency
 			trSoundPlayFN("settlement.wav","1",-1,"","");
 		}
 	} else {
-		xDatabaseNext(dNpcTalk);
-		xUnitSelect(dNpcTalk,xUnitName);
-		if (trUnitIsSelected()) {
-			startNPCDialog(xGetInt(dNpcTalk,xNpcDialog));
-			reselectMyself();
-		}
 		
 		if (trQuestVarGet("questActive") == 0) {
 			for(p=1; < ENEMY_PLAYER) {

@@ -339,6 +339,72 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitChangeProtoUnit("Gaia Forest effect");
 			xsEnableRule("relic_transporter_guy_found");
 		}
+		case ROOM_EXCALIBUR:
+		{
+			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, worldHeight, false);
+			paintSecondary(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30);
+			paintEyecandy(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, "sprite");
+
+			trQuestVarSet("excaliburRevealer", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Victory Marker", 1, 70 * x + 41, 0, 70 * z + 41, 0, true);
+
+			trQuestVarSet("excavation", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41, 0, true);
+			trUnitSelectClear();
+			trUnitSelectByQV("excavation");
+			trUnitChangeProtoUnit("Spy Eye");
+			trUnitSelectClear();
+			trUnitSelectByQV("excavation");
+			trMutateSelected(kbGetProtoUnitID("Excavation"));
+			trUnitSetAnimationPath("1,0,0,0,0,0,0");
+
+			xAddDatabaseBlock(dNpcTalk, true);
+			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER);
+			trArmyDispatch("0,0","Villager Norse",1, x * 70 + 31, 0, z * 70 + 41, 90, true);
+
+			xAddDatabaseBlock(dNpcTalk, true);
+			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER + 1);
+			xAddDatabaseBlock(dStunnedUnits, true);
+			xSetInt(dStunnedUnits, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Axeman"));
+			trArmyDispatch("0,0","Axeman",1, x * 70 + 31, 0, z * 70 + 35, 90, true);
+
+			xAddDatabaseBlock(dNpcTalk, true);
+			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER + 2);
+			trArmyDispatch("0,0","Skult",1, x * 70 + 31, 0, z * 70 + 31, 45, true);
+
+			xAddDatabaseBlock(dNpcTalk, true);
+			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER + 3);
+			trArmyDispatch("0,0","Villager Egyptian",1, x * 70 + 35, 0, z * 70 + 31, 270, true);
+
+			xAddDatabaseBlock(dNpcTalk, true);
+			xSetInt(dNpcTalk, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dNpcTalk, xNpcDialog, NPC_EXCALIBUR_BYSTANDER + 4);
+			xAddDatabaseBlock(dStunnedUnits, true);
+			xSetInt(dStunnedUnits, xUnitName, trGetNextUnitScenarioNameNumber());
+			xSetInt(dStunnedUnits, xStunnedProto, kbGetProtoUnitID("Militia"));
+			trArmyDispatch("0,0","Militia",1, x * 70 + 41, 0, z * 70 + 31, 270, true);
+
+			trQuestVarSet("DPSCheckObject", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41, 0, true);
+			trUnitSelectClear();
+			trUnitSelectByQV("DPSCheckObject");
+			trUnitChangeProtoUnit("Wall Connector");
+			trModifyProtounit("Wall Connector", ENEMY_PLAYER, 0, 9999999999999999999.0);
+			trModifyProtounit("Wall Connector", ENEMY_PLAYER, 0, -9999999999999999999.0);
+			trModifyProtounit("Wall Connector", ENEMY_PLAYER, 0, 10000);
+
+			activateEnemy(1*trQuestVarGet("DPSCheckObject"));
+			xSetBool(dEnemies, xLaunched, true, xGetNewestPointer(dEnemies));
+			xsEnableRule("excalibur_find");
+
+			debugLog("excalibur room: " + room);
+		}
 		case ROOM_VILLAGE + 1:
 		{
 			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
@@ -448,8 +514,14 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitSelectByQV("runestone", true);
 			trSetSelectedScale(2.5,2.5,2.5);
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") + trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) >= 1) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 1 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
 				xsEnableRule("runestone_read");
+			}
+			for(p=1; < ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"runestoneQuest") >= 1) {
+					deployTownEyecandy("Healing SFX", 33, 33);
+					break;
+				}
 			}
 
 
@@ -572,8 +644,15 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trSetSelectedScale(2.5,2.5,2.5);
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
 
+
 			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
 				xsEnableRule("runestone_read");
+			}
+			for(p=1; < ENEMY_PLAYER) {
+				if (trQuestVarGet("p"+p+"runestoneQuest") >= 2) {
+					deployTownEyecandy("Healing SFX", 31, 9);
+					break;
+				}
 			}
 			
 			trQuestVarSetFromRand("localQuest", 1, 3, true);
@@ -1340,6 +1419,16 @@ highFrequency
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
+
+				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"swordpieceQuest"+SWORD_HANDLE) == 1) {
+						trQuestVarSetFromRand("excaliburRoom", 1, 14, true);
+						trQuestVarSet("excaliburRoom", trQuestVarGet("village") + trQuestVarGet("excaliburRoom"));
+						if (trQuestVarGet("excaliburRoom") > 14) {
+							trQuestVarSet("excaliburRoom", trQuestVarGet("excaliburRoom") - 13);
+						}
+					}
+				}
 			}
 			case 2:
 			{
@@ -2134,6 +2223,8 @@ highFrequency
 				}
 				if (i == 1*trQuestVarGet("bossEntranceRoom")) {
 					buildRoom(x, z, ROOM_BOSS_ENTRANCE);
+				} else if (i == 1*trQuestVarGet("excaliburRoom")) {
+					buildRoom(x, z, ROOM_EXCALIBUR);
 				} else if (i == 1*trQuestVarGet("relicTransporterGuy")) {
 					buildRoom(x, z, ROOM_TRANSPORTER_GUY);
 				} else if (i == 1*trQuestVarGet("village")) {
@@ -2855,66 +2946,72 @@ rule final_build_map
 inactive
 highFrequency
 {
-	xsDisableSelf();
-	int x = 0;
-	int z = 0;
+	if (trTime() > cActivationTime + 1) {
+		trUIFadeToColor(0,0,0,1000,0,false);
+		trLetterBox(false);
+		xsDisableSelf();
+		int x = 0;
+		int z = 0;
 
-	trSetCivAndCulture(0, 0, 3);
+		trSetCivAndCulture(0, 1, 0);
 
 
-	trPaintTerrain(0, 0, 145, 145, 2, 13, false);
+		trPaintTerrain(0, 0, 145, 145, 2, 13, false);
 
-	for(x=0; < 145) {
-		trPaintTerrain(x, x-5, x, x+5, 5, 4, false);
-	}
-	/* center island */
-	for(x=0; <15) {
-		for(b=0; < 15) {
-			if (x*x + z*z <= 225) {
-				trPaintTerrain(72-x,72-z,72+x,72+z,0,50,false);
-				break;
-			} else {
-				z = z - 1;
+		for(x=0; < 145) {
+			trPaintTerrain(x, x-5, x, x+5, 5, 4, false);
+		}
+		/* center island */
+		z = 15;
+		for(x=0; <15) {
+			for(b=0; < 15) {
+				if (x*x + z*z <= 225) {
+					trPaintTerrain(72-x,72-z,72+x,72+z,0,50,false);
+					break;
+				} else {
+					z = z - 1;
+				}
 			}
 		}
+		
+		/* pathways */
+		trPaintTerrain(57,71,87,73,0,53,false);
+		trPaintTerrain(71,57,73,87,0,53,false);
+
+		/* eyecandy - candy for the eyes */
+		for(x=0; < 145) {
+			trQuestVarSetFromRand("rand", 0, 145, true);
+			if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
+				trQuestVarSetFromRand("heading", 0, 360, true);
+				trArmyDispatch("0,0","Ruins",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
+			}
+			trQuestVarSetFromRand("rand", 0, 145, true);
+			if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
+				trQuestVarSetFromRand("heading", 0, 360, true);
+				trArmyDispatch("0,0","Columns Broken",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
+			}
+		}
+
+		for(z=0; < 145) {
+			trQuestVarSetFromRand("rand", 0, 145, true);
+			if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
+				trQuestVarSetFromRand("heading", 0, 360, true);
+				trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
+			}
+			trQuestVarSetFromRand("rand", 0, 145, true);
+			if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
+				trQuestVarSetFromRand("heading", 0, 360, true);
+				trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
+			}
+		}
+
+		bossUnit = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 225, true);
+		trArmySelect("0,0");
+		trUnitChangeProtoUnit("Guardian Sleeping");
+
+		xsEnableRule("guardian_dialog");
+		xsEnableRule("gameplay_start");
+		trVectorQuestVarSet("startPosition", vector(15,0,15));
 	}
-	
-	/* pathways */
-	trPaintTerrain(57,71,87,73,0,53,false);
-	trPaintTerrain(71,57,73,87,0,53,false);
-
-	/* eyecandy - candy for the eyes */
-	for(x=0; < 145) {
-		trQuestVarSetFromRand("rand", 0, 145, true);
-		if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
-			trQuestVarSetFromRand("heading", 0, 360, true);
-			trArmyDispatch("0,0","Ruins",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
-		}
-		trQuestVarSetFromRand("rand", 0, 145, true);
-		if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
-			trQuestVarSetFromRand("heading", 0, 360, true);
-			trArmyDispatch("0,0","Columns Broken",1,x * 2 + 1, 0, trQuestVarGet("rand") * 2 + 1, trQuestVarGet("heading"), true);
-		}
-	}
-
-	for(z=0; < 145) {
-		trQuestVarSetFromRand("rand", 0, 145, true);
-		if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
-			trQuestVarSetFromRand("heading", 0, 360, true);
-			trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
-		}
-		trQuestVarSetFromRand("rand", 0, 145, true);
-		if (trGetTerrainType(trQuestVarGet("rand"), z) == 2) {
-			trQuestVarSetFromRand("heading", 0, 360, true);
-			trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
-		}
-	}
-
-	bossUnit = trGetNextUnitScenarioNameNumber();
-	trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 225, true);
-	trArmySelect("0,0");
-	trUnitChangeProtoUnit("Guardian Sleeping");
-
-	xsEnableRule("guardian_dialog");
-	xsEnableRule("gameplay_start");
 }

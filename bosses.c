@@ -7054,11 +7054,11 @@ highFrequency
 		trQuestVarSetFromRand("rand", 10, 30, true);
 		trQuestVarSet("keeperClawAttack", trTime() + trQuestVarGet("rand") * (50 + trQuestVarGet("bossHealth")) / 100);
 		pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)));
-		spawnAttackFinger(pos + vector(-6, 0, 2), xsVectorNormalize(vector(6, 0, -2)));
-		spawnAttackFinger(pos + vector(0, 0, 4), vector(-0.707107, 0, -0.707107));
-		spawnAttackFinger(pos + vector(2, 0, 2), vector(-0.707107, 0, -0.707107));
-		spawnAttackFinger(pos + vector(4, 0, 0), vector(-0.707107, 0, -0.707107));
-		spawnAttackFinger(pos + vector(4, 0, -2), vector(-0.707107, 0, -0.707107));
+		dir = vector(1,0,0);
+		for(i=8; >0) {
+			spawnAttackFinger(pos - (dir * 4.0), dir);
+			dir = rotationMatrix(dir, 0.707107, 0.707107);
+		}
 	}
 
 	if (trQuestVarGet("runestoneActive") == 1) {

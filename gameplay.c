@@ -1525,3 +1525,46 @@ highFrequency
 		debugLog("Hippocampus ejected from the database!");
 	}
 }
+/*
+rule excalibur_find
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("DPSCheckObject");
+	for(p=1; < ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			xsDisableSelf();
+			xsEnableRule("excalibur_always");
+			trUnitSelectClear();
+			trUnitSelectByQV("excaliburRevealer");
+			trUnitConvert(1);
+			trUnitChangeProtoUnit("Revealer to Player");
+			break;
+		}
+	}
+}
+
+rule excalibur_always
+inactive
+highFrequency
+{
+	float amt = trQuestVarGet("DPSCheckLast") - trTimeMS();
+	trQuestVarSet("DPSCheckLast", trTimeMS());
+	trUnitSelectClear();
+	trUnitSelectByQV("DPSCheckObject");
+	if (trUnitAlive()) {
+		trDamageUnit(amt * 0.001);
+	} else {
+		for(x=xGetDatabaseCount(dNpcTalk); >0) {
+			xDatabaseNext(dNpcTalk);
+			if (xGetInt(dNpcTalk, xNpcDialog) >= NPC_EXCALIBUR_BYSTANDER) {
+				xSetInt(dNpcTalk, xNpcDialog, 5 + xGetInt(dNpcTalk, xNpcDialog));
+			}
+		}
+		trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HANDLE, 1);
+		startNPCDialog(NPC_EXCALIBUR_BREAK);
+		xsDisableSelf();
+	}
+}
+*/

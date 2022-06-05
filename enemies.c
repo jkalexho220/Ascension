@@ -149,6 +149,8 @@ highFrequency
 	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
 
 	setupProtounitBounty("Argus", 0.5, 10, 0);
+
+	setupProtounitBounty("Wall Connector", 0.5, 0, 0);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);

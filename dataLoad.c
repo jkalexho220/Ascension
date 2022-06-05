@@ -147,7 +147,10 @@ void saveAllData() {
 	savedata = savedata * 10 + currentdata;
 
 	currentdata = 0; // 3 placeholder bits
-	savedata = savedata * 8 + currentdata;
+	for(x=3; >0) {
+		currentdata = trQuestVarGet("p"+p+"swordpieceQuest"+x);
+		savedata = savedata * 2 + currentdata;
+	}
 	currentdata = xsMin(4, trQuestVarGet("p"+p+"runestoneQuest"));
 	savedata = savedata * 4 + currentdata;
 
@@ -354,7 +357,10 @@ inactive
 
 		trQuestVarSet("p1runestoneQuest", iModulo(4, savedata));
 		savedata = savedata / 4;
-		savedata = savedata / 8; // spare data
+		for(x=1; <= 3) {
+			trQuestVarSet("p1swordpieceQuest"+x, iModulo(2, savedata));
+			savedata = savedata / 2;
+		}
 
 		trQuestVarSet("p1relicsSacrificed", iModulo(10, savedata));
 		savedata = savedata / 10;
@@ -492,7 +498,10 @@ inactive
 						currentdata = x;
 						trQuestVarSet("p"+p+"runestoneQuest", iModulo(4, currentdata));
 						currentdata = currentdata / 4;
-						// placeholder 3 bits
+						for(i=1; <= 3) {
+							trQuestVarSet("p"+p+"swordpieceQuest"+i, iModulo(2, currentdata));
+							currentdata = currentdata / 2;
+						}
 					} else if (loadProgress == 24) {
 						currentdata = x;
 						trQuestVarSet("p"+p+"relicsSacrificed", iModulo(10, currentdata));

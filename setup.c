@@ -28,6 +28,10 @@ const int STARSTONE = 0;
 const int SOULSTONE = 1;
 const int MANASTONE = 2;
 
+const int SWORD_BLADE = 1;
+const int SWORD_HILT = 2;
+const int SWORD_HANDLE = 3;
+
 float worldHeight = 0;
 float wallHeight = 5;
 int ENEMY_PLAYER = 0;
@@ -597,6 +601,7 @@ highFrequency
 	
 	trModifyProtounit("Uproot 2x2", 0, 8, -99);
 	
+	zInitProtoUnitStat("Revealer to Player", 0, 2, 12);
 	for(p=ENEMY_PLAYER; >0) {
 		zInitProtoUnitStat("Revealer to Player", p, 2, 12);
 		zSetProtoUnitStat("Revealer to Player", p, 2, 32);
