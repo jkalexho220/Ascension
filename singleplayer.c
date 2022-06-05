@@ -735,7 +735,8 @@ highFrequency
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
-		if (xGetInt(dPlayerData, xPlayerProgress, 1) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
+		// excalibur quest
+		if (xGetInt(dPlayerData, xPlayerProgress, 7) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
 			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
 			xsEnableRule("rogers_always");

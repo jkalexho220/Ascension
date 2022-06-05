@@ -270,7 +270,7 @@ inactive
 				}
 				case 8:
 				{
-					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 1.0);
+					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 0.1);
 					trQuestVarSet("musicTime", trTime() + 360);
 				}
 				case 9:
