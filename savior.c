@@ -298,7 +298,7 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (trQuestVarGet("p"+p+"dead") > 0 &&
+	if (xGetInt(dPlayerData, xPlayerDead, p) > 0 &&
 		trPlayerResourceCount(p, "favor") >= interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost)) {
 		trQuestVarSet("p"+p+"intervention", 1);
 	}

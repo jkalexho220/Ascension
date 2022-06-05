@@ -341,9 +341,9 @@ highFrequency
 		xRestoreCache(dPlayerUnits);
 		int id = 0;
 		trQuestVarSet("deadPlayerCount", 0);
-		int level = trQuestVarGet("stage") / 3;
-		trQuestVarSet("bossRelicCount", randomLow(2 + level));
-		trQuestVarSet("normalRelicCount", (2 + level) - trQuestVarGet("bossRelicCount"));
+		int level = (trQuestVarGet("stage") - 1) / 3 + 1;
+		trQuestVarSet("bossRelicCount", randomLow(level));
+		trQuestVarSet("normalRelicCount", level - trQuestVarGet("bossRelicCount"));
 		trQuestVarSet("gameOverStep", 0);
 		/*
 		painting walls to block off the entrance
@@ -6464,6 +6464,7 @@ int dFingers = 0;
 int xFingerDir = 0;
 int xFingerStep = 0;
 int xFingerTimeout = 0;
+int xFingerScale = 0;
 
 rule the_keeper_hunt_start
 inactive
@@ -6546,6 +6547,15 @@ highFrequency
 				}
 			}
 		}
+		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			p = xGetInt(dPlayerUnits, xPlayerOwner);
+			if ((xGetBool(dPlayerUnits, xIsHero) == false) || (trQuestVarGet("p"+p+"runestoneQuest") < 2)) {
+				if (terrainIsType(vectorToGrid(xGetVector(dPlayerUnits, xUnitPos)), 5, 4)) {
+					trUnitDelete(false);
+				}
+			}
+		}
 		trVectorQuestVarSet("keeperPos", pos);
 		trUnitSelectClear();
 		trUnitSelectByQV("keeperTartarianGate");
@@ -6576,7 +6586,9 @@ highFrequency
 					xSetInt(dStunnedUnits, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
 					xSetInt(dStunnedUnits, xStunnedProto, xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p)));
 					uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, p));
-					trSoundPlayFN("Zenophobia\True Origin shortened.mp3","1",-1,"","");
+					if (customContent) {
+						trSoundPlayFN("Zenophobia\True Origin shortened.mp3","1",-1,"","");
+					}
 					trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
 					trSoundPlayFN("xpack\xcinematics\8_in\guardianawaken.mp3","1",-1,"","");
 					trCameraShake(10.0, 0.1);
@@ -6818,6 +6830,9 @@ highFrequency
 				uiLookAtUnitByName(""+1*trQuestVarGet("runestone"));
 				xFreeDatabaseBlock(dEnemies, bossPointer);
 				unitTransform("Imperial Examination", "Rocket");
+
+				trQuestVarSet("clawScale", 1);
+				bossScale = 1;
 			}
 			case 1:
 			{
@@ -6891,6 +6906,7 @@ highFrequency
 				trEventSetHandler(10001, "keeperWrongAnswer");
 				xFingerStep = xInitAddInt(dFingers, "step");
 				xFingerTimeout = xInitAddInt(dFingers, "timeout");
+				xFingerScale = xInitAddFloat(dFingers, "scale");
 
 				bossDir = vector(1,0,0);
 
@@ -6926,7 +6942,7 @@ highFrequency
 	}
 }
 
-void spawnAttackFinger(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
+void spawnAttackFinger(vector pos = vector(0,0,0), vector dir = vector(0,0,0), float scale = 1.0) {
 	int next = trGetNextUnitScenarioNameNumber();
 	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 	trArmySelect("0,0");
@@ -6941,11 +6957,12 @@ void spawnAttackFinger(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
 	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 	xUnitSelect(dFingers, xUnitName);
 	trMutateSelected(kbGetProtoUnitID("Taproot Small"));
-	trSetSelectedScale(-0.5, 2.0, -2.0);
+	trSetSelectedScale(-0.5 * scale, 0.25 * scale, -2.0 * scale);
 	trUnitSetAnimationPath("0,0,0,0,0,0,0");
 	trSetUnitOrientation(rotationMatrix(dir, 0, -1.0), vector(0,0,0) - dir, true);
 	xSetVector(dFingers, xFingerDir, dir);
 	xSetInt(dFingers, xFingerTimeout, trTimeMS() + 1500);
+	xSetFloat(dFingers, xFingerScale, scale);
 }
 
 rule boss11_battle
@@ -6970,7 +6987,7 @@ highFrequency
 				diff = xGetInt(dFingers, xFingerTimeout) - trTimeMS();
 				if (diff > 0) {
 					diff = 3.5 - 0.002 * diff;
-					trSetSelectedScale(0.0 - diff, 0.5 * diff, -2.0);
+					trSetSelectedScale(0.0 - diff * xGetFloat(dFingers,xFingerScale), 0.5 * diff * xGetFloat(dFingers,xFingerScale), 0.0 - 1.0 - xGetFloat(dFingers,xFingerScale));
 				} else {
 					xSetInt(dFingers, xFingerStep, 1);
 					xSetInt(dFingers, xFingerTimeout, trTimeMS());
@@ -6985,7 +7002,7 @@ highFrequency
 				mCos = xsCos(diff);
 				dir = xsVectorSetY(xGetVector(dFingers, xFingerDir) * mSin, mCos);
 				trSetUnitOrientation(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0), vector(0,0,0) - dir, true);
-				if (diff > 3.5) {
+				if (diff > 3.4) {
 					trQuestVarSet("sound", 0);
 					xSetInt(dFingers,xFingerStep, 2);
 					xSetInt(dFingers, xFingerTimeout, trTimeMS() + 1000);
@@ -6996,7 +7013,7 @@ highFrequency
 						xUnitSelectByID(dPlayerUnits, xUnitID);
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (rayCollision(dPlayerUnits, pos, dir, 6.0, 2.0)) {
+						} else if (rayCollision(dPlayerUnits, pos, dir, 5.0 * xGetFloat(dFingers,xFingerScale), 2.0)) {
 							damagePlayerUnit(500.0);
 							trQuestVarSet("sound", 1);
 						}
@@ -7037,7 +7054,7 @@ highFrequency
 		if (trUnitAlive()) {
 			pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)) + bossDir * 4.0);
 			dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)));
-			spawnAttackFinger(pos, dir);
+			spawnAttackFinger(pos, dir, bossScale);
 		}
 
 		bossDir = rotationMatrix(bossDir, -0.740544, -0.672008);
@@ -7056,7 +7073,7 @@ highFrequency
 		pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)));
 		dir = vector(1,0,0);
 		for(i=8; >0) {
-			spawnAttackFinger(pos - (dir * 4.0), dir);
+			spawnAttackFinger(pos - (dir * 6.0), dir);
 			dir = rotationMatrix(dir, 0.707107, 0.707107);
 		}
 	}
@@ -7075,6 +7092,8 @@ highFrequency
 				trSoundPlayFN("recreation.wav","1",-1,"","");
 				trQuestVarSet("bossHealth", trQuestVarGet("bossHealth") - 10);
 				if (trQuestVarGet("bossHealth") > 0) {
+					trQuestVarSet("clawScale", 0.5 + trQuestVarGet("clawScale"));
+					bossScale = xsSqrt(trQuestVarGet("clawScale"));
 					trCounterAbort("bossHealth");
 					trCounterAddTime("bossHealth", -1, -9999, "<color={Playercolor(2)}>Crawling Shadow: " + 1*trQuestVarGet("bossHealth") + "</color>", -1);
 					trQuestVarSet("runestoneActive", 0);

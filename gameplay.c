@@ -536,9 +536,14 @@ highFrequency
 		xsEnableRule("nick_dialog");
 	}
 	vector pos = trVectorQuestVarGet("startPosition");
+	vector dir = vector(4,0,4);
+	float angle = 6.283185 / (ENEMY_PLAYER - 1);
+	float mCos = xsCos(angle);
+	float mSin = xsSin(angle);
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
-		spawnPlayer(p, pos);
+		spawnPlayer(p, vectorSnapToGrid(pos + dir));
+		dir = rotationMatrix(dir, mCos, mSin);
 		trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
 		trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
 		if (trQuestVarGet("p"+p+"nickEquipped") == 1) {
@@ -1553,21 +1558,25 @@ rule excalibur_always
 inactive
 highFrequency
 {
-	float amt = trQuestVarGet("DPSCheckLast") - trTimeMS();
-	trQuestVarSet("DPSCheckLast", trTimeMS());
-	trUnitSelectClear();
-	trUnitSelectByQV("DPSCheckObject");
-	if (trUnitPercentDamaged() < 100) {
-		trDamageUnit(amt);
-	} else {
-		for(x=xGetDatabaseCount(dNpcTalk); >0) {
-			xDatabaseNext(dNpcTalk);
-			if (xGetInt(dNpcTalk, xNpcDialog) >= NPC_EXCALIBUR_BYSTANDER) {
-				xSetInt(dNpcTalk, xNpcDialog, 5 + xGetInt(dNpcTalk, xNpcDialog));
-			}
-		}
-		trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HANDLE, 1);
-		startNPCDialog(NPC_EXCALIBUR_BREAK);
+	if (boss > 0) {
 		xsDisableSelf();
+	} else {
+		float amt = trQuestVarGet("DPSCheckLast") - trTimeMS();
+		trQuestVarSet("DPSCheckLast", trTimeMS());
+		trUnitSelectClear();
+		trUnitSelectByQV("DPSCheckObject");
+		if (trUnitPercentDamaged() < 100) {
+			trDamageUnit(amt);
+		} else {
+			for(x=xGetDatabaseCount(dNpcTalk); >0) {
+				xDatabaseNext(dNpcTalk);
+				if (xGetInt(dNpcTalk, xNpcDialog) >= NPC_EXCALIBUR_BYSTANDER) {
+					xSetInt(dNpcTalk, xNpcDialog, 5 + xGetInt(dNpcTalk, xNpcDialog));
+				}
+			}
+			trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HANDLE, 1);
+			startNPCDialog(NPC_EXCALIBUR_BREAK);
+			xsDisableSelf();
+		}
 	}
 }

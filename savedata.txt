@@ -61,20 +61,20 @@ watch venlesh die again
 stuff
 
 <scenariodata name ="ascension mmorpg">
-	<data>10886147</data>
-	<data>3225</data>
-	<data>8470606</data>
-	<data>0</data>
-	<data>259873</data>
-	<data>0</data>
-	<data>1</data>
-	<data>5085</data>
-	<data>2893043</data>
-	<data>90012206</data>
-	<data>148737298</data>
-	<data>21465170</data>
-	<data>386699294</data>
-	<data>699256962</data>
-	<data>62779817</data>
-	<data>835536</data>
-</scenariodata>
+			<data>10889297</data>
+			<data>3937</data>
+			<data>532471834</data>
+			<data>154045</data>
+			<data>2273</data>
+			<data>0</data>
+			<data>1</data>
+			<data>5085</data>
+			<data>2893043</data>
+			<data>90012206</data>
+			<data>148737298</data>
+			<data>21465170</data>
+			<data>386299440</data>
+			<data>699257313</data>
+			<data>31272</data>
+			<data>464243</data>
+		</scenariodata>

@@ -112,9 +112,11 @@ const int BOUNTY_GUY = 2;
 const int SHOP_GUY = 3;
 
 void startNPCDialog(int npc = 0) {
-	xsEnableRule("npc_talk_01");
-	trQuestVarSet("currentNPC", npc);
-	trQuestVarSet("currentNPCProgress", 0);
+	if (trQuestVarGet("currentNPCProgress") == 0) {
+		xsEnableRule("npc_talk_01");
+		trQuestVarSet("currentNPC", npc);
+		trQuestVarSet("currentNPCProgress", 0);
+	}
 }
 
 int npcDiag(int npc = 0, int dialog = 0) {
@@ -163,6 +165,10 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("Maybe we can damage the stone around it enough to free it.");
+				}
+				case 3:
+				{
+					uiMessageBox("But the stone regenerates, so our damage needs to surpass the regeneration.");
 					dialog = 0;
 				}
 			}
@@ -3987,20 +3993,22 @@ rule runestone_read
 inactive
 minInterval 3
 {
-	int p = trCurrentPlayer();
-	switch(1*trQuestVarGet("readRunestone"))
-	{
-		case 0:
+	if (boss == 0) {
+		int p = trCurrentPlayer();
+		switch(1*trQuestVarGet("readRunestone"))
 		{
-			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 36.0) {
-				trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10002, "No", -1);
-				trQuestVarSet("readRunestone", 1);
+			case 0:
+			{
+				if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) < 36.0) {
+					trShowChoiceDialog("The Runestone stands before you. Do you read it?", "Yes", 10002, "No", -1);
+					trQuestVarSet("readRunestone", 1);
+				}
 			}
-		}
-		case 1:
-		{
-			if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) > 36.0) {
-				trQuestVarSet("readRunestone", 0);
+			case 1:
+			{
+				if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), trVectorQuestVarGet("runestonePos")) > 36.0) {
+					trQuestVarSet("readRunestone", 0);
+				}
 			}
 		}
 	}

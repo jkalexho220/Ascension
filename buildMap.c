@@ -402,8 +402,6 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			activateEnemy(1*trQuestVarGet("DPSCheckObject"));
 			xSetBool(dEnemies, xLaunched, true, xGetNewestPointer(dEnemies));
 			xsEnableRule("excalibur_find");
-
-			debugLog("excalibur room: " + room);
 		}
 		case ROOM_VILLAGE + 1:
 		{
