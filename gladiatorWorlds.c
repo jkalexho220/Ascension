@@ -48,5 +48,23 @@ highFrequency
 
 		xsDisableSelf();
 		xsEnableRule("gladiator_worlds_cin");
+		trQuestVarSet("cinTime", trTime());
+		trQuestVarSet("cinStep", 0);
+	}
+}
+
+rule gladiator_worlds_cin
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Welcome to Gladiator Worlds! The land of madness incarnate!","icons\special n minotaur icon 64");
+			}
+		}
 	}
 }

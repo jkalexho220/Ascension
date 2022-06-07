@@ -17,7 +17,7 @@ const int TOTAL_LOAD = 25;
 
 void saveAllData() {
 	xsSetContextPlayer(0);
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 2);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
@@ -115,6 +115,8 @@ void saveAllData() {
 	
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = trQuestVarGet("runestoneComplete");
+	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("monsterpediaQuestComplete");
 	savedata = savedata * 2 + currentdata;
 	currentdata = xsMin(10, trQuestVarGet("chestCount"));
@@ -151,7 +153,7 @@ void saveAllData() {
 		currentdata = trQuestVarGet("p"+p+"swordpieceQuest"+x);
 		savedata = savedata * 2 + currentdata;
 	}
-	currentdata = xsMin(4, trQuestVarGet("p"+p+"runestoneQuest"));
+	currentdata = xsMin(3, trQuestVarGet("p"+p+"runestoneQuest"));
 	savedata = savedata * 4 + currentdata;
 
 	for(x=3; >0) {
@@ -192,6 +194,13 @@ inactive
 		savedata = iModulo(896, savedata) + 32 * currentdata * 896;
 		trSetCurrentScenarioUserData(4, savedata);
 		trSetCurrentScenarioUserData(VERSION_NUMBER, 1);
+	}
+	if (trGetScenarioUserData(VERSION_NUMBER) == 1) {
+		savedata = trGetScenarioUserData(7);
+		currentdata = savedata / xsPow(2, BOON_HEALTH_ATTACK);
+		currentdata = iModulo(2, currentdata);
+		trSetCurrentScenarioUserData(8, trGetScenarioUserData(8) + currentdata * 2933040);
+		trSetCurrentScenarioUserData(VERSION_NUMBER, 2);
 	}
 	
 
@@ -240,6 +249,8 @@ inactive
 	trQuestVarSet("chestCount", iModulo(11, savedata));
 	savedata = savedata / 11;
 	trQuestVarSet("monsterpediaQuestComplete", iModulo(2, savedata));
+	savedata = savedata / 2;
+	trQuestVarSet("runestoneComplete", iModulo(2, savedata));
 	savedata = savedata / 2;
 	
 	if ((trCurrentPlayer() == 1) && Multiplayer) {

@@ -184,7 +184,7 @@ string boonName(int boon = 0) {
 		}
 		case BOON_HEALTH_ATTACK:
 		{
-			name = "Add 5 percent of your health to your attack.";
+			name = "Add 3 percent of your health to your attack.";
 		}
 		case BOON_ATTACK_PROLONGS_STUN:
 		{

@@ -56,6 +56,12 @@ void saviorAlways(int eventID = -1) {
 		}
 		
 		if (hit > 0) {
+			int relics = getRelicsDB(p);
+			for(x=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				xUnitSelect(relics, xUnitName);
+				trUnitChangeProtoUnit("Relic");
+			}
 			gainFavor(p, 5);
 			xSetPointer(dPlayerUnits, hit);
 			pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
@@ -237,6 +243,7 @@ void saviorAlways(int eventID = -1) {
 							break;
 						}
 					}
+					OnHit(p, xGetPointer(dEnemies));
 				}
 			} else if (xGetBool(db, xJumping)) {
 				xSetBool(db, xJumping, false);

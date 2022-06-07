@@ -92,17 +92,23 @@ const int NPC_RUNESTONE_AKARD = 439;
 
 const int NPC_HUNT_THE_TIGER_START = 441;
 const int NPC_HUNT_THE_TIGER_NEXT = 442;
+const int NPC_HUNT_THE_TIGER_END = 443;
 
+const int NPC_EXCALIBUR_START = 444;
+const int NPC_EXCALIBUR_NEXT = 445;
+const int NPC_EXCALIBUR_END = 446;
 
-const int NPC_EXCALIBUR_START = 443;
-const int NPC_EXCALIBUR_NEXT = 444;
-const int NPC_EXCALIBUR_END = 445;
-
-const int NPC_EXCALIBUR_BYSTANDER = 446;
+const int NPC_EXCALIBUR_BYSTANDER = 447;
 /*
-RESERVED TO 455
+RESERVED TO 457
 */
-const int NPC_EXCALIBUR_BREAK = 456;
+const int NPC_EXCALIBUR_BREAK = 458;
+
+const int NPC_POISON_TRIAL_START = 459;
+const int NPC_POISON_TRIAL_NEXT = 460;
+
+const int NPC_HUNT_THE_TIGER_KILL = 461;
+
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -274,6 +280,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 5:
 				{
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 1);
 					trMessageSetText("Find and kill the White Tiger.", -1);
 					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					dialog = 0;
@@ -291,6 +298,59 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					uiMessageBox("We need to put a stop to its rampage!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_HUNT_THE_TIGER_END:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thank goodness you've defeated the White Tiger!");
+				}
+				case 2:
+				{
+					uiMessageBox("So all you found from its stomach was a rusty old hilt?");
+				}
+				case 3:
+				{
+					uiMessageBox("Well, that sucks.");
+				}
+				case 4:
+				{
+					uiMessageBox("Acquired: Hilt of an unknown sword");
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 0);
+					trUnitSelectClear();
+					trUnitSelectByQV("tigerHunter");
+					trUnitDestroy();
+					xsDisableRule("tiger_hunter_always");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_HUNT_THE_TIGER_KILL:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Boss defeated! Here are the rewards!");
+				}
+				case 2:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(relicIcon(1*trQuestVarGet("bossReward")), relicName(1*trQuestVarGet("bossReward")));
+				}
+				case 3:
+				{
+					trSoundPlayFN("favordump.wav","1",-1,"","");
+					trShowImageDialog(boonIcon(BOON_HEALTH_ATTACK), boonName(BOON_HEALTH_ATTACK));
+				}
+				case 4:
+				{
+					uiMessageBox("You can equip this blessing in singleplayer.");
 					dialog = 0;
 				}
 			}
@@ -324,7 +384,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("He granted their wish, and thus, the Starsword was born.");
-					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 1 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 1 || trQuestVarGet("runestoneComplete") == 1) {
 						dialog = 0;
 					}
 				}
@@ -391,7 +451,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 5:
 				{
 					uiMessageBox("In the end, only one god remained. The rest had succumbed to madness.");
-					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 2 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") > 2 || trQuestVarGet("runestoneComplete") == 1) {
 						dialog = 0;
 					}
 				}
@@ -2060,7 +2120,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Impressive. If you had brought the wrong fruit...");
+					if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") < 3) {
+						uiMessageBox("Impressive. If you had brought the wrong fruit...");
+					} else {
+						uiMessageBox("Oh thank goodness. If you had brought the wrong fruit, something catastrophic-");
+					}
 				}
 				case 2:
 				{

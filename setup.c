@@ -458,6 +458,8 @@ runImmediately
 		trModifyProtounit("Pegasus", p, 55, 1);
 		trModifyProtounit("Hippocampus", p, 55, 1);
 		trModifyProtounit("Junk", p, 55, 1);
+
+		trModifyProtounit("Petosuchus Projectile", p, 55, 2);
 		
 		trModifyProtounit("Statue of Lightning", p, 1, 3.5);
 		
@@ -581,7 +583,7 @@ highFrequency
 	setupPlayerProto("Circe", 1000, 100, 3.7, 0, 15);
 	setupPlayerProto("Audrey", 1000, 50, 0);
 	setupPlayerProto("Walking Berry Bush", 500, 25, 3.5, 0.3);
-	setupPlayerProto("Hero Norse", 1200, 50, 4.3, 0.3);
+	setupPlayerProto("Hero Norse", 1200, 50, 4.3, 0.2);
 	setupPlayerProto("Hippocampus", 1200, 0, 6.0, 0.5);
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);

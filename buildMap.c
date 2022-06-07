@@ -512,7 +512,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitSelectByQV("runestone", true);
 			trSetSelectedScale(2.5,2.5,2.5);
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 1 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 1 || trQuestVarGet("runestoneComplete") == 1) {
 				xsEnableRule("runestone_read");
 			}
 			for(p=1; < ENEMY_PLAYER) {
@@ -643,7 +643,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
 
 
-			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2 || trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+			if (trQuestVarGet("p"+trCurrentPlayer()+"runestoneQuest") >= 2 || trQuestVarGet("runestoneComplete") == 1) {
 				xsEnableRule("runestone_read");
 			}
 			for(p=1; < ENEMY_PLAYER) {
@@ -958,11 +958,13 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trUnitChangeProtoUnit("White Tiger");
 			xAddDatabaseBlock(dEnemiesIncoming,true);
 			xSetInt(dEnemiesIncoming, xUnitName, bossUnit);
-			xsEnableRule("white_tiger_boss");
+			xsEnableRule("white_tiger_find");
 
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 9999999999999999999.0);
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, -9999999999999999999.0);
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+
+			trModifyProtounit("Tartarian Gate flame", 0, 8, -999);
 
 			trModifyProtounit("Victory Marker", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
 		}
@@ -2194,14 +2196,12 @@ highFrequency
 		}
 
 		bool tigerSpawn = false;
-		/*
 		if (trQuestVarGet("stage") > 1 && trQuestVarGet("stage") < 7) {
 			trQuestVarSetFromRand("tigerSpawn", 1, 10, true);
 			if (trQuestVarGet("tigerSpawn") < trQuestVarGet("stage")) {
 				tigerSpawn = true;
 			}
 		}
-		*/
 		
 		if (trQuestVarGet("stage") > 10) {
 			trQuestVarSet("relicTransporterGuy", -1);
@@ -2653,7 +2653,7 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("runestone");
 		trSetSelectedScale(2.5,2.5,2.5);
-		if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 1) {
+		if (trQuestVarGet("runestoneComplete") == 1) {
 			xsEnableRule("runestone_read");
 		}
 

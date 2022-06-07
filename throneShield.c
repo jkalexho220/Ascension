@@ -8,6 +8,7 @@ float shieldOfLightCost = 60;
 int shieldOfLightCooldown = 20;
 float shieldOfLightDuration = 9;
 float shieldOfLightWidth = 3;
+float shieldOfLightRadius = 20;
 
 int xThroneShieldSFX = 0;
 int xThroneShieldAbsorbed = 0;
@@ -231,6 +232,18 @@ void throneShieldAlways(int eventID = -1) {
 			} else {
 				xUnitSelect(db, xThroneShieldSFX);
 				trUnitChangeProtoUnit("Increase Prosperity Small");
+			}
+		}
+
+		start = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit), true);
+		dist = xsPow(shieldOfLightRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+		for(x=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			if (trUnitAlive() == false) {
+				removeEnemy();
+			} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), start) < dist) {
+				trUnitDoWorkOnUnit(""+xGetInt(dPlayerData, xPlayerUnit, p));
 			}
 		}
 		gainFavor(p, 0.0 - shieldOfLightCost * xGetFloat(dPlayerData, xPlayerUltimateCost));

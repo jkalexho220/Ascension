@@ -729,19 +729,25 @@ highFrequency
 		}
 
 		// runestone quest
-		if ((trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
+		if ((trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
 			xsEnableRule("venlesh_always");
 			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
 		// excalibur quest
-		if (xGetInt(dPlayerData, xPlayerProgress, 7) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 7 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
 			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
 			xsEnableRule("rogers_always");
 		}
 
+		// white tiger quest quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
+			trQuestVarSet("tigerHunter", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Archer Atlantean",1, 127, 0, 157, 225, true);
+			xsEnableRule("tiger_hunter_always");
+		}
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
@@ -1606,7 +1612,20 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("venlesh", true);
 	if (trUnitIsSelected()) {
-		startNPCDialog(NPC_VENLESH_START + trQuestVarGet("p1runestoneQuest") +trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK));
+		startNPCDialog(NPC_VENLESH_START + trQuestVarGet("p1runestoneQuest") + trQuestVarGet("runestoneComplete"));
+		reselectMyself();
+	}
+}
+
+rule tiger_hunter_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("tigerHunter", true);
+	if (trUnitIsSelected()) {
+		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
+		startNPCDialog(NPC_HUNT_THE_TIGER_START + i);
 		reselectMyself();
 	}
 }

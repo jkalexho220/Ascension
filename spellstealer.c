@@ -1,7 +1,7 @@
 
 float spellstealerPassiveRadius = 6;
 
-float bladeDanceCost = 20;
+float bladeDanceCost = 12;
 float bladeDanceRadius = 15;
 
 float negationCloakDuration = 3;

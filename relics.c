@@ -726,7 +726,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case BOON_HEALTH_ATTACK:
 		{
-			xSetFloat(dPlayerData, xPlayerBaseAttack, xGetFloat(dPlayerData,xPlayerBaseAttackTrue) + 0.05 * xGetFloat(dPlayerData,xPlayerHealth));
+			xSetFloat(dPlayerData, xPlayerBaseAttack, xGetFloat(dPlayerData,xPlayerBaseAttackTrue) + 0.03 * xGetFloat(dPlayerData,xPlayerHealth));
 			xSetFloat(dPlayerData,xPlayerAttack,xGetFloat(dPlayerData,xPlayerBaseAttack));
 			zSetProtoUnitStat(proto, p, 27, xGetFloat(dPlayerData,xPlayerBaseAttack));
 			zSetProtoUnitStat(proto, p, 31, xGetFloat(dPlayerData,xPlayerBaseAttack));

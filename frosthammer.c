@@ -22,7 +22,7 @@ int xSmashDir = 0;
 int xSmashTimeout = 0;
 
 int blizzardCost = 80;
-float blizzardDuration = 8;
+float blizzardDuration = 10;
 float blizzardRadius = 10;
 
 int xBlizzardSFX = 0;
@@ -62,12 +62,12 @@ void frosthammerAlways(int eventID = -1) {
 	vector pos = vector(0,0,0);
 	vector dir = vector(0,0,0);
 
-	float scale = xsSqrt(1.0 + 0.03 * trQuestVarGet("p"+p+"frostHammerBonus"));
+	float scale = xsSqrt(1.0 + 0.02 * trQuestVarGet("p"+p+"frostHammerBonus"));
 
 	float tdiff = 0.001 * (trTimeMS() - trQuestVarGet("p"+p+"frostHammerLast"));
 	trQuestVarSet("p"+p+"frostHammerLast", trTimeMS());
 
-	trQuestVarSet("p"+p+"frostHammerBonus", trQuestVarGet("p"+p+"frostHammerBonus") - tdiff * xsMax(1.0, 0.03 * trQuestVarGet("p"+p+"frostHammerBonus")));
+	trQuestVarSet("p"+p+"frostHammerBonus", trQuestVarGet("p"+p+"frostHammerBonus") - tdiff * xsMax(0.5, 0.01 * trQuestVarGet("p"+p+"frostHammerBonus")));
 	if (trQuestVarGet("p"+p+"frostHammerBonus") < 0) {
 		trQuestVarSet("p"+p+"frostHammerBonus", 0);
 	}
@@ -190,7 +190,7 @@ void frosthammerAlways(int eventID = -1) {
 				amt = xGetFloat(smashes, xSmashScale);
 				dist = amt * smashRange;
 				current = xsPow(amt * smashWidth, 2);
-				amt = amt * 0.003 * xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerAttack);
+				amt = amt * 0.002 * xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerAttack);
 				for(y=xGetDatabaseCount(dEnemies); >0) {
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies, xUnitID);
@@ -290,7 +290,7 @@ void frosthammerAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"blizzard") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"blizzardNext")) {
-			trQuestVarSet("p"+p+"blizzardNext", trQuestVarGet("p"+p+"blizzardNext") + 500 / xGetDatabaseCount(db));
+			trQuestVarSet("p"+p+"blizzardNext", trQuestVarGet("p"+p+"blizzardNext") + 1000 / xGetDatabaseCount(db));
 			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			if (xGetDatabaseCount(dEnemies) > 0) {
 				dist = xsPow(blizzardRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);

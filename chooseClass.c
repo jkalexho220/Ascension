@@ -595,7 +595,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 13:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "Cost: 20 | Radius: 15 | Damage: Attack x Spell Power";
+					msg = "Cost: 12 | Radius: 15 | Damage: Attack x Spell Power";
 					next = 0;
 				}
 			}
@@ -722,14 +722,19 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "(E) Shield of Light: Absorb all the damage you receive for a short duration.";
+					msg = "(E) Shield of Light: Force nearby enemies to attack you.";
 				}
 				case 11:
 				{
 					icon = "icons\god power valor icons 64";
-					msg = "Then, your next attack will fire an enormous laser that deals all the absorbed damage.";
+					msg = "Then absorb all the damage you receive for a short duration.";
 				}
 				case 12:
+				{
+					icon = "icons\god power valor icons 64";
+					msg = "Then, your next attack will fire an enormous laser that deals all the absorbed damage.";
+				}
+				case 13:
 				{
 					icon = "icons\god power valor icons 64";
 					msg = "Cost: 60 | Duration: 9 | Absorbed damage is calculated before your passive reduction";
@@ -1082,7 +1087,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Bonus decays by 3 percent per second.";
+					msg = "Bonus decays by 1 percent per second. (Minimum of 0.5 per second)";
 				}
 				case 3:
 				{
@@ -1126,7 +1131,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "Cooldown: 24 | Range: 6 | Damage: 3 percent of your health for every 10 attack";
+					msg = "Cooldown: 24 | Range: 6 | Damage: 2 percent of your health for every 10 attack";
 				}
 				case 12:
 				{
@@ -1136,12 +1141,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 13:
 				{
 					icon = "ui\god minor icon norse skadi";
-					msg = "The snowstorm stuns a random nearby enemy every 0.5 seconds.";
+					msg = "The snowstorm stuns a random nearby enemy every second.";
 				}
 				case 14:
 				{
 					icon = "ui\god minor icon norse skadi";
-					msg = "Cost: 80 | Duration: 8 | Radius: 10";
+					msg = "Cost: 80 | Duration: 10 | Radius: 10";
 					next = 0;
 				}
 			}

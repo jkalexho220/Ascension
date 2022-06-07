@@ -953,7 +953,6 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 						if (trUnitAlive()) {
 							if (rayCollision(dEnemies, pos, dir, dist, 3.0)) {
 								damageEnemy(p, xGetFloat(db, xCharSmiteDamage));
-								OnHit(p, xGetPointer(dEnemies));
 							}
 						}
 					}
