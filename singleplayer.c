@@ -587,20 +587,6 @@ highFrequency
 			}
 			xsEnableRule("monsterpedia_always");
 		}
-
-		// start the hippocampus quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
-			xsEnableRule("milkman_matty_always");
-			trQuestVarSet("milkmanMatty", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
-		}
-
-		if ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2)) {
-			// quest is in progress
-			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Ajax",1,143,0,171,180,true);
-			xsEnableRule("monsterpedia_quest");
-		}
 		
 		dBoons = xInitDatabase("boonStatues",12);
 		xInitAddInt(dBoons,"name");
@@ -728,11 +714,37 @@ highFrequency
 			}
 		}
 
+		// white tiger quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
+			trQuestVarSet("tigerHunter", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Ulfsark",1, 127, 0, 157, 225, true);
+			xsEnableRule("tiger_hunter_always");
+		}
+
+		// monsterpedia quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
+			// quest is in progress
+			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Ajax",1,143,0,171,180,true);
+			xsEnableRule("monsterpedia_quest");
+		}
+
+		// idk quest floor 3
+
 		// runestone quest
 		if ((trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
 			xsEnableRule("venlesh_always");
 			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
+		}
+
+		// kastor quest
+
+		// start the hippocampus quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
+			xsEnableRule("milkman_matty_always");
+			trQuestVarSet("milkmanMatty", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
 		}
 
 		// excalibur quest
@@ -742,12 +754,9 @@ highFrequency
 			xsEnableRule("rogers_always");
 		}
 
-		// white tiger quest quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
-			trQuestVarSet("tigerHunter", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Archer Atlantean",1, 127, 0, 157, 225, true);
-			xsEnableRule("tiger_hunter_always");
-		}
+		// idk quest floor 8
+
+		// poison trial quest for the blade of the starsword
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());

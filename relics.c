@@ -193,7 +193,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_NOTTUD:
 			{
-				msg = "+0.2x area damage on attacks. (Radius 4)";
+				msg = "+0.3x area damage on attacks. (Radius 4)";
 			}
 			case RELIC_PET_DOG:
 			{
@@ -689,7 +689,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		}
 		case RELIC_NOTTUD:
 		{
-			xSetFloat(dPlayerData,xPlayerCleave,xGetFloat(dPlayerData,xPlayerCleave) + 0.2 * m);
+			xSetFloat(dPlayerData,xPlayerCleave,xGetFloat(dPlayerData,xPlayerCleave) + 0.3 * m);
 		}
 		case RELIC_DEFIANCE:
 		{

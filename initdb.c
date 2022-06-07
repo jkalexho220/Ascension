@@ -12,6 +12,7 @@ int xUnitPos = 0;
 int xDoppelganger = 0;
 
 int xCurrentHealth = 0;
+int xUnitProto = 0;
 int xStunStatus = 0;
 int xStunTimeout = 0;
 int xStunSFX = 0;
@@ -257,6 +258,7 @@ highFrequency
 		xUnitPos = xInitAddVector(db,"UnitPos");
 		xDoppelganger = xInitAddInt(db,"doppelganger");
 		xCurrentHealth = xInitAddFloat(db,"currentHP");
+		xUnitProto = xInitAddInt(db, "unitProto");
 		xStunStatus = xInitAddInt(db,"stunStatus");
 		xPoisonStatus = xInitAddInt(db,"poisonStatus");
 		xSilenceStatus = xInitAddInt(db,"silenceStatus");

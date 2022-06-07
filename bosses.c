@@ -6610,7 +6610,9 @@ highFrequency
 					trQuestVarSet("keeperGrabTime", trTimeMS());
 					xsEnableRule("keeper_grab");
 					trQuestVarSet("keeperTarget", p);
-					trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has been devoured and lost a level!", -1);
+					if (trCurrentPlayer() != p) {
+						trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has been devoured and lost a level!", -1);
+					}
 					break;
 				}
 			}
@@ -7178,8 +7180,8 @@ highFrequency
 			case 2:
 			{
 				trQuestVarSet("gameOverNext", trTime() + 7);
-				trQuestVarSet("ownedRelics"+RELIC_ZENOPHOBIA, 1 + trQuestVarGet("ownedRelics"+RELIC_ZENOPHOBIA));
-				trShowImageDialog(relicIcon(RELIC_ZENOPHOBIA), relicName(RELIC_ZENOPHOBIA));
+				trQuestVarSet("ownedRelics"+RELIC_COOLDOWN_REDUCTION, 1 + trQuestVarGet("ownedRelics"+RELIC_COOLDOWN_REDUCTION));
+				trShowImageDialog(relicIcon(RELIC_COOLDOWN_REDUCTION), relicName(RELIC_COOLDOWN_REDUCTION));
 			}
 			case 4:
 			{

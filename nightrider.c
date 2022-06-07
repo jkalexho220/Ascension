@@ -7,20 +7,26 @@ float deathSentenceRadius = 8;
 
 int ariseCooldown = 16;
 
-float nightfallCost = 75;
+float nightfallCost = 80;
 float nightfallRadius = 15;
+float nightfallDuration = 12;
+float nightfallDecay = 12;
 
 int xDeathSentenceIndex = 0;
-int xDeathSentencePos = 0;
 int xDeathSentenceTimeout = 0;
 int xDeathSentenceHealth = 0;
 int xDeathSentenceSFX = 0;
+int xDeathSentenceProto = 0;
 
 int xAbductDest = 0;
 int xAbductTimeout = 0;
 int xAbductCurse = 0;
 
+int xNightfallSFX = 0;
+
 void removeNightrider(int p = 0) {
+	xUnitSelect(getCharactersDB(p), xNightfallSFX);
+	trUnitDestroy();
 	removePlayerSpecific(p);
 }
 
@@ -46,8 +52,8 @@ void castDeathSentence(int p = 0) {
 	xAddDatabaseBlock(sentences, true);
 	xSetInt(sentences, xUnitName, xGetInt(dEnemies, xUnitName));
 	xSetInt(sentences, xDeathSentenceIndex, xGetPointer(dEnemies));
+	xSetInt(sentences, xDeathSentenceProto, xGetInt(dEnemies, xUnitProto));
 	xSetInt(sentences, xUnitID, xGetInt(dEnemies, xUnitID));
-	xSetVector(sentences, xDeathSentencePos, xGetVector(dEnemies, xUnitPos));
 	xSetInt(sentences, xDeathSentenceTimeout,
 		trTimeMS() + 1000 * deathSentenceDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 	
@@ -60,9 +66,10 @@ void castDeathSentence(int p = 0) {
 	float health = kbUnitGetCurrentHitpoints(id);
 	xsSetContextPlayer(0);
 	xSetFloat(sentences, xDeathSentenceHealth, health);
-	
+
 	spyEffect(xGetInt(dEnemies, xUnitName),kbGetProtoUnitID("Shade"),
 		xsVectorSet(sentences, xDeathSentenceSFX, xGetNewestPointer(sentences)));
+	
 }
 
 void nightriderAlways(int eventID = -1) {
@@ -80,6 +87,7 @@ void nightriderAlways(int eventID = -1) {
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
+	bool special = false;
 	xSetPointer(dPlayerData, p);
 	
 	vector pos = vector(0,0,0);
@@ -125,30 +133,31 @@ void nightriderAlways(int eventID = -1) {
 		xDatabaseNext(sentences);
 		xUnitSelectByID(sentences, xUnitID);
 		if (trUnitAlive() == false) {
-			pos = xGetVector(sentences, xDeathSentencePos);
+			pos = kbGetBlockPosition(""+xGetInt(sentences, xUnitName));
+			
+			if (trQuestVarGet("p"+p+"nightfallActive") == 1) {
+				spawnPlayerUnit(p, xGetInt(sentences, xDeathSentenceProto), pos, calculateDecay(p, nightfallDecay));
+			} else {
+				trQuestVarSetFromRand("heading", 1, 360, true);
+				spawnMinion(p, pos, trQuestVarGet("heading"));
+			}
+
 			hit = 0;
-			dist = 100;
+			dist = xsPow(deathSentenceRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+			xUnitSelect(sentences, xDeathSentenceSFX);
+			trUnitDestroy();
+			xFreeDatabaseBlock(sentences);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
 				xUnitSelectByID(dEnemies, xUnitID);
 				if (trUnitAlive() == false) {
 					removeEnemy();
 				} else if (xGetBool(dEnemies, xDeathSentence) == false) {
-					current = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
-					if (current < dist) {
-						dist = current;
-						hit = xGetPointer(dEnemies);
+					if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
+						castDeathSentence(p);
+						break;
 					}
 				}
-			}
-			xUnitSelect(sentences, xDeathSentenceSFX);
-			trUnitDestroy();
-			xFreeDatabaseBlock(sentences);
-			trQuestVarSetFromRand("heading",1,360,false);
-			spawnMinion(p, pos, trQuestVarGet("heading"));
-			if (hit > 0) {
-				xSetPointer(dEnemies, hit);
-				castDeathSentence(p);
 			}
 		} else {
 			hit = xGetPointer(dEnemies);
@@ -159,7 +168,6 @@ void nightriderAlways(int eventID = -1) {
 					xSetBool(dEnemies, xDeathSentence, false);
 					xFreeDatabaseBlock(sentences);
 				} else {
-					xSetVector(sentences, xDeathSentencePos, xGetVector(dEnemies, xUnitPos));
 					id = xGetInt(dEnemies, xUnitID);
 					if (PvP) {
 						xsSetContextPlayer(kbUnitGetOwner(id));
@@ -278,6 +286,29 @@ void nightriderAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"ariseNext", trQuestVarGet("p"+p+"ariseNext") + 200);
 		}
 	}
+
+	if (trQuestVarGet("p"+p+"nightfallSpy") == 1) {
+		if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelect(db, xNightfallSFX);
+				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+				trUnitOverrideAnimation(6,0,true,false,-1);
+			}
+			trQuestVarSet("p"+p+"nightfallSpy", 0);
+		}
+	}
+
+	if (trQuestVarGet("p"+p+"nightfallActive") == 1) {
+		if (trTimeMS() > trQuestVarGet("p"+p+"nightfallTimeout")) {
+			for(x=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelect(db, xNightfallSFX);
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			}
+			trQuestVarSet("p"+p+"nightfallActive", 0);
+		}
+	}
 	
 	switch(1*trQuestVarGet("p"+p+"nightfall"))
 	{
@@ -363,6 +394,22 @@ void nightriderAlways(int eventID = -1) {
 					trUnitDestroy();
 				}
 				xClearDatabase(clouds);
+
+				trQuestVarSet("p"+p+"nightfallActive", 1);
+				trQuestVarSet("p"+p+"nightfallTimeout", trTimeMS() + 1000 * nightfallDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
+				for(x=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeNightrider(p);
+					} else if (xGetInt(db, xNightfallSFX) < 0) {
+						spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(db,xNightfallSFX,xGetPointer(db)),vector(0,0,0));
+						trQuestVarSet("p"+p+"nightfallSpy", 1);
+					} else {
+						xUnitSelect(db, xNightfallSFX);
+						trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+					}
+				}
 			}
 			pos = trVectorQuestVarGet("p"+p+"nightfallCenter");
 			dist = xsPow(dist, 2);
@@ -483,6 +530,7 @@ void chooseNightrider(int eventID = -1) {
 		lureName = "(E) Nightfall";
 		lureIsUltimate = true;
 	}
+	xNightfallSFX = xInitAddInt(db, "nightfallSFX", -1);
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, abductCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
@@ -497,10 +545,10 @@ void chooseNightrider(int eventID = -1) {
 		xInitAddInt(db, "name");
 		xDeathSentenceIndex = xInitAddInt(db, "index");
 		xInitAddInt(db, "id");
-		xDeathSentencePos = xInitAddVector(db, "pos");
 		xDeathSentenceTimeout = xInitAddInt(db, "timeout");
 		xDeathSentenceHealth = xInitAddFloat(db, "health");
 		xDeathSentenceSFX = xInitAddInt(db, "sfx");
+		xDeathSentenceProto = xInitAddInt(db, "proto");
 	}
 	
 	if (trQuestVarGet("p"+p+"abducts") == 0) {

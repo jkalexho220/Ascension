@@ -1501,6 +1501,7 @@ int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) 
 	xSetInt(dPlayerUnits,xUnitID,id);
 	xSetFloat(dPlayerUnits,xDecay,decay);
 	xSetInt(dPlayerUnits,xDecayNext,trTimeMS()+1000);
+	xSetInt(dPlayerUnits, xUnitProto, proto);
 	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
 	if (PvP) {
@@ -1509,6 +1510,7 @@ int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) 
 		xSetInt(dEnemies,xPlayerOwner,p);
 		xSetInt(dEnemies,xUnitName,name);
 		xSetInt(dEnemies,xUnitID,id);
+		xSetInt(dEnemies, xUnitProto, proto);
 		xSetFloat(dEnemies,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
 		xSetFloat(dEnemies,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
 		if (pvpDetached) {

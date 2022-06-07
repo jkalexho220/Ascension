@@ -293,11 +293,15 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("The White Tiger has been hunting within the tower! It occasionally appears in the middle floors!");
+					uiMessageBox("The White Tiger has been hunting within the Tower! It occasionally appears in the middle floors!");
 				}
-				case 5:
+				case 2:
 				{
-					uiMessageBox("We need to put a stop to its rampage!");
+					uiMessageBox("If you come across it, make sure to put an end to it!");
+				}
+				case 3:
+				{
+					uiMessageBox("Also, there might be some loot in its stomach that would be worth getting.");
 					dialog = 0;
 				}
 			}
@@ -317,10 +321,6 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 3:
 				{
 					uiMessageBox("Well, that sucks.");
-				}
-				case 4:
-				{
-					uiMessageBox("Acquired: Hilt of an unknown sword");
 					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 0);
 					trUnitSelectClear();
 					trUnitSelectByQV("tigerHunter");
@@ -351,6 +351,10 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("You can equip this blessing in singleplayer.");
+				}
+				case 5:
+				{
+					uiMessageBox("Acquired: Hilt of an unknown sword");
 					dialog = 0;
 				}
 			}
@@ -875,7 +879,9 @@ int npcDiag(int npc = 0, int dialog = 0) {
 		{
 			if (dialog > trQuestVarGet("question"+1*trQuestVarGet("currentQuestion")+"explainations")) {
 				dialog = 0;
-				uiMessageBox("That's all for today! I'll be back after you clear another floor!");
+				if (xGetInt(dPlayerData, xPlayerProgress, 1) < 6) {
+					uiMessageBox("That's all for today! I'll be back after you clear another floor!");
+				}
 				trUnitSelectClear();
 				trUnitSelectByQV("zenoUnit");
 				trUnitChangeProtoUnit("Arkantos God Out");
@@ -964,7 +970,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("There should be some Sphinxes on the first floor of the tower.");
+					uiMessageBox("There should be some Sphinxes on the first floor of the Tower.");
 					dialog = 0;
 				}
 			}
@@ -980,7 +986,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("We can find Dryads on the second floor of the tower.");
+					uiMessageBox("We can find Dryads on the second floor of the Tower.");
 					dialog = 0;
 				}
 			}
@@ -1272,7 +1278,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("Try talking to the people in the tower. They might have seen something.");
+					uiMessageBox("Try talking to the people in the Tower. They might have seen something.");
 					dialog = 0;
 				}
 			}
@@ -1400,7 +1406,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("They say there are ten floors in this tower, but no one knows what's at the top.");
+					uiMessageBox("They say there are ten floors in this Tower, but no one knows what's at the top.");
 				}
 				case 2:
 				{
@@ -1516,7 +1522,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Welcome, travelers! Come and rest a while. The ascent up this tower can be quite arduous.");
+					uiMessageBox("Welcome, travelers! Come and rest a while. The ascent up this Tower can be quite arduous.");
 				}
 				case 2:
 				{
@@ -1568,7 +1574,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
-					uiMessageBox("Very interesting. What drives people to climb this tower?");
+					uiMessageBox("Very interesting. What drives people to climb this Tower?");
 				}
 				case 2:
 				{
@@ -2285,7 +2291,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					uiMessageBox("They reside within the tower. Catch one to have it assist you!");
+					uiMessageBox("They reside within the Tower. Catch one to have it assist you!");
 					dialog = 0;
 				}
 			}

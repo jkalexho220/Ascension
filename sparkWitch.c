@@ -143,10 +143,7 @@ void sparkWitchAlways(int eventID = -1) {
 	if (xGetDatabaseCount(pigs) > 0) {
 		xDatabaseNext(pigs);
 		xUnitSelect(pigs, xUnitName);
-		if ((xGetInt(pigs, xWitchPigProto) == kbGetProtoUnitID("Hero Boar")) ||
-			(xGetInt(pigs, xWitchPigProto) == kbGetProtoUnitID("Hero Boar 2"))) {
-			xFreeDatabaseBlock(pigs);
-		} else if (trUnitAlive() == false) {
+		if (trUnitAlive() == false) {
 			trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(pigs, xWitchPigProto)));
 			xFreeDatabaseBlock(pigs);
 		} else if (trTimeMS() > xGetInt(pigs, xWitchPigTimeout)) {
@@ -235,7 +232,7 @@ void sparkWitchAlways(int eventID = -1) {
 								if (xGetInt(zaps, xZapHex) == 2) {
 									xAddDatabaseBlock(pigs, true);
 									xSetInt(pigs, xUnitName, xGetInt(zaps, xUnitName));
-									xSetInt(pigs, xWitchPigProto, kbGetUnitBaseTypeID(xGetInt(dEnemies, xUnitID)));
+									xSetInt(pigs, xWitchPigProto, xGetInt(dEnemies, xUnitProto));
 									xSetFloat(pigs, xPhysicalResist, xGetFloat(dEnemies, xPhysicalResist));
 									xSetFloat(pigs, xMagicResist, xGetFloat(dEnemies, xMagicResist));
 									xSetInt(pigs, xWitchPigIndex, xGetPointer(dEnemies));

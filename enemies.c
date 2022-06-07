@@ -70,6 +70,7 @@ void activateEnemy(int name = 0, int bounty = -1, int relic = -1) {
 	xSetInt(dEnemies, xBounty, 1*trQuestVarGet("bounty"));
 	xSetInt(dEnemies, xDropRelic, relic);
 	xSetVector(dEnemies,xUnitPos,pos);
+	xSetInt(dEnemies, xUnitProto, proto);
 	xSetFloat(dEnemies,xMagicResist,armor);
 	xSetFloat(dEnemies,xPhysicalResist,armor);
 	for(p=1; < ENEMY_PLAYER) {

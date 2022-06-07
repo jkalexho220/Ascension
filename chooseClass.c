@@ -947,7 +947,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 15:
 				{
 					icon = "icons\god power meteor icon 64";
-					msg = "Cost: 75 | Radius: 15";
+					msg = "Then, when a Death Sentence triggers, summon a copy of the target instead of a minion.";
+				}
+				case 16:
+				{
+					icon = "icons\god power meteor icon 64";
+					msg = "Cost: 80 | Radius: 15 | Duration: 12 | Decay: 12";
 					next = 0;
 				}
 			}
