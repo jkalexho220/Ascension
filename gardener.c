@@ -9,7 +9,7 @@ float stranglethornsRadius = 3;
 float stranglethornsDuration = 3;
 float stranglethornsDamage = 20;
 
-float natureBountyCost = 60;
+float natureBountyCost = 70;
 float natureBountyDuration = 12;
 
 int xSeedReadyTime = 0;
@@ -286,7 +286,7 @@ void gardenerAlways(int eventID = -1) {
 					xUnitSelect(seeds, xUnitName);
 					trUnitConvert(p);
 					trUnitChangeProtoUnit("Walking Berry Bush");
-					activatePlayerUnit(xGetInt(seeds, xUnitName), p, kbGetProtoUnitID("Walking Berry Bush"), calculateDecay(p, 5.0));
+					activatePlayerUnit(xGetInt(seeds, xUnitName), p, kbGetProtoUnitID("Walking Berry Bush"), calculateDecay(p, 8.0));
 					xSetInt(dPlayerUnits, xDecayNext, trTimeMS() + 5000); // berry bush birth animation is five seconds long wtf
 				} else {
 					trUnitConvert(0);

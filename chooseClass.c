@@ -864,7 +864,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\world berry bush icon 64";
-					msg = "Cost: 60 | Duration: 12 | Heal: 120 | Decay: 4 percent per second";
+					msg = "Cost: 70 | Duration: 12 | Heal: 120 | Decay: 8 percent per second";
 					next = 0;
 				}
 			}

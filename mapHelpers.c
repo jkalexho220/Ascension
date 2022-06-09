@@ -242,7 +242,7 @@ void paintEyecandy(int x0 = 0, int z0 = 0, int x1 = 0, int z1 = 0, string type =
 			if (trQuestVarGet("deploy") < trQuestVarGet(type+"Density")) {
 				trQuestVarSetFromRand("x", x0, x1, true);
 				loc = xsVectorSet(trQuestVarGet("x"),0,b);
-				if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				if (terrainIsType(loc, TERRAIN_WALL, TERRAIN_SUB_WALL) == false) {
 					trQuestVarSetFromRand("type", 1, 3, true);
 					trQuestVarSetFromRand("heading", 0, 360, true);
 					next = trGetNextUnitScenarioNameNumber();

@@ -642,8 +642,9 @@ highFrequency
 		trModifyProtounit("Kraken", p, 55, 1);
 		trModifyProtounit("Nereid", p, 55, 1);
 		trModifyProtounit("Scylla", p, 55, 1);
-		
-		trModifyProtounit("Axe",p,1,-20);
+
+		trModifyProtounit("Catapult Shot", p, 8, -99);
+		trModifyProtounit("Petrobolos Shot", p, 8, -99);
 	}
 
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);

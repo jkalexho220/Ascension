@@ -18,6 +18,27 @@ highFrequency
 		} else {
 			xsEnableRule("choose_stage_02");
 			trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
+			for(p=ENEMY_PLAYER; >0) {
+				for(i=trQuestVarGet("stage"); >1) {
+					/* bacchanalia 3 x stage */
+					for(j=3; >0) {
+						trTechSetStatus(p, 78, 4);
+					}
+				}
+				for(i=trQuestVarGet("stage")/2; >0) {
+					/* monstrous rage */
+					trTechSetStatus(p, 76, 4);
+					if ((trQuestVarGet("stage") > 6) && (p == ENEMY_PLAYER)) {
+						trTechSetStatus(p, 76, 4);
+					}
+				}
+			}
+			for(i=trQuestVarGet("stage"); >1) {
+				/* bacchanalia 7 x stage */
+				for(j=7; >0) {
+					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+			}
 		}
 		trUnitSelectClear();
 		trUnitSelectByQV("chooser", true);
@@ -34,27 +55,7 @@ highFrequency
 		trUIFadeToColor(0,0,0,1000,0,true);
 		trSoundPlayFN("ui\thunder2.wav","1",-1,"","");
 		trOverlayText(stageName(1*trQuestVarGet("stage")), 3.0, -1, -1, -1);
-		for(p=ENEMY_PLAYER; >0) {
-			for(i=trQuestVarGet("stage"); >1) {
-				/* bacchanalia 3 x stage */
-				for(j=3; >0) {
-					trTechSetStatus(p, 78, 4);
-				}
-			}
-			for(i=trQuestVarGet("stage")/2; >0) {
-				/* monstrous rage */
-				trTechSetStatus(p, 76, 4);
-				if ((trQuestVarGet("stage") > 6) && (p == ENEMY_PLAYER)) {
-					trTechSetStatus(p, 76, 4);
-				}
-			}
-		}
-		for(i=trQuestVarGet("stage"); >1) {
-			/* bacchanalia 7 x stage */
-			for(j=7; >0) {
-				trTechSetStatus(ENEMY_PLAYER, 78, 4);
-			}
-		}
+		
 		xsEnableRule("delayed_modify");
 	} else if (trUnitIsSelected()) {
 		uiClearSelection();
@@ -1548,7 +1549,7 @@ highFrequency
 				TERRAIN_SUB_SECONDARY = 3;
 				
 				trQuestVarSet("mapType", MAP_OPEN);
-				trQuestVarSet("treeDensity", 0.3);
+				trQuestVarSet("treeDensity", 0.15);
 				trStringQuestVarSet("treeProto1", "Pine");
 				trStringQuestVarSet("treeProto2", "Pine");
 				trStringQuestVarSet("treeProto3", "Ruins");
@@ -1556,7 +1557,7 @@ highFrequency
 				trStringQuestVarSet("spriteProto1", "Flowers");
 				trStringQuestVarSet("spriteProto2", "Grass");
 				trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
-				trQuestVarSet("rockDensity", 0.4);
+				trQuestVarSet("rockDensity", 0.2);
 				trStringQuestVarSet("rockProto1", "Rock Granite Big");
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Rock Granite Small");
@@ -1598,7 +1599,7 @@ highFrequency
 				TERRAIN_SUB_SECONDARY = 33;
 				
 				trQuestVarSet("mapType", MAP_PORTALS);
-				trQuestVarSet("treeDensity", 0.1);
+				trQuestVarSet("treeDensity", 0.05);
 				trStringQuestVarSet("treeProto1", "Statue Pharaoh");
 				trStringQuestVarSet("treeProto2", "Statue Pharaoh");
 				trStringQuestVarSet("treeProto3", "Statue Pharaoh");
@@ -1606,7 +1607,7 @@ highFrequency
 				trStringQuestVarSet("spriteProto1", "Rock Dirt Sprite");
 				trStringQuestVarSet("spriteProto2", "Cinematic Scorch");
 				trStringQuestVarSet("spriteProto3", "Skeleton");
-				trQuestVarSet("rockDensity", 0.2);
+				trQuestVarSet("rockDensity", 0.1);
 				trStringQuestVarSet("rockProto1", "Rock Dirt Big");
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Pestilence SFX1");
@@ -1720,15 +1721,15 @@ highFrequency
 				TERRAIN_SUB_SECONDARY = 9;
 				
 				trQuestVarSet("mapType", MAP_OPEN);
-				trQuestVarSet("treeDensity", 0.3);
+				trQuestVarSet("treeDensity", 0.2);
 				trStringQuestVarSet("treeProto1", "Columns");
 				trStringQuestVarSet("treeProto2", "Columns Broken");
 				trStringQuestVarSet("treeProto3", "Columns Fallen");
-				trQuestVarSet("spriteDensity", 0.7);
+				trQuestVarSet("spriteDensity", 0.5);
 				trStringQuestVarSet("spriteProto1", "Seaweed");
 				trStringQuestVarSet("spriteProto2", "Water Reeds");
 				trStringQuestVarSet("spriteProto3", "Rock Granite Small");
-				trQuestVarSet("rockDensity", 0.4);
+				trQuestVarSet("rockDensity", 0.2);
 				trStringQuestVarSet("rockProto1", "Rock Granite Big");
 				trStringQuestVarSet("rockProto2", "Rock Limestone Sprite");
 				trStringQuestVarSet("rockProto3", "Shipwreck");
@@ -1792,15 +1793,15 @@ highFrequency
 				TERRAIN_SUB_SECONDARY = 50;
 				
 				trQuestVarSet("mapType", MAP_PORTALS);
-				trQuestVarSet("treeDensity", 0.1);
+				trQuestVarSet("treeDensity", 0.05);
 				trStringQuestVarSet("treeProto1", "Ruins");
 				trStringQuestVarSet("treeProto2", "Rock Granite Big");
 				trStringQuestVarSet("treeProto3", "Mist");
-				trQuestVarSet("spriteDensity", 0.3);
+				trQuestVarSet("spriteDensity", 0.2);
 				trStringQuestVarSet("spriteProto1", "Rock Granite Sprite");
 				trStringQuestVarSet("spriteProto2", "Rock Granite Small");
 				trStringQuestVarSet("spriteProto3", "Rock Limestone Small");
-				trQuestVarSet("rockDensity", 0.2);
+				trQuestVarSet("rockDensity", 0.12);
 				trStringQuestVarSet("rockProto1", "Columns");
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Columns Fallen");
@@ -1939,15 +1940,15 @@ highFrequency
 				TERRAIN_SUB_SECONDARY = 73;
 				
 				trQuestVarSet("mapType", MAP_STANDARD);
-				trQuestVarSet("treeDensity", 0.2);
+				trQuestVarSet("treeDensity", 0.1);
 				trStringQuestVarSet("treeProto1", "Oak Tree Burning");
 				trStringQuestVarSet("treeProto2", "Marsh Tree");
 				trStringQuestVarSet("treeProto3", "Pine Snow");
-				trQuestVarSet("spriteDensity", 0.5);
+				trQuestVarSet("spriteDensity", 0.3);
 				trStringQuestVarSet("spriteProto1", "Cinematic Dead Bodies");
 				trStringQuestVarSet("spriteProto2", "Cinematic Dead Bodies Xpack");
 				trStringQuestVarSet("spriteProto3", "Columns");
-				trQuestVarSet("rockDensity", 0.2);
+				trQuestVarSet("rockDensity", 0.1);
 				trStringQuestVarSet("rockProto1", "Ruins");
 				trStringQuestVarSet("rockProto2", "Columns Broken");
 				trStringQuestVarSet("rockProto3", "Cinematic Dead Bodies");
@@ -2450,6 +2451,10 @@ highFrequency
 			trQuestVarSet("bossKey", trGetNextUnitScenarioNameNumber());
 			spawnRelicSpecific(xsVectorSet(x * 70 + 40, 0, z * 70 + 40), 1*trQuestVarGet("keyType"));
 			trQuestVarSet("keyType", 1 + trQuestVarGet("keyType"));
+
+			paintEyecandy(10, 10, 140, 140, "tree");
+			paintEyecandy(10, 10, 140, 140, "sprite");
+			paintEyecandy(10, 10, 140, 140, "rock");
 		}
 		
 		if (trQuestVarGet("pestilenceStart") > 0) {

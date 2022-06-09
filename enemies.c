@@ -150,6 +150,9 @@ highFrequency
 	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
 
 	setupProtounitBounty("Argus", 0.5, 10, 0);
+	setupProtounitBounty("Apep", 0.5, 3, 0);
+	setupProtounitBounty("Stymphalian Bird", 0.1, 5, 0.03);
+	setupProtounitBounty("Catapult", 0, 5, 0.05);
 
 	setupProtounitBounty("Wall Connector", 0.5, 0, 0);
 	
@@ -169,10 +172,11 @@ highFrequency
 			trQuestVarGet("proto"+xGetInt(dClass,xClassProto,class)+"armor"), 8, 0);
 	}
 	
-	/* ballista projectiles */
+	/* ballista projectiles and range */
 	for(p=ENEMY_PLAYER; >0) {
 		trModifyProtounit("Ballista", p, 13, -3);
-		trModifyProtounit("Ballista", p, 11, -12);
+		trModifyProtounit("Ballista", p, 11, -13);
+		trModifyProtounit("Ballista", p, 2, -20);
 	}
 	trModifyProtounit("Ballista Shot", ENEMY_PLAYER, 1, -19);
 	trModifyProtounit("Priest Projectile", ENEMY_PLAYER, 1, -20);
@@ -488,7 +492,7 @@ void specialUnitsAlways() {
 			}
 			xFreeDatabaseBlock(dSphinxes);
 		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSphinxes,xSpecialIndex)) == 1) {
-			xSetInt(dSphinxes,xSpecialStep,2);
+			xSetInt(dSphinxes,xSpecialStep,1);
 		} else if (trTimeMS() > xGetInt(dSphinxes,xSpecialNext)) {
 			switch(xGetInt(dSphinxes, xSpecialStep))
 			{
@@ -506,7 +510,7 @@ void specialUnitsAlways() {
 							if (trUnitAlive() == false) {
 								removeOpponentUnit(p);
 							} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
-								silenceUnit(db,5,p);
+								silenceUnit(db,6.0,p);
 							}
 						}
 						if (p == ENEMY_PLAYER) {
@@ -1094,7 +1098,7 @@ void specialUnitsAlways() {
 						removeOpponentUnit(p);
 					} else if (rayCollision(db,pos,dir,amt + 1.0,9.0)) {
 						damageOpponentUnit(p, amt * 20.0);
-						silenceUnit(db,5.0,p);
+						silenceUnit(db,6.0,p);
 					}
 				}
 				xSetVector(dAvengerProj,xProjPrev,end);
@@ -1222,7 +1226,7 @@ void specialUnitsAlways() {
 					{
 						case STATUS_SILENCE:
 						{
-							silenceUnit(db, 5.0, p);
+							silenceUnit(db, 6.0, p);
 						}
 						case STATUS_POISON:
 						{
@@ -1571,7 +1575,7 @@ void specialUnitsAlways() {
 						} else if (xGetInt(db, xPoisonStatus) == 0) {
 							pos = kbGetBlockPosition(""+xGetInt(db,xUnitName),true);
 							if (distanceBetweenVectors(pos, start) < 9.0) {
-								trDamageUnit(-100);
+								trDamageUnit(-500);
 								trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 								trArmySelect("0,0");
 								trUnitChangeProtoUnit("Regeneration SFX");
