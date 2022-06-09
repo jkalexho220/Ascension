@@ -41,109 +41,38 @@ highFrequency
 			trQuestVarSet("map"+i, i);
 		}
 		trQuestVarSetFromRand("rand", 1, 4, true);
-		trQuestVarSet("rand", 3);
 		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
 		trQuestVarSet("map"+1*trQuestVarGet("rand"), 1);
+
+		trQuestVarSet("gladiatorRound", 1);
 
 		/* oracle */
 		for(i=10; >0) {
 			trTechSetStatus(ENEMY_PLAYER, 297, 4);
 		}
 
+		bullshitProj = trGetNextUnitScenarioNameNumber();
+
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
 		xsEnableRule("gladiator_worlds_cin_1");
+
+		trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 
 		xsDisableSelf();
 	}
 }
 
-rule gladiator_worlds_build_1
-inactive
-highFrequency
-{
-	xsDisableSelf();
-	vector pos = vector(0,0,0);
-	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
-	wallHeight = 9;
-
-	TERRAIN_WALL = 2;
-	TERRAIN_SUB_WALL = 1;
-	
-	TERRAIN_PRIMARY = 0;
-	TERRAIN_SUB_PRIMARY = 5;
-	
-	TERRAIN_SECONDARY = 0;
-	TERRAIN_SUB_SECONDARY = 3;
-
-	trQuestVarSet("treeDensity", 0.5);
-	trStringQuestVarSet("treeProto1", "Pine");
-	trStringQuestVarSet("treeProto2", "Pine");
-	trStringQuestVarSet("treeProto3", "Ruins");
-	trQuestVarSet("spriteDensity", 1.0);
-	trStringQuestVarSet("spriteProto1", "Flowers");
-	trStringQuestVarSet("spriteProto2", "Grass");
-	trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
-	trQuestVarSet("rockDensity", 0.8);
-	trStringQuestVarSet("rockProto1", "Rock Granite Big");
-	trStringQuestVarSet("rockProto2", "Columns Broken");
-	trStringQuestVarSet("rockProto3", "Rock Granite Small");
-
-	trQuestVarSet("columnDensity", 0.5);
-
-	trPaintTerrain(0, 0, 145, 145, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-	paintSecondary(0, 0, 145, 145);
-
-	// cliff outer circle
-	for(x=0; <= 145) {
-		for(z=0; <= 145) {
-			if (xsPow(x - 73, 2) + xsPow(z - 73, 2) > 900) { // 30 radius
-				trPaintTerrain(x, z, x, z, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-				trChangeTerrainHeight(x, z, x, z, wallHeight, false);
-			}
-		}
+void spawnPlayerCircle(vector pos = vector(0,0,0)) {
+	float angle = 6.283185 / (ENEMY_PLAYER - 1);
+	float mCos = xsCos(angle);
+	float mSin = xsSin(angle);
+	vector dir = vector(4, 0, 4);
+	for(p=1; < ENEMY_PLAYER) {
+		spawnPlayer(p, pos + dir);
+		equipRelicsAgain(p);
+		dir = rotationMatrix(dir, mCos, mSin);
 	}
-
-	paintColumns(43, 43, 103, 103);
-	paintEyecandy(43, 43, 103, 103, "tree");
-	paintEyecandy(43, 43, 103, 103, "rock");
-	paintEyecandy(43, 43, 103, 103, "sprite");
-
-	trQuestVarSet("gladiatorRound", 1);
-	
-	trStringQuestVarSet("enemyProto1", "Petsuchos");
-	trStringQuestVarSet("enemyProto2", "Mountain Giant");
-	trStringQuestVarSet("enemyProto3", "Frost Giant");
-	trStringQuestVarSet("enemyProto4", "Centaur");
-	trStringQuestVarSet("enemyProto5", "Onager");
-
-	bullshitProj = trGetNextUnitScenarioNameNumber();
-
-	for(i=20; >0) {
-		/* 100% health bacchanalia x 20 */
-		trTechSetStatus(ENEMY_PLAYER, 78, 4);
-	}
-
-	for(i=4; >0) {
-		/* 100% attack monstrous rage x4 */
-		trTechSetStatus(ENEMY_PLAYER, 76, 4);
-	}
-
-	trQuestVarSetFromRand("portalangle", 0, 3.14, false);
-	bossDir = xsVectorSet(xsCos(trQuestVarGet("portalangle")), 0, xsSin(trQuestVarGet("portalangle"))) * 35.0;
-
-	for(i=3; >0) {
-		pos = vectorToGrid(trVectorQuestVarGet("startPosition") + bossDir);
-		trPaintTerrain(xsVectorGetX(pos) - 3, xsVectorGetZ(pos) - 3, xsVectorGetX(pos) + 3, xsVectorGetZ(pos) + 3, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
-		trChangeTerrainHeight(xsVectorGetX(pos) - 3, xsVectorGetZ(pos) - 3, xsVectorGetX(pos) + 3, xsVectorGetZ(pos) + 3, worldHeight, false);
-		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
-	}
-	bossDir = vector(0,0,0) - bossDir;
-
-	trPaintTerrain(0,0,0,0,TERRAIN_WALL,TERRAIN_SUB_WALL,true);
-
-	trShowImageDialog("ui\ui map king of the hill 256x256", "Entering bullshit canyon...");
-	gadgetUnreal("ShowImageBox-CloseButton");
 }
 
 rule gladiator_worlds_cin_1
@@ -184,8 +113,189 @@ highFrequency
 				trUIFadeToColor(0,0,0,1000,0,false);
 				xsEnableRule("gameplay_start");
 				xsEnableRule("gladiator_worlds_portals");
+
+				for(i=20; >0) {
+					/* 100% health bacchanalia x 20 */
+					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+
+				for(i=4; >0) {
+					/* 100% attack monstrous rage x4 */
+					trTechSetStatus(ENEMY_PLAYER, 76, 4);
+				}
 				
 				trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
+			}
+		}
+	}
+}
+
+rule gladiator_worlds_cin_2
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trLetterBox(true);
+				trSoundPlayFN("default","1",-1,"nottud:Wow! You've managed to survive the first wave! Well done!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 2:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Let's up the ante now, shall we?","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 3:
+			{
+				trSoundPlayFN("default","1",-1,"MODERATE DIFFICULTY:Enemies have 1.5X power","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 4:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Good luck! You're going to need it!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 5:
+			{
+				gadgetReal("ShowImageBox-CloseButton");
+				gadgetUnreal("ShowImageBox");
+				xsDisableSelf();
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsEnableRule("gladiator_worlds_portals");
+				xsEnableRule("gameplay_always");
+
+				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
+
+				for(i=20; >0) {
+					/* 100% health bacchanalia x 20 */
+					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+
+				for(i=4; >0) {
+					/* 100% attack monstrous rage x4 */
+					trTechSetStatus(ENEMY_PLAYER, 76, 4);
+				}
+				
+				trStringQuestVarSet("advice", "Have you tried complaining to nottud about the difficulty? Because it doesn't work.");
+			}
+		}
+	}
+}
+
+rule gladiator_worlds_cin_3
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trLetterBox(true);
+				trSoundPlayFN("default","1",-1,"nottud:Color me impressed! You've managed to survive two rounds!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 2:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:But the show has only just begun!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 3:
+			{
+				trSoundPlayFN("default","1",-1,"HARD DIFFICULTY:Enemies have 2X power","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 4:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Good luck! You're going to need it!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 5:
+			{
+				gadgetReal("ShowImageBox-CloseButton");
+				gadgetUnreal("ShowImageBox");
+				xsDisableSelf();
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsEnableRule("gladiator_worlds_portals");
+				xsEnableRule("gameplay_always");
+
+				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
+
+				for(i=20; >0) {
+					/* 100% health bacchanalia x 20 */
+					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+
+				for(i=4; >0) {
+					/* 100% attack monstrous rage x4 */
+					trTechSetStatus(ENEMY_PLAYER, 76, 4);
+				}
+				
+				trStringQuestVarSet("advice", "Fun fact. I've never beaten Gladiator Worlds before. On any difficulty.");
+			}
+		}
+	}
+}
+
+rule gladiator_worlds_cin_4
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trLetterBox(true);
+				trSoundPlayFN("default","1",-1,"nottud:A true display of skill! I commend you for making it this far!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 2:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:But can you survive this next round?","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 3:
+			{
+				trSoundPlayFN("default","1",-1,"TITAN DIFFICULTY:Enemies have 3X power","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 4:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Good luck! You're going to need it!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 5:
+			{
+				gadgetReal("ShowImageBox-CloseButton");
+				gadgetUnreal("ShowImageBox");
+				xsDisableSelf();
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsEnableRule("gladiator_worlds_portals");
+				xsEnableRule("gameplay_always");
+
+				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
+
+				for(i=40; >0) {
+					/* 100% health bacchanalia x 20 */
+					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+
+				for(i=8; >0) {
+					/* 100% attack monstrous rage x4 */
+					trTechSetStatus(ENEMY_PLAYER, 76, 4);
+				}
+				
+				trStringQuestVarSet("advice", "You were so close! I believe in you!");
 			}
 		}
 	}
@@ -416,7 +526,7 @@ highFrequency
 			} else if (trTimeMS() > xGetInt(dFireLance, xSpecialNext)) {
 				if (kbUnitGetAnimationActionType(id) == 12) {
 					hit = true;
-					xSetInt(dFireLance, xSpecialNext, trTimeMS() + 400);
+					xSetInt(dFireLance, xSpecialNext, trTimeMS() + 500);
 					xsSetContextPlayer(p);
 					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 					xsSetContextPlayer(0);
@@ -506,7 +616,8 @@ minInterval 3
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("proto")),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 				if (next < trGetNextUnitScenarioNameNumber()) {
-					activateEnemy(next);
+					trQuestVarSetFromRand("randrelic", 1, 20);
+					activateEnemy(next, -1, trQuestVarGet("randrelic"));
 				}
 			}
 		}
@@ -518,8 +629,11 @@ inactive
 highFrequency
 {
 	if (trTime() >= cActivationTime + 4) {
+		trChangeTerrainHeight(0,0, 145,145, 10, true);
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
+		trCounterAbort("killcount");
+		xClearDatabase(dMouthOfChaos);
 		for(i=trQuestVarGet("eyecandyStart"); < trGetNextUnitScenarioNameNumber()) {
 			trUnitSelectClear();
 			trUnitSelect(""+i, true);
@@ -527,16 +641,21 @@ highFrequency
 		}
 		for(p=1; < ENEMY_PLAYER) {
 			trPlayerKillAllGodPowers(p);
+			xSetInt(dPlayerData, xPlayerDead, 0, p);
+			xResetDatabase(getCharactersDB(p));
 			if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-				for(i=xGetDatabaseCount(getCharactersDB(p)); >0) {
-					xDatabaseNext(getCharactersDB(p));
-					removeThunderRider(p);
-				}
 				trQuestVarSet("p"+p+"rideLightning", 0);
 			}
+			if (trQuestVarGet("p"+p+"nightfall") > 0) {
+				trQuestVarSet("p"+p+"nightfall", 0);
+			}
+			xSetBool(dPlayerData, xPlayerSilenced, true, p);
 		}
-		xClearDatabase(dPlayerUnits);
-		xClearDatabase(dFreeRelics);
+
+		trQuestVarSet("deadPlayerCount", 0);
+
+		xResetDatabase(dPlayerUnits);
+		xResetDatabase(dFreeRelics);
 
 		trQuestVarSet("gladiatorRound", 1 + trQuestVarGet("gladiatorRound"));
 		trQuestVarSetFromRand("rand", trQuestVarGet("gladiatorRound"), 4, true);
@@ -544,6 +663,10 @@ highFrequency
 		trQuestVarSet("map"+1*trQuestVarGet("rand"), trQuestVarGet("map"+1*trQuestVarGet("gladiatorRound")));
 
 		xsEnableRule("gladiator_worlds_cin_"+1*trQuestVarGet("gladiatorRound"));
+		trChangeTerrainHeight(0,0, 145,145, 0, false);
+
+		trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
+		xsDisableSelf();
 	}
 }
 
@@ -594,6 +717,80 @@ void paintIsland(vector pos = vector(0,0,0)) {
 		}
 		xFreeDatabaseBlock(dEdgeFrontier, pointer);
 	}
+}
+
+
+rule gladiator_worlds_build_1
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	vector pos = vector(0,0,0);
+	wallHeight = 9;
+
+	TERRAIN_WALL = 2;
+	TERRAIN_SUB_WALL = 1;
+	
+	TERRAIN_PRIMARY = 0;
+	TERRAIN_SUB_PRIMARY = 5;
+	
+	TERRAIN_SECONDARY = 0;
+	TERRAIN_SUB_SECONDARY = 3;
+
+	trQuestVarSet("treeDensity", 0.5);
+	trStringQuestVarSet("treeProto1", "Pine");
+	trStringQuestVarSet("treeProto2", "Pine");
+	trStringQuestVarSet("treeProto3", "Ruins");
+	trQuestVarSet("spriteDensity", 1.0);
+	trStringQuestVarSet("spriteProto1", "Flowers");
+	trStringQuestVarSet("spriteProto2", "Grass");
+	trStringQuestVarSet("spriteProto3", "Rock Limestone Sprite");
+	trQuestVarSet("rockDensity", 0.8);
+	trStringQuestVarSet("rockProto1", "Rock Granite Big");
+	trStringQuestVarSet("rockProto2", "Columns Broken");
+	trStringQuestVarSet("rockProto3", "Rock Granite Small");
+
+	trQuestVarSet("columnDensity", 0.5);
+
+	trPaintTerrain(0, 0, 145, 145, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+	paintSecondary(0, 0, 145, 145);
+
+	// cliff outer circle
+	for(x=0; <= 145) {
+		for(z=0; <= 145) {
+			if (xsPow(x - 73, 2) + xsPow(z - 73, 2) > 900) { // 30 radius
+				trPaintTerrain(x, z, x, z, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+				trChangeTerrainHeight(x, z, x, z, wallHeight, false);
+			}
+		}
+	}
+
+	paintColumns(43, 43, 103, 103);
+	paintEyecandy(43, 43, 103, 103, "tree");
+	paintEyecandy(43, 43, 103, 103, "rock");
+	paintEyecandy(43, 43, 103, 103, "sprite");
+	
+	trStringQuestVarSet("enemyProto1", "Petsuchos");
+	trStringQuestVarSet("enemyProto2", "Mountain Giant");
+	trStringQuestVarSet("enemyProto3", "Frost Giant");
+	trStringQuestVarSet("enemyProto4", "Centaur");
+	trStringQuestVarSet("enemyProto5", "Stymphalian Bird");
+
+	trQuestVarSetFromRand("portalangle", 0, 3.14, false);
+	bossDir = xsVectorSet(xsCos(trQuestVarGet("portalangle")), 0, xsSin(trQuestVarGet("portalangle"))) * 35.0;
+
+	for(i=3; >0) {
+		pos = vectorToGrid(trVectorQuestVarGet("startPosition") + bossDir);
+		trPaintTerrain(xsVectorGetX(pos) - 3, xsVectorGetZ(pos) - 3, xsVectorGetX(pos) + 3, xsVectorGetZ(pos) + 3, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+		trChangeTerrainHeight(xsVectorGetX(pos) - 3, xsVectorGetZ(pos) - 3, xsVectorGetX(pos) + 3, xsVectorGetZ(pos) + 3, worldHeight, false);
+		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
+	}
+	bossDir = vector(0,0,0) - bossDir;
+
+	trPaintTerrain(0,0,0,0,TERRAIN_WALL,TERRAIN_SUB_WALL,true);
+
+	trShowImageDialog("ui\ui map king of the hill 256x256", "Entering bullshit canyon...");
+	gadgetUnreal("ShowImageBox-CloseButton");
 }
 
 rule gladiator_worlds_build_2
@@ -677,8 +874,6 @@ highFrequency
 	paintEyecandy(43, 43, 103, 103, "tree");
 	paintEyecandy(43, 43, 103, 103, "rock");
 	paintEyecandy(43, 43, 103, 103, "sprite");
-
-	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 
 
 	trStringQuestVarSet("enemyProto1", "War Salamander");
@@ -846,8 +1041,6 @@ highFrequency
 	paintEyecandy(43, 43, 103, 103, "rock");
 	paintEyecandy(43, 43, 103, 103, "sprite");
 
-	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
-
 	trStringQuestVarSet("enemyProto1", "Wadjet");
 	trStringQuestVarSet("enemyProto2", "Apep");
 	trStringQuestVarSet("enemyProto3", "Argus");
@@ -997,13 +1190,11 @@ highFrequency
 	paintEyecandy(43, 43, 103, 103, "rock");
 	paintEyecandy(43, 43, 103, 103, "sprite");
 
-	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
-
-	trStringQuestVarSet("enemyProto1", "Fire Giant");
+	trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
 	trStringQuestVarSet("enemyProto2", "Avenger");
 	trStringQuestVarSet("enemyProto3", "Sphinx");
 	trStringQuestVarSet("enemyProto4", "Mummy");
-	trStringQuestVarSet("enemyProto5", "Stymphalian Bird");
+	trStringQuestVarSet("enemyProto5", "Onager");
 
 	trShowImageDialog("ui\ui map valley of kings 256x256", "Entering bullshit desert...");
 	gadgetUnreal("ShowImageBox-CloseButton");
