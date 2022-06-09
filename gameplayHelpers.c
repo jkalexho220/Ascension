@@ -1130,6 +1130,13 @@ int dLightningStatues = 0;
 int dManticores = 0;
 int dFireGiants = 0;
 int dArgus = 0;
+int dFireLance = 0;
+
+int dFireLancePellets = 0;
+int xFireLancePelletPrev = 0;
+int xFireLancePelletDir = 0;
+int xFireLancePelletLast = 0;
+int xFireLancePelletTimeout = 0;
 
 int dAutomatonBombs = 0;
 
@@ -1345,6 +1352,16 @@ highFrequency
 	xFireGiantProjOwner = xInitAddInt(dFireGiantProj, "owner"); // for some reason, only p0 meteorite death works
 	dFireGiantBalls = initGenericProj("fireGiantBalls",kbGetProtoUnitID("Fire Giant"),19,10.0,4.5,0,ENEMY_PLAYER,true);
 	xProjDist = xInitAddFloat(dFireGiantBalls,"dist");
+
+	dFireLance = initSpecialDatabase("fireLance");
+
+	dFireLancePellets = xInitDatabase("fireLancePellets");
+	xInitAddInt(dFireLancePellets, "name");
+	xInitAddInt(dFireLancePellets, "player");
+	xFireLancePelletPrev = xInitAddVector(dFireLancePellets, "prev");
+	xFireLancePelletDir = xInitAddVector(dFireLancePellets, "dir");
+	xFireLancePelletLast = xInitAddInt(dFireLancePellets, "last");
+	xFireLancePelletTimeout = xInitAddInt(dFireLancePellets, "timeout");
 	
 	dAmbushRooms = xInitDatabase("ambushRooms");
 	xAmbushRoomType = xInitAddInt(dAmbushRooms, "type");
@@ -1488,6 +1505,10 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 				xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
 				xSetFloat(db,xPhysicalResist,1,xGetNewestPointer(db));
 			}
+		}
+		case kbGetProtoUnitID("Fire Lance"):
+		{
+			addSpecialToDatabase(dFireLance,name,db,p);
 		}
 	}
 }

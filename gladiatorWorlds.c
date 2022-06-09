@@ -37,19 +37,22 @@ highFrequency
 
 		trVectorQuestVarSet("startPosition", vector(145,0,145));
 
-		xsEnableRule("gladiator_worlds_build_3");
+		for(i=1; < 5) {
+			trQuestVarSet("map"+i, i);
+		}
+		trQuestVarSetFromRand("rand", 1, 4, true);
+		trQuestVarSet("rand", 3);
+		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
+		trQuestVarSet("map"+1*trQuestVarGet("rand"), 1);
 
 		/* oracle */
 		for(i=10; >0) {
 			trTechSetStatus(ENEMY_PLAYER, 297, 4);
 		}
 
-		trLetterBox(false);
-		trUIFadeToColor(0,0,0,0,0,false);
-
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
-		//xsEnableRule("gladiator_worlds_cin_1");
+		xsEnableRule("gladiator_worlds_cin_1");
 
 		xsDisableSelf();
 	}
@@ -109,10 +112,10 @@ highFrequency
 	trQuestVarSet("gladiatorRound", 1);
 	
 	trStringQuestVarSet("enemyProto1", "Petsuchos");
-	trStringQuestVarSet("enemyProto2", "Apep");
-	trStringQuestVarSet("enemyProto3", "Argus");
+	trStringQuestVarSet("enemyProto2", "Mountain Giant");
+	trStringQuestVarSet("enemyProto3", "Frost Giant");
 	trStringQuestVarSet("enemyProto4", "Centaur");
-	trStringQuestVarSet("enemyProto5", "Catapult");
+	trStringQuestVarSet("enemyProto5", "Onager");
 
 	bullshitProj = trGetNextUnitScenarioNameNumber();
 
@@ -135,8 +138,12 @@ highFrequency
 		trChangeTerrainHeight(xsVectorGetX(pos) - 3, xsVectorGetZ(pos) - 3, xsVectorGetX(pos) + 3, xsVectorGetZ(pos) + 3, worldHeight, false);
 		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
 	}
+	bossDir = vector(0,0,0) - bossDir;
 
 	trPaintTerrain(0,0,0,0,TERRAIN_WALL,TERRAIN_SUB_WALL,true);
+
+	trShowImageDialog("ui\ui map king of the hill 256x256", "Entering bullshit canyon...");
+	gadgetUnreal("ShowImageBox-CloseButton");
 }
 
 rule gladiator_worlds_cin_1
@@ -165,8 +172,6 @@ highFrequency
 			}
 			case 4:
 			{
-				trShowImageDialog("ui\ui map king of the hill 256x256", "Entering bullshit canyon...");
-				gadgetUnreal("ShowImageBox-CloseButton");
 				trSoundPlayFN("default","1",-1,"nottud:Good luck! You're going to need it!","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 			}
@@ -178,7 +183,6 @@ highFrequency
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 				xsEnableRule("gameplay_start");
-				xsEnableRule("gladiator_worlds_always");
 				xsEnableRule("gladiator_worlds_portals");
 				
 				trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
@@ -209,6 +213,7 @@ highFrequency
 			bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
 		}
 		xsEnableRule("gladiator_worlds_spawn");
+		xsEnableRule("gladiator_worlds_always");
 		xsDisableSelf();
 
 		trQuestVarSet("currentKills", trGetStatValue(ENEMY_PLAYER, 6));
@@ -224,10 +229,14 @@ highFrequency
 {
 	bool explode = false;
 	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	vector end = vector(0,0,0);
+	int target = 0;
 	int next = 0;
 	int id = 0;
 	int p = 0;
 	int db = 0;
+	float dist = 0;
 	bool hit = false;
 
 	int kills = trGetStatValue(ENEMY_PLAYER, 6);
@@ -338,10 +347,102 @@ highFrequency
 				if (trUnitAlive() == false) {
 					removeOpponentUnit(p);
 				} else if (unitDistanceToVector(xGetInt(db, xUnitName), pos) < 25.0) {
-					damageOpponentUnit(p, 200.0);
+					damageOpponentUnit(p, 200.0 + 100.0 * trQuestVarGet("gladiatorRound"));
 				}
 			}
 			xFreeDatabaseBlock(dRevealerBoom);
+		}
+	}
+
+	if (xGetDatabaseCount(dFireLancePellets) > 0) {
+		for(i=xsMin(8, xGetDatabaseCount(dFireLancePellets)); >0) {
+			xDatabaseNext(dFireLancePellets);
+			if (xGetInt(dFireLancePellets, xFireLancePelletTimeout) == 0) {
+				xSetInt(dFireLancePellets, xFireLancePelletTimeout, trTimeMS() + 1500);
+				xUnitSelect(dFireLancePellets, xUnitName);
+				trMutateSelected(kbGetProtoUnitID("Thor Hammer"));
+				trUnitOverrideAnimation(2,0,true,false,-1);
+				trSetSelectedScale(0.3,0.3,-0.2);
+				trUnitSetAnimationPath("3,0,0,0,0,0,0");
+			} else {
+				dist = trTimeMS() - xGetInt(dFireLancePellets, xFireLancePelletLast);
+				if (dist > 100) {
+					hit = false;
+					pos = xGetVector(dFireLancePellets, xFireLancePelletPrev);
+					dir = xGetVector(dFireLancePellets, xFireLancePelletDir);
+					p = xGetInt(dFireLancePellets, xPlayerOwner);
+					dist = 0.03 * dist;
+					db = opponentDatabaseName(p);
+					for(j=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db, xUnitID);
+						if (trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (rayCollision(db, pos, dir, dist + 1.0, 1.0)) {
+							hit = true;
+							damagePlayerUnit(40.0 + 20.0 * trQuestVarGet("gladiatorRound"));
+						}
+					}
+					if (hit || trTimeMS() > xGetInt(dFireLancePellets, xFireLancePelletTimeout)) {
+						xUnitSelect(dFireLancePellets, xUnitName);
+						trUnitChangeProtoUnit("Dust Small");
+						xUnitSelect(dFireLancePellets, xUnitName);
+						trDamageUnitPercent(-100);
+						xFreeDatabaseBlock(dFireLancePellets);
+						if (hit) {
+							trQuestVarSetFromRand("sound", 1, 4, true);
+							trSoundPlayFN("arrowonflesh"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+						}
+					} else {
+						pos = pos + (dir * dist);
+						xSetVector(dFireLancePellets, xFireLancePelletPrev, pos);
+						xSetInt(dFireLancePellets, xFireLancePelletLast, trTimeMS());
+					}
+				}
+			}
+		}
+	}
+
+	if (xGetDatabaseCount(dFireLance) > 0) {
+		hit = false;
+		for(i=xGetDatabaseCount(dFireLance); >0) {
+			xDatabaseNext(dFireLance);
+			id = xGetInt(dFireLance, xUnitID);
+			p = xGetInt(dFireLance, xPlayerOwner);
+			trUnitSelectClear();
+			trUnitSelectByID(id);
+			if (trUnitAlive() == false) {
+				xFreeDatabaseBlock(dFireLance);
+			} else if (trTimeMS() > xGetInt(dFireLance, xSpecialNext)) {
+				if (kbUnitGetAnimationActionType(id) == 12) {
+					hit = true;
+					xSetInt(dFireLance, xSpecialNext, trTimeMS() + 400);
+					xsSetContextPlayer(p);
+					target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+					xsSetContextPlayer(0);
+					pos = kbGetBlockPosition(""+xGetInt(dFireLance, xUnitName), true);
+					end = kbGetBlockPosition(""+target, true);
+					dir = getUnitVector(pos, end);
+					zSetProtoUnitStat("Kronny Flying", p, 1, 30.0);
+					xAddDatabaseBlock(dFireLancePellets, true);
+					xSetInt(dFireLancePellets, xUnitName, trGetNextUnitScenarioNameNumber());
+					xSetInt(dFireLancePellets, xPlayerOwner, p);
+					xSetVector(dFireLancePellets, xFireLancePelletDir, dir);
+					xSetVector(dFireLancePellets, xFireLancePelletPrev, pos);
+					xSetInt(dFireLancePellets, xFireLancePelletLast, trTimeMS());
+					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect(""+p+",0");
+					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+					trSetUnitOrientation(dir,vector(0,1,0),true);
+					trSetSelectedScale(0,-4.5,0);
+					trDamageUnitPercent(100);
+				} else {
+					xSetInt(dFireLance, xSpecialNext, trTimeMS());
+				}
+			}
+		}
+		if (hit) {
+			trSoundPlayFN("titanfall.wav","1",-1,"","");
 		}
 	}
 
@@ -375,6 +476,12 @@ highFrequency
 			case kbGetProtoUnitID("Petrobolos Shot"):
 			{
 				/* onager launches units at you */
+			}
+			case kbGetProtoUnitID("Fire Lance Projectile"):
+			{
+				trUnitSelectClear();
+				trUnitSelectByID(id);
+				trUnitChangeProtoUnit("Dust Small");
 			}
 		}
 		bullshitProj = bullshitProj + 1;
@@ -432,7 +539,10 @@ highFrequency
 		xClearDatabase(dFreeRelics);
 
 		trQuestVarSet("gladiatorRound", 1 + trQuestVarGet("gladiatorRound"));
-		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("gladiatorRound"));
+		trQuestVarSetFromRand("rand", trQuestVarGet("gladiatorRound"), 4, true);
+		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("map"+1*trQuestVarGet("rand")));
+		trQuestVarSet("map"+1*trQuestVarGet("rand"), trQuestVarGet("map"+1*trQuestVarGet("gladiatorRound")));
+
 		xsEnableRule("gladiator_worlds_cin_"+1*trQuestVarGet("gladiatorRound"));
 	}
 }
@@ -525,6 +635,7 @@ highFrequency
 		paintIsland(vectorToGrid(trVectorQuestVarGet("startPosition") + bossDir));
 		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
 	}
+	bossDir = vector(0,0,0) - bossDir;
 
 	subModeEnter("Simulation", "Editor");
 	terrainFilter();
@@ -568,6 +679,16 @@ highFrequency
 	paintEyecandy(43, 43, 103, 103, "sprite");
 
 	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
+
+
+	trStringQuestVarSet("enemyProto1", "War Salamander");
+	trStringQuestVarSet("enemyProto2", "Hydra");
+	trStringQuestVarSet("enemyProto3", "Medusa");
+	trStringQuestVarSet("enemyProto4", "Nereid");
+	trStringQuestVarSet("enemyProto5", "Catapult");
+
+	trShowImageDialog("ui\ui map old atlantis 256x256", "Entering bullshit island...");
+	gadgetUnreal("ShowImageBox-CloseButton");
 
 	xsDisableSelf();
 }
@@ -668,13 +789,12 @@ highFrequency
 	}
 
 	trQuestVarSetFromRand("portalangle", 0, 3.14, false);
-	bossDir = xsVectorSet(xsCos(trQuestVarGet("portalangle")), 0, xsSin(trQuestVarGet("portalangle"))) * 35.0;
+	bossDir = xsVectorSet(xsCos(trQuestVarGet("portalangle")), 0, xsSin(trQuestVarGet("portalangle"))) * 40.0;
 
 	for(i=3; >0) {
 		paintSwampPool(vectorToGrid(trVectorQuestVarGet("startPosition") + bossDir), terrainHeights);
 		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
 	}
-	bossDir = rotationMatrix(bossDir, 0.5, 0.866025);
 
 	for(i=0; < 145) {
 		for(j=0; < 145) {
@@ -728,12 +848,165 @@ highFrequency
 
 	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 
-	trStringQuestVarSet("enemyProto1", "Petsuchos");
+	trStringQuestVarSet("enemyProto1", "Wadjet");
 	trStringQuestVarSet("enemyProto2", "Apep");
 	trStringQuestVarSet("enemyProto3", "Argus");
-	trStringQuestVarSet("enemyProto4", "Hydra");
-	trStringQuestVarSet("enemyProto5", "");
+	trStringQuestVarSet("enemyProto4", "Jiangshi");
+	trStringQuestVarSet("enemyProto5", "Fire Lance");
+
+	trShowImageDialog("ui\ui map marsh 256x256", "Entering bullshit swamp...");
+	gadgetUnreal("ShowImageBox-CloseButton");	
+
+	xsDisableSelf();
+}
+
+void paintCliff(vector pos = vector(0,0,0)) {
+	int x = 0;
+	int z = 0;
+	for(x=0; < 145) {
+		for(z=0; < 145) {
+			aiPlanSetUserVariableBool(dMapTiles, x, z, false);
+		}
+	}
+	xClearDatabase(dEdgeFrontier);
+	int pointer = 0;
+	float height = 0;
+	xAddDatabaseBlock(dEdgeFrontier, true);
+	xSetVector(dEdgeFrontier, xEdgeFrontierLoc, pos);
+	xSetInt(dEdgeFrontier, xEdgeFrontierHeight, 30);
+	aiPlanSetUserVariableBool(dMapTiles, 1*xsVectorGetX(pos), 1*xsVectorGetZ(pos), true);
+	while(xGetDatabaseCount(dEdgeFrontier) > 0) {
+		trQuestVarSetFromRand("rand", 1, 8, true);
+		for(i=trQuestVarGet("rand"); >0) {
+			xDatabaseNext(dEdgeFrontier, false);
+		}
+		pointer = xGetPointer(dEdgeFrontier);
+		pos = xGetVector(dEdgeFrontier, xEdgeFrontierLoc);
+		x = xsVectorGetX(pos);
+		z = xsVectorGetZ(pos);
+		height = worldHeight + 3.0 * (xGetInt(dEdgeFrontier, xEdgeFrontierHeight) / 10);
+		if (trGetTerrainHeight(x, z) < height || trGetTerrainHeight(x + 1, z + 1) < height) {
+			trChangeTerrainHeight(x, z, 1 + x, 1 + z, height, false);
+			for(a= -1; <= 1) {
+				for (b= -1; <= 1) {
+					if (xsAbs(a) + xsAbs(b) > 0) {
+						pos = xsVectorSet(a + x, 0, b + z);
+						if (x > 1 && x < 144 && z > 1 && z < 144) {
+							if (aiPlanGetUserVariableBool(dMapTiles, x + a, z + b) == false) {
+								trQuestVarSetFromRand("rand", 1, 5, true);
+								height = xGetInt(dEdgeFrontier, xEdgeFrontierHeight, pointer) - trQuestVarGet("rand");
+								xAddDatabaseBlock(dEdgeFrontier, true);
+								xSetVector(dEdgeFrontier, xEdgeFrontierLoc, pos);
+								xSetInt(dEdgeFrontier, xEdgeFrontierHeight, height);
+								aiPlanSetUserVariableBool(dMapTiles, x + a, z + b, true);
+							}
+						}
+					}
+				}
+			}
+		}
+		xFreeDatabaseBlock(dEdgeFrontier, pointer);
+	}
+}
+
+rule gladiator_worlds_build_4
+inactive
+highFrequency
+{
+	float height = 0;
+
+	TERRAIN_WALL = 2;
+	TERRAIN_SUB_WALL = 2;
+
+	TERRAIN_PRIMARY = 0;
+	TERRAIN_SUB_PRIMARY = 34;
+
+	TERRAIN_SECONDARY = 0;
+	TERRAIN_SUB_SECONDARY = 38;
+
+	worldHeight = 0;
+
+	/* circular island */
+	for(i=0; < 145) {
+		for(j=0; < 145) {
+			if (xsPow(i - 73, 2) + xsPow(j - 73, 2) > 900.0) {
+				trChangeTerrainHeight(i, j, i+1, j+1, 9.0, false);
+			} else {
+				trChangeTerrainHeight(i, j, i+1, j+1, 0, false);
+			}
+		}
+	}
+
+	dMapTiles = aiPlanCreate("mapTiles", 8);
+	dEdgeFrontier = xInitDatabase("edgeFrontier");
+	xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
+	xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
+	for(i=0; < 145) {
+		if (aiPlanAddUserVariableFloat(dMapTiles,i,"row"+i,144) == false) {
+			trSoundPlayFN("cantdothat.wav","1",-1,"","");
+			debugLog("Cannot create new user variable at " + i);
+		}
+	}
+
+	trQuestVarSetFromRand("portalangle", 0, 3.14, false);
+	bossDir = xsVectorSet(xsCos(trQuestVarGet("portalangle")), 0, xsSin(trQuestVarGet("portalangle"))) * 40.0;
+
+	for(i=3; >0) {
+		paintCliff(vectorToGrid(trVectorQuestVarGet("startPosition") + bossDir));
+		bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
+	}
+
+
+	subModeEnter("Simulation", "Editor");
+	terrainFilter();
+	subModeLeave("Simulation", "Editor");
+	modeEnter("Pregame");
+	modeEnter("Simulation");
+
+	aiPlanDestroy(dMapTiles);
+
+	for(x=0; < 145) {
+		for(z=0; < 145) {
+			height = 0.5 * (trGetTerrainHeight(x, z) + trGetTerrainHeight(x+1, z+1));
+			if (height < 0.5) {
+				trPaintTerrain(x, z, x, z, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			} else if (height < 1.0) {
+				trPaintTerrain(x, z, x, z, TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, false);
+			} else {
+				trPaintTerrain(x, z, x, z, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			}
+		}
+	}
 	
+	trQuestVarSet("treeDensity", 0.3);
+	trStringQuestVarSet("treeProto1", "Statue Pharaoh");
+	trStringQuestVarSet("treeProto2", "Statue Pharaoh");
+	trStringQuestVarSet("treeProto3", "Palm");
+	trQuestVarSet("spriteDensity", 1.0);
+	trStringQuestVarSet("spriteProto1", "Grass");
+	trStringQuestVarSet("spriteProto2", "Water Reeds");
+	trStringQuestVarSet("spriteProto3", "Rock Sandstone Sprite");
+	trQuestVarSet("rockDensity", 0.5);
+	trStringQuestVarSet("rockProto1", "Rock River Sandy");
+	trStringQuestVarSet("rockProto2", "Bush");
+	trStringQuestVarSet("rockProto3", "Rock Sandstone Big");
+
+	trPaintTerrain(0, 0, 1, 1, TERRAIN_WALL, TERRAIN_SUB_WALL, true);
+
+	paintEyecandy(43, 43, 103, 103, "tree");
+	paintEyecandy(43, 43, 103, 103, "rock");
+	paintEyecandy(43, 43, 103, 103, "sprite");
+
+	trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
+
+	trStringQuestVarSet("enemyProto1", "Fire Giant");
+	trStringQuestVarSet("enemyProto2", "Avenger");
+	trStringQuestVarSet("enemyProto3", "Sphinx");
+	trStringQuestVarSet("enemyProto4", "Mummy");
+	trStringQuestVarSet("enemyProto5", "Stymphalian Bird");
+
+	trShowImageDialog("ui\ui map valley of kings 256x256", "Entering bullshit desert...");
+	gadgetUnreal("ShowImageBox-CloseButton");
 
 	xsDisableSelf();
 }
