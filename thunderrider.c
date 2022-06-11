@@ -546,12 +546,12 @@ void thunderRiderAlways(int eventID = -1) {
 					xUnitSelectByID(dEnemies, xUnitID);
 					trUnitHighlight(0.2, false);
 					damageEnemy(p, xGetFloat(shocks, xShockDamage), false);
-					OnHit(p, xGetPointer(dEnemies));
 					pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect(""+p+",0");
 					trUnitChangeProtoUnit("Lightning Sparks Ground");
 					xSetVector(shocks, xShockPos, pos);
+					OnHit(p, xGetPointer(dEnemies));
 				}
 				xFreeDatabaseBlock(shockTargets);
 			}

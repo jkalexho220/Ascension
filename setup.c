@@ -605,6 +605,7 @@ highFrequency
 	
 	zInitProtoUnitStat("Revealer to Player", 0, 2, 12);
 	for(p=ENEMY_PLAYER; >0) {
+		trModifyProtounit("Onager", p, 13, -1);
 		zInitProtoUnitStat("Revealer to Player", p, 2, 12);
 		zSetProtoUnitStat("Revealer to Player", p, 2, 32);
 		trModifyProtounit("Revealer to Player", p, 0, 999999);

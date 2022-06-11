@@ -62,7 +62,7 @@ highFrequency
 			trQuestVarSet("map"+i, i);
 		}
 		trQuestVarSetFromRand("rand", 1, 4, true);
-		//xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
+		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
 		trQuestVarSet("map"+1*trQuestVarGet("rand"), 1);
 
 		trQuestVarSet("gladiatorRound", 1);
@@ -77,8 +77,7 @@ highFrequency
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
 
-		//xsEnableRule("gladiator_worlds_cin_1");
-		xsEnableRule("gladiator_worlds_cin_5");
+		xsEnableRule("gladiator_worlds_cin_1");
 
 		trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 
@@ -111,6 +110,10 @@ highFrequency
 				trMusicPlay("xpack\xcinematics\10_a\music.mp3", "1", 0);
 				trSoundPlayFN("default","1",-1,"nottud:Welcome to Gladiator Worlds! The land of madness incarnate!","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
+				if (trCurrentPlayer() == 1) {
+					trQuestVarSet("nottudTicketsCount", trQuestVarGet("nottudTicketsCount") - 1);
+				}
+				trQuestVarSet("p1gladiatorWorlds", 0);
 			}
 			case 2:
 			{
@@ -140,6 +143,10 @@ highFrequency
 				for(i=20; >0) {
 					/* 100 health bacchanalia x 20 */
 					trTechSetStatus(ENEMY_PLAYER, 78, 4);
+				}
+
+				if (trCurrentPlayer() == 1) {
+					uiMessageBox("Your copy of Gladiator Worlds was consumed. It's a one-time use item.");
 				}
 				
 				trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
@@ -358,8 +365,7 @@ highFrequency
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
 
-				//xsEnableRule("gameplay_always");
-				xsEnableRule("gameplay_start");
+				xsEnableRule("gameplay_always");
 
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -379,9 +385,9 @@ highFrequency
 
 				trQuestVarSet("bossSpell", dPitOfDoom);
 				trQuestVarSet("bossPhase", 2);
-				trQuestVarSet("bossCooldownTime", trTimeMS() + 3000);
+				trQuestVarSet("bossCooldownTime", trTimeMS() + 15000);
 
-				//spawnPlayerCircle(trVectorQuestVarGet("startPosition") - vector(10, 0, 10));
+				spawnPlayerCircle(trVectorQuestVarGet("startPosition") - vector(10, 0, 10));
 
 				if (customContent == false) {
 					xsEnableRule("boss_music");
@@ -422,6 +428,32 @@ highFrequency
 		trQuestVarSet("totalKills", 0);
 		trQuestVarSet("killReward", 0);
 		trCounterAddTime("killcount",-1,-9999,"Kills: " + 1*trQuestVarGet("totalKills"),-1);
+	}
+}
+
+void processRevealerBoom() {
+	int db = 0;
+	int p = 0;
+	vector pos = vector(0,0,0);
+	if (xGetDatabaseCount(dRevealerBoom) > 0) {
+		xDatabaseNext(dRevealerBoom);
+		if (trTimeMS() > xGetInt(dRevealerBoom, xRevealerBoomTimeout)) {
+			p = xGetInt(dRevealerBoom, xPlayerOwner);
+			db = opponentDatabaseName(p);
+			pos = kbGetBlockPosition(""+xGetInt(dRevealerBoom, xUnitName), true);
+			xUnitSelect(dRevealerBoom, xUnitName);
+			trUnitDestroy();
+			for(i=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
+					removeOpponentUnit(p);
+				} else if (unitDistanceToVector(xGetInt(db, xUnitName), pos) < 25.0) {
+					damageOpponentUnit(p, 200.0 + 100.0 * trQuestVarGet("gladiatorRound"));
+				}
+			}
+			xFreeDatabaseBlock(dRevealerBoom);
+		}
 	}
 }
 
@@ -535,26 +567,7 @@ highFrequency
 		}
 	}
 
-	if (xGetDatabaseCount(dRevealerBoom) > 0) {
-		xDatabaseNext(dRevealerBoom);
-		if (trTimeMS() > xGetInt(dRevealerBoom, xRevealerBoomTimeout)) {
-			p = xGetInt(dRevealerBoom, xPlayerOwner);
-			db = opponentDatabaseName(p);
-			pos = kbGetBlockPosition(""+xGetInt(dRevealerBoom, xUnitName), true);
-			xUnitSelect(dRevealerBoom, xUnitName);
-			trUnitDestroy();
-			for(i=xGetDatabaseCount(db); >0) {
-				xDatabaseNext(db);
-				xUnitSelectByID(db, xUnitID);
-				if (trUnitAlive() == false) {
-					removeOpponentUnit(p);
-				} else if (unitDistanceToVector(xGetInt(db, xUnitName), pos) < 25.0) {
-					damageOpponentUnit(p, 200.0 + 100.0 * trQuestVarGet("gladiatorRound"));
-				}
-			}
-			xFreeDatabaseBlock(dRevealerBoom);
-		}
-	}
+	processRevealerBoom();
 
 	if (xGetDatabaseCount(dOnagerShots) > 0) {
 		xDatabaseNext(dOnagerShots);
@@ -794,6 +807,7 @@ highFrequency
 		trQuestVarSet("deadPlayerCount", 0);
 
 		xResetDatabase(dPlayerUnits);
+		xResetDatabase(dPlayerCharacters);
 		xResetDatabase(dFreeRelics);
 
 		trQuestVarSet("gladiatorRound", 1 + trQuestVarGet("gladiatorRound"));
@@ -1416,6 +1430,8 @@ int xFermiBomberDir = 0;
 int xFermiBomberPos = 0;
 int xFermiBomberNext = 0;
 
+int dValkyrieProj = 0;
+
 void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false) {
 	xDatabaseNext(dPhysicsBalls);
 	vector pos = xGetVector(dPhysicsBalls, xPhysicsBallPos) + (xGetVector(dPhysicsBalls, xPhysicsBallDir) * 0.001 * speed * timediff);
@@ -1448,12 +1464,16 @@ inactive
 highFrequency
 {
 	dDragonFireballs = initGenericProj("dragonFireballs",kbGetProtoUnitID("Fire Giant"),19,6,4.5,0,ENEMY_PLAYER,true);
+	xDragonFireballRemove = xInitAddBool(dDragonFireballs, "rotate", true);
+
+	dValkyrieProj = initGenericProj("valkyrieProj",kbGetProtoUnitID("Valkyrie"),15,5,4.5,0,0);
 	
 	dFallingFireballs = initGenericProj("fallingFireballs",kbGetProtoUnitID("Fire Giant"),19,10.0,0,0,ENEMY_PLAYER,true);
 
 	dBossWhirlpoolBalls = initGenericProj("bossWhirlpoolBalls",kbGetProtoUnitID("Pharaoh of Osiris XP"),50,8.0,0,0,0,true);
 
 	dShadeBolts = initGenericProj("shadeBolts",kbGetProtoUnitID("Lampades"),18,9.0,0,0,1,true);
+	xInitAddBool(dShadeBolts, "rotate", true);
 
 	dLionShockwaves = initGenericProj("lionShockwaves",kbGetProtoUnitID("Heka Shockwave SFX"),2,15.0,4.0);
 
@@ -1740,11 +1760,11 @@ highFrequency
 			{
 				trUnitSelectClear();
 				trUnitSelectByID(bossID);
+				trDamageUnitPercent(10);
 				trUnitChangeProtoUnit("Minotaur");
 				trUnitSelectClear();
 				trUnitSelectByID(bossID);
 				trQuestVarSetFromRand("rand", 1, 2 + xsMin(3, trUnitPercentDamaged() * 0.05), true);
-				trQuestVarSet("rand", 5);
 				trQuestVarSet("bossSpell", trQuestVarGet("nottud"+1*trQuestVarGet("rand")));
 				trQuestVarSet("bossPhase", 1);
 				bossNext = trTimeMS();
@@ -1840,6 +1860,11 @@ highFrequency
 					{
 						if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 							trQuestVarSet("bossPhase", 0);
+						}
+						pos = vectorToGrid(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName)));
+						if (trGetTerrainHeight(xsVectorGetX(pos),xsVectorGetZ(pos)) < worldHeight - 1.0) {
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							trDamageUnitPercent(100);
 						}
 						if (xGetDatabaseCount(dLionShockwaves) > 0) {
 							action = processGenericProj(dLionShockwaves);
@@ -2061,7 +2086,7 @@ highFrequency
 								lastTime = trTimeMS();
 								dir = vector(1,0,0);
 								amt = 2.5;
-								pos = kbGetBlockPosition(""+bossUnit, true);
+								pos = vector(145,0,145);
 								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
 									xDatabaseNext(dPhysicsBalls);
 									xSetVector(dPhysicsBalls, xPhysicsBallPos, pos);
@@ -2077,14 +2102,19 @@ highFrequency
 							}
 							case 1:
 							{
+								if (trTime() > trQuestVarGet("soundTime")) {
+									trSoundPlayFN("vortexexist2.wav","1",-1,"","");
+									trQuestVarSet("soundTime", trTime() + 6);
+								}
 								trQuestVarSet("sound", 0);
+								pos = kbGetBlockPosition(""+bossUnit, true);
 								bossCount = 5;
 								timediff = trTimeMS() - lastTime;
 								lastTime = trTimeMS();
 								xSetPointer(dPhysicsBalls, physicsBallPointer);
 								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
 									processPhysicsBall(timediff, physicsSpeed, bossCount > 0);
-									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), vector(145,0,145), 0.01 * timediff);
+									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), pos, 0.01 * timediff);
 									xSetVector(dPhysicsBalls, xPhysicsBallDir, xGetVector(dPhysicsBalls, xPhysicsBallDir) + dir);
 
 									bossCount = bossCount - 1;
@@ -2109,6 +2139,7 @@ highFrequency
 					}
 					case dFermi:
 					{
+						processRevealerBoom();
 						if (xGetDatabaseCount(dFermiBombers) > 0) {
 							zSetProtoUnitStat("Kronny Flying", 0, 1, 0.01);
 							xDatabaseNext(dFermiBombers);
@@ -2201,6 +2232,11 @@ highFrequency
 							}
 							case 1:
 							{
+								if (trTimeMS() > trQuestVarGet("soundTime")) {
+									trQuestVarSetFromRand("sound", 1, 3, true);
+									trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+									trQuestVarSet("soundTime", trTimeMS() + 400);
+								}
 								processPillarBall(dFallingFireballs);
 								processPillarBall(dShadeBolts);
 								processPillarBall(dBossWhirlpoolBalls);
@@ -2226,7 +2262,141 @@ highFrequency
 					}
 					case dBigBang:
 					{
-						
+						switch(1*trQuestVarGet("bossStep"))
+						{
+							case 0:
+							{
+								if (trTimeMS() > bossTimeout) {
+									bossDir = vector(1,0,0);
+									trVectorQuestVarSet("shootLaserDir", vector(0,0,1));
+									bossNext = trTimeMS();
+									bossTimeout = trTimeMS();
+									trQuestVarSet("bossCooldownTime", trTimeMS() + 20000);
+									trQuestVarSet("blackhole", trGetNextUnitScenarioNameNumber());
+									trArmyDispatch("0,0","Dwarf",1,145,0,145,180,true);
+									trArmySelect("0,0");
+									trUnitChangeProtoUnit("Implode Sphere Effect");
+									trQuestVarSet("bossStep", 1);
+									trUIFadeToColor(255,255,255,2000,0,false);
+									trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
+									trCameraShake(3.0, 1.0);
+								}
+							}
+							case 1:
+							{
+								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+									trQuestVarSet("bossPhase", 0);
+									trUnitSelectClear();
+									trUnitSelectByQV("blackhole");
+									trUnitDestroy();
+								}
+								if (trTime() > trQuestVarGet("soundTime")) {
+									trQuestVarSet("soundTime", trTime() + 8);
+									trSoundPlayFN("lightning loop.wav","1",-1,"","");
+								}
+								for(i=xsMin(5, xGetDatabaseCount(dDragonFireballs)); >0) {
+									action = processGenericProj(dDragonFireballs);
+									if (action == PROJ_FALLING) {
+										dir = xGetVector(dDragonFireballs, xProjDir);
+										pos = kbGetBlockPosition(""+xGetInt(dDragonFireballs, xUnitName), true);
+										prev = xGetVector(dDragonFireballs, xProjPrev);
+										dist = distanceBetweenVectors(pos, prev, false) + 2.0;
+										hit = false;
+										for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+											xDatabaseNext(dPlayerUnits);
+											xUnitSelectByID(dPlayerUnits, xUnitID);
+											if (trUnitAlive() == false) {
+												removePlayerUnit();
+											} else if (rayCollision(dPlayerUnits, prev, dir, dist, 2.0)) {
+												hit = true;
+												damagePlayerUnit(300.0);
+											}
+										}
+										if (hit) {
+											trQuestVarSetFromRand("sound", 1, 2, true);
+											trSoundPlayFN("fireball fall "+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+											xUnitSelectByID(dDragonFireballs, xUnitID);
+											trUnitChangeProtoUnit("Meteorite");
+											xFreeDatabaseBlock(dDragonFireballs);
+										} else if (distanceBetweenVectors(pos, vector(145,0,145)) > 900.0) {
+											xFreeDatabaseBlock(dDragonFireballs);
+										} else {
+											xSetVector(dDragonFireballs, xProjPrev, pos);
+											if (xGetBool(dDragonFireballs, xDragonFireballRemove)) {
+												xSetBool(dDragonFireballs, xDragonFireballRemove, false);
+												xSetVector(dDragonFireballs, xProjDir, rotationMatrix(dir, 0, -1.0));
+											}
+										}
+									}
+								}
+								for(i=xsMin(5, xGetDatabaseCount(dShadeBolts)); >0) {
+									action = processGenericProj(dShadeBolts);
+									if (action == PROJ_FALLING) {
+										dir = xGetVector(dShadeBolts, xProjDir);
+										pos = kbGetBlockPosition(""+xGetInt(dShadeBolts, xUnitName), true);
+										prev = xGetVector(dShadeBolts, xProjPrev);
+										dist = distanceBetweenVectors(pos, prev, false) + 2.0;
+										hit = false;
+										for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+											xDatabaseNext(dPlayerUnits);
+											xUnitSelectByID(dPlayerUnits, xUnitID);
+											if (trUnitAlive() == false) {
+												removePlayerUnit();
+											} else if (rayCollision(dPlayerUnits, prev, dir, dist, 2.0)) {
+												hit = true;
+												damagePlayerUnit(300.0);
+											}
+										}
+										if (hit) {
+											trQuestVarSetFromRand("sound", 1, 3, true);
+											trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+											xUnitSelectByID(dShadeBolts, xUnitID);
+											trUnitChangeProtoUnit("Lightning Sparks");
+											xUnitSelectByID(dShadeBolts, xUnitID);
+											trDamageUnitPercent(-100);
+											xFreeDatabaseBlock(dShadeBolts);
+										} else if (distanceBetweenVectors(pos, vector(145,0,145)) > 900.0) {
+											xFreeDatabaseBlock(dShadeBolts);
+										} else {
+											xSetVector(dShadeBolts, xProjPrev, pos);
+											if (xGetBool(dShadeBolts, xDragonFireballRemove)) {
+												xSetBool(dShadeBolts, xDragonFireballRemove, false);
+												xSetVector(dShadeBolts, xProjDir, rotationMatrix(dir, 0, 1.0));
+											}
+										}
+									}
+								}
+								for(i=xsMin(5, xGetDatabaseCount(dValkyrieProj)); >0) {
+									action = processGenericProj(dValkyrieProj);
+									if (action == PROJ_BOUNCE) {
+										trUnitSetAnimationPath("1,0,0,0,0,0,0");
+									} else if (action == PROJ_FALLING) {
+										if (unitDistanceToVector(xGetInt(dValkyrieProj, xUnitName), vector(145,0,145)) > 900.0) {
+											xFreeDatabaseBlock(dValkyrieProj);
+										}
+									}
+								}
+								if (trTimeMS() > bossNext) {
+									bossNext = bossNext + 300;
+									bossDir = rotationMatrix(bossDir, -0.740544, -0.672008);
+									dir = bossDir;
+									addGenericProj(dDragonFireballs, vector(145,0,145), dir);
+
+									dir = rotationMatrix(dir, -0.5, 0.866025);
+									addGenericProj(dShadeBolts, vector(145, 0, 145), dir, -1, 10.0, 5.0);
+
+									dir = rotationMatrix(dir, -0.5, 0.866025);
+									addGenericProj(dValkyrieProj, vector(145, 0, 145), dir);
+								}
+								if (trTimeMS() > bossTimeout) {
+									bossTimeout = bossTimeout + 300;
+									dir = trVectorQuestVarGet("shootLaserDir");
+									dir = rotationMatrix(dir, -0.740544, -0.672008);
+									trVectorQuestVarSet("shootLaserDir", dir);
+									shootLaser(vector(145,0,145), dir, 60.0, ENEMY_PLAYER);
+								}
+							}
+						}
 					}
 				}
 			}
@@ -2251,6 +2421,10 @@ highFrequency
 					if (timediff <= 0) {
 						trQuestVarSet("bossPhase", 2);
 						trQuestVarSet("bossStep", 0);
+						trSoundPlayFN("vortexstart.wav","1",-1,"","");
+						trSoundPlayFN("meteorapproach.wav","1",-1,"","");
+						trCameraShake(3.0, 0.1);
+						bossTimeout = trTimeMS() + 3000;
 					}
 				}
 			}
@@ -2262,6 +2436,8 @@ highFrequency
 		xsDisableRule("boss_music");
 		xsDisableRule("gameplay_always");
 
+		xsEnableRule("nottud_ded");
+
 		boss = 0;
 		trSetLighting("hades", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
@@ -2271,5 +2447,49 @@ highFrequency
 			trDamageUnitPercent(100);
 		}
 		uiLookAtUnitByName(""+bossUnit);
+	}
+}
+
+
+rule nottud_ded
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("gameOverNext")) {
+		int relic = 0;
+		trQuestVarSet("gameOverStep", 1 + trQuestVarGet("gameOverStep"));
+		switch(1*trQuestVarGet("gameOverStep"))
+		{
+			case 1:
+			{
+				trQuestVarSet("playersWon", 1);
+				trLetterBox(true);
+				trUIFadeToColor(0,0,0, 2000,0,true);
+				trQuestVarSet("gameOverNext", trTime() + 5);
+				trSoundPlayFN("default","1",-1,
+					"nottud:No! Impossible!","icons\special g minotaur icon 64");
+			}
+			case 2:
+			{
+				trShowImageDialog(relicIcon(RELIC_NOTTUD), "Relic: " + relicName(RELIC_NOTTUD));
+				trQuestVarSet("gameOverNext", trTime() + 6);
+				trQuestVarSet("ownedRelics"+RELIC_NOTTUD, 1 + trQuestVarGet("ownedRelics"+RELIC_NOTTUD));
+				trSoundPlayFN("default","1",-1,"Zenophobia:Yeah what the fuck? How did you beat that?","icons\infantry g hoplite icon 64");
+				trSoundPlayFN("favordump.wav","1",-1,"","");
+			}
+			case 3:
+			{
+				gadgetUnreal("ShowImageBox");
+				trQuestVarSet("gameOverNext", trTime() + 3);
+				trQuestVarSet("gameOverStep", 1);
+				if (trQuestVarGet("newPlayers") == 0) {
+					trQuestVarSet("gameOverStep", 4);
+				}
+				xsDisableSelf();
+				xsEnableRule("game_over");
+				trQuestVarSet("bossKills", 1 + trQuestVarGet("bossKills"));
+			}
+		}
+		gadgetUnreal("ShowImageBox-CloseButton");
 	}
 }

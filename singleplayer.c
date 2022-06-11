@@ -715,11 +715,13 @@ highFrequency
 		}
 
 		// white tiger quest
+		/*
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
 			trQuestVarSet("tigerHunter", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Ulfsark",1, 127, 0, 157, 225, true);
 			xsEnableRule("tiger_hunter_always");
 		}
+		*/
 
 		// monsterpedia quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
@@ -729,7 +731,7 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
-		// idk quest floor 3
+		// relic carrying company quest
 
 		// runestone quest
 		if ((trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
