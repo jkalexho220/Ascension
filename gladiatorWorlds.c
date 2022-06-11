@@ -346,6 +346,7 @@ highFrequency
 			}
 			case 3:
 			{
+				trOverlayText("nottud", 3.0, -1, -1, -1);
 				trSoundPlayFN("default","1",-1,"BOSS BATTLE:Enemies have ??? power","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 			}
@@ -359,8 +360,6 @@ highFrequency
 
 				//xsEnableRule("gameplay_always");
 				xsEnableRule("gameplay_start");
-
-				xsEnableRule("gladiator_worlds_always");
 
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -1448,6 +1447,12 @@ rule gladiator_worlds_build_5
 inactive
 highFrequency
 {
+	dFallingFireballs = initGenericProj("fallingFireballs",kbGetProtoUnitID("Fire Giant"),19,10.0,0,0,ENEMY_PLAYER,true);
+
+	dBossWhirlpoolBalls = initGenericProj("bossWhirlpoolBalls",kbGetProtoUnitID("Pharaoh of Osiris XP"),50,8.0,0,0,0,true);
+
+	dShadeBolts = initGenericProj("shadeBolts",kbGetProtoUnitID("Lampades"),18,9.0,0,0,1,true);
+
 	dLionShockwaves = initGenericProj("lionShockwaves",kbGetProtoUnitID("Heka Shockwave SFX"),2,15.0,4.0);
 
 	dFermiBombers = xInitDatabase("fermiBombers");
@@ -1569,17 +1574,17 @@ highFrequency
 		}
 	}
 
-	dir = vector(22.627424, 0, 22.627424); // distance of 32 in coordinates
-	trVectorQuestVarSet("firePillar", vectorToGrid(vector(147,0,147) + dir));
-	paintPillar(trVectorQuestVarGet("firePillar"), dPillars, 2, 10); // hades 7
+	dir = vector(16.970568, 0, 16.970568); // distance of 32 in coordinates
+	trVectorQuestVarSet("firePillar", vectorSnapToGrid(vector(145,0,145) + dir));
+	paintPillar(vectorToGrid(trVectorQuestVarGet("firePillar")), dPillars, 2, 10); // hades 7
 
 	dir = rotationMatrix(dir, -0.5, 0.866025);
-	trVectorQuestVarSet("grassPillar", vectorToGrid(vector(147,0,147) + dir));
-	paintPillar(trVectorQuestVarGet("grassPillar"), dPillars, 0, 8); // gaia creep
+	trVectorQuestVarSet("grassPillar", vectorSnapToGrid(vector(147,0,147) + dir));
+	paintPillar(vectorToGrid(trVectorQuestVarGet("grassPillar")), dPillars, 0, 8); // gaia creep
 
 	dir = rotationMatrix(dir, -0.5, 0.866025);
-	trVectorQuestVarSet("coralPillar", vectorToGrid(vector(147,0,147) + dir));
-	paintPillar(trVectorQuestVarGet("coralPillar"), dPillars, 3, 10); // coral A
+	trVectorQuestVarSet("coralPillar", vectorSnapToGrid(vector(147,0,147) + dir));
+	paintPillar(vectorToGrid(trVectorQuestVarGet("coralPillar")), dPillars, 3, 10); // coral A
 
 	dKepler = aiPlanCreate("kepler", 8);
 	// gravitational pull field
@@ -1655,6 +1660,7 @@ highFrequency
 			} else {
 				data = xsVectorSet(5, 4, 3.0); // black
 			}
+			aiPlanSetUserVariableVector(dBigBang, x, z, data);
 		}
 	}
 
@@ -1672,7 +1678,34 @@ highFrequency
 	xsDisableSelf();
 }
 
-
+void processPillarBall(int db = 0) {
+	for (j=xsMin(xGetDatabaseCount(db), 3); > 0) {
+		int action = processGenericProj(db);
+		if (action == PROJ_GROUND) {
+			vector pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+			if (xsVectorGetX(pos) < 0) {
+				pos = xGetVector(db, xProjPrev);
+			}
+			for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
+				xUnitSelectByID(dPlayerUnits, xUnitID);
+				if (trUnitAlive() == false) {
+					removePlayerUnit();
+				} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 4.0) {
+					damagePlayerUnit(100.0);
+				}
+			}
+			xUnitSelectByID(db, xUnitID);
+			trUnitChangeProtoUnit("Dwarf");
+			xUnitSelectByID(db, xUnitID);
+			trDamageUnitPercent(-100);
+			trUnitChangeProtoUnit("Lightning Sparks");
+			xFreeDatabaseBlock(db);
+		} else {
+			xSetVector(db, xProjPrev, kbGetBlockPosition(""+xGetInt(db, xUnitName),true));
+		}
+	}
+}
 
 rule boss12_battle
 inactive
@@ -1686,6 +1719,7 @@ highFrequency
 	float amt = 0;
 	float angle = 0;
 	float dist = 0;
+
 	int timediff = 0;
 	bool hit = false;
 	
@@ -1708,6 +1742,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByID(bossID);
 				trQuestVarSetFromRand("rand", 1, 2 + xsMin(3, trUnitPercentDamaged() * 0.05), true);
+				trQuestVarSet("rand", 5);
 				trQuestVarSet("bossSpell", trQuestVarGet("nottud"+1*trQuestVarGet("rand")));
 				trQuestVarSet("bossPhase", 1);
 				bossNext = trTimeMS();
@@ -1715,10 +1750,10 @@ highFrequency
 				bossTimeout = 72;
 				trQuestVarSet("nottud"+1*trQuestVarGet("rand"), trQuestVarGet("nottud0"));
 				trQuestVarSet("nottud0", trQuestVarGet("bossSpell"));
-
-				trQuestVarSet("bossSpell", dFermi);
 				
-				paintMapTile(72, 72, 1*trQuestVarGet("bossSpell"));
+				if (trQuestVarGet("bossSpell") != dBigBang) {
+					paintMapTile(72, 72, 1*trQuestVarGet("bossSpell"));
+				}
 
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
@@ -1771,19 +1806,21 @@ highFrequency
 						trOverlayText("The Big Bang", 3.0, -1, -1, -1);
 						trSetLighting("default", 2.0);
 						worldHeight = 3;
+						trQuestVarSet("bossPhase", 3);
+						bossCount = 30;
 					}
 				}
 			}
 			case 1:
 			{
 				while(trTimeMS() > bossNext) {
-					bossNext = bossNext + 3000 / (35 + bossCount);
+					bossNext = bossNext + 2500 / (25 + bossCount);
 					bossCount = bossCount + 1;
 					transitionRing(bossCount, 1*trQuestVarGet("bossSpell"));
 				}
 				if (bossCount > bossTimeout) {
 					trQuestVarSet("bossPhase", 2);
-					trQuestVarSet("bossCooldownTime", trTimeMS() + 30000);
+					trQuestVarSet("bossCooldownTime", trTimeMS() + 20000);
 					trQuestVarSet("bossStep", 0);
 				}
 			}
@@ -1810,6 +1847,10 @@ highFrequency
 											launchUnit(dPlayerUnits, pos + (xGetVector(dLionShockwaves, xProjDir) * 100.0));
 										}
 									}
+								}
+								pos = vectorToGrid(pos);
+								if (trGetTerrainHeight(xsVectorGetX(pos),xsVectorGetZ(pos)) < worldHeight - 0.5) {
+									xFreeDatabaseBlock(dLionShockwaves);
 								}
 							}
 						}
@@ -2139,11 +2180,69 @@ highFrequency
 					}
 					case dPillars:
 					{
-						
+						switch(1*trQuestVarGet("bossStep"))
+						{
+							case 0:
+							{
+								trQuestVarSet("bossStep", 1);
+								bossNext = trTimeMS();
+								bossDir = vector(1,0,0);
+								bossAngle = 0.1;
+								bossScale = 0;
+								bossTimeout = trTimeMS() + 20000;
+							}
+							case 1:
+							{
+								processPillarBall(dFallingFireballs);
+								processPillarBall(dShadeBolts);
+								processPillarBall(dBossWhirlpoolBalls);
+								if (trTimeMS() > bossTimeout) {
+									trQuestVarSet("bossPhase", 0);
+								} else if (trTimeMS() > bossNext) {
+									bossScale = fModulo(6.283185, bossScale + 0.1);
+									bossAngle = fModulo(6.283185, bossAngle + 0.02);
+									bossNext = bossNext + 100;
+									bossDir = rotationMatrix(bossDir, xsCos(bossAngle), xsSin(bossAngle));
+
+									bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
+									addGenericProj(dFallingFireballs, trVectorQuestVarGet("firePillar"), bossDir, 1, 12.0 + 6.0 * xsCos(bossScale));
+
+									bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
+									addGenericProj(dShadeBolts, trVectorQuestVarGet("coralPillar"), bossDir, 0, 12.0 + 6.0 * xsCos(fModulo(6.283185, bossScale + 2.094395)));
+
+									bossDir = rotationMatrix(bossDir, -0.5, 0.866025);
+									addGenericProj(dBossWhirlpoolBalls, trVectorQuestVarGet("grassPillar"), bossDir, ENEMY_PLAYER, 12.0 + 6.0 * xsCos(fModulo(6.283185, bossScale + 4.18879)));
+								}
+							}
+						}
 					}
 					case dBigBang:
 					{
 						
+					}
+				}
+			}
+			case 3:
+			{
+				while(trTimeMS() > bossNext) {
+					bossNext = bossNext + 50;
+					bossCount = bossCount - 1;
+					timediff = bossCount;
+					for(i=5; >= 0) {
+						timediff = timediff + 30;
+						if (timediff > 0) {
+							transitionRing(timediff, 1*trQuestVarGet("nottud"+i));
+							if (timediff == 20) {
+								trQuestVarSetFromRand("sound", 1, 3, true);
+								trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+							}
+						} else {
+							paintMapTile(72, 72, 1*trQuestVarGet("nottud"+i));
+						}
+					}
+					if (timediff <= 0) {
+						trQuestVarSet("bossPhase", 2);
+						trQuestVarSet("bossStep", 0);
 					}
 				}
 			}
