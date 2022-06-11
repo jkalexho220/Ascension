@@ -83,6 +83,8 @@ int xMirrorTowerLaserTimeout = 0;
 int dKeeperTargets = 0;
 int xKeeperTargetPlayer = 0;
 
+int dDonkeys = 0;
+
 rule initialize_map_databases
 active
 highFrequency
@@ -356,4 +358,17 @@ void placeTemple(int x = 0, int z = 0, float los = 0) {
 	trUnitOverrideAnimation(2,0,true,false,-1);
 	trQuestVarSet("templeLOS", los);
 	trVectorQuestVarSet("templePos", xsVectorSet(70*x+40,0,70*z+40));
+}
+
+void startDeliveryQuest(int progress = 0) {
+	for(p=1; < ENEMY_PLAYER) {
+		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == progress) {
+			xsEnableRule("delivery_quest_start");
+			break;
+		}
+	}
+	trQuestVarSet("deliveryQuest", progress);
+	dDonkeys = xInitDatabase("donkeys");
+	xInitAddInt(dDonkeys, "name");
+	xInitAddInt(dDonkeys, "player");
 }

@@ -515,6 +515,8 @@ highFrequency
 	trDelayedRuleActivation("gameplay_start_2");
 	for(p=1; < ENEMY_PLAYER) {
 		chooseClass(p, xGetInt(dPlayerData, xPlayerClass, p));
+		trModifyProtounit("Villager Atlantean Hero", p, 1, xsMin(2, xGetInt(dPlayerData, xPlayerRelicTransporterLevel) / 2)); // speed at 2, 4
+		trModifyProtounit("Villager Atlantean Hero", p, 5, xsMin(2, (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) - 1) / 2)); // carry capacity at 3, 5
 	}
 	trMusicPlayCurrent();
 	trPlayNextMusicTrack();
@@ -545,6 +547,9 @@ highFrequency
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		spawnPlayer(p, vectorSnapToGrid(pos + dir));
+		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 6) {
+			spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
+		}
 		dir = rotationMatrix(dir, mCos, mSin);
 		trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
 		trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
@@ -1580,5 +1585,86 @@ highFrequency
 			startNPCDialog(NPC_EXCALIBUR_BREAK);
 			xsDisableSelf();
 		}
+	}
+}
+
+rule delivery_quest_start
+inactive
+highFrequency
+{
+	if (trQuestVarGet("play") == 1) {
+		int next = 0;
+		vector pos = trVectorQuestVarGet("startPosition");
+		for(p=1; < ENEMY_PLAYER) {
+			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == trQuestVarGet("deliveryQuest")) {
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+p+",0","Caravan Greek",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				activatePlayerUnit(next, p, kbGetProtoUnitID("Caravan Greek"));
+				xAddDatabaseBlock(dDonkeys, true);
+				xSetInt(dDonkeys, xUnitName, next);
+				xSetInt(dDonkeys, xPlayerOwner, p);
+			}
+		}
+		xsEnableRule("delivery_quest_always");
+		xsDisableSelf();
+	}
+}
+
+void deliverySuccess(int p = 0) {
+	string msg = "yay";
+	int reward = 1 + trQuestVarGet("deliveryQuest");
+	xSetInt(dPlayerData, xPlayerRelicTransporterLevel, reward, p);
+	if (reward == 6) {
+		msg = "Delivery complete! You will now receive a free Relic Transporter on each floor!";
+	} else if (iModulo(2, reward) == 1) { // 3 and 5, which is capacity
+		trModifyProtounit("Villager Atlantean Hero", p, 5, 1);
+		msg = "Delivery complete! Your Relic Transporters now carry +1 relic!";
+	} else { // 2 and 4, which is speed
+		trModifyProtounit("Villager Atlantean Hero", p, 1, 1);
+		msg = "Delivery complete! Your Relic Transporters now have +1 speed!";
+	}
+	if (trCurrentPlayer() == p) {
+		uiMessageBox(msg);
+		trSoundPlayFN("favordump.wav","1",-1,"","");
+	}
+}
+
+rule delivery_quest_always
+inactive
+minInterval 3
+{
+	vector pos = vector(0,0,0);
+	if (xGetDatabaseCount(dDonkeys) > 0) {
+		xDatabaseNext(dDonkeys);
+		for(i=xGetDatabaseCount(dDonkeys); >0) {
+			xDatabaseNext(dDonkeys);
+			xUnitSelect(dDonkeys, xUnitName);
+			if (trUnitAlive() == false) {
+				if (trCurrentPlayer() == xGetInt(dDonkeys, xPlayerOwner)) {
+					uiMessageBox("Your delivery has perished!");
+				}
+				xFreeDatabaseBlock(dDonkeys);
+			} else {
+				pos = kbGetBlockPosition(""+xGetInt(dDonkeys, xUnitName));
+				if (trQuestVarGet("townFound") == 1) {
+					if (distanceBetweenVectors(pos, trVectorQuestVarGet("townCenter")) < 64.0) {
+						xUnitSelect(dDonkeys, xUnitName);
+						trUnitChangeProtoUnit("Qilin Heal");
+						deliverySuccess(xGetInt(dDonkeys, xPlayerOwner));
+						xFreeDatabaseBlock(dDonkeys);
+					}
+				}
+			}
+		}
+		for(i=xGetDatabaseCount(dEnemiesIncoming); >0) {
+			xDatabaseNext(dEnemiesIncoming);
+			if (unitDistanceToVector(xGetInt(dEnemiesIncoming, xUnitName), pos) < 1600.0) {
+				xUnitSelect(dEnemiesIncoming, xUnitName);
+				trUnitMoveToPoint(xsVectorGetX(pos),0,xsVectorGetZ(pos),-1, true);
+				break;
+			}
+		}
+	} else {
+		xsDisableSelf();
 	}
 }

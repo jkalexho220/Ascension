@@ -7751,12 +7751,17 @@ highFrequency
 			trQuestVarSetFromRand("bossReward", 11, 20, true);
 
 			trQuestVarSet("ownedRelics"+1*trQuestVarGet("bossReward"), 1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("bossReward")));
+			/*
 			if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0) {
 				startNPCDialog(NPC_HUNT_THE_TIGER_KILL);
 			} else {
 				trSoundPlayFN("favordump.wav","1",-1,"","");
 				trShowImageDialog(relicIcon(1*trQuestVarGet("bossReward")), relicName(1*trQuestVarGet("bossReward")));
 			}
+			*/
+
+			trSoundPlayFN("favordump.wav","1",-1,"","");
+			trShowImageDialog(relicIcon(1*trQuestVarGet("bossReward")), relicName(1*trQuestVarGet("bossReward")));
 
 			trQuestVarSet("boonUnlocked"+BOON_HEALTH_ATTACK, 1);
 		}

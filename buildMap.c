@@ -1370,6 +1370,7 @@ highFrequency
 		{
 			case 1:
 			{
+				startDeliveryQuest(1);
 				trQuestVarSet("templeRoom", -1);
 				trSetCivAndCulture(0, 5, 1);
 				trQuestVarSet("bossRoomSize", 16);
@@ -1476,6 +1477,7 @@ highFrequency
 			}
 			case 3:
 			{
+				startDeliveryQuest(2);
 				trQuestVarSet("stageTemple", BOON_REGENERATE_HEALTH);
 				trSetCivAndCulture(0, 7, 2);
 				trQuestVarSet("bossRoomSize", 14);
@@ -1534,6 +1536,7 @@ highFrequency
 			}
 			case 4:
 			{
+				startDeliveryQuest(4);
 				trQuestVarSet("stageTemple", BOON_MORE_GOLD);
 				trSetCivAndCulture(0, statueCiv(1*trQuestVarGet("stageTemple")), statueCulture(1*trQuestVarGet("stageTemple")));
 				trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
@@ -1584,6 +1587,7 @@ highFrequency
 			}
 			case 5:
 			{
+				startDeliveryQuest(3);
 				trQuestVarSet("stageTemple", BOON_SPELL_POISON);
 				trSetCivAndCulture(0, 3, 1);
 				trQuestVarSet("bossRoomShape", ROOM_SQUARE);
@@ -1642,6 +1646,7 @@ highFrequency
 			}
 			case 6:
 			{
+				startDeliveryQuest(5);
 				trQuestVarSet("stageTemple", BOON_STATUS_COOLDOWNS);
 				xsEnableRule("laser_rooms_always");
 				initializeLaserTrapDatabase();

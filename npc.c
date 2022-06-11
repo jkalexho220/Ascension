@@ -109,6 +109,10 @@ const int NPC_POISON_TRIAL_NEXT = 460;
 
 const int NPC_HUNT_THE_TIGER_KILL = 461;
 
+const int NPC_RELIC_TRANSPORTER_QUEST = 462;
+/*
+RESERVED TO 468
+*/
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -131,6 +135,137 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_RELIC_TRANSPORTER_QUEST:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Relic Transporting Company here! Did you like our services while in the Tower?");
+				}
+				case 2:
+				{
+					uiMessageBox("Well today, we've got an important task for you!");
+				}
+				case 3:
+				{
+					uiMessageBox("We've witnessed your prowess in battle first-hand, and would like your help.");
+				}
+				case 4:
+				{
+					uiMessageBox("We need some cargo delivered to various people within the Tower.");
+				}
+				case 5:
+				{
+					uiMessageBox("However, the cargo attracts monsters.");
+				}
+				case 6:
+				{
+					uiMessageBox("For each successful delivery, we'll give you some pretty awesome rewards.");
+					xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Ready for your first delivery?");
+				}
+				case 2:
+				{
+					uiMessageBox("Please escort our goods to Foothill Camp on the first floor.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thanks for your help last time!");
+				}
+				case 2:
+				{
+					uiMessageBox("Next, I need your help delivering goods to the town on the third floor.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Good work on the deliveries!");
+				}
+				case 2:
+				{
+					uiMessageBox("Next up, the camp on the fifth floor is in desperate need of supplies.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("We've got an unusual request today.");
+				}
+				case 2:
+				{
+					uiMessageBox("The wizard Akard needs some goods delivered to him.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Yeebaagooon has submitted a request for some supplies.");
+				}
+				case 2:
+				{
+					uiMessageBox("He said not to look at them though, or else he would fry us alive.");
+				}
+				case 3:
+				{
+					uiMessageBox("Anyway, you'll be the one at risk, not me. Have fun!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 6:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thank you for all that you have done for us, adventurer.");
+				}
+				case 2:
+				{
+					uiMessageBox("The time we've spent together has been great. I wish you all the best.");
+				}
+				case 3:
+				{
+					uiMessageBox("This is where our collaboration ends. Farewell, good friend.");
+					xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_EXCALIBUR_START:
 		{
 			switch(dialog)

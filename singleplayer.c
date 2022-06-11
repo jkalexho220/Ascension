@@ -732,6 +732,11 @@ highFrequency
 		}
 
 		// relic carrying company quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && xGetInt(dPlayerData, xPlayerRelicTransporterLevel) < 7) {
+			trQuestVarSet("relicCarrier", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Villager Atlantean",1,165,0,153,225,true);
+			xsEnableRule("relic_carrier_always");
+		}
 
 		// runestone quest
 		if ((trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
@@ -1691,6 +1696,18 @@ highFrequency
 	if (trUnitIsSelected()) {
 		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) + trQuestVarGet("p1swordpiece"+SWORD_HANDLE);
 		startNPCDialog(NPC_EXCALIBUR_START + i);
+		reselectMyself();
+	}
+}
+
+rule relic_carrier_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("relicCarrier", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_RELIC_TRANSPORTER_QUEST + xGetInt(dPlayerData, xPlayerRelicTransporterLevel));
 		reselectMyself();
 	}
 }

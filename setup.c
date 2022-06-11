@@ -587,6 +587,7 @@ highFrequency
 	setupPlayerProto("Hippocampus", 1200, 0, 6.0, 0.5);
 	
 	setupPlayerProto("Villager Atlantean Hero", 500, 0, 4.0);
+	setupPlayerProto("Caravan Greek", 500, 0, 4.0);
 	
 	trModifyProtounit("Sky Passage", 0, 5, 999);
 	
