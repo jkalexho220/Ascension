@@ -1412,6 +1412,11 @@ int dLaplaceLaser = 0;
 int xLaplaceLaserDir = 0;
 int xLaplaceLaserPos = 0;
 
+int dFermiBombers = 0;
+int xFermiBomberDir = 0;
+int xFermiBomberPos = 0;
+int xFermiBomberNext = 0;
+
 void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false) {
 	xDatabaseNext(dPhysicsBalls);
 	vector pos = xGetVector(dPhysicsBalls, xPhysicsBallPos) + (xGetVector(dPhysicsBalls, xPhysicsBallDir) * 0.001 * speed * timediff);
@@ -1444,6 +1449,11 @@ inactive
 highFrequency
 {
 	dLionShockwaves = initGenericProj("lionShockwaves",kbGetProtoUnitID("Heka Shockwave SFX"),2,15.0,4.0);
+
+	dFermiBombers = xInitDatabase("fermiBombers");
+	xFermiBomberNext = xInitAddInt(dFermiBombers, "next");
+	xFermiBomberPos = xInitAddVector(dFermiBombers, "pos");
+	xFermiBomberDir = xInitAddVector(dFermiBombers, "dir");
 
 	trSetLighting("hades", 0);
 	TERRAIN_WALL = 2;
@@ -1603,7 +1613,7 @@ highFrequency
 
 	for(x=0; < 20) {
 		for(z=0; < 20) {
-			dist = x + z - 6;
+			dist = x + z - 5;
 			if (dist < 0) {
 				data = xsVectorSet(0, 53, -3);
 			} else {
@@ -1706,7 +1716,7 @@ highFrequency
 				trQuestVarSet("nottud"+1*trQuestVarGet("rand"), trQuestVarGet("nottud0"));
 				trQuestVarSet("nottud0", trQuestVarGet("bossSpell"));
 
-				trQuestVarSet("bossSpell", dKepler);
+				trQuestVarSet("bossSpell", dFermi);
 				
 				paintMapTile(72, 72, 1*trQuestVarGet("bossSpell"));
 
@@ -1846,9 +1856,9 @@ highFrequency
 									pos = vector(145,0,145) + dir;
 									xSetVector(dPhysicsBalls, xPhysicsBallPos, pos);
 									xSetVector(dPhysicsBalls, xPhysicsBallPrev, pos);
-									if (xGetDatabaseCount(dPlayerUnits) > 0) {
-										xDatabaseNext(dPlayerUnits);
-										xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(xsVectorNormalize(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName)) - pos), 0.980785, 0.19509));
+									if (xGetDatabaseCount(dPlayerCharacters) > 0) {
+										xDatabaseNext(dPlayerCharacters);
+										xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(xsVectorNormalize(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName)) - pos), 0.980785, 0.19509));
 									} else {
 										xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(xsVectorNormalize(start - pos), 0.980785, 0.19509));
 									}
@@ -2050,7 +2060,82 @@ highFrequency
 					}
 					case dFermi:
 					{
-						
+						if (xGetDatabaseCount(dFermiBombers) > 0) {
+							zSetProtoUnitStat("Kronny Flying", 0, 1, 0.01);
+							xDatabaseNext(dFermiBombers);
+							if (trTimeMS() > xGetInt(dFermiBombers, xFermiBomberNext)) {
+								pos = xGetVector(dFermiBombers, xFermiBomberPos);
+								xSetInt(dFermiBombers, xFermiBomberNext, xGetInt(dFermiBombers, xFermiBomberNext) + 500);
+								
+								xSetVector(dFermiBombers, xFermiBomberPos, pos + xGetVector(dFermiBombers, xFermiBomberDir));
+								if (terrainIsType(vectorToGrid(xGetVector(dFermiBombers, xFermiBomberPos)), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+									xFreeDatabaseBlock(dFermiBombers);
+								}
+
+								trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+								trArmySelect("0,0");
+								trUnitChangeProtoUnit("Traitors effect");
+
+								action = trGetNextUnitScenarioNameNumber();
+								xAddDatabaseBlock(dRevealerBoom, true);
+								xSetInt(dRevealerBoom, xUnitName, action);
+								xSetInt(dRevealerBoom, xPlayerOwner, ENEMY_PLAYER);
+								xSetInt(dRevealerBoom, xRevealerBoomTimeout, trTimeMS() + 1200);
+								trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+								trArmySelect("0,0");
+								trUnitChangeProtoUnit("Spy Eye");
+								trUnitSelectClear();
+								trUnitSelect(""+action, true);
+								trMutateSelected(kbGetProtoUnitID("Hades Door"));
+								trSetSelectedScale(0,0,0);
+								trUnitOverrideAnimation(25,0,false,false,-1);
+								trUnitSetAnimationPath("3,0,0,0,0,0,0");
+								trSetUnitOrientation(vector(0,1,0),vector(1,0,0),true);
+							}
+						}
+						switch(1*trQuestVarGet("bossStep"))
+						{
+							case 0:
+							{
+								bossDir = vector(1,0,0);
+								trQuestVarSet("bossStep", 1);
+								bossNext = trTimeMS();
+								bossCount = 2500;
+								bossTimeout = trTimeMS() + 20000;
+							}
+							case 1:
+							{
+								if (trTimeMS() > bossNext) {
+									trQuestVarSetFromRand("rand", -4, 4, true);
+									pos = vector(145, 0, 145) + (bossDir * trQuestVarGet("rand") * 2);
+									dist = 15.0 - (trQuestVarGet("rand") * 2.0);
+									bossDir = rotationMatrix(bossDir, 0, 1.0);
+									pos = pos - (bossDir * dist);
+									xAddDatabaseBlock(dFermiBombers, true);
+									xSetInt(dFermiBombers, xFermiBomberNext, trTimeMS());
+									xSetVector(dFermiBombers, xFermiBomberDir, (bossDir * 4.0));
+									xSetVector(dFermiBombers, xFermiBomberPos, pos);
+									bossNext = bossNext + bossCount;
+									bossCount = bossCount - 100;
+								}
+								if (trTimeMS() > bossTimeout) {
+									trQuestVarSet("bossStep", 2);
+								}
+							}
+							case 2:
+							{
+								if (xGetDatabaseCount(dFermiBombers) == 0) {
+									trQuestVarSet("bossCooldownTime", trTimeMS() + 5000);
+									trQuestVarSet("bossStep", 3);
+								}
+							}
+							case 3:
+							{
+								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+									trQuestVarSet("bossPhase", 0);
+								}
+							}
+						}
 					}
 					case dPillars:
 					{
