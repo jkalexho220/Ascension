@@ -59,6 +59,8 @@ void noSpecials() {
 			trModifyProtounit("Titan Atlantean", p, 9, 99999);
 			trModifyProtounit("Argus", p, 9, -99990);
 			trModifyProtounit("Argus", p, 9, 99999);
+			trModifyProtounit("Minotaur", p, 9, -99990);
+			trModifyProtounit("Minotaur", p, 9, 99999);
 		}
 	}
 }

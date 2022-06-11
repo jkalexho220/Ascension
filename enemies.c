@@ -101,6 +101,7 @@ highFrequency
 	setupProtounitBounty("Titan Atlantean", 0.5, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	setupProtounitBounty("White Tiger", 0.4, 0, 0);
+	setupProtounitBounty("Minotaur", 0.5, 0, RELIC_NOTTUD);
 	
 	setupProtounitBounty("Golden Lion", 0.3, 3);
 	setupProtounitBounty("Anubite", 0.3, 4, 0.03);
@@ -153,6 +154,7 @@ highFrequency
 	setupProtounitBounty("Apep", 0.5, 3, 0);
 	setupProtounitBounty("Stymphalian Bird", 0.1, 5, 0.03);
 	setupProtounitBounty("Catapult", 0, 5, 0.05);
+	setupProtounitBounty("Onager", 0, 5, 0.05);
 
 	setupProtounitBounty("Wall Connector", 0.5, 0, 0);
 	

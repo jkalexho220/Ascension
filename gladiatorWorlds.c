@@ -1,5 +1,16 @@
+int dPitOfDoom = 0;
+int dLaplace = 0;
+int dFermi = 0;
+int dKepler = 0;
+int dPillars = 0;
+int dBigBang = 0;
+
 int dMouthOfChaos = 0;
 int bullshitProj = 0;
+
+int dOnagerShots = 0;
+int xOnagerShotProto = 0;
+int xOnagerShotPos = 0;
 
 int dRevealerShots = 0;
 int xRevealerShotPos = 0;
@@ -25,10 +36,20 @@ highFrequency
 		xInitAddInt(dRevealerShots, "player");
 		xRevealerShotPos = xInitAddVector(dRevealerShots, "pos");
 
+		dOnagerShots = xInitDatabase("onagerShots");
+		xInitAddInt(dOnagerShots, "name");
+		xInitAddInt(dOnagerShots, "player");
+		xOnagerShotPos = xInitAddVector(dOnagerShots, "pos");
+		xOnagerShotProto = xInitAddInt(dOnagerShots, "proto");
+
 		dRevealerBoom = xInitDatabase("revealerBooms");
 		xInitAddInt(dRevealerBoom, "name");
 		xInitAddInt(dRevealerBoom, "player");
 		xRevealerBoomTimeout = xInitAddInt(dRevealerBoom, "timeout");
+
+		dEdgeFrontier = xInitDatabase("edgeFrontier");
+		xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
+		xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
 
 		trModifyProtounit("Revealer",1,2,999);
 		trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
@@ -41,7 +62,7 @@ highFrequency
 			trQuestVarSet("map"+i, i);
 		}
 		trQuestVarSetFromRand("rand", 1, 4, true);
-		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
+		//xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("rand"));
 		trQuestVarSet("map"+1*trQuestVarGet("rand"), 1);
 
 		trQuestVarSet("gladiatorRound", 1);
@@ -55,7 +76,9 @@ highFrequency
 
 		trQuestVarSet("cinTime", trTime());
 		trQuestVarSet("cinStep", 0);
-		xsEnableRule("gladiator_worlds_cin_1");
+
+		//xsEnableRule("gladiator_worlds_cin_1");
+		xsEnableRule("gladiator_worlds_cin_5");
 
 		trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 
@@ -115,13 +138,8 @@ highFrequency
 				xsEnableRule("gladiator_worlds_portals");
 
 				for(i=20; >0) {
-					/* 100% health bacchanalia x 20 */
+					/* 100 health bacchanalia x 20 */
 					trTechSetStatus(ENEMY_PLAYER, 78, 4);
-				}
-
-				for(i=4; >0) {
-					/* 100% attack monstrous rage x4 */
-					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
 				
 				trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
@@ -172,12 +190,12 @@ highFrequency
 				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
 
 				for(i=20; >0) {
-					/* 100% health bacchanalia x 20 */
+					/* 100 health bacchanalia x 20 */
 					trTechSetStatus(ENEMY_PLAYER, 78, 4);
 				}
 
-				for(i=4; >0) {
-					/* 100% attack monstrous rage x4 */
+				for(i=2; >0) {
+					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
 				
@@ -229,12 +247,12 @@ highFrequency
 				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
 
 				for(i=20; >0) {
-					/* 100% health bacchanalia x 20 */
+					/* 100 health bacchanalia x 20 */
 					trTechSetStatus(ENEMY_PLAYER, 78, 4);
 				}
 
-				for(i=4; >0) {
-					/* 100% attack monstrous rage x4 */
+				for(i=2; >0) {
+					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
 				
@@ -286,16 +304,91 @@ highFrequency
 				spawnPlayerCircle(trVectorQuestVarGet("startPosition"));
 
 				for(i=40; >0) {
-					/* 100% health bacchanalia x 20 */
+					/* 100 health bacchanalia x 20 */
 					trTechSetStatus(ENEMY_PLAYER, 78, 4);
 				}
 
-				for(i=8; >0) {
-					/* 100% attack monstrous rage x4 */
+				for(i=4; >0) {
+					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
 				
 				trStringQuestVarSet("advice", "You were so close! I believe in you!");
+			}
+		}
+	}
+}
+
+
+rule gladiator_worlds_cin_5
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trLetterBox(true);
+				trSoundPlayFN("default","1",-1,"nottud:At last, you have achieved the unfathomable. You are worthy.","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 4);
+				xsEnableRule("gladiator_worlds_build_5");
+				boss = 12;
+				if (customContent) {
+					xsEnableRule("boss_music");
+				}
+			}
+			case 2:
+			{
+				trSoundPlayFN("default","1",-1,"nottud:Now, let's finish this!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 3:
+			{
+				trSoundPlayFN("default","1",-1,"BOSS BATTLE:Enemies have ??? power","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 4:
+			{
+				gadgetReal("ShowImageBox-CloseButton");
+				gadgetUnreal("ShowImageBox");
+				xsDisableSelf();
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+
+				//xsEnableRule("gameplay_always");
+				xsEnableRule("gameplay_start");
+
+				xsEnableRule("gladiator_worlds_always");
+
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+
+				xsEnableRule("boss_stun_recovery");
+
+				bossUnit = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Minotaur",1,155,0,155,225,true);
+				activateEnemy(bossUnit);
+				bossPointer = xGetNewestPointer(dEnemies);
+				xSetBool(dEnemies, xLaunched, true, bossPointer);
+
+				bossID = kbGetBlockID(""+bossUnit, true);
+
+				xsEnableRule("boss12_battle");
+
+				trQuestVarSet("bossSpell", dPitOfDoom);
+				trQuestVarSet("bossPhase", 2);
+				trQuestVarSet("bossCooldownTime", trTimeMS() + 3000);
+
+				//spawnPlayerCircle(trVectorQuestVarGet("startPosition") - vector(10, 0, 10));
+
+				if (customContent == false) {
+					xsEnableRule("boss_music");
+				}
+				
+				trStringQuestVarSet("advice", "Well, you tried. But mess with the bull and you get the bullshit.");
 			}
 		}
 	}
@@ -464,6 +557,38 @@ highFrequency
 		}
 	}
 
+	if (xGetDatabaseCount(dOnagerShots) > 0) {
+		xDatabaseNext(dOnagerShots);
+		explode = false;
+		id = kbGetBlockID(""+xGetInt(dOnagerShots, xUnitName), true);
+		if (id == -1) {
+			pos = xGetVector(dOnagerShots, xOnagerShotPos);
+			explode = true;
+		} else {
+			pos = kbGetBlockPosition(""+xGetInt(dOnagerShots, xUnitName), true);
+			xSetVector(dOnagerShots, xOnagerShotPos, pos);
+			if (xsVectorGetY(pos) < worldHeight + 0.5) {
+				explode = true;
+			}
+		}
+		if (explode) {
+			xUnitSelect(dOnagerShots, xUnitName);
+			trUnitChangeProtoUnit("Dust Large");
+			trSoundPlayFN("backtowork.wav","1",-1,"","");
+			p = xGetInt(dOnagerShots, xPlayerOwner);
+			if (p == ENEMY_PLAYER) {
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dOnagerShots, xOnagerShotProto)));
+				activateEnemy(next);
+			} else {
+				spawnPlayerUnit(p, xGetInt(dOnagerShots, xOnagerShotProto), pos, 5.0);
+			}
+			xFreeDatabaseBlock(dOnagerShots);
+		}
+	}
+
 	if (xGetDatabaseCount(dFireLancePellets) > 0) {
 		for(i=xsMin(8, xGetDatabaseCount(dFireLancePellets)); >0) {
 			xDatabaseNext(dFireLancePellets);
@@ -586,6 +711,16 @@ highFrequency
 			case kbGetProtoUnitID("Petrobolos Shot"):
 			{
 				/* onager launches units at you */
+				trQuestVarSetFromRand("proto", 10 * trQuestVarGet("gladiatorRound") - 10, 10 * trQuestVarGet("gladiatorRound"), true);
+				target = monsterPetProto(1*trQuestVarGet("proto"));
+				trUnitSelectClear();
+				trUnitSelectByID(id);
+				trMutateSelected(target);
+				trUnitOverrideAnimation(24, 0, true, false, -1);
+				xAddDatabaseBlock(dOnagerShots, true);
+				xSetInt(dOnagerShots, xUnitName, bullshitProj);
+				xSetInt(dOnagerShots, xPlayerOwner, p);
+				xSetInt(dOnagerShots, xOnagerShotProto, target);
 			}
 			case kbGetProtoUnitID("Fire Lance Projectile"):
 			{
@@ -616,7 +751,12 @@ minInterval 3
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("proto")),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 				if (next < trGetNextUnitScenarioNameNumber()) {
-					trQuestVarSetFromRand("randrelic", 1, 20);
+					trQuestVarSetFromRand("relicdrop", 0, 1, false);
+					if (trQuestVarGet("relicdrop") < 0.05) {
+						trQuestVarSetFromRand("randrelic", 1, 20);
+					} else {
+						trQuestVarSet("randrelic", 0);
+					}
 					activateEnemy(next, -1, trQuestVarGet("randrelic"));
 				}
 			}
@@ -658,9 +798,12 @@ highFrequency
 		xResetDatabase(dFreeRelics);
 
 		trQuestVarSet("gladiatorRound", 1 + trQuestVarGet("gladiatorRound"));
-		trQuestVarSetFromRand("rand", trQuestVarGet("gladiatorRound"), 4, true);
-		xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("map"+1*trQuestVarGet("rand")));
-		trQuestVarSet("map"+1*trQuestVarGet("rand"), trQuestVarGet("map"+1*trQuestVarGet("gladiatorRound")));
+
+		if (trQuestVarGet("gladiatorRound") < 5) {
+			trQuestVarSetFromRand("rand", trQuestVarGet("gladiatorRound"), 4, true);
+			xsEnableRule("gladiator_worlds_build_"+1*trQuestVarGet("map"+1*trQuestVarGet("rand")));
+			trQuestVarSet("map"+1*trQuestVarGet("rand"), trQuestVarGet("map"+1*trQuestVarGet("gladiatorRound")));
+		}
 
 		xsEnableRule("gladiator_worlds_cin_"+1*trQuestVarGet("gladiatorRound"));
 		trChangeTerrainHeight(0,0, 145,145, 0, false);
@@ -813,9 +956,6 @@ highFrequency
 	trCoverTerrainWithWater(0, 3.0, "Aegean Sea");
 
 	dMapTiles = aiPlanCreate("mapTiles", 8);
-	dEdgeFrontier = xInitDatabase("edgeFrontier");
-	xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
-	xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
 	for(i=0; < 145) {
 		if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
 			trSoundPlayFN("cantdothat.wav","1",-1,"","");
@@ -945,6 +1085,8 @@ highFrequency
 {
 	float height = 0;
 
+	trSetLighting("eclipse", 0);
+
 	TERRAIN_WALL = 4;
 	TERRAIN_SUB_WALL = 38;
 
@@ -973,11 +1115,8 @@ highFrequency
 	}
 
 	dMapTiles = aiPlanCreate("mapTiles", 8);
-	dEdgeFrontier = xInitDatabase("edgeFrontier");
-	xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
-	xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
 	for(i=0; < 145) {
-		if (aiPlanAddUserVariableFloat(dMapTiles,i,"row"+i,144) == false) {
+		if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
 			trSoundPlayFN("cantdothat.wav","1",-1,"","");
 			debugLog("Cannot create new user variable at " + i);
 		}
@@ -1131,11 +1270,8 @@ highFrequency
 	}
 
 	dMapTiles = aiPlanCreate("mapTiles", 8);
-	dEdgeFrontier = xInitDatabase("edgeFrontier");
-	xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
-	xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
 	for(i=0; < 145) {
-		if (aiPlanAddUserVariableFloat(dMapTiles,i,"row"+i,144) == false) {
+		if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
 			trSoundPlayFN("cantdothat.wav","1",-1,"","");
 			debugLog("Cannot create new user variable at " + i);
 		}
@@ -1200,4 +1336,748 @@ highFrequency
 	gadgetUnreal("ShowImageBox-CloseButton");
 
 	xsDisableSelf();
+}
+
+void paintMapTile(int x = 0, int z = 0, int db = 0) {
+	vector data = aiPlanGetUserVariableVector(db, x, z);
+	trPaintTerrain(x, z, x, z, 1*xsVectorGetX(data), 1*xsVectorGetY(data), false);
+	trChangeTerrainHeight(x, z, x, z, xsVectorGetZ(data), false);
+}
+
+void paintMapInstant(int db = 0) {
+	for(x=0; < 145) {
+		for(z=0; < 145) {
+			paintMapTile(x, z, db);
+		}
+	}
+}
+
+void paintPillar(vector pos = vector(0,0,0), int db = 0, int primary = 0, int secondary = 0) {
+	xClearDatabase(dEdgeFrontier);
+	int x = 0;
+	int z = 0;
+	for(x=0; < 145) {
+		for(z=0; < 145) {
+			aiPlanSetUserVariableBool(dMapTiles, x, z, false);
+		}
+	}
+
+	vector data = vector(0,0,0);
+	vector dir = vector(1,0,0);
+	vector temp = vector(1,0,0);
+	x = xsVectorGetX(pos);
+	z = xsVectorGetZ(pos);
+
+	aiPlanSetUserVariableBool(dMapTiles, x, z, true);
+	aiPlanSetUserVariableVector(db, x, z, xsVectorSet(primary, secondary, 15.0));
+	for(i=14; >= -3) {
+		temp = rotationMatrix(dir, 0, 1.0);
+		if (aiPlanGetUserVariableBool(dMapTiles, x + xsVectorGetX(temp), z + xsVectorGetZ(temp)) == false) {
+			dir = temp;
+		}
+		pos = pos + dir;
+		x = xsVectorGetX(pos);
+		z = xsVectorGetZ(pos);
+		aiPlanSetUserVariableBool(dMapTiles, x, z, true);
+		aiPlanSetUserVariableVector(db, x, z, xsVectorSet(primary, secondary, i));
+		data = aiPlanGetUserVariableVector(db, x-1, z-1);
+		data = xsVectorSet(primary, secondary, xsVectorGetZ(data));
+		aiPlanSetUserVariableVector(db, x-1, z-1, data);
+	}
+	xClearDatabase(dEdgeFrontier);
+}
+
+void transitionRing(int dist = 0, int db = 0) {
+	if (dist < 73) {
+		for(i = 0 - dist; <= dist) {
+			paintMapTile(72 - dist, 72 + i, db);
+			paintMapTile(72 + dist, 72 + i, db);
+			paintMapTile(72 + i, 72 - dist, db);
+			paintMapTile(72 + i, 72 + dist, db);
+		}
+	}
+}
+
+float physicsSpeed = 1;
+int lastTime = 0;
+
+int physicsBallPointer = 0;
+int dPhysicsBalls = 0;
+int xPhysicsBallPos = 0;
+int xPhysicsBallDir = 0;
+int xPhysicsBallPrev = 0;
+int xPhysicsBallOut = 0;
+
+int dLaplaceLaser = 0;
+int xLaplaceLaserDir = 0;
+int xLaplaceLaserPos = 0;
+
+void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false) {
+	xDatabaseNext(dPhysicsBalls);
+	vector pos = xGetVector(dPhysicsBalls, xPhysicsBallPos) + (xGetVector(dPhysicsBalls, xPhysicsBallDir) * 0.001 * speed * timediff);
+	xSetVector(dPhysicsBalls, xPhysicsBallPos, pos);
+	vector dir = (pos - vector(145,0,145)) * 3.33;
+
+	xUnitSelectByID(dPhysicsBalls, xUnitID);
+	trSetSelectedUpVector(xsVectorGetX(dir), 0.2, xsVectorGetZ(dir));
+
+	if (hitbox) {
+		float dist = distanceBetweenVectors(pos, xGetVector(dPhysicsBalls, xPhysicsBallPrev), false) + 1.0;
+		dir = xsVectorNormalize(pos - xGetVector(dPhysicsBalls, xPhysicsBallPrev));
+		pos = xGetVector(dPhysicsBalls, xPhysicsBallPrev);
+		for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			if (trUnitAlive() == false) {
+				removePlayerUnit();
+			} else if (rayCollision(dPlayerUnits, pos, dir, dist, 0.5)) {
+				trQuestVarSet("sound", 1);
+				damagePlayerUnit(100.0);
+			}
+		}
+		xSetVector(dPhysicsBalls, xPhysicsBallPrev, xGetVector(dPhysicsBalls, xPhysicsBallPos));
+	}
+}
+
+rule gladiator_worlds_build_5
+inactive
+highFrequency
+{
+	dLionShockwaves = initGenericProj("lionShockwaves",kbGetProtoUnitID("Heka Shockwave SFX"),2,15.0,4.0);
+
+	trSetLighting("hades", 0);
+	TERRAIN_WALL = 2;
+	TERRAIN_SUB_WALL = 12;
+
+	TERRAIN_SECONDARY = 5;
+	TERRAIN_SUB_SECONDARY = 7;
+
+	TERRAIN_PRIMARY = 5;
+	TERRAIN_SUB_PRIMARY = 5;
+
+	dPhysicsBalls = xInitDatabase("physicsBalls", 32);
+	xPhysicsBallPos = xInitAddVector(dPhysicsBalls, "pos");
+	xPhysicsBallDir = xInitAddVector(dPhysicsBalls, "dir");
+	xInitAddInt(dPhysicsBalls, "id");
+	xPhysicsBallPrev = xInitAddVector(dPhysicsBalls, "prev");
+	xPhysicsBallOut = xInitAddBool(dPhysicsBalls, "out", false);
+
+	dLaplaceLaser = xInitDatabase("laplaceLasers", 32);
+	xLaplaceLaserPos = xInitAddVector(dLaplaceLaser, "pos");
+	xLaplaceLaserDir = xInitAddVector(dLaplaceLaser, "dir");
+	xInitAddInt(dLaplaceLaser, "id");
+
+	float dist = 0;
+	int terrain = 0;
+	int next = 0;
+	vector dir = vector(0,0,0);
+	vector data = vector(0,0,0);
+	worldHeight = 6;
+
+	dMapTiles = aiPlanCreate("mapTiles", 8);
+	for(i=0; < 145) {
+		if (aiPlanAddUserVariableBool(dMapTiles,i,"row"+i,144) == false) {
+			trSoundPlayFN("cantdothat.wav","1",-1,"","");
+			debugLog("Cannot create new user variable at " + i);
+		}
+	}
+
+	// pit of doom
+	dPitOfDoom = aiPlanCreate("pitOfDoom", 8);
+
+	for(x=0; <145) {
+		aiPlanAddUserVariableVector(dPitOfDoom, x, "row"+x, 145);
+		for(z=0; <145) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist >= 144) {
+				data = xsVectorSet(TERRAIN_WALL, TERRAIN_SUB_WALL, -3);
+				trChangeTerrainHeight(x, z, x+1, z+1, -3, false);
+			} else {
+				data = xsVectorSet(TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, 6);
+				trChangeTerrainHeight(x, z, x+1, z+1, 6, false);
+			}
+			aiPlanSetUserVariableVector(dPitOfDoom, x, z, data);
+			trPaintTerrain(x, z, x, z, 1*xsVectorGetX(data), 1*xsVectorGetY(data), false);
+			trChangeTerrainHeight(x, z, x, z, xsVectorGetZ(data), false);
+		}
+	}
+
+	trPaintTerrain(0,0,0,0,TERRAIN_WALL, TERRAIN_SUB_WALL, true);
+
+	for(x=56; < 90) {
+		for(z=56; < 90) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist > 144 && dist <= 256) {
+				aiPlanSetUserVariableVector(dPitOfDoom, x, z, xsVectorSet(TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, -3));
+				trPaintTerrain(x, z, x, z, TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, false);
+			}
+		}
+	}
+
+	for(i=32; >0) {
+		// physics balls
+		xAddDatabaseBlock(dPhysicsBalls, true);
+		next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch("0,0","Dwarf",1,145,0,145,0,true);
+		if (next == trGetNextUnitScenarioNameNumber()) {
+			debugLog("Physics ball failed to create.");
+		} else {
+			xSetInt(dPhysicsBalls, xUnitID, kbGetBlockID(""+next, true));
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Spy Eye");
+			xUnitSelectByID(dPhysicsBalls, xUnitID);
+			trMutateSelected(kbGetProtoUnitID("Outpost"));
+			trSetSelectedScale(0,0,0);
+			trSetSelectedUpVector(0, -10, 0);
+		}
+		// laplace lasers
+		xAddDatabaseBlock(dLaplaceLaser, true);
+		next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
+		if (next == trGetNextUnitScenarioNameNumber()) {
+			debugLog("Laplace Laser failed to create.");
+		} else {
+			xSetInt(dLaplaceLaser, xUnitID, kbGetBlockID(""+next, true));
+			trArmySelect("1,0");
+			trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+			trSetSelectedScale(0,0,0);
+		}
+	}
+
+	dPillars = aiPlanCreate("pillarsOfCreation", 8);
+	// pillars of creation
+	for(x=0; <145) {
+		aiPlanAddUserVariableVector(dPillars, x, "row"+x, 145);
+		for(z=0; < 145) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist > 144) {
+				data = xsVectorSet(3, 9, -3); // coral A
+			} else {
+				data = xsVectorSet(5, 0, -3); // ice A
+			}
+			aiPlanSetUserVariableVector(dPillars, x, z, data);
+		}
+	}
+
+	dir = vector(22.627424, 0, 22.627424); // distance of 32 in coordinates
+	trVectorQuestVarSet("firePillar", vectorToGrid(vector(147,0,147) + dir));
+	paintPillar(trVectorQuestVarGet("firePillar"), dPillars, 2, 10); // hades 7
+
+	dir = rotationMatrix(dir, -0.5, 0.866025);
+	trVectorQuestVarSet("grassPillar", vectorToGrid(vector(147,0,147) + dir));
+	paintPillar(trVectorQuestVarGet("grassPillar"), dPillars, 0, 8); // gaia creep
+
+	dir = rotationMatrix(dir, -0.5, 0.866025);
+	trVectorQuestVarSet("coralPillar", vectorToGrid(vector(147,0,147) + dir));
+	paintPillar(trVectorQuestVarGet("coralPillar"), dPillars, 3, 10); // coral A
+
+	dKepler = aiPlanCreate("kepler", 8);
+	// gravitational pull field
+	for(x=0; <145) {
+		aiPlanAddUserVariableVector(dKepler, x, "row"+x, 145);
+		for(z=0; < 145) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist > 144) {
+				dist = xsSqrt(dist) - 12.0;
+				if (dist > 5.0) {
+					dist = 18;
+				} else {
+					dist = -0.72 * xsPow(dist - 5.0, 2) + 18.0;
+				}
+				data = xsVectorSet(0, 73, dist - 3); // black rock
+			} else {
+				data = xsVectorSet(5, 4, -3); // black
+			}
+			aiPlanSetUserVariableVector(dKepler, x, z, data);
+		}
+	}
+
+	dFermi = aiPlanCreate("Fermi", 8);
+
+	for(x=0; < 145) {
+		aiPlanAddUserVariableVector(dFermi, x, "row"+x, 145);
+		for(z=0; < 145) {
+			aiPlanSetUserVariableVector(dFermi, x, z, xsVectorSet(0, 50, 15));
+		}
+	}
+
+	for(x=0; < 20) {
+		for(z=0; < 20) {
+			dist = x + z - 6;
+			if (dist < 0) {
+				data = xsVectorSet(0, 53, -3);
+			} else {
+				data = xsVectorSet(0, 50, xsMin(15.0, 3.0 * dist));
+			}
+			for(a = -1; <= 1) {
+				for(b = -1; <= 1) {
+					aiPlanSetUserVariableVector(dFermi, 73 + 3*x + a, 73 + 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 73 + 3*x + a, 73 - 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 73 - 3*x + a, 73 + 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 73 - 3*x + a, 73 - 3*z + b, data);
+				}
+			}
+		}
+	}
+
+	dLaplace = aiPlanCreate("Laplace", 8);
+	for(x=0; <145) {
+		aiPlanAddUserVariableVector(dLaplace, x, "row"+x, 145);
+		for(z=0; < 145) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist > 144) {
+				dist = -8.0 * xsSin(0.2 * (xsSqrt(dist) - 12.0));
+				data = xsVectorSet(0, 37, dist + 6.0); // sand d
+			} else {
+				data = xsVectorSet(0, 53, 6); // olympus tile
+			}
+			aiPlanSetUserVariableVector(dLaplace, x, z, data);
+		}
+	}
+
+	dBigBang = aiPlanCreate("bigBang", 8);
+	for(x=0; < 145) {
+		aiPlanAddUserVariableVector(dBigBang, x, "row"+x, 145);
+		for(z=0; < 145) {
+			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+			if (dist > 144) {
+				data = xsVectorSet(2, 13, 3.0); // black rock
+			} else {
+				data = xsVectorSet(5, 4, 3.0); // black
+			}
+		}
+	}
+
+	paintMapInstant(dPitOfDoom);
+
+	aiPlanDestroy(dMapTiles);
+
+	trQuestVarSet("nottud0", dPitOfDoom);
+	trQuestVarSet("nottud1", dPillars);
+	trQuestVarSet("nottud2", dKepler);
+	trQuestVarSet("nottud3", dLaplace);
+	trQuestVarSet("nottud4", dFermi);
+	trQuestVarSet("nottud5", dBigBang);
+
+	xsDisableSelf();
+}
+
+
+
+rule boss12_battle
+inactive
+highFrequency
+{
+	int p = 0;
+	int x = 0;
+	int z = 0;
+	int action = 0;
+	int id = 0;
+	float amt = 0;
+	float angle = 0;
+	float dist = 0;
+	int timediff = 0;
+	bool hit = false;
+	
+	vector hitbox = vector(0,0,0);
+	vector start = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector prev = vector(0,0,0);
+	vector dir = vector(0,0,0);
+
+	trUnitSelectClear();
+	trUnitSelectByID(bossID);
+	if (trUnitAlive()) {
+		switch(1*trQuestVarGet("bossPhase"))
+		{
+			case 0:
+			{
+				trUnitSelectClear();
+				trUnitSelectByID(bossID);
+				trUnitChangeProtoUnit("Minotaur");
+				trUnitSelectClear();
+				trUnitSelectByID(bossID);
+				trQuestVarSetFromRand("rand", 1, 2 + xsMin(3, trUnitPercentDamaged() * 0.05), true);
+				trQuestVarSet("bossSpell", trQuestVarGet("nottud"+1*trQuestVarGet("rand")));
+				trQuestVarSet("bossPhase", 1);
+				bossNext = trTimeMS();
+				bossCount = 0;
+				bossTimeout = 72;
+				trQuestVarSet("nottud"+1*trQuestVarGet("rand"), trQuestVarGet("nottud0"));
+				trQuestVarSet("nottud0", trQuestVarGet("bossSpell"));
+
+				trQuestVarSet("bossSpell", dKepler);
+				
+				paintMapTile(72, 72, 1*trQuestVarGet("bossSpell"));
+
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				switch(1*trQuestVarGet("bossSpell"))
+				{
+					case dPitOfDoom:
+					{
+						TERRAIN_WALL = 2;
+						TERRAIN_SUB_WALL = 12;
+						trOverlayText("The Pit of Doom", 3.0, -1, -1, -1);
+						trSetLighting("hades", 2.0);
+						worldHeight = 6;
+					}
+					case dLaplace:
+					{
+						TERRAIN_WALL = 0;
+						TERRAIN_SUB_WALL = 37;
+						trOverlayText("Laplace's Demon", 3.0, -1, -1, -1);
+						trSetLighting("dawn", 2.0);
+						worldHeight = 6;
+					}
+					case dKepler:
+					{
+						TERRAIN_WALL = 0;
+						TERRAIN_SUB_WALL = 73;
+						trOverlayText("Kepler's Law", 3.0, -1, -1, -1);
+						trSetLighting("Fimbulwinter", 2.0);
+						worldHeight = -3;
+					}
+					case dFermi:
+					{
+						TERRAIN_WALL = 0;
+						TERRAIN_SUB_WALL = 50;
+						trOverlayText("The Fermi Paradox", 3.0, -1, -1, -1);
+						trSetLighting("eclipse", 2.0);
+						worldHeight = -3;
+					}
+					case dPillars:
+					{
+						TERRAIN_WALL = 3;
+						TERRAIN_SUB_WALL = 9;
+						trOverlayText("Pillars of Creation", 3.0, -1, -1, -1);
+						trSetLighting("default", 2.0);
+						worldHeight = -3;
+					}
+					case dBigBang:
+					{
+						TERRAIN_WALL = 2;
+						TERRAIN_SUB_WALL = 13;
+						trOverlayText("The Big Bang", 3.0, -1, -1, -1);
+						trSetLighting("default", 2.0);
+						worldHeight = 3;
+					}
+				}
+			}
+			case 1:
+			{
+				while(trTimeMS() > bossNext) {
+					bossNext = bossNext + 3000 / (35 + bossCount);
+					bossCount = bossCount + 1;
+					transitionRing(bossCount, 1*trQuestVarGet("bossSpell"));
+				}
+				if (bossCount > bossTimeout) {
+					trQuestVarSet("bossPhase", 2);
+					trQuestVarSet("bossCooldownTime", trTimeMS() + 30000);
+					trQuestVarSet("bossStep", 0);
+				}
+			}
+			case 2:
+			{
+				switch(1*trQuestVarGet("bossSpell"))
+				{
+					case dPitOfDoom:
+					{
+						if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+							trQuestVarSet("bossPhase", 0);
+						}
+						if (xGetDatabaseCount(dLionShockwaves) > 0) {
+							action = processGenericProj(dLionShockwaves);
+							if (action == PROJ_FALLING) {
+								pos = kbGetBlockPosition(""+xGetInt(dLionShockwaves, xUnitName), true);
+								for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+									xDatabaseNext(dPlayerUnits);
+									xUnitSelectByID(dPlayerUnits, xUnitID);
+									if (trUnitAlive() == false) {
+										removePlayerUnit();
+									} else if (xGetBool(dPlayerUnits, xLaunched) == false) {
+										if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
+											launchUnit(dPlayerUnits, pos + (xGetVector(dLionShockwaves, xProjDir) * 100.0));
+										}
+									}
+								}
+							}
+						}
+						if (kbUnitGetAnimationActionType(bossID) == 6) {
+							xsSetContextPlayer(ENEMY_PLAYER);
+							bossTarget = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(bossID));
+							xsSetContextPlayer(0);
+							bossPos = kbGetBlockPosition(""+bossUnit, true);
+							trUnitSelectClear();
+							trUnitSelectByID(bossID);
+							trUnitOverrideAnimation(26, 0, false, false, -1);
+							bossDir = getUnitVector(bossPos, kbGetBlockPosition(""+bossTarget, true));
+							bossNext = trTimeMS() + 1000;
+							trQuestVarSet("bossStep", 1);
+						} else if (trTimeMS() > bossNext) {
+							switch(1*trQuestVarGet("bossStep"))
+							{
+								case 1:
+								{
+									addGenericProj(dLionShockwaves, bossPos, bossDir);
+									trQuestVarSet("bossStep", 2);
+									bossNext = bossNext + 1000;
+								}
+								case 2:
+								{
+									trQuestVarSet("bossStep", 0);
+									trUnitSelectClear();
+									trUnitSelectByID(bossID);
+									trUnitOverrideAnimation(-1,0,false,true,-1);
+								}
+							}
+						}
+					}
+					case dLaplace:
+					{
+						switch(1*trQuestVarGet("bossStep"))
+						{
+							case 0:
+							{
+								start = kbGetBlockPosition(""+bossUnit, true);
+								dir = vector(20, 0, 0);
+								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+									xDatabaseNext(dPhysicsBalls);
+									pos = vector(145,0,145) + dir;
+									xSetVector(dPhysicsBalls, xPhysicsBallPos, pos);
+									xSetVector(dPhysicsBalls, xPhysicsBallPrev, pos);
+									if (xGetDatabaseCount(dPlayerUnits) > 0) {
+										xDatabaseNext(dPlayerUnits);
+										xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(xsVectorNormalize(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName)) - pos), 0.980785, 0.19509));
+									} else {
+										xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(xsVectorNormalize(start - pos), 0.980785, 0.19509));
+									}
+									
+									xSetBool(dPhysicsBalls, xPhysicsBallOut, false);
+									dir = rotationMatrix(dir, 0.980785, 0.19509);
+								}
+								trQuestVarSet("bossStep", 1);
+								bossNext = trTimeMS() + 20000;
+								bossTimeout = bossNext + 2000;
+								physicsSpeed = 1;
+								lastTime = trTimeMS();
+								trSoundPlayFN("petsuchosattack.wav","1",-1,"","");
+							}
+							case 1:
+							{
+								trQuestVarSet("sound", 0);
+								bossCount = 5;
+								timediff = trTimeMS() - lastTime;
+								lastTime = trTimeMS();
+								if (physicsSpeed < 10) {
+									physicsSpeed = xsMin(10.0, physicsSpeed + 0.003 * timediff);
+								}
+								xSetPointer(dPhysicsBalls, physicsBallPointer);
+								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+									processPhysicsBall(timediff, physicsSpeed, bossCount > 0);
+									if (distanceBetweenVectors(xGetVector(dPhysicsBalls, xPhysicsBallPos), vector(145,0,145)) > 625.0) {
+										if (xGetBool(dPhysicsBalls, xPhysicsBallOut) == false) {
+											xSetBool(dPhysicsBalls, xPhysicsBallOut, true);
+											trQuestVarSetFromRand("rand", 1, 3, true);
+											trSoundPlayFN("mine"+1*trQuestVarGet("rand")+".wav","1",-1,"","");
+											dir = xsVectorNormalize(xGetVector(dPhysicsBalls, xPhysicsBallPos) - vector(145,0,145));
+											xSetVector(dPhysicsBalls, xPhysicsBallDir, xsVectorNormalize(xGetVector(dPhysicsBalls, xPhysicsBallDir) - (dir * dotProduct(dir, xGetVector(dPhysicsBalls, xPhysicsBallDir)) * 2.2)));
+										}
+									} else {
+										xSetBool(dPhysicsBalls, xPhysicsBallOut, false);
+									}
+
+									bossCount = bossCount - 1;
+									if (bossCount == -1) {
+										physicsBallPointer = xGetPointer(dPhysicsBalls);
+									}
+								}
+								if (trQuestVarGet("sound") > 0) {
+									trQuestVarSetFromRand("sound", 1, 3, true);
+									trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+								}
+
+								if (trTimeMS() > bossNext) {
+									physicsSpeed = 0.005 * (bossTimeout - trTimeMS());
+									if (physicsSpeed < 0) {
+										physicsSpeed = 0;
+										trQuestVarSet("bossStep", 2);
+										bossTimeout = trTimeMS() + 3000;
+										bossCount = 3;
+
+										for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+											xDatabaseNext(dPhysicsBalls);
+											pos = xGetVector(dPhysicsBalls, xPhysicsBallPos);
+											dir = xsVectorNormalize(xGetVector(dPhysicsBalls, xPhysicsBallDir));
+											xDatabaseNext(dLaplaceLaser);
+											xSetVector(dLaplaceLaser, xLaplaceLaserDir, dir);
+											xSetVector(dLaplaceLaser, xLaplaceLaserPos, pos);
+											xUnitSelectByID(dLaplaceLaser, xUnitID);
+											trSetUnitOrientation(vector(0,0,0) - dir, vector(0,1,0), true);
+											trUnitTeleport(xsVectorGetX(pos),worldHeight + 0.5, xsVectorGetZ(pos));
+										}
+									}
+								}
+							}
+							case 2:
+							{
+								if (trTimeMS() > bossTimeout) {
+									bossCount = bossCount - 1;
+									trSoundPlayFN("attackwarning.wav","1",-1,"","");
+									if (bossCount <= 0) {
+										trQuestVarSet("bossStep", 3);
+										bossCount = xGetDatabaseCount(dPhysicsBalls);
+										bossNext = trTimeMS();
+									} else {
+										bossTimeout = bossTimeout + 1000;
+									}
+								}
+							}
+							case 3:
+							{
+								while (trTimeMS() > bossNext) {
+									trQuestVarSetFromRand("sound", 1, 5, true);
+									trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+									bossCount = bossCount - 1;
+									bossNext = bossNext + 100;
+									xDatabaseNext(dLaplaceLaser);
+									dir = xGetVector(dLaplaceLaser, xLaplaceLaserDir);
+									pos = xGetVector(dLaplaceLaser, xLaplaceLaserPos);
+									for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+										xDatabaseNext(dPlayerUnits);
+										xUnitSelectByID(dPlayerUnits, xUnitID);
+										if (trUnitAlive() == false) {
+											removePlayerUnit();
+										} else if (rayCollision(dPlayerUnits, pos, dir, 999.0, 1.0)) {
+											damagePlayerUnit(500.0);
+										}
+									}
+									xUnitSelectByID(dLaplaceLaser, xUnitID);
+									trUnitHighlight(10.0, false);
+									trSetSelectedScale(5.0, 0, 40.0);
+									xDatabaseNext(dPhysicsBalls);
+									xUnitSelectByID(dPhysicsBalls, xUnitID);
+									trSetSelectedUpVector(0, -10, 0);
+									if (bossCount <= 0) {
+										trQuestVarSet("bossStep", 4);
+										bossTimeout = 1000;
+										break;
+									}
+								}
+							}
+							case 4:
+							{
+								dist = bossTimeout - trTimeMS();
+								if (dist > 0) {
+									dist = 0.005 * dist;
+									for(i=xGetDatabaseCount(dLaplaceLaser); >0) {
+										xDatabaseNext(dLaplaceLaser);
+										xUnitSelectByID(dLaplaceLaser, xUnitID);
+										trSetSelectedScale(dist, 0, 40);
+									}
+								} else {
+									for(i=xGetDatabaseCount(dLaplaceLaser); >0) {
+										xDatabaseNext(dLaplaceLaser);
+										xUnitSelectByID(dLaplaceLaser, xUnitID);
+										trSetSelectedScale(0, 0, 0);
+									}
+									trQuestVarSet("bossStep", 5);
+									trQuestVarSet("bossCooldownTime", trTimeMS() + 2000);
+								}
+							}
+							case 5:
+							{
+								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+									trQuestVarSet("bossPhase", 0);
+								}
+							}
+						}
+					}
+					case dKepler:
+					{
+						switch(1*trQuestVarGet("bossStep"))
+						{
+							case 0:
+							{
+								lastTime = trTimeMS();
+								dir = vector(1,0,0);
+								amt = 2.5;
+								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+									xDatabaseNext(dPhysicsBalls);
+									xSetVector(dPhysicsBalls, xPhysicsBallPos, vector(145,0,145));
+									xSetVector(dPhysicsBalls, xPhysicsBallPrev, vector(145, 0, 145));
+									xSetVector(dPhysicsBalls, xPhysicsBallDir, dir * amt);
+									dir = rotationMatrix(dir, -0.19509, 0.980785);
+									amt = amt + 0.4;
+								}
+								physicsSpeed = 1;
+								trQuestVarSet("bossStep", 1);
+								trSoundPlayFN("vortexstart.wav","1",-1,"","");
+								trQuestVarSet("bossCooldownTime", trTimeMS() + 15000);
+							}
+							case 1:
+							{
+								trQuestVarSet("sound", 0);
+								bossCount = 5;
+								timediff = trTimeMS() - lastTime;
+								lastTime = trTimeMS();
+								pos = kbGetBlockPosition(""+bossUnit, true);
+								xSetPointer(dPhysicsBalls, physicsBallPointer);
+								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+									processPhysicsBall(timediff, physicsSpeed, bossCount > 0);
+									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), pos, 0.01 * timediff);
+									xSetVector(dPhysicsBalls, xPhysicsBallDir, xGetVector(dPhysicsBalls, xPhysicsBallDir) + dir);
+
+									bossCount = bossCount - 1;
+									if (bossCount == -1) {
+										physicsBallPointer = xGetPointer(dPhysicsBalls);
+									}
+								}
+								if (trQuestVarGet("sound") > 0) {
+									trQuestVarSetFromRand("sound", 1, 3, true);
+									trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+								}
+								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
+									trQuestVarSet("bossPhase", 0);
+									for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
+										xDatabaseNext(dPhysicsBalls);
+										xUnitSelectByID(dPhysicsBalls, xUnitID);
+										trSetSelectedUpVector(0, -10, 0);
+									}
+								}
+							}
+						}
+					}
+					case dFermi:
+					{
+						
+					}
+					case dPillars:
+					{
+						
+					}
+					case dBigBang:
+					{
+						
+					}
+				}
+			}
+		}
+	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
+		xsDisableSelf();
+		trMusicStop();
+		xsDisableRule("boss_music");
+		xsDisableRule("gameplay_always");
+
+		boss = 0;
+		trSetLighting("hades", 1.0);
+		trSoundPlayFN("win.wav","1",-1,"","");
+		for(x=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			trDamageUnitPercent(100);
+		}
+		uiLookAtUnitByName(""+bossUnit);
+	}
 }
