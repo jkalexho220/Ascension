@@ -346,7 +346,7 @@ highFrequency
 			}
 			case 3:
 			{
-				trOverlayText("nottud", 3.0, -1, -1, -1);
+				trOverlayText("nottud", 4.0, -1, -1, -1);
 				trSoundPlayFN("default","1",-1,"BOSS BATTLE:Enemies have ??? power","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 			}
@@ -1447,6 +1447,8 @@ rule gladiator_worlds_build_5
 inactive
 highFrequency
 {
+	dDragonFireballs = initGenericProj("dragonFireballs",kbGetProtoUnitID("Fire Giant"),19,6,4.5,0,ENEMY_PLAYER,true);
+	
 	dFallingFireballs = initGenericProj("fallingFireballs",kbGetProtoUnitID("Fire Giant"),19,10.0,0,0,ENEMY_PLAYER,true);
 
 	dBossWhirlpoolBalls = initGenericProj("bossWhirlpoolBalls",kbGetProtoUnitID("Pharaoh of Osiris XP"),50,8.0,0,0,0,true);
@@ -1763,6 +1765,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 2;
 						TERRAIN_SUB_WALL = 12;
+						trOverlayTextColour(255,255,255);
 						trOverlayText("The Pit of Doom", 3.0, -1, -1, -1);
 						trSetLighting("hades", 2.0);
 						worldHeight = 6;
@@ -1771,6 +1774,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 0;
 						TERRAIN_SUB_WALL = 37;
+						trOverlayTextColour(255,0,0);
 						trOverlayText("Laplace's Demon", 3.0, -1, -1, -1);
 						trSetLighting("dawn", 2.0);
 						worldHeight = 6;
@@ -1779,6 +1783,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 0;
 						TERRAIN_SUB_WALL = 73;
+						trOverlayTextColour(255,0,0);
 						trOverlayText("Kepler's Law", 3.0, -1, -1, -1);
 						trSetLighting("Fimbulwinter", 2.0);
 						worldHeight = -3;
@@ -1787,6 +1792,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 0;
 						TERRAIN_SUB_WALL = 50;
+						trOverlayTextColour(255,0,0);
 						trOverlayText("The Fermi Paradox", 3.0, -1, -1, -1);
 						trSetLighting("eclipse", 2.0);
 						worldHeight = -3;
@@ -1795,6 +1801,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 3;
 						TERRAIN_SUB_WALL = 9;
+						trOverlayTextColour(255,0,0);
 						trOverlayText("Pillars of Creation", 3.0, -1, -1, -1);
 						trSetLighting("default", 2.0);
 						worldHeight = -3;
@@ -1803,6 +1810,7 @@ highFrequency
 					{
 						TERRAIN_WALL = 2;
 						TERRAIN_SUB_WALL = 13;
+						trOverlayTextColour(255,0,0);
 						trOverlayText("The Big Bang", 3.0, -1, -1, -1);
 						trSetLighting("default", 2.0);
 						worldHeight = 3;
@@ -2053,10 +2061,11 @@ highFrequency
 								lastTime = trTimeMS();
 								dir = vector(1,0,0);
 								amt = 2.5;
+								pos = kbGetBlockPosition(""+bossUnit, true);
 								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
 									xDatabaseNext(dPhysicsBalls);
-									xSetVector(dPhysicsBalls, xPhysicsBallPos, vector(145,0,145));
-									xSetVector(dPhysicsBalls, xPhysicsBallPrev, vector(145, 0, 145));
+									xSetVector(dPhysicsBalls, xPhysicsBallPos, pos);
+									xSetVector(dPhysicsBalls, xPhysicsBallPrev, pos);
 									xSetVector(dPhysicsBalls, xPhysicsBallDir, dir * amt);
 									dir = rotationMatrix(dir, -0.19509, 0.980785);
 									amt = amt + 0.4;
@@ -2072,11 +2081,10 @@ highFrequency
 								bossCount = 5;
 								timediff = trTimeMS() - lastTime;
 								lastTime = trTimeMS();
-								pos = kbGetBlockPosition(""+bossUnit, true);
 								xSetPointer(dPhysicsBalls, physicsBallPointer);
 								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
 									processPhysicsBall(timediff, physicsSpeed, bossCount > 0);
-									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), pos, 0.01 * timediff);
+									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), vector(145,0,145), 0.01 * timediff);
 									xSetVector(dPhysicsBalls, xPhysicsBallDir, xGetVector(dPhysicsBalls, xPhysicsBallDir) + dir);
 
 									bossCount = bossCount - 1;
