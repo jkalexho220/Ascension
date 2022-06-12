@@ -142,13 +142,13 @@ highFrequency
 	
 	setupProtounitBounty("Griffon", 0.6, 6, 0.03);
 	setupProtounitBounty("Einheriar", 0.6, 7, 0.03);
-	setupProtounitBounty("Statue of Lightning", 0.5, 8, 0.05);
-	setupProtounitBounty("Lampades", 0.8, 12, 0.1);
+	setupProtounitBounty("Statue of Lightning", 0.4, 8, 0.05);
+	setupProtounitBounty("Lampades", 0.4, 12, 0.1);
 
 	setupProtounitBounty("Tartarian Gate Spawn", 0.7, 6, 0.03);
 	setupProtounitBounty("Troll", 0.7, 7, 0.03);
 	setupProtounitBounty("Manticore", 0.3, 8, 0.05);
-	setupProtounitBounty("Fire Giant", 0.7, 12, 0.1);
+	setupProtounitBounty("Fire Giant", 0.6, 12, 0.1);
 
 	setupProtounitBounty("Argus", 0.5, 10, 0);
 	setupProtounitBounty("Apep", 0.5, 3, 0);

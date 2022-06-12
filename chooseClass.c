@@ -417,7 +417,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 1:
 				{
-					msg = "Passive: You deal more damage the further your target is. 10 percent for every 5 meters.";
+					msg = "Passive: You deal more damage the further your target is. 20 percent for every 5 meters.";
 				}
 				case 2:
 				{
@@ -775,7 +775,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\improvement heroic renewal icons 64";
-					msg = "Cooldown: 8 | Heal: 50 + 5 x distance traveled";
+					msg = "Cooldown: 8 | Radius: 10 | Heal: 50 + 5 x distance traveled";
 				}
 				case 7:
 				{
@@ -883,11 +883,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (8 attacks): Curse your target with a Death Sentence.";
+					msg = "Special Attack (7 attacks): Curse your target with a Death Sentence.";
 				}
 				case 3:
 				{
-					msg = "This does not trigger if your target already has a Death Sentence.";
+					msg = "If your target already has a Death Sentence, summon a minion instead.";
 				}
 				case 4:
 				{

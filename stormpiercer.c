@@ -60,7 +60,7 @@ void stormpiercerAlways(int eventID = -1) {
 				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 				end = kbGetBlockPosition(""+trGetUnitScenarioNameNumber(target));
 				dist = distanceBetweenVectors(pos, end, false);
-				trQuestVarSet("p"+p+"stormbonus", dist * 0.02);
+				trQuestVarSet("p"+p+"stormbonus", dist * 0.04);
 				xSetFloat(dPlayerData, xPlayerAttack,
 					xGetFloat(dPlayerData, xPlayerBaseAttack) * (1.0 + trQuestVarGet("p"+p+"stormbonus")));
 				zSetProtoUnitStat("Archer Atlantean Hero", p, 31, xGetFloat(dPlayerData, xPlayerAttack));
@@ -162,7 +162,7 @@ void stormpiercerAlways(int eventID = -1) {
 				if (xSetPointer(dEnemies, xGetInt(spearedUnits, xSpearedIndex))) {
 					xUnitSelectByID(dEnemies, xUnitID);
 					damageEnemy(p,
-						shockArrowDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * (1.0 + 0.02 * xGetFloat(spearedUnits, xSpearedDist)));
+						shockArrowDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * (1.0 + 0.04 * xGetFloat(spearedUnits, xSpearedDist)));
 				}
 			}
 			xFreeDatabaseBlock(spearedUnits);
@@ -212,7 +212,7 @@ void stormpiercerAlways(int eventID = -1) {
 						trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					}
 					damageEnemy(p,
-						shockArrowDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * (1.0 + 0.02 * xGetFloat(shockArrows, xShockArrowDist)));
+						shockArrowDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * (1.0 + 0.04 * xGetFloat(shockArrows, xShockArrowDist)));
 					if (trUnitAlive()) {
 						xAddDatabaseBlock(spearedUnits, true);
 						xSetInt(spearedUnits, xUnitName, xGetInt(dEnemies, xUnitName));

@@ -583,7 +583,7 @@ Enemies have elemental resistance and weakness
 */
 float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
 	if (spell) {
-		dmg = dmg - dmg * xGetFloat(dEnemies, xMagicResist) * (1.0 - pierce - xGetFloat(dPlayerData,xPlayerMagicPen,p));
+		dmg = dmg - dmg * (xGetFloat(dEnemies, xMagicResist) * (1.0 - pierce) - xGetFloat(dPlayerData,xPlayerMagicPen,p));
 	} else {
 		dmg = dmg - dmg * xGetFloat(dEnemies, xPhysicalResist) * (1.0 - pierce);
 	}
@@ -897,6 +897,11 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 					if (xGetInt(db, xCharSpecialAttack) <= 0) {
 						xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
 						status = ON_HIT_SPECIAL;
+						if (xGetFloat(dPlayerData, xPlayerFavorSpecial) > 0) {
+							for(p=1; < ENEMY_PLAYER) {
+								gainFavor(p, xGetFloat(dPlayerData, xPlayerFavorSpecial));
+							}
+						}
 					}
 				}
 				/* simp benefits */
@@ -1131,6 +1136,7 @@ int dManticores = 0;
 int dFireGiants = 0;
 int dArgus = 0;
 int dFireLance = 0;
+int dOnagers = 0;
 
 int dFireLancePellets = 0;
 int xFireLancePelletPrev = 0;
@@ -1374,6 +1380,12 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 	int index = 0;
 	switch(proto)
 	{
+		case kbGetProtoUnitID("Onager"):
+		{
+			xAddDatabaseBlock(dOnagers, true);
+			xSetInt(dOnagers, xUnitName, name);
+			xSetInt(dOnagers, xPlayerOwner, p);
+		}
 		case kbGetProtoUnitID("Sphinx"):
 		{
 			addSpecialToDatabase(dSphinxes,name,db,p);
@@ -1616,6 +1628,8 @@ void revivePlayer(int p = 0) {
 		uiLookAtUnitByName(""+xGetInt(dPlayerData,xPlayerUnit));
 	}
 	xSetPointer(dPlayerData, prev);
+	xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+	xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
 }
 
 void shootLaser(vector start = vector(0,0,0), vector dir = vector(0,0,0), float dist = -1, int p = 0) {

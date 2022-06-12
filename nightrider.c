@@ -119,9 +119,10 @@ void nightriderAlways(int eventID = -1) {
 					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
 						if (xGetBool(dEnemies, xDeathSentence) == false) {
 							castDeathSentence(p);
-						} else {
-							/* don't consume special attack */
-							xSetInt(db, xCharSpecialAttack, 0);
+						} else { // summon a minion instead
+							pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+							trQuestVarSetFromRand("heading", 1, 360, true);
+							spawnMinion(p, pos, trQuestVarGet("heading"));
 						}
 					}
 				}

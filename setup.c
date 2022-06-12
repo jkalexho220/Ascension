@@ -432,6 +432,7 @@ runImmediately
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
 		trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");
+		trPlayerSetDiplomacy(ENEMY_PLAYER, p, "Enemy");
 		for(x=p+1; < ENEMY_PLAYER) {
 			trPlayerSetDiplomacy(p, x, "ally");
 			trPlayerSetDiplomacy(x, p, "ally");
@@ -530,7 +531,7 @@ highFrequency
 	setupClass("Hero Greek Hippolyta", SUNBOW, 1350, 1750, STARSTONE);
 	setupClass("Hero Greek Atalanta", THUNDERRIDER, 630, 1400, MANASTONE, 4);
 	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
-	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 8);
+	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 7);
 	setupClass("Priest", BLASTMAGE, 500, 800, STARSTONE);
 	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
 	setupClass("Archer Atlantean Hero", STORMPIERCER, 400, 1000, MANASTONE);

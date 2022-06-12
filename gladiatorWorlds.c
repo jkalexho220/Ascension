@@ -47,6 +47,10 @@ highFrequency
 		xInitAddInt(dRevealerBoom, "player");
 		xRevealerBoomTimeout = xInitAddInt(dRevealerBoom, "timeout");
 
+		dOnagers = xInitDatabase("onagers");
+		xInitAddInt(dOnagers, "name");
+		xInitAddInt(dOnagers, "player");
+
 		dEdgeFrontier = xInitDatabase("edgeFrontier");
 		xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
 		xEdgeFrontierLoc = xInitAddVector(dEdgeFrontier, "location");
@@ -148,6 +152,9 @@ highFrequency
 				if (trCurrentPlayer() == 1) {
 					uiMessageBox("Your copy of Gladiator Worlds was consumed. It's a one-time use item.");
 				}
+
+				trMusicPlayCurrent();
+				trPlayNextMusicTrack();
 				
 				trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
 			}
@@ -205,6 +212,9 @@ highFrequency
 					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
+
+				trMusicPlayCurrent();
+				trPlayNextMusicTrack();
 				
 				trStringQuestVarSet("advice", "Have you tried complaining to nottud about the difficulty? Because it doesn't work.");
 			}
@@ -262,6 +272,9 @@ highFrequency
 					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
+
+				trMusicPlayCurrent();
+				trPlayNextMusicTrack();
 				
 				trStringQuestVarSet("advice", "Fun fact. I've never beaten Gladiator Worlds before. On any difficulty.");
 			}
@@ -319,6 +332,9 @@ highFrequency
 					/* 0.5 attack monstrous rage x4 */
 					trTechSetStatus(ENEMY_PLAYER, 76, 4);
 				}
+
+				trMusicPlayCurrent();
+				trPlayNextMusicTrack();
 				
 				trStringQuestVarSet("advice", "You were so close! I believe in you!");
 			}
@@ -369,7 +385,7 @@ highFrequency
 
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 
 				xsEnableRule("boss_stun_recovery");
 
@@ -471,6 +487,7 @@ highFrequency
 	int p = 0;
 	int db = 0;
 	float dist = 0;
+	float current = 0;
 	bool hit = false;
 
 	int kills = trGetStatValue(ENEMY_PLAYER, 6);
@@ -608,6 +625,7 @@ highFrequency
 				xSetInt(dFireLancePellets, xFireLancePelletTimeout, trTimeMS() + 1500);
 				xUnitSelect(dFireLancePellets, xUnitName);
 				trMutateSelected(kbGetProtoUnitID("Thor Hammer"));
+				trUnitHighlight(3.0, false);
 				trUnitOverrideAnimation(2,0,true,false,-1);
 				trSetSelectedScale(0.3,0.3,-0.2);
 				trUnitSetAnimationPath("3,0,0,0,0,0,0");
@@ -733,6 +751,27 @@ highFrequency
 				xSetInt(dOnagerShots, xUnitName, bullshitProj);
 				xSetInt(dOnagerShots, xPlayerOwner, p);
 				xSetInt(dOnagerShots, xOnagerShotProto, target);
+				dist = 100;
+				pos = kbGetBlockPosition(""+bullshitProj, true);
+				target = -1;
+				for(i=xGetDatabaseCount(dOnagers); >0) {
+					xDatabaseNext(dOnagers);
+					xUnitSelect(dOnagers, xUnitName);
+					if (trUnitAlive() == false) {
+						xFreeDatabaseBlock(dOnagers);
+					} else if (xGetInt(dOnagers, xPlayerOwner) == p) {
+						current = unitDistanceToVector(xGetInt(dOnagers, xUnitName), pos);
+						if (current < dist) {
+							dist = current;
+							target = xGetPointer(dOnagers);
+						}
+					}
+				}
+				if (target > 0) {
+					xSetPointer(dOnagers, target);
+					xUnitSelect(dOnagers, xUnitName);
+					trDamageUnitPercent(20);
+				}
 			}
 			case kbGetProtoUnitID("Fire Lance Projectile"):
 			{
@@ -1714,14 +1753,16 @@ void processPillarBall(int db = 0) {
 				if (trUnitAlive() == false) {
 					removePlayerUnit();
 				} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 4.0) {
-					damagePlayerUnit(100.0);
+					damagePlayerUnit(300.0);
 				}
 			}
 			xUnitSelectByID(db, xUnitID);
 			trUnitChangeProtoUnit("Dwarf");
 			xUnitSelectByID(db, xUnitID);
 			trDamageUnitPercent(-100);
-			trUnitChangeProtoUnit("Lightning Sparks");
+			trUnitChangeProtoUnit("Tartarian Gate Flame");
+			xUnitSelectByID(db, xUnitID);
+			trSetSelectedScale(0,1,0);
 			xFreeDatabaseBlock(db);
 		} else {
 			xSetVector(db, xProjPrev, kbGetBlockPosition(""+xGetInt(db, xUnitName),true));
@@ -1842,7 +1883,7 @@ highFrequency
 			case 1:
 			{
 				while(trTimeMS() > bossNext) {
-					bossNext = bossNext + 2500 / (25 + bossCount);
+					bossNext = bossNext + 2000 / (20 + bossCount);
 					bossCount = bossCount + 1;
 					transitionRing(bossCount, 1*trQuestVarGet("bossSpell"));
 				}
@@ -1941,7 +1982,7 @@ highFrequency
 									dir = rotationMatrix(dir, 0.980785, 0.19509);
 								}
 								trQuestVarSet("bossStep", 1);
-								bossNext = trTimeMS() + 20000;
+								bossNext = trTimeMS() + 15000;
 								bossTimeout = bossNext + 2000;
 								physicsSpeed = 1;
 								lastTime = trTimeMS();
@@ -2181,7 +2222,7 @@ highFrequency
 								trQuestVarSet("bossStep", 1);
 								bossNext = trTimeMS();
 								bossCount = 2500;
-								bossTimeout = trTimeMS() + 20000;
+								bossTimeout = trTimeMS() + 15000;
 							}
 							case 1:
 							{
@@ -2228,7 +2269,7 @@ highFrequency
 								bossDir = vector(1,0,0);
 								bossAngle = 0.1;
 								bossScale = 0;
-								bossTimeout = trTimeMS() + 20000;
+								bossTimeout = trTimeMS() + 15000;
 							}
 							case 1:
 							{

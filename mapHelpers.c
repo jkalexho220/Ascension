@@ -362,7 +362,7 @@ void placeTemple(int x = 0, int z = 0, float los = 0) {
 
 void startDeliveryQuest(int progress = 0) {
 	for(p=1; < ENEMY_PLAYER) {
-		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == progress) {
+		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel, p) == progress) {
 			xsEnableRule("delivery_quest_start");
 			break;
 		}

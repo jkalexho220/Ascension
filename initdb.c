@@ -86,7 +86,7 @@ int xPlayerMagicResist = 0;
 int xPlayerPetDogs = 0;
 int xPlayerMagicPen = 0;
 int xPlayerCleave = 0;
-int xPlayerDefiance = 0;
+int xPlayerFavorSpecial = 0;
 
 int xPlayerUltimateCost = 0;
 int xPlayerCooldownReduction = 0;
@@ -320,7 +320,7 @@ highFrequency
 	xPlayerPetDogs = xInitAddInt(dPlayerData,"petDogs");
 	xPlayerMagicPen = xInitAddFloat(dPlayerData,"magicPen");
 	xPlayerCleave = xInitAddFloat(dPlayerData,"cleave");
-	xPlayerDefiance = xInitAddFloat(dPlayerData,"defiance");
+	xPlayerFavorSpecial = xInitAddFloat(dPlayerData,"defiance");
 	
 	xPlayerUltimateCost = xInitAddFloat(dPlayerData,"ultimateCost",1);
 	xPlayerCooldownReduction = xInitAddFloat(dPlayerData,"cdr",1);

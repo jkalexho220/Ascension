@@ -293,7 +293,7 @@ void saviorAlways(int eventID = -1) {
 						xUnitSelectByID(dPlayerUnits, xUnitID);
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (unitDistanceToVector(dPlayerUnits, pos) < dist) {
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < dist) {
 							healUnit(p, amt);
 							if (xGetBool(dPlayerUnits, xIsHero)) {
 								gainFavor(xGetInt(dPlayerUnits, xPlayerOwner), 3.0);
@@ -321,7 +321,7 @@ void saviorAlways(int eventID = -1) {
 		for(x=1; < ENEMY_PLAYER) {
 			if (xGetInt(dPlayerData, xPlayerDead, x) > 0) {
 				revivePlayer(x);
-				xSetInt(dPlayerData, xPlayerDead, x, 0);
+				xSetInt(dPlayerData, xPlayerDead, 0, x);
 			}
 		}
 		gainFavor(p, 0.0 - interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost));

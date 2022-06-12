@@ -868,25 +868,19 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("To hire me, simply drop a relic next to me. I will charge you 100 gold. (The relic will be re-equipped)");
-					dialog = -1;
+					dialog = 0;
 				}
 			}
 		}
 		case NPC_RELIC_TRANSPORTER_WTF:
 		{
-			dialog = -1;
+			dialog = 0;
 			uiMessageBox("You want to hire another? What happened to the last guy?!");
 		}
 		case NPC_BOSS_ENTRANCE:
 		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Find the relic matching my symbol and bring it to me to open the portal to the boss room.");
-					dialog = 0;
-				}
-			}
+			uiMessageBox("Find the relic matching my symbol and bring it to me to open the portal to the boss room.");
+			dialog = 0;
 		}
 		case NPC_MONSTERPEDIA_COMPLETE:
 		{

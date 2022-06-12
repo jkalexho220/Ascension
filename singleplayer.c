@@ -16,6 +16,7 @@ void spChooseBoon(int eventID = -1) {
 		equipRelicsAgain(1);
 	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_DOUBLE_FAVOR) {
 		trSetCivAndCulture(1, 1, 0);
+		gainFavor(1, 0);
 	}
 	xSetInt(dPlayerData, xPlayerGodBoon, trQuestVarGet("selectedBoon"));
 	trQuestVarSetFromRand("rand", 1, 5, true);
@@ -33,6 +34,7 @@ void spChooseBoon(int eventID = -1) {
 		}
 	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_DOUBLE_FAVOR) {
 		trSetCivAndCulture(1, 0, 0);
+		gainFavor(1, 0);
 	} else if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_MONSTER_COMPANION) {
 		uiMessageBox("Select a monster in the Monsterpedia to be your pet.");
 	}
@@ -739,7 +741,7 @@ highFrequency
 		}
 
 		// runestone quest
-		if ((trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3) && (xGetInt(dPlayerData, xPlayerProgress, 1) >= 4)) {
+		if ((xGetInt(dPlayerData, xPlayerProgress) >= 4) && (trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3)) {
 			xsEnableRule("venlesh_always");
 			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);

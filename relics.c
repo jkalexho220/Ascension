@@ -26,7 +26,7 @@ const int RELIC_ALL = 20;
 auras
 pet companion?
 */
-const int RELIC_DEFIANCE = 21; // regenerate 1 health per second for each visible enemy
+const int RELIC_FAVOR_SPECIAL = 21; // when your special attack triggers, all allies gain 1 favor
 const int RELIC_PET_DOG = 22; // Bella fights for you
 const int RELIC_NOTTUD = 23; // +0.2x area damage on attacks. (Radius 4)
 const int RELIC_ZENOPHOBIA = 24; // +0.2 magic penetration
@@ -149,7 +149,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_ULTIMATE_COST:
 			{
-				msg = "Ultimate Cost Reduction x0.1";
+				msg = "Ultimate Cost Reduction x0.12";
 			}
 			case RELIC_PROJECTILES:
 			{
@@ -177,7 +177,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_FAVOR_FROM_ATTACKS:
 			{
-				msg = "When you attack, gain 1 favor. Ultimate Cost Increased x0.1";
+				msg = "When you attack, gain 1 favor. Ultimate Cost Increased x0.12";
 			}
 			case RELIC_POISON_FASTER:
 			{
@@ -189,7 +189,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_ZENOPHOBIA:
 			{
-				msg = "+0.2x ignore enemy magic resist";
+				msg = "+0.2 ignore enemy magic resist";
 			}
 			case RELIC_NOTTUD:
 			{
@@ -199,11 +199,10 @@ string relicName(int relic = 0) {
 			{
 				msg = "A pet dog fights for you. (Respawn = 30 seconds)";
 			}
-			case RELIC_DEFIANCE:
+			case RELIC_FAVOR_SPECIAL:
 			{
-				msg = "Regenerate 1 health per second for each visible enemy.";
+				msg = "When your special attack activates, all allies gain 1 favor";
 			}
-			
 			case RELIC_GHOST_PICTURE:
 			{
 				msg = "A picture of a young man.";
@@ -437,9 +436,9 @@ string relicIcon(int relic = 0) {
 			{
 				icon = "icons\special g minotaur icon 64";
 			}
-			case RELIC_DEFIANCE:
+			case RELIC_FAVOR_SPECIAL:
 			{
-				icon = "icons\special g hydra icon 64";
+				icon = "icons\special x lampades icons 64";
 			}
 			case RELIC_BINARY_POISON:
 			{
@@ -576,7 +575,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		case RELIC_ULTIMATE_COST:
 		{
 			xSetInt(dPlayerData,xPlayerUltimateCostCount,xGetInt(dPlayerData,xPlayerUltimateCostCount) + 1 * m);
-			xSetFloat(dPlayerData,xPlayerUltimateCost, xsPow(0.9, xGetInt(dPlayerData,xPlayerUltimateCostCount)));
+			xSetFloat(dPlayerData,xPlayerUltimateCost, xsPow(0.88, xGetInt(dPlayerData,xPlayerUltimateCostCount)));
 		}
 		case RELIC_PROJECTILES:
 		{
@@ -611,7 +610,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			xSetInt(dPlayerData,xPlayerFavorFromAttacks,xGetInt(dPlayerData,xPlayerFavorFromAttacks) + m);
 			xSetInt(dPlayerData,xPlayerUltimateCostCount,xGetInt(dPlayerData,xPlayerUltimateCostCount) - 1 * m);
-			xSetFloat(dPlayerData,xPlayerUltimateCost,xsPow(0.9, xGetInt(dPlayerData,xPlayerUltimateCostCount)));
+			xSetFloat(dPlayerData,xPlayerUltimateCost,xsPow(0.88, xGetInt(dPlayerData,xPlayerUltimateCostCount)));
 		}
 		case RELIC_POISON_FASTER:
 		{
@@ -691,9 +690,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 		{
 			xSetFloat(dPlayerData,xPlayerCleave,xGetFloat(dPlayerData,xPlayerCleave) + 0.3 * m);
 		}
-		case RELIC_DEFIANCE:
+		case RELIC_FAVOR_SPECIAL:
 		{
-			xSetFloat(dPlayerData,xPlayerDefiance,xGetFloat(dPlayerData,xPlayerDefiance) + m);
+			xSetFloat(dPlayerData,xPlayerFavorSpecial,xGetFloat(dPlayerData,xPlayerFavorSpecial) + m);
 		}
 		case RELIC_BINARY_POISON:
 		{
@@ -915,9 +914,9 @@ int relicProto(int relic = 0) {
 			{
 				proto = kbGetProtoUnitID("Minotaur");
 			}
-			case RELIC_DEFIANCE:
+			case RELIC_FAVOR_SPECIAL:
 			{
-				proto = kbGetProtoUnitID("Hydra");
+				proto = kbGetProtoUnitID("Lampades");
 			}
 			case RELIC_BINARY_POISON:
 			{

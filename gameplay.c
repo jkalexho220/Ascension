@@ -135,9 +135,6 @@ void processRegen(int p = 0) {
 		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_REGENERATE_HEALTH) {
 			amt = diff * 0.00002 * xGetFloat(dPlayerData, xPlayerHealth, p);
 		}
-		if (xGetFloat(dPlayerData, xPlayerDefiance, p) > 0) {
-			amt = amt + 0.001 * diff * xGetFloat(dPlayerData, xPlayerDefiance, p) * xGetDatabaseCount(dEnemies);
-		}
 		xSetFloat(dPlayerData, xPlayerLifestealTotal, xGetFloat(dPlayerData, xPlayerLifestealTotal, p) + amt, p);
 		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
 	}
@@ -548,6 +545,7 @@ highFrequency
 	for(p=1; < ENEMY_PLAYER) {
 		spawnPlayer(p, vectorSnapToGrid(pos + dir));
 		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 6) {
+			trQuestVarSet("p"+p+"transporterPurchased", 1);
 			spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
 		}
 		dir = rotationMatrix(dir, mCos, mSin);
@@ -944,8 +942,6 @@ highFrequency
 							"<color={Playercolor("+p+")}>{Playername("+p+")}</color> is being revived: " + xGetInt(dPlayerData, xPlayerDead));
 						if (xGetInt(dPlayerData, xPlayerDead) <= 0) {
 							revivePlayer(p);
-							xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
-							xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
 						}
 					}
 				}
@@ -1596,7 +1592,7 @@ highFrequency
 		int next = 0;
 		vector pos = trVectorQuestVarGet("startPosition");
 		for(p=1; < ENEMY_PLAYER) {
-			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == trQuestVarGet("deliveryQuest")) {
+			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel, p) == trQuestVarGet("deliveryQuest")) {
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch(""+p+",0","Caravan Greek",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				activatePlayerUnit(next, p, kbGetProtoUnitID("Caravan Greek"));
@@ -1647,7 +1643,7 @@ minInterval 3
 			} else {
 				pos = kbGetBlockPosition(""+xGetInt(dDonkeys, xUnitName));
 				if (trQuestVarGet("townFound") == 1) {
-					if (distanceBetweenVectors(pos, trVectorQuestVarGet("townCenter")) < 64.0) {
+					if (distanceBetweenVectors(pos, trVectorQuestVarGet("townCenter")) < 100.0) {
 						xUnitSelect(dDonkeys, xUnitName);
 						trUnitChangeProtoUnit("Qilin Heal");
 						deliverySuccess(xGetInt(dDonkeys, xPlayerOwner));

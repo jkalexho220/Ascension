@@ -5040,6 +5040,13 @@ highFrequency
 					trQuestVarSet("dragonSpotlight", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					if (trQuestVarGet("dragonSpotlight") < trGetNextUnitScenarioNameNumber()) {
+
+						trQuestVarSet("dragonSpotlight2", trGetNextUnitScenarioNameNumber());
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						trUnitSelectClear();
+						trUnitSelectByQV("dragonSpotlight2");
+						trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+
 						trQuestVarSet("dragonSpotlightStep", 2);
 						trUnitSelectClear();
 						trUnitSelectByQV("dragonSpotlight");
@@ -5062,6 +5069,10 @@ highFrequency
 				pos = kbGetBlockPosition(""+bossUnit);
 				if (distanceBetweenVectors(trVectorQuestVarGet("dragonSpotlightPos"), pos) < 9.0) {
 					trDamageUnit(10000);
+					trUnitSelectClear();
+					trUnitSelectByQV("dragonSpotlight2");
+					trUnitDestroy();
+
 					trUnitSelectClear();
 					trUnitSelectByQV("dragonSpotlight");
 					trUnitChangeProtoUnit("Dwarf");
@@ -5128,6 +5139,8 @@ highFrequency
 					trUnitChangeProtoUnit("Meteorite");
 					xUnitSelect(dDragonMeteors, xUnitName);
 					trUnitChangeProtoUnit("Meteor");
+					xUnitSelect(dDragonMeteors, xUnitName);
+					trSetSelectedScale(1,1000.0,1);
 					pos = xGetVector(dDragonMeteors, xDragonMeteorPos);
 					for(j=xGetDatabaseCount(dPlayerUnits); >0) {
 						xDatabaseNext(dPlayerUnits);
@@ -5213,9 +5226,13 @@ highFrequency
 				if (trUnitPercentDamaged() < 10) {
 					bossCooldown(10, 15);
 				} else {
-					trQuestVarSetFromRand("rand", 1 + trUnitPercentDamaged() / 20, 1 + trUnitPercentDamaged() / 10, true);
+					trQuestVarSetFromRand("rand", 1, 1 + trUnitPercentDamaged() / 10, true);
 					bossCount = trQuestVarGet("rand");
 					trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
+					trQuestVarSetFromRand("rand", 1, 6, true);
+					if (trQuestVarGet("rand") < trQuestVarGet("cloudDeployProto")) {
+						trQuestVarSet("cloudDeployProto", trQuestVarGet("rand"));
+					}
 					if ((bossCount + xGetDatabaseCount(dEnemies) > ENEMY_PLAYER) && (trQuestVarGet("secondPhase") == 0)) {
 						bossCount = ENEMY_PLAYER - xGetDatabaseCount(dEnemies);
 					}
@@ -5604,6 +5621,16 @@ highFrequency
 							damagePlayerUnit(250);
 						}
 					}
+
+					for(i=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
+							removeEnemy();
+						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), bossTargetPos) < 9.0) {
+							trDamageUnit(500);
+						}
+					}
 					
 					trQuestVarSetFromRand("sound", 1, 2, true);
 					trSoundPlayFN("nidhoggflame"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
@@ -5729,7 +5756,7 @@ highFrequency
 			}
 			case 3:
 			{
-				trModifyProtounit("Nidhogg", 0, 0, 100000);
+				trModifyProtounit("Nidhogg", 0, 0, 50000);
 				xsEnableRule("boss8_battle");
 				boss = trQuestVarGet("stage");
 				bossID = kbGetBlockID(""+bossUnit, true);
@@ -6619,7 +6646,7 @@ highFrequency
 		}
 	}
 
-	if (xGetDatabaseCount(dKeeperPaint) > 0) {
+	for (i=xsMin(3, xGetDatabaseCount(dKeeperPaint)); > 0) {
 		xDatabaseNext(dKeeperPaint);
 		if (trTimeMS() > xGetInt(dKeeperPaint, xKeeperPaintTimeout)) {
 			pos = xGetVector(dKeeperPaint, xKeeperPaintPos);
