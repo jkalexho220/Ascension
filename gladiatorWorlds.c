@@ -387,6 +387,8 @@ highFrequency
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 27, 100);
+
 				xsEnableRule("boss_stun_recovery");
 
 				bossUnit = trGetNextUnitScenarioNameNumber();
