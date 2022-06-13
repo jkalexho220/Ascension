@@ -1737,7 +1737,7 @@ void fermiFilterActivate() {
 	xsEnableRule("fermi_filter_on");
 	trQuestVarSet("fermiFilterNext", trTimeMS() + 3000);
 	trSoundPlayFN("attackwarning.wav","1",-1,"","");
-	trSoundPlayFN("cinematics\35_out\doorseal.mp3","1",-1,"","");
+	trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
 }
 
 rule fermi_filter_on
@@ -1746,7 +1746,7 @@ highFrequency
 {
 	if (trTimeMS() > trQuestVarGet("fermiFilterNext")) {
 		trSoundPlayFN("firegiantdie.wav","1",-1,"","");
-		trSoundPlayFN("cinematics\35_out\doorbigshut.mp3","1",-1,"","");
+		trSoundPlayFN("cinematics\32_out\doorbigshut.mp3","1",-1,"","");
 		trCameraShake(0.5, 0.5);
 		vector pos = vector(0,0,0);
 		// 16 x 16 with 73 at the center
@@ -1829,7 +1829,7 @@ highFrequency
 					xUnitSelectByID(dPlayerUnits, xUnitID);
 					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (xGetBool(dPlayerUnits, xLaunched) == false) {
+					} else if ((xGetBool(dPlayerUnits, xLaunched) == false) && (xGetInt(dPlayerUnits, xStunStatus) == 0)) {
 						if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
 							launchUnit(dPlayerUnits, pos + (xGetVector(dLionShockwaves, xProjDir) * 100.0));
 						}
@@ -2326,7 +2326,7 @@ highFrequency
 										trSoundPlayFN("recreation.wav","1",-1,"","");
 										trUnitSelectClear();
 										trUnitSelect(""+bossUnit, true);
-										trDamageUnitPercent(-1);
+										trDamageUnitPercent(-3);
 										trUnitHighlight(0.2,false);
 									} else {
 										xSetVector(dBossHeals, xProjDir, getUnitVector(pos, bossPos));
