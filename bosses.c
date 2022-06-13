@@ -6553,6 +6553,7 @@ highFrequency
 {
 	vector pos = vectorToGrid(kbGetBlockPosition(""+1*trQuestVarGet("keeperHawk")));
 	vector prev = trVectorQuestVarGet("keeperPos");
+	vector temp = vector(0,0,0);
 	int primary = 0;
 	int secondary = 0;
 	int x = 0;
@@ -6582,8 +6583,11 @@ highFrequency
 				removePlayerUnit();
 			} else if ((xGetBool(dPlayerUnits, xIsHero) == false) || (trQuestVarGet("p"+p+"runestoneQuest") < 2)) {
 				// the hand only eats people at phase 3 of the quest
-				if (terrainIsType(vectorToGrid(xGetVector(dPlayerUnits, xUnitPos)), 5, 4)) {
-					trUnitDelete(false);
+				temp = vectorToGrid(xGetVector(dPlayerUnits, xUnitPos));
+				if (xsVectorGetX(temp) + xsVectorGetZ(temp) > 0) {
+					if (terrainIsType(temp, 5, 4)) {
+						trUnitDelete(false);
+					}
 				}
 			}
 		}
@@ -6647,7 +6651,7 @@ highFrequency
 	}
 
 	for (i=xsMin(3, xGetDatabaseCount(dKeeperPaint)); > 0) {
-		xDatabaseNext(dKeeperPaint);
+		xDatabaseNext(dKeeperPaint, false);
 		if (trTimeMS() > xGetInt(dKeeperPaint, xKeeperPaintTimeout)) {
 			pos = xGetVector(dKeeperPaint, xKeeperPaintPos);
 			x = xsVectorGetX(pos);
@@ -7306,12 +7310,16 @@ highFrequency
 		vector dir = vector(0,0,0);
 
 		if (xGetInt(dEnemies, xUnitName, bossPointer) != bossUnit) {
+			bossPointer = -1;
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
 				if (xGetInt(dEnemies, xUnitName) == bossUnit) {
 					bossPointer = xGetPointer(dEnemies);
+					break;
 				}
 			}
+		} else {
+			xSetInt(dEnemies, xMissingTimeout, -999, bossPointer);
 		}
 		
 		trUnitSelectClear();
@@ -7399,7 +7407,7 @@ highFrequency
 										xSetInt(dTigerPaint, xTigerPaintPrimary, trGetTerrainType(x, z));
 										xSetInt(dTigerPaint, xTigerPaintSecondary, trGetTerrainSubType(x, z));
 										xSetVector(dTigerPaint, xTigerPaintPos, pos);
-										trPaintTerrain(x, z, x, z, 5, 4, false);
+										trPaintTerrain(x, z, x, z, 2, 13, false);
 									}
 								}
 							}

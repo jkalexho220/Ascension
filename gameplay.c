@@ -544,7 +544,7 @@ highFrequency
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		spawnPlayer(p, vectorSnapToGrid(pos + dir));
-		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 6) {
+		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 6 && Multiplayer && trQuestVarGet("stage") < 10) {
 			trQuestVarSet("p"+p+"transporterPurchased", 1);
 			spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
 		}

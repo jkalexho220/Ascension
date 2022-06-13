@@ -897,8 +897,8 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 					if (xGetInt(db, xCharSpecialAttack) <= 0) {
 						xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
 						status = ON_HIT_SPECIAL;
-						if (xGetFloat(dPlayerData, xPlayerFavorSpecial) > 0) {
-							for(p=1; < ENEMY_PLAYER) {
+						if (xGetFloat(dPlayerData, xPlayerFavorSpecial, p) > 0) {
+							for(i=1; < ENEMY_PLAYER) {
 								gainFavor(p, xGetFloat(dPlayerData, xPlayerFavorSpecial));
 							}
 						}

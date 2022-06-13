@@ -1083,7 +1083,7 @@ void specialUnitsAlways() {
 		}
 	}
 	
-	if (xGetDatabaseCount(dAvengerProj) > 0) {
+	for (i=xsMin(4, xGetDatabaseCount(dAvengerProj)); > 0) {
 		if (processGenericProj(dAvengerProj) == PROJ_FALLING) {
 			p = xGetInt(dAvengerProj,xPlayerOwner);
 			db = opponentDatabaseName(p);
@@ -1208,7 +1208,7 @@ void specialUnitsAlways() {
 		}
 	}
 	
-	if (xGetDatabaseCount(dMummyBalls) > 0) {
+	for (i=xsMin(5, xGetDatabaseCount(dMummyBalls)); > 0) {
 		if (processGenericProj(dMummyBalls) == PROJ_FALLING) {
 			p = xGetInt(dMummyBalls,xPlayerOwner);
 			db = opponentDatabaseName(p);
