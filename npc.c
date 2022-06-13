@@ -1921,6 +1921,26 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 			}
 		}
+
+		case NPC_QUEST + SHOP_NPC + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I don't think I can make it any further than this. Want to buy my equipment?");
+				}
+				case 2:
+				{
+					trShowImageDialog(relicIcon(1*trQuestVarGet("shopRelic")),relicName(1*trQuestVarGet("shopRelic")));
+				}
+				case 3:
+				{
+					uiMessageBox("Maybe it will be better off in your hands.");
+					dialog = 0;
+				}
+			}
+		}
 		
 		case NPC_QUEST_COMPLETE + SHOP_NPC:
 		{

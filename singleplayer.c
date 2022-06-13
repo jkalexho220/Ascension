@@ -259,8 +259,8 @@ void monsterpedia(int stage = 0, int x = 0) {
 			tPrimary = 5;
 			tSubPrimary = 7;
 			trStringQuestVarSet("enemyProto1", "Tartarian Gate spawn");
-			trStringQuestVarSet("enemyProto2", "Troll");
-			trStringQuestVarSet("enemyProto3", "Manticore");
+			trStringQuestVarSet("enemyProto2", "Manticore");
+			trStringQuestVarSet("enemyProto3", "Troll");
 			trStringQuestVarSet("enemyProto4", "Fire Giant");
 			trStringQuestVarSet("enemyProto5", "Titan Atlantean");
 			bossScale = 1.2;
@@ -726,12 +726,15 @@ highFrequency
 		*/
 
 		// monsterpedia quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
 			// quest is in progress
 			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Ajax",1,143,0,171,180,true);
 			xsEnableRule("monsterpedia_quest");
 		}
+
+
+		// sword piece quest
 
 		// relic carrying company quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && xGetInt(dPlayerData, xPlayerRelicTransporterLevel) < 7) {
@@ -765,7 +768,7 @@ highFrequency
 
 		// idk quest floor 8
 
-		// poison trial quest for the blade of the starsword
+		// flame trial quest for the blade of the starsword
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
@@ -1260,7 +1263,7 @@ highFrequency
 			}
 			case kbGetProtoUnitID("Troll"):
 			{
-				desc("Regenerates 1 percent health each second. (Nullified by Poison)");
+				desc("Launches a harpoon that drags in the first unit hit.");
 			}
 			case kbGetProtoUnitID("Manticore"):
 			{

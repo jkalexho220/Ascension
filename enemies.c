@@ -137,7 +137,7 @@ highFrequency
 	
 	setupProtounitBounty("Servant", 0.5, 5, 0.03);
 	setupProtounitBounty("Nereid", 0.3, 7, 0.05);
-	setupProtounitBounty("Kraken", 0.4, 9, 0.08);
+	setupProtounitBounty("Kraken", 0.5, 9, 0.08);
 	setupProtounitBounty("Hydra", 0.4, 10, 0.1);
 	
 	setupProtounitBounty("Griffon", 0.6, 6, 0.03);
@@ -146,8 +146,8 @@ highFrequency
 	setupProtounitBounty("Lampades", 0.4, 12, 0.1);
 
 	setupProtounitBounty("Tartarian Gate Spawn", 0.7, 6, 0.03);
-	setupProtounitBounty("Troll", 0.7, 7, 0.03);
-	setupProtounitBounty("Manticore", 0.3, 8, 0.05);
+	setupProtounitBounty("Troll", 0.6, 7, 0.03);
+	setupProtounitBounty("Manticore", 0.5, 8, 0.05);
 	setupProtounitBounty("Fire Giant", 0.6, 12, 0.1);
 
 	setupProtounitBounty("Argus", 0.5, 10, 0);
@@ -2109,6 +2109,164 @@ void specialUnitsAlways() {
 			db = databaseName(xGetInt(dTartarianSpawns,xPlayerOwner));
 			xSetVector(dTartarianSpawns,xSpecialNext,kbGetBlockPosition(""+xGetInt(dTartarianSpawns,xUnitName)));
 			xSetInt(dTartarianSpawns, xSpecialStep, xGetInt(db, xSilenceStatus, xGetInt(dTartarianSpawns, xSpecialIndex)));
+		}
+	}
+
+	for(i=xGetDatabaseCount(dTrollLines); >0) {
+		xDatabaseNext(dTrollLines);
+		xUnitSelect(dTrollLines, xTrollLineTarget);
+		if (trUnitAlive()) {
+			db = xGetInt(dTrollLines, xTrollLineTargetDB);
+			if (xGetBool(db, xLaunched, xGetInt(dTrollLines, xTrollLineTargetIndex))) {
+				pos = kbGetBlockPosition(""+xGetInt(dTrollLines, xTrollLineTarget), true);
+				dist = distanceBetweenVectors(xGetVector(dTrollLines, xTrollLineStart), pos, false);
+				xUnitSelect(dTrollLines, xUnitName);
+				trSetSelectedScale(1.0, dist / 5.8, 1.0);
+			} else {
+				xUnitSelect(dTrollLines, xUnitName);
+				trUnitDestroy();
+				xFreeDatabaseBlock(dTrollLines);
+			}
+		} else {
+			xUnitSelect(dTrollLines, xUnitName);
+			trUnitDestroy();
+			xFreeDatabaseBlock(dTrollLines);
+		}
+	}
+
+	for(i=xGetDatabaseCount(dTrollHarpoons); >0) {
+		action = processGenericProj(dTrollHarpoons);
+		if (action != PROJ_GROUND) {
+			pos = kbGetBlockPosition(""+xGetInt(dTrollHarpoons, xUnitName));
+			dist = distanceBetweenVectors(pos, xGetVector(dTrollHarpoons, xTrollHarpoonStart), false);
+			if (dist > 30.0 || terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+				xUnitSelect(dTrollHarpoons, xTrollHarpoonLine);
+				trUnitDestroy();
+				xUnitSelect(dTrollHarpoons, xUnitName);
+				trUnitChangeProtoUnit("Dust Large");
+				xUnitSelect(dTrollHarpoons, xUnitName);
+				trDamageUnitPercent(-100);
+				xFreeDatabaseBlock(dTrollHarpoons);
+			} else {
+				xUnitSelect(dTrollHarpoons, xTrollHarpoonLine);
+				trSetSelectedScale(1.0, dist / 5.8, 1.0);
+				if (trTimeMS() - xGetInt(dTrollHarpoons, xTrollHarpoonLast) > 150) {
+					xSetInt(dTrollHarpoons, xTrollHarpoonLast, trTimeMS());
+					start = xGetVector(dTrollHarpoons, xProjPrev);
+					dir = xGetVector(dTrollHarpoons, xProjDir);
+					dist = distanceBetweenVectors(pos, start, false) + 2.0;
+					p = xGetInt(dTrollHarpoons, xPlayerOwner);
+					db = opponentDatabaseName(p);
+					target = 0;
+					for(j=xGetDatabaseCount(db); >0) {
+						xDatabaseNext(db);
+						xUnitSelectByID(db, xUnitID);
+						if (trUnitAlive() == false) {
+							removeOpponentUnit(p);
+						} else if (xGetBool(db, xLaunched) == false) {
+							if (rayCollision(db, start, dir, dist, 2.0)) {
+								target = xGetInt(db, xUnitName);
+								launchUnit(db, xGetVector(dTrollHarpoons, xTrollHarpoonStart));
+								trQuestVarSetFromRand("sound", 1, 2, true);
+								trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+								break;
+							}
+						}
+					}
+					if (target > 0) {
+						xUnitSelect(dTrollHarpoons, xUnitName);
+						trUnitChangeProtoUnit("Dust Large");
+						xUnitSelect(dTrollHarpoons, xUnitName);
+						trDamageUnitPercent(-100);
+						dir = getUnitVector(xGetVector(dTrollHarpoons, xTrollHarpoonStart), kbGetBlockPosition(""+target, true));
+						xUnitSelect(dTrollHarpoons, xTrollHarpoonLine);
+						trSetUnitOrientation(rotationMatrix(dir, 0.0, 1.0), xsVectorNormalize(xsVectorSetY(dir, 0.1)), true);
+
+						xAddDatabaseBlock(dTrollLines, true);
+						xSetInt(dTrollLines, xUnitName, xGetInt(dTrollHarpoons, xTrollHarpoonLine));
+						xSetInt(dTrollLines, xTrollLineTarget, target);
+						xSetInt(dTrollLines, xTrollLineTargetDB, db);
+						xSetInt(dTrollLines, xTrollLineTargetIndex, xGetPointer(db));
+						xSetVector(dTrollLines, xTrollLineStart, xGetVector(dTrollHarpoons, xTrollHarpoonStart));
+						xFreeDatabaseBlock(dTrollHarpoons);
+					} else {
+						xSetVector(dTrollHarpoons, xProjPrev, pos);
+					}
+				}
+			}
+		}
+	}
+
+	if(xGetDatabaseCount(dTrolls) >0) {
+		xDatabaseNext(dTrolls);
+		id = xGetInt(dTrolls,xUnitID);
+		p = xGetInt(dTrolls,xPlayerOwner);
+		trUnitSelectClear();
+		trUnitSelectByID(id);
+		db = databaseName(p);
+		if (trUnitAlive() == false) {
+			trUnitChangeProtoUnit("Troll");
+			xFreeDatabaseBlock(dTrolls);
+		} else if (checkEnemyDeactivated(dTrolls)) {
+			trUnitOverrideAnimation(-1,0,false,true,-1);
+			xFreeDatabaseBlock(dTrolls);
+		} else if (xGetInt(db, xSilenceStatus, xGetInt(dTrolls, xSpecialIndex)) == 1) {
+			xSetInt(dTrolls, xSpecialStep, 2);
+		} else if (trTimeMS() > xGetInt(dTrolls, xSpecialNext)) {
+			switch(xGetInt(dTrolls, xSpecialStep))
+			{
+				case 0:
+				{
+					if (kbUnitGetAnimationActionType(id) == 12) {
+						trUnitHighlight(0.5, false);
+						trSoundPlayFN("trollmove3.wav","1",-1,"","");
+						xsSetContextPlayer(p);
+						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
+						xsSetContextPlayer(0);
+						xSetVector(dTrolls, xSpecialTarget, kbGetBlockPosition(""+target, true));
+						xSetInt(dTrolls, xSpecialStep, 1);
+						xSetInt(dTrolls, xSpecialNext, trTimeMS() + 1000);
+						trUnitOverrideAnimation(12,0,false,false,-1);
+					}
+				}
+				case 1:
+				{
+					trSoundPlayFN("catapultattack.wav","1",-1,"","");
+					pos = kbGetBlockPosition(""+xGetInt(dTrolls, xUnitName));
+					dir = getUnitVector(pos, xGetVector(dTrolls, xSpecialTarget));
+					addGenericProj(dTrollHarpoons, pos, dir, p);
+					xSetInt(dTrollHarpoons, xTrollHarpoonLine, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect(""+p+",0");
+					trUnitChangeProtoUnit("Spy Eye");
+					xUnitSelect(dTrollHarpoons, xTrollHarpoonLine);
+					trMutateSelected(kbGetProtoUnitID("Torch"));
+					trSetSelectedScale(1, 0, 1);
+					trUnitSetAnimationPath("2,0,1,1,1,0,0");
+					trSetUnitOrientation(rotationMatrix(dir, 0.0, 1.0), xsVectorNormalize(xsVectorSetY(dir, 0.1)),true);
+					xSetInt(dTrollHarpoons, xTrollHarpoonLast, trTimeMS());
+					xSetVector(dTrollHarpoons, xProjPrev, pos);
+					xSetVector(dTrollHarpoons, xTrollHarpoonStart, xsVectorSetY(pos, worldHeight));
+
+					xSetInt(dTrolls, xSpecialStep, 2);
+					xSetInt(dTrolls, xSpecialNext, trTimeMS() + 500);
+				}
+				case 2:
+				{
+					trUnitOverrideAnimation(-1,0,false,true,-1);
+					xSetInt(dTrolls, xSpecialStep, 0);
+					xSetInt(dTrolls, xSpecialNext, trTimeMS() + 15000);
+				}
+			}
+		} else {
+			action = xGetInt(db, xStunStatus, xGetInt(dTrolls, xSpecialIndex));
+			if (xGetBool(db, xLaunched, xGetInt(dTrolls, xSpecialIndex))) {
+				action = action + 1;
+			}
+			if (action > 0 && xGetInt(dTrolls, xSpecialStep) == 1) {
+				xSetInt(dTrolls, xSpecialStep, 0);
+				xSetInt(dTrolls, xSpecialNext, trTimeMS() + 18000);
+			}
 		}
 	}
 

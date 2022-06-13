@@ -638,6 +638,8 @@ highFrequency
 		trModifyProtounit("Phoenix From Egg", p, 29, 9999999999999999999.0);
 		trModifyProtounit("Phoenix From Egg", p, 29, -9999999999999999999.0);
 		trModifyProtounit("Phoenix From Egg", p, 29, 0);
+
+		trModifyProtounit("Troll", p, 11, 2); // troll range 16
 		
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
 		
@@ -1058,11 +1060,11 @@ int monsterPetProto(int i = 0) {
 		}
 		case 33:
 		{
-			proto = kbGetProtoUnitID("Troll");
+			proto = kbGetProtoUnitID("Manticore");
 		}
 		case 34:
 		{
-			proto = kbGetProtoUnitID("Manticore");
+			proto = kbGetProtoUnitID("Troll");
 		}
 		case 35:
 		{

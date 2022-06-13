@@ -1902,8 +1902,8 @@ highFrequency
 				
 				trQuestVarSet("enemyProtoCount", 6);
 				trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
-				trStringQuestVarSet("enemyProto2", "Troll");
-				trStringQuestVarSet("enemyProto3", "Manticore");
+				trStringQuestVarSet("enemyProto2", "Manticore");
+				trStringQuestVarSet("enemyProto3", "Troll");
 				trStringQuestVarSet("enemyProto4", "Frost Giant");
 				trStringQuestVarSet("enemyProto5", "Mummy");
 				trStringQuestVarSet("enemyProto6", "Fire Giant");

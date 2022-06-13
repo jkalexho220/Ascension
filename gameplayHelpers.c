@@ -899,7 +899,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 						status = ON_HIT_SPECIAL;
 						if (xGetFloat(dPlayerData, xPlayerFavorSpecial, p) > 0) {
 							for(i=1; < ENEMY_PLAYER) {
-								gainFavor(p, xGetFloat(dPlayerData, xPlayerFavorSpecial));
+								gainFavor(i, xGetFloat(dPlayerData, xPlayerFavorSpecial));
 							}
 						}
 					}
@@ -1186,10 +1186,22 @@ int xAvengerProjIndex = 0;
 int xMummyStart = 0;
 int xMummyDir = 0;
 
-int dManticoreProj = 0;
 int dFireGiantProj = 0;
 int xFireGiantProjOwner = 0;
 int dFireGiantBalls = 0;
+
+int dTrolls = 0;
+
+int dTrollHarpoons = 0;
+int xTrollHarpoonLast = 0;
+int xTrollHarpoonLine = 0;
+int xTrollHarpoonStart = 0;
+
+int dTrollLines = 0;
+int xTrollLineTarget = 0;
+int xTrollLineTargetDB = 0;
+int xTrollLineTargetIndex = 0;
+int xTrollLineStart = 0;
 
 int dYeebLightningBalls = 0;
 
@@ -1241,6 +1253,21 @@ highFrequency
 	
 	dFrostGiants = initSpecialDatabase("FrostGiants");
 	xInitAddInt(dFrostGiants,"target");
+
+	dTrolls = initSpecialDatabase("Trolls");
+	xInitAddVector(dTrolls,"target");
+
+	dTrollHarpoons = initGenericProj("harpoons",kbGetProtoUnitID("Ballista"),2,30.0,5.0,0.5,0,true);
+	xTrollHarpoonLine = xInitAddInt(dTrollHarpoons, "lineObject");
+	xTrollHarpoonLast = xInitAddInt(dTrollHarpoons, "last");
+	xTrollHarpoonStart = xInitAddVector(dTrollHarpoons, "start");
+
+	dTrollLines = xInitDatabase("trollLines");
+	xInitAddInt(dTrollLines, "name");
+	xTrollLineTarget = xInitAddInt(dTrollLines, "target");
+	xTrollLineTargetDB = xInitAddInt(dTrollLines, "targetDB");
+	xTrollLineTargetIndex = xInitAddInt(dTrollLines, "targetindex");
+	xTrollLineStart = xInitAddVector(dTrollLines, "start");
 
 	dArgus = initSpecialDatabase("Argus");
 	xInitAddInt(dArgus, "target");
@@ -1410,6 +1437,10 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		{
 			addSpecialToDatabase(dFrostGiants,name,db,p);
 		}
+		case kbGetProtoUnitID("Troll"):
+		{
+			addSpecialToDatabase(dTrolls,name,db,p);
+		}
 		case kbGetProtoUnitID("Argus"):
 		{
 			addSpecialToDatabase(dArgus,name,db,p);
@@ -1505,11 +1536,6 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 		case kbGetProtoUnitID("Tartarian Gate Spawn"):
 		{
 			addSpecialToDatabase(dTartarianSpawns,name,db,p);
-		}
-		case kbGetProtoUnitID("Troll"):
-		{
-			addSpecialToDatabase(dHydras,name,db,p);
-			xSetInt(dHydras,xSpecialStep,trTime());
 		}
 		case kbGetProtoUnitID("Hippocampus"):
 		{

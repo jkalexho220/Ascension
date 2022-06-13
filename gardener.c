@@ -115,6 +115,7 @@ void gardenerAlways(int eventID = -1) {
 				if (hit == 1) {
 					trQuestVarSet("eatSound", 1);
 					trUnitChangeProtoUnit("Regeneration SFX");
+					xFreeDatabaseBlock(seeds);
 				} else {
 					dist = 0.5 + 0.5 * dist;
 					trSetSelectedScale(dist, dist, dist);

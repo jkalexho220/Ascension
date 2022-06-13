@@ -7402,7 +7402,7 @@ highFrequency
 								pos = xsVectorSet(x, 0, z);
 								dist = xsPow(bossCount, 2);
 								if (distanceBetweenVectors(pos, bossPos) <= dist) {
-									if ((trGetTerrainType(x, z) != 5) || (trGetTerrainSubType(x, z) != 4)) {
+									if ((trGetTerrainType(x, z) != 2) || (trGetTerrainSubType(x, z) != 13)) {
 										xAddDatabaseBlock(dTigerPaint, true);
 										xSetInt(dTigerPaint, xTigerPaintPrimary, trGetTerrainType(x, z));
 										xSetInt(dTigerPaint, xTigerPaintSecondary, trGetTerrainSubType(x, z));

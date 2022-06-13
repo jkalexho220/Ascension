@@ -805,7 +805,7 @@ minInterval 3
 				trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("proto")),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 				if (next < trGetNextUnitScenarioNameNumber()) {
 					trQuestVarSetFromRand("relicdrop", 0, 1, false);
-					if (trQuestVarGet("relicdrop") < 0.05) {
+					if (trQuestVarGet("relicdrop") < 0.02) {
 						trQuestVarSetFromRand("randrelic", 1, 20);
 					} else {
 						trQuestVarSet("randrelic", 0);
@@ -921,6 +921,7 @@ rule gladiator_worlds_build_1
 inactive
 highFrequency
 {
+	trSetLighting("default", 0);
 	xsDisableSelf();
 	vector pos = vector(0,0,0);
 	wallHeight = 9;
@@ -1385,8 +1386,8 @@ highFrequency
 	trStringQuestVarSet("enemyProto1", "Tartarian Gate Spawn");
 	trStringQuestVarSet("enemyProto2", "Avenger");
 	trStringQuestVarSet("enemyProto3", "Sphinx");
-	trStringQuestVarSet("enemyProto4", "Mummy");
-	trStringQuestVarSet("enemyProto5", "Onager");
+	trStringQuestVarSet("enemyProto4", "Troll");
+	trStringQuestVarSet("enemyProto5", "Mummy");
 
 	trShowImageDialog("ui\ui map valley of kings 256x256", "Entering bullshit desert...");
 	gadgetUnreal("ShowImageBox-CloseButton");
@@ -1747,7 +1748,7 @@ highFrequency
 	if (trTimeMS() > trQuestVarGet("fermiFilterNext")) {
 		trSoundPlayFN("firegiantdie.wav","1",-1,"","");
 		trSoundPlayFN("cinematics\32_out\doorbigshut.mp3","1",-1,"","");
-		trCameraShake(0.5, 0.5);
+		trCameraShake(1.0, 0.5);
 		vector pos = vector(0,0,0);
 		// 16 x 16 with 73 at the center
 		for(x=57; < 90) {
@@ -1759,21 +1760,10 @@ highFrequency
 				}
 			}
 		}
-		for(i=xGetDatabaseCount(dPlayerUnits); >0) {
-			xDatabaseNext(dPlayerUnits);
-			xUnitSelectByID(dPlayerUnits, xUnitID);
-			if (trUnitAlive() == false) {
-				removePlayerUnit();
-			} else {
-				pos = vectorToGrid(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true));
-				if (terrainIsType(pos, 0, 73) == false) { // blue tiles
-					trUnitDelete(false);
-				}
-			}
-		}
+		
 		xsDisableSelf();
 		xsEnableRule("fermi_filter_off");
-		trQuestVarSet("fermiFilterNext", trTimeMS() + 500);
+		trQuestVarSet("fermiFilterNext", trTimeMS() + 1000);
 	}
 }
 
@@ -1790,6 +1780,20 @@ highFrequency
 			}
 		}
 		xsDisableSelf();
+	} else {
+		vector pos = vector(0,0,0);
+		for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+			xDatabaseNext(dPlayerUnits);
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			if (trUnitAlive() == false) {
+				removePlayerUnit();
+			} else {
+				pos = vectorToGrid(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true));
+				if (terrainIsType(pos, 0, 73) == false) { // blue tiles
+					trUnitDelete(false);
+				}
+			}
+		}
 	}
 }
 
@@ -1822,22 +1826,24 @@ highFrequency
 		// lion shockwaves
 		if (xGetDatabaseCount(dLionShockwaves) > 0) {
 			action = processGenericProj(dLionShockwaves);
-			if (action == PROJ_FALLING) {
-				pos = kbGetBlockPosition(""+xGetInt(dLionShockwaves, xUnitName), true);
-				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-					xDatabaseNext(dPlayerUnits);
-					xUnitSelectByID(dPlayerUnits, xUnitID);
-					if (trUnitAlive() == false) {
-						removePlayerUnit();
-					} else if ((xGetBool(dPlayerUnits, xLaunched) == false) && (xGetInt(dPlayerUnits, xStunStatus) == 0)) {
-						if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
-							launchUnit(dPlayerUnits, pos + (xGetVector(dLionShockwaves, xProjDir) * 100.0));
+			if (trQuestVarGet("bossPhase") == 2) {
+				if (action == PROJ_FALLING) {
+					pos = kbGetBlockPosition(""+xGetInt(dLionShockwaves, xUnitName), true);
+					for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if ((xGetBool(dPlayerUnits, xLaunched) == false) && (xGetInt(dPlayerUnits, xStunStatus) == 0)) {
+							if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
+								launchUnit(dPlayerUnits, pos + (xGetVector(dLionShockwaves, xProjDir) * 100.0));
+							}
 						}
 					}
-				}
-				pos = vectorToGrid(pos);
-				if (trGetTerrainHeight(xsVectorGetX(pos),xsVectorGetZ(pos)) < worldHeight - 0.5 || terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-					xFreeDatabaseBlock(dLionShockwaves);
+					pos = vectorToGrid(pos);
+					if (trGetTerrainHeight(xsVectorGetX(pos),xsVectorGetZ(pos)) < worldHeight - 0.5 || terrainIsType(pos, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+						xFreeDatabaseBlock(dLionShockwaves);
+					}
 				}
 			}
 		}
@@ -1894,6 +1900,8 @@ highFrequency
 				if (trQuestVarGet("bossSpell") != dBigBang) {
 					paintMapTile(72, 72, 1*trQuestVarGet("bossSpell"));
 				}
+
+				xClearDatabase(dLionShockwaves);
 
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
