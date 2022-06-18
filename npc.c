@@ -85,14 +85,8 @@ const int NPC_RUNESTONE_SECOND = 436;
 
 const int NPC_RUNESTONE_FINAL = 437;
 
-const int NPC_RUNESTONE_STOP = 440;
-
 const int NPC_RUNESTONE_DWARF = 438;
 const int NPC_RUNESTONE_AKARD = 439;
-
-const int NPC_HUNT_THE_TIGER_START = 441;
-const int NPC_HUNT_THE_TIGER_NEXT = 442;
-const int NPC_HUNT_THE_TIGER_END = 443;
 
 const int NPC_EXCALIBUR_START = 444;
 const int NPC_EXCALIBUR_NEXT = 445;
@@ -256,12 +250,47 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("The time we've spent together has been great. I wish you all the best.");
+					uiMessageBox("Our journey together has been an amazing one. For your help, we offer this reward:");
 				}
 				case 3:
 				{
-					uiMessageBox("This is where our collaboration ends. Farewell, good friend.");
+					uiMessageBox("Bring this relic with you whenever you want one of us to accompany you.");
+					spawnRelicSpecific(vector(163,0,151), RELIC_TRANSPORTER_TICKET);
 					xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 7:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I can offer you my assistance anytime.");
+				}
+				case 2:
+				{
+					uiMessageBox("Bring this relic with you into the Tower and one of us will join your adventure.");
+				}
+				case 3:
+				{
+					uiMessageBox("Completely free of charge!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_RELIC_TRANSPORTER_QUEST + 8:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Well then, off you go.");
+				}
+				case 2:
+				{
+					uiMessageBox("Bring back a souvenir!");
 					dialog = 0;
 				}
 			}
@@ -393,78 +422,6 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			uiMessageBox("Looks like you didn't morb hard enough.");
 			dialog = 0;
 		}
-		case NPC_HUNT_THE_TIGER_START:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Adventurers! Can anyone lend a hand?");
-				}
-				case 2:
-				{
-					uiMessageBox("A vicious beast has been spotted roaming the Tower! It has already devoured two parties!");
-				}
-				case 3:
-				{
-					uiMessageBox("There will be more casualties if it isn't hunted down now! If anyone can assist, please lend a hand!");
-				}
-				case 4:
-				{
-					uiMessageBox("The creature is a large white tiger! You can't miss it!");
-				}
-				case 5:
-				{
-					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 1);
-					trMessageSetText("Find and kill the White Tiger.", -1);
-					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
-					dialog = 0;
-				}
-			}
-		}
-		case NPC_HUNT_THE_TIGER_NEXT:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("The White Tiger has been hunting within the Tower! It occasionally appears in the middle floors!");
-				}
-				case 2:
-				{
-					uiMessageBox("If you come across it, make sure to put an end to it!");
-				}
-				case 3:
-				{
-					uiMessageBox("Also, there might be some loot in its stomach that would be worth getting.");
-					dialog = 0;
-				}
-			}
-		}
-		case NPC_HUNT_THE_TIGER_END:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Thank goodness you've defeated the White Tiger!");
-				}
-				case 2:
-				{
-					uiMessageBox("So all you found from its stomach was a rusty old hilt?");
-				}
-				case 3:
-				{
-					uiMessageBox("Well, that sucks.");
-					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 0);
-					trUnitSelectClear();
-					trUnitSelectByQV("tigerHunter");
-					trUnitDestroy();
-					xsDisableRule("tiger_hunter_always");
-					dialog = 0;
-				}
-			}
-		}
 		case NPC_HUNT_THE_TIGER_KILL:
 		{
 			switch(dialog)
@@ -486,21 +443,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("You can equip this blessing in singleplayer.");
-				}
-				case 5:
-				{
-					uiMessageBox("Acquired: Hilt of an unknown sword");
 					dialog = 0;
-				}
-			}
-		}
-		case NPC_RUNESTONE_STOP:
-		{
-			switch(dialog)
-			{
-				case 1:
-				{
-					uiMessageBox("Whoa there buddy! I wouldn't do that if I were you!");
 				}
 			}
 		}
@@ -4095,6 +4038,10 @@ highFrequency
 				trQuestVarSet("stage", 11);
 				xsEnableRule("rebuild_map");
 				trOverlayText("Zeno's Paradox",3,-1,-1,-1);
+				for(p=1; < ENEMY_PLAYER) {
+					xSetBool(dPlayerData, xPlayerDead, 0, p);
+				}
+				trQuestVarSet("deadPlayerCount", 0);
 			}
 		}
 	}

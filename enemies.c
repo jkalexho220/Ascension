@@ -156,7 +156,7 @@ highFrequency
 	setupProtounitBounty("Catapult", 0, 5, 0.05);
 	setupProtounitBounty("Onager", 0, 5, 0.05);
 
-	setupProtounitBounty("Wall Connector", 0.5, 0, 0);
+	setupProtounitBounty("Wall Connector", 0, 0, 0);
 	
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);

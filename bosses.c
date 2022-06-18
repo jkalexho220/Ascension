@@ -1,5 +1,10 @@
 const int BOSS_SPELL_COOLDOWN = -1;
 
+
+void yeebMusicLoop(int eventID = -1) {
+	trSoundPlayFN("Zenophobia\Death track loop.mp3","1",7047,"","");
+}
+
 void bossCooldown(int minVal = 0, int maxVal = 0) {
 	trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
 	trQuestVarSetFromRand("bossCooldownTime", minVal, maxVal, true);
@@ -68,7 +73,7 @@ highFrequency
 			}
 			case 2:
 			{
-				trSoundPlayFN("","1",-1,"Yeebaagooon: Did you really think you could escape me by resigning before the bossfight?",
+				trSoundPlayFN("","1",-1,"Yeebaagooon: Did you really think you could escape me by resigning with the relic equipped?",
 					"icons\special e son of osiris icon 64");
 				trQuestVarSet("yeebNext", trTime() + 6);
 			}
@@ -125,7 +130,13 @@ highFrequency
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trLetterBox(false);
 				trQuestVarSet("yeebNext", trTime() + 3);
-				xsEnableRule("boss_music");
+				if (customContent) {
+					trEventSetHandler(7047, "yeebMusicLoop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+				} else {
+					xsEnableRule("boss_music");
+					trQuestVarSet("musicTime", trTime());
+				}
 				boss = 1;
 				trVectorQuestVarSet("yeebPos", trVectorQuestVarGet("startPosition"));
 			}
@@ -820,7 +831,7 @@ highFrequency
 			}
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitOverrideAnimation(6,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		boss = 0;
@@ -1726,7 +1737,7 @@ highFrequency
 			trSoundPlayFN("icemono.wav","1",-1,"","");
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitOverrideAnimation(6,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		boss = 0;
@@ -2128,7 +2139,7 @@ highFrequency
 			}
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitOverrideAnimation(6,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		boss = 0;
@@ -2753,7 +2764,7 @@ highFrequency
 			}
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitOverrideAnimation(6,0,false,false,-1);
 		xsDisableSelf();
 		trMusicStop();
 		boss = 0;
@@ -2949,7 +2960,13 @@ highFrequency
 				
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trLetterBox(false);
-				xsEnableRule("boss_music");
+				if (customContent) {
+					trEventSetHandler(7047, "yeebMusicLoop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+				} else {
+					xsEnableRule("boss_music");
+					trQuestVarSet("musicTime", trTime());
+				}
 				trQuestVarSet("cinTime", trTime() + 3);
 			}
 			case 4:
@@ -3907,6 +3924,7 @@ highFrequency
 		{
 			case 1:
 			{
+				trFadeOutAllSounds(1.0);
 				trSetUnitIdleProcessing(false);
 				trUIFadeToColor(0,0,0,1000,0,true);
 				trLetterBox(true);
@@ -3999,8 +4017,13 @@ highFrequency
 				trUnitChangeProtoUnit("Cinematic Block");
 				xsEnableRule("yeebaagooon_battle");
 				bossCooldown(10, 12);
-				trQuestVarSet("musicTime", 0);
-				xsEnableRule("boss_music");
+				if (customContent) {
+					trEventSetHandler(7047, "yeebMusicLoop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+				} else {
+					xsEnableRule("boss_music");
+					trQuestVarSet("musicTime", trTime());
+				}
 				trVectorQuestVarSet("yeebDir", vector(1,0,0));
 				trQuestVarSet("yeebLightningNext", trTimeMS());
 				if (boss == 1) {
@@ -4014,7 +4037,6 @@ highFrequency
 						trVectorQuestVarGetX("startPosition"),0,trVectorQuestVarGetZ("startPosition"),0,true);
 				}
 				trQuestVarSet("yeebLatestFeather", trGetNextUnitScenarioNameNumber() - 1);
-				
 			}
 			case 5:
 			{
@@ -4819,7 +4841,7 @@ highFrequency
 			debugLog("bossSpell: " + 1*trQuestVarGet("bossSpell"));
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitOverrideAnimation(6,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		xsDisableRule("boss_music");
@@ -6981,8 +7003,8 @@ highFrequency
 
 void spawnAttackFinger(vector pos = vector(0,0,0), vector dir = vector(0,0,0), float scale = 1.0) {
 	int next = trGetNextUnitScenarioNameNumber();
-	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-	trArmySelect("0,0");
+	trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("1,0");
 	trUnitChangeProtoUnit("Tartarian Gate Flame");
 	trUnitSelectClear();
 	trUnitSelect(""+next, true);
@@ -7512,7 +7534,7 @@ highFrequency
 						trQuestVarSet("bossSpell", 22);
 						trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 						bossTargetPos = vectorSnapToGrid(kbGetBlockPosition(""+action));
-						dir = vector(0,0,6);
+						dir = vector(0,0,8);
 						trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
 						for(x=0; <8) {
 							pos = bossTargetPos + dir;
@@ -7786,17 +7808,12 @@ highFrequency
 			trQuestVarSetFromRand("bossReward", 11, 20, true);
 
 			trQuestVarSet("ownedRelics"+1*trQuestVarGet("bossReward"), 1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("bossReward")));
-			/*
 			if (trQuestVarGet("boonUnlocked"+BOON_HEALTH_ATTACK) == 0) {
 				startNPCDialog(NPC_HUNT_THE_TIGER_KILL);
 			} else {
 				trSoundPlayFN("favordump.wav","1",-1,"","");
 				trShowImageDialog(relicIcon(1*trQuestVarGet("bossReward")), relicName(1*trQuestVarGet("bossReward")));
 			}
-			*/
-
-			trSoundPlayFN("favordump.wav","1",-1,"","");
-			trShowImageDialog(relicIcon(1*trQuestVarGet("bossReward")), relicName(1*trQuestVarGet("bossReward")));
 
 			trQuestVarSet("boonUnlocked"+BOON_HEALTH_ATTACK, 1);
 		}

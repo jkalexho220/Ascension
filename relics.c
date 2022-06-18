@@ -43,6 +43,8 @@ const int RELIC_POISON_FASTER = 30;
 const int NORMAL_RELICS = 30;
 /* key relics */
 
+const int RELIC_TRANSPORTER_TICKET = 34;
+
 const int RELIC_NOTTUD_TICKET = 35;
 
 const int RELIC_NICKONHAWK = 36;
@@ -83,6 +85,10 @@ string relicName(int relic = 0) {
 	} else {
 		switch(relic)
 		{
+			case RELIC_TRANSPORTER_TICKET:
+			{
+				msg = "Free Relic Transporter at the start of the next level you play";
+			}
 			case RELIC_HEALTH:
 			{
 				msg = "Health +300";
@@ -264,6 +270,10 @@ string relicIcon(int relic = 0) {
 	} else {
 		switch(relic)
 		{
+			case RELIC_TRANSPORTER_TICKET:
+			{
+				icon = "icons\villager x male icons 64";
+			}
 			case RELIC_HEALTH:
 			{
 				icon = "icons\special g sea turtle icon 64";
@@ -474,6 +484,10 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	string proto = kbGetProtoUnitName(xGetInt(dClass,xClassProto,class));
 	switch(relic)
 	{
+		case RELIC_TRANSPORTER_TICKET:
+		{
+			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, xGetInt(dPlayerData, xPlayerRelicTransporterLevel, p) + m, p);
+		}
 		case RELIC_HEALTH:
 		{
 			xSetFloat(dPlayerData,xPlayerHealth,xGetFloat(dPlayerData,xPlayerHealth) + 300.0 * m);
@@ -742,6 +756,10 @@ int relicProto(int relic = 0) {
 	} else {
 		switch(relic)
 		{
+			case RELIC_TRANSPORTER_TICKET:
+			{
+				proto = kbGetProtoUnitID("Villager Atlantean");
+			}
 			case RELIC_HEALTH:
 			{
 				proto = kbGetProtoUnitID("Sea Turtle");

@@ -716,15 +716,6 @@ highFrequency
 			}
 		}
 
-		// white tiger quest
-		/*
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
-			trQuestVarSet("tigerHunter", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Ulfsark",1, 127, 0, 157, 225, true);
-			xsEnableRule("tiger_hunter_always");
-		}
-		*/
-
 		// monsterpedia quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
 			// quest is in progress
@@ -734,13 +725,22 @@ highFrequency
 		}
 
 
-		// sword piece quest
+		// excalibur quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
+			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
+			xsEnableRule("rogers_always");
+		}
 
 		// relic carrying company quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && xGetInt(dPlayerData, xPlayerRelicTransporterLevel) < 7) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 3) {
 			trQuestVarSet("relicCarrier", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Villager Atlantean",1,165,0,153,225,true);
 			xsEnableRule("relic_carrier_always");
+			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 7) {
+				xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
+				spawnRelicSpecific(vector(163,0,151), RELIC_TRANSPORTER_TICKET);
+			}
 		}
 
 		// runestone quest
@@ -759,12 +759,7 @@ highFrequency
 			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
 		}
 
-		// excalibur quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 7 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
-			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
-			xsEnableRule("rogers_always");
-		}
+		// sword piece quest
 
 		// idk quest floor 8
 
@@ -1638,18 +1633,6 @@ highFrequency
 	}
 }
 
-rule tiger_hunter_always
-inactive
-highFrequency
-{
-	trUnitSelectClear();
-	trUnitSelectByQV("tigerHunter", true);
-	if (trUnitIsSelected()) {
-		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
-		startNPCDialog(NPC_HUNT_THE_TIGER_START + i);
-		reselectMyself();
-	}
-}
 
 rule keeper_grab_singleplayer
 inactive

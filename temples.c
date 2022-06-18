@@ -749,8 +749,6 @@ highFrequency
 			xSetInt(dFreeRelics, xRelicType, xGetInt(db, xRelicType));
 			if (xGetInt(db, xRelicType) - RELIC_MATH_PROBLEM == trQuestVarGet("questAnswer")) {
 				trQuestVarSet("correctRelic", xGetInt(db, xUnitName));
-			} else if (xGetInt(db, xRelicType) - RELIC_MATH_PROBLEM == trQuestVarGet("wrongAnswer")) {
-				trQuestVarSet("wrongRelic", xGetInt(db, xUnitName));
 			} else {
 				xAddDatabaseBlock(dZenoRelics, true);
 				xSetInt(dZenoRelics, xUnitName, xGetInt(db, xUnitName));

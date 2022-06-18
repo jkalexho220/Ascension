@@ -544,7 +544,8 @@ highFrequency
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		spawnPlayer(p, vectorSnapToGrid(pos + dir));
-		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 6 && Multiplayer && trQuestVarGet("stage") < 10) {
+		if ((xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == 8) && Multiplayer && trQuestVarGet("stage") < 10) {
+			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
 			trQuestVarSet("p"+p+"transporterPurchased", 1);
 			spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
 		}
@@ -578,6 +579,15 @@ highFrequency
 		trSetCivilizationNameOverride(p, "Level " + (1+xGetInt(dPlayerData, xPlayerLevel, p)));
 	}
 	trQuestVarSet("nextProj", trGetNextUnitScenarioNameNumber());
+
+	// delete me
+	/*
+	trEventSetHandler(997, "fancyFootageStop");
+	trSetFogAndBlackmap(false, false);
+	trQuestVarSet("fancyAngle", 0);
+	trQuestVarSet("fancyTimeLast", trTimeMS());
+	xsEnableRule("fancy_footage");
+	*/
 	
 	if (Multiplayer) {
 		trSetUnitIdleProcessing(true);
@@ -780,7 +790,8 @@ highFrequency
 							if ((Multiplayer == false) &&
 								(trQuestVarGet("p1nickQuestProgress") >= 5) &&
 								(distanceBetweenVectors(pos, trVectorQuestVarGet("nickPos")) < 9) &&
-								(xGetDatabaseCount(dSlotRelics) < 3)) {
+								(xGetDatabaseCount(dSlotRelics) < 3) &&
+								(xGetInt(db, xRelicType) <= NORMAL_RELICS)) {
 								trSoundPlayFN("storehouse.wav","1",-1,"","");
 								xUnitSelect(db, xUnitName);
 								trUnitChangeProtoUnit("Conversion SFX");
@@ -960,6 +971,9 @@ highFrequency
 						xUnitSelect(db, xUnitName);
 						trUnitConvert(0);
 						trUnitChangeProtoUnit("Relic");
+					} else {
+						xUnitSelect(db, xUnitName);
+						trUnitDestroy();
 					}
 				}
 				db = getWarehouseDB(p);
@@ -1611,7 +1625,7 @@ void deliverySuccess(int p = 0) {
 	int reward = 1 + trQuestVarGet("deliveryQuest");
 	xSetInt(dPlayerData, xPlayerRelicTransporterLevel, reward, p);
 	if (reward == 6) {
-		msg = "Delivery complete! You will now receive a free Relic Transporter on each floor!";
+		msg = "Delivery complete! Return to singleplayer for your final reward!";
 	} else if (iModulo(2, reward) == 1) { // 3 and 5, which is capacity
 		trModifyProtounit("Villager Atlantean Hero", p, 5, 1);
 		msg = "Delivery complete! Your Relic Transporters now carry +1 relic!";
@@ -1664,3 +1678,56 @@ minInterval 3
 		xsDisableSelf();
 	}
 }
+
+/*
+void fancyFootageStop(int unused = -1) {
+	trackRemove();
+	trQuestVarSet("fancyFootageStep", 0);
+	trQuestVarSet("fancyFootageCount", 1 + trQuestVarGet("fancyFootageCount"));
+	if (trQuestVarGet("fancyFootageCount") >= 20) {
+		xsDisableRule("fancy_footage");
+		trLetterBox(false);
+	}
+}
+
+rule fancy_footage
+inactive
+highFrequency
+{
+	trLetterBox(true);
+	
+	if (trQuestVarGet("fancyFootageStep") == 0) {
+		trQuestVarSetFromRand("modx", 20, 140, false);
+		trQuestVarSetFromRand("modz", 20, 140, false);
+		trCameraCut(xsVectorSet(trQuestVarGet("modx"),70.710701,trQuestVarGet("modz")), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+		trackInsert();
+		trackAddWaypoint();
+		trQuestVarSetFromRand("rand", 10, 30, false);
+		trQuestVarSet("modx", trQuestVarGet("modx") + trQuestVarGet("rand"));
+		trQuestVarSetFromRand("rand", 10, 40 - trQuestVarGet("rand"), false);
+		trQuestVarSet("modz", trQuestVarGet("modz") + trQuestVarGet("rand"));
+		trCameraCut(xsVectorSet(trQuestVarGet("modx"),70.710701,trQuestVarGet("modz")), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+		trackAddWaypoint();
+		trackPlay(3000,997);
+		trQuestVarSet("fancyFootageStep", 1);
+	}
+	
+	float diff = trTimeMS() - trQuestVarGet("fancyTimeLast");
+	trQuestVarSet("fancyTimeLast", trTimeMS());
+	float angle = trQuestVarGet("fancyAngle") + 0.0003 * diff;
+	trQuestVarSet("fancyAngle", angle);
+	float mCos = xsCos(angle);
+	float mSin = xsSin(angle);
+	int x = trQuestVarGet("village");
+	int z = x / 4;
+	x = trQuestVarGet("village") - 4 * z;
+	vector pos = xsVectorSet(70*x + 40, 0, 70*z + 40);
+	vector dir = xsVectorSet(mCos, 0, mSin);
+	trCameraCut(xsVectorSetY(pos - dir * 70, 70.710701), xsVectorSet(0.707107 * mCos,-0.707107, 0.707107 * mSin), xsVectorSet(0.707107 * mCos,0.707107, 0.707107 * mSin), rotationMatrix(dir, 0, -1.0));
+	if (trQuestVarGet("fancyAngle") > 6) {
+		trLetterBox(false);
+		xsDisableSelf();
+	}
+}
+
+*/

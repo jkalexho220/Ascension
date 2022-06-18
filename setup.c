@@ -378,6 +378,8 @@ runImmediately
 	Multiplayer = aiIsMultiplayer();
 	trSetUnitIdleProcessing(false);
 
+	gadgetUnreal("ScoreDisplay");
+
 	// If this plays, you got the goods
 	trEventSetHandler(998, "customContentEnabled");
 	trSoundPlayFN("Zenophobia\Test sound.mp3", "1", 998, "", "");
@@ -539,7 +541,7 @@ highFrequency
 	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
 	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
 	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
-	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, STARSTONE, 3);
+	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
 	setupClass("Circe", SPARKWITCH, 1400, 2800, MANASTONE);
 	setupClass("Hero Norse", FROSTHAMMER, 500, 1200, MANASTONE, 5);
