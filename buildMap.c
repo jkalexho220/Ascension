@@ -141,6 +141,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 						x1 = x * 35 + 24;
 						z0 = z * 35 + 16;
 						z1 = z * 35 + 24;
+						trVectorQuestVarSet("room"+room+"top1", xsVectorSet(x1,0,z1));
+						trVectorQuestVarSet("room"+room+"bottom1", xsVectorSet(x0,0,z0));
 						paintCircle(x, z, 9, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 						pos = xsVectorSet(x * 70 + 41, 5, z * 70 + 41);
 						next = trGetNextUnitScenarioNameNumber();

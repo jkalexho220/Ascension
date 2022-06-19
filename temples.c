@@ -885,12 +885,12 @@ void setupTempleQuestion(string question = "", string first = "", string second 
 	trStringQuestVarSet("question", question);
 	trStringQuestVarSet("questionfirst", first);
 	trStringQuestVarSet("questionsecond", second);
-	trQuestVarSet("questionanswer", answer);
+	trQuestVarSet("currentAnswer", answer);
 }
 
 void quizTempleQuestion(int eventID = -1) {
 	int answer = eventID - 6000;
-	if (answer != trQuestVarGet("questionanswer")) {
+	if (answer != trQuestVarGet("currentAnswer")) {
 		uiMessageBox("Incorrect! Come back when you have studied up more.");
 		trQuestVarSet("templefailed", 1);
 		trSoundPlayFN("cantdothat.wav","1",-1,"","");
@@ -939,6 +939,7 @@ void quizTempleQuestion(int eventID = -1) {
 				}
 			} 
 		} else {
+			trQuestVarSet("boonUnlocked"+1*trQuestVarGet("stageTemple"), 1);
 			startNPCDialog(NPC_TEMPLE_COMPLETE + trQuestVarGet("stage"));
 		}
 	}

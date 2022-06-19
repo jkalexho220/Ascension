@@ -226,7 +226,7 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 	if (xSetPointer(dPlayerUnits, index)) {
 		amt = amt * xGetFloat(dPlayerData,xPlayerHealBoost,p);
 		if (trQuestVarGet("stage") == 9) {
-			amt = 0.2 * amt;
+			amt = 0.25 * amt;
 		}
 		if (xGetInt(dPlayerUnits, xPoisonStatus) == 0) {
 			trDamageUnit(0.0 - amt);
@@ -816,8 +816,10 @@ void stunsAndPoisons(int db = 0) {
 	}
 	if (xGetInt(db, xStunStatus) >= 1) {
 		if (trTimeMS() > xGetInt(db, xStunTimeout)) {
-			xUnitSelectByID(db,xUnitID);
-			trUnitOverrideAnimation(-1,0,false,true,-1);
+			if ((xGetInt(db, xUnitName) != bossUnit) || (bossAnim == false)) {
+				xUnitSelectByID(db,xUnitID);
+				trUnitOverrideAnimation(-1,0,false,true,-1);
+			}
 			xUnitSelect(db, xStunSFX);
 			trMutateSelected(kbGetProtoUnitID("Rocket"));
 			xFreeDatabaseBlock(dStunnedUnits, xGetInt(db, xStunStatus));
@@ -1143,7 +1145,6 @@ int dManticores = 0;
 int dFireGiants = 0;
 int dArgus = 0;
 int dFireLance = 0;
-int dOnagers = 0;
 
 int dFireLancePellets = 0;
 int xFireLancePelletPrev = 0;
@@ -1414,12 +1415,6 @@ void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
 	int index = 0;
 	switch(proto)
 	{
-		case kbGetProtoUnitID("Onager"):
-		{
-			xAddDatabaseBlock(dOnagers, true);
-			xSetInt(dOnagers, xUnitName, name);
-			xSetInt(dOnagers, xPlayerOwner, p);
-		}
 		case kbGetProtoUnitID("Sphinx"):
 		{
 			addSpecialToDatabase(dSphinxes,name,db,p);

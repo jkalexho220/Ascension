@@ -1301,7 +1301,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Healing is reduced to 20 percent effectiveness on this floor.");
+					uiMessageBox("Healing is reduced to 25 percent effectiveness on this floor.");
 				}
 				case 3:
 				{
@@ -2902,7 +2902,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 					dialog = 0;
 					xsEnableRule("status_effect_temple_always");
 					trQuestVarSet("currentQuestion", 0);
-					trQuestVarSet("currentAnswer", 1);
+					trQuestVarSet("currentAnswer", 2);
 					trStringQuestVarSet("question", "You cannot cast spells when stunned.");
 					trStringQuestVarSet("questionfirst", "True");
 					trStringQuestVarSet("questionsecond", "False");

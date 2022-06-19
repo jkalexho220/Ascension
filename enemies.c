@@ -1801,7 +1801,7 @@ void specialUnitsAlways() {
 		}
 	}
 
-	for(i=xsMin(10, xGetDatabaseCount(dFireGiantBalls)); >0) {
+	for(i=xsMin(20, xGetDatabaseCount(dFireGiantBalls)); >0) {
 		processGenericProj(dFireGiantBalls);
 		p = xGetInt(dFireGiantBalls, xPlayerOwner);
 		pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);
@@ -2167,6 +2167,7 @@ void specialUnitsAlways() {
 							if (rayCollision(db, start, dir, dist, 2.0)) {
 								target = xGetInt(db, xUnitName);
 								launchUnit(db, xGetVector(dTrollHarpoons, xTrollHarpoonStart));
+								xSetBool(dLaunchedUnits, xLaunchedStun, true);
 								trQuestVarSetFromRand("sound", 1, 2, true);
 								trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 								break;

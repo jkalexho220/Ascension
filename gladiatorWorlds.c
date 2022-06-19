@@ -8,10 +8,6 @@ int dBigBang = 0;
 int dMouthOfChaos = 0;
 int bullshitProj = 0;
 
-int dOnagerShots = 0;
-int xOnagerShotProto = 0;
-int xOnagerShotPos = 0;
-
 int dRevealerShots = 0;
 int xRevealerShotPos = 0;
 
@@ -36,20 +32,10 @@ highFrequency
 		xInitAddInt(dRevealerShots, "player");
 		xRevealerShotPos = xInitAddVector(dRevealerShots, "pos");
 
-		dOnagerShots = xInitDatabase("onagerShots");
-		xInitAddInt(dOnagerShots, "name");
-		xInitAddInt(dOnagerShots, "player");
-		xOnagerShotPos = xInitAddVector(dOnagerShots, "pos");
-		xOnagerShotProto = xInitAddInt(dOnagerShots, "proto");
-
 		dRevealerBoom = xInitDatabase("revealerBooms");
 		xInitAddInt(dRevealerBoom, "name");
 		xInitAddInt(dRevealerBoom, "player");
 		xRevealerBoomTimeout = xInitAddInt(dRevealerBoom, "timeout");
-
-		dOnagers = xInitDatabase("onagers");
-		xInitAddInt(dOnagers, "name");
-		xInitAddInt(dOnagers, "player");
 
 		dEdgeFrontier = xInitDatabase("edgeFrontier");
 		xEdgeFrontierHeight = xInitAddInt(dEdgeFrontier, "height");
@@ -588,38 +574,6 @@ highFrequency
 
 	processRevealerBoom();
 
-	if (xGetDatabaseCount(dOnagerShots) > 0) {
-		xDatabaseNext(dOnagerShots);
-		explode = false;
-		id = kbGetBlockID(""+xGetInt(dOnagerShots, xUnitName), true);
-		if (id == -1) {
-			pos = xGetVector(dOnagerShots, xOnagerShotPos);
-			explode = true;
-		} else {
-			pos = kbGetBlockPosition(""+xGetInt(dOnagerShots, xUnitName), true);
-			xSetVector(dOnagerShots, xOnagerShotPos, pos);
-			if (xsVectorGetY(pos) < worldHeight + 0.5) {
-				explode = true;
-			}
-		}
-		if (explode) {
-			xUnitSelect(dOnagerShots, xUnitName);
-			trUnitChangeProtoUnit("Dust Large");
-			trSoundPlayFN("backtowork.wav","1",-1,"","");
-			p = xGetInt(dOnagerShots, xPlayerOwner);
-			if (p == ENEMY_PLAYER) {
-				next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trArmySelect(""+ENEMY_PLAYER+",0");
-				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dOnagerShots, xOnagerShotProto)));
-				activateEnemy(next);
-			} else {
-				spawnPlayerUnit(p, xGetInt(dOnagerShots, xOnagerShotProto), pos, 5.0);
-			}
-			xFreeDatabaseBlock(dOnagerShots);
-		}
-	}
-
 	if (xGetDatabaseCount(dFireLancePellets) > 0) {
 		for(i=xsMin(8, xGetDatabaseCount(dFireLancePellets)); >0) {
 			xDatabaseNext(dFireLancePellets);
@@ -739,41 +693,6 @@ highFrequency
 				xAddDatabaseBlock(dRevealerShots, true);
 				xSetInt(dRevealerShots, xUnitName, bullshitProj);
 				xSetInt(dRevealerShots, xPlayerOwner, p);
-			}
-			case kbGetProtoUnitID("Petrobolos Shot"):
-			{
-				/* onager launches units at you */
-				trQuestVarSetFromRand("proto", 10 * trQuestVarGet("gladiatorRound") - 10, 10 * trQuestVarGet("gladiatorRound"), true);
-				target = monsterPetProto(1*trQuestVarGet("proto"));
-				trUnitSelectClear();
-				trUnitSelectByID(id);
-				trMutateSelected(target);
-				trUnitOverrideAnimation(24, 0, true, false, -1);
-				xAddDatabaseBlock(dOnagerShots, true);
-				xSetInt(dOnagerShots, xUnitName, bullshitProj);
-				xSetInt(dOnagerShots, xPlayerOwner, p);
-				xSetInt(dOnagerShots, xOnagerShotProto, target);
-				dist = 100;
-				pos = kbGetBlockPosition(""+bullshitProj, true);
-				target = -1;
-				for(i=xGetDatabaseCount(dOnagers); >0) {
-					xDatabaseNext(dOnagers);
-					xUnitSelect(dOnagers, xUnitName);
-					if (trUnitAlive() == false) {
-						xFreeDatabaseBlock(dOnagers);
-					} else if (xGetInt(dOnagers, xPlayerOwner) == p) {
-						current = unitDistanceToVector(xGetInt(dOnagers, xUnitName), pos);
-						if (current < dist) {
-							dist = current;
-							target = xGetPointer(dOnagers);
-						}
-					}
-				}
-				if (target > 0) {
-					xSetPointer(dOnagers, target);
-					xUnitSelect(dOnagers, xUnitName);
-					trDamageUnitPercent(20);
-				}
 			}
 			case kbGetProtoUnitID("Fire Lance Projectile"):
 			{

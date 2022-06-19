@@ -224,13 +224,13 @@ highFrequency
 				if (xGetBool(dCarouselRooms, xCarouselRoomHitbox)) {
 					dir = rotationMatrix(dir, 0, 1.0);
 				}
-				pos = xGetVector(dCarouselRooms, xCarouselRoomPos) - dir * 12.0;
+				pos = xGetVector(dCarouselRooms, xCarouselRoomPos) - dir * 16.0;
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);
 					xUnitSelectByID(dPlayerUnits, xUnitID);
 					if (trUnitAlive() == false) {
 						removePlayerUnit();
-					} else if (rayCollision(dPlayerUnits, pos, dir, 24.0, 6.0)) {
+					} else if (rayCollision(dPlayerUnits, pos, dir, 32.0, 6.0)) {
 						damagePlayerUnit(200.0);
 					}
 				}
@@ -239,7 +239,7 @@ highFrequency
 					xUnitSelectByID(dEnemies, xUnitID);
 					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (rayCollision(dEnemies, pos, dir, 24.0, 6.0)) {
+					} else if (rayCollision(dEnemies, pos, dir, 32.0, 6.0)) {
 						trDamageUnit(200.0);
 					}
 				}

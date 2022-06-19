@@ -516,6 +516,20 @@ runImmediately
 	
 	xsEnableRule("data_load_00");
 	xsDisableSelf();
+
+	if (trCurrentPlayer() == 1) {
+		xsEnableRule("debug_is_on");
+	}
+}
+
+rule debug_is_on
+inactive
+minInterval 5
+{
+	if (trChatHistoryContains("debug on", 1)) {
+		debugIsOn = true;
+		xsDisableSelf();
+	}
 }
 
 rule setup_classes
