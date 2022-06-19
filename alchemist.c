@@ -57,6 +57,9 @@ void alchemistAlways(int eventID = -1) {
 					if (trQuestVarGet("p"+p+"potion") == POTION_HEAL) {
 						amt = potionHeal * xGetFloat(dPlayerData, xPlayerSpellDamage) * xGetFloat(dPlayerData, xPlayerHealBoost);
 						amt = amt * (1.0 + 0.2 * xGetInt(dPlayerData, xPlayerProjectiles));
+						if (trQuestVarGet("stage") == 9) {
+							amt = 0.2 * amt;
+						}
 						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 							xDatabaseNext(dPlayerUnits);
 							xUnitSelectByID(dPlayerUnits, xUnitID);

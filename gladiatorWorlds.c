@@ -1486,6 +1486,9 @@ int dLaplaceLaser = 0;
 int xLaplaceLaserDir = 0;
 int xLaplaceLaserPos = 0;
 
+vector keplerPos = vector(0,0,0);
+vector keplerDir = vector(0,0,0);
+
 
 int dValkyrieProj = 0;
 
@@ -1560,6 +1563,31 @@ highFrequency
 	vector dir = vector(0,0,0);
 	vector data = vector(0,0,0);
 	worldHeight = 6;
+	wallHeight = -3;
+
+	trChangeTerrainHeight(140, 140, 150, 150, -3, false);
+	trQuestVarSet("keplerStart", trGetNextUnitScenarioNameNumber());
+	for(i=10; >0) {
+		next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
+		trArmySelect("1,0");
+		trUnitChangeProtoUnit("Spy Eye");
+		trUnitSelectClear();
+		trUnitSelect(""+next, true);
+		trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+	}
+	trQuestVarSet("keplerEnd", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
+	trArmySelect("1,0");
+	trUnitChangeProtoUnit("Spy Eye");
+	trUnitSelectClear();
+	trUnitSelectByQV("keplerEnd");
+	trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+	trSetSelectedScale(0,1,0);
+	trSetUnitOrientation(vector(1,0,0),vector(0,-1,0),true);
+	bossCount = trQuestVarGet("keplerStart");
+	bossNext = trTimeMS();
+	xsEnableRule("kepler_offset");
 
 	dMapTiles = aiPlanCreate("mapTiles", 8);
 	for(i=0; < 145) {
@@ -1716,7 +1744,11 @@ highFrequency
 		for(z=0; <= 60) {
 			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist > 144) {
-				dist = -8.0 * xsSin(1.0 * (xsSqrt(dist) - 12.0));
+				if (dist <= 30.0) {
+					dist = -8.0 * xsSin(0.349 * (xsSqrt(dist) - 12.0));
+				} else {
+					dist = 6.0;
+				}
 				data = xsVectorSet(0, 37, dist + 6.0); // sand d
 			} else {
 				data = xsVectorSet(0, 53, 6); // olympus tile
@@ -1813,6 +1845,25 @@ highFrequency
 					trUnitDelete(false);
 				}
 			}
+		}
+	}
+}
+
+rule kepler_offset
+inactive
+highFrequency
+{
+	if (trTimeMS() >= bossNext) {
+		bossNext = bossNext + 30;
+		trUnitSelectClear();
+		trUnitSelect(""+bossCount, true);
+		trMutateSelected(kbGetProtoUnitID("Dock"));
+		trSetSelectedScale(0,1,0);
+		trSetSelectedUpVector(0,-2,0);
+		trUnitSetAnimationPath("1,0,0,0,0,0,0");
+		bossCount = bossCount + 1;
+		if (bossCount == trQuestVarGet("keplerEnd")) {
+			xsDisableSelf();
 		}
 	}
 }
@@ -1945,7 +1996,7 @@ highFrequency
 						trOverlayText("Laplace's Demon", 3.0, -1, -1, -1);
 						trSetLighting("dawn", 2.0);
 						worldHeight = 6;
-						wallHeight = -3;
+						wallHeight = 6;
 					}
 					case dKepler:
 					{
@@ -2046,7 +2097,7 @@ highFrequency
 									dir = rotationMatrix(dir, 0.980785, 0.19509);
 								}
 								trQuestVarSet("bossStep", 1);
-								bossNext = trTimeMS() + 15000;
+								bossNext = trTimeMS() + 9000;
 								bossTimeout = bossNext + 2000;
 								physicsSpeed = 1;
 								lastTime = trTimeMS();
@@ -2149,7 +2200,7 @@ highFrequency
 									trSetSelectedUpVector(0, -10, 0);
 									if (bossCount <= 0) {
 										trQuestVarSet("bossStep", 4);
-										bossTimeout = 1000;
+										bossTimeout = 1000 + trTimeMS();
 									}
 								}
 							}
@@ -2169,13 +2220,6 @@ highFrequency
 										xUnitSelectByID(dLaplaceLaser, xUnitID);
 										trSetSelectedScale(0, 0, 0);
 									}
-									trQuestVarSet("bossStep", 5);
-									trQuestVarSet("bossCooldownTime", trTimeMS() + 2000);
-								}
-							}
-							case 5:
-							{
-								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 									trQuestVarSet("bossPhase", 0);
 								}
 							}
@@ -2187,56 +2231,79 @@ highFrequency
 						{
 							case 0:
 							{
-								lastTime = trTimeMS();
-								dir = vector(1,0,0);
-								amt = 2.0;
-								pos = vector(145,0,145);
-								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
-									xDatabaseNext(dPhysicsBalls);
-									xSetVector(dPhysicsBalls, xPhysicsBallPos, pos + (dir * 24.0));
-									xSetVector(dPhysicsBalls, xPhysicsBallPrev, pos + (dir * 24.0));
-									xSetVector(dPhysicsBalls, xPhysicsBallDir, rotationMatrix(dir, 0.0, 1.0) * amt);
-									dir = rotationMatrix(dir, -0.19509, 0.980785);
-									amt = amt + 0.4;
+								bossCount = trQuestVarGet("keplerStart");
+								bossNext = trTimeMS();
+								xsEnableRule("kepler_offset");
+								for(i=trQuestVarGet("keplerStart"); < trQuestVarGet("keplerEnd")) {
+									trUnitSelectClear();
+									trUnitSelect(""+i, true);
+									trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 								}
-								physicsSpeed = 1;
 								trQuestVarSet("bossStep", 1);
-								trSoundPlayFN("vortexstart.wav","1",-1,"","");
-								trQuestVarSet("bossCooldownTime", trTimeMS() + 15000);
 							}
 							case 1:
+							{
+								if (bossCount == trQuestVarGet("keplerEnd")) {
+									lastTime = trTimeMS();
+									keplerPos = kbGetBlockPosition(""+bossUnit, true);
+									keplerDir = getUnitVector(keplerPos, vector(145,0,145), 15.0);
+									
+									trQuestVarSet("bossStep", 2);
+									trSoundPlayFN("vortexstart.wav","1",-1,"","");
+									trQuestVarSet("bossCooldownTime", trTimeMS() + 15000);
+								}
+							}
+							case 2:
 							{
 								if (trTime() > trQuestVarGet("soundTime")) {
 									trSoundPlayFN("vortexexist2.wav","1",-1,"","");
 									trQuestVarSet("soundTime", trTime() + 6);
 								}
-								trQuestVarSet("sound", 0);
-								pos = vector(145,0,145);
-								bossCount = 5;
+								pos = kbGetBlockPosition(""+bossUnit, true);
 								timediff = trTimeMS() - lastTime;
+								dist = 0.001 * timediff;
 								lastTime = trTimeMS();
-								xSetPointer(dPhysicsBalls, physicsBallPointer);
-								for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
-									processPhysicsBall(timediff, physicsSpeed, bossCount > 0);
-									dir = getUnitVector(xGetVector(dPhysicsBalls, xPhysicsBallPos), pos, 0.01 * timediff);
-									xSetVector(dPhysicsBalls, xPhysicsBallDir, xGetVector(dPhysicsBalls, xPhysicsBallDir) + dir);
 
-									bossCount = bossCount - 1;
-									if (bossCount == -1) {
-										physicsBallPointer = xGetPointer(dPhysicsBalls);
+								prev = keplerPos;
+								keplerPos = keplerPos + (keplerDir * dist);
+								keplerDir = keplerDir + getUnitVector(keplerPos, pos, dist * 10.0);
+
+								dir = (keplerPos - vector(145.0, 0.0, 145.0)) * 0.125;
+
+								for(i=trQuestVarGet("keplerStart"); < trQuestVarGet("keplerEnd")) {
+									trUnitSelectClear();
+									trUnitSelect(""+i, true);
+									trSetSelectedUpVector(xsVectorGetX(dir),-0.9,xsVectorGetZ(dir));
+								}
+
+								trUnitSelectClear();
+								trUnitSelectByQV("keplerEnd");
+								trSetSelectedScale(0,distanceBetweenVectors(keplerPos, vector(145,0,145), false) * 0.125, 0);
+								trSetUnitOrientation(vector(0,1,0),getUnitVector(vector(145,0,145), keplerPos),true);
+
+								amt = distanceBetweenVectors(keplerPos, prev, false) + 4.0;
+								dir = getUnitVector(prev, keplerPos);
+
+								for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+									xDatabaseNext(dPlayerUnits);
+									xUnitSelectByID(dPlayerUnits, xUnitID);
+									if (trUnitAlive() == false) {
+										removePlayerUnit();
+									} else if (rayCollision(dPlayerUnits, prev, dir, amt, 16.0)) {
+										damagePlayerUnit(dist * 3000);
 									}
 								}
-								if (trQuestVarGet("sound") > 0) {
-									trQuestVarSetFromRand("sound", 1, 3, true);
-									trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-								}
+								
 								if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 									trQuestVarSet("bossPhase", 0);
-									for(i=xGetDatabaseCount(dPhysicsBalls); >0) {
-										xDatabaseNext(dPhysicsBalls);
-										xUnitSelectByID(dPhysicsBalls, xUnitID);
+									for(i=trQuestVarGet("keplerStart"); < trQuestVarGet("keplerEnd")) {
+										trUnitSelectClear();
+										trUnitSelect(""+i, true);
 										trSetSelectedUpVector(0, -10, 0);
 									}
+									trUnitSelectClear();
+									trUnitSelectByQV("keplerEnd");
+									trSetUnitOrientation(vector(1,0,0),vector(0,-1,0),true);
 								}
 							}
 						}
@@ -2559,6 +2626,8 @@ highFrequency
 		xsDisableRule("gameplay_always");
 
 		xsEnableRule("nottud_ded");
+
+		xRestoreCache(dPhysicsBalls);
 
 		boss = 0;
 		trSetLighting("hades", 1.0);

@@ -1301,7 +1301,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("All allies take 10 damage per second on this floor.");
+					uiMessageBox("Healing is reduced to 20 percent effectiveness on this floor.");
 				}
 				case 3:
 				{
@@ -2896,6 +2896,9 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 2:
 				{
 					uiMessageBox("It is time for your ultimate test. Ready? Let's begin.");
+				}
+				case 3:
+				{
 					dialog = 0;
 					xsEnableRule("status_effect_temple_always");
 					trQuestVarSet("currentQuestion", 0);

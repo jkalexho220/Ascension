@@ -1394,7 +1394,7 @@ void specialUnitsAlways() {
 			db = databaseName(xGetInt(dHydras,xPlayerOwner));
 			if (xGetInt(db,xPoisonStatus,xGetInt(dHydras,xSpecialIndex)) == 0) {
 				xUnitSelectByID(dHydras,xUnitID);
-				trDamageUnitPercent(0 - amt);
+				trDamageUnitPercent(0.0 - amt);
 			}
 		}
 	}
@@ -1801,7 +1801,7 @@ void specialUnitsAlways() {
 		}
 	}
 
-	for(i=xsMin(8, xGetDatabaseCount(dFireGiantBalls)); >0) {
+	for(i=xsMin(10, xGetDatabaseCount(dFireGiantBalls)); >0) {
 		processGenericProj(dFireGiantBalls);
 		p = xGetInt(dFireGiantBalls, xPlayerOwner);
 		pos = kbGetBlockPosition(""+xGetInt(dFireGiantBalls, xUnitName), true);

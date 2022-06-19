@@ -682,7 +682,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Special Attack (10 attacks): Stun your target and heal all allies for 5 percent of your health.";
+					msg = "Special Attack (10 attacks): Stun your target and heal all allies for 10 percent of your health.";
 				}
 				case 3:
 				{

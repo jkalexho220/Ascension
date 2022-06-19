@@ -225,6 +225,9 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 	}
 	if (xSetPointer(dPlayerUnits, index)) {
 		amt = amt * xGetFloat(dPlayerData,xPlayerHealBoost,p);
+		if (trQuestVarGet("stage") == 9) {
+			amt = 0.2 * amt;
+		}
 		if (xGetInt(dPlayerUnits, xPoisonStatus) == 0) {
 			trDamageUnit(0.0 - amt);
 		}

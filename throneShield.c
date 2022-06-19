@@ -397,7 +397,7 @@ void throneShieldAlways(int eventID = -1) {
 					} else if (hit == ON_HIT_SPECIAL) {
 						gainFavor(p, 3);
 						stunUnit(dEnemies, 3.0, p);
-						amt = 0.05 * xGetFloat(dPlayerData, xPlayerHealth);
+						amt = 0.1 * xGetFloat(dPlayerData, xPlayerHealth);
 						for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 							xDatabaseNext(dPlayerCharacters);
 							xUnitSelectByID(dPlayerCharacters, xUnitID);

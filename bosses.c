@@ -425,13 +425,13 @@ highFrequency
 			id = xGetInt(dPlayerUnits, xUnitID);
 			trUnitSelectClear();
 			trUnitSelectByID(id);
-			if (trUnitAlive() == false) {
-				removePlayerUnit();
-			} else if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Villager Atlantean Hero")) {
+			if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Villager Atlantean Hero")) {
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
-				removePlayerUnit();
+			} else {
+				trUnitDestroy();
 			}
 		}
+		xClearDatabase(dPlayerUnits);
 		
 		for(x=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
@@ -5541,6 +5541,7 @@ highFrequency
 						trChatSendSpoofed(ENEMY_PLAYER, "Lord of the Heavens: Roast human for dinner!");
 					}
 				}
+				trStringQuestVarSet("advice", "His aimed laser breath attack will also damage enemies! Use it to your advantage!");
 				trSoundPlayFN("nidhogggrunt1.wav","1",-1,"","");
 				trMutateSelected(kbGetProtoUnitID("Nidhogg"));
 				trUnitSetStance("Passive");
@@ -6080,25 +6081,32 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			if (trQuestVarGet("bossSpell") == 31) {
 				trQuestVarSet("bossUsedUltimate", 1);
+				trSetLighting("night", 1.0);
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
-				trSetLighting("night", 1.0);
-				trOverlayText("Doomsday",3.0,-1,-1,-1);
+			}
+		} else if (trQuestVarGet("bossSpell") > 20) {
+			if (trQuestVarGet("bossSpell") == 21) {
 				trUnitOverrideAnimation(25,0,false,false,-1);
+				trCameraShake(1.0, 0.5);
 				bossAnim = true;
+				bossNext = trTimeMS() - 1000;
 				bossTimeout = trTimeMS() + 4000;
-				trQuestVarSet("bossSpell", 32);
-			} else if (trQuestVarGet("bossSpell") == 32) {
+				trQuestVarSet("bossSpell", 22);
+			} else if (trQuestVarGet("bossSpell") >= 22) {
 				if (trTimeMS() > bossTimeout) {
-					trUnitOverrideAnimation(-1,0,false,true,-1);
-					bossAnim = false;
-					bossNext = trTimeMS();
-					bossTimeout = trTimeMS() + 8000 + 4000 * trQuestVarGet("secondPhase");
-					trQuestVarSet("bossSpell", 33);
+					if (trQuestVarGet("bossSpell") == 22) {
+						trUnitOverrideAnimation(-1,0,false,true,-1);
+						bossAnim = false;
+						bossNext = trTimeMS();
+						bossTimeout = trTimeMS() + 2000 + 3000 * trQuestVarGet("secondPhase");
+						trQuestVarSet("bossSpell", 23);
+					} else {
+						bossCooldown(8, 12);
+					}
 				}
-			} else if (trQuestVarGet("bossSpell") == 33) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 800;
+					bossNext = bossNext + 500;
 					trQuestVarSetFromRand("modx", 4.0 - 2 * trQuestVarGet("bossRoomSize"), 2 * trQuestVarGet("bossRoomSize") - 4.0, true);
 					dist = xsSqrt(xsPow(2.0 * trQuestVarGet("bossRoomSize") - 8.0, 2) - xsPow(trQuestVarGet("modx"), 2));
 					trQuestVarSetFromRand("modz", 0.0 - dist, dist, true);
@@ -6112,54 +6120,6 @@ highFrequency
 					trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
 					trSetSelectedScale(0,10.0,0);
 					trDamageUnitPercent(100);
-				}
-				if (trTimeMS() > bossTimeout) {
-					bossCooldown(8, 12);
-					trQuestVarSet("bossUltimate", 3);
-				}
-			}
-		} else if (trQuestVarGet("bossSpell") > 20) {
-			if (trQuestVarGet("bossSpell") == 21) {
-				trQuestVarSetFromRand("rand", 1, 5, true);
-				if (trQuestVarGet("rand") == 1) {
-					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Hellpath!");
-				} else if (trQuestVarGet("rand") == 2) {
-					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: Who wants a piece of this?");
-				} else if (trQuestVarGet("rand") == 3) {
-					trChatSendSpoofed(ENEMY_PLAYER, "Hellkeeper: These hands are rated E for everyone!");
-				}
-				trSoundPlayFN("wild.wav","1",-1,"","");
-				trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
-				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 1, 3.0);
-				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 27, 200.0);
-				trUnitSelectClear();
-				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
-				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
-				trUnitOverrideAnimation(6,0,false,false,-1);
-				trSetSelectedScale(0,0,0);
-
-				bossPos = kbGetBlockPosition(""+bossUnit);
-				trQuestVarSet("bossSpell", 22);
-				bossTimeout = trTimeMS() + 12000;
-			} else if (trQuestVarGet("bossSpell") == 22) {
-				pos = kbGetBlockPosition(""+bossUnit);
-				dist = distanceBetweenVectors(bossPos, pos);
-				if (dist > 0) {
-					dist = xsSqrt(dist);
-					dir = getUnitVector(bossPos, pos, 2.0);
-					for (i = 1 + dist / 2; > 0) {
-						paintLava(bossPos);
-						bossPos = bossPos + dir;
-					}
-					bossPos = pos;
-				}
-				if (trTimeMS() > bossTimeout) {
-					bossCooldown(8, 12);
-					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 1, -3.0);
-					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 27, -200.0);
-					trUnitSelectClear();
-					trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,1));
-					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
@@ -6178,24 +6138,24 @@ highFrequency
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 55, 2);
 				trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
 				trUnitOverrideAnimation(26, 0, false, false, -1);
+				trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
+				for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
+					xDatabaseNext(dPlayerCharacters);
+					xUnitSelectByID(dPlayerCharacters, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerCharacter();
+					} else {
+						pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true));
+						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						trArmySelect("1,0");
+						trMutateSelected(kbGetProtoUnitID("Gaia Forest effect"));
+					}
+				}
+				trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
 			} else if (trQuestVarGet("bossSpell") == 12) {
 				if (trTimeMS() > bossNext) {
 					bossNext = bossNext + 1100;
-					trQuestVarSet("bossWarnStart", trGetNextUnitScenarioNameNumber());
-					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
-						xDatabaseNext(dPlayerCharacters);
-						xUnitSelectByID(dPlayerCharacters, xUnitID);
-						if (trUnitAlive() == false) {
-							removePlayerCharacter();
-						} else {
-							pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true));
-							trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-							trArmySelect("1,0");
-							trMutateSelected(kbGetProtoUnitID("Ball of Fire"));
-						}
-					}
 					trQuestVarSet("bossSpell", 13);
-					trQuestVarSet("bossWarnEnd", trGetNextUnitScenarioNameNumber());
 					trCameraShake(0.7, 0.3);
 					trSoundPlayFN("implode reverse.wav","1",-1,"","");
 				}
@@ -6218,7 +6178,7 @@ highFrequency
 								xUnitSelectByID(dPlayerUnits, xUnitID);
 								if (trUnitAlive() == false) {
 									removePlayerUnit();
-								} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 9.0) {
+								} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 25.0) {
 									damagePlayerUnit(1000.0);
 								}
 							}

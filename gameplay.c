@@ -1354,8 +1354,17 @@ highFrequency
 			{
 				case kbGetProtoUnitID("Tartarian Gate"):
 				{
-					xAddDatabaseBlock(dPitGates, true);
-					xSetInt(dPitGates, xUnitName, i);
+					if (boss == 0) {
+						trUnitSelectClear();
+						trUnitSelectByID(id);
+						trDamageUnitPercent(-100);
+						trUnitChangeProtoUnit("Tartarian Gate");
+						trUnitSelectClear();
+						trUnitSelectByID(id);
+						trDamageUnitPercent(-100);
+						xAddDatabaseBlock(dPitGates, true);
+						xSetInt(dPitGates, xUnitName, i);
+					}
 					trQuestVarSetFromRand("angle", 0, 6.283185, false);
 					trUnitSelectClear();
 					trUnitSelectByID(id);
@@ -1396,17 +1405,6 @@ highFrequency
 
 		if (trTime() > trQuestVarGet("pitDamageNext")) {
 			trQuestVarSet("pitDamageNext", trTime());
-			
-			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-				xDatabaseNext(dPlayerUnits);
-				xUnitSelectByID(dPlayerUnits, xUnitID);
-				if (trUnitAlive() == false) {
-					removePlayerUnit();
-				} else {
-					trDamageUnit(10);
-				}
-			}
-
 			if (boss == 0) {
 				for(i=xGetDatabaseCount(dPitGates); >0) {
 					xDatabaseNext(dPitGates);
