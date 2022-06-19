@@ -137,6 +137,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					}
 					case TRAP_CAROUSEL:
 					{
+						x0 = x * 35 + 16;
+						x1 = x * 35 + 24;
+						z0 = z * 35 + 16;
+						z1 = z * 35 + 24;
 						paintCircle(x, z, 9, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, worldHeight);
 						pos = xsVectorSet(x * 70 + 41, 5, z * 70 + 41);
 						next = trGetNextUnitScenarioNameNumber();
@@ -1222,14 +1226,6 @@ void buildEdge(int edge = 0, int type = 0) {
 			x0 = x0 * 35 + 17;
 			z1 = z1 * 35 + 23;
 			x1 = x1 * 35 + 23;
-			if (type == EDGE_BIG) {
-				trQuestVarSetFromRand("rand", 0, 7, true);
-				z0 = z0 - trQuestVarGet("rand");
-				x0 = x0 - trQuestVarGet("rand");
-				trQuestVarSetFromRand("rand", 0, 7, true);
-				z1 = z1 + trQuestVarGet("rand");
-				x1 = x1 + trQuestVarGet("rand");
-			}
 			/* Zeno's Paradox */
 			trQuestVarSet("rand", 0);
 			if (trQuestVarGet("stage") == 11) {

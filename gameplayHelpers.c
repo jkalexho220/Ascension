@@ -328,7 +328,11 @@ void removePlayerSpecific(int p = 0) {
 		trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
 		if (PvP == false) {
 			trUnitOverrideAnimation(6,0,false,false,-1);
-			trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
+			if (trQuestVarGet("gladiatorRound") > 0) {
+				trSoundPlayPaused("xpack\xdialog\ko\xkri075.mp3","1",-1,"","");
+			} else {
+				trSoundPlayFN("aherohasfallen.wav","1",-1,"","");
+			}
 			trMessageSetText(trStringQuestVarGet("p"+p+"name") + " has fallen! Clear nearby enemies to revive them!");
 			trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);

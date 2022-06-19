@@ -1395,18 +1395,35 @@ highFrequency
 	xsDisableSelf();
 }
 
+// 60 x 60 square with (72,72) at the center
+
 void paintMapTile(int x = 0, int z = 0, int db = 0) {
-	vector data = aiPlanGetUserVariableVector(db, x, z);
+	vector data = aiPlanGetUserVariableVector(db, x - 42, z - 42);
 	trPaintTerrain(x, z, x, z, 1*xsVectorGetX(data), 1*xsVectorGetY(data), false);
 	trChangeTerrainHeight(x, z, x, z, xsVectorGetZ(data), false);
 }
 
+void paintMapOutside() {
+	trPaintTerrain(0, 0, 144, 42, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+	trChangeTerrainHeight(0, 0, 145, 43, wallHeight, false);
+
+	trPaintTerrain(0, 103, 144, 144, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+	trChangeTerrainHeight(0, 103, 145, 145, wallHeight, false);
+
+	trPaintTerrain(0, 43, 43, 103, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+	trChangeTerrainHeight(0, 43, 44, 103, wallHeight, false);
+
+	trPaintTerrain(103, 43, 144, 103, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+	trChangeTerrainHeight(103, 43, 145, 104, wallHeight, false);
+}
+
 void paintMapInstant(int db = 0) {
-	for(x=0; < 145) {
-		for(z=0; < 145) {
+	for(x=42; < 103) {
+		for(z=42; < 103) {
 			paintMapTile(x, z, db);
 		}
 	}
+	paintMapOutside();
 }
 
 void paintPillar(vector pos = vector(0,0,0), int db = 0, int primary = 0, int secondary = 0) {
@@ -1426,7 +1443,7 @@ void paintPillar(vector pos = vector(0,0,0), int db = 0, int primary = 0, int se
 	z = xsVectorGetZ(pos);
 
 	aiPlanSetUserVariableBool(dMapTiles, x, z, true);
-	aiPlanSetUserVariableVector(db, x, z, xsVectorSet(primary, secondary, 15.0));
+	aiPlanSetUserVariableVector(db, x - 42, z - 42, xsVectorSet(primary, secondary, 15.0));
 	for(i=14; >= -3) {
 		temp = rotationMatrix(dir, 0, 1.0);
 		if (aiPlanGetUserVariableBool(dMapTiles, x + xsVectorGetX(temp), z + xsVectorGetZ(temp)) == false) {
@@ -1436,16 +1453,16 @@ void paintPillar(vector pos = vector(0,0,0), int db = 0, int primary = 0, int se
 		x = xsVectorGetX(pos);
 		z = xsVectorGetZ(pos);
 		aiPlanSetUserVariableBool(dMapTiles, x, z, true);
-		aiPlanSetUserVariableVector(db, x, z, xsVectorSet(primary, secondary, i));
-		data = aiPlanGetUserVariableVector(db, x-1, z-1);
+		aiPlanSetUserVariableVector(db, x - 42, z - 42, xsVectorSet(primary, secondary, i));
+		data = aiPlanGetUserVariableVector(db, x - 43, z - 43);
 		data = xsVectorSet(primary, secondary, xsVectorGetZ(data));
-		aiPlanSetUserVariableVector(db, x-1, z-1, data);
+		aiPlanSetUserVariableVector(db, x - 43, z - 43, data);
 	}
 	xClearDatabase(dEdgeFrontier);
 }
 
 void transitionRing(int dist = 0, int db = 0) {
-	if (dist < 73) {
+	if (dist < 31) {
 		for(i = 0 - dist; <= dist) {
 			paintMapTile(72 - dist, 72 + i, db);
 			paintMapTile(72 + dist, 72 + i, db);
@@ -1492,7 +1509,7 @@ void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false
 				removePlayerUnit();
 			} else if (rayCollision(dPlayerUnits, pos, dir, dist, 0.5)) {
 				trQuestVarSet("sound", 1);
-				damagePlayerUnit(100.0);
+				damagePlayerUnit(200.0);
 			}
 		}
 		xSetVector(dPhysicsBalls, xPhysicsBallPrev, xGetVector(dPhysicsBalls, xPhysicsBallPos));
@@ -1555,20 +1572,23 @@ highFrequency
 	// pit of doom
 	dPitOfDoom = aiPlanCreate("pitOfDoom", 8);
 
-	for(x=0; <145) {
-		aiPlanAddUserVariableVector(dPitOfDoom, x, "row"+x, 145);
-		for(z=0; <145) {
-			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+	trPaintTerrain(0, 0, 144, 144, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+	trChangeTerrainHeight(0, 0, 144, 144, -3, false);
+
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dPitOfDoom, x, "row"+x, 61);
+		for(z=0; <= 60) {
+			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist >= 144) {
 				data = xsVectorSet(TERRAIN_WALL, TERRAIN_SUB_WALL, -3);
-				trChangeTerrainHeight(x, z, x+1, z+1, -3, false);
+				trChangeTerrainHeight(x + 42, z + 42, x+43, z+43, -3, false);
 			} else {
 				data = xsVectorSet(TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, 6);
-				trChangeTerrainHeight(x, z, x+1, z+1, 6, false);
+				trChangeTerrainHeight(x + 42, z + 42, x+43, z+43, 6, false);
 			}
 			aiPlanSetUserVariableVector(dPitOfDoom, x, z, data);
-			trPaintTerrain(x, z, x, z, 1*xsVectorGetX(data), 1*xsVectorGetY(data), false);
-			trChangeTerrainHeight(x, z, x, z, xsVectorGetZ(data), false);
+			trPaintTerrain(x + 42, z + 42, x + 42, z + 42, 1*xsVectorGetX(data), 1*xsVectorGetY(data), false);
+			trChangeTerrainHeight(x + 42, z + 42, x + 43, z + 43, xsVectorGetZ(data), false);
 		}
 	}
 
@@ -1578,7 +1598,7 @@ highFrequency
 		for(z=55; < 90) {
 			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
 			if (dist > 144 && dist <= 289) {
-				aiPlanSetUserVariableVector(dPitOfDoom, x, z, xsVectorSet(TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, -3));
+				aiPlanSetUserVariableVector(dPitOfDoom, x - 42, z - 42, xsVectorSet(TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, -3));
 				trPaintTerrain(x, z, x, z, TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, false);
 			}
 		}
@@ -1616,10 +1636,10 @@ highFrequency
 
 	dPillars = aiPlanCreate("pillarsOfCreation", 8);
 	// pillars of creation
-	for(x=0; <145) {
-		aiPlanAddUserVariableVector(dPillars, x, "row"+x, 145);
-		for(z=0; < 145) {
-			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dPillars, x, "row"+x, 61);
+		for(z=0; <= 60) {
+			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist > 144) {
 				data = xsVectorSet(3, 9, -3); // coral A
 			} else {
@@ -1643,10 +1663,10 @@ highFrequency
 
 	dKepler = aiPlanCreate("kepler", 8);
 	// gravitational pull field
-	for(x=0; <145) {
-		aiPlanAddUserVariableVector(dKepler, x, "row"+x, 145);
-		for(z=0; < 145) {
-			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dKepler, x, "row"+x, 61);
+		for(z=0; <= 60) {
+			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist > 144) {
 				dist = xsSqrt(dist) - 12.0;
 				if (dist > 5.0) {
@@ -1664,15 +1684,15 @@ highFrequency
 
 	dFermi = aiPlanCreate("Fermi", 8);
 
-	for(x=0; < 145) {
-		aiPlanAddUserVariableVector(dFermi, x, "row"+x, 145);
-		for(z=0; < 145) {
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dFermi, x, "row"+x, 61);
+		for(z=0; <= 60) {
 			aiPlanSetUserVariableVector(dFermi, x, z, xsVectorSet(0, 50, 15));
 		}
 	}
 
-	for(x=0; < 20) {
-		for(z=0; < 20) {
+	for(x=0; <= 10) {
+		for(z=0; <= 10) {
 			dist = x + z - 5;
 			if (dist < 0) {
 				data = xsVectorSet(0, 53, -3);
@@ -1681,22 +1701,22 @@ highFrequency
 			}
 			for(a = -1; <= 1) {
 				for(b = -1; <= 1) {
-					aiPlanSetUserVariableVector(dFermi, 73 + 3*x + a, 73 + 3*z + b, data);
-					aiPlanSetUserVariableVector(dFermi, 73 + 3*x + a, 73 - 3*z + b, data);
-					aiPlanSetUserVariableVector(dFermi, 73 - 3*x + a, 73 + 3*z + b, data);
-					aiPlanSetUserVariableVector(dFermi, 73 - 3*x + a, 73 - 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 30 + 3*x + a, 30 + 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 30 + 3*x + a, 30 - 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 30 - 3*x + a, 30 + 3*z + b, data);
+					aiPlanSetUserVariableVector(dFermi, 30 - 3*x + a, 30 - 3*z + b, data);
 				}
 			}
 		}
 	}
 
 	dLaplace = aiPlanCreate("Laplace", 8);
-	for(x=0; <145) {
-		aiPlanAddUserVariableVector(dLaplace, x, "row"+x, 145);
-		for(z=0; < 145) {
-			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dLaplace, x, "row"+x, 61);
+		for(z=0; <= 60) {
+			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist > 144) {
-				dist = -8.0 * xsSin(0.2 * (xsSqrt(dist) - 12.0));
+				dist = -8.0 * xsSin(1.0 * (xsSqrt(dist) - 12.0));
 				data = xsVectorSet(0, 37, dist + 6.0); // sand d
 			} else {
 				data = xsVectorSet(0, 53, 6); // olympus tile
@@ -1706,10 +1726,10 @@ highFrequency
 	}
 
 	dBigBang = aiPlanCreate("bigBang", 8);
-	for(x=0; < 145) {
-		aiPlanAddUserVariableVector(dBigBang, x, "row"+x, 145);
-		for(z=0; < 145) {
-			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
+	for(x=0; <= 60) {
+		aiPlanAddUserVariableVector(dBigBang, x, "row"+x, 61);
+		for(z=0; <= 60) {
+			dist = xsPow(x - 30, 2) + xsPow(z - 30, 2);
 			if (dist > 144) {
 				data = xsVectorSet(2, 13, 3.0); // black rock
 			} else {
@@ -1893,7 +1913,7 @@ highFrequency
 				trQuestVarSet("bossPhase", 1);
 				bossNext = trTimeMS();
 				bossCount = 0;
-				bossTimeout = 72;
+				bossTimeout = 30;
 				trQuestVarSet("nottud"+1*trQuestVarGet("rand"), trQuestVarGet("nottud0"));
 				trQuestVarSet("nottud0", trQuestVarGet("bossSpell"));
 				
@@ -1915,6 +1935,7 @@ highFrequency
 						trOverlayText("The Pit of Doom", 3.0, -1, -1, -1);
 						trSetLighting("hades", 2.0);
 						worldHeight = 6;
+						wallHeight = -3;
 					}
 					case dLaplace:
 					{
@@ -1924,6 +1945,7 @@ highFrequency
 						trOverlayText("Laplace's Demon", 3.0, -1, -1, -1);
 						trSetLighting("dawn", 2.0);
 						worldHeight = 6;
+						wallHeight = -3;
 					}
 					case dKepler:
 					{
@@ -1933,6 +1955,7 @@ highFrequency
 						trOverlayText("Kepler's Law", 3.0, -1, -1, -1);
 						trSetLighting("Fimbulwinter", 2.0);
 						worldHeight = -3;
+						wallHeight = 15;
 					}
 					case dFermi:
 					{
@@ -1942,6 +1965,7 @@ highFrequency
 						trOverlayText("The Fermi Paradox", 3.0, -1, -1, -1);
 						trSetLighting("eclipse", 2.0);
 						worldHeight = -3;
+						wallHeight = 15;
 					}
 					case dPillars:
 					{
@@ -1951,6 +1975,7 @@ highFrequency
 						trOverlayText("Pillars of Creation", 3.0, -1, -1, -1);
 						trSetLighting("default", 2.0);
 						worldHeight = -3;
+						wallHeight = -3;
 					}
 					case dBigBang:
 					{
@@ -1960,19 +1985,23 @@ highFrequency
 						trOverlayText("The Big Bang", 3.0, -1, -1, -1);
 						trSetLighting("default", 2.0);
 						worldHeight = 3;
+						wallHeight = 3;
 						trQuestVarSet("bossPhase", 3);
-						bossCount = 30;
+						bossCount = 31;
+						bossTimeout = 5;
+						paintMapOutside();
 					}
 				}
 			}
 			case 1:
 			{
-				while(trTimeMS() > bossNext) {
-					bossNext = bossNext + 1000 / (10 + bossCount);
+				if(trTimeMS() > bossNext) {
+					bossNext = bossNext + 50;
 					bossCount = bossCount + 1;
 					transitionRing(bossCount, 1*trQuestVarGet("bossSpell"));
 				}
 				if (bossCount > bossTimeout) {
+					paintMapOutside();
 					trQuestVarSet("bossPhase", 2);
 					trQuestVarSet("bossCooldownTime", trTimeMS() + 20000);
 					trQuestVarSet("bossStep", 0);
@@ -2018,7 +2047,7 @@ highFrequency
 								}
 								trQuestVarSet("bossStep", 1);
 								bossNext = trTimeMS() + 15000;
-								bossTimeout = bossNext + 1000;
+								bossTimeout = bossNext + 2000;
 								physicsSpeed = 1;
 								lastTime = trTimeMS();
 								trSoundPlayFN("petsuchosattack.wav","1",-1,"","");
@@ -2058,7 +2087,7 @@ highFrequency
 								}
 
 								if (trTimeMS() > bossNext) {
-									physicsSpeed = 0.02 * (bossTimeout - trTimeMS());
+									physicsSpeed = 0.01 * (bossTimeout - trTimeMS());
 									if (physicsSpeed < 0) {
 										physicsSpeed = 0;
 										trQuestVarSet("bossStep", 2);
@@ -2095,7 +2124,7 @@ highFrequency
 							}
 							case 3:
 							{
-								while (trTimeMS() > bossNext) {
+								if (trTimeMS() > bossNext) {
 									trQuestVarSetFromRand("sound", 1, 5, true);
 									trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 									bossCount = bossCount - 1;
@@ -2109,7 +2138,7 @@ highFrequency
 										if (trUnitAlive() == false) {
 											removePlayerUnit();
 										} else if (rayCollision(dPlayerUnits, pos, dir, 999.0, 1.0)) {
-											damagePlayerUnit(500.0);
+											damagePlayerUnit(900.0);
 										}
 									}
 									xUnitSelectByID(dLaplaceLaser, xUnitID);
@@ -2121,7 +2150,6 @@ highFrequency
 									if (bossCount <= 0) {
 										trQuestVarSet("bossStep", 4);
 										bossTimeout = 1000;
-										break;
 									}
 								}
 							}
@@ -2476,7 +2504,7 @@ highFrequency
 									}
 								}
 								if (trTimeMS() > bossNext) {
-									bossNext = bossNext + 300;
+									bossNext = bossNext + 200;
 									bossDir = rotationMatrix(bossDir, -0.740544, -0.672008);
 									dir = bossDir;
 									addGenericProj(dDragonFireballs, vector(145,0,145), dir);
@@ -2501,29 +2529,24 @@ highFrequency
 			}
 			case 3:
 			{
-				while(trTimeMS() > bossNext) {
+				if(trTimeMS() > bossNext) {
 					bossNext = bossNext + 50;
 					bossCount = bossCount - 1;
 					timediff = bossCount;
-					for(i=5; >= 0) {
-						timediff = timediff + 30;
-						if (timediff > 0) {
-							transitionRing(timediff, 1*trQuestVarGet("nottud"+i));
-							if (timediff == 20) {
-								trQuestVarSetFromRand("sound", 1, 3, true);
-								trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-							}
-						} else {
-							paintMapTile(72, 72, 1*trQuestVarGet("nottud"+i));
+					transitionRing(bossCount, 1*trQuestVarGet("nottud"+bossTimeout));
+					if (bossCount == 0) {
+						bossCount = 31;
+						bossTimeout = bossTimeout - 1;
+						trQuestVarSetFromRand("sound", 1, 3, true);
+						trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+						if (bossTimeout < 0) {
+							trQuestVarSet("bossPhase", 2);
+							trQuestVarSet("bossStep", 0);
+							trSoundPlayFN("vortexstart.wav","1",-1,"","");
+							trSoundPlayFN("meteorapproach.wav","1",-1,"","");
+							trCameraShake(3.0, 0.1);
+							bossTimeout = trTimeMS() + 3000;
 						}
-					}
-					if (timediff <= 0) {
-						trQuestVarSet("bossPhase", 2);
-						trQuestVarSet("bossStep", 0);
-						trSoundPlayFN("vortexstart.wav","1",-1,"","");
-						trSoundPlayFN("meteorapproach.wav","1",-1,"","");
-						trCameraShake(3.0, 0.1);
-						bossTimeout = trTimeMS() + 3000;
 					}
 				}
 			}

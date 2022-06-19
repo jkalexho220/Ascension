@@ -2070,7 +2070,7 @@ void specialUnitsAlways() {
 				if (trUnitAlive() == false) {
 					removeOpponentUnit();
 				} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
-					damageOpponentUnit(p, 200.0);
+					damageOpponentUnit(p, 50.0 * trQuestVarGet("stage"));
 				}
 			}
 			xFreeDatabaseBlock(dTartarianEggs);

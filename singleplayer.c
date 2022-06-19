@@ -724,16 +724,17 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
+		// some random quest
 
 		// excalibur quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
 			trQuestVarSet("phdorogers4", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Hero Greek Jason",1, 157, 0, 131, 225, true);
 			xsEnableRule("rogers_always");
 		}
 
 		// relic carrying company quest
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 3) {
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 4) {
 			trQuestVarSet("relicCarrier", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Villager Atlantean",1,165,0,153,225,true);
 			xsEnableRule("relic_carrier_always");
@@ -741,13 +742,6 @@ highFrequency
 				xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
 				spawnRelicSpecific(vector(163,0,151), RELIC_TRANSPORTER_TICKET);
 			}
-		}
-
-		// runestone quest
-		if ((xGetInt(dPlayerData, xPlayerProgress) >= 4) && (trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3)) {
-			xsEnableRule("venlesh_always");
-			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
 		// kastor quest
@@ -759,11 +753,16 @@ highFrequency
 			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
 		}
 
-		// sword piece quest
-
-		// idk quest floor 8
+		// runestone quest
+		if ((xGetInt(dPlayerData, xPlayerProgress) >= 7) && (trQuestVarGet("runestoneComplete") == 0 || trQuestVarGet("p1runestoneQuest") == 3)) {
+			xsEnableRule("venlesh_always");
+			trQuestVarSet("venlesh", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
+		}
 
 		// flame trial quest for the blade of the starsword
+
+		// sword piece puzzle quest
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
@@ -1329,8 +1328,8 @@ highFrequency
 				name = "Lord of the Heavens";
 				desc("Drops: Starstone");
 				desc("Common Relic: " + relicName(18));
-				desc("He can only be damaged by dropping Spark Relics at the base of the statue.");
-				desc("Spark Relics are dropped by enemies that spawn during the fight.");
+				desc("He can only be damaged by luring him over spotlights, which will damage him.");
+				desc("Beware his powerful flame breath attacks.");
 			}
 			case kbGetProtoUnitID("Titan Atlantean"):
 			{

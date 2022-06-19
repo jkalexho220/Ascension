@@ -5248,7 +5248,7 @@ highFrequency
 				if (trUnitPercentDamaged() < 10) {
 					bossCooldown(10, 15);
 				} else {
-					trQuestVarSetFromRand("rand", 1, 1 + trUnitPercentDamaged() / 10, true);
+					trQuestVarSetFromRand("rand", 1 + trUnitPercentDamaged() / 30, 1 + trUnitPercentDamaged() / 10, true);
 					bossCount = trQuestVarGet("rand");
 					trQuestVarSetFromRand("cloudDeployProto", 1, 6, true);
 					trQuestVarSetFromRand("rand", 1, 6, true);
@@ -6877,6 +6877,7 @@ highFrequency
 {
 	int x = 0;
 	int z = 0;
+	int db = 0;
 	float dist = 0;
 	vector pos = vector(0,0,0);
 	if (trTime() > trQuestVarGet("cinTime")) {
@@ -6889,6 +6890,22 @@ highFrequency
 				uiLookAtUnitByName(""+1*trQuestVarGet("runestone"));
 				xFreeDatabaseBlock(dEnemies, bossPointer);
 				unitTransform("Imperial Examination", "Rocket");
+
+				db = trQuestVarGet("zenoRelicsIncoming");
+				for(i=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelect(db, xUnitName);
+					trUnitDestroy();
+				}
+				xClearDatabase(db);
+				for(i=xGetDatabaseCount(dFreeRelics); >0) {
+					xDatabaseNext(dFreeRelics);
+					if (xGetInt(dFreeRelics, xRelicType) > NORMAL_RELICS) {
+						xUnitSelect(dFreeRelics, xUnitName);
+						trUnitDestroy();
+						xFreeDatabaseBlock(dFreeRelics);
+					}
+				}
 
 				trQuestVarSet("clawScale", 1);
 				bossScale = 1;
@@ -7073,7 +7090,7 @@ highFrequency
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (rayCollision(dPlayerUnits, pos, dir, 5.0 * xGetFloat(dFingers,xFingerScale), 2.0)) {
-							damagePlayerUnit(500.0);
+							damagePlayerUnit(300.0);
 							trQuestVarSet("sound", 1);
 						}
 					}

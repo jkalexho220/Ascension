@@ -568,7 +568,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					uiMessageBox("Perhaps the indigenous people of the Tower know something?");
+					uiMessageBox("Perhaps the dwarves know something?");
+				}
+				case 5:
+				{
+					uiMessageBox("They're indigenous to the Tower.");
 					dialog = 0;
 				}
 			}
@@ -4039,7 +4043,7 @@ highFrequency
 				xsEnableRule("rebuild_map");
 				trOverlayText("Zeno's Paradox",3,-1,-1,-1);
 				for(p=1; < ENEMY_PLAYER) {
-					xSetBool(dPlayerData, xPlayerDead, 0, p);
+					xSetInt(dPlayerData, xPlayerDead, 0, p);
 				}
 				trQuestVarSet("deadPlayerCount", 0);
 			}
