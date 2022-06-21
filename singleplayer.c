@@ -587,6 +587,16 @@ highFrequency
 					}
 				}
 			}
+			if (xGetInt(dPlayerData, xPlayerProgress) >= 9) {
+				for(i=xGetDatabaseCount(dMonsterpedia); >0) {
+					xDatabaseNext(dMonsterpedia, true);
+					if (kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(dMonsterpedia, xUnitName), true)) == kbGetProtoUnitID("Titan Atlantean")) {
+						trUnitSetAnimationPath("3,0,0,0,0,0,0");
+						trUnitOverrideAnimation(2,0,true,false,-1);
+						trUnitOverrideAnimation(2,-1,true,false,-1);
+					}
+				}
+			}
 			xsEnableRule("monsterpedia_always");
 		}
 		
@@ -724,7 +734,10 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
-		// some random quest
+		// some random quest. pet dog quest?
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 2) {
+
+		}
 
 		// excalibur quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
@@ -744,7 +757,7 @@ highFrequency
 			}
 		}
 
-		// kastor quest
+		// kastor quest with poison trial
 
 		// start the hippocampus quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
@@ -760,15 +773,13 @@ highFrequency
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
-		// flame trial quest for the blade of the starsword
-
 		// sword piece puzzle quest
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Minotaur",1,127,0,167,225,true);
+			trArmyDispatch("0,0","Minotaur",1,153,0,165,225,true);
 			int start = trGetNextUnitScenarioNameNumber();
-			trArmyDispatch("0,0","Dwarf",trQuestVarGet("nottudTicketsCount"),125,0,165,225,true);
+			trArmyDispatch("0,0","Dwarf",trQuestVarGet("nottudTicketsCount"),151,0,163,225,true);
 			trArmySelect("0,0");
 			trUnitChangeProtoUnit("Relic");
 			for(i = start; < trGetNextUnitScenarioNameNumber()) {
@@ -1328,8 +1339,8 @@ highFrequency
 				name = "Lord of the Heavens";
 				desc("Drops: Starstone");
 				desc("Common Relic: " + relicName(18));
-				desc("He can only be damaged by luring him over spotlights, which will damage him.");
-				desc("Beware his powerful flame breath attacks.");
+				desc("He can only be damaged by luring him over spotlights.");
+				desc("His directed breath attack will chase after a player, but it can also damage enemies.");
 			}
 			case kbGetProtoUnitID("Titan Atlantean"):
 			{

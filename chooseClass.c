@@ -120,8 +120,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 12 favor per second.";
-					next = 0;
+					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 8 favor per second.";
+					if (Multiplayer) {
+						next = 0;
+					} else {
+						next = 10;
+					}
 				}
 				case 6:
 				{
@@ -139,6 +143,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					msg = "It has a fifth of your attack and health. Decay: 5 percent health per second";
 					next = 3;
+				}
+				case 10:
+				{
+					icon = "icons\improvement rheias gift icons 64";
+					msg = "Cost increases by 0.5 each second while active.";
+					next = 0;
 				}
 			}
 		}
@@ -181,12 +191,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "During this time, your heals damage enemies instead. Costs 5 favor per second";
+					msg = "During this time, your heals damage enemies instead. Cost increases per second while active";
 				}
 				case 6:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "Cost: 6 per second | Radius: 5 | Damage: 240";
+					msg = "Cost: 4 + 0.5 per second | Radius: 5 | Damage: 240";
 					next = 0;
 				}
 				case 7:
@@ -271,7 +281,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\god power implode icons 64";
-					msg = "Cost: 8 favor per second | Radius: 5 | Damage: 100 + 50 per bounce | Velocity: 2 x Speed";
+					msg = "Cost: 5 + 0.5 favor per second | Radius: 5 | Damage: 100 + 100 per bounce | Velocity: 2 x Speed";
 					next = 0;
 				}
 			}

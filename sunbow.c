@@ -25,7 +25,7 @@ int xSmitingSFX = 0;
 
 int lightwingDamage = 240;
 int lightwingDuration = 15;
-int lightwingCost = 6;
+int lightwingCost = 4;
 
 void removeSunbow(int p = 0) {
 	if (trQuestVarGet("p"+p+"lightwing") == 1) {
@@ -290,7 +290,10 @@ void sunbowAlways(int eventID = -1) {
 	if (trQuestVarGet("p"+p+"lightwing") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"lightwingNext")) {
 			gainFavor(p, -1.0);
-			trQuestVarSet("p"+p+"lightwingNext", trQuestVarGet("p"+p+"lightwingNext") + 1000 / lightwingCost / xGetFloat(dPlayerData, xPlayerUltimateCost));
+			amt = 1000.0 / trQuestVarGet("p"+p+"lightwingCost");
+			trQuestVarSet("p"+p+"lightwingNext", trQuestVarGet("p"+p+"lightwingNext") + amt);
+			// lightwing cost increases by 0.5 favor per second
+			trQuestVarSet("p"+p+"lightwingCost", trQuestVarGet("p"+p+"lightwingCost") + 0.0005 * amt * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			if (trPlayerResourceCount(p, "favor") == 0) {
 				lightwingOff(p);
 			}
@@ -302,6 +305,7 @@ void sunbowAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"lightwing", 1 - trQuestVarGet("p"+p+"lightwing"));
 		if (trQuestVarGet("p"+p+"lightwing") == 1) {
 			trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
+			trQuestVarSet("p"+p+"lightwingCost", lightwingCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			xSetBool(dPlayerData, xPlayerLaunched, true);
 			for(x=xGetDatabaseCount(relics); >0) {
 				xDatabaseNext(relics);

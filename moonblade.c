@@ -7,7 +7,7 @@ const int crescentCooldown = 12;
 const float crescentCount = 3;
 const float crescentDamage = 50;
 
-const float protectionDelay = 83.33; // 1000 / 12
+const float protectionCost = 8;
 
 int xCrescentCount = 0;
 int xCrescentTimeout = 0;
@@ -150,8 +150,8 @@ void moonbladeAlways(int eventID = -1) {
 				trQuestVarSet("p"+p+"protection", 0);
 			} else {
 				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
-				trQuestVarSet("p"+p+"protectionNext",
-					trTimeMS() + protectionDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
+				trQuestVarSet("p"+p+"protectionCost", protectionCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
+				trQuestVarSet("p"+p+"protectionNext", trTimeMS());
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);
@@ -232,8 +232,11 @@ void moonbladeAlways(int eventID = -1) {
 	
 	if (trQuestVarGet("p"+p+"protection") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"protectionNext")) {
+			amt = 1000.0 / trQuestVarGet("p"+p+"protectionCost");
 			trQuestVarSet("p"+p+"protectionNext",
-				trQuestVarGet("p"+p+"protectionNext") + protectionDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
+				trQuestVarGet("p"+p+"protectionNext") + amt);
+			// protection cost increases by 0.5 per second. amt is the amount of time that has passed in milliseconds
+			trQuestVarSet("p"+p+"protectionCost", trQuestVarGet("p"+p+"protectionCost") + 0.0005 * amt * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			gainFavor(p, 0.0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"protection", 0);

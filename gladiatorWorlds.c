@@ -75,18 +75,6 @@ highFrequency
 	}
 }
 
-void spawnPlayerCircle(vector pos = vector(0,0,0)) {
-	float angle = 6.283185 / (ENEMY_PLAYER - 1);
-	float mCos = xsCos(angle);
-	float mSin = xsSin(angle);
-	vector dir = vector(4, 0, 4);
-	for(p=1; < ENEMY_PLAYER) {
-		spawnPlayer(p, pos + dir);
-		equipRelicsAgain(p);
-		dir = rotationMatrix(dir, mCos, mSin);
-	}
-}
-
 rule gladiator_worlds_cin_1
 inactive
 highFrequency
@@ -674,14 +662,16 @@ highFrequency
 		{
 			case kbGetProtoUnitID("Stymph Bird Feather"):
 			{
-				pos = kbGetBlockPosition(""+bullshitProj, true);
-				xAddDatabaseBlock(dYeebFeathers, true);
-				xSetInt(dYeebFeathers, xUnitName, bullshitProj);
-				xSetInt(dYeebFeathers, xPlayerOwner, p);
-				xSetVector(dYeebFeathers, xYeebFeatherPos, pos);
-				trUnitSelectClear();
-				trUnitSelectByID(id);
-				trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
+				if ((p == ENEMY_PLAYER) || (xGetInt(dPlayerData, xPlayerClass) != SPELLSTEALER)) {
+					pos = kbGetBlockPosition(""+bullshitProj, true);
+					xAddDatabaseBlock(dYeebFeathers, true);
+					xSetInt(dYeebFeathers, xUnitName, bullshitProj);
+					xSetInt(dYeebFeathers, xPlayerOwner, p);
+					xSetVector(dYeebFeathers, xYeebFeatherPos, pos);
+					trUnitSelectClear();
+					trUnitSelectByID(id);
+					trMutateSelected(kbGetProtoUnitID("Lampades Bolt"));
+				}
 			}
 			case kbGetProtoUnitID("Catapult Shot"):
 			{

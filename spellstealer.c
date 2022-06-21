@@ -55,11 +55,7 @@ void spellstealerAlways(int eventID = -1) {
 			hit = CheckOnHit(p);
 			if (hit >= ON_HIT_NORMAL) {
 				if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
-					amt = 1;
-					if (xGetInt(dEnemies, xStunStatus) > 0) {
-						amt = amt * 2;
-					}
-					amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus)) - 1; // -1 because character attack
+					amt = xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) + xsMin(1, xGetInt(dEnemies, xStunStatus))) - 1; // -1 because character attack
 					xUnitSelectByID(dEnemies, xUnitID);
 					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerAttack), false);
 					if (hit == ON_HIT_SPECIAL) {
@@ -147,7 +143,7 @@ void spellstealerAlways(int eventID = -1) {
 					hit = xGetInt(dEnemies, xStunStatus, id) * stunned;
 					hit = hit + xGetInt(dEnemies, xPoisonStatus, id) * poisoned;
 					hit = hit + xGetInt(dEnemies, xSilenceStatus, id) * silenced;
-					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < 2.0 * amt)) {
+					if ((hit == 0) || (trPlayerResourceCount(p, "favor") < amt)) {
 						xFreeDatabaseBlock(bladeDanceTargets);
 					} else {
 						xSetInt(bladeDanceTargets, xBladeDanceStatus, trQuestVarGet("p"+p+"spellStealStatus"));
@@ -195,10 +191,6 @@ void spellstealerAlways(int eventID = -1) {
 						hit = hit - xsPow(2, STATUS_STUN);
 						stunUnit(dEnemies, 3.0, p);
 					}
-					if (xGetInt(dEnemies, xStunStatus) > 0) {
-						amt = amt * 2;
-					}
-					amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus));
 					pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+p+",0", "Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -275,10 +267,6 @@ void spellstealerAlways(int eventID = -1) {
 					hit = hit - xsPow(2, STATUS_STUN);
 					stunUnit(dEnemies, 3.0, p);
 				}
-				if (xGetInt(dEnemies, xStunStatus) > 0) {
-					amt = amt * 2;
-				}
-				amt = amt * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus));
 				damageEnemy(p, amt, true);
 				hit = 1;
 			}

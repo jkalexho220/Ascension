@@ -6,7 +6,7 @@ int rechargeCooldown = 22;
 
 float rideLightningDamage = 100;
 float rideLightningRange = 5;
-float rideLightningDelay = 125; // 1000 / 8
+float rideLightningCost = 5;
 
 int xThunderRiderPrev = 0;
 int xThunderRiderIndex = 0;
@@ -254,7 +254,7 @@ void thunderRiderAlways(int eventID = -1) {
 					trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 					xSetVector(balls, xLightningBallDir, getBounceDir(pos, loc, dir));
 					
-					amt = 0.5 * rideLightningDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
+					amt = rideLightningDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
 					xSetFloat(balls, xLightningBallDamage, amt + xGetFloat(balls, xLightningBallDamage));
 					lightningBallBounce(p, prev);
 					refreshRideLightningTargets(p);
@@ -266,8 +266,9 @@ void thunderRiderAlways(int eventID = -1) {
 			}
 		}
 		if (trTimeMS() > trQuestVarGet("p"+p+"rideLightningNext")) {
-			trQuestVarSet("p"+p+"rideLightningNext",
-				trQuestVarGet("p"+p+"rideLightningNext") + rideLightningDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
+			amt = 1000.0 / trQuestVarGet("p"+p+"rideLightningCost");
+			trQuestVarSet("p"+p+"rideLightningNext", trQuestVarGet("p"+p+"rideLightningNext") + amt);
+			trQuestVarSet("p"+p+"rideLightningCost", trQuestVarGet("p"+p+"rideLightningCost") + 0.0005 * amt * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			gainFavor(p, -1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
 				trQuestVarSet("p"+p+"rideLightning", 0);
@@ -378,10 +379,10 @@ void thunderRiderAlways(int eventID = -1) {
 				}
 				trQuestVarSet("p"+p+"rideLightning", 0);
 			} else {
+				trQuestVarSet("p"+p+"rideLightningCost", rideLightningCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 				xSetBool(dPlayerData, xPlayerLaunched, true);
 				refreshRideLightningTargets(p);
-				trQuestVarSet("p"+p+"rideLightningNext",
-					trTimeMS() + rideLightningDelay / xGetFloat(dPlayerData, xPlayerUltimateCost));
+				trQuestVarSet("p"+p+"rideLightningNext", trTimeMS());
 				trSoundPlayFN("lightningbirth.wav","1",-1,"","");
 				zSetProtoUnitStat("Attack Revealer", p, 2, xGetFloat(dPlayerData, xPlayerLos));
 				zSetProtoUnitStat("Kronny Flying", p, 1, 2.0 * xGetFloat(dPlayerData, xPlayerSpeed));

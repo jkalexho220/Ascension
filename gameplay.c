@@ -16,11 +16,12 @@ void fixAnimations(int p = 0) {
 		if (xGetInt(dPlayerData, xPlayerAnimation, p) == action) {
 			if (action == -1) {
 				trUnitOverrideAnimation(-1,0,false,true,-1);
+			} else if ((action == 11) || (action == 12)) {
+				xSetInt(dPlayerData, xPlayerAction, 11, p);
 			}
 		} else {
 			xSetInt(dPlayerData, xPlayerAnimation, action, p);
-			if ((action == 11) && (xGetInt(dPlayerData, xPlayerAction, p) != 12) &&
-				(xGetInt(dPlayerData, xPlayerAction, p) != 30)) {
+			if ((action == 11) && (xGetInt(dPlayerData, xPlayerAction, p) != 12)) {
 				trUnitSetAnimationPath("0,0,0,0,0,0,0");
 			} else if (action == -1) {
 				xsSetContextPlayer(p);
@@ -100,6 +101,13 @@ void processSilence(int p = 0) {
 void processLifesteal(int p = 0) {
 	int simp = 0;
 	if (xGetFloat(dPlayerData, xPlayerLifestealTotal, p) > 0) {
+		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_HEAL_FAVOR) {
+			// no favor from lifesteal
+			if (xGetInt(dPlayerData, xPlayerHealFavorCharges, p) > 0) {
+				xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges, p) + 1, p);
+				gainFavor(p, -1.0);
+			}
+		}
 		trUnitSelectClear();
 		trUnitSelect(""+xGetInt(dPlayerData,xPlayerUnit,p),true);
 		healUnit(p, xGetFloat(dPlayerData,xPlayerLifestealTotal,p), xGetInt(dPlayerData,xPlayerIndex,p));

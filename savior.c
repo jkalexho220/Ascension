@@ -31,6 +31,8 @@ void saviorAlways(int eventID = -1) {
 	float dist = 0;
 	float current = 0;
 	xSetPointer(dPlayerData, p);
+
+	bool saviorAlive = (xGetInt(dPlayerData, xPlayerDead) == 0);
 	
 	vector start = vector(0,0,0);
 	vector pos = vector(0,0,0);
@@ -305,8 +307,8 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if (xGetInt(dPlayerData, xPlayerDead, p) > 0 &&
-		trPlayerResourceCount(p, "favor") >= interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost)) {
+	if ((xGetInt(dPlayerData, xPlayerDead, p) > 0) && saviorAlive && (xGetInt(dPlayerData, xPlayerRainCooldownStatus) == ABILITY_READY) && 
+		(trPlayerResourceCount(p, "favor") >= interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost))) {
 		trQuestVarSet("p"+p+"intervention", 1);
 	}
 	

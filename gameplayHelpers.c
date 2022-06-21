@@ -597,6 +597,9 @@ float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0)
 	if (xGetInt(dEnemies, xPoisonStatus) == 1) {
 		dmg = dmg * (1.0 + xGetFloat(dPlayerData,xPlayerPoisonKiller,p));
 	}
+	if (xGetInt(dPlayerData, xPlayerClass, p) == SPELLSTEALER) {
+		dmg = dmg * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) + xsMin(1, xGetInt(dEnemies, xStunStatus)));
+	}
 	float lifesteal = xGetFloat(dPlayerData,xPlayerLifesteal,p) * dmg;
 	if (spell) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_SPELL_POISON) {
@@ -1733,6 +1736,19 @@ highFrequency
 		}
 	} else {
 		spyreset = 0;
+	}
+}
+
+
+void spawnPlayerCircle(vector pos = vector(0,0,0)) {
+	float angle = 6.283185 / (ENEMY_PLAYER - 1);
+	float mCos = xsCos(angle);
+	float mSin = xsSin(angle);
+	vector dir = vector(4, 0, 4);
+	for(p=1; < ENEMY_PLAYER) {
+		spawnPlayer(p, pos + dir);
+		equipRelicsAgain(p);
+		dir = rotationMatrix(dir, mCos, mSin);
 	}
 }
 

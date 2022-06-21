@@ -414,24 +414,16 @@ highFrequency
 		xClearDatabase(dPlayerCharacters);
 		for(p=1; < ENEMY_PLAYER) {
 			if (xGetBool(dPlayerData, xPlayerResigned, p) == false) {
-				relics = getRelicsDB(p);
-				for(x=xGetDatabaseCount(relics); >0) {
-					xDatabaseNext(relics);
-					xUnitSelect(relics, xUnitName);
-					trUnitDestroy();
-					xSetInt(relics, xUnitName, trGetNextUnitScenarioNameNumber());
-					trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-				}
 				trUnitSelectClear();
 				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
 				trUnitDestroy();
 				trPlayerKillAllGodPowers(p);
 				xSetInt(dPlayerData, xPlayerDead, 0, p);
-				xSetBool(dPlayerData, xPlayerSilenced, true, p); // the un-silence will grant the right god powers
-				spawnPlayer(p, pos);
-				equipRelicsAgain(p);		
+				xSetBool(dPlayerData, xPlayerSilenced, true, p); // the un-silence will grant the right god powers	
 			}
 		}
+
+		spawnPlayerCircle(pos);
 		
 		for(x=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
@@ -7347,8 +7339,8 @@ highFrequency
 			case 2:
 			{
 				trQuestVarSet("gameOverNext", trTime() + 7);
-				trQuestVarSet("ownedRelics"+RELIC_COOLDOWN_REDUCTION, 1 + trQuestVarGet("ownedRelics"+RELIC_COOLDOWN_REDUCTION));
-				trShowImageDialog(relicIcon(RELIC_COOLDOWN_REDUCTION), relicName(RELIC_COOLDOWN_REDUCTION));
+				trQuestVarSet("ownedRelics"+RELIC_ZENOPHOBIA, 1 + trQuestVarGet("ownedRelics"+RELIC_ZENOPHOBIA));
+				trShowImageDialog(relicIcon(RELIC_ZENOPHOBIA), relicName(RELIC_ZENOPHOBIA));
 			}
 			case 4:
 			{
