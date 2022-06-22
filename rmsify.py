@@ -364,6 +364,8 @@ class StackFrame(Job):
 						self.parent.children.pop()
 				elif self.name == 'switch' and not token == 'case':
 					accepted = False
+				elif token == 'case' and not self.name == 'switch':
+					error("Case statement without switch parent")
 				elif token in LOGIC:
 					self.children.append(Logic(token, self))
 				elif token in DATATYPE:
@@ -495,6 +497,10 @@ class Logic(StackFrame):
 					while searchState.name not in ['for', 'while'] and searchState.parent:
 						searchState = searchState.parent
 					if searchState.name in ['for','while']:
+						self.children.append(Literal('0',self,'int'))
+						self.children[-1].closed = True
+						self.children[-1].type = 'BREAK'
+					elif token == 'break' and self.name == 'case':
 						self.children.append(Literal('0',self,'int'))
 						self.children[-1].closed = True
 						self.children[-1].type = 'BREAK'

@@ -98,15 +98,19 @@ RESERVED TO 457
 */
 const int NPC_EXCALIBUR_BREAK = 458;
 
-const int NPC_POISON_TRIAL_START = 459;
-const int NPC_POISON_TRIAL_NEXT = 460;
-
 const int NPC_HUNT_THE_TIGER_KILL = 461;
 
 const int NPC_RELIC_TRANSPORTER_QUEST = 462;
 /*
-RESERVED TO 468
+RESERVED TO 470
 */
+
+const int NPC_WELCOME_TO_ASCENSION = 471;
+const int NPC_THANK_YOU_PLAYTESTERS = 472;
+
+const int NPC_POISON_CHAMBER_START = 473;
+const int NPC_POISON_CHAMBER_NEXT = 474;
+const int NPC_POISON_CHAMBER_END = 475;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -129,6 +133,96 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_THANK_YOU_PLAYTESTERS:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thank you to all my playtesters! This map wouldn't have been possible without you!");
+				}
+				case 2:
+				{
+					uiMessageBox("Nickonhawk");
+				}
+				case 3:
+				{
+					uiMessageBox("nottud");
+				}
+				case 4:
+				{
+					uiMessageBox("Yeebaagooon");
+				}
+				case 5:
+				{
+					uiMessageBox("devil_do1");
+				}
+				case 6:
+				{
+					uiMessageBox("Masaomi");
+				}
+				case 7:
+				{
+					uiMessageBox("scragins");
+				}
+				case 8:
+				{
+					uiMessageBox("DURPINMCSLURPIN");
+				}
+				case 9:
+				{
+					uiMessageBox("phdorogers4");
+				}
+				case 10:
+				{
+					uiMessageBox("Venlesh");
+				}
+				case 11:
+				{
+					uiMessageBox("tuutikka");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_WELCOME_TO_ASCENSION:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Welcome to Ascension! This is a map that REMEMBERS YOUR PROGRESS!");
+				}
+				case 2:
+				{
+					uiMessageBox("Gold, levels, artifacts, everything is saved between playthroughs!");
+				}
+				case 3:
+				{
+					uiMessageBox("The objective on each floor is to find and defeat the boss of the floor.");
+				}
+				case 4:
+				{
+					uiMessageBox("Once you've defeated a boss, the next floor will be unlocked in your future playthroughs.");
+				}
+				case 5:
+				{
+					uiMessageBox("You can also open this map in singleplayer to choose your class and customize your equipment.");
+				}
+				case 6:
+				{
+					uiMessageBox("For starters, choose one of the two flashing characters by walking up to them.");
+				}
+				case 7:
+				{
+					uiMessageBox("Also remember to click on characters and objects in the world to receive useful information!");
+				}
+				case 8:
+				{
+					uiMessageBox("Good luck and have fun!");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_RELIC_TRANSPORTER_QUEST:
 		{
 			switch(dialog)
@@ -371,6 +465,50 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			trUnitChangeProtoUnit("Hero Birth");
 			trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
 			dialog = 0;
+		}
+		case NPC_POISON_CHAMBER_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Adventurers! We have discovered a dangerous chamber on the fifth floor!");
+				}
+				case 2:
+				{
+					uiMessageBox("It is filled with a deadly miasma. Some other adventurers went in but never came out.");
+				}
+				case 3:
+				{
+					uiMessageBox("At the very least, we want to retrieve their belongings so their family may find solace.");
+				}
+				case 4:
+				{
+					uiMessageBox("Can you try and retrieve their belongings? I know this is a difficult task.");
+				}
+				case 5:
+				{
+					trMessageSetText("Discover what's left of the adventurers in the miasmic chamber.", -1);
+					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_POISON_CHAMBER_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The miasmic chamber is on the fifth floor. My guess is that there are no survivors.");
+				}
+				case 2:
+				{
+					uiMessageBox("If you're entering it, be sure to be well equipped!");
+					dialog = 0;
+				}
+			}
 		}
 		case NPC_EXCALIBUR_BYSTANDER:
 		{

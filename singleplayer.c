@@ -428,6 +428,7 @@ highFrequency
 		xsDisableSelf();
 	}
 	if (trTime() > cActivationTime + 2) {
+		int next = 0;
 		xsSetContextPlayer(0);
 		bool boons = false;
 		int proto = 0;
@@ -734,7 +735,7 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
-		// some random quest. pet dog quest?
+		// quest for pet dog
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 2) {
 
 		}
@@ -753,11 +754,21 @@ highFrequency
 			xsEnableRule("relic_carrier_always");
 			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 7) {
 				xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
-				spawnRelicSpecific(vector(163,0,151), RELIC_TRANSPORTER_TICKET);
+				xAddDatabaseBlock(dFreeRelics, true);
+				xSetInt(dFreeRelics, xUnitName, trGetNextUnitScenarioNameNumber());
+				xSetInt(dFreeRelics, xRelicType, RELIC_TRANSPORTER_TICKET);
+				trArmyDispatch("0,0","Dwarf",1,163,0,151,225,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Relic");
 			}
 		}
 
-		// kastor quest with poison trial
+		// poison trial for sword hilt
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 5 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
+			xsEnableRule("lewonas_always");
+			trQuestVarSet("lewonas", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0", "General Melagius", 1, 131, 0, 157, 225, true);
+		}
 
 		// start the hippocampus quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
@@ -773,7 +784,10 @@ highFrequency
 			trArmyDispatch("0,0","Maceman Hero",1,145,0,133,225,true);
 		}
 
-		// sword piece puzzle quest
+		// sword blade puzzle quest
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 8 && (trQuestVarGet("p1swordpiece"+SWORD_BLADE) - trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) <= 0)) {
+
+		}
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
@@ -1709,3 +1723,17 @@ highFrequency
 		reselectMyself();
 	}
 }
+/*
+rule lewonas_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("lewonas", true);
+	if (trUnitIsSelected()) {
+		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
+		startNPCDialog(0 + i);
+		reselectMyself();
+	}
+}
+*/

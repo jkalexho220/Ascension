@@ -375,6 +375,8 @@ highFrequency
 
 				xsEnableRule("boss12_battle");
 
+				reselectMyself();
+
 				trQuestVarSet("bossSpell", dPitOfDoom);
 				trQuestVarSet("bossPhase", 2);
 				trQuestVarSet("bossCooldownTime", trTimeMS() + 15000);
@@ -662,7 +664,7 @@ highFrequency
 		{
 			case kbGetProtoUnitID("Stymph Bird Feather"):
 			{
-				if ((p == ENEMY_PLAYER) || (xGetInt(dPlayerData, xPlayerClass) != SPELLSTEALER)) {
+				if ((p == ENEMY_PLAYER) || (xGetInt(dPlayerData, xPlayerClass, p) != SPELLSTEALER)) {
 					pos = kbGetBlockPosition(""+bullshitProj, true);
 					xAddDatabaseBlock(dYeebFeathers, true);
 					xSetInt(dYeebFeathers, xUnitName, bullshitProj);
@@ -1419,7 +1421,7 @@ void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false
 			xUnitSelectByID(dPlayerUnits, xUnitID);
 			if (trUnitAlive() == false) {
 				removePlayerUnit();
-			} else if (rayCollision(dPlayerUnits, pos, dir, dist, 0.5)) {
+			} else if (rayCollision(dPlayerUnits, pos, dir, dist, 1.0)) {
 				trQuestVarSet("sound", 1);
 				damagePlayerUnit(200.0);
 			}

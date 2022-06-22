@@ -399,14 +399,17 @@ dist is the actual value
 width is the squared value
 */
 bool rayCollision(int db = 0, vector start = vector(0,0,0), vector dir = vector(1,0,0),
-	float dist = 0, float width = 0) {
+	float dist = 0, float width = 0, bool projectile = false) {
 	vector pos = kbGetBlockPosition(""+xGetInt(db,xUnitName),true);
-	float current = distanceBetweenVectors(pos, start, false);
-	if (current < dist) {
-		vector hitbox = xsVectorSet(xsVectorGetX(start) + current * xsVectorGetX(dir),0,
-			xsVectorGetZ(start) + current * xsVectorGetZ(dir));
-		if (distanceBetweenVectors(pos, hitbox, true) < width) {
-			return(true);
+	float current = distanceBetweenVectors(pos, start);
+	if ((projectile == false) || (current > width)) {
+		current = xsSqrt(current);
+		if (current < dist) {
+			vector hitbox = xsVectorSet(xsVectorGetX(start) + current * xsVectorGetX(dir),0,
+				xsVectorGetZ(start) + current * xsVectorGetZ(dir));
+			if (distanceBetweenVectors(pos, hitbox, true) <= width) {
+				return(true);
+			}
 		}
 	}
 	return(false);

@@ -183,15 +183,15 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "(E) Lightwing (Toggle): Transform into a phoenix that deals magic damage for a short duration.";
-					if (Multiplayer) {
-						next = 0;
-					}
+					msg = "(E) Lightwing (Toggle): Transform into a phoenix that deals magic damage.";
 				}
 				case 5:
 				{
 					icon = "icons\special e phoenix icon 64";
 					msg = "During this time, your heals damage enemies instead. Cost increases per second while active";
+					if (Multiplayer) {
+						next = 0;
+					}
 				}
 				case 6:
 				{
@@ -560,52 +560,62 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 4:
 				{
 					icon = "icons\god power barrage icon";
-					msg = "(Q) Spellblades: Throw daggers in a cone that damage enemies.";
+					msg = "(Q) Spellblades: Throw five daggers in a cone that deal magic damage.";
 				}
 				case 5:
 				{
 					icon = "icons\god power barrage icon";
-					msg = "Cooldown: 9 | Damage: 0.5 x Attack x Spell Power | Knives: 5 + 2 x Projectiles";
+					msg = "Each dagger can pierce through a number of enemies, up to your Projectile count.";
 				}
 				case 6:
 				{
-					icon = "icons\god major leto icons 64";
-					msg = "(W) Negation Cloak: For a short duration, you absorb status effects and spell damage that hits you.";
+					icon = "icons\god power barrage icon";
+					msg = "When a dagger pierces an enemy with a status, it asborbs it and applies it to subsequent targets";
 				}
 				case 7:
 				{
-					icon = "icons\god major leto icons 64";
-					msg = "During this time, spell damage will heal you instead of damaging you.";
+					icon = "icons\god power barrage icon";
+					msg = "Cooldown: 9 | Damage: 0.5 x Attack x Spell Power";
 				}
 				case 8:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "When this spell ends, your next spell will apply all the absorbed status effects.";
+					msg = "(W) Negation Cloak: For a short duration, you absorb status effects and spell damage that hits you.";
 				}
 				case 9:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "Cooldown: 12 | Duration: 3";
+					msg = "During this time, spell damage will heal you instead of damaging you.";
 				}
 				case 10:
 				{
-					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "(E) Blade Dance: Teleport to an enemy and attack them, ignoring their armor.";
+					icon = "icons\god major leto icons 64";
+					msg = "When this spell ends, your next spell will apply all the absorbed status effects.";
 				}
 				case 11:
 				{
-					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "If the target is affected by a status effect, also attack nearby enemies with the same status";
+					icon = "icons\god major leto icons 64";
+					msg = "Cooldown: 12 | Duration: 3";
 				}
 				case 12:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "If this hits only one enemy, it costs half.";
+					msg = "(E) Blade Dance: Teleport to an enemy and attack them, ignoring their armor.";
 				}
 				case 13:
 				{
 					icon = "icons\improvement greatest of fifty icon 64";
-					msg = "Cost: 12 | Radius: 15 | Damage: Attack x Spell Power";
+					msg = "If the target is affected by a status effect, also attack nearby enemies with the same status";
+				}
+				case 14:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "If this hits only one enemy, it costs half.";
+				}
+				case 15:
+				{
+					icon = "icons\improvement greatest of fifty icon 64";
+					msg = "Cost: 16 | Radius: 16 | Damage: Attack x Spell Power";
 					next = 0;
 				}
 			}

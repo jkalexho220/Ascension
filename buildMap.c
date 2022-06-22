@@ -3019,5 +3019,6 @@ highFrequency
 		xsEnableRule("guardian_dialog");
 		xsEnableRule("gameplay_start");
 		trVectorQuestVarSet("startPosition", vector(15,0,15));
+		trChangeTerrainHeight(0,0,0,0,worldHeight,true);
 	}
 }

@@ -1,14 +1,14 @@
 
 float spellstealerPassiveRadius = 6;
 
-float bladeDanceCost = 12;
-float bladeDanceRadius = 15;
+float bladeDanceCost = 16;
+float bladeDanceRadius = 16;
 
 float negationCloakDuration = 3;
 int negationCloakCooldown = 12;
 
 int spellbladesCooldown = 9;
-int spellbladesCount = 3;
+int spellbladesCount = 5;
 
 int xBladeDanceIndex = 0;
 int xBladeDanceStatus = 0;
@@ -16,6 +16,7 @@ int xBladeDanceStatus = 0;
 int xSpellbladePrev = 0;
 int xSpellbladeDir = 0;
 int xSpellbladeStatus = 0;
+int xSpellbladePierce = 0;
 
 int xCloakSFX = 0;
 
@@ -181,7 +182,7 @@ void spellstealerAlways(int eventID = -1) {
 					amt = xGetFloat(dPlayerData, xPlayerAttack) * xGetFloat(dPlayerData, xPlayerSpellDamage);
 					if (hit >= xsPow(2, STATUS_SILENCE)) {
 						hit = hit - xsPow(2, STATUS_SILENCE);
-						silenceUnit(dEnemies, 9.0, p);
+						silenceUnit(dEnemies, 6.0, p);
 					}
 					if (hit >= xsPow(2, STATUS_POISON)) {
 						hit = hit - xsPow(2, STATUS_POISON);
@@ -239,55 +240,59 @@ void spellstealerAlways(int eventID = -1) {
 			}
 		}
 	}
-	
 	for(y=xsMin(2, xGetDatabaseCount(spellblades)); >0) {
-		hit = 0;
 		xDatabaseNext(spellblades);
 		pos = xGetVector(spellblades, xSpellbladePrev);
-		dir = xGetVector(spellblades, xSpellbladeDir);
-		dist = unitDistanceToVector(xGetInt(spellblades, xUnitName), pos, false);
-		for(x=xGetDatabaseCount(dEnemies); >0) {
-			xDatabaseNext(dEnemies);
-			xUnitSelectByID(dEnemies,xUnitID);
-			if (trUnitAlive() == false) {
-				removeEnemy();
-			} else if (rayCollision(dEnemies, pos, dir, dist + 3.0, 9.0)) {
-				trQuestVarSet("spellsound", 2);
-				amt = 0.5 * xGetFloat(dPlayerData, xPlayerAttack) * xGetFloat(dPlayerData, xPlayerSpellDamage);
-				hit = xGetInt(spellblades, xSpellbladeStatus);
-				if (hit >= xsPow(2, STATUS_SILENCE)) {
-					hit = hit - xsPow(2, STATUS_SILENCE);
-					silenceUnit(dEnemies, 9.0, p);
+		dist = unitDistanceToVector(xGetInt(spellblades, xUnitName), pos);
+		if (dist > 9.0) {
+			dist = xsSqrt(dist) + 2.0;
+			dir = xGetVector(spellblades, xSpellbladeDir);
+			target = 0;
+			amt = 0.5 * xGetFloat(dPlayerData, xPlayerAttack) * xGetFloat(dPlayerData, xPlayerSpellDamage);
+			for(x=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies,xUnitID);
+				if (trUnitAlive() == false) {
+					removeEnemy();
+				} else if (rayCollision(dEnemies, pos, dir, dist, 4.0, true)) {
+					trQuestVarSet("spellsound", 2);
+					hit = xGetInt(spellblades, xSpellbladeStatus);
+					if (hit >= xsPow(2, STATUS_SILENCE)) {
+						hit = hit - xsPow(2, STATUS_SILENCE);
+						silenceUnit(dEnemies, 6.0, p);
+					}
+					if (hit >= xsPow(2, STATUS_POISON)) {
+						hit = hit - xsPow(2, STATUS_POISON);
+						poisonUnit(dEnemies, 12.0, 12.0, p);
+					}
+					if (hit >= xsPow(2, STATUS_STUN)) {
+						hit = hit - xsPow(2, STATUS_STUN);
+						stunUnit(dEnemies, 3.0, p);
+					}
+					hit = xsPow(2, STATUS_SILENCE) * xGetInt(dEnemies, xSilenceStatus) + xsPow(2, STATUS_POISON) * xGetInt(dEnemies, xPoisonStatus) + xsPow(2, STATUS_STUN) * xsMin(1, xGetInt(dEnemies, xStunStatus));
+					xSetInt(spellblades, xSpellbladeStatus, hit);
+					damageEnemy(p, amt, true);
+					target = target + 1;
 				}
-				if (hit >= xsPow(2, STATUS_POISON)) {
-					hit = hit - xsPow(2, STATUS_POISON);
-					poisonUnit(dEnemies, 12.0, 12.0, p);
-				}
-				if (hit >= xsPow(2, STATUS_STUN)) {
-					hit = hit - xsPow(2, STATUS_STUN);
-					stunUnit(dEnemies, 3.0, p);
-				}
-				damageEnemy(p, amt, true);
-				hit = 1;
 			}
-		}
-		if (hit == 0) {
-			pos = kbGetBlockPosition(""+xGetInt(spellblades, xUnitName), true);
-			if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
-				hit = 1;
-				trQuestVarSet("spellsound", 1);
+			
+			gainFavor(p, target);
+			xSetInt(spellblades, xSpellbladePierce, xGetInt(spellblades, xSpellbladePierce) - target);
+			if (xGetInt(spellblades, xSpellbladePierce) <= 0) {
+				xUnitSelect(spellblades, xUnitName);
+				trUnitChangeProtoUnit("Lightning Sparks Ground");
+				xFreeDatabaseBlock(spellblades);
 			} else {
-				xSetVector(spellblades, xSpellbladePrev, pos);
+				pos = kbGetBlockPosition(""+xGetInt(spellblades, xUnitName), true);
+				if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+					xUnitSelect(spellblades, xUnitName);
+					trUnitChangeProtoUnit("Lightning Sparks Ground");
+					xFreeDatabaseBlock(spellblades);
+					trQuestVarSet("spellsound", 1);
+				} else {
+					xSetVector(spellblades, xSpellbladePrev, pos);
+				}
 			}
-		}
-		
-		if (hit == 1) {
-			gainFavor(p, 1);
-			xUnitSelect(spellblades, xUnitName);
-			trUnitChangeProtoUnit("Lightning Sparks Ground");
-			xUnitSelect(spellblades, xUnitName);
-			trDamageUnitPercent(-100);
-			xFreeDatabaseBlock(spellblades);
 		}
 	}
 	
@@ -310,14 +315,17 @@ void spellstealerAlways(int eventID = -1) {
 				removeSpellstealer(p);
 			} else {
 				pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+				/*
 				hit = spellbladesCount + 2 * xGetInt(dPlayerData, xPlayerProjectiles);
 				amt = angleBetweenVectors(pos, xGetVector(dPlayerData, xPlayerWellPos));
-				amt = fModulo(6.283185, amt - 0.196349 * (hit - 1) * 0.5);
-				for(x=hit; >0) {
-					dir = xsVectorSet(xsSin(amt),0,xsCos(amt)); // AoM devs not the sharpest tools in the shed
+				amt = fModulo(6.283185, amt - 0.196349 * (spellbladesCount - 1) * 0.5);
+				dir = xsVectorSet(xsSin(amt),0,xsCos(amt)); // AoM devs not the sharpest tools in the shed
+				*/
+				dir = getUnitVector(pos, xGetVector(dPlayerData, xPlayerWellPos));
+				dir = rotationMatrix(dir, 0.923879, -0.382682);
+				for(x=spellbladesCount; >0) {
 					end = pos + dir;
 					end = vectorSetAsTargetVector(pos,end,300.0);
-					amt = fModulo(6.283185, amt + 0.196349);
 					trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trUnitSelectClear();
@@ -327,9 +335,11 @@ void spellstealerAlways(int eventID = -1) {
 					trUnitMoveToPoint(xsVectorGetX(end),0,xsVectorGetZ(end),-1,false);
 					xAddDatabaseBlock(spellblades, true);
 					xSetInt(spellblades, xUnitName, 1*trQuestVarGet("next"));
-					xSetVector(spellblades, xSpellbladePrev, pos);
+					xSetVector(spellblades, xSpellbladePrev, pos - (dir * 2.0));
 					xSetVector(spellblades, xSpellbladeDir, dir);
 					xSetInt(spellblades, xSpellbladeStatus, 1*trQuestVarGet("p"+p+"spellstealStatus"));
+					xSetInt(spellblades, xSpellbladePierce, xGetInt(dPlayerData, xPlayerProjectiles));
+					dir = rotationMatrix(dir, 0.980785, 0.195089);
 				}
 			}
 		}
@@ -424,6 +434,7 @@ void chooseSpellstealer(int eventID = -1) {
 		xSpellbladePrev = xInitAddVector(db, "prev");
 		xSpellbladeDir = xInitAddVector(db, "dir");
 		xSpellbladeStatus = xInitAddInt(db, "status");
+		xSpellbladePierce = xInitAddInt(db, "pierce");
 	}
 }
 

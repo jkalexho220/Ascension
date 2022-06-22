@@ -599,6 +599,9 @@ highFrequency
 	
 	if (Multiplayer) {
 		trSetUnitIdleProcessing(true);
+		if (trQuestVarGet("p"+trCurrentPlayer()+"noob") == 1) {
+			startNPCDialog(NPC_WELCOME_TO_ASCENSION);
+		}
 	}
 	/*
 	TESTING STUFF BELOW THIS LINE
@@ -797,7 +800,7 @@ highFrequency
 							/* Nickonhawk's Quantum Slot Machine */
 							if ((Multiplayer == false) &&
 								(trQuestVarGet("p1nickQuestProgress") >= 5) &&
-								(distanceBetweenVectors(pos, trVectorQuestVarGet("nickPos")) < 9) &&
+								(distanceBetweenVectors(pos, trVectorQuestVarGet("nickPos")) < 16) &&
 								(xGetDatabaseCount(dSlotRelics) < 3) &&
 								(xGetInt(db, xRelicType) <= NORMAL_RELICS)) {
 								trSoundPlayFN("storehouse.wav","1",-1,"","");
@@ -1523,7 +1526,7 @@ highFrequency
 		trChatSendSpoofed(ENEMY_PLAYER, "devil_do1: Noooo! How can this be?!");
 		xsDisableSelf();
 		trUnitChangeProtoUnit("Lampades Blood");
-		if (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") == 2) {
+		if (trQuestVarGet("p"+trCurrentPlayer()+"monsterpediaQuest") >= 1) {
 			startNPCDialog(NPC_DEVIL_DIE);
 			trQuestVarSet("monsterpediaQuestComplete", 1);
 		}

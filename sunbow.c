@@ -440,7 +440,7 @@ void chooseSunbow(int eventID = -1) {
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
 	xSetInt(dPlayerData,xPlayerLureCooldown, smitingRaysCooldown);
 	xSetFloat(dPlayerData,xPlayerLureCost,0);
-	xSetInt(dPlayerData,xPlayerRainCooldown,1);
+	xSetInt(dPlayerData,xPlayerRainCooldown,2);
 	xSetFloat(dPlayerData,xPlayerRainCost, lightwingCost);
 	
 	

@@ -396,7 +396,6 @@ highFrequency
 		boss = trQuestVarGet("stage");
 		
 		pos = pos - vector(12,0,12);
-		int relics = 0;
 
 		for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 			xDatabaseNext(dPlayerUnits);
@@ -517,6 +516,8 @@ highFrequency
 				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
 				xsEnableRule("boss_music");
 				trMessageSetText("Use the rocks to take cover from the lion's roar!", -1);
+
+				reselectMyself();
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -917,6 +918,8 @@ highFrequency
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 27, 656);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 28, 566);
 				trModifyProtounit("Shade XP", ENEMY_PLAYER, 29, 656);
+
+				reselectMyself();
 				
 				xsEnableRule("boss2_battle");
 				trQuestVarSet("bossSpell", 41);
@@ -1356,6 +1359,8 @@ highFrequency
 				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
 				xsEnableRule("boss_music");
+
+				reselectMyself();
 				
 				bossCooldown(10, 15);
 				
@@ -1779,6 +1784,8 @@ highFrequency
 				trQuestVarSet("bossGem", STARSTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
+
+				reselectMyself();
 				
 				bossCooldown(10, 15);
 				
@@ -2206,6 +2213,7 @@ highFrequency
 				trUnitConvert(ENEMY_PLAYER);
 				trMutateSelected(kbGetProtoUnitID("Transport Ship Greek"));
 				
+				reselectMyself();
 				bossCooldown(10, 15);
 				
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 27, 20);
@@ -2908,6 +2916,8 @@ highFrequency
 				trQuestVarSet("bossGem", MANASTONE);
 				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
 				xsEnableRule("boss_music");
+
+				reselectMyself();
 				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 27, 20);
 			}
@@ -2960,6 +2970,8 @@ highFrequency
 					trQuestVarSet("musicTime", trTime());
 				}
 				trQuestVarSet("cinTime", trTime() + 3);
+
+				reselectMyself();
 			}
 			case 4:
 			{
@@ -4201,6 +4213,8 @@ highFrequency
 				trArmySelect(""+ENEMY_PLAYER+",0");
 				trSetSelectedScale(0,0,0);
 				bossCooldown(10, 15);
+
+				reselectMyself();
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 27, 50);
 				xSetBool(dEnemies, xLaunched, true, bossPointer);
@@ -4993,6 +5007,8 @@ highFrequency
 				}
 
 				trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "neutral");
+
+				reselectMyself();
 				
 				trStringQuestVarSet("advice",
 					"You need to lure the dragon over the spotlights to damage him.");
@@ -5863,6 +5879,8 @@ highFrequency
 				bossCooldown(8, 12);
 
 				lavaDamageNext = trTimeMS();
+
+				reselectMyself();
 
 				for(i=xStunSFX; <= xSilenceSFX) {
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
@@ -7094,6 +7112,8 @@ highFrequency
 				xsEnableRule("boss_music");
 
 				xsEnableRule("boss11_battle");
+
+				reselectMyself();
 
 				bossNext = trTimeMS() + 3000;
 
