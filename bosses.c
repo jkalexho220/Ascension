@@ -34,9 +34,6 @@ void processBossCooldown(int ultimate = 31) {
 	}
 }
 
-int bossInts = 0;
-int bossFloats = 0;
-
 rule initialize_boss_db
 active
 highFrequency
@@ -6478,7 +6475,7 @@ highFrequency
 				bossID = kbGetBlockID(""+bossUnit, true);
 				bossPointer = xGetNewestPointer(dEnemies);
 				xSetBool(dEnemies, xLaunched, true);
-				
+
 				for(i=xStunSFX; <= xSilenceSFX) {
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
 				}

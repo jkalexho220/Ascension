@@ -48,6 +48,9 @@ float bossScale = 0;
 float bossAngle = 0;
 bool bossAnim = false;
 
+int bossInts = 0;
+int bossFloats = 0;
+
 vector bossPos = vector(0,0,0);
 vector bossTargetPos = vector(0,0,0);
 vector bossDir = vector(0,0,0);
