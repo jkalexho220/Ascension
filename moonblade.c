@@ -1,5 +1,5 @@
 const int moonbeamCooldown = 18;
-const float moonbeamDamage = 30;
+const float moonbeamDamage = 60;
 const float moonbeamDuration = 6;
 const float moonbeamRadius = 6;
 
@@ -60,7 +60,7 @@ void moonbladeAlways(int eventID = -1) {
 					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
 						stunUnit(dEnemies, 3.0, p);
 						xUnitSelectByID(dEnemies, xUnitID);
-						damageEnemy(p, crescentDamage * xGetFloat(dPlayerData,xPlayerSpellDamage), false);
+						damageEnemy(p, crescentDamage * xGetFloat(dPlayerData,xPlayerSpellDamage));
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName));
 						
 						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -105,7 +105,7 @@ void moonbladeAlways(int eventID = -1) {
 		pos = vectorSnapToGrid(xGetVector(dPlayerData, xPlayerWellPos));
 		xAddDatabaseBlock(moonbeams, true);
 		xSetFloat(moonbeams, xMoonbeamRadius, xsPow(moonbeamRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2));
-		xSetFloat(moonbeams, xMoonbeamDamage, moonbeamDamage * xGetFloat(dPlayerData, xPlayerSpellDamage));
+		xSetFloat(moonbeams, xMoonbeamDamage, moonbeamDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * 0.5);
 		xSetInt(moonbeams,xMoonbeamTimeout, trTimeMS() + 1000 * moonbeamDuration * xGetFloat(dPlayerData,xPlayerSpellDuration));
 		xSetInt(moonbeams, xMoonbeamStart, trGetNextUnitScenarioNameNumber());
 		xSetVector(moonbeams, xMoonbeamPos, pos);

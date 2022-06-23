@@ -256,7 +256,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power bolt icon 64";
-					msg = "Cooldown: 8 | Range: 12 | Damage: 50";
+					msg = "Cooldown: 8 | Range: 12 | Damage: 80";
 				}
 				case 7:
 				{

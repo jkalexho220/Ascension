@@ -1,6 +1,6 @@
 int blitzCooldown = 8;
 float blitzRange = 12;
-float blitzDamage = 50;
+float blitzDamage = 80;
 
 int rechargeCooldown = 22;
 

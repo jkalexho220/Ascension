@@ -120,50 +120,50 @@ void starseerAlways(int eventID = -1) {
 				dir = rotationMatrix(dir, -0.5, -0.866025);
 			}
 			
-				/* collision detection for one star */
-				outer = xsPow(xGetFloat(db, xStarseerCurrentRadius) + 1.5, 2);
-				inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
-				center = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
-				
-				amt = starBaseDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
-				target = 0;
-				for(x=xGetDatabaseCount(dEnemies); >0) {
-					xDatabaseNext(dEnemies);
-					xUnitSelectByID(dEnemies, xUnitID);
-					if (trUnitAlive() == false) {
-						removeEnemy();
-					} else {
-						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
-						dist = distanceBetweenVectors(pos, center);
-						if (dist < outer && dist > inner) {
-							/* enemy is within the donut */
-							dir = getUnitVector(center, pos);
-							/* if enemy is in between the old and new positions, that's a hit */
-							if (dotProduct(dir, cur) > angleDiff) {
-								if (dotProduct(dir, prev) > angleDiff) {
-									/* HIT */
-									if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
-										stunUnit(dEnemies, 1.5, p);
-									} else {
-										gainFavor(p, 1);
-									}
-									trUnitHighlight(0.2, false);
-									damageEnemy(p, amt, true);
-									target = 1;
+			/* collision detection for one star */
+			outer = xsPow(xGetFloat(db, xStarseerCurrentRadius) + 1.5, 2);
+			inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
+			center = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+			
+			amt = starBaseDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
+			target = 0;
+			for(x=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (trUnitAlive() == false) {
+					removeEnemy();
+				} else {
+					pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
+					dist = distanceBetweenVectors(pos, center);
+					if (dist < outer && dist > inner) {
+						/* enemy is within the donut */
+						dir = getUnitVector(center, pos);
+						/* if enemy is in between the old and new positions, that's a hit */
+						if (dotProduct(dir, cur) > angleDiff) {
+							if (dotProduct(dir, prev) > angleDiff) {
+								/* HIT */
+								if (trQuestVarGet("p"+p+"eventHorizon") == 1) {
+									stunUnit(dEnemies, 1.5, p);
+								} else {
+									gainFavor(p, 1);
 								}
+								trUnitHighlight(0.2, false);
+								damageEnemy(p, amt, true);
+								target = 1;
 							}
 						}
 					}
 				}
-				
-				/* the star hit something so we update the prev position to be the current position */
-				if (target == 1) {
-					trQuestVarSetFromRand("sound", 1, 3, true);
-					trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-					xSetVector(db, xStarseerDir + hit, cur);
-				} else if (angleDiff < trQuestVarGet("p"+p+"starCosine")) {
-					xSetVector(db, xStarseerDir + hit, cur);
-				}
+			}
+			
+			/* the star hit something so we update the prev position to be the current position */
+			if (target == 1) {
+				trQuestVarSetFromRand("sound", 1, 3, true);
+				trSoundPlayFN("fleshcrush"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				xSetVector(db, xStarseerDir + hit, cur);
+			} else if (angleDiff < trQuestVarGet("p"+p+"starCosine")) {
+				xSetVector(db, xStarseerDir + hit, cur);
+			}
 		}
 	}
 	

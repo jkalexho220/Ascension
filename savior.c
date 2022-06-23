@@ -106,14 +106,14 @@ void saviorAlways(int eventID = -1) {
 			trUnitChangeProtoUnit("Arkantos God Out");
 			trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
 			
-			amt = guardianAngelHeal * (1.0 + 0.1 * amt);
+			amt = guardianAngelHeal * (1.0 + 0.1 * amt) * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			dist = xsPow(guardianAngelRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			
 			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				xDatabaseNext(dPlayerUnits);
 				if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < dist) {
 					xUnitSelectByID(dPlayerUnits, xUnitID);
-					healUnit(p, amt * xGetFloat(dPlayerData, xPlayerSpellDamage));
+					healUnit(p, amt);
 				}
 			}
 		} else {
@@ -307,7 +307,7 @@ void saviorAlways(int eventID = -1) {
 		}
 	}
 	
-	if ((xGetInt(dPlayerData, xPlayerDead, p) > 0) && saviorAlive && (xGetInt(dPlayerData, xPlayerRainCooldownStatus) == ABILITY_READY) && 
+	if ((xGetInt(dPlayerData, xPlayerDead) > 0) && saviorAlive && (xGetInt(dPlayerData, xPlayerRainCooldownStatus) == ABILITY_READY) && 
 		(trPlayerResourceCount(p, "favor") >= interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost))) {
 		trQuestVarSet("p"+p+"intervention", 1);
 	}

@@ -57,8 +57,10 @@ void spellstealerAlways(int eventID = -1) {
 			if (hit >= ON_HIT_NORMAL) {
 				if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
 					amt = xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) + xsMin(1, xGetInt(dEnemies, xStunStatus))) - 1; // -1 because character attack
+					xSetInt(dPlayerData, xPlayerClass, MOONBLADE); // disable the built-in damage multiplier of damageEnemy(). hacky but whatever
 					xUnitSelectByID(dEnemies, xUnitID);
 					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerAttack), false);
+					xSetInt(dPlayerData, xPlayerClass, SPELLSTEALER);
 					if (hit == ON_HIT_SPECIAL) {
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 						dist = xsPow(spellstealerPassiveRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);

@@ -244,7 +244,7 @@ void sunbowAlways(int eventID = -1) {
 							if (trUnitAlive() == false) {
 								removeSunbow(p);
 							} else if (unitDistanceToVector(xGetInt(db, xUnitName), pos) < dist) {
-								hit = hit + 1;
+								hit = hit + 2;
 								end = kbGetBlockPosition(""+xGetInt(db, xUnitName)) + vector(0,1,0);
 								dir = getUnitVector3d(end, pos);
 								next = trGetNextUnitScenarioNameNumber();

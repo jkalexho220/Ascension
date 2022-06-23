@@ -67,9 +67,14 @@ void castDeathSentence(int p = 0) {
 	xsSetContextPlayer(0);
 	xSetFloat(sentences, xDeathSentenceHealth, health);
 
-	spyEffect(xGetInt(dEnemies, xUnitName),kbGetProtoUnitID("Shade"),
-		xsVectorSet(sentences, xDeathSentenceSFX, xGetNewestPointer(sentences)));
-	
+	if ((xGetInt(dEnemies, xUnitName) == bossUnit) && (trQuestVarGet("stage") == 9)) {
+		xSetInt(sentences, xDeathSentenceSFX, aiPlanGetUserVariableInt(ARRAYS,bossInts,2));
+		xUnitSelect(sentences, xDeathSentenceSFX);
+		trMutateSelected(kbGetProtoUnitID("Shade"));
+	} else {
+		spyEffect(xGetInt(dEnemies, xUnitName),kbGetProtoUnitID("Shade"),
+			xsVectorSet(sentences, xDeathSentenceSFX, xGetNewestPointer(sentences)));
+	}
 }
 
 void nightriderAlways(int eventID = -1) {
@@ -146,7 +151,12 @@ void nightriderAlways(int eventID = -1) {
 			hit = 0;
 			dist = xsPow(deathSentenceRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			xUnitSelect(sentences, xDeathSentenceSFX);
-			trUnitDestroy();
+			if ((xGetInt(sentences, xUnitName) == bossUnit) && (trQuestVarGet("stage") == 9)) {
+				trSetSelectedScale(1,1,1);
+				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+			} else {
+				trUnitDestroy();
+			}
 			xFreeDatabaseBlock(sentences);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);

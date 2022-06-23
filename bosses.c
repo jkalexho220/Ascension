@@ -5876,6 +5876,7 @@ highFrequency
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
 
 				bossCooldown(8, 12);
 
@@ -6477,9 +6478,14 @@ highFrequency
 				bossID = kbGetBlockID(""+bossUnit, true);
 				bossPointer = xGetNewestPointer(dEnemies);
 				xSetBool(dEnemies, xLaunched, true);
+				
 				for(i=xStunSFX; <= xSilenceSFX) {
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
 				}
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
+
 				xsEnableRule("boss9_ready");
 				bossCooldown(8, 12);
 				xsEnableRule("boss_music");
