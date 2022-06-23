@@ -108,9 +108,9 @@ RESERVED TO 470
 const int NPC_WELCOME_TO_ASCENSION = 471;
 const int NPC_THANK_YOU_PLAYTESTERS = 472;
 
-const int NPC_POISON_CHAMBER_START = 473;
-const int NPC_POISON_CHAMBER_NEXT = 474;
-const int NPC_POISON_CHAMBER_END = 475;
+const int NPC_ELECTRIC_CHAMBER_START = 473;
+const int NPC_ELECTRIC_CHAMBER_NEXT = 474;
+const int NPC_ELECTRIC_CHAMBER_END = 475;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -218,7 +218,13 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 8:
 				{
-					uiMessageBox("Good luck and have fun!");
+					uiMessageBox("Good luck and have fun! You're in for a wild adventure!");
+					trUnitSelectClear();
+					trUnitSelectByQV("choice1unit");
+					trUnitHighlight(60, true);
+					trUnitSelectClear();
+					trUnitSelectByQV("choice2unit");
+					trUnitHighlight(60, true);
 					dialog = 0;
 				}
 			}
@@ -466,17 +472,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
 			dialog = 0;
 		}
-		case NPC_POISON_CHAMBER_START:
+		case NPC_ELECTRIC_CHAMBER_START:
 		{
 			switch(dialog)
 			{
 				case 1:
 				{
-					uiMessageBox("Adventurers! We have discovered a dangerous chamber on the fifth floor!");
+					uiMessageBox("Adventurers! We have discovered a dangerous chamber on the sixth floor!");
 				}
 				case 2:
 				{
-					uiMessageBox("It is filled with a deadly miasma. Some other adventurers went in but never came out.");
+					uiMessageBox("It is charged with lethal electricity. Some other adventurers went in but never came out.");
 				}
 				case 3:
 				{
@@ -488,20 +494,20 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 5:
 				{
-					trMessageSetText("Discover what's left of the adventurers in the miasmic chamber.", -1);
+					trMessageSetText("Discover what's left of the adventurers in the electric chamber.", -1);
 					trSoundPlayFN("xnew_objective.wav","1",-1,"","");
 					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 1);
 					dialog = 0;
 				}
 			}
 		}
-		case NPC_POISON_CHAMBER_NEXT:
+		case NPC_ELECTRIC_CHAMBER_NEXT:
 		{
 			switch(dialog)
 			{
 				case 1:
 				{
-					uiMessageBox("The miasmic chamber is on the fifth floor. My guess is that there are no survivors.");
+					uiMessageBox("The electric chamber is on the sixth floor. My guess is that there are no survivors.");
 				}
 				case 2:
 				{

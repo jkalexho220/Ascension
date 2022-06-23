@@ -7,7 +7,7 @@ const int crescentCooldown = 12;
 const float crescentCount = 3;
 const float crescentDamage = 50;
 
-const float protectionCost = 8;
+const float protectionCost = 9;
 
 int xCrescentCount = 0;
 int xCrescentTimeout = 0;

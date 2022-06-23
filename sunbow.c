@@ -130,7 +130,7 @@ void sunbowAlways(int eventID = -1) {
 		pos = vectorSnapToGrid(xGetVector(dPlayerData, xPlayerWellPos));
 		xAddDatabaseBlock(sunlights, true);
 		xSetFloat(sunlights, xSunlightRadius, xsPow(sunlightRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2));
-		xSetFloat(sunlights, xSunlightDamage, sunlightPower * xGetFloat(dPlayerData, xPlayerSpellDamage));
+		xSetFloat(sunlights, xSunlightDamage, 0.5 * sunlightPower * xGetFloat(dPlayerData, xPlayerSpellDamage));
 		xSetInt(sunlights, xSunlightTimeout,
 			trTimeMS() + 1000 * sunlightDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 		xSetInt(sunlights, xSunlightStart, trGetNextUnitScenarioNameNumber());

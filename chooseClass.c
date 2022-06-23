@@ -120,7 +120,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 8 favor per second.";
+					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 9 favor per second.";
 					if (Multiplayer) {
 						next = 0;
 					} else {
@@ -580,7 +580,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 8:
 				{
 					icon = "icons\god major leto icons 64";
-					msg = "(W) Negation Cloak: For a short duration, you absorb status effects and spell damage that hits you.";
+					msg = "(W) Negation Cloak: For a brief duration, you absorb status effects and spell damage that hits you.";
 				}
 				case 9:
 				{

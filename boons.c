@@ -180,7 +180,7 @@ string boonName(int boon = 0) {
 		}
 		case BOON_HEAL_FAVOR:
 		{
-			name = "Each time you heal an ally, gain 1 favor. (Maximum of 5 per second)";
+			name = "Each time you heal an ally, gain 1 favor. (Maximum of 3 per second)";
 		}
 		case BOON_HEALTH_ATTACK:
 		{

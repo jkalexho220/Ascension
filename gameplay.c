@@ -147,13 +147,13 @@ void processRegen(int p = 0) {
 		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
 	}
 	if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_HEAL_FAVOR) {
-		if (xGetInt(dPlayerData, xPlayerHealFavorCharges, p) < 5) {
+		if (xGetInt(dPlayerData, xPlayerHealFavorCharges, p) < 3) {
 			if (trTimeMS() > xGetInt(dPlayerData, xPlayerHealFavorNext, p)) {
-				xSetInt(dPlayerData, xPlayerHealFavorNext, xGetInt(dPlayerData, xPlayerHealFavorNext, p) + 200, p);
+				xSetInt(dPlayerData, xPlayerHealFavorNext, xGetInt(dPlayerData, xPlayerHealFavorNext, p) + 333, p);
 				xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges, p) + 1, p);
 			}
 		} else {
-			xSetInt(dPlayerData, xPlayerHealFavorNext, trTimeMS() + 200, p);
+			xSetInt(dPlayerData, xPlayerHealFavorNext, trTimeMS() + 333, p);
 		}
 	}
 }

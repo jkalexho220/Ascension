@@ -250,7 +250,7 @@ void gardenerAlways(int eventID = -1) {
 			} else {
 				pos = xGetVector(stranglethorns, xStranglethornPos);
 				dist = xsPow(stranglethornsRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
-				amt = stranglethornsDamage * xGetFloat(dPlayerData, xPlayerSpellDuration);
+				amt = stranglethornsDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
 				for (x=xGetDatabaseCount(dEnemies); >0) {
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies, xUnitID);

@@ -280,8 +280,7 @@ void throneShieldAlways(int eventID = -1) {
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
-		dist = justiceRadius * xGetFloat(dPlayerData, xPlayerSpellRange);
-		dist = dist * dist;
+		dist = xsPow(justiceRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 		for(x=xGetDatabaseCount(db); >0) {
 			xDatabaseNext(db);
 			target = xGetInt(db, xUnitID);

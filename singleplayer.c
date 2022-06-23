@@ -736,9 +736,13 @@ highFrequency
 		}
 
 		// quest for pet dog
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 2) {
-
+		/*
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && trQuestVarGet("")) {
+			trQuestVarSet("dogOwner", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Setna",1,135,0,157,225,true);
+			xsEnableRule("dog_owner_always");
 		}
+		*/
 
 		// excalibur quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
@@ -763,11 +767,11 @@ highFrequency
 			}
 		}
 
-		// poison trial for sword hilt
+		// electric trial for sword hilt
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 5 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
-			xsEnableRule("lewonas_always");
-			trQuestVarSet("lewonas", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0", "General Melagius", 1, 131, 0, 157, 225, true);
+			xsEnableRule("out_reach_always");
+			trQuestVarSet("out_reach", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0", "Royal Guard", 1, 131, 0, 157, 225, true);
 		}
 
 		// start the hippocampus quest
@@ -1723,17 +1727,16 @@ highFrequency
 		reselectMyself();
 	}
 }
-/*
-rule lewonas_always
+
+rule out_reach_always
 inactive
 highFrequency
 {
 	trUnitSelectClear();
-	trUnitSelectByQV("lewonas", true);
+	trUnitSelectByQV("out_reach", true);
 	if (trUnitIsSelected()) {
 		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
 		startNPCDialog(0 + i);
 		reselectMyself();
 	}
 }
-*/
