@@ -307,8 +307,7 @@ void fireknightAlways(int eventID = -1) {
 				if (trTimeMS() > xGetInt(db, xFireKnightOverheatNext)) {
 					xSetInt(db, xFireKnightOverheatNext, xGetInt(db, xFireKnightOverheatNext) + 500);
 					xUnitSelectByID(db, xUnitID);
-					damagePlayerUnit(overheatDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * 0.5,
-						xGetInt(db, xCharIndex));
+					trDamageUnit(overheatDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * 0.5);
 					xsSetContextPlayer(p);
 					current = kbUnitGetCurrentHitpoints(id);
 					xsSetContextPlayer(0);
@@ -334,7 +333,7 @@ void fireknightAlways(int eventID = -1) {
 	if (xGetDatabaseCount(infernos) >0) {
 		xDatabaseNext(infernos);
 		if (trTimeMS() > xGetInt(infernos, xInfernoNext)) {
-			xSetInt(infernos, xInfernoNext, xGetInt(infernos, xInfernoNext) + 300);
+			xSetInt(infernos, xInfernoNext, xGetInt(infernos, xInfernoNext) + 250);
 			pos = xGetVector(infernos, xInfernoPos);
 			if (xGetFloat(infernos, xInfernoRadius) < xGetFloat(infernos, xInfernoMaxRadius)) {
 				xSetFloat(infernos, xInfernoRadius, 2.0 + xGetFloat(infernos, xInfernoRadius));
@@ -354,7 +353,7 @@ void fireknightAlways(int eventID = -1) {
 					dir = rotationMatrix(dir, mCos, mSin);
 				}
 			}
-			amt = xGetFloat(infernos, xInfernoDamage) * 0.3;
+			amt = xGetFloat(infernos, xInfernoDamage) * 0.25;
 			dist = xsPow(xGetFloat(infernos, xInfernoRadius), 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);

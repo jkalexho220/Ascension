@@ -194,7 +194,7 @@ highFrequency
 
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, -9999999999999999999.0);
-	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 47);
+	trModifyProtounit("Outpost", ENEMY_PLAYER, 0, 10);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);

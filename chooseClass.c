@@ -1156,7 +1156,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 11:
 				{
 					icon = "icons\scenario thors hammer icon 64";
-					msg = "Cooldown: 24 | Range: 6 | Damage: 2 percent of your health for every 10 attack";
+					msg = "Cooldown: 24 | Range: 6 | Damage: 3 percent of your health for every 10 attack";
 				}
 				case 12:
 				{

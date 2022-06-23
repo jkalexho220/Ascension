@@ -60,6 +60,7 @@ void blastmageSpell(int p = 0) {
 void spawnStar(int p = 0, vector pos = vector(0,0,0)) {
 	int next = trGetNextUnitScenarioNameNumber();
 	int stars = trQuestVarGet("p"+p+"stars");
+	int solarflare = trQuestVarGet("p"+p+"solarFlare");
 	trArmyDispatch(""+p+",0","Dwarf",2,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 	trArmySelect(""+p+",0");
 	trUnitChangeProtoUnit("Spy Eye");
@@ -76,6 +77,10 @@ void spawnStar(int p = 0, vector pos = vector(0,0,0)) {
 	xSetVector(stars, xStarPos, pos);
 	xSetInt(stars, xStarTimeout, trTimeMS() + 1000 * starDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 	xSetFloat(dPlayerData, xPlayerFavorRegen, xGetFloat(dPlayerData, xPlayerFavorRegen, p) + 0.2, p);
+	if (xGetDatabaseCount(solarflare) > 0) {
+		xAddDatabaseBlock(solarflare, true);
+		xSetVector(solarflare, xSolarFlarePos, pos);
+	}
 }
 
 void blastmageAlways(int eventID = -1) {

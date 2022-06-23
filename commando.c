@@ -396,7 +396,12 @@ void commandoAlways(int eventID = -1) {
 					trCameraShake(0.5, 0.3);
 				}
 				xUnitSelect(echoBombs, xUnitName);
-				trUnitDestroy();
+				if ((xGetInt(echoBombs, xEchoBombUnit) == bossUnit) && (trQuestVarGet("stage") == 9)) {
+					trSetSelectedScale(1,1,1);
+					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				} else {
+					trUnitDestroy();
+				}
 				
 				zSetProtoUnitStat("Kronny Flying", p, 1, 0.01);
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -449,8 +454,15 @@ void commandoAlways(int eventID = -1) {
 			xSetBool(dEnemies, xEchoBomb, true);
 			xAddDatabaseBlock(echoBombs, true);
 			xSetInt(echoBombs, xEchoBombUnit, xGetInt(dEnemies, xUnitName));
-			spyEffect(xGetInt(dEnemies, xUnitName), kbGetProtoUnitID("Phoenix Egg"),
-				xsVectorSet(echoBombs, xUnitName, xGetPointer(echoBombs)));
+			if ((xGetInt(dEnemies, xUnitName) == bossUnit) && (trQuestVarGet("stage") == 9)) {
+				// can't cast spy on the titan atlantean
+				xSetInt(echoBombs, xUnitName, aiPlanGetUserVariableInt(ARRAYS, bossInts, 2));
+				xUnitSelect(echoBombs, xUnitName);
+				trMutateSelected(kbGetProtoUnitID("Phoenix Egg"));
+			} else {
+				spyEffect(xGetInt(dEnemies, xUnitName), kbGetProtoUnitID("Phoenix Egg"),
+					xsVectorSet(echoBombs, xUnitName, xGetPointer(echoBombs)));
+			}
 			if (PvP) {
 				xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner, xGetInt(dEnemies, xDoppelganger)));
 			} else {

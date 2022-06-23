@@ -5875,6 +5875,7 @@ highFrequency
 				xsEnableRule("boss_music");
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
 
 				bossCooldown(8, 12);
 

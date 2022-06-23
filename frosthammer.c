@@ -190,7 +190,7 @@ void frosthammerAlways(int eventID = -1) {
 				amt = xGetFloat(smashes, xSmashScale);
 				dist = amt * smashRange;
 				current = xsPow(amt * smashWidth, 2);
-				amt = amt * 0.002 * xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerAttack);
+				amt = 0.003 * xGetFloat(dPlayerData, xPlayerHealth) * xGetFloat(dPlayerData, xPlayerAttack);
 				for(y=xGetDatabaseCount(dEnemies); >0) {
 					xDatabaseNext(dEnemies);
 					xUnitSelectByID(dEnemies, xUnitID);
