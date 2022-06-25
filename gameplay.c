@@ -1200,8 +1200,8 @@ highFrequency
 		if (trUnitAlive() == false) {
 			xsDisableSelf();
 			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
-			trUnitSetAnimationPath("3,1,0,0,0,0,0");
 			trUnitOverrideAnimation(6,0,false,false,-1);
+			trUnitSetAnimationPath("3,1,0,0,0,0,0");
 		}
 	}
 }

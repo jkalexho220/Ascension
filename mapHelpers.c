@@ -26,7 +26,7 @@ const int ROOM_TIGER = 9;
 const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;
 const int ROOM_EXCALIBUR = 100;
-const int ROOM_BURNING = 101;
+const int ROOM_ELECTRIC = 101;
 
 const int ROOM_CIRCLE = 0;
 const int ROOM_SQUARE = 1;

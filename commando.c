@@ -487,6 +487,7 @@ void commandoAlways(int eventID = -1) {
 				} else {
 					trChatSend(0, "You must target an enemy with this ability!");
 				}
+				trCounterAbort("lure");
 			}
 			xSetInt(dPlayerData, xPlayerLureCooldownStatus, ABILITY_COST);
 		}

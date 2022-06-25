@@ -112,6 +112,16 @@ const int NPC_ELECTRIC_CHAMBER_START = 473;
 const int NPC_ELECTRIC_CHAMBER_NEXT = 474;
 const int NPC_ELECTRIC_CHAMBER_END = 475;
 
+const int NPC_DOGGO_QUEST_OWNER = 476;
+/*
+RESERVED TO 480
+*/
+const int NPC_DOGGO_QUEST_DOGGO = 481;
+/*
+RESERVED TO 486
+*/
+const int NPC_DOGGO_QUEST_QUESTION = 487;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -471,6 +481,286 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			trUnitChangeProtoUnit("Hero Birth");
 			trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
 			dialog = 0;
+		}
+		case NPC_DOGGO_QUEST_OWNER:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Can anyone help me look for my dog? My precious Angel ran away!");
+				}
+				case 2:
+				{
+					uiMessageBox("He's very cute and lovable! If you see him, please let me know!");
+					trQuestVarSet("doggoQuestProgress", 1 + trQuestVarGet("doggoQuestProgress"));
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_OWNER + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh, also, he's a super funny dog!");
+				}
+				case 2:
+				{
+					uiMessageBox("He makes some pretty alarming jokes. You don't have to take him seriously.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_OWNER + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Angel! Where are you, Angel?!");
+				}
+				case 2:
+				{
+					uiMessageBox("Hey you! Have you seen my dog?");
+				}
+				case 3:
+				{
+					// DECISION TIME
+					trShowChoiceDialog("Have you seen my dog?","Yes",10003,"No",10004);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_OWNER + 3:
+		{
+			switch(dialog)	
+			{
+				case 1:
+				{
+					uiMessageBox("Oh, I hope nothing's happened to Angel!");
+				}
+				case 2:
+				{
+					uiMessageBox("He means everything to me!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_OWNER + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Oh Angel!! Where are you ?");
+				}
+				case 2:
+				{
+					uiMessageBox("I've got your treats here!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_QUESTION:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Really? He was here?");
+				}
+				case 2:
+				{
+					uiMessageBox("Thank you so much kind stranger! I'll patiently search the area then.");
+					trQuestVarSet("doggoQuestProgress", 4);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_QUESTION + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Aw, drats. I hope he didn't enter the Tower!");
+				}
+				case 2:
+				{
+					uiMessageBox("Alright, adventurer! I'll go into the Tower and find him!");
+				}
+				case 3:
+				{
+					uiMessageBox("If any harm were to come to him, I don't know what I would do!");
+					trQuestVarSet("doggoQuestProgress", 3);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_DOGGO + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Psst! Hey you! Have you seen that bastard in the cloak and staff?");
+				}
+				case 2:
+				{
+					uiMessageBox("Yeah he says he's my master and he's a liar. That man just wants to skin me and eat me!");
+				}
+				case 3:
+				{
+					uiMessageBox("If you see him, don't let him know where I am! My life depends on it!");
+					trQuestVarSet("doggoQuestProgress", 1 + trQuestVarGet("doggoQuestProgress"));
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_DOGGO + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("And what the heck kind of name is Angel?!");
+				}
+				case 2:
+				{
+					uiMessageBox("I should be called The Great Lord of Calamity and Evil The First!");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_DOGGO + 3:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Thanks for telling that lie for me man.");
+				}
+				case 2:
+				{
+					uiMessageBox("That bastard entered the Tower and not long after they found his corpse.");
+				}
+				case 3:
+				{
+					uiMessageBox("...");
+				}
+				case 4:
+				{
+					uiMessageBox("Dumbass.");
+				}
+				case 5:
+				{
+					uiMessageBox("...");
+				}
+				case 6:
+				{
+					uiMessageBox("Maybe...");
+				}
+				case 7:
+				{
+					uiMessageBox("...he wasn't such a bad guy after all.");
+				}
+				case 8:
+				{
+					dialog = 0;
+					xsDisableRule("talking_dog_always");
+					trUnitSelectClear();
+					trUnitSelectByQV("talkingDog");
+					trUnitChangeProtoUnit("Relic");
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, trQuestVarGet("talkingDog"));
+					xSetInt(dFreeRelics, xRelicType, RELIC_PET_DOG);
+					trQuestVarSet("doggoQuestProgress", 5);
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_DOGGO + 4:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("talkingDog");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("You bastard! Why did you tell him where I was!");
+				}
+				case 2:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dogOwner");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Now now, Angel. Watch your language.");
+				}
+				case 3:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("talkingDog");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("My name's not Angel! It's Lord of Calamity and Evil The First!");
+				}
+				case 4:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dogOwner");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Okay, okay, mister Angel of Calamity. Here have a treat.");
+				}
+				case 5:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("talkingDog");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Ooh, Angel of Calamity. That doesn't sound too bad- Hey wait! I won't be swayed by your treats!");
+				}
+				case 6:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dogOwner");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("I'm sorry for his behavior, stranger. Here, take this as thanks.");
+				}
+				case 7:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dogOwner");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Ange- Lord Calamity is everything to me.");
+				}
+				case 8:
+				{
+					trQuestVarSet("doggoQuestProgress", 5);
+					dialog = 0;
+					spawnRelicSpecific(vector(135,0,157), RELIC_FAVOR_SPECIAL);
+				}
+			}
+		}
+		case NPC_DOGGO_QUEST_DOGGO + 5:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("talkingDog");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Okay fine. You can be my master for another day.");
+				}
+				case 2:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dogOwner");
+					trUnitHighlight(2.5, true);
+					uiMessageBox("Oh wonderful! Let's go hunt for female dogs now.");
+					dialog = 0;
+				}
+			}
 		}
 		case NPC_ELECTRIC_CHAMBER_START:
 		{

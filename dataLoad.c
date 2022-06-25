@@ -115,6 +115,8 @@ void saveAllData() {
 	
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = trQuestVarGet("doggoQuestProgress");
+	savedata = savedata * 6 + currentdata;
 	currentdata = trQuestVarGet("runestoneComplete");
 	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("monsterpediaQuestComplete");
@@ -252,6 +254,8 @@ inactive
 	savedata = savedata / 2;
 	trQuestVarSet("runestoneComplete", iModulo(2, savedata));
 	savedata = savedata / 2;
+	trQuestVarSet("doggoQuestProgress", iModulo(6, savedata));
+	savedata = savedata / 6;
 	
 	if ((trCurrentPlayer() == 1) && Multiplayer) {
 		trQuestVarSet("playerHasHosted", 1);

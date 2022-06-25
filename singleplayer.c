@@ -735,14 +735,25 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
-		// quest for pet dog
-		/*
-		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && trQuestVarGet("")) {
-			trQuestVarSet("dogOwner", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Setna",1,135,0,157,225,true);
-			xsEnableRule("dog_owner_always");
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && trQuestVarGet("doggoQuestProgress") < 5) {
+			if (trQuestVarGet("doggoQuestProgress") == 4) {
+				trQuestVarSet("dogOwner", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Setna",1,137,0,159,315,true);
+				trQuestVarSet("talkingDog", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dog",1,133,0,163,135,true);
+				xsEnableRule("dog_final_battle");
+			} else if (iModulo(2, 1*trQuestVarGet("doggoQuestProgress")) == 0) {
+				trQuestVarSet("dogOwner", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Setna",1,135,0,157,225,true);
+				xsEnableRule("dog_owner_always");
+				trEventSetHandler(10003, "dogChoice");
+				trEventSetHandler(10004, "dogChoice");
+			} else {
+				trQuestVarSet("talkingDog", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dog",1,135,0,157,225,true);
+				xsEnableRule("talking_dog_always");
+			}
 		}
-		*/
 
 		// excalibur quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 3 && (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) - trQuestVarGet("p1swordpieceQuest"+SWORD_HANDLE) <= 0)) {
@@ -768,11 +779,13 @@ highFrequency
 		}
 
 		// electric trial for sword hilt
+		/*
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 5 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
 			xsEnableRule("out_reach_always");
 			trQuestVarSet("out_reach", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0", "Royal Guard", 1, 131, 0, 157, 225, true);
 		}
+		*/
 
 		// start the hippocampus quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
@@ -988,6 +1001,7 @@ highFrequency
 			case THRONESHIELD:
 			{
 				uiMessageBox("To unlock this class, defeat five bosses. Current: " + 1*trQuestVarGet("bossKills"));
+				//uiMessageBox("To unlock this class, play in a lobby with five or more players.");
 			}
 			case ALCHEMIST:
 			{
@@ -995,7 +1009,7 @@ highFrequency
 			}
 			case BLASTMAGE:
 			{
-				uiMessageBox("To unlock this class, complete five quests. Current: " + 1*trQuestVarGet("questCount"));
+				uiMessageBox("To unlock this class, complete five quests in the tower. Current: " + 1*trQuestVarGet("questCount"));
 			}
 			case SPARKWITCH:
 			{
@@ -1737,6 +1751,53 @@ highFrequency
 	if (trUnitIsSelected()) {
 		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
 		startNPCDialog(0 + i);
+		reselectMyself();
+	}
+}
+
+void dogChoice(int eventID = -1) {
+	startNPCDialog(NPC_DOGGO_QUEST_QUESTION + eventID - 10003);
+	reselectMyself();
+}
+
+rule dog_owner_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("dogOwner", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_DOGGO_QUEST_OWNER + trQuestVarGet("doggoQuestProgress"));
+		reselectMyself();
+	}
+}
+
+rule talking_dog_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("talkingDog", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_DOGGO_QUEST_DOGGO + trQuestVarGet("doggoQuestProgress"));
+		reselectMyself();
+	}
+}
+
+rule dog_final_battle
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("dogOwner", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_DOGGO_QUEST_DOGGO + trQuestVarGet("doggoQuestProgress"));
+		reselectMyself();
+	}
+	trUnitSelectClear();
+	trUnitSelectByQV("talkingDog", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_DOGGO_QUEST_DOGGO + trQuestVarGet("doggoQuestProgress"));
 		reselectMyself();
 	}
 }

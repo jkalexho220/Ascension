@@ -224,7 +224,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 	} else if (trQuestVarGet("room"+room+"key") > 0) {
 		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-		spawnRelicSpecific(xsVectorSet(70 * x + 36,0,70 * z + 36),1*trQuestVarGet("room"+room+"key"));
+		spawnRelicSpecific(xsVectorSet(70 * x + 34,0,70 * z + 34),1*trQuestVarGet("room"+room+"key"));
 		trQuestVarSet("room"+room+"key", 0);
 	}
 	switch(type)
@@ -345,6 +345,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trArmySelect("1,0");
 			trUnitChangeProtoUnit("Gaia Forest effect");
 			xsEnableRule("relic_transporter_guy_found");
+		}
+		case ROOM_ELECTRIC:
+		{
+			trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, worldHeight, false);
+			// paint a spiral of cliff
 		}
 		case ROOM_EXCALIBUR:
 		{
@@ -1427,6 +1433,7 @@ highFrequency
 						if (trQuestVarGet("excaliburRoom") > 14) {
 							trQuestVarSet("excaliburRoom", trQuestVarGet("excaliburRoom") - 13);
 						}
+						break;
 					}
 				}
 			}
@@ -1705,6 +1712,17 @@ highFrequency
 				trModifyProtounit("Helepolis", 0, 0, 20000 * ENEMY_PLAYER);
 				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 13, -2);
+
+				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"swordpieceQuest"+SWORD_HILT) == 1) {
+						trQuestVarSetFromRand("electricRoom", 1, 14, true);
+						trQuestVarSet("electricRoom", trQuestVarGet("village") + trQuestVarGet("electricRoom"));
+						if (trQuestVarGet("electricRoom") > 14) {
+							trQuestVarSet("electricRoom", trQuestVarGet("electricRoom") - 13);
+						}
+						break;
+					}
+				}
 			}
 			case 7:
 			{
