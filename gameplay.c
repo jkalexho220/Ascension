@@ -1741,3 +1741,77 @@ highFrequency
 }
 
 */
+
+rule electric_room_find
+inactive
+highFrequency
+{
+	vector pos = xGetVector(dPlayerUnits, xUnitPos);
+	vector center = trVectorQuestVarGet("electricRoomCenter");
+	if (xsMax(xsAbs(xsVectorGetX(pos) - xsVectorGetX(center)), xsAbs(xsVectorGetZ(pos) - xsVectorGetZ(center))) < 30) {
+		trUnitSelectClear();
+		trUnitSelectByQV("electricRoomRevealer");
+		zSetProtoUnitStat("Revealer to Player", 0, 2, 30);
+		trUnitChangeProtoUnit("Revealer to Player");
+		trUnitSelectClear();
+		trUnitSelectByQV("electricRoomRevealer");
+		trUnitConvert(1);
+		xsDisableSelf();
+		xsEnableRule("electric_room_always");
+		trSoundPlayFN("visionswoosh.wav","1",-1,"","");
+	}
+}
+
+rule electric_room_always
+inactive
+highFrequency
+{
+	int dist = 0;
+	int index = 0;
+	vector pos = vector(0,0,0);
+	vector center = trVectorQuestVarGet("electricRoomCenter");
+	vector top = trVectorQuestVarGet("electricRoomTop");
+	vector bot = trVectorQuestVarGet("electricRoomBot");
+	if (xGetBool(dPlayerUnits, xIsHero) == false) {
+		pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName));
+		if (vectorInRectangle(pos, bot, top)) {
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			trUnitDelete(false);
+		}
+	}
+	if (xGetDatabaseCount(dPlayerCharacters) > 0) {
+		xDatabaseNext(dPlayerCharacters);
+		xUnitSelectByID(dPlayerCharacters, xUnitID);
+		if (trUnitAlive() == false) {
+			removePlayerCharacter();
+		} else if (trTimeMS() > xGetInt(dPlayerCharacters, xElectricNext)) {
+			pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true);
+			if (vectorInRectangle(pos, bot, top)) {
+				gainFavor(xGetInt(dPlayerCharacters, xPlayerOwner), -1.0);
+				dist = xsMax(xsAbs(xsVectorGetX(pos) - xsVectorGetX(center)), xsAbs(xsVectorGetZ(pos) - xsVectorGetZ(center)));
+				if (dist > 4) {
+					xSetInt(dPlayerCharacters, xElectricNext, xGetInt(dPlayerCharacters, xElectricNext) + 200 + 100 * dist);
+					trTechGodPower(0, "bolt", 1);
+					trChatSetStatus(false);
+					trDelayedRuleActivation("enable_chat");
+					trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
+					index = xGetPointer(dPlayerUnits);
+					xSetPointer(dPlayerUnits, xGetInt(dPlayerCharacters, xCharIndex));
+					damagePlayerUnit(1000);
+					xSetPointer(dPlayerUnits, index);
+					trQuestVarSetFromRand("sound", 1, 5, true);
+					trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+				} else {
+					trSoundPlayFN("frostgiantmove1.wav","1",-1,"","");
+					if (trQuestVarGet("p"+trCurrentPlayer()+"swordpieceQuest"+SWORD_HILT) == 1) {
+						trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HILT, 1);
+						uiMessageBox("Acquired: Hilt of an unknown sword");
+					}
+					xsDisableSelf();
+				}
+			} else {
+				xSetInt(dPlayerCharacters, xElectricNext, trTimeMS() + 1000);
+			}
+		}
+	}
+}

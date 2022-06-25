@@ -779,13 +779,12 @@ highFrequency
 		}
 
 		// electric trial for sword hilt
-		/*
+		
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 5 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
 			xsEnableRule("out_reach_always");
 			trQuestVarSet("out_reach", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0", "Royal Guard", 1, 131, 0, 157, 225, true);
 		}
-		*/
 
 		// start the hippocampus quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 6 && trQuestVarGet("p1hippocampus") == 0) {
@@ -802,9 +801,11 @@ highFrequency
 		}
 
 		// sword blade puzzle quest
+		/*
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 8 && (trQuestVarGet("p1swordpiece"+SWORD_BLADE) - trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) <= 0)) {
 
 		}
+		*/
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
@@ -1750,7 +1751,7 @@ highFrequency
 	trUnitSelectByQV("out_reach", true);
 	if (trUnitIsSelected()) {
 		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) + trQuestVarGet("p1swordpiece"+SWORD_HILT);
-		startNPCDialog(0 + i);
+		startNPCDialog(NPC_ELECTRIC_CHAMBER_START + i);
 		reselectMyself();
 	}
 }

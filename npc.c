@@ -474,13 +474,29 @@ int npcDiag(int npc = 0, int dialog = 0) {
 		}
 		case NPC_EXCALIBUR_END:
 		{
-			uiMessageBox("What? So it was just the handle of a sword? Haha! Sucks to be you!");
-			xsDisableRule("rogers_always");
-			trUnitSelectClear();
-			trUnitSelectByQV("phdorogers4");
-			trUnitChangeProtoUnit("Hero Birth");
-			trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
-			dialog = 0;
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("What? So it was just the handle of a sword? Damn...");
+				}
+				case 2:
+				{
+					uiMessageBox("Well, as compensation, you can have this.");
+				}
+				case 3:
+				{
+					xsDisableRule("rogers_always");
+					trUnitSelectClear();
+					trUnitSelectByQV("phdorogers4");
+					trUnitChangeProtoUnit("Relic");
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, trQuestVarGet("phdorogers4"));
+					xSetInt(dFreeRelics, xRelicType, RELIC_COOLDOWN_REDUCTION);
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HANDLE, 0);
+					dialog = 0;
+				}
+			}
 		}
 		case NPC_DOGGO_QUEST_OWNER:
 		{
@@ -803,6 +819,32 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				{
 					uiMessageBox("If you're entering it, be sure to be well equipped!");
 					dialog = 0;
+				}
+			}
+		}
+		case NPC_ELECTRIC_CHAMBER_END:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I see, all that was left was this rusty old hilt.");
+				}
+				case 2:
+				{
+					uiMessageBox("Well, thank you for your efforts anyway. Here, have this.");
+				}
+				case 3:
+				{
+					dialog = 0;
+					trQuestVarSet("p1swordpieceQuest"+SWORD_HILT, 0);
+					xsDisableRule("out_reach_always");
+					trUnitSelectClear();
+					trUnitSelectByQV("out_reach");
+					trUnitChangeProtoUnit("Relic");
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, trQuestVarGet("out_reach"));
+					xSetInt(dFreeRelics, xRelicType, RELIC_WEIGHTED_BLOWS);
 				}
 			}
 		}

@@ -224,7 +224,11 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 	} else if (trQuestVarGet("room"+room+"key") > 0) {
 		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
-		spawnRelicSpecific(xsVectorSet(70 * x + 34,0,70 * z + 34),1*trQuestVarGet("room"+room+"key"));
+		if (type == ROOM_ELECTRIC) {
+			spawnRelicSpecific(xsVectorSet(70 * x + 15,0,70 * z + 15),1*trQuestVarGet("room"+room+"key"));
+		} else {
+			spawnRelicSpecific(xsVectorSet(70 * x + 34,0,70 * z + 34),1*trQuestVarGet("room"+room+"key"));
+		}
 		trQuestVarSet("room"+room+"key", 0);
 	}
 	switch(type)
@@ -348,9 +352,34 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		}
 		case ROOM_ELECTRIC:
 		{
-			trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trPaintTerrain(x * 35 + 5, z * 35 + 5, x * 35 + 34, z * 35 + 34, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
 			trChangeTerrainHeight(x * 35 + 5, z * 35 + 5, x * 35 + 35, z * 35 + 35, worldHeight, false);
 			// paint a spiral of cliff
+			dir = vector(1,0,0);
+			pos = xsVectorSet(x * 35 + 10, 0, z * 35 + 30);
+			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, 0, 73, false); // city water pool
+			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 10, z * 35 + 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+			for(i=10; >1) {
+				trPaintTerrain(xsVectorGetX(pos),xsVectorGetZ(pos),xsVectorGetX(pos) + 2 * xsVectorGetX(dir) * i, xsVectorGetZ(pos) + 2 * xsVectorGetZ(dir) * i, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+				pos = pos + (dir * i * 2);
+				dir = rotationMatrix(dir, 0, -1);
+				trPaintTerrain(xsVectorGetX(pos),xsVectorGetZ(pos),xsVectorGetX(pos) + 2 * xsVectorGetX(dir) * i, xsVectorGetZ(pos) + 2 * xsVectorGetZ(dir) * i, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
+				pos = pos + (dir * i * 2);
+				dir = rotationMatrix(dir, 0, -1);
+			}
+			trQuestVarSet("electricRoomRevealer", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41,0,true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Cinematic Block");
+			trQuestVarSet("electricRoomShiny", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41,0,true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Curse SFX"));
+			trVectorQuestVarSet("electricRoomCenter", xsVectorSet(x * 70 + 41, 0, z * 70 + 41));
+			trVectorQuestVarSet("electricRoomBot", xsVectorSet(x * 70 + 20, 0, z * 70 + 20));
+			trVectorQuestVarSet("electricRoomTop", xsVectorSet(x * 70 + 60, 0, z * 70 + 60));
+			xsEnableRule("electric_room_find");
+			xElectricNext = xInitAddInt(dPlayerCharacters, "electricNext");
 		}
 		case ROOM_EXCALIBUR:
 		{
@@ -1668,7 +1697,7 @@ highFrequency
 				trQuestVarSet("trapRooms", 3);
 				trQuestVarSet("trapType", TRAP_LASERS);
 				TERRAIN_WALL = 2;
-				TERRAIN_SUB_WALL = 5;
+				TERRAIN_SUB_WALL = 2;
 				
 				TERRAIN_PRIMARY = 0;
 				TERRAIN_SUB_PRIMARY = 70;
@@ -2243,6 +2272,8 @@ highFrequency
 				}
 				if (i == 1*trQuestVarGet("bossEntranceRoom")) {
 					buildRoom(x, z, ROOM_BOSS_ENTRANCE);
+				} else if (i == 1*trQuestVarGet("electricRoom")) {
+					buildRoom(x, z, ROOM_ELECTRIC);
 				} else if (i == 1*trQuestVarGet("excaliburRoom")) {
 					buildRoom(x, z, ROOM_EXCALIBUR);
 				} else if (i == 1*trQuestVarGet("relicTransporterGuy")) {

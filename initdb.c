@@ -50,6 +50,8 @@ int xCharAttackTarget = 0;
 int xCharAttackTargetIndex = 0;
 int xCharSpecialAttack = 0;
 
+int xElectricNext = 0;
+
 /* relics */
 int dFreeRelics = 0;
 int xRelicName = 0;
