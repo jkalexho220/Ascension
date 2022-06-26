@@ -735,6 +735,7 @@ highFrequency
 			xsEnableRule("monsterpedia_quest");
 		}
 
+		// doggo quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 2 && trQuestVarGet("doggoQuestProgress") < 5) {
 			if (trQuestVarGet("doggoQuestProgress") == 4) {
 				trQuestVarSet("dogOwner", trGetNextUnitScenarioNameNumber());
@@ -779,7 +780,6 @@ highFrequency
 		}
 
 		// electric trial for sword hilt
-		
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 5 && (trQuestVarGet("p1swordpiece"+SWORD_HILT) - trQuestVarGet("p1swordpieceQuest"+SWORD_HILT) <= 0)) {
 			xsEnableRule("out_reach_always");
 			trQuestVarSet("out_reach", trGetNextUnitScenarioNameNumber());
@@ -801,11 +801,9 @@ highFrequency
 		}
 
 		// sword blade puzzle quest
-		/*
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 8 && (trQuestVarGet("p1swordpiece"+SWORD_BLADE) - trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) <= 0)) {
 
 		}
-		*/
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
 			trQuestVarSet("nottudUnit", trGetNextUnitScenarioNameNumber());
