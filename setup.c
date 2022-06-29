@@ -528,6 +528,8 @@ minInterval 5
 {
 	if (trChatHistoryContains("debug on", 1)) {
 		debugIsOn = true;
+		trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+		trChatSend(0, "<color=1,0,0>Debugging has been turned on.</color>");
 		xsDisableSelf();
 	}
 }
@@ -619,6 +621,15 @@ highFrequency
 	trModifyProtounit("Monument 2", 0, 26, -1);
 	trModifyProtounit("Monument 2", ENEMY_PLAYER, 0, 1000);
 	trModifyProtounit("Monument 2", 0, 0, 1000);
+
+	trModifyProtounit("Monument", ENEMY_PLAYER, 24, -1);
+	trModifyProtounit("Monument", ENEMY_PLAYER, 25, -1);
+	trModifyProtounit("Monument", ENEMY_PLAYER, 26, -1);
+	trModifyProtounit("Monument", 0, 24, -1);
+	trModifyProtounit("Monument", 0, 25, -1);
+	trModifyProtounit("Monument", 0, 26, -1);
+	trModifyProtounit("Monument", ENEMY_PLAYER, 0, 1000);
+	trModifyProtounit("Monument", 0, 0, 1000);
 	
 	trModifyProtounit("Uproot 2x2", 0, 8, -99);
 	

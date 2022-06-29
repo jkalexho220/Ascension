@@ -27,6 +27,7 @@ const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;
 const int ROOM_EXCALIBUR = 100;
 const int ROOM_ELECTRIC = 101;
+const int ROOM_PUZZLE = 102;
 
 const int ROOM_CIRCLE = 0;
 const int ROOM_SQUARE = 1;
@@ -84,6 +85,9 @@ int dKeeperTargets = 0;
 int xKeeperTargetPlayer = 0;
 
 int dDonkeys = 0;
+
+int puzzleDB = 0;
+int puzzleStatues = 0;
 
 rule initialize_map_databases
 active

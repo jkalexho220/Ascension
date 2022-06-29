@@ -226,6 +226,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 		xSetInt(dUnlockWalls,xWallKey, trGetNextUnitScenarioNameNumber(), 1*trQuestVarGet("room"+room+"index"));
 		if (type == ROOM_ELECTRIC) {
 			spawnRelicSpecific(xsVectorSet(70 * x + 15,0,70 * z + 15),1*trQuestVarGet("room"+room+"key"));
+		} else if (type == ROOM_PUZZLE) {
+			spawnRelicSpecific(xsVectorSet(70 * x + 53,0,70 * z + 53),1*trQuestVarGet("room"+room+"key"));
 		} else {
 			spawnRelicSpecific(xsVectorSet(70 * x + 34,0,70 * z + 34),1*trQuestVarGet("room"+room+"key"));
 		}
@@ -349,6 +351,80 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trArmySelect("1,0");
 			trUnitChangeProtoUnit("Gaia Forest effect");
 			xsEnableRule("relic_transporter_guy_found");
+		}
+		case ROOM_PUZZLE:
+		{
+			trPaintTerrain(x * 35 + 11, z * 35 + 11, x * 35 + 29, z * 35 + 29, TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+			trChangeTerrainHeight(x * 35 + 11, z * 35 + 11, x * 35 + 30, z * 35 + 30, worldHeight, false);
+			puzzleStatues = xInitDatabase("puzzleStatues");
+			trVectorQuestVarSet("puzzleRoomCenter", xsVectorSet(x * 70 + 41, 0, z * 70 + 41));
+			xInitAddInt(puzzleStatues, "name");
+			xStatueState = xInitAddInt(puzzleStatues,"state");
+			xStatuePosition = xInitAddInt(puzzleStatues,"position");
+			xStatueAngle = xInitAddFloat(puzzleStatues,"angle");
+			xStatueTimeout = xInitAddInt(puzzleStatues,"timeout");
+			xStatuePos = xInitAddVector(puzzleStatues,"pos"); // repurposed to the x/z coordinates of the statue
+
+			puzzleDB = aiPlanCreate("puzzleDB", 8);
+			bool soldier = false;
+			trQuestVarSet("puzzleRoomRevealer", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41, 0, true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Revealer to Player");
+
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 55,0,z * 70 + 55, 225, true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Monument 5"));
+
+			trArmyDispatch("0,0","Dwarf",1, x * 70 + 27, 0, z * 70 + 27, 45, true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Monument 4"));
+
+			x = x * 70 + 29;
+			z = z * 70 + 41;
+			for(i=0; <4) {
+				soldier = (soldier == false);
+				aiPlanAddUserVariableInt(puzzleDB, i, "row"+i, 4);
+				for(j=0; <4) {
+					aiPlanSetUserVariableInt(puzzleDB, i, j, xAddDatabaseBlock(puzzleStatues, true));
+					xSetInt(puzzleStatues, xUnitName, trGetNextUnitScenarioNameNumber());
+					xSetVector(puzzleStatues, xStatuePos, xsVectorSet(i, 0, j));
+					if (soldier) {
+						xSetFloat(puzzleStatues, xStatueAngle, 0.785398);
+						trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x + i * 4 + j * 4, 0, z + j * 4 - i * 4, 225, true);
+						trArmySelect(""+ENEMY_PLAYER+",0");
+						trMutateSelected(kbGetProtoUnitID("Monument 2"));
+					} else {
+						xSetFloat(puzzleStatues, xStatueAngle, 3.92699);
+						trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x + i * 4 + j * 4, 0, z + j * 4 - i * 4, 45, true);
+						trArmySelect(""+ENEMY_PLAYER+",0");
+						trMutateSelected(kbGetProtoUnitID("Monument"));
+					}
+					soldier = (soldier == false);
+				}
+			}
+			for(i=0; <3) {
+				for(j=0; <4) {
+					trArmyDispatch("0,0","Dwarf",1,x + 2 + i * 4 + j * 4, 0, z - 2 + j * 4 - i * 4, 45, true);
+					trArmySelect("0,0");
+					trMutateSelected(kbGetProtoUnitID("Undermine Ground decal long"));
+					trSetSelectedScale(0.62, 1, 0.3);
+
+					trArmyDispatch("0,0","Dwarf",1,x + 2 + i * 4 + j * 4, 0, z + 2 + i * 4 - j * 4, 135, true);
+					trArmySelect("0,0");
+					trMutateSelected(kbGetProtoUnitID("Undermine Ground decal long"));
+					trSetSelectedScale(0.62, 1, 0.3);
+				}
+			}
+			turnPuzzleStatue(1, true, true);
+			turnPuzzleStatue(8, true, true);
+			turnPuzzleStatue(10, true, true);
+			turnPuzzleStatue(10, true, true);
+			turnPuzzleStatue(15, true, true);
+			turnPuzzleStatue(15, true, true);
+			turnPuzzleStatue(15, true, true);
+
+			xsEnableRule("puzzle_room_find");
 		}
 		case ROOM_ELECTRIC:
 		{
@@ -1963,6 +2039,19 @@ highFrequency
 				
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				bossScale = 1.0;
+
+				for(p=1; < ENEMY_PLAYER) {
+					if (trQuestVarGet("p"+p+"swordpieceQuest"+SWORD_BLADE) == 1) {
+						trQuestVarSetFromRand("puzzleRoom", 1, 14, true);
+						trQuestVarSet("puzzleRoom", trQuestVarGet("village") + trQuestVarGet("puzzleRoom"));
+						if (trQuestVarGet("puzzleRoom") > 14) {
+							trQuestVarSet("puzzleRoom", trQuestVarGet("puzzleRoom") - 13);
+						}
+						break;
+					}
+				}
+
+				trQuestVarSet("puzzleRoom", 1);
 			}
 			case 11:
 			{
@@ -2272,6 +2361,8 @@ highFrequency
 				}
 				if (i == 1*trQuestVarGet("bossEntranceRoom")) {
 					buildRoom(x, z, ROOM_BOSS_ENTRANCE);
+				} else if (i == 1*trQuestVarGet("puzzleRoom")) {
+					buildRoom(x, z, ROOM_PUZZLE);
 				} else if (i == 1*trQuestVarGet("electricRoom")) {
 					buildRoom(x, z, ROOM_ELECTRIC);
 				} else if (i == 1*trQuestVarGet("excaliburRoom")) {

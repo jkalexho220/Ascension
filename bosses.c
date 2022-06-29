@@ -5928,6 +5928,7 @@ highFrequency
 	if (trUnitAlive() == true) {
 		if (trQuestVarGet("secondPhase") == 1) {
 			if ((trTime() > trQuestVarGet("pitDeployNext")) || (trQuestVarGet("noGates") == 1)) {
+				trQuestVarSet("pitDeployNext", trTime() + 30 - trUnitPercentDamaged() / 5);
 				// tartarian gates
 				dir = trVectorQuestVarGet("gateSpawnDir");
 				pos = trVectorQuestVarGet("bossRoomCenter") - (dir * 15.0);
@@ -5938,7 +5939,6 @@ highFrequency
 
 				trQuestVarSet("noGates", 1);
 				trVectorQuestVarSet("gateSpawnDir", rotationMatrix(dir, -0.757322, 0.653041));
-				trQuestVarSet("pitDeployNext", trTime() + 30);
 			} else if (trUnitPercentDamaged() > trQuestVarGet("pitDeployDamage")) {
 				trQuestVarSet("pitDeployNext", trQuestVarGet("pitDeployNext") - trUnitPercentDamaged() + trQuestVarGet("pitDeployDamage"));
 				trQuestVarSet("pitDeployDamage", trUnitPercentDamaged());

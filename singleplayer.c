@@ -802,7 +802,9 @@ highFrequency
 
 		// sword blade puzzle quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 8 && (trQuestVarGet("p1swordpiece"+SWORD_BLADE) - trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) <= 0)) {
-
+			xsEnableRule("scragins_always");
+			trQuestVarSet("scragins", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Archer Atlantean",1,165,0,137,225,true);
 		}
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
@@ -1797,6 +1799,20 @@ highFrequency
 	trUnitSelectByQV("talkingDog", true);
 	if (trUnitIsSelected()) {
 		startNPCDialog(NPC_DOGGO_QUEST_DOGGO + trQuestVarGet("doggoQuestProgress"));
+		reselectMyself();
+	}
+}
+
+
+rule scragins_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("scragins", true);
+	if (trUnitIsSelected()) {
+		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) + trQuestVarGet("p1swordpiece"+SWORD_BLADE);
+		startNPCDialog(NPC_PUZZLE_QUEST_START + i);
 		reselectMyself();
 	}
 }

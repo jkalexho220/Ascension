@@ -121,6 +121,10 @@ const int NPC_DOGGO_QUEST_DOGGO = 481;
 RESERVED TO 486
 */
 const int NPC_DOGGO_QUEST_QUESTION = 487;
+// 488 RESERVED
+const int NPC_PUZZLE_QUEST_START = 489;
+const int NPC_PUZZLE_QUEST_NEXT = 490;
+const int NPC_PUZZLE_QUEST_END = 491;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -143,6 +147,75 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_PUZZLE_QUEST_START:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("I received a strange message a couple days ago. Do you know what it means?");
+				}
+				case 2:
+				{
+					uiMessageBox("The soldiers serve mortal rulers.");
+				}
+				case 3:
+				{
+					uiMessageBox("But the people know of only one god.");
+				}
+				case 4:
+				{
+					uiMessageBox("It seems like a riddle of some sort.");
+					trQuestVarSet("p1swordpieceQuest"+SWORD_BLADE, 1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_PUZZLE_QUEST_NEXT:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The soldiers serve mortal rulers.");
+				}
+				case 2:
+				{
+					uiMessageBox("But the people know of only one god.");
+				}
+				case 3:
+				{
+					uiMessageBox("Huh, what a weird message.");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_PUZZLE_QUEST_END:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Wait, you figured out what the message means?");
+				}
+				case 2:
+				{
+					uiMessageBox("What! How!");
+				}
+				case 3:
+				{
+					dialog = 0;
+					xsDisableRule("scragins_always");
+					trUnitSelectClear();
+					trUnitSelectByQV("scragins");
+					trUnitChangeProtoUnit("Relic");
+					xAddDatabaseBlock(dFreeRelics, true);
+					xSetInt(dFreeRelics, xUnitName, trQuestVarGet("scragins"));
+					xSetInt(dFreeRelics, xRelicType, RELIC_ALL);
+					trQuestVarSet("p1swordpieceQuest"+SWORD_BLADE, 0);
+				}
+			}
+		}
 		case NPC_THANK_YOU_PLAYTESTERS:
 		{
 			switch(dialog)
@@ -220,15 +293,15 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 6:
 				{
-					uiMessageBox("For starters, choose one of the two flashing characters by walking up to them.");
+					uiMessageBox("Also remember to click on characters and objects in the world to receive useful information!");
 				}
 				case 7:
 				{
-					uiMessageBox("Also remember to click on characters and objects in the world to receive useful information!");
+					uiMessageBox("Good luck and have fun! The Tower of Ascension awaits!");
 				}
 				case 8:
 				{
-					uiMessageBox("Good luck and have fun! You're in for a wild adventure!");
+					uiMessageBox("For starters, choose one of the two flashing characters by walking up to them.");
 					trUnitSelectClear();
 					trUnitSelectByQV("choice1unit");
 					trUnitHighlight(60, true);

@@ -65,9 +65,9 @@ void initializeStatuePuzzle(int room = 0) {
 	xStatuePosition = xInitAddInt(db,"position");
 	xStatueAngle = xInitAddFloat(db,"angle");
 	xStatueTimeout = xInitAddInt(db,"timeout");
+	xStatuePos = xInitAddVector(db,"pos");
 	xStatueConnections = xInitAddInt(db,"connections");
 	xStatueArray = xInitAddInt(db,"array");
-	xStatuePos = xInitAddVector(db,"pos");
 }
 
 void turnStatue(int room = 0, int index = 0, bool first = false, bool immediate = false) {
