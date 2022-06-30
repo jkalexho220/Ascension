@@ -493,14 +493,12 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Sphinx");
 			}
 			xFreeDatabaseBlock(dSphinxes);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSphinxes,xSpecialIndex)) == 1) {
-			xSetInt(dSphinxes,xSpecialStep,1);
 		} else if (trTimeMS() > xGetInt(dSphinxes,xSpecialNext)) {
 			switch(xGetInt(dSphinxes, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dSphinxes,xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xSetInt(dSphinxes, xSpecialNext, trTimeMS() + 1600);
 						xSetInt(dSphinxes, xSpecialStep, 1);
 						trUnitOverrideAnimation(39,0,false,false,-1);
@@ -549,14 +547,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dMountainGiants)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dMountainGiants);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMountainGiants, xSpecialIndex)) == 1) {
-			xSetInt(dMountainGiants, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dMountainGiants, xSpecialNext)) {
 			switch(xGetInt(dMountainGiants, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dMountainGiants, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -655,15 +651,12 @@ void specialUnitsAlways() {
 		if (trUnitAlive() == false || checkEnemyDeactivated(dMedusas)) {
 			trUnitChangeProtoUnit("Medusa");
 			xFreeDatabaseBlock(dMedusas);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMedusas, xSpecialIndex)) == 1) {
-			trUnitOverrideAnimation(-1,0,false,true,-1);
-			xSetInt(dMedusas, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dMedusas, xSpecialNext)) {
 			switch(xGetInt(dMedusas, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 12) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dMedusas, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -873,14 +866,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dFrostGiants)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dFrostGiants);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dFrostGiants, xSpecialIndex)) == 1) {
-			xSetInt(dFrostGiants, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dFrostGiants, xSpecialNext)) {
 			switch(xGetInt(dFrostGiants, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dFrostGiants, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -989,10 +980,8 @@ void specialUnitsAlways() {
 		db = databaseName(p);
 		if (trUnitAlive() == false || checkEnemyDeactivated(dSatyrs)) {
 			xFreeDatabaseBlock(dSatyrs);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dSatyrs, xSpecialIndex)) == 1) {
-			xSetInt(dSatyrs, xSpecialNext, trTimeMS() + 10000);
 		} else if (trTimeMS() > xGetInt(dSatyrs, xSpecialNext)) {
-			if (kbUnitGetAnimationActionType(id) == 12) {
+			if ((xGetInt(db, xSilenceStatus, xGetInt(dSatyrs, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 				xsSetContextPlayer(p);
 				target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 				xsSetContextPlayer(0);
@@ -1029,14 +1018,12 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Battle Boar");
 			}
 			xFreeDatabaseBlock(dBattleBoars);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dBattleBoars, xSpecialIndex)) == 1) {
-			xSetInt(dBattleBoars, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dBattleBoars, xSpecialNext)) {
 			switch(xGetInt(dBattleBoars, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dBattleBoars, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1258,14 +1245,12 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Mummy");
 			}
 			xFreeDatabaseBlock(dMummies);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dMummies, xSpecialIndex)) == 1) {
-			xSetInt(dMummies, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dMummies, xSpecialNext)) {
 			switch(xGetInt(dMummies, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 12) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dMummies, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1324,14 +1309,12 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Scorpion Man");
 			}
 			xFreeDatabaseBlock(dScorpionMen);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dScorpionMen, xSpecialIndex)) == 1) {
-			xSetInt(dScorpionMen, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dScorpionMen, xSpecialNext)) {
 			switch(xGetInt(dScorpionMen, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dScorpionMen, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1413,14 +1396,12 @@ void specialUnitsAlways() {
 				trUnitChangeProtoUnit("Nereid");
 			}
 			xFreeDatabaseBlock(dNereids);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dNereids, xSpecialIndex)) == 1) {
-			xSetInt(dNereids, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dNereids, xSpecialNext)) {
 			switch(xGetInt(dNereids, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dNereids, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1484,14 +1465,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dKrakens)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dKrakens);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dKrakens, xSpecialIndex)) == 1) {
-			xSetInt(dKrakens, xSpecialStep, 0);
 		} else if (trTimeMS() > xGetInt(dKrakens, xSpecialNext)) {
 			switch(xGetInt(dKrakens, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dKrakens, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1560,7 +1539,7 @@ void specialUnitsAlways() {
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dEinherjars, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xSetInt(dEinherjars, xSpecialStep, 1);
 						xSetInt(dEinherjars, xSpecialNext, trTimeMS() + 1400);
 						trUnitOverrideAnimation(39,0,false,false,-1);
@@ -1752,15 +1731,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dLampades)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dLampades);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dLampades, xSpecialIndex)) == 1) {
-			trUnitOverrideAnimation(-1,0,false,true,-1);
-			xSetInt(dLampades, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dLampades, xSpecialNext)) {
 			switch(xGetInt(dLampades, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 12) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dLampades, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -1919,15 +1895,12 @@ void specialUnitsAlways() {
 		} if (checkEnemyDeactivated(dFireGiants)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dFireGiants);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dFireGiants, xSpecialIndex)) == 1) {
-			trUnitOverrideAnimation(-1,0,false,true,-1);
-			xSetInt(dFireGiants, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dFireGiants, xSpecialNext)) {
 			switch(xGetInt(dFireGiants, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 12) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dFireGiants, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);
@@ -2211,14 +2184,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dTrolls)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dTrolls);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dTrolls, xSpecialIndex)) == 1) {
-			xSetInt(dTrolls, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dTrolls, xSpecialNext)) {
 			switch(xGetInt(dTrolls, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 12) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dTrolls, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 12)) {
 						trUnitHighlight(0.5, false);
 						trSoundPlayFN("trollmove3.wav","1",-1,"","");
 						xsSetContextPlayer(p);
@@ -2285,14 +2256,12 @@ void specialUnitsAlways() {
 		} else if (checkEnemyDeactivated(dArgus)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);
 			xFreeDatabaseBlock(dArgus);
-		} else if (xGetInt(db, xSilenceStatus, xGetInt(dArgus, xSpecialIndex)) == 1) {
-			xSetInt(dArgus, xSpecialStep, 2);
 		} else if (trTimeMS() > xGetInt(dArgus, xSpecialNext)) {
 			switch(xGetInt(dArgus, xSpecialStep))
 			{
 				case 0:
 				{
-					if (kbUnitGetAnimationActionType(id) == 6) {
+					if ((xGetInt(db, xSilenceStatus, xGetInt(dArgus, xSpecialIndex)) == 0) && (kbUnitGetAnimationActionType(id) == 6)) {
 						xsSetContextPlayer(p);
 						target = trGetUnitScenarioNameNumber(kbUnitGetTargetUnitID(id));
 						xsSetContextPlayer(0);

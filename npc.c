@@ -126,6 +126,8 @@ const int NPC_PUZZLE_QUEST_START = 489;
 const int NPC_PUZZLE_QUEST_NEXT = 490;
 const int NPC_PUZZLE_QUEST_END = 491;
 
+const int NPC_SWORD_COMPLETED = 492;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -147,6 +149,29 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_SWORD_COMPLETED:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("You have acquired all three pieces of the unknown sword!");
+				}
+				case 2:
+				{
+					uiMessageBox("Rust vanishes from its blade as it begins to glow with a dark radiance.");
+				}
+				case 3:
+				{
+					uiMessageBox("Almost as if stars, souls, and mana were gathered upon its blade.");
+				}
+				case 4:
+				{
+					xsEnableRule("create_sword");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_PUZZLE_QUEST_START:
 		{
 			switch(dialog)

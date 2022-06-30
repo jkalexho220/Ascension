@@ -78,6 +78,12 @@ highFrequency
     for(x=xGetDatabaseCount(puzzleStatues); >0) {
         xDatabaseNext(puzzleStatues);
         xUnitSelect(puzzleStatues,xUnitName);
+        if (trUnitAlive() == false) {
+            trDamageUnitPercent(-100);
+            trUnitChangeProtoUnit(kbGetProtoUnitName(kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(puzzleStatues, xUnitName)))));
+            xUnitSelect(puzzleStatues, xUnitName);
+            trDamageUnitPercent(-100);
+        }
         switch(xGetInt(puzzleStatues, xStatueState))
         {
             case 0:

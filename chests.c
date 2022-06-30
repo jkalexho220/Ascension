@@ -230,6 +230,12 @@ void processChests() {
 						for(x=xGetDatabaseCount(db); >0) {
 							xDatabaseNext(db);
 							xUnitSelect(db,xUnitName);
+							if (trUnitAlive() == false) {
+								trDamageUnitPercent(-100);
+								trUnitChangeProtoUnit("Monument 2");
+								xUnitSelect(db,xUnitName);
+								trDamageUnitPercent(-100);
+							}
 							switch(xGetInt(db, xStatueState))
 							{
 								case 0:

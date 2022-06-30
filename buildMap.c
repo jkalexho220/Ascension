@@ -390,12 +390,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					xSetInt(puzzleStatues, xUnitName, trGetNextUnitScenarioNameNumber());
 					xSetVector(puzzleStatues, xStatuePos, xsVectorSet(i, 0, j));
 					if (soldier) {
-						xSetFloat(puzzleStatues, xStatueAngle, 0.785398);
+						xSetFloat(puzzleStatues, xStatueAngle, 3.92699);
 						trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x + i * 4 + j * 4, 0, z + j * 4 - i * 4, 225, true);
 						trArmySelect(""+ENEMY_PLAYER+",0");
 						trMutateSelected(kbGetProtoUnitID("Monument 2"));
 					} else {
-						xSetFloat(puzzleStatues, xStatueAngle, 3.92699);
+						xSetFloat(puzzleStatues, xStatueAngle, 0.785398);
 						trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,x + i * 4 + j * 4, 0, z + j * 4 - i * 4, 45, true);
 						trArmySelect(""+ENEMY_PLAYER+",0");
 						trMutateSelected(kbGetProtoUnitID("Monument"));
@@ -2050,8 +2050,6 @@ highFrequency
 						break;
 					}
 				}
-
-				trQuestVarSet("puzzleRoom", 1);
 			}
 			case 11:
 			{

@@ -471,6 +471,12 @@ highFrequency
 		/* pathways */
 		trPaintTerrain(57,71,73,73,0,53,false);
 		trPaintTerrain(71,57,73,73,0,53,false);
+
+		trQuestVarSet("playtestersStatue", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("0,0","Dwarf",1,117,0,117,225,true);
+		trArmySelect("0,0");
+		trMutateSelected(kbGetProtoUnitID("Monument 5"));
+		xsEnableRule("playtester_statue_always");
 		
 		trQuestVarSet("levelupObelisk", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0","Dwarf",1,145,0,118,0,true);
@@ -805,6 +811,21 @@ highFrequency
 			xsEnableRule("scragins_always");
 			trQuestVarSet("scragins", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Archer Atlantean",1,165,0,137,225,true);
+		}
+
+		// all three sword pieces
+		int quests = 0;
+		int ready = 0;
+		for(i=SWORD_BLADE; <= SWORD_HANDLE) {
+			quests = quests + trQuestVarGet("p1swordpieceQuest"+i);
+			ready = ready + trQuestVarGet("p1swordpiece"+i);
+		}
+		if (ready == 3) {
+			if (quests > 0) {
+				xsEnableRule("sword_is_ready");
+			} else {
+				xsEnableRule("create_sword");
+			}
 		}
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
@@ -1813,6 +1834,52 @@ highFrequency
 	if (trUnitIsSelected()) {
 		int i = trQuestVarGet("p1swordpieceQuest"+SWORD_BLADE) + trQuestVarGet("p1swordpiece"+SWORD_BLADE);
 		startNPCDialog(NPC_PUZZLE_QUEST_START + i);
+		reselectMyself();
+	}
+}
+
+rule sword_is_ready
+inactive
+highFrequency
+{
+	int quests = 0;
+	for(i=SWORD_BLADE; <= SWORD_HANDLE) {
+		quests = quests + trQuestVarGet("p1swordpieceQuest"+i);
+	}
+	if (quests == 0) {
+		// the beginning of the end
+		startNPCDialog();
+		xsDisableSelf();
+	}
+}
+
+rule create_sword
+inactive
+highFrequency
+{
+	// create the starsword
+	trQuestVarSet("swordBlade", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
+
+	trQuestVarSet("swordHilt", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
+	trQuestVarSet("swordHiltObject", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
+
+	trQuestVarSet("swordHandle", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
+
+	xsDisableSelf();
+}
+
+rule playtester_statue_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("playtestersStatue");
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_THANK_YOU_PLAYTESTERS);
 		reselectMyself();
 	}
 }
