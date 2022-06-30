@@ -32,7 +32,7 @@ void turnPuzzleStatue(int index = 0, bool first = false, bool immediate = false)
         vector pos = xGetVector(puzzleStatues, xStatuePos);
         int x = xsVectorGetX(pos);
         int z = xsVectorGetZ(pos);
-        for(i=0; <4) {
+        for(i=0; <3) {
             if (i != x) {
                 turnPuzzleStatue(aiPlanGetUserVariableInt(puzzleDB, i, z), false, immediate);
             }

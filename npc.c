@@ -159,15 +159,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Rust vanishes from its blade as it begins to glow with a dark radiance.");
+					uiMessageBox("Rust vanishes from its blade as it begins to glow with a magnificent radiance.");
 				}
 				case 3:
 				{
 					uiMessageBox("Almost as if stars, souls, and mana were gathered upon its blade.");
-				}
-				case 4:
-				{
-					xsEnableRule("create_sword");
 					dialog = 0;
 				}
 			}

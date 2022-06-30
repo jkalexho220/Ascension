@@ -380,12 +380,12 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trArmySelect("0,0");
 			trMutateSelected(kbGetProtoUnitID("Monument 4"));
 
-			x = x * 70 + 29;
+			x = x * 70 + 33;
 			z = z * 70 + 41;
-			for(i=0; <4) {
-				soldier = (soldier == false);
+			for(i=0; <3) {
+				//soldier = (soldier == false);
 				aiPlanAddUserVariableInt(puzzleDB, i, "row"+i, 4);
-				for(j=0; <4) {
+				for(j=0; <3) {
 					aiPlanSetUserVariableInt(puzzleDB, i, j, xAddDatabaseBlock(puzzleStatues, true));
 					xSetInt(puzzleStatues, xUnitName, trGetNextUnitScenarioNameNumber());
 					xSetVector(puzzleStatues, xStatuePos, xsVectorSet(i, 0, j));
@@ -403,8 +403,8 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 					soldier = (soldier == false);
 				}
 			}
-			for(i=0; <3) {
-				for(j=0; <4) {
+			for(i=0; <2) {
+				for(j=0; <3) {
 					trArmyDispatch("0,0","Dwarf",1,x + 2 + i * 4 + j * 4, 0, z - 2 + j * 4 - i * 4, 45, true);
 					trArmySelect("0,0");
 					trMutateSelected(kbGetProtoUnitID("Undermine Ground decal long"));
@@ -417,12 +417,9 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 				}
 			}
 			turnPuzzleStatue(1, true, true);
+			turnPuzzleStatue(6, true, true);
 			turnPuzzleStatue(8, true, true);
-			turnPuzzleStatue(10, true, true);
-			turnPuzzleStatue(10, true, true);
-			turnPuzzleStatue(15, true, true);
-			turnPuzzleStatue(15, true, true);
-			turnPuzzleStatue(15, true, true);
+			turnPuzzleStatue(8, true, true);
 
 			xsEnableRule("puzzle_room_find");
 		}

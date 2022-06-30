@@ -473,10 +473,104 @@ highFrequency
 		trPaintTerrain(71,57,73,73,0,53,false);
 
 		trQuestVarSet("playtestersStatue", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("0,0","Dwarf",1,117,0,117,225,true);
+		trArmyDispatch("0,0","Dwarf",1,115,0,115,225,true);
 		trArmySelect("0,0");
 		trMutateSelected(kbGetProtoUnitID("Monument 5"));
 		xsEnableRule("playtester_statue_always");
+
+		// all three sword pieces
+		int quests = 0;
+		int ready = 0;
+		for(i=SWORD_BLADE; <= SWORD_HANDLE) {
+			quests = quests + trQuestVarGet("p1swordpieceQuest"+i);
+			ready = ready + trQuestVarGet("p1swordpiece"+i);
+		}
+		if ((ready == 3) && (quests > 0)) {
+			xsEnableRule("sword_is_ready");
+		}
+
+		if (trQuestVarGet("p1swordpiece"+SWORD_BLADE) == 1) {
+			trQuestVarSet("swordBlade", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Stymph Bird Feather"));
+			trSetSelectedScale(2,1,7);
+			trSetUnitOrientation(vector(0.024677,0.999391,-0.024677), vector(-0.707107,0,-0.707107),true);
+			trUnitHighlight(3600, false);
+			trUnitTeleport(112,7,112);
+
+			trQuestVarSet("swordBlade", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Stymph Bird Feather"));
+			trSetSelectedScale(-2,1,7);
+			trSetUnitOrientation(vector(-0.024677,0.999391,0.024677), vector(-0.707107,0,-0.707107),true);
+			trUnitHighlight(3600, false);
+			trUnitTeleport(112,7,112);
+		}
+
+		if (trQuestVarGet("p1swordpiece"+SWORD_HILT) == 1) {
+			trQuestVarSet("swordHiltObject", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Sentinel Base");
+
+			trQuestVarSet("swordHilt", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,225,true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
+
+			trUnitSelectClear();
+			trUnitSelectByQV("swordHiltObject");
+			trMutateSelected(kbGetProtoUnitID("Relic"));
+			trImmediateUnitGarrison(""+1*trQuestVarGet("swordHilt"));
+			trMutateSelected(kbGetProtoUnitID("Sentinel Base"));
+			trSetSelectedScale(1,0.3,0.4);
+
+			trUnitSelectClear();
+			trUnitSelectByQV("swordHilt");
+			trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+			trUnitTeleport(112,10,112);
+		}
+
+		if (trQuestVarGet("p1swordpiece"+SWORD_HANDLE) == 1) {
+			trQuestVarSet("swordHandleObject", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit("Torch");
+
+			trQuestVarSet("swordHandle", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,1,0,1,0,true);
+			trArmySelect("0,0");
+			trMutateSelected(kbGetProtoUnitID("Lancer Hero"));
+
+			trUnitSelectClear();
+			trUnitSelectByQV("swordHandleObject");
+			trMutateSelected(kbGetProtoUnitID("Relic"));
+			trImmediateUnitGarrison(""+1*trQuestVarGet("swordHandle"));
+			trMutateSelected(kbGetProtoUnitID("Torch"));
+			trSetSelectedScale(0.6,0.6,0.6);
+			trUnitSetAnimationPath("1,0,1,0,1,0,0");
+
+			trUnitSelectClear();
+			trUnitSelectByQV("swordHandle");
+			trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+			trUnitTeleport(112,10,112);
+		}
+
+		if (ready == 3) {
+			trQuestVarSet("swordGlow", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
+			trArmySelect("0,0");
+			trUnitSelectClear();
+			trUnitSelectByQV("SwordGlow");
+			trMutateSelected(kbGetProtoUnitID("Valkyrie"));
+			trUnitTeleport(112, 1, 112);
+			trSetSelectedScale(0,0,0);
+			trUnitSetAnimationPath("1,0,0,0,0,0,0");
+			trUnitOverrideAnimation(15,0,true,false,-1);
+			xsEnableRule("sword_glow_always");
+		}
 		
 		trQuestVarSet("levelupObelisk", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("1,0","Dwarf",1,145,0,118,0,true);
@@ -811,21 +905,6 @@ highFrequency
 			xsEnableRule("scragins_always");
 			trQuestVarSet("scragins", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Archer Atlantean",1,165,0,137,225,true);
-		}
-
-		// all three sword pieces
-		int quests = 0;
-		int ready = 0;
-		for(i=SWORD_BLADE; <= SWORD_HANDLE) {
-			quests = quests + trQuestVarGet("p1swordpieceQuest"+i);
-			ready = ready + trQuestVarGet("p1swordpiece"+i);
-		}
-		if (ready == 3) {
-			if (quests > 0) {
-				xsEnableRule("sword_is_ready");
-			} else {
-				xsEnableRule("create_sword");
-			}
 		}
 
 		if (trQuestVarGet("nottudTicketsCount") > 0) {
@@ -1848,28 +1927,9 @@ highFrequency
 	}
 	if (quests == 0) {
 		// the beginning of the end
-		startNPCDialog();
+		startNPCDialog(NPC_SWORD_COMPLETED);
 		xsDisableSelf();
 	}
-}
-
-rule create_sword
-inactive
-highFrequency
-{
-	// create the starsword
-	trQuestVarSet("swordBlade", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
-
-	trQuestVarSet("swordHilt", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
-	trQuestVarSet("swordHiltObject", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
-
-	trQuestVarSet("swordHandle", trGetNextUnitScenarioNameNumber());
-	trArmyDispatch("0,0", "Dwarf", 1, 1, 0, 1, 0, true);
-
-	xsDisableSelf();
 }
 
 rule playtester_statue_always
@@ -1882,4 +1942,17 @@ highFrequency
 		startNPCDialog(NPC_THANK_YOU_PLAYTESTERS);
 		reselectMyself();
 	}
+}
+
+rule sword_glow_always
+inactive
+highFrequency
+{
+	float diff = trTimeMS() - trQuestVarGet("swordGlowLast");
+	trQuestVarSet("swordGlowLast", trTimeMS());
+	diff = diff * 0.005;
+	trQuestVarSet("swordGlowHeight", fModulo(5, trQuestVarGet("swordGlowHeight") + diff));
+	trUnitSelectClear();
+	trUnitSelectByQV("swordGlow");
+	trSetSelectedUpVector(0,trQuestVarGet("swordGlowHeight"),0);
 }
