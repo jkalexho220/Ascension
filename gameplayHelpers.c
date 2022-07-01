@@ -1637,36 +1637,42 @@ void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
 }
 
 void revivePlayer(int p = 0) {
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"reviveBeam");
-	trUnitChangeProtoUnit("Rocket");
-	int prev = xGetPointer(dPlayerData);
-	xSetPointer(dPlayerData,p);
-	xUnitSelect(dPlayerData,xPlayerUnit);
-	trUnitDestroy();
-	spawnPlayer(p, trVectorQuestVarGet("dead"+p+"pos"));
-	trSoundPlayFN("herorevived.wav","1",-1,"","");
-	xUnitSelect(dPlayerData,xPlayerUnit);
-	trDamageUnitPercent(50);
-	trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
-	if (trQuestVarGet("deadPlayerCount") < 0) {
-		trQuestVarSet("deadPlayerCount", 0);
-		debugLog("deadPlayerCount was negative!");
+	if (trQuestVarGet("stage") < 10 || trQuestVarGet("reviveCount") > 0) {
+		trUnitSelectClear();
+		trUnitSelectByQV("p"+p+"reviveBeam");
+		trUnitChangeProtoUnit("Rocket");
+		int prev = xGetPointer(dPlayerData);
+		xSetPointer(dPlayerData,p);
+		xUnitSelect(dPlayerData,xPlayerUnit);
+		trUnitDestroy();
+		spawnPlayer(p, trVectorQuestVarGet("dead"+p+"pos"));
+		trSoundPlayFN("herorevived.wav","1",-1,"","");
+		xUnitSelect(dPlayerData,xPlayerUnit);
+		trDamageUnitPercent(50);
+		trQuestVarSet("deadPlayerCount", trQuestVarGet("deadPlayerCount") - 1);
+		if (trQuestVarGet("deadPlayerCount") < 0) {
+			trQuestVarSet("deadPlayerCount", 0);
+			debugLog("deadPlayerCount was negative!");
+		}
+		trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been revived!");
+		int db = getRelicsDB(p);
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			xSetInt(db, xUnitName, trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		}
+		equipRelicsAgain(p);
+		if (trCurrentPlayer() == p) {
+			uiLookAtUnitByName(""+xGetInt(dPlayerData,xPlayerUnit));
+		}
+		xSetPointer(dPlayerData, prev);
+		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
+		xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
+		if (trQuestVarGet("stage") == 10) {
+			trQuestVarSet("reviveCount", trQuestVarGet("reviveCount") - 1);
+			trMessageSetText("Revives remaining: " + 1*trQuestVarGet("reviveCount"));
+		}
 	}
-	trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has been revived!");
-	int db = getRelicsDB(p);
-	for(x=xGetDatabaseCount(db); >0) {
-		xDatabaseNext(db);
-		xSetInt(db, xUnitName, trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
-	}
-	equipRelicsAgain(p);
-	if (trCurrentPlayer() == p) {
-		uiLookAtUnitByName(""+xGetInt(dPlayerData,xPlayerUnit));
-	}
-	xSetPointer(dPlayerData, prev);
-	xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
-	xSetInt(dPlayerData, xPlayerRegenerateFavorLast, trTimeMS(), p);
 }
 
 void shootLaser(vector start = vector(0,0,0), vector dir = vector(0,0,0), float dist = -1, int p = 0) {

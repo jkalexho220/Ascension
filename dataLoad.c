@@ -647,6 +647,10 @@ inactive
 		if (trQuestVarGet("p"+p+"yeebHit") == 1) {
 			trQuestVarSet("yeebBossFight", p);
 		}
+		trQuestVarSet("p"+p+"starsword", 0);
+		for(i=1; <= 3) {
+			trQuestVarSet("p"+p+"starsword", trQuestVarGet("p"+p+"starsword") + trQuestVarGet("p"+p+"swordpiece"+i));
+		}
 		trPlayerGrantResources(p, "Gold", xGetInt(dPlayerData,xPlayerGold, p));
 		trQuestVarSet("p"+p+"startingGold", xGetInt(dPlayerData,xPlayerGold, p));
 	}

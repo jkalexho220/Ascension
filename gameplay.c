@@ -937,7 +937,7 @@ highFrequency
 				if (Multiplayer == false) {
 					reviving = true;
 					count = 1;
-				} else {
+				} else if (trQuestVarGet("stage") < 10 || trQuestVarGet("reviveCount") > 0) {
 					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 						xDatabaseNext(dPlayerCharacters);
 						xUnitSelectByID(dPlayerCharacters, xUnitID);

@@ -128,6 +128,8 @@ const int NPC_PUZZLE_QUEST_END = 491;
 
 const int NPC_SWORD_COMPLETED = 492;
 
+const int NPC_GUARDIAN_SLEEPING = 493;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -149,6 +151,28 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_GUARDIAN_SLEEPING:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("The statue stands alone on the platform. Something is missing from his hand.");
+					if (trQuestVarGet("p"+trCurrentPlayer()+"starsword") < 3) {
+						dialog = 0;
+					}
+				}
+				case 2:
+				{
+					uiMessageBox("Perhaps this is where the Starsword belongs?");
+				}
+				case 3:
+				{
+					trMessageSetText("Approach the statue to insert the Starsword in his hand.");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_SWORD_COMPLETED:
 		{
 			switch(dialog)
@@ -1880,6 +1904,30 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				case 4:
 				{
 					uiMessageBox("Destroy the Flame Palace to make the attacks stop.");
+					dialog = 0;
+				}
+			}
+		}
+
+		case NPC_EXPLAIN_SPACE:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Only the worthy have been able to make it to the top of the Tower.");
+				}
+				case 2:
+				{
+					uiMessageBox("On this floor, the party has a shared pool of limited revives.");
+				}
+				case 3:
+				{
+					uiMessageBox("Your total revives is " + (ENEMY_PLAYER - 1) + ". (Player count)");
+				}
+				case 4:
+				{
+					uiMessageBox("Once these revives are spent, no one can revive for the rest of this floor.");
 					dialog = 0;
 				}
 			}
@@ -4764,7 +4812,7 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelect(""+bossUnit, true);
 	if (trUnitIsSelected()) {
-		uiMessageBox("The statue stands alone on the platform. Something is missing from his hand.");
+		startNPCDialog(NPC_GUARDIAN_SLEEPING);
 		reselectMyself();
 	}
 }

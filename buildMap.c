@@ -3099,9 +3099,11 @@ highFrequency
 
 		trPaintTerrain(0, 0, 145, 145, 2, 13, false);
 
+		/*
 		for(x=0; < 145) {
 			trPaintTerrain(x, x-5, x, x+5, 5, 4, false);
 		}
+		*/
 		/* center island */
 		z = 15;
 		for(x=0; <15) {
@@ -3146,14 +3148,22 @@ highFrequency
 			}
 		}
 
+		trQuestVarSet("bossRevealer", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 0, true);
+		trArmySelect("0,0");
+		trUnitChangeProtoUnit("Cinematic Block");
+		zSetProtoUnitStat("Revealer", 0, 2, 50);
+
 		bossUnit = trGetNextUnitScenarioNameNumber();
 		trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 225, true);
 		trArmySelect("0,0");
 		trUnitChangeProtoUnit("Guardian Sleeping");
 
-		xsEnableRule("guardian_dialog");
+		xsEnableRule("guardian_find");
 		xsEnableRule("gameplay_start");
 		trVectorQuestVarSet("startPosition", vector(15,0,15));
-		trChangeTerrainHeight(0,0,0,0,worldHeight,true);
+
+		trQuestVarSet("reviveCount", ENEMY_PLAYER - 1);
+		startNPCDialog(NPC_EXPLAIN_SPACE);
 	}
 }

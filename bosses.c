@@ -7953,3 +7953,146 @@ highFrequency
 		trQuestVarSet("bossUltimate", 0);
 	}
 }
+
+rule guardian_find
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelect(""+bossUnit, true);
+	for(p=1; < ENEMY_PLAYER) {
+		if (trUnitHasLOS(p)) {
+			trUnitSelectClear();
+			trUnitSelectByQV("bossRevealer");
+			trUnitChangeProtoUnit("Revealer");
+			xsEnableRule("guardian_awaken");
+			xsEnableRule("guardian_dialog");
+			xsDisableSelf();
+			break;
+		}
+	}
+}
+
+rule guardian_awaken
+inactive
+highFrequency
+{
+	vector pos = vector(0,0,0);
+	for(p=1; < ENEMY_PLAYER) {
+		if (trQuestVarGet("p"+p+"starsword") == 3) {
+			pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p));
+			if (distanceBetweenVectors(pos, vector(145,0,145)) < 36.0) {
+				xsEnableRule("boss_cin_00");
+				trVectorQuestVarSet("bossRoomCenter", vector(145,0,145));
+				trPaintTerrain(0,0,0,0,5,4,true);
+				trStringQuestVarSet("bossProto", "Heka Gigantes");
+				xsDisableSelf();
+				break;
+			}
+		}
+	}
+}
+
+
+rule boss10_init
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("cinTime")) {
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 0:
+			{
+				trSoundPlayFN("default","1",-1,"???:It has been a long time since I've felt this blade.","");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 1:
+			{
+				trSoundPlayFN("default","1",-1,"???:It took my peers from me, one by one. None of us were worthy of its power.","");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 2:
+			{
+				trSoundPlayFN("default","1",-1,"???:But now that it is finally here, that must mean that darkness is approaching once more.","");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 3:
+			{
+				trSoundPlayFN("default","1",-1,"???:Challengers. Perhaps you are the ones that the world has been waiting for.","");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 4:
+			{
+				trSoundPlayFN("default","1",-1,"???:Perhaps you are the ones that can finally defeat The Void.","");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 5:
+			{
+				trSoundPlayFN("default","1",-1,"???:Show me your mettle! Show me your might!","");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 6:
+			{
+				trSoundPlayFN("default","1",-1,"???:Can you accomplish what we could not? Can you handle the power of the Starsword?","");
+				trQuestVarSet("cinTime", trTime() + 6);
+				trOverlayText("Nameless God",5.0,-1,-1,-1);
+				if (customContent) {
+					xsEnableRule("boss_music");
+				}
+			}
+			case 7:
+			{
+				if (customContent == false) {
+					xsEnableRule("boss_music");
+				}
+				bossDir = vector(0,0,-1);
+
+				xSetBool(dEnemies, xLaunched, true, bossPointer);
+
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				xsDisableSelf();
+				trUnitSelectClear();
+				trUnitSelect(""+bossUnit, true);
+				trUnitConvert(ENEMY_PLAYER);
+				xsEnableRule("boss10_battle");
+
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
+
+				bossCooldown(8, 12);
+
+				reselectMyself();
+
+				for(i=xStunSFX; <= xSilenceSFX) {
+					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
+				}
+				xsEnableRule("boss10_ready");
+
+				trStringQuestVarSet("advice","You can do this! I believe in you!");
+
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 50000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -400);
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
+			}
+		}
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+	}
+}
+
+
+rule boss10_ready
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
+		xsDisableSelf();
+		trUnitSelectClear();
+		trUnitSelect(""+bossUnit, true);
+		trMutateSelected(kbGetProtoUnitID("Guardian XP"));
+	}
+}
