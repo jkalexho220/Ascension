@@ -3088,40 +3088,107 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
+		worldHeight = 13;
 		trUIFadeToColor(0,0,0,1000,0,false);
 		trLetterBox(false);
 		xsDisableSelf();
 		int x = 0;
 		int z = 0;
+		vector dir = vector(-1,0,-1);
+		int tempX = 0;
+		int tempZ = 0;
+		float height = 0;
 
 		trSetCivAndCulture(0, 1, 0);
 
+		trPaintTerrain(0, 0, 145, 145, 0, 50, false);
+		trChangeTerrainHeight(0, 0, 145, 145, -2.0, false);
+		trChangeTerrainHeight(57, 57, 87, 87, 13.0, false);
 
-		trPaintTerrain(0, 0, 145, 145, 2, 13, false);
-
-		/*
-		for(x=0; < 145) {
-			trPaintTerrain(x, x-5, x, x+5, 5, 4, false);
-		}
-		*/
-		/* center island */
-		z = 15;
-		for(x=0; <15) {
-			for(b=0; < 15) {
-				if (x*x + z*z <= 225) {
-					trPaintTerrain(72-x,72-z,72+x,72+z,0,50,false);
-					break;
-				} else {
-					z = z - 1;
+		// southeast slope
+		for(a=37; < 108) {
+			for(b=37; < 57) {
+				if (b <= a && b <= 145 - a) {
+					x = a;
+					z = b;
+					height = 15.0 * (b - 37) / 20.0 - 2.0;
+					for(i=4; >0) {
+						trPaintTerrain(x, z, x, z, 2, 13, false);
+						trChangeTerrainHeight(x, z, x, z, height);
+						tempX = x - 72;
+						tempZ = z - 72;
+						x = tempZ + 72;
+						z = 72 - tempX;
+					}
 				}
 			}
 		}
-		
-		/* pathways */
-		trPaintTerrain(57,71,87,73,0,53,false);
-		trPaintTerrain(71,57,73,87,0,53,false);
 
-		/* eyecandy - candy for the eyes */
+		// south pathway
+		/*
+		12.4266 is the length of one side of the octagon
+		72 - 15 = 57
+		72 - 6.213 = 65.787
+		y = -x + b
+		57 = -65.787 + b
+		65.787 = 57 + b
+		b = 122.787
+		y = x + 8.787
+		y = x - 8.787
+		37 = x - 8.787
+		x = 45.787
+		87 = b - 78
+		b = 
+		*/
+		for(a=37; < 72) {
+			for(b=37; < 72) {
+				if ((b > a - 8.787) && (b < 122.787 - a) && (b < a + 8.787)) {
+					x = a;
+					z = b;
+					dir = vector(0,0,0);
+					vector offset = vector(0,0,-1);
+					height = xsMax(-2.0, 15.0 * (1.0 * a + b - 82.787) / 40 - 2.0);
+					for(i=4; >0) {
+						trPaintTerrain(x + xsVectorGetX(dir), z + xsVectorGetZ(dir), x + xsVectorGetX(dir), z + xsVectorGetZ(dir), 5, 4, false);
+						trChangeTerrainHeight(x, z, x, z, height);
+						tempX = x - 72;
+						tempZ = z - 72;
+						x = tempZ + 72;
+						z = 72 - tempX;
+						dir = dir + offset;
+						offset = rotationMatrix(offset, 0, -1.0);
+					}
+				}
+			}
+		}
+
+		/*
+		for(x=78; < 87) {
+			z = 165 - x;
+			trPaintTerrain(x, z, x, z, 5, 4, false);
+		}
+		*/
+
+		// update passability
+		trPaintTerrain(0,0,0,0, 0, 50, true);
+
+		// re-paint the black outside with something else
+		for(x=0; < 145) {
+			for(z=0; < 145) {
+				if (trGetTerrainHeight(x, z) > worldHeight - 0.1 && trGetTerrainHeight(x + 1, z + 1) > worldHeight - 0.1) {
+					trPaintTerrain(x, z, x, z, 0, 70, false);
+				} else if (trGetTerrainType(x, z) == 2) {
+					trPaintTerrain(x, z, x, z, 0, 50, false);
+				} else if (trGetTerrainType(x, z) == 5) {
+					trPaintTerrain(x, z, x, z, 0, 53, false);
+				}
+			}
+		}
+
+		//trPaintTerrain(0, 0, 145, 145, 0, 37, false);
+
+
+		/* eyecandy - candy for the eyes 
 		for(x=0; < 145) {
 			trQuestVarSetFromRand("rand", 0, 145, true);
 			if (trGetTerrainType(x, trQuestVarGet("rand")) == 2) {
@@ -3147,6 +3214,8 @@ highFrequency
 				trArmyDispatch("0,0","Columns Fallen",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
 			}
 		}
+
+		*/
 
 		trQuestVarSet("bossRevealer", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 0, true);
