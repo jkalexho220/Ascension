@@ -7985,7 +7985,6 @@ highFrequency
 			if (distanceBetweenVectors(pos, vector(145,0,145)) < 36.0) {
 				xsEnableRule("boss_cin_00");
 				trVectorQuestVarSet("bossRoomCenter", vector(145,0,145));
-				trPaintTerrain(0,0,0,0,5,4,true);
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				xsDisableSelf();
 				break;
@@ -8006,6 +8005,23 @@ highFrequency
 			{
 				trSoundPlayFN("default","1",-1,"???:It has been a long time since I've felt this blade in my hand.","");
 				trQuestVarSet("cinTime", trTime() + 5);
+				for(x=37; < 107) {
+					for(z=37; < 107) {
+						if (trGetTerrainHeight(x, z) > -2.0 && trGetTerrainHeight(x, z) < worldHeight) {
+							trPaintTerrain(x, z, x, z, 2, 13, false);
+						}
+					}
+				}
+
+				trPaintTerrain(0,0, 0,0, 0, 37, true);
+
+				for(x=37; < 107) {
+					for(z=37; < 107) {
+						if (trGetTerrainType(x, z) == 2) {
+							trPaintTerrain(x, z, x, z, 0, 70, false);
+						}
+					}
+				}
 			}
 			case 1:
 			{

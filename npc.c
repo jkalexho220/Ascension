@@ -130,6 +130,9 @@ const int NPC_SWORD_COMPLETED = 492;
 
 const int NPC_GUARDIAN_SLEEPING = 493;
 
+const int NPC_ARE_YOU_SUBSCRIBED = 494;
+const int NPC_THANK_YOU_SUBSCRIBER = 495;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -151,6 +154,53 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_THANK_YOU_SUBSCRIBER:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey, thanks for subscribing to this map on the Steam Workshop!");
+				}
+				case 2:
+				{
+					uiMessageBox("Here, have this relic as thanks! You're the best!");
+				}
+				case 3:
+				{
+					dialog = 0;
+					trUnitSelectClear();
+					trUnitSelectByQV("");
+				}
+			}
+		}
+		case NPC_ARE_YOU_SUBSCRIBED:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey you! Are you enjoying the map so far?");
+				}
+				case 2:
+				{
+					uiMessageBox("Consider subscribing to it in the Steam Workshop! Just search for 'Ascension MMORPG'!");
+				}
+				case 3:
+				{
+					uiMessageBox("If you subscribe, you will get access to cool stuff like custom boss music and icons!");
+				}
+				case 4:
+				{
+					uiMessageBox("Also, you will get a super cool relic! Don't miss out!");
+				}
+				case 5:
+				{
+					uiMessageBox("You can also report any bugs and feedback there as well. Thanks!");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_GUARDIAN_SLEEPING:
 		{
 			switch(dialog)
