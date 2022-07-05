@@ -1984,6 +1984,7 @@ inactive
 highFrequency
 {
 	xsDisableSelf();
+	xsDisableRule("lewonas_always");
 	trQuestVarSet("subscribed", 1);
 	trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
 	trUnitSelectClear();
