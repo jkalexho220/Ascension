@@ -548,11 +548,7 @@ highFrequency
 			{
 				trQuestVarSet("pvpStep", 5);
 				trQuestVarSet("pvpTime", trTime() + 29);
-				if (trQuestVarGet("pvpRound") < 10) {
-					trOverlayText("("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")), 9999,20,20,1000);
-				} else {
-					trOverlayText("(Blessing) +2 Relic Slots");
-				}
+				trOverlayText("("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")), 9999,20,20,1000);
 			}
 			case 5:
 			{
@@ -616,12 +612,8 @@ highFrequency
 					trQuestVarSet("pvpStep", 0);
 					trSoundPlayFN("","1",-1,"Nickonhawk: "+trStringQuestVarGet("p"+p+"name")+" was the only participant! Default victory!",
 						"icons\hero g odysseus icon 64");
-					if (trQuestVarGet("pvpRound") < 10) {
-						for(x=trQuestVarGet("pvpCount"); >0) {
-							pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
-						}
-					} else if (trCurrentPlayer() == p) {
-						trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
+					for(x=trQuestVarGet("pvpCount"); >0) {
+						pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
 					}
 				} else {
 					pvpDetached = false;
@@ -712,8 +704,9 @@ highFrequency
 				trShowImageDialog(boonIcon(BOON_TWO_RELICS), boonName(BOON_TWO_RELICS));
 				trQuestVarSet("pvpTime", trTime() + 8);
 				trQuestVarSet("pvpStep", 3);
-				trSoundPlayFN("wonder.wav","1",-1,
-					"Nickonhawk:THE BLESSING OF NICKONHAWK","icons\hero g odysseus icon 64");
+				trSoundPlayFN("market.wav","1",-1,"","");
+				trQuestVarSetFromRand("pvpReward",20,25,true);
+				trQuestVarSet("pvpCount", 1);
 			}
 			case 20:
 			{
@@ -941,12 +934,8 @@ highFrequency
 			trSoundPlayFN("favordump.wav","1",-1,"","");
 			trUIFadeToColor(0,0,0,1000,1000,true);
 			xsDisableRule("pvp_battle");
-			if (trQuestVarGet("pvpRound") < 10) {
-				for(y=trQuestVarGet("pvpCount"); >0) {
-					pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
-				}
-			} else if (trCurrentPlayer() == p) {
-				trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
+			for(y=trQuestVarGet("pvpCount"); >0) {
+				pvpGetRelic(p, 1*trQuestVarGet("pvpReward"));
 			}
 			trQuestVarSet("pvpStep", 10);
 			trQuestVarSet("pvpTime", trTime() + 2);

@@ -827,11 +827,17 @@ highFrequency
 			}
 		}
 
+		if (xGetInt(dPlayerData, xPlayerProgress) >= 4 && (trQuestVarGet("subscribed") == 0)) {
+			trQuestVarSet("lewonas", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","General Melagius",1,171,0,145,270,true);
+			xsEnableRule("lewonas_always");
+		}
+
 		// monsterpedia quest
 		if (xGetInt(dPlayerData, xPlayerProgress) >= 1 && ((trQuestVarGet("monsterpediaQuestComplete") == 0) || (trQuestVarGet("p1monsterpediaQuest") * trQuestVarGet("monsterpediaQuestComplete") == 2))) {
 			// quest is in progress
 			trQuestVarSet("beastmaster", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Ajax",1,143,0,171,180,true);
+			trArmyDispatch("0,0","Ajax",1,145,0,171,180,true);
 			xsEnableRule("monsterpedia_quest");
 		}
 
@@ -1955,4 +1961,64 @@ highFrequency
 	trUnitSelectClear();
 	trUnitSelectByQV("swordGlow");
 	trSetSelectedUpVector(0,trQuestVarGet("swordGlowHeight"),0);
+}
+
+rule lewonas_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("lewonas");
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		if (customContent) {
+			startNPCDialog(NPC_THANK_YOU_SUBSCRIBER);
+		} else {
+			startNPCDialog(NPC_ARE_YOU_SUBSCRIBED);
+		}
+	}
+}
+
+rule subscribe_complete
+inactive
+highFrequency
+{
+	xsDisableSelf();
+	trQuestVarSet("subscribed", 1);
+	trQuestVarSet("boonUnlocked"+BOON_TWO_RELICS, 1);
+	trUnitSelectClear();
+	trUnitSelectByQV("lewonas");
+	trUnitChangeProtoUnit("Arkantos God Out");
+	trSoundPlayFN("arrkantosleave.wav","1",-1,"","");
+
+	if (xGetDatabaseCount(dBoons) == 0) {
+		trQuestVarSet("boonSpotlight", trGetNextUnitScenarioNameNumber());
+		trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
+		trArmySelect("1,0");
+		trUnitChangeProtoUnit("Garrison Flag Sky Passage");
+		xsEnableRule("select_boon");
+		trEventSetHandler(8000, "spChooseBoon");
+		trPaintTerrain(71,71,87,73,0,53,false);
+		trPaintTerrain(88,69, 92,75, 4,15, true);
+		/* paint deployment square at the bottom of the map */
+		trPaintTerrain(0,0,5,5,0,70,true);
+		trPaintTerrain(0,0,5,5,2,13,false);
+		startNPCDialog(NPC_EXPLAIN_BOONS);
+	}
+	int x = 177 + 4 * iModulo(3, BOON_TWO_RELICS - 1);
+	int z = 139 + 4 * ((BOON_TWO_RELICS-1) / 3);
+	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("1,0","Statue of Lightning",1,x,0,z,180,true);
+	trUnitSelectClear();
+	trUnitSelectByQV("next");
+	trUnitConvert(0);
+	overrideStatue(BOON_TWO_RELICS);
+	xAddDatabaseBlock(dBoons, true);
+	xSetInt(dBoons, xUnitName, 1*trQuestVarGet("next"));
+	xSetInt(dBoons, xBoonType, BOON_TWO_RELICS);
+	if (xGetInt(dPlayerData, xPlayerGodBoon) == BOON_TWO_RELICS) {
+		trUnitSelectClear();
+		trUnitSelectByQV("boonSpotlight", true);
+		trUnitTeleport(x,0,z);
+	}
 }

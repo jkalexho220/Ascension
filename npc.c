@@ -164,13 +164,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Here, have this relic as thanks! You're the best!");
+					uiMessageBox("Here, have this Blessing as thanks! You're the best!");
 				}
 				case 3:
 				{
+					trShowImageDialog(boonIcon(BOON_TWO_RELICS), boonName(BOON_TWO_RELICS));
+				}
+				case 4:
+				{
+					uiMessageBox("Thank you again, and have fun!");
+					xsEnableRule("subscribe_complete");
 					dialog = 0;
-					trUnitSelectClear();
-					trUnitSelectByQV("");
 				}
 			}
 		}
@@ -192,7 +196,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 4:
 				{
-					uiMessageBox("Also, you will get a super cool relic! Don't miss out!");
+					uiMessageBox("Also, you will get a super cool and exclusive Blessing! Don't miss out!");
 				}
 				case 5:
 				{
@@ -229,7 +233,10 @@ int npcDiag(int npc = 0, int dialog = 0) {
 			{
 				case 1:
 				{
+					trSoundPlayFN("ui\thunder5.wav","1",-1,"","");
+					trSoundPlayFN("lightthunder.wav","1",-1,"","");
 					uiMessageBox("You have acquired all three pieces of the unknown sword!");
+					uiLookAtUnitByName(""+1*trQuestVarGet("playtestersStatue"));
 				}
 				case 2:
 				{

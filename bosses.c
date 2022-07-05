@@ -344,6 +344,7 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
+		vector pos = trVectorQuestVarGet("bossRoomCenter");
 		xsDisableSelf();
 		trQuestVarSetFromRand("music", 1, 6, true);
 		xRestoreCache(dPlayerUnits);
@@ -359,29 +360,37 @@ highFrequency
 		if (trQuestVarGet("stage") == 9) {
 			wallHeight = -3;
 		}
-		vector pos = xsVectorSet(trQuestVarGet("bossRoomSize"),0,trQuestVarGet("bossRoomSize"));
-		pos = (trVectorQuestVarGet("bossRoomCenter") * 0.5) - pos;
-		trPaintTerrain(xsVectorGetX(pos), xsVectorGetZ(pos) - 3,
-			xsVectorGetX(pos) + 35, xsVectorGetZ(pos),
-			TERRAIN_WALL, TERRAIN_SUB_WALL);
-		trChangeTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos) - 3,
-			xsVectorGetX(pos) + 35, xsVectorGetZ(pos),wallHeight,false);
-		trPaintTerrain(xsVectorGetX(pos)-4, xsVectorGetZ(pos),
-			xsVectorGetX(pos), xsVectorGetZ(pos) + 35,
-			TERRAIN_WALL, TERRAIN_SUB_WALL);
-		trChangeTerrainHeight(xsVectorGetX(pos) - 3, xsVectorGetZ(pos),
-			xsVectorGetX(pos), xsVectorGetZ(pos) + 35,wallHeight,false);
-		
-		trVectorQuestVarSet("bossRoomEntrance", pos);
-		trPaintTerrain(0,0,5,5,0,70,true);
-		trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
-		
-		pos = trVectorQuestVarGet("bossRoomCenter");
-		bossUnit = trGetNextUnitScenarioNameNumber();
-		trArmyDispatch("0,0","Dwarf",1,
-			xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
-		trArmySelect("0,0");
-		trUnitChangeProtoUnit(trStringQuestVarGet("bossProto"));
+		if (trQuestVarGet("stage") < 10) {
+			pos = xsVectorSet(trQuestVarGet("bossRoomSize"),0,trQuestVarGet("bossRoomSize"));
+			pos = (trVectorQuestVarGet("bossRoomCenter") * 0.5) - pos;
+			trPaintTerrain(xsVectorGetX(pos), xsVectorGetZ(pos) - 3,
+				xsVectorGetX(pos) + 35, xsVectorGetZ(pos),
+				TERRAIN_WALL, TERRAIN_SUB_WALL);
+			trChangeTerrainHeight(xsVectorGetX(pos), xsVectorGetZ(pos) - 3,
+				xsVectorGetX(pos) + 35, xsVectorGetZ(pos),wallHeight,false);
+			trPaintTerrain(xsVectorGetX(pos)-4, xsVectorGetZ(pos),
+				xsVectorGetX(pos), xsVectorGetZ(pos) + 35,
+				TERRAIN_WALL, TERRAIN_SUB_WALL);
+			trChangeTerrainHeight(xsVectorGetX(pos) - 3, xsVectorGetZ(pos),
+				xsVectorGetX(pos), xsVectorGetZ(pos) + 35,wallHeight,false);
+			
+			trVectorQuestVarSet("bossRoomEntrance", pos);
+			trPaintTerrain(0,0,5,5,0,70,true);
+			trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
+			
+			pos = trVectorQuestVarGet("bossRoomCenter");
+			bossUnit = trGetNextUnitScenarioNameNumber();
+			trArmyDispatch("0,0","Dwarf",1,
+				xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+			trArmySelect("0,0");
+			trUnitChangeProtoUnit(trStringQuestVarGet("bossProto"));
+
+			zSetProtoUnitStat("Revealer", 1, 2, 32);
+			trArmyDispatch("1,0","Revealer",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			uiLookAtUnitByName(""+bossUnit);
+		}
 		
 		bossID = kbGetBlockID(""+bossUnit);
 		
@@ -433,13 +442,6 @@ highFrequency
 		
 		activateEnemy(bossUnit, 0, 0);
 		bossPointer = xGetNewestPointer(dEnemies);
-		
-		pos = trVectorQuestVarGet("bossRoomCenter");
-		zSetProtoUnitStat("Revealer", 1, 2, 32);
-		trArmyDispatch("1,0","Revealer",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
-		trArmySelect("1,0");
-		trUnitConvert(0);
-		uiLookAtUnitByName(""+bossUnit);
 		
 		xClearDatabase(dFreeRelics);
 		
@@ -7962,6 +7964,7 @@ highFrequency
 	trUnitSelect(""+bossUnit, true);
 	for(p=1; < ENEMY_PLAYER) {
 		if (trUnitHasLOS(p)) {
+			trSoundPlayFN("cinematics\14_in\stairfog.mp3","1",-1,"","");
 			trUnitSelectClear();
 			trUnitSelectByQV("bossRevealer");
 			trUnitChangeProtoUnit("Revealer");
@@ -7984,8 +7987,11 @@ highFrequency
 			pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p));
 			if (distanceBetweenVectors(pos, vector(145,0,145)) < 36.0) {
 				xsEnableRule("boss_cin_00");
+				xsDisableRule("guardian_dialog");
 				trVectorQuestVarSet("bossRoomCenter", vector(145,0,145));
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
+				trLetterBox(true);
+				trUIFadeToColor(0,0,0,1000,0,true);
 				xsDisableSelf();
 				break;
 			}
@@ -8007,7 +8013,8 @@ highFrequency
 				trQuestVarSet("cinTime", trTime() + 5);
 				for(x=37; < 107) {
 					for(z=37; < 107) {
-						if (trGetTerrainHeight(x, z) > -2.0 && trGetTerrainHeight(x, z) < worldHeight) {
+						if ((trGetTerrainHeight(x, z) > -2.0 && trGetTerrainHeight(x, z) < worldHeight) ||
+							(trGetTerrainHeight(x + 1, z + 1) > -2.0 && trGetTerrainHeight(x + 1, z + 1) < worldHeight)) {
 							trPaintTerrain(x, z, x, z, 2, 13, false);
 						}
 					}
@@ -8018,7 +8025,7 @@ highFrequency
 				for(x=37; < 107) {
 					for(z=37; < 107) {
 						if (trGetTerrainType(x, z) == 2) {
-							trPaintTerrain(x, z, x, z, 0, 70, false);
+							trPaintTerrain(x, z, x, z, 0, 50, false);
 						}
 					}
 				}
@@ -8072,6 +8079,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelect(""+bossUnit, true);
 				trUnitConvert(ENEMY_PLAYER);
+				trUnitChangeProtoUnit("Heka Gigantes");
 				xsEnableRule("boss10_battle");
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
@@ -8095,6 +8103,13 @@ highFrequency
 
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -400);
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
+
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -8114,8 +8129,6 @@ highFrequency
 			trMutateSelected(kbGetProtoUnitID("Guardian"));
 		} else {
 			trMutateSelected(kbGetProtoUnitID("Guardian XP"));
-			xSetFloat(dEnemies, xPhysicalResist, 0.6, bossPointer);
-			xSetFloat(dEnemies, xMagicResist, 0.6, bossPointer);
 		}
 	}
 }

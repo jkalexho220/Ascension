@@ -1825,6 +1825,7 @@ highFrequency
 						break;
 					}
 				}
+				trQuestVarSet("electricRoom", 1);
 			}
 			case 7:
 			{
@@ -3090,8 +3091,8 @@ highFrequency
 	if (trTime() > cActivationTime + 1) {
 		worldHeight = 13;
 		TERRAIN_WALL = 0;
-		TERRAIN_SUB_WALL = 70;
-		
+		TERRAIN_SUB_WALL = 50;
+
 		trUIFadeToColor(0,0,0,1000,0,false);
 		trLetterBox(false);
 		xsDisableSelf();
