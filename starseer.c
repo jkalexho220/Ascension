@@ -1,4 +1,4 @@
-float starBaseDamage = 60;
+float starBaseDamage = 50;
 
 int realignCooldown = 5;
 float realignRadius = 15;
@@ -125,7 +125,7 @@ void starseerAlways(int eventID = -1) {
 			inner = xsPow(xGetFloat(db, xStarseerCurrentRadius) - 1.5, 2);
 			center = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			
-			amt = starBaseDamage * xGetFloat(dPlayerData, xPlayerSpellDamage);
+			amt = (starBaseDamage + 2.0 * xGetFloat(db, xStarseerCurrentRadius)) * xGetFloat(dPlayerData, xPlayerSpellDamage);
 			target = 0;
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);

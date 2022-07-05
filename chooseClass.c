@@ -991,7 +991,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				}
 				case 2:
 				{
-					msg = "Damage: 60 | Rotation speed + 0.33x projectiles";
+					msg = "Damage: 50 | Rotation speed + 0.33x projectiles";
 				}
 				case 3:
 				{
@@ -1011,12 +1011,12 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\god power vision icon 64";
-					msg = "The closer they are, the faster you move.";
+					msg = "The closer they are, the faster you move. The farther they are, the more damage they deal.";
 				}
 				case 7:
 				{
 					icon = "icons\god power vision icon 64";
-					msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x";
+					msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x | Damage Bonus: 2x Distance";
 				}
 				case 8:
 				{
