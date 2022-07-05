@@ -1825,7 +1825,6 @@ highFrequency
 						break;
 					}
 				}
-				trQuestVarSet("electricRoom", 1);
 			}
 			case 7:
 			{
