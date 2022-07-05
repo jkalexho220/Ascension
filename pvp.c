@@ -702,10 +702,10 @@ highFrequency
 			{
 				gadgetUnreal("ShowImageBox-CloseButton");
 				trShowImageDialog(boonIcon(BOON_TWO_RELICS), boonName(BOON_TWO_RELICS));
-				trQuestVarSet("pvpTime", trTime() + 8);
+				trQuestVarSet("pvpTime", trTime() + 5);
 				trQuestVarSet("pvpStep", 3);
 				trSoundPlayFN("market.wav","1",-1,"","");
-				trQuestVarSetFromRand("pvpReward",20,25,true);
+				trQuestVarSetFromRand("pvpReward",21,25,true);
 				trQuestVarSet("pvpCount", 1);
 			}
 			case 20:
