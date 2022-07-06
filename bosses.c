@@ -8002,19 +8002,69 @@ highFrequency
 int dGuardianClones = 0;
 int xGuardianCloneDir = 0;
 int xGuardianCloneSpell = 0;
+int xGuardianCloneCount = 0;
+
+int dGuardianStuns = 0;
+
+int dStarswords = 0;
+int xStarswordDir = 0;
+int xStarswordPos = 0;
+int xStarswordStep = 0;
+int xStarswordAngle = 0;
+int xStarswordVelocity = 0;
+
+int dStarShooters = 0;
+int xStarShooterProj = 0;
+int xStarShooterNext = 0;
+int xStarShooterStep = 0;
+int xStarShooterPos = 0;
 
 const int GUARDIAN_STARSWORD = 2; // laser that slams down and instakills (use three petsuchos projectiles in fan shape)
 const int GUARDIAN_STARSHATTER = 1; // Releases 7 stars into the air. Each one shoots one delay laser. 1000 damage
 const int GUARDIAN_STARWAVE = 0; // wave of gold (qilin heal) that stuns
 
 void activateGuardianClone(int index = 0) {
+	xSetBool(dEnemies, xLaunched, true, index);
 	xAddDatabaseBlock(dGuardianClones, true);
 	xSetInt(dGuardianClones, xSpecialIndex, index);
 	xSetInt(dGuardianClones, xUnitName, xGetInt(dEnemies, xUnitName, index));
 	xSetInt(dGuardianClones, xUnitID, xGetInt(dEnemies, xUnitID, index));
-	trQuestVarSetFromRand("rand", 0, 2, true);
-	trQuestVarSetFromRand("rand2", 0, 2, true);
-	xSetInt(dGuardianClones, xGuardianCloneSpell, 1*xsMin(trQuestVarGet("rand"), trQuestVarGet("rand2")));
+}
+
+void summonStarsword(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
+	xAddDatabaseBlock(dStarswords, true);
+	xSetInt(dStarswords, xUnitName, trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+	trSetUnitOrientation(vector(0,-1,0), rotationMatrix(dir, 0, 1.0), true);
+	trUnitHighlight(10, false);
+	xSetVector(dStarswords, xStarswordPos, pos);
+	xSetVector(dStarswords, xStarswordDir, dir);
+	xSetFloat(dStarswords, xStarswordAngle, trTimeMS());
+}
+
+void summonStarShooter(vector pos = vector(0,0,0)) {
+	xAddDatabaseBlock(dStarShooters, true);
+	xSetInt(dStarShooters, xUnitName, trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Spy Eye");
+	xSetInt(dStarShooters, xStarShooterProj, trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Pegasus");
+
+	xUnitSelect(dStarShooters, xUnitName);
+	trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+	trSetSelectedScale(0,-1,0);
+
+	xUnitSelect(dStarShooters, xStarShooterProj);
+	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+	trSetSelectedScale(0,0,0);
+
+	xSetInt(dStarShooters, xStarShooterNext, trTimeMS() + 1500);
+	xSetVector(dStarShooters, xStarShooterPos, xsVectorSetY(pos, worldHeight + 11.5));
 }
 
 rule boss10_init
@@ -8026,6 +8076,25 @@ highFrequency
 		{
 			case 0:
 			{
+				trSetFogAndBlackmap(false, false);
+				
+				dStarswords = xInitDatabase("starswords");
+				xInitAddInt(dStarswords, "name");
+				xStarswordDir = xInitAddVector(dStarswords, "dir");
+				xStarswordPos = xInitAddVector(dStarswords, "pos");
+				xStarswordStep = xInitAddInt(dStarswords, "step");
+				xStarswordAngle = xInitAddFloat(dStarswords, "angle");
+				xStarswordVelocity = xInitAddFloat(dStarswords, "velocity");
+
+				dStarShooters = xInitDatabase("starShooters");
+				xInitAddInt(dStarShooters, "name");
+				xStarShooterProj = xInitAddInt(dStarShooters, "proj");
+				xStarShooterNext = xInitAddInt(dStarShooters, "next");
+				xStarShooterStep = xInitAddInt(dStarShooters, "step");
+				xStarShooterPos = xInitAddVector(dStarShooters, "pos");
+
+				dGuardianStuns = initGenericProj("guardianStuns", kbGetProtoUnitID("Qilin Heal"), 2, 10, 5, 0, ENEMY_PLAYER, true);
+
 				dGuardianClones = xInitDatabase("guardianClones");
 				xInitAddInt(dGuardianClones, "name");
 				xGuardianCloneSpell = xInitAddInt(dGuardianClones, "spell");
@@ -8034,6 +8103,7 @@ highFrequency
 				xSpecialStep = xInitAddInt(dGuardianClones, "step");
 				xSpecialNext = xInitAddInt(dGuardianClones, "next");
 				xGuardianCloneDir = xInitAddVector(dGuardianClones, "dir");
+				xGuardianCloneCount = xInitAddInt(dGuardianClones, "count");
 
 				trSoundPlayFN("default","1",-1,"???:It has been a long time since I've felt this blade in my hand.","");
 				trQuestVarSet("cinTime", trTime() + 5);
@@ -8157,7 +8227,11 @@ highFrequency
 	float amt = 0;
 	float angle = 0;
 	float dist = 0;
+
 	bool hit = false;
+
+	float timediff = 0.001 * (trTimeMS() - trQuestVarGet("guardianLast"));
+	trQuestVarSet("guardianLast", trTimeMS());
 	
 	vector hitbox = vector(0,0,0);
 	vector start = vector(0,0,0);
@@ -8166,6 +8240,148 @@ highFrequency
 	vector dir = vector(0,0,0);
 	
 	if (trUnitAlive() == true) {
+
+		for(i=xsMin(5, xGetDatabaseCount(dStarShooters)); >0) {
+			xDatabaseNext(dStarShooters);
+			switch(xGetInt(dStarShooters, xStarShooterStep))
+			{
+				case 0:
+				{
+					amt = 0.001 * (xGetInt(dStarShooters, xStarShooterNext) - trTimeMS());
+					if (amt <= 0) {
+						trSoundPlayFN("skypassagein.wav","1",-1,"","");
+						amt = 1.3;
+						xSetInt(dStarShooters, xStarShooterStep, 1);
+						xSetInt(dStarShooters, xStarShooterNext, trTimeMS() + 1500);
+						xDatabaseNext(dPlayerCharacters);
+						pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName));
+
+						dir = getUnitVector3d(xGetVector(dStarShooters, xStarShooterPos), pos);
+						xUnitSelect(dStarShooters, xStarShooterProj);
+						trSetSelectedScale(2, 2, 60);
+						trSetUnitOrientation(vector(0,0,0) - dir, rotationMatrix(getUnitVector(xGetVector(dStarShooters, xStarShooterPos), pos), 0, 1.0), true);
+						xSetVector(dStarShooters, xStarShooterPos, pos);
+					} else {
+						amt = 1.3 - 0.577777 * xsPow(amt, 2);
+					}
+					xUnitSelect(dStarShooters, xUnitName);
+					trSetSelectedScale(0,amt,0);
+				}
+				case 1:
+				{
+					if (trTimeMS() > xGetInt(dStarShooters, xStarShooterNext)) {
+						xUnitSelect(dStarShooters, xUnitName);
+						trUnitDestroy();
+						trSoundPlayFN("sky passage.wav","1",-1,"","");
+						xUnitSelect(dStarShooters, xStarShooterProj);
+						trUnitHighlight(3.0, false);
+						trSetSelectedScale(12.0, 12.0, 60.0);
+						xSetInt(dStarShooters, xStarShooterNext, trTimeMS() + 500);
+						xSetInt(dStarShooters, xStarShooterStep, 2);
+						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+							xDatabaseNext(dPlayerUnits);
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							if (trUnitAlive() == false) {
+								removePlayerUnit();
+							} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), xGetVector(dStarShooters, xStarShooterPos)) < 1.0) {
+								damagePlayerUnit(1000.0);
+							}
+						}
+					}
+				}
+				case 2:
+				{
+					amt = 0.024 * (xGetInt(dStarShooters, xStarShooterNext) - trTimeMS());
+					xUnitSelect(dStarShooters, xStarShooterProj);
+					if (amt < 0) {
+						trUnitDestroy();
+						xFreeDatabaseBlock(dStarShooters);
+					} else {
+						trSetSelectedScale(amt, amt, 60.0);
+					}
+				}
+			}
+		}
+
+		for(i=xsMin(3, xGetDatabaseCount(dGuardianStuns)); >0) {
+			if (processGenericProj(dGuardianStuns) == PROJ_FALLING) {
+				pos = kbGetBlockPosition(""+xGetInt(dGuardianStuns, xUnitName), true);
+				prev = xGetVector(dGuardianStuns, xProjPrev);
+				dist = distanceBetweenVectors(pos, prev);
+				if (dist > 4.0) {
+					dir = xGetVector(dGuardianStuns, xProjDir);
+					dist = xsSqrt(dist) + 4.0;
+					for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (rayCollision(dPlayerUnits, prev, dir, dist, 16.0, true)) {
+							stunUnit(dPlayerUnits, 3.0);
+							damagePlayerUnit(100.0);
+						}
+					}
+					xSetVector(dGuardianStuns, xProjPrev, pos);
+				}
+				if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+					xFreeDatabaseBlock(dGuardianStuns);
+				}
+			}
+		}
+
+		for(i=xsMin(3, xGetDatabaseCount(dStarswords)); >0) {
+			xDatabaseNext(dStarswords);
+			xUnitSelect(dStarswords, xUnitName);
+			switch(xGetInt(dStarswords, xStarswordStep))
+			{
+				case 0:
+				{
+					amt = 0.05 * (trTimeMS() - xGetFloat(dStarswords, xStarswordAngle));
+					trSetSelectedScale(5.0, 1.0, amt);
+					if (amt > 50) {
+						xSetInt(dStarswords, xStarswordStep, 1);
+						xSetFloat(dStarswords, xStarswordAngle, 0);
+					}
+				}
+				case 1:
+				{
+					dir = xGetVector(dStarswords, xStarswordDir);
+					xSetFloat(dStarswords, xStarswordVelocity, xGetFloat(dStarswords, xStarswordVelocity) + timediff * 4.0);
+					xSetFloat(dStarswords, xStarswordAngle, xGetFloat(dStarswords, xStarswordAngle) + timediff * xGetFloat(dStarswords, xStarswordVelocity));
+					if (xGetFloat(dStarswords, xStarswordAngle) > 1.57) {
+						pos = xGetVector(dStarswords, xStarswordPos);
+						trUnitDestroy();
+						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+							xDatabaseNext(dPlayerUnits);
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							if (trUnitAlive() == false) {
+								removePlayerUnit();
+							} else if (rayCollision(dPlayerUnits, pos, dir, 300, 12.0)) {
+								trUnitDelete(false);
+							}
+						}
+						trCameraShake(2.0, 0.4);
+						trSoundPlayFN("cinematics\35_out\strike.mp3","1",-1,"","");
+						dir = dir * 4.0;
+						for(j=10; >0) {
+							trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+							trArmySelect("0,0");
+							trDamageUnitPercent(100);
+							trUnitChangeProtoUnit("Implode Sphere Effect");
+							pos = pos + dir;
+							if (terrainIsType(vectorToGrid(pos), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+								break;
+							}
+						}
+						xFreeDatabaseBlock(dStarswords);
+					} else {
+						angle = xGetFloat(dStarswords, xStarswordAngle);
+						trSetUnitOrientation(vector(0,0,0) - xsVectorSetY(dir * xsSin(angle), xsCos(angle)), rotationMatrix(dir, 0, 1.0), true);
+						trSetSelectedScale(5.0 + 5.0 * xGetFloat(dStarswords, xStarswordVelocity), 1.0, 50);
+					}
+				}
+			}
+		}
 
 		for(i=xGetDatabaseCount(dGuardianClones); >0) {
 			xDatabaseNext(dGuardianClones);
@@ -8178,30 +8394,89 @@ highFrequency
 					case 0:
 					{
 						if (xGetInt(dEnemies, xSilenceStatus, xGetInt(dGuardianClones, xSpecialIndex)) == 0) {
+							xSetInt(dGuardianClones, xSpecialStep, 1);
+							trQuestVarSetFromRand("rand", 0, 2, true);
+							xSetInt(dGuardianClones, xSpecialStep, 1);
+							xSetInt(dGuardianClones, xGuardianCloneSpell, 1*trQuestVarGet("rand"));
 							switch(xGetInt(dGuardianClones, xGuardianCloneSpell))
 							{
 								case GUARDIAN_STARSWORD:
 								{
-
+									xDatabaseNext(dPlayerCharacters);
+									pos = kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName), true);
+									xSetVector(dGuardianClones, xGuardianCloneDir, getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true)));
+									trSetUnitOrientation(xGetVector(dGuardianClones, xGuardianCloneDir), vector(0,1,0), true);
+									trUnitOverrideAnimation(3, 0, false, false, -1);
+									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 1000);
+									trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
 								}
 								case GUARDIAN_STARSHATTER:
 								{
-
+									trUnitOverrideAnimation(3, 0, false, false, -1); // 3200 milliseconds for bored animation
+									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 1500);
+									xSetInt(dGuardianClones, xGuardianCloneCount, 8);
+									xSetVector(dGuardianClones, xGuardianCloneDir, vector(0,0,8));
+								}
+								case GUARDIAN_STARWAVE:
+								{
+									xDatabaseNext(dPlayerCharacters);
+									pos = kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName), true);
+									xSetVector(dGuardianClones, xGuardianCloneDir, getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true)));
+									trUnitOverrideAnimation(1, 0, false, false, -1);
+									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 750);
 								}
 							}
 						}
 					}
+					case 1:
+					{
+						switch(xGetInt(dGuardianClones, xGuardianCloneSpell))
+						{
+							case GUARDIAN_STARSWORD:
+							{
+								summonStarsword(vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName)) + (xGetVector(dGuardianClones, xGuardianCloneDir) * 2.0)), xGetVector(dGuardianClones, xGuardianCloneDir));
+								xSetInt(dGuardianClones, xSpecialNext, xGetInt(dGuardianClones, xSpecialNext) + 2200);
+								trSoundPlayFN("cinematics\32_out\hammerconnect.mp3","1",-1,"","");
+								xSetInt(dGuardianClones, xSpecialStep, 10);
+							}
+							case GUARDIAN_STARSHATTER:
+							{
+								xSetInt(dGuardianClones, xSpecialStep, 2);
+								trSoundPlayFN("petsuchosattack.wav","1",-1,"","");
+							}
+							case GUARDIAN_STARWAVE:
+							{
+								xSetInt(dGuardianClones, xSpecialStep, 10);
+								xSetInt(dGuardianClones, xSpecialNext, xGetInt(dGuardianClones, xSpecialNext) + 750);
+								pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName), true));
+								addGenericProj(dGuardianStuns, pos, xGetVector(dGuardianClones, xGuardianCloneDir));
+								trSoundPlayFN("olympustemplesfx.wav","1",-1,"","");
+							}
+						}
+					}
+					case 2:
+					{
+						xSetInt(dGuardianClones, xGuardianCloneCount, xGetInt(dGuardianClones, xGuardianCloneCount) - 1);
+						pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName)) + xGetVector(dGuardianClones, xGuardianCloneDir));
+						summonStarShooter(pos);
+						if (xGetInt(dGuardianClones, xGuardianCloneCount) == 0) {
+							xSetInt(dGuardianClones, xSpecialStep, 10);
+							xSetInt(dGuardianClones, xSpecialNext, xGetInt(dGuardianClones, xSpecialNext) + 300);
+						} else {
+							xSetInt(dGuardianClones, xSpecialNext, xGetInt(dGuardianClones, xSpecialNext) + 200);
+							xSetVector(dGuardianClones, xGuardianCloneDir, rotationMatrix(xGetVector(dGuardianClones, xGuardianCloneDir), 0.707107, 0.707107));
+						}
+					}
+					case 10:
+					{
+						trUnitOverrideAnimation(-1,0,false,true,-1);
+						xSetInt(dGuardianClones, xSpecialStep, 0);
+						trQuestVarSetFromRand("rand", 5000, 15000, true);
+						xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + trQuestVarGet("rand"));
+					}
 				}
-			} else {
-				action = xGetInt(db, xStunStatus, xGetInt(dGuardianClones, xSpecialIndex));
-				if (xGetBool(db, xLaunched, xGetInt(dGuardianClones, xSpecialIndex))) {
-					action = action + 1;
-				}
-				// interrupt
-				if (action > 0 && xGetInt(dGuardianClones, xSpecialStep) == 2) {
-					xSetInt(dGuardianClones, xSpecialStep, 0);
-					xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 18000);
-				}
+			} else if ((xGetInt(dGuardianClones, xGuardianCloneSpell) != GUARDIAN_STARSHATTER) && (xGetInt(dGuardianClones, xSpecialStep) > 0)) {
+				trSetUnitOrientation(xGetVector(dGuardianClones, xGuardianCloneDir), vector(0,1,0), true);
 			}
 		}
 		

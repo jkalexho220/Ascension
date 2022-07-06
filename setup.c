@@ -680,6 +680,8 @@ highFrequency
 		trModifyProtounit("Petrobolos Shot", p, 8, -99);
 	}
 
+	trModifyProtounit("Revealer", 0, 0, 999999);
+
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, -9999999999999999999.0);
 	trModifyProtounit("Shaba Ka", ENEMY_PLAYER, 0, 3000 * ENEMY_PLAYER);
