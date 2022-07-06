@@ -431,6 +431,8 @@ runImmediately
 	trModifyProtounit("Scylla", 0, 55, 1);
 	trModifyProtounit("Scylla", 1, 55, 1);
 	trModifyProtounit("Scylla", ENEMY_PLAYER, 55, 1);
+
+	trModifyProtounit("Petosuchus Projectile", 0, 55, 2);
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
 		trPlayerSetDiplomacy(p, ENEMY_PLAYER, "Enemy");

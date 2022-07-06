@@ -345,7 +345,7 @@ highFrequency
 			}
 			case 3:
 			{
-				trOverlayText("nottud", 4.0, -1, -1, -1);
+				trOverlayText("nottud", 6.0, -1, -1, -1);
 				trSoundPlayFN("default","1",-1,"BOSS BATTLE:Enemies have ??? power","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 			}

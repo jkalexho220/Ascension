@@ -7989,7 +7989,7 @@ highFrequency
 				xsEnableRule("boss_cin_00");
 				xsDisableRule("guardian_dialog");
 				trVectorQuestVarSet("bossRoomCenter", vector(145,0,145));
-				trStringQuestVarSet("bossProto", "Heka Gigantes");
+				trStringQuestVarSet("bossProto", "Guardian XP");
 				trLetterBox(true);
 				trUIFadeToColor(0,0,0,1000,0,true);
 				xsDisableSelf();
@@ -8019,6 +8019,11 @@ int xStarShooterNext = 0;
 int xStarShooterStep = 0;
 int xStarShooterPos = 0;
 
+const int KALEIDOSCOPE_COUNT = 32;
+int dKaleidoscopes = 0;
+int xKaleidoscopeDiff = 0;
+int xKaleidoscopeLast = 0;
+
 const int GUARDIAN_STARSWORD = 2; // laser that slams down and instakills (use three petsuchos projectiles in fan shape)
 const int GUARDIAN_STARSHATTER = 1; // Releases 7 stars into the air. Each one shoots one delay laser. 1000 damage
 const int GUARDIAN_STARWAVE = 0; // wave of gold (qilin heal) that stuns
@@ -8029,6 +8034,8 @@ void activateGuardianClone(int index = 0) {
 	xSetInt(dGuardianClones, xSpecialIndex, index);
 	xSetInt(dGuardianClones, xUnitName, xGetInt(dEnemies, xUnitName, index));
 	xSetInt(dGuardianClones, xUnitID, xGetInt(dEnemies, xUnitID, index));
+	trQuestVarSetFromRand("rand", 5000, 15000, true);
+	xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + trQuestVarGet("rand"));
 }
 
 void summonStarsword(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
@@ -8077,7 +8084,27 @@ highFrequency
 			case 0:
 			{
 				trSetFogAndBlackmap(false, false);
-				
+
+				trUnitSelectClear();
+				trUnitSelect(""+bossUnit, true);
+				trUnitChangeProtoUnit("Cinematic Block");
+
+				dKaleidoscopes = xInitDatabase("kaleidoscopes", KALEIDOSCOPE_COUNT);
+				xInitAddInt(dKaleidoscopes, "name");
+				xKaleidoscopeDiff = xInitAddVector(dKaleidoscopes, "diff");
+				xKaleidoscopeLast = xInitAddInt(dKaleidoscopes, "last");
+
+				for(i=KALEIDOSCOPE_COUNT; >0) {
+					xAddDatabaseBlock(dKaleidoscopes, true);
+					xSetInt(dKaleidoscopes, xUnitName, trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 0, true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Spy Eye");
+					xUnitSelect(dKaleidoscopes, xUnitName);
+					trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+					trSetSelectedScale(0,-1,0);
+				}
+
 				dStarswords = xInitDatabase("starswords");
 				xInitAddInt(dStarswords, "name");
 				xStarswordDir = xInitAddVector(dStarswords, "dir");
@@ -8155,7 +8182,7 @@ highFrequency
 			{
 				trSoundPlayFN("default","1",-1,"???:Can you accomplish what we could not? Can you handle the power of the Starsword?","");
 				trQuestVarSet("cinTime", trTime() + 6);
-				trOverlayText("Nameless God",5.0,-1,-1,-1);
+				trOverlayText("Nameless God",6.0,-1,-1,-1);
 				if (customContent) {
 					xsEnableRule("boss_music");
 				}
@@ -8177,7 +8204,7 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelect(""+bossUnit, true);
 				trUnitConvert(ENEMY_PLAYER);
-				trUnitChangeProtoUnit("Guardian");
+				trUnitChangeProtoUnit("Guardian XP");
 				xsEnableRule("boss10_battle");
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
@@ -8198,12 +8225,12 @@ highFrequency
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
 
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -400);
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -200);
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
 
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
 
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);
@@ -8337,7 +8364,7 @@ highFrequency
 				case 0:
 				{
 					amt = 0.05 * (trTimeMS() - xGetFloat(dStarswords, xStarswordAngle));
-					trSetSelectedScale(5.0, 1.0, amt);
+					trSetSelectedScale(10.0, 1.0, amt);
 					if (amt > 50) {
 						xSetInt(dStarswords, xStarswordStep, 1);
 						xSetFloat(dStarswords, xStarswordAngle, 0);
@@ -8377,7 +8404,7 @@ highFrequency
 					} else {
 						angle = xGetFloat(dStarswords, xStarswordAngle);
 						trSetUnitOrientation(vector(0,0,0) - xsVectorSetY(dir * xsSin(angle), xsCos(angle)), rotationMatrix(dir, 0, 1.0), true);
-						trSetSelectedScale(5.0 + 5.0 * xGetFloat(dStarswords, xStarswordVelocity), 1.0, 50);
+						trSetSelectedScale(10.0 + 3.0 * xGetFloat(dStarswords, xStarswordVelocity), 1.0, 50);
 					}
 				}
 			}
@@ -8484,17 +8511,143 @@ highFrequency
 		trUnitSelect(""+bossUnit, true);
 		
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-			processBossCooldown();
+			processBossCooldown(41);
+		} else if (trQuestVarGet("bossSpell") > 40) {
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			
 		} else if (trQuestVarGet("bossSpell") > 10) {
-			
+			if (trQuestVarGet("bossSpell") == 11) {
+				if (xGetDatabaseCount(dGuardianClones) < 5) {
+					// duplication
+					bossPos = kbGetBlockPosition(""+bossUnit);
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(bossPos) - 2, 0, xsVectorGetZ(bossPos) + 2, 0, true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Traitors effect");
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(bossPos) + 2, 0, xsVectorGetZ(bossPos) - 2, 0, true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Traitors effect");
+					bossNext = trTimeMS() + 1000;
+					trQuestVarSet("bossSpell", 12);
+				} else {
+					trQuestVarSet("bossSpell", 21);
+				}
+			} else if (trQuestVarGet("bossSpell") == 12) {
+				if (trTimeMS() > bossNext) {
+					trSoundPlayFN("sentinelbirth.wav","1",-1,"","");
+					action = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(bossPos) - 2, 0, xsVectorGetZ(bossPos) + 2, 315, true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trUnitChangeProtoUnit("Guardian");
+					trUnitSelectClear();
+					trUnitSelect(""+action, true);
+					trUnitChangeProtoUnit("Guardian");
+					activateEnemy(action);
+					activateGuardianClone(xGetNewestPointer(dEnemies));
+					action = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(bossPos) + 2, 0, xsVectorGetZ(bossPos) - 2, 135, true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trUnitChangeProtoUnit("Guardian");
+					trUnitSelectClear();
+					trUnitSelect(""+action, true);
+					trUnitChangeProtoUnit("Guardian");
+					activateEnemy(action);
+					activateGuardianClone(xGetNewestPointer(dEnemies));
+					bossCooldown(20, 30);
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 0) {
-			
+			if (trQuestVarGet("bossSpell") == 1) {
+				// celestial kaleidoscope
+				trSoundPlayFN("vortexstart.wav","1",-1,"","");
+				trQuestVarSetFromRand("kaleidoscopeAngle", 0, 6.283185, false);
+				angle = trQuestVarGet("kaleidoscopeAngle");
+				xSetPointer(dKaleidoscopes, 1);
+				xSetVector(dKaleidoscopes, xKaleidoscopeDiff, vector(1,0,0));
+				for(i=KALEIDOSCOPE_COUNT; >1) {
+					xDatabaseNext(dKaleidoscopes);
+					trQuestVarSetFromRand("rand", 0, 3.141592, false);
+					angle = trQuestVarGet("rand");
+					start = xsVectorSet(xsCos(angle),0,xsSin(angle)); // the difference between this angle and the previous one
+					xSetVector(dKaleidoscopes, xKaleidoscopeDiff, start);
+					xSetInt(dKaleidoscopes, xKaleidoscopeLast, trTimeMS() + 1500);
+					dir = rotationMatrix(dir, xsVectorGetX(start),xsVectorGetZ(start));
+				}
+
+				trQuestVarSet("kaleidoscopeHitbox", 1);
+
+				bossNext = trTimeMS() + 1000;
+				trQuestVarSet("bossSpell", 2);
+			} else if (trQuestVarGet("bossSpell") == 2) {
+				amt = 0.001 * (bossNext - trTimeMS());
+				if (amt < 0) {
+					trQuestVarSet("bossSpell", 3);
+					amt = 0;
+				}
+				amt = 1.0 - xsPow(amt, 2);
+				angle = fModulo(6.283185, trQuestVarGet("kaleidoscopeAngle") + timediff * 0.2);
+				trQuestVarSet("kaleidoscopeAngle", angle);
+				dir = xsVectorSet(xsCos(angle),0,xsSin(angle));
+				xSetPointer(dKaleidoscopes, 1);
+				for(i=KALEIDOSCOPE_COUNT; >0) {
+					pos = xGetVector(dKaleidoscopes, xKaleidoscopeDiff);
+					dir = rotationMatrix(dir, xsVectorGetX(pos), xsVectorGetZ(pos));
+					xUnitSelect(dKaleidoscopes, xUnitName);
+					trSetSelectedScale(0,0.123 * amt * xGetPointer(dKaleidoscopes),0);
+					trSetUnitOrientation(vector(0,1,0), dir, true);
+					xDatabaseNext(dKaleidoscopes);
+				}
+				bossTimeout = trTimeMS() + 15000;
+			} else if (trQuestVarGet("bossSpell") == 3) {
+				if (trTimeMS() > bossTimeout) {
+					for(i=KALEIDOSCOPE_COUNT; >0) {
+						xDatabaseNext(dKaleidoscopes);
+						xUnitSelect(dKaleidoscopes, xUnitName);
+						trSetUnitOrientation(vector(1,0,0),vector(0,1,0),true);
+						trSetSelectedScale(0,-1,0);
+					}
+					bossCooldown(20, 30);
+				} else {
+					angle = fModulo(6.283185, trQuestVarGet("kaleidoscopeAngle") + timediff * 0.2);
+					trQuestVarSet("kaleidoscopeAngle", angle);
+					dir = xsVectorSet(xsCos(angle),0,xsSin(angle));
+					xSetPointer(dKaleidoscopes, 1);
+					action = 0;
+					for(i=KALEIDOSCOPE_COUNT; >0) {
+						pos = xGetVector(dKaleidoscopes, xKaleidoscopeDiff);
+						dir = rotationMatrix(dir, xsVectorGetX(pos), xsVectorGetZ(pos));
+						xUnitSelect(dKaleidoscopes, xUnitName);
+						trSetSelectedScale(0,0.123 * xGetPointer(dKaleidoscopes),0);
+						trSetUnitOrientation(vector(0,1,0), dir, true);
+						if (xGetPointer(dKaleidoscopes) == trQuestVarGet("kaleidoscopeHitbox")) {
+							action = 8;
+						}
+						if (action > 0) {
+							amt = 0.3 * (trTimeMS() - xGetInt(dKaleidoscopes, xKaleidoscopeLast));
+							xSetInt(dKaleidoscopes, xKaleidoscopeLast, trTimeMS());
+							action = action - 1;
+							pos = vector(145, 0, 145) + (dir * xGetPointer(dKaleidoscopes));
+							for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+								xDatabaseNext(dPlayerUnits);
+								xUnitSelectByID(dPlayerUnits, xUnitID);
+								if (trUnitAlive() == false) {
+									removePlayerUnit();
+								} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 4.0) {
+									damagePlayerUnit(amt);
+								}
+							}
+						}
+						xDatabaseNext(dKaleidoscopes);
+					}
+					trQuestVarSet("kaleidoscopeHitbox", trQuestVarGet("kaleidoscopeHitbox") + 8);
+					if (trQuestVarGet("kaleidoscopeHitbox") > KALEIDOSCOPE_COUNT) {
+						trQuestVarSet("kaleidoscopeHitbox", 1);
+					}
+				}
+			}
 		} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
-			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(4, trUnitPercentDamaged() * 0.06), true);
 			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
 			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);

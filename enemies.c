@@ -100,9 +100,9 @@ highFrequency
 	setupProtounitBounty("Scylla", 0.5, 0, 0);
 	setupProtounitBounty("Titan Atlantean", 0.5, 0, 0);
 	setupProtounitBounty("Heka Gigantes", 0.5, 0, 0);
-	setupProtounitBounty("Guardian Sleeping", 0.5, 0, 0);
-	setupProtounitBounty("Guardian", 0.5, 0, 0);
-	setupProtounitBounty("Guardian XP", 0.6, 0, 0);
+	setupProtounitBounty("Guardian Sleeping", 0.6, 0, 0);
+	setupProtounitBounty("Guardian", 0.6, 0, 0);
+	setupProtounitBounty("Guardian XP", 0.7, 0, 0);
 	setupProtounitBounty("Pharaoh of Osiris XP", 0.47, 0, 0);
 	setupProtounitBounty("White Tiger", 0.4, 0, 0);
 	setupProtounitBounty("Minotaur", 0.5, 0, 0);
