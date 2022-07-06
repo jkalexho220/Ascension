@@ -8012,6 +8012,7 @@ int xStarswordPos = 0;
 int xStarswordStep = 0;
 int xStarswordAngle = 0;
 int xStarswordVelocity = 0;
+int xStarswordSFX = 0;
 
 int dStarShooters = 0;
 int xStarShooterProj = 0;
@@ -8023,6 +8024,21 @@ const int KALEIDOSCOPE_COUNT = 32;
 int dKaleidoscopes = 0;
 int xKaleidoscopeDiff = 0;
 int xKaleidoscopeLast = 0;
+
+int radianceArray = 0;
+int radianceDamageArray = 0;
+
+int dBlossoms = 0;
+int xBlossomStep = 0;
+int xBlossomNext = 0;
+int xBlossomDir = 0;
+int xBlossomPos = 0;
+
+int dBlossomLasers = 0;
+int xBlossomLaserPos = 0;
+int xBlossomLaserDir = 0;
+int xBlossomLaserStep = 0;
+int xBlossomLaserNext = 0;
 
 const int GUARDIAN_STARSWORD = 2; // laser that slams down and instakills (use three petsuchos projectiles in fan shape)
 const int GUARDIAN_STARSHATTER = 1; // Releases 7 stars into the air. Each one shoots one delay laser. 1000 damage
@@ -8049,6 +8065,12 @@ void summonStarsword(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
 	xSetVector(dStarswords, xStarswordPos, pos);
 	xSetVector(dStarswords, xStarswordDir, dir);
 	xSetFloat(dStarswords, xStarswordAngle, trTimeMS());
+	xSetInt(dStarswords, xStarswordSFX, trGetNextUnitScenarioNameNumber());
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Osiris Birth");
+	xUnitSelect(dStarswords, xStarswordSFX);
+	trSetSelectedScale(0,0,0);
 }
 
 void summonStarShooter(vector pos = vector(0,0,0)) {
@@ -8074,6 +8096,32 @@ void summonStarShooter(vector pos = vector(0,0,0)) {
 	xSetVector(dStarShooters, xStarShooterPos, xsVectorSetY(pos, worldHeight + 11.5));
 }
 
+void summonBlossom(vector pos = vector(0,0,0)) {
+	xAddDatabaseBlock(dBlossoms, true);
+	xSetInt(dBlossoms, xUnitName, trGetNextUnitScenarioNameNumber());
+	xSetVector(dBlossoms, xBlossomPos, pos);
+	xSetInt(dBlossoms, xBlossomNext, trTimeMS() + 2000);
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trUnitChangeProtoUnit("Spy Eye");
+	xUnitSelect(dBlossoms, xUnitName);
+	trMutateSelected(kbGetProtoUnitID("Tower Mirror"));
+	trSetSelectedScale(0,2.5,0);
+}
+
+void summonBlossomLaser(vector pos = vector(0,0,0), vector dir = vector(0,0,0)) {
+	xAddDatabaseBlock(dBlossomLasers, true);
+	xSetInt(dBlossomLasers, xUnitName, trGetNextUnitScenarioNameNumber());
+	xSetVector(dBlossomLasers, xBlossomLaserPos, pos);
+	xSetVector(dBlossomLasers, xBlossomLaserDir, dir);
+	xSetInt(dBlossomLasers, xBlossomLaserNext, trTimeMS() + 2000);
+	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+	trArmySelect("0,0");
+	trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+	trSetSelectedScale(3,3,60);
+	trSetUnitOrientation(vector(0,0,0) - dir, rotationMatrix(xsVectorNormalize(xsVectorSetY(dir, 0)), 0, 1.0), true);
+}
+
 rule boss10_init
 inactive
 highFrequency
@@ -8084,6 +8132,23 @@ highFrequency
 			case 0:
 			{
 				trSetFogAndBlackmap(false, false);
+
+				dBlossoms = xInitDatabase("blossoms");
+				xInitAddInt(dBlossoms, "name");
+				xBlossomStep = xInitAddInt(dBlossoms, "step");
+				xBlossomNext = xInitAddInt(dBlossoms, "next");
+				xBlossomPos = xInitAddVector(dBlossoms, "pos");
+				xBlossomDir = xInitAddVector(dBlossoms, "dir");
+
+				dBlossomLasers = xInitDatabase("blossomLasers");
+				xInitAddInt(dBlossomLasers, "name");
+				xBlossomLaserPos = xInitAddVector(dBlossomLasers, "pos");
+				xBlossomLaserDir = xInitAddVector(dBlossomLasers, "dir");
+				xBlossomLaserStep = xInitAddInt(dBlossomLasers, "step");
+				xBlossomLaserNext = xInitAddInt(dBlossomLasers, "next");
+
+				radianceArray = zNewArray(mInt, 16, "radianceLasers");
+				radianceDamageArray = zNewArray(mFloat, 4, "radianceDamage");
 
 				trUnitSelectClear();
 				trUnitSelect(""+bossUnit, true);
@@ -8112,6 +8177,7 @@ highFrequency
 				xStarswordStep = xInitAddInt(dStarswords, "step");
 				xStarswordAngle = xInitAddFloat(dStarswords, "angle");
 				xStarswordVelocity = xInitAddFloat(dStarswords, "velocity");
+				xStarswordSFX = xInitAddInt(dStarswords, "sfx");
 
 				dStarShooters = xInitDatabase("starShooters");
 				xInitAddInt(dStarShooters, "name");
@@ -8268,6 +8334,76 @@ highFrequency
 	
 	if (trUnitAlive() == true) {
 
+		for(i=xGetDatabaseCount(dBlossoms); >0) {
+			xDatabaseNext(dBlossoms);
+			if (xGetInt(dBlossoms, xBlossomStep) == 0) {
+				amt = 0.001 * (xGetInt(dBlossoms, xBlossomNext) - trTimeMS());
+				xUnitSelect(dBlossoms, xUnitName);
+				if (amt > 0) {
+					trSetSelectedScale(0, 0.625 * xsPow(amt, 2), 0);
+				} else {
+					trUnitChangeProtoUnit("Osiris Birth");
+					xUnitSelect(dBlossoms, xUnitName);
+					trSetSelectedScale(0,0,0);
+					xSetInt(dBlossoms, xBlossomStep, 1);
+					xSetInt(dBlossoms, xBlossomNext, trTimeMS());
+					trQuestVarSetFromRand("rand", 0, 3.14, false);
+					xSetVector(dBlossoms, xBlossomDir, xsVectorSet(xsCos(trQuestVarGet("rand")),0,xsSin(trQuestVarGet("rand"))));
+					trSoundPlayFN("skypassageout.wav","1",-1,"","");
+				}
+			} else if (trTimeMS() > xGetInt(dBlossoms, xBlossomNext)) {
+				xSetInt(dBlossoms, xBlossomStep, 1 + xGetInt(dBlossoms, xBlossomStep));
+				dir = rotationMatrix(xGetVector(dBlossoms, xBlossomDir),0.737277, 0.67559); // 42.5 degrees
+				xSetVector(dBlossoms, xBlossomDir, dir);
+				summonBlossomLaser(xGetVector(dBlossoms, xBlossomPos), dir);
+				summonBlossomLaser(xGetVector(dBlossoms, xBlossomPos), vector(0,0,0) - dir);
+				xSetInt(dBlossoms, xBlossomNext, xGetInt(dBlossoms, xBlossomNext) + 200);
+				if (xGetInt(dBlossoms, xBlossomStep) >= 12) {
+					xUnitSelect(dBlossoms, xUnitName);
+					trUnitDestroy();
+					xFreeDatabaseBlock(dBlossoms);
+				}
+			}
+		}
+
+		for(i=xsMin(5*xGetDatabaseCount(dBlossoms) + 5, xGetDatabaseCount(dBlossomLasers)); >0) {
+			xDatabaseNext(dBlossomLasers);
+			xUnitSelect(dBlossomLasers, xUnitName);
+			switch(xGetInt(dBlossomLasers, xBlossomLaserStep))
+			{
+				case 0:
+				{
+					if (trTimeMS() > xGetInt(dBlossomLasers, xBlossomLaserNext)) {
+						trUnitHighlight(3.0, false);
+						trSetSelectedScale(6, 6, 60);
+						pos = xGetVector(dBlossomLasers, xBlossomLaserPos);
+						dir = xGetVector(dBlossomLasers, xBlossomLaserDir);
+						for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+							xDatabaseNext(dPlayerUnits);
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							if (trUnitAlive() == false) {
+								removePlayerUnit();
+							} else if (rayCollision(dPlayerUnits, pos, dir, 100.0, 1.0)) {
+								damagePlayerUnit(300.0);
+							}
+						}
+						xSetInt(dBlossomLasers, xBlossomLaserStep, 1);
+						xSetInt(dBlossomLasers, xBlossomLaserNext, trTimeMS() + 1000);
+					}
+				}
+				case 1:
+				{
+					amt = 0.006 * (xGetInt(dBlossomLasers, xBlossomLaserNext) - trTimeMS());
+					if (amt > 0) {
+						trSetSelectedScale(amt, amt, 60);
+					} else {
+						trUnitDestroy();
+						xFreeDatabaseBlock(dBlossomLasers);
+					}
+				}
+			}
+		}
+
 		for(i=xsMin(5, xGetDatabaseCount(dStarShooters)); >0) {
 			xDatabaseNext(dStarShooters);
 			switch(xGetInt(dStarShooters, xStarShooterStep))
@@ -8400,6 +8536,8 @@ highFrequency
 								break;
 							}
 						}
+						xUnitSelect(dStarswords, xStarswordSFX);
+						trUnitDestroy();
 						xFreeDatabaseBlock(dStarswords);
 					} else {
 						angle = xGetFloat(dStarswords, xStarswordAngle);
@@ -8511,12 +8649,147 @@ highFrequency
 		trUnitSelect(""+bossUnit, true);
 		
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
-			processBossCooldown(41);
-		} else if (trQuestVarGet("bossSpell") > 40) {
+			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
-			
+			if (trQuestVarGet("bossSpell") == 31) {
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trSetLighting("night", 1.0);
+				trOverlayText("Tears for the Fallen", 3.0, -1, -1, -1);
+				bossNext = trTimeMS() + 2000;
+				bossCount = 2000;
+				bossTarget = 10;
+				trQuestVarSet("bossSpell", 32);
+			} else if (trQuestVarGet("bossSpell") == 32) {
+				if (trTimeMS() > bossNext) {
+					trQuestVarSetFromRand("modx", -20, 20, true);
+					amt = xsSqrt(400 - xsPow(trQuestVarGet("modx"), 2));
+					trQuestVarSetFromRand("modz", 0 - amt, amt, true);
+					summonBlossom(xsVectorSet(145 + trQuestVarGet("modx"), 0, 145 + trQuestVarGet("modz")));
+					bossNext = bossNext + bossCount;
+					bossTarget = bossTarget + 1;
+					bossCount = 20000 / bossTarget;
+					if (bossTarget > 30) {
+						trQuestVarSet("bossSpell", 33);
+					}
+				}
+			} else if (trQuestVarGet("bossSpell") == 33) {
+				if (xGetDatabaseCount(dBlossoms) == 0) {
+					bossCooldown(20, 30);
+					trSetLighting("dusk", 1.0);
+					trQuestVarSet("bossUltimate", 3);
+					trQuestVarSet("bossUsedUltimate", 1);
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
-			
+			if (trQuestVarGet("bossSpell") == 21) {
+				if (xGetDatabaseCount(dGuardianClones) > 1) {
+					bossAnim = true;
+					trUnitOverrideAnimation(3,0,true,false,-1);
+					bossPos = vectorSnapToGrid(kbGetBlockPosition(""+bossUnit, true));
+					bossDir = vector(1,0,0);
+					trQuestVarSet("radianceHitbox", 0);
+					trQuestVarSet("radianceDamage", 0);
+					bossAngle = 0;
+					for(i=0; <16) {
+						action = trGetNextUnitScenarioNameNumber();
+						aiPlanSetUserVariableInt(ARRAYS, radianceArray, i, action);
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(bossPos),0,xsVectorGetZ(bossPos),0,true);
+						trArmySelect("0,0");
+						trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+					}
+					trQuestVarSet("bossSpell", 22);
+					bossNext = trTimeMS() + 2000;
+					trSoundPlayFN("forestfirebirth.wav","1",-1,"","");
+				} else {
+					trQuestVarSet("bossSpell", 11);
+				}
+			} else {
+				aiPlanSetUserVariableFloat(ARRAYS, radianceDamageArray, 1*trQuestVarGet("radianceDamage"), timediff);
+				bossAngle = fModulo(6.283185, bossAngle + timediff * 0.3);
+				bossDir = xsVectorSet(xsCos(bossAngle),0,xsSin(bossAngle));
+				dir = bossDir;
+				angle = 5.0;
+				if (trQuestVarGet("bossSpell") == 23) {
+					angle = 20.0;
+				}
+				action = 0;
+
+				amt = 0;
+				for(i=0; < 4) {
+					amt = amt + aiPlanGetUserVariableFloat(ARRAYS, radianceDamageArray, i);
+				}
+				amt = amt * 1000.0;
+
+				for(i=0; < 16) {
+					trUnitSelectClear();
+					trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS, radianceArray,i), true);
+					trSetUnitOrientation(vector(0,0,0) - dir, vector(0,1,0), true);
+					if (trQuestVarGet("radianceHitbox") == i) {
+						action = 4;
+					}
+					if(action > 0) {
+						dist = 80;
+						action = action - 1;
+						for(j=xGetDatabaseCount(dGuardianClones); >0) {
+							xDatabaseNext(dGuardianClones);
+							if (xGetInt(dGuardianClones, xUnitName) != bossUnit) {
+								if (rayCollision(dGuardianClones, bossPos, dir, dist, 9.0)) {
+									dist = unitDistanceToVector(xGetInt(dGuardianClones, xUnitName), bossPos, false);
+								}
+							}
+						}
+						if (trQuestVarGet("bossSpell") == 23) {
+							for(j=xGetDatabaseCount(dPlayerUnits); >0) {
+								xDatabaseNext(dPlayerUnits);
+								xUnitSelectByID(dPlayerUnits, xUnitID);
+								if (trUnitAlive() == false) {
+									removePlayerUnit();
+								} else if (rayCollision(dPlayerUnits, bossPos, dir, dist, 4.0)) {
+									damagePlayerUnit(amt);
+								}
+							}
+						}
+						trUnitSelectClear();
+						trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS, radianceArray,i), true);
+						trSetSelectedScale(angle, angle, dist * 1.222222);
+					}
+
+					dir = rotationMatrix(dir, 0.92388, 0.382683);
+				}
+
+				trQuestVarSet("radianceHitbox", 4 + trQuestVarGet("radianceHitbox"));
+				trQuestVarSet("radianceDamage", 1 + trQuestVarGet("radianceDamage"));
+				if (trQuestVarGet("radianceHitbox") >= 16) {
+					trQuestVarSet("radianceHitbox", 0);
+					trQuestVarSet("radianceDamage", 0);
+				}
+
+				if (trTimeMS() > bossNext) {
+					if (trQuestVarGet("bossSpell") == 22) {
+						trQuestVarSet("bossSpell", 23);
+						bossNext = trTimeMS() + 8000;
+						trSoundPlayFN("sonofosirisbolt.wav","1",-1,"","");
+						trCameraShake(8.0, 0.2);
+						for(i=0; < 16) {
+							trUnitSelectClear();
+							trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS, radianceArray, i), true);
+							trUnitHighlight(10.0, false);
+						}
+					} else {
+						bossAnim = false;
+						trUnitSelectClear();
+						trUnitSelect(""+bossUnit, true);
+						trUnitOverrideAnimation(-1,0,false,true,-1);
+						bossCooldown(20, 30);
+						for(i=0; < 16) {
+							trUnitSelectClear();
+							trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS, radianceArray,i), true);
+							trUnitDestroy();
+						}
+					}
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
 				if (xGetDatabaseCount(dGuardianClones) < 5) {
@@ -8646,8 +8919,10 @@ highFrequency
 					}
 				}
 			}
+		} else if ((trQuestVarGet("bossUsedUltimate") == 0) && trUnitPercentDamaged() >= 70) {
+			trQuestVarSet("bossSpell", 31);
 		} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
-			trQuestVarSetFromRand("bossSpell", 0, xsMin(4, trUnitPercentDamaged() * 0.06), true);
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
 			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
 			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
