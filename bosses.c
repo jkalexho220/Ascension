@@ -8388,7 +8388,7 @@ highFrequency
 				summonBlossomLaser(xGetVector(dBlossoms, xBlossomPos), dir);
 				summonBlossomLaser(xGetVector(dBlossoms, xBlossomPos), vector(0,0,0) - dir);
 				xSetInt(dBlossoms, xBlossomNext, xGetInt(dBlossoms, xBlossomNext) + 200);
-				if (xGetInt(dBlossoms, xBlossomStep) >= 12) {
+				if (xGetInt(dBlossoms, xBlossomStep) >= 9) {
 					xUnitSelect(dBlossoms, xUnitName);
 					trUnitDestroy();
 					xFreeDatabaseBlock(dBlossoms);
@@ -9029,6 +9029,10 @@ int xVoidEggStep = 0;
 int dVoidEggDust = 0;
 int xVoidEggDustTimeout = 0;
 
+int dDuelists = 0;
+int xDuelistOpponent = 0;
+int xDuelistPos = 0;
+
 void paintVoid(int x = 0, int z = 0, int duration = 10000) {
 	vector data = aiPlanGetUserVariableVector(voidPaintArray, x - 32, z - 32);
 	if (xsVectorGetY(data) < trTimeMS() + duration) {
@@ -9092,7 +9096,6 @@ highFrequency
 			}
 			case 2:
 			{
-				
 				trSoundPlayFN("","1",-1,"The Last God:No... you have surpassed it. You can achieve what we could not.");
 				trQuestVarSet("cinTime", trTime() + 5);
 
@@ -9109,6 +9112,12 @@ highFrequency
 						aiPlanSetUserVariableVector(voidPaintArray, x, z, xsVectorSet(trGetTerrainType(x + 32, z + 32),0,trGetTerrainSubType(x + 32, z + 32)));
 					}
 				}
+
+				dDuelists = xInitDatabase("duelists", ENEMY_PLAYER - 1);
+				xInitAddInt(dDuelists, "name");
+				xInitAddInt(dDuelists, "player");
+				xDuelistOpponent = xInitAddInt(dDuelists, "opponent");
+				xDuelistPos = xInitAddVector(dDuelists, "pos");
 
 				dVoidEggDust = xInitDatabase("voidEggDust");
 				xInitAddInt(dVoidEggDust, "name");
@@ -9543,6 +9552,15 @@ highFrequency
 				trPaintTerrain(x, z, x, z, 1*xsVectorGetX(start), 1*xsVectorGetZ(start), false);
 				aiPlanSetUserVariableVector(voidPaintArray, 1*xsVectorGetX(pos), 1*xsVectorGetZ(pos), xsVectorSetY(start, 0));
 				xFreeDatabaseBlock(dVoidPaint);
+			} else if ((trTimeMS() > trQuestVarGet("bossSummonNext")) && (trQuestVarGet("secondPhase") == 1)) { // random argus spawn
+				pos = gridToVector(pos + vector(32, 0, 32));
+				action = trGetNextUnitScenarioNameNumber();
+				trQuestVarSetFromRand("rand", 0, 360, true);
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("rand"),true);
+				activateEnemy(action);
+				trQuestVarSetFromRand("bossSummonNext", 100, 9000, true);
+				trQuestVarSetFromRand("rand", 100, 9000, true);
+				trQuestVarSet("bossSummonNext", trTimeMS() + xsMin(trQuestVarGet("bossSummonNext"), trQuestVarGet("rand")));
 			} else if (trTimeMS() > trQuestVarGet("voidClawsNext")) {
 				pos = gridToVector(pos + vector(32, 0, 32));
 				hit = false;
@@ -9604,17 +9622,68 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
-			
+			if (trQuestVarGet("bossSpell") == 31) {
+				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
+				trSoundPlayFN("godpower.wav","1",-1,"","");
+				trOverlayText("Nightmare Duel", 3.0, -1, -1, -1);
+				trUIFadeToColor(0,0,0,1000,0,true);
+				bossNext = trTimeMS() + 1000;
+				trQuestVarSet("bossSpell", 32);
+			} else if (trQuestVarGet("bossSpell") == 32) {
+				if (trTimeMS() > bossNext) {
+					trUnitSelectClear();
+					trUnitSelectByQV("bossRevealer");
+					trUnitChangeProtoUnit("Cinematic Block");
+					for(p=1; < ENEMY_PLAYER) {
+						for(x=p; < ENEMY_PLAYER) {
+							trPlayerModifyLOS(p, false, x);
+							trPlayerModifyLOS(x, false, p);
+						}
+						if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
+							trQuestVarSet("p"+p+"rideLightning", 0);
+							trQuestVarSet("p"+p+"lightwing", 0);
+							pos = trVectorQuestVarGet("p"+p+"arena");
+							for(a = -6; <= 6) {
+								for(b = -6; <= 6) {
+									if (xsPow(a, 2) + xsPow(b, 2) <= 6) {
+										x = a + xsVectorGetX(pos);
+										z = b + xsVectorGetZ(pos);
+										trPaintTerrain(x, z, x, z, 5, 5, false);
+									}
+								}
+							}
+							pos = gridToVector(pos);
+							xAddDatabaseBlock(dDuelists, true);
+							xSetInt(dDuelists, xPlayerOwner, p);
+							xSetVector(dDuelists, xDuelistPos, kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true));
+							xSetInt(dDuelists, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
+							action = trGetNextUnitScenarioNameNumber();
+							trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos) - 8, 0, xsVectorGetZ(pos) - 8,45,true);
+							trArmySelect(""+p+",0");
+							trUnitChangeProtoUnit("Transport Ship Greek");
+							xSetInt(dDuelists, xDuelistOpponent, trGetNextUnitScenarioNameNumber());
+							
+						}
+					}
+					bossNext = trTimeMS() + 30000;
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			if (trQuestVarGet("bossSpell") == 21) {
 				trMessageSetText("Destroy the eggs before they explode!", -1);
 				bossCount = ENEMY_PLAYER / 2;
+				if (trQuestVarGet("secondPhase") == 1) {
+					bossCount = bossCount * 2;
+				}
 				bossNext = trTimeMS();
 				trQuestVarSet("bossSpell", 22);
 			} else if (trQuestVarGet("bossSpell") == 22) {
 				if (trTimeMS() > bossNext) {
 					trSoundPlayFN("gatherpoint.wav","1",-1,"","");
 					bossNext = bossNext + 1500;
+					if (trQuestVarGet("secondPhase") == 1) {
+						bossNext = bossNext - 500;
+					}
 					trQuestVarSetFromRand("modx", -20, 20, true);
 					amt = xsSqrt(400 - xsPow(trQuestVarGet("modx"), 2));
 					trQuestVarSetFromRand("modz", 0 - amt, amt, true);
@@ -9717,6 +9786,9 @@ highFrequency
 			if (trQuestVarGet("bossSpell") == 1) {
 				bossNext = trTimeMS();
 				bossTimeout = trTimeMS() + 9000;
+				if (trQuestVarGet("secondPhase") == 1) {
+					bossTimeout = bossTimeout + 3000;
+				}
 				trQuestVarSet("bossSpell", 2);
 				trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
 			} else if (trQuestVarGet("bossSpell") == 2) {
