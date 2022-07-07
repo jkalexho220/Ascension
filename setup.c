@@ -841,7 +841,10 @@ void paintTowerSegment(int stage = 0) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	int x = 139;
 	int z = 89 + 6 * stage;
-	if (iModulo(2, stage) == 0) {
+	if (stage == 10) {
+		x = 145;
+		z = 153;
+	} else if (iModulo(2, stage) == 0) {
 		x = 151;
 	}
 	int next = trGetNextUnitScenarioNameNumber();

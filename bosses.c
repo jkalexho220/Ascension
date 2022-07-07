@@ -8248,7 +8248,7 @@ highFrequency
 			{
 				trSoundPlayFN("default","1",-1,"???:Can you accomplish what we could not? Can you handle the power of the Starsword?","");
 				trQuestVarSet("cinTime", trTime() + 6);
-				trOverlayText("Nameless God",6.0,-1,-1,-1);
+				trOverlayText("The Last God",6.0,-1,-1,-1);
 				if (customContent) {
 					xsEnableRule("boss_music");
 				}
@@ -8289,10 +8289,17 @@ highFrequency
 
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
 
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -200);
 				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
+
+				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 27, 450);
+				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 29, -70);
 
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -8928,32 +8935,339 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			trDamageUnitPercent(100);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
 		xsDisableSelf();
 		trMusicStop();
 		xsDisableRule("boss_music");
-		if (trQuestVarGet("secondPhase") == 1) {
-			xsEnableRule("boss_ded");
-			xsDisableRule("gameplay_always");
-		} else {
-			trQuestVarSet("secondPhase", 1);
-			trQuestVarSet("cinStep", 0);
-			trQuestVarSet("cinTime", trTime() + 3);
-			xsEnableRule("boss10_start_again");
-			trForceNonCinematicModels(true);
-			trUIFadeToColor(0,0,0,1000,0,true);
-			trLetterBox(true);
-		}
+		trQuestVarSet("cinStep", 0);
+		trQuestVarSet("cinTime", trTime() + 3);
+		xsEnableRule("boss10_start_again");
+		trForceNonCinematicModels(true);
+		trUIFadeToColor(0,0,0,1000,0,true);
+		trLetterBox(true);
+		
+		xsDisableRule("gameplay_always");
+		xsEnableRule("guardian_ded");
 		boss = 0;
 		trSetLighting("dusk", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
-		for(x=xGetDatabaseCount(dEnemies); >0) {
+		xSetPointer(dEnemies, bossPointer);
+		for(x=xGetDatabaseCount(dEnemies); >1) {
 			xDatabaseNext(dEnemies);
 			xUnitSelectByID(dEnemies, xUnitID);
+			trUnitDestroy();
+		}
+		for(i=xGetDatabaseCount(dStarswords); >0) {
+			xDatabaseNext(dStarswords);
+			xUnitSelect(dStarswords, xUnitName);
+			trUnitDestroy();
+			xUnitSelect(dStarswords, xStarswordSFX);
+			trUnitDestroy();
+		}
+		for(i=xGetDatabaseCount(dBlossoms); >0) {
+			xDatabaseNext(dBlossoms);
+			xUnitSelect(dBlossoms, xUnitName);
+			trUnitDestroy();
+		}
+		for(i=xGetDatabaseCount(dBlossomLasers); >0) {
+			xDatabaseNext(dBlossomLasers);
+			xUnitSelect(dBlossomLasers, xUnitName);
+			trUnitDestroy();
+		}
+		for(i=xGetDatabaseCount(dStarShooters); >0) {
+			xDatabaseNext(dStarShooters);
+			xUnitSelect(dStarShooters, xUnitName);
+			trUnitDestroy();
+			xUnitSelect(dStarShooters, xStarShooterProj);
+			trUnitDestroy();
+		}
+		uiLookAtUnitByName(""+bossUnit);
+	}
+}
+
+
+rule boss10_start_again
+inactive
+highFrequency
+{
+	vector pos = vector(0,0,0);
+	int x = 0;
+	int z = 0;
+	vector dir = vector(-1,0,-1);
+	vector offset = vector(0,0,0);
+	int tempX = 0;
+	int tempZ = 0;
+	float height = 0;
+	if (trTime() > trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trQuestVarSet("play", 0);
+				trSoundPlayFN("","1",-1,"The Last God:At last, I rest. You... are worthy of the Starsword.");
+				trQuestVarSet("cinTime", trTime() + 4);
+				bossUnit = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+ENEMY_PLAYER+",0", "Heka Gigantes", 1, 145, 0, 145, 225, true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetSelectedScale(0,0,0);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, 5);
+				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 4);
+				activateEnemy(bossUnit);
+				xSetFloat(dEnemies, xPhysicalResist, 0.7);
+				xSetFloat(dEnemies, xMagicResist, 0.7);
+				bossPointer = xGetNewestPointer(dEnemies);
+				xSetBool(dEnemies, xLaunched, true);
+
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
+
+				spyEffect(bossUnit,kbGetProtoUnitID("Tartarian Gate"),xsVectorSet(ARRAYS,bossInts,0)); // tartarian gate
+
+				for(i=xStunSFX; <= xSilenceSFX) {
+					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
+				}
+				trSetUnitIdleProcessing(false);
+			}
+			case 2:
+			{
+				
+				trSoundPlayFN("","1",-1,"The Last God:No... you have surpassed it. You can achieve what we could not.");
+				trQuestVarSet("cinTime", trTime() + 5);
+
+				trUnitSelectClear();
+				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,0), true);
+				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+				trSetSelectedScale(0,0,0);
+				trUnitOverrideAnimation(6,0,true,false,-1);
+			}
+			case 3:
+			{
+				trSoundPlayFN("","1",-1,"The Last God:When The Void comes... I believe that you will be able to stop it.");
+				trQuestVarSet("cinTime", trTime() + 5);
+
+				// repaint pathways
+				for(a=37; < 72) {
+					for(b=37; < 72) {
+						if ((b > a - 8.787) && (b < 122.787 - a) && (b < a + 8.787)) {
+							x = a;
+							z = b;
+							dir = vector(0,0,0);
+							offset = vector(0,0,-1);
+							height = 15.0 * (1.0 * a + b - 82.787) / 40 - 2.0;
+							for(i=4; >0) {
+								if (height > -2.0) {
+									trPaintTerrain(x + xsVectorGetX(dir), z + xsVectorGetZ(dir), x + xsVectorGetX(dir), z + xsVectorGetZ(dir), 0, 53, false);
+									trChangeTerrainHeight(x, z, x, z, height);
+								} else {
+									trPaintTerrain(x + xsVectorGetX(dir), z + xsVectorGetZ(dir), x + xsVectorGetX(dir), z + xsVectorGetZ(dir), 0, 37, false);
+									trChangeTerrainHeight(x, z, x, z, -2.0);
+								}
+								tempX = x - 72;
+								tempZ = z - 72;
+								x = tempZ + 72;
+								z = 72 - tempX;
+								dir = dir + offset;
+								offset = rotationMatrix(offset, 0, -1.0);
+							}
+						}
+					}
+				}
+				TERRAIN_WALL = 2;
+				TERRAIN_SUB_WALL = 13;
+
+				for(x=0; < 145) {
+					for(z=0; < 145) {
+						height = xsPow(x - 72, 2) + xsPow(z - 72, 2);
+						if (height > 3600) {
+							trPaintTerrain(x, z, x, z, 2, 13, false);
+						} else if (height > 1000) {
+							trQuestVarSetFromRand("rand", 0, height, true);
+							if (trQuestVarGet("rand") > 1000) {
+								trPaintTerrain(x, z, x, z, 5, 4, false);
+							}
+						}
+					}
+				}
+
+				for(i=trQuestVarGet("eyecandyStart"); < trQuestVarGet("eyecandyEnd")) {
+					trUnitSelectClear();
+					trUnitSelect(""+i);
+					trUnitChangeProtoUnit("Spy Eye");
+					trUnitSelectClear();
+					trUnitSelect(""+i);
+					trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+					trUnitOverrideAnimation(6,0,true,false,-1);
+					trSetSelectedScale(0,0,0);
+				}
+
+				trPaintTerrain(0,0,5,5,5,4,true);
+			}
+			case 4:
+			{
+				trSoundPlayFN("","1",-1,"The Last God:When you... Huh?!");
+				trQuestVarSet("cinTime", trTime() + 3);
+				trCameraCut(vector(211.435150,23.190313,212.623291), vector(0.618019,-0.485905,0.618020), vector(0.343586,0.874012,0.343587), vector(0.707107,0.000000,-0.707107));
+				trackInsert();
+				trackAddWaypoint();
+				trCameraCut(vector(75.809708,86.270889,74.961533), vector(0.545177,-0.636841,0.545175), vector(0.450317,0.770992,0.450318), vector(0.707107,0.000000,-0.707107));
+				trackAddWaypoint();
+				trCameraCut(vector(211.435150,23.190313,212.623291), vector(0.618019,-0.485905,0.618020), vector(0.343586,0.874012,0.343587), vector(0.707107,0.000000,-0.707107));
+			}
+			case 5:
+			{
+				trSoundPlayFN("","1",-1,"The Last God:Th-The Void is already here!");
+				trQuestVarSet("cinTime", trTime() + 5);
+				trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
+				trackPlay(10000,-1);
+				
+				trUIFadeToColor(0,0,0,1000,0,false);
+				if (customContent) {
+					trSoundPlayFN("Zenophobia\True Origin shortened.mp3","1",-1,"","");
+				}
+			}
+			case 6:
+			{
+				trOverlayText("The Void", 6.0, -1, -1, -1);
+				trSoundPlayFN("","1",-1,"The Last God:It's now or never, challengers! You must defeat The Void for the sake of the world!");
+				trQuestVarSet("cinTime", trTime() + 5);
+				trUIFadeToColor(0,0,0, 2000, 2000, true);
+				if (customContent) {
+					xsEnableRule("void_music");
+				}
+			}
+			case 7:
+			{
+				trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+					xDatabaseNext(dPlayerUnits);
+					xUnitSelectByID(dPlayerUnits, xUnitID);
+					trUnitDestroy();
+				}
+				xResetDatabase(dPlayerUnits);
+				xClearDatabase(dPlayerCharacters);
+				for(p=1; < ENEMY_PLAYER) {
+					trQuestVarSet("p"+p+"rideLightning", 0);
+					trPlayerKillAllGodPowers(p);
+					xSetInt(dPlayerData, xPlayerDead, 0, p);
+					xSetBool(dPlayerData, xPlayerSilenced, true, p); // the un-silence will grant the right god powers
+				}
+				spawnPlayerCircle(vector(131,0,131));
+				uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 8:
+			{
+				xsEnableRule("void_battle");
+				xsEnableRule("gameplay_always");
+				trQuestVarSet("play", 1);
+				boss = 20;
+				bossID = kbGetBlockID(""+bossUnit, true);
+				if (customContent == false) {
+					xsEnableRule("boss_music");
+				}
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trQuestVarSet("musicTime", 0);
+
+				bossCooldown(10, 15);
+
+				trSetUnitIdleProcessing(true);
+
+				trUnitSelectClear();
+				trUnitSelect(""+bossUnit, true);
+				trUnitChangeProtoUnit("Titan Kronos");
+
+				trQuestVarSet("bossUsedUltimate", 0);
+			}
+		}
+	}
+}
+
+rule void_music
+minInterval 3
+inactive
+{
+	if (trTime() >= trQuestVarGet("musicTime")) {
+		trMusicPlay("Zenophobia\The God Clad in Chaos and Calamity.mp3", "1", 1.0);
+		trQuestVarSet("musicTime", trTime() + 290);
+	}
+}
+
+rule boss10_battle
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelect(""+bossUnit, true);
+	int p = 0;
+	int x = 0;
+	int z = 0;
+	int action = 0;
+	int id = 0;
+	float amt = 0;
+	float angle = 0;
+	float dist = 0;
+
+	bool hit = false;
+
+	float timediff = 0.001 * (trTimeMS() - trQuestVarGet("guardianLast"));
+	trQuestVarSet("guardianLast", trTimeMS());
+	
+	vector hitbox = vector(0,0,0);
+	vector start = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector prev = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	
+	if (trUnitAlive() == true) {
+
+		
+		
+		trUnitSelectClear();
+		trUnitSelect(""+bossUnit, true);
+		
+		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
+			processBossCooldown();
+		} else if (trQuestVarGet("bossSpell") > 30) {
+			
+		} else if (trQuestVarGet("bossSpell") > 20) {
+			
+		} else if (trQuestVarGet("bossSpell") > 10) {
+			
+		} else if (trQuestVarGet("bossSpell") > 0) {
+			
+		} else if ((trQuestVarGet("bossUsedUltimate") == 0) && trUnitPercentDamaged() >= 70) {
+			trQuestVarSet("bossSpell", 31);
+		} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
+			trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
+			trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
+			if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
+				trQuestVarSetFromRand("bossSpell", 0, 2, true);
+				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+			}
 			trDamageUnitPercent(100);
 		}
+	} else {
+		trUnitOverrideAnimation(-1,0,false,true,-1);
+		xsDisableSelf();
+		trMusicStop();
+		xsDisableRule("boss_music");
+		xsDisableRule("void_music");
+		trForceNonCinematicModels(true);
+		trUIFadeToColor(0,0,0,1000,0,true);
+		trLetterBox(true);
+		
+		xsDisableRule("gameplay_always");
+		xsEnableRule("guardian_ded");
+		boss = 0;
+		trSetLighting("dusk", 1.0);
+		trSoundPlayFN("win.wav","1",-1,"","");
+		
 		uiLookAtUnitByName(""+bossUnit);
 	}
 }

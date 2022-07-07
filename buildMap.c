@@ -3228,6 +3228,7 @@ highFrequency
 
 
 		/* eyecandy - candy for the eyes */
+		trQuestVarSet("eyecandyStart", trGetNextUnitScenarioNameNumber());
 		for(x=0; < 145) {
 			trQuestVarSetFromRand("rand", 0, 145, true);
 			if (trGetTerrainSubType(x, trQuestVarGet("rand")) == 37) {
@@ -3253,6 +3254,8 @@ highFrequency
 				trArmyDispatch("0,0","Columns",1, trQuestVarGet("rand") * 2 + 1, 0, z * 2 + 1, trQuestVarGet("heading"), true);
 			}
 		}
+
+		trQuestVarSet("eyecandyEnd", trGetNextUnitScenarioNameNumber());
 
 		trQuestVarSet("bossRevealer", trGetNextUnitScenarioNameNumber());
 		trArmyDispatch("0,0", "Dwarf", 1, 145, 0, 145, 0, true);
