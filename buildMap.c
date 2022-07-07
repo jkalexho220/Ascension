@@ -3107,6 +3107,8 @@ highFrequency
 
 		trSetLighting("dusk", 0);
 
+		trVectorQuestVarSet("bossRoomCenter", vector(145,0,145));
+
 		trPaintTerrain(0, 0, 145, 145, 0, 37, false);
 		trChangeTerrainHeight(0, 0, 145, 145, -2.0, false);
 		trChangeTerrainHeight(57, 57, 87, 87, 13.0, false);

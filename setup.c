@@ -843,7 +843,7 @@ void paintTowerSegment(int stage = 0) {
 	int z = 89 + 6 * stage;
 	if (stage == 10) {
 		x = 145;
-		z = 153;
+		z = 151;
 	} else if (iModulo(2, stage) == 0) {
 		x = 151;
 	}
