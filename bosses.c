@@ -6632,6 +6632,7 @@ int xFingerDir = 0;
 int xFingerStep = 0;
 int xFingerTimeout = 0;
 int xFingerScale = 0;
+int xFingerAttacker = 0;
 
 rule the_keeper_hunt_start
 inactive
@@ -6656,6 +6657,7 @@ highFrequency
 	dFingers = xInitDatabase("fingers");
 	xInitAddInt(dFingers, "name");
 	xFingerDir = xInitAddVector(dFingers, "dir");
+	xFingerAttacker = xInitAddBool(dFingers, "attacker", true);
 }
 
 rule the_keeper_hunt_sfx
@@ -6806,6 +6808,7 @@ void spawnFinger(vector center = vector(0,0,0), vector offset = vector(0,0,0), v
 	vector pos = center + offset;
 	vector dir = xsVectorNormalize(rotationMatrix(dest - offset, 0, -1.0));
 	xAddDatabaseBlock(dFingers, true);
+	xSetBool(dFingers, xFingerAttacker, false);
 	xSetInt(dFingers, xUnitName, trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 	xUnitSelect(dFingers, xUnitName);
@@ -9075,6 +9078,8 @@ highFrequency
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
 				}
 				trSetUnitIdleProcessing(false);
+
+				trStringQuestVarSet("advice","This can't be the end! You have to stop The Void!");
 			}
 			case 2:
 			{
@@ -9112,10 +9117,11 @@ highFrequency
 				xFingerStep = xInitAddInt(dFingers, "step");
 				xFingerTimeout = xInitAddInt(dFingers, "timeout");
 				xFingerScale = xInitAddFloat(dFingers, "scale");
+				xFingerAttacker = xInitAddBool(dFingers, "attacker", true);
 			}
 			case 3:
 			{
-				trSoundPlayFN("","1",-1,"The Last God:When The Void comes... I believe that you will be able to stop it.");
+				trSoundPlayFN("","1",-1,"The Last God:When The Void comes... I believe that you will be able to stop it once and for all.");
 				trQuestVarSet("cinTime", trTime() + 5);
 
 				// repaint pathways
@@ -9275,6 +9281,20 @@ inactive
 	}
 }
 
+void paintVoidCircle(vector pos = vector(0,0,0), int radius = 0, int duration = 3000) {
+	int x = 0;
+	int z = 0;
+	for(a = 0 - radius; <= radius) {
+		for(b = 0 - radius; <= radius) {
+			if (xsPow(a, 2) + xsPow(b, 2) <= radius * radius) {
+				x = a + xsVectorGetX(pos);
+				z = b + xsVectorGetZ(pos);
+				paintVoid(x, z, duration);
+			}
+		}
+	}
+}
+
 rule void_battle
 inactive
 highFrequency
@@ -9291,6 +9311,7 @@ highFrequency
 	float mSin = 0;
 	float mCos = 0;
 
+
 	bool hit = false;
 
 	float timediff = 0.001 * (trTimeMS() - trQuestVarGet("guardianLast"));
@@ -9304,69 +9325,89 @@ highFrequency
 	
 	trUnitSelectClear();
 	trUnitSelect(""+bossUnit, true);
+	float percentDamaged = trUnitPercentDamaged();
 	if (trUnitAlive() == true) {
 		trDamageUnit(timediff * 100); // counteract regen
+
+		if (trTime() > trQuestVarGet("bossSummonTime")) {
+			trQuestVarSetFromRand("bossSummonTime", 1, 2000.0 / (100.0 + percentDamaged), true);
+			trQuestVarSet("bossSummonTime", trTime() + trQuestVarGet("bossSummonTime"));
+			trQuestVarSetFromRand("rand", 0, 6.283185, false);
+			dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
+			pos = vector(145, 0, 145) - (dir * 100.0);
+			action = trGetNextUnitScenarioNameNumber();
+			trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+			trArmySelect(""+ENEMY_PLAYER+",0");
+			trSetUnitOrientation(dir, vector(0,1,0), true);
+			trUnitMoveToPoint(145, 0, 145, -1, true);
+			activateEnemy(action);
+		}
+
 		for(i=xGetDatabaseCount(dFingers); >0) {
 			xDatabaseNext(dFingers);
 			xUnitSelect(dFingers, xUnitName);
-			switch(xGetInt(dFingers, xFingerStep))
-			{
-				case 0:
+			if (xGetBool(dFingers, xFingerAttacker)) {
+				switch(xGetInt(dFingers, xFingerStep))
 				{
-					diff = xGetInt(dFingers, xFingerTimeout) - trTimeMS();
-					if (diff > 0) {
-						diff = 3.5 - 0.002 * diff;
-						trSetSelectedScale(0.0 - diff * xGetFloat(dFingers,xFingerScale), 0.5 * diff * xGetFloat(dFingers,xFingerScale), 0.0 - 1.0 - xGetFloat(dFingers,xFingerScale));
-					} else {
-						xSetInt(dFingers, xFingerStep, 1);
-						xSetInt(dFingers, xFingerTimeout, trTimeMS());
-						trQuestVarSetFromRand("sound", 1, 3, true);
-						trSoundPlayFN("tartarianspawngrunt"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+					case 0:
+					{
+						diff = xGetInt(dFingers, xFingerTimeout) - trTimeMS();
+						if (diff > 0) {
+							diff = 3.5 - 0.002 * diff;
+							trSetSelectedScale(0.0 - diff * xGetFloat(dFingers,xFingerScale), 0.5 * diff * xGetFloat(dFingers,xFingerScale), 0.0 - 1.0 - xGetFloat(dFingers,xFingerScale));
+						} else {
+							xSetInt(dFingers, xFingerStep, 1);
+							xSetInt(dFingers, xFingerTimeout, trTimeMS());
+							trQuestVarSetFromRand("sound", 1, 3, true);
+							trSoundPlayFN("tartarianspawngrunt"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+						}
 					}
-				}
-				case 1:
-				{
-					diff = 1.570796 + 0.01 * (trTimeMS() - xGetInt(dFingers, xFingerTimeout));
-					mSin = xsSin(diff);
-					mCos = xsCos(diff);
-					dir = xsVectorSetY(xGetVector(dFingers, xFingerDir) * mSin, mCos);
-					trSetUnitOrientation(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0), vector(0,0,0) - dir, true);
-					if (diff > 3.4) {
-						trQuestVarSet("sound", 0);
-						xSetInt(dFingers,xFingerStep, 2);
-						xSetInt(dFingers, xFingerTimeout, trTimeMS() + 1000);
-						dir = xGetVector(dFingers, xFingerDir);
-						pos = kbGetBlockPosition(""+xGetInt(dFingers, xUnitName), true);
-						for(x=xGetDatabaseCount(dPlayerUnits); >0) {
-							xDatabaseNext(dPlayerUnits);
-							xUnitSelectByID(dPlayerUnits, xUnitID);
-							if (trUnitAlive() == false) {
-								removePlayerUnit();
-							} else if (rayCollision(dPlayerUnits, pos, dir, 5.0 * xGetFloat(dFingers,xFingerScale), 2.0)) {
-								damagePlayerUnit(300.0);
-								trQuestVarSet("sound", 1);
+					case 1:
+					{
+						diff = 1.570796 + 0.01 * (trTimeMS() - xGetInt(dFingers, xFingerTimeout));
+						mSin = xsSin(diff);
+						mCos = xsCos(diff);
+						dir = xsVectorSetY(xGetVector(dFingers, xFingerDir) * mSin, mCos);
+						trSetUnitOrientation(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0), vector(0,0,0) - dir, true);
+						if (diff > 3.4) {
+							trQuestVarSet("sound", 0);
+							xSetInt(dFingers,xFingerStep, 2);
+							xSetInt(dFingers, xFingerTimeout, trTimeMS() + 1000);
+							dir = xGetVector(dFingers, xFingerDir);
+							pos = kbGetBlockPosition(""+xGetInt(dFingers, xUnitName), true);
+							for(x=xGetDatabaseCount(dPlayerUnits); >0) {
+								xDatabaseNext(dPlayerUnits);
+								xUnitSelectByID(dPlayerUnits, xUnitID);
+								if (trUnitAlive() == false) {
+									removePlayerUnit();
+								} else if (rayCollision(dPlayerUnits, pos, dir, 5.0 * xGetFloat(dFingers,xFingerScale), 2.0)) {
+									damagePlayerUnit(300.0);
+									trQuestVarSet("sound", 1);
+								}
+							}
+
+							if (trQuestVarGet("sound") == 1) {
+								trQuestVarSetFromRand("sound", 1, 2, true);
+								trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 							}
 						}
-
-						if (trQuestVarGet("sound") == 1) {
-							trQuestVarSetFromRand("sound", 1, 2, true);
-							trSoundPlayFN("titanpunch"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
-						}
 					}
-				}
-				case 2:
-				{
-					diff = trTimeMS() - xGetInt(dFingers, xFingerTimeout);
-					if (diff > 0) {
-						diff = 3.5 - 0.002 * diff;
+					case 2:
+					{
+						diff = trTimeMS() - xGetInt(dFingers, xFingerTimeout);
 						if (diff > 0) {
-							trSetSelectedScale(0.0 - diff, diff, 2.0);
-						} else {
-							trUnitDestroy();
-							xFreeDatabaseBlock(dFingers);
+							diff = 3.5 - 0.002 * diff;
+							if (diff > 0) {
+								trSetSelectedScale(0.0 - diff, diff, 2.0);
+							} else {
+								trUnitDestroy();
+								xFreeDatabaseBlock(dFingers);
+							}
 						}
 					}
 				}
+			} else {
+
 			}
 		}
 
@@ -9393,9 +9434,9 @@ highFrequency
 						removePlayerUnit();
 					} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 16.0) {
 						dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName)));
-						spawnAttackFinger(pos, dir, 1.5);
-						trQuestVarSetFromRand("voidClawsNext", 100, 4000, true);
-						trQuestVarSetFromRand("rand", 100, 4000, true);
+						spawnAttackFinger(pos, dir, 1.0 + xsSqrt(percentDamaged * 0.05));
+						trQuestVarSetFromRand("voidClawsNext", 100, 5000, true);
+						trQuestVarSetFromRand("rand", 100, 5000, true);
 						trQuestVarSet("voidClawsNext", trTimeMS() + xsMin(trQuestVarGet("voidClawsNext"), trQuestVarGet("rand")));
 						break;
 					}
@@ -9406,15 +9447,7 @@ highFrequency
 		pos = vectorToGrid(kbGetBlockPosition(""+bossUnit, true));
 		if (trTime() > trQuestVarGet("bossPaintNext")) {
 			trQuestVarSet("bossPaintNext", trTime());
-			for(a = -6; <= 6) {
-				for(b = -6; <= 6) {
-					if (xsPow(a, 2) + xsPow(b, 2) <= 36) {
-						x = a + xsVectorGetX(pos);
-						z = b + xsVectorGetZ(pos);
-						paintVoid(x, z, 3000);
-					}
-				}
-			}
+			paintVoidCircle(pos, 5, 2000);
 		}
 
 		if (xGetDatabaseCount(dVoidGlow) > 0) {
@@ -9439,17 +9472,9 @@ highFrequency
 				trSetSelectedScale(0,0,0);
 				xAddDatabaseBlock(dVoidGlow, true);
 				xSetInt(dVoidGlow, xUnitName, xGetInt(dFallingVoid, xUnitName));
-				xSetInt(dVoidGlow, xVoidGlowTimeout, trTimeMS() + 15000);
+				xSetInt(dVoidGlow, xVoidGlowTimeout, trTimeMS() + 12000);
 				pos = xGetVector(dFallingVoid, xProjPrev);
-				for(a = -4; <= 4) {
-					for(b = -4; <= 4) {
-						if (xsPow(a, 2) + xsPow(b, 2) <= 16) {
-							x = a + xsVectorGetX(pos);
-							z = b + xsVectorGetZ(pos);
-							paintVoid(x, z, 15000);
-						}
-					}
-				}
+				paintVoidCircle(pos, 3, 12000);
 				xFreeDatabaseBlock(dFallingVoid);
 			}
 		}
@@ -9464,7 +9489,86 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 20) {
 			
 		} else if (trQuestVarGet("bossSpell") > 10) {
-			
+			if (trQuestVarGet("bossSpell") == 11) {
+				xDatabaseNext(dPlayerCharacters);
+				pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName));
+				trVectorQuestVarSet("keeperPos", vectorSnapToGrid(pos));
+				dir = vector(-10, 0, -10);
+				// thumb
+				spawnFinger(pos, vector(-6, 0, 2), vector(-1,0,-1), 3.5);
+				// other fingers
+				spawnFinger(pos, vector(0, 0, 4), dir, 4.5);
+				spawnFinger(pos, vector(2, 0, 2), dir, 5.5);
+				spawnFinger(pos, vector(4, 0, 0), dir, 4.5);
+				spawnFinger(pos, vector(4, 0, -2), dir, 3.5);
+
+				trQuestVarSet("keeperTartarianGate", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Cinematic Block");
+
+				trSoundPlayFN("wonderdeath.wav","1",-1,"","");
+				trSoundPlayFN("cinematics\32_out\kronosbehinddorrshort.mp3","1",-1,"","");
+				trSoundPlayFN("cinematics\31_in\swipenew.mp3","1",-1,"","");
+				trQuestVarSet("bossSpell", 12);
+				bossAngle = 3.141592;
+
+				bossNext = trTimeMS();
+				trCameraShake(3.0, 0.3);
+				pos = vectorToGrid(pos);
+				paintVoidCircle(pos, 6, 5000);
+			} else if (trQuestVarGet("bossSpell") == 12) {
+				dist = trTimeMS() - bossNext;
+				bossAngle = 3.141592 - 0.001 * dist;
+				mCos = xsCos(bossAngle);
+				mSin = xsSin(bossAngle);
+				for(i=xGetDatabaseCount(dFingers); >0) {
+					xDatabaseNext(dFingers);
+					if (xGetBool(dFingers, xFingerAttacker) == false) {
+						xUnitSelect(dFingers, xUnitName);
+						pos = xsVectorSetY(rotationMatrix(xGetVector(dFingers, xFingerDir), 0.0, -1.0) * mSin, mCos);
+						trSetUnitOrientation(xGetVector(dFingers, xFingerDir), pos, true);
+					}
+				}
+				if (bossAngle < 0) {
+					trQuestVarSet("bossSpell", 13);
+					trSoundPlayFN("xpack\xcinematics\7_in\krioschange.mp3","1",-1,"","");
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitChangeProtoUnit("Tartarian Gate birth");
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trSetSelectedScale(0,0,0);
+					trCameraShake(3.0, 0.5);
+					bossNext = trTimeMS() + 2000;
+				}
+			} else if (trQuestVarGet("bossSpell") == 13) {
+				if (trTimeMS() > bossNext) {
+					trUnitSelectClear();
+					trUnitSelectByQV("keeperTartarianGate");
+					trUnitDestroy();
+					for(i=xGetDatabaseCount(dFingers); >0) {
+						xDatabaseNext(dFingers);
+						if (xGetBool(dFingers, xFingerAttacker) == false) {
+							xUnitSelect(dFingers, xUnitName);
+							trUnitDestroy();
+							xFreeDatabaseBlock(dFingers);
+						}
+					}
+					bossCooldown(10, 15);
+				} else {
+					pos = trVectorQuestVarGet("keeperPos");
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 6) {
+							trUnitDelete(false);
+						}
+					}
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 0) {
 			if (trQuestVarGet("bossSpell") == 1) {
 				bossNext = trTimeMS();
@@ -9473,9 +9577,9 @@ highFrequency
 				trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
 			} else if (trQuestVarGet("bossSpell") == 2) {
 				if (trTimeMS() > bossNext) {
-					bossNext = bossNext + 800;
-					trQuestVarSetFromRand("modx", -20, 20, true);
-					amt = xsSqrt(400 - xsPow(trQuestVarGet("modx"), 2));
+					bossNext = bossNext + 600;
+					trQuestVarSetFromRand("modx", -30, 30, true);
+					amt = xsSqrt(900 - xsPow(trQuestVarGet("modx"), 2));
 					trQuestVarSetFromRand("modz", 0 - amt, amt, true);
 					pos = vectorSnapToGrid(kbGetBlockPosition(""+bossUnit) + xsVectorSet(trQuestVarGet("modx"), 0, trQuestVarGet("modz")));
 					addGenericProj(dFallingVoid, pos, vector(1,0,0));

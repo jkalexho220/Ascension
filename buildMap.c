@@ -3088,6 +3088,29 @@ inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
+		trStringQuestVarSet("advice", "Are you worthy?");
+		for(p=ENEMY_PLAYER; >0) {
+			for(i=10; >1) {
+				/* bacchanalia 3 x stage */
+				for(j=3; >0) {
+					trTechSetStatus(p, 78, 4);
+				}
+			}
+			for(i=5; >0) {
+				/* monstrous rage */
+				trTechSetStatus(p, 76, 4);
+				if (p == ENEMY_PLAYER) {
+					trTechSetStatus(p, 76, 4);
+				}
+			}
+		}
+		for(i=10; >1) {
+			/* bacchanalia 7 x stage */
+			for(j=7; >0) {
+				trTechSetStatus(ENEMY_PLAYER, 78, 4);
+			}
+		}
+
 		worldHeight = 13;
 		TERRAIN_WALL = 0;
 		TERRAIN_SUB_WALL = 50;
