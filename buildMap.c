@@ -9,15 +9,17 @@ highFrequency
 	xUnitSelect(dStageChoices,xUnitName);
 	if (trCountUnitsInArea(""+n, 1, "Athena",3) == 1) {
 		trQuestVarSet("stage", xGetInt(dStageChoices,xStageChoicesStage));
-		if (trQuestVarGet("stage") == 10) {
-			xsEnableRule("final_build_map");
-		} else if (trQuestVarGet("stage") == 0) {
+		if (trQuestVarGet("stage") == 0) {
 			xsEnableRule("pvp_build_map");
 		} else if (trQuestVarGet("stage") == 12) {
 			xsEnableRule("gladiator_worlds_build_map");
 		} else {
-			xsEnableRule("choose_stage_02");
-			trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
+			if (trQuestVarGet("stage") == 10) {
+				xsEnableRule("final_build_map");
+			} else {
+				xsEnableRule("choose_stage_02");
+				trStringQuestVarSet("advice", "Having difficulty at higher floors? Level up and bring some friends!");
+			}
 			for(p=ENEMY_PLAYER; >0) {
 				for(i=trQuestVarGet("stage"); >1) {
 					/* bacchanalia 3 x stage */
@@ -3089,27 +3091,6 @@ highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
 		trStringQuestVarSet("advice", "Are you worthy?");
-		for(p=ENEMY_PLAYER; >0) {
-			for(i=10; >1) {
-				/* bacchanalia 3 x stage */
-				for(j=3; >0) {
-					trTechSetStatus(p, 78, 4);
-				}
-			}
-			for(i=5; >0) {
-				/* monstrous rage */
-				trTechSetStatus(p, 76, 4);
-				if (p == ENEMY_PLAYER) {
-					trTechSetStatus(p, 76, 4);
-				}
-			}
-		}
-		for(i=10; >1) {
-			/* bacchanalia 7 x stage */
-			for(j=7; >0) {
-				trTechSetStatus(ENEMY_PLAYER, 78, 4);
-			}
-		}
 
 		worldHeight = 13;
 		TERRAIN_WALL = 0;

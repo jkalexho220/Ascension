@@ -203,6 +203,13 @@ highFrequency
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Outpost", ENEMY_PLAYER, 26, 1);
+
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 0, 5);
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 24, 1);
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 25, 1);
+	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 26, 1);
 	
 	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);

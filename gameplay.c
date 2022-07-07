@@ -1073,6 +1073,8 @@ highFrequency
 		trQuestVarSet("play", 0);
 		xsDisableSelf();
 		xsDisableRule("boss"+1*trQuestVarGet("stage")+"_battle");
+		xsDisableRule("void_battle");
+		xsDisableRule("white_tiger_battle");
 		trSoundPlayFN("lose.wav","1",-1,"","");
 		trUIFadeToColor(0,0,0,1500,0,true);
 		trLetterBox(true);

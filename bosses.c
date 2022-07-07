@@ -9021,6 +9021,14 @@ int xVoidGlowTimeout = 0;
 
 int dFallingVoid = 0;
 
+int dVoidEggs = 0;
+int xVoidEggPos = 0;
+int xVoidEggTimeout = 0;
+int xVoidEggStep = 0;
+
+int dVoidEggDust = 0;
+int xVoidEggDustTimeout = 0;
+
 void paintVoid(int x = 0, int z = 0, int duration = 10000) {
 	vector data = aiPlanGetUserVariableVector(voidPaintArray, x - 32, z - 32);
 	if (xsVectorGetY(data) < trTimeMS() + duration) {
@@ -9042,6 +9050,7 @@ highFrequency
 	vector pos = vector(0,0,0);
 	int x = 0;
 	int z = 0;
+	int p = 0;
 	vector dir = vector(-1,0,-1);
 	vector offset = vector(0,0,0);
 	int tempX = 0;
@@ -9100,6 +9109,16 @@ highFrequency
 						aiPlanSetUserVariableVector(voidPaintArray, x, z, xsVectorSet(trGetTerrainType(x + 32, z + 32),0,trGetTerrainSubType(x + 32, z + 32)));
 					}
 				}
+
+				dVoidEggDust = xInitDatabase("voidEggDust");
+				xInitAddInt(dVoidEggDust, "name");
+				xVoidEggDustTimeout = xInitAddInt(dVoidEggDust, "timeout");
+
+				dVoidEggs = xInitDatabase("voidEggs");
+				xInitAddInt(dVoidEggs, "name");
+				xVoidEggPos = xInitAddVector(dVoidEggs, "pos");
+				xVoidEggTimeout = xInitAddInt(dVoidEggs, "timeout");
+				xVoidEggStep = xInitAddInt(dVoidEggs, "step");
 
 				dVoidGlow = xInitDatabase("voidGlow");
 				xInitAddInt(dVoidGlow, "name");
@@ -9179,7 +9198,30 @@ highFrequency
 					trSetSelectedScale(0,0,0);
 				}
 
-				trPaintTerrain(0,0,5,5,5,4,true);
+				// paint battle arenas for players
+				pos = vector(20, 0, 20);
+				dir = vector(72, 0, 72) - pos;
+				p = 1;
+				for(i=0; <4) {
+					for(j=0; >4) {
+						trVectorQuestVarSet("p"+p+"arena", pos);
+						p = p + 1;
+						for(a = -6; <= 6) {
+							for(b = -6; <= 6) {
+								if(xsPow(a, 2) + xsPow(b, 2) <= 6) {
+									x = a + xsVectorGetX(pos);
+									z = a + xsVectorGetZ(pos);
+									trPaintTerrain(x, z, x, z, 5, 4, false);
+								}
+							}
+						}
+						dir = rotationMatrix(dir, 0, 1.0);
+						pos = vector(72, 0, 72) + dir;
+					}
+					pos = pos + vector(35,0,0);
+				}
+
+				trPaintTerrain(0,0,5,5,5,4,true); // refresh passability
 			}
 			case 4:
 			{
@@ -9201,7 +9243,8 @@ highFrequency
 				
 				trUIFadeToColor(0,0,0,1000,0,false);
 				if (customContent) {
-					trMusicPlay("Zenophobia\True Origin.mp3", "1", 0);
+					xsEnableRule("void_music");
+					trQuestVarSet("musicTime", 0);
 				}
 			}
 			case 6:
@@ -9210,10 +9253,6 @@ highFrequency
 				trSoundPlayFN("","1",-1,"The Last God:It's now or never, challengers! You must defeat The Void for the sake of the world!");
 				trQuestVarSet("cinTime", trTime() + 5);
 				trUIFadeToColor(0,0,0, 2000, 2000, true);
-				if (customContent) {
-					xsEnableRule("void_music");
-					trQuestVarSet("musicTime", 0);
-				}
 			}
 			case 7:
 			{
@@ -9284,9 +9323,10 @@ inactive
 void paintVoidCircle(vector pos = vector(0,0,0), int radius = 0, int duration = 3000) {
 	int x = 0;
 	int z = 0;
+	int dist = radius * radius;
 	for(a = 0 - radius; <= radius) {
 		for(b = 0 - radius; <= radius) {
-			if (xsPow(a, 2) + xsPow(b, 2) <= radius * radius) {
+			if (xsPow(a, 2) + xsPow(b, 2) <= dist) {
 				x = a + xsVectorGetX(pos);
 				z = b + xsVectorGetZ(pos);
 				paintVoid(x, z, duration);
@@ -9330,7 +9370,7 @@ highFrequency
 		trDamageUnit(timediff * 100); // counteract regen
 
 		if (trTime() > trQuestVarGet("bossSummonTime")) {
-			trQuestVarSetFromRand("bossSummonTime", 1, 2000.0 / (100.0 + percentDamaged), true);
+			trQuestVarSetFromRand("bossSummonTime", 1, 1000.0 / (50.0 + percentDamaged), true);
 			trQuestVarSet("bossSummonTime", trTime() + trQuestVarGet("bossSummonTime"));
 			trQuestVarSetFromRand("rand", 0, 6.283185, false);
 			dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
@@ -9341,6 +9381,87 @@ highFrequency
 			trSetUnitOrientation(dir, vector(0,1,0), true);
 			trUnitMoveToPoint(145, 0, 145, -1, true);
 			activateEnemy(action);
+		}
+
+		for(i=xGetDatabaseCount(dVoidEggDust); >0) {
+			xDatabaseNext(dVoidEggDust);
+			if (xGetInt(dVoidEggDust, xVoidEggDustTimeout) == 0) {
+				xUnitSelect(dVoidEggDust, xUnitName);
+				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
+				trUnitOverrideAnimation(6, 0, true, false, -1);
+				trSetSelectedScale(0,0,0);
+				xSetInt(dVoidEggDust, xVoidEggDustTimeout, trTimeMS() + 2000);
+			} else if (trTimeMS() > xGetInt(dVoidEggDust, xVoidEggDustTimeout)) {
+				xUnitSelect(dVoidEggDust, xUnitName);
+				trUnitDestroy();
+			}
+		}
+
+		if (xGetDatabaseCount(dVoidEggs) > 0) {
+			xDatabaseNext(dVoidEggs);
+			if (xGetInt(dVoidEggs, xVoidEggStep) > 1) { // exploding
+				dist = 0.01 * (trTimeMS() - xGetInt(dVoidEggs, xVoidEggTimeout));
+				amt = 0.01 * (xGetInt(dVoidEggs, xVoidEggStep) - xGetInt(dVoidEggs, xVoidEggTimeout));
+				if (dist - amt > 2.0) {
+					diff = xsPow(dist, 2);
+					pos = xGetVector(dVoidEggs, xVoidEggPos);
+					paintVoidCircle(vectorToGrid(pos), dist, 6000);
+					dist = xsPow(dist * 2, 2);
+					amt = xsPow(amt * 2, 2);
+					
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else {
+							diff = unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos);
+							if (diff < dist && diff > amt) {
+								damagePlayerUnit(1500.0);
+							}
+						}
+					}
+					xSetInt(dVoidEggs, xVoidEggStep, trTimeMS());
+					if (trTimeMS() - xGetInt(dVoidEggs, xVoidEggTimeout) > 1500) {
+						xFreeDatabaseBlock(dVoidEggs);
+					}
+				}
+			} else {
+				xUnitSelect(dVoidEggs, xUnitName);
+				if (trUnitAlive() == false) {
+					xFreeDatabaseBlock(dVoidEggs);
+				} else {
+					amt = xsSqrt(0.001 * (10000 - xGetInt(dVoidEggs, xVoidEggTimeout) + trTimeMS()));
+					trSetSelectedScale(amt, amt, amt);
+					if (xGetInt(dVoidEggs, xVoidEggStep) == 0) {
+						if (xGetInt(dVoidEggs, xVoidEggTimeout) - trTimeMS() < 3000) {
+							trUnitHighlight(3, true);
+							xSetInt(dVoidEggs, xVoidEggStep, 1);
+						}
+					} else if (trTimeMS() > xGetInt(dVoidEggs, xVoidEggTimeout)) {
+						xUnitSelect(dVoidEggs, xUnitName);
+						trUnitChangeProtoUnit("Meteor Impact Ground");
+						xSetInt(dVoidEggs, xVoidEggStep, trTimeMS());
+						trSoundPlayFN("meteorbighit.wav","1",-1,"","");
+						trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
+						trCameraShake(2.0, 0.5);
+						dir = vector(0,0,1);
+						zSetProtoUnitStat("Kronny Flying", 0, 1, 20.0);
+						pos = xGetVector(dVoidEggs, xVoidEggPos);
+						for(i=30; >0) {
+							xAddDatabaseBlock(dVoidEggDust, true);
+							xSetInt(dVoidEggDust, xUnitName, trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+							trArmySelect("0,0");
+							trSetUnitOrientation(dir, vector(0,1,0), true);
+							trMutateSelected(kbGetProtoUnitID("Kronny Flying"));
+							trSetSelectedScale(0, -4.5, 0);
+							trDamageUnitPercent(100);
+							dir = rotationMatrix(dir, 0.978148, 0.207912);
+						}
+					}
+				}
+			}
 		}
 
 		for(i=xGetDatabaseCount(dFingers); >0) {
@@ -9406,8 +9527,6 @@ highFrequency
 						}
 					}
 				}
-			} else {
-
 			}
 		}
 
@@ -9487,7 +9606,32 @@ highFrequency
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			
 		} else if (trQuestVarGet("bossSpell") > 20) {
-			
+			if (trQuestVarGet("bossSpell") == 21) {
+				trMessageSetText("Destroy the eggs before they explode!", -1);
+				bossCount = ENEMY_PLAYER / 2;
+				bossNext = trTimeMS();
+				trQuestVarSet("bossSpell", 22);
+			} else if (trQuestVarGet("bossSpell") == 22) {
+				if (trTimeMS() > bossNext) {
+					trSoundPlayFN("gatherpoint.wav","1",-1,"","");
+					bossNext = bossNext + 1500;
+					trQuestVarSetFromRand("modx", -20, 20, true);
+					amt = xsSqrt(400 - xsPow(trQuestVarGet("modx"), 2));
+					trQuestVarSetFromRand("modz", 0 - amt, amt, true);
+					pos = vectorSnapToGrid(kbGetBlockPosition(""+bossUnit) + xsVectorSet(trQuestVarGet("modx"), 0, trQuestVarGet("modz")));
+					xAddDatabaseBlock(dVoidEggs, true);
+					xSetInt(dVoidEggs, xUnitName, trGetNextUnitScenarioNameNumber());
+					xSetVector(dVoidEggs, xVoidEggPos, pos);
+					xSetInt(dVoidEggs, xVoidEggTimeout, trTimeMS() + 9000);
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect(""+ENEMY_PLAYER+",0");
+					trUnitChangeProtoUnit("Spider Egg");
+					bossCount = bossCount - 1;
+					if (bossCount == 0) {
+						bossCooldown(10, 15);
+					}
+				}
+			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
 				xDatabaseNext(dPlayerCharacters);
@@ -9598,6 +9742,7 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			trQuestVarSet("bossSpell", 21);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
