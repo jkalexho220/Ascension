@@ -9289,6 +9289,8 @@ highFrequency
 				trQuestVarSet("cinTime", trTime() + 3);
 
 				trStringQuestVarSet("bossProto", "Titan Kronos");
+
+				trModifyProtounit("Argus", ENEMY_PLAYER, 2, 20);
 			}
 			case 9:
 			{
@@ -9682,6 +9684,13 @@ highFrequency
 				trUIFadeToColor(0,0,0,1000,0,true);
 				bossNext = trTimeMS() + 1000;
 				trQuestVarSet("bossSpell", 32);
+				if (trQuestVarGet("zenophobiaStep") == 0) {
+					trQuestVarSet("zenophobiaNext", trQuestVarGet("zenophobiaNext") + 30000);
+				}
+				if (trQuestVarGet("nickonhawkStep") == 0) {
+					trQuestVarSet("nickonhawkNext", trQuestVarGet("nickonhawkNext") + 30000);
+				}
+				trQuestVarSet("yeebLightningNext", trQuestVarGet("yeebLightningNext") + 30000);
 			} else if (trQuestVarGet("bossSpell") == 32) {
 				if (trTimeMS() > bossNext) {
 					worldHeight = -2;
@@ -9993,9 +10002,7 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
-			if (trQuestVarGet("secondPhase") == 1) {
-				trQuestVarSet("bossSpell", 1);
-			} else {
+			if (trQuestVarGet("secondPhase") == 0) {
 				trDamageUnitPercent(50);
 			}
 		}
@@ -10051,6 +10058,10 @@ void modifyHero(string proto = "") {
 	trModifyProtounit(proto, 0, 2, 15);
 }
 
+int dValkyrieProj = 0;
+int dNickLaunches = 0;
+int xNickLaunchIndex = 0;
+
 rule heroes_cin
 inactive
 highFrequency
@@ -10078,7 +10089,6 @@ highFrequency
 				trMutateSelected(kbGetUnitBaseTypeID(xGetInt(dEnemies, xUnitID)));
 			}
 		}
-		trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Ally");
 		trTechSetStatus(0, 476, 4);
 		trTechSetStatus(0, 7, 4);
 
@@ -10096,6 +10106,11 @@ highFrequency
 		{
 			case 2:
 			{
+				dValkyrieProj = initGenericProj("valkyrieProj",kbGetProtoUnitID("Valkyrie"),15,30,4.5,0,0);
+				dNickLaunches = xInitDatabase("nickLaunches");
+				xInitAddInt(dNickLaunches, "name");
+				xNickLaunchIndex = xInitAddInt(dNickLaunches, "index");
+
 				trQuestVarSet("cinTime", trTime() + 1);
 				trCameraCut(vector(0,47,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
 				trQuestVarSet("zenoPort", trGetNextUnitScenarioNameNumber());
@@ -10231,6 +10246,7 @@ highFrequency
 
 				trSoundPlayFN("","1",-1,"nottud:What the heck Zeno. I was in the middle of working on my new map!","icons\special g minotaur icon 64");
 				trQuestVarSet("cinTime", trTime() + 1);
+				trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Enemy");
 			}
 			case 12:
 			{
@@ -10238,6 +10254,17 @@ highFrequency
 				trUnitSelectByQV("notPort");
 				trUnitChangeProtoUnit("Traitors effect");
 				trQuestVarSet("cinTime", trTime() + 1);
+
+				trTechGodPower(ENEMY_PLAYER, "spy", 1);
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk");
+				trTechInvokeGodPower(ENEMY_PLAYER, "spy", vector(0,0,0), vector(0,0,0));
+				next = modularCounterNext("spyFind");
+				aiPlanSetUserVariableInt(ARRAYS,spyProto,next,kbGetProtoUnitID("Cinematic Block"));
+				aiPlanSetUserVariableInt(ARRAYS,spyUnit,next,1*trQuestVarGet("nickonhawk"));
+				aiPlanSetUserVariableBool(ARRAYS,spyActive,next,true);
+				aiPlanSetUserVariableVector(ARRAYS,spyDest,next,xsVectorSet(ARRAYS, bossInts, 4));
+				aiPlanSetUserVariableVector(ARRAYS,spyScale,next,vector(1,1,1));
 			}
 			case 13:
 			{
@@ -10253,6 +10280,10 @@ highFrequency
 				trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
 
 				trQuestVarSet("cinTime", trTime() + 3);
+
+				trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Ally");
+
+				trQuestVarSet("nickImplodeEffect", aiPlanGetUserVariableInt(ARRAYS, bossInts, 4));
 			}
 			case 14:
 			{
@@ -10357,7 +10388,7 @@ highFrequency
 				trQuestVarSetFromRand("rand", 5000, 10000, true);
 				trQuestVarSet("zenophobiaNext", trTimeMS() + trQuestVarGet("rand"));
 				trQuestVarSetFromRand("rand", 5000, 10000, true);
-				trQuestVarSet("nickNext", trQuestVarGet("zenophobiaNext") + trQuestVarGet("rand"));
+				trQuestVarSet("nickonhawkNext", trQuestVarGet("zenophobiaNext") + trQuestVarGet("rand"));
 
 				trQuestVarSet("yeebLightningNext", trTimeMS());
 
@@ -10418,11 +10449,20 @@ highFrequency
 	float diff = 0;
 	float amt = 0;
 	int target = 0;
+	int action = 0;
 	vector pos = vector(0,0,0);
 	vector dir = vector(0,0,0);
 	vector targetPos = vector(0,0,0);
 
-	int id = 0;
+	int id = xGetInt(dEnemies, xUnitID);
+	xsSetContextPlayer(ENEMY_PLAYER);
+	target = kbUnitGetTargetUnitID(id);
+	xsSetContextPlayer(0);
+	if (target <= 0) {
+		xUnitSelectByID(dEnemies, xUnitID);
+		trUnitMoveToPoint(145, 0, 145, -1, true);
+	}
+
 	if (trTime() > trQuestVarGet("heroesRefresh")) {
 		trQuestVarSet("heroesRefresh", trTime());
 		heroAttack("zenophobia");
@@ -10458,6 +10498,141 @@ highFrequency
 		trUnitSelect(""+target, true);
 		trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
 		trDamageUnit(470);
+	}
+
+	if (xGetDatabaseCount(dNickLaunches) > 0) {
+		xDatabaseNext(dNickLaunches);
+		xUnitSelect(dNickLaunches, xUnitName);
+		if ((trUnitAlive() == false) || (xGetBool(dEnemies, xLaunched, xGetInt(dNickLaunches, xNickLaunchIndex)) == false)) {
+			trUnitChangeProtoUnit("Lightning Sparks");
+			if (trUnitAlive()) {
+				xSetBool(dEnemies, xLaunched, true, xGetInt(dNickLaunches, xNickLaunchIndex));
+			}
+			trQuestVarSetFromRand("sound", 1, 2, true);
+			trSoundPlayFN("implodehit"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+			xFreeDatabaseBlock(dNickLaunches);
+			trQuestVarSet("nickonhawkCount", 0.5 + trQuestVarGet("nickonhawkCount"));
+			amt = xsSqrt(trQuestVarGet("nickonhawkCount"));
+			trUnitSelectClear();
+			trUnitSelectByQV("nickonhawk");
+			trSetSelectedScale(amt, amt, amt);
+		}
+	}
+
+	for(i=xGetDatabaseCount(dValkyrieProj); >0) {
+		action = processGenericProj(dValkyrieProj);
+		if (action == PROJ_BOUNCE) {
+			trUnitSetAnimationPath("1,0,0,0,0,0,0");
+			xFreeDatabaseBlock(dValkyrieProj);
+		}
+	}
+
+	switch(1*trQuestVarGet("nickonhawkStep"))
+	{
+		case 0:
+		{
+			if (trTimeMS() > trQuestVarGet("nickonhawkNext")) {
+				trUnitSelectClear();
+				trUnitSelectByQV("nickImplodeEffect");
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+				trSoundPlayFN("lightning loop.wav","1",-1,"","");
+				trQuestVarSet("nickonhawkStep", 1);
+				trQuestVarSet("nickonhawkCount", 1);
+				trQuestVarSet("nickonhawkNext", trTimeMS());
+				trQuestVarSet("nickonhawkTimeout", trTimeMS() + 8000);
+			}
+		}
+		case 1:
+		{
+			if (trTimeMS() > trQuestVarGet("nickonhawkNext")) {
+				trQuestVarSet("nickonhawkNext", trQuestVarGet("nickonhawkNext") + 200);
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk"));
+				for(i=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (xGetBool(dEnemies, xLaunched) == false) {
+						if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 225.0) {
+							launchUnit(dEnemies, kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk")));
+							trQuestVarSetFromRand("sound", 1, 3, true);
+							trSoundPlayFN("suckup"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
+							xAddDatabaseBlock(dNickLaunches, true);
+							xSetInt(dNickLaunches, xUnitName, xGetInt(dEnemies, xUnitName));
+							xSetInt(dNickLaunches, xNickLaunchIndex, xGetPointer(dEnemies));
+							break;
+						}
+					}
+				}
+			}
+			if (trTimeMS() > trQuestVarGet("nickonhawkTimeout")) {
+				trQuestVarSet("nickonhawkStep", 2);
+			}
+		}
+		case 2:
+		{
+			if (xGetDatabaseCount(dNickLaunches) == 0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("nickImplodeEffect");
+				trUnitChangeProtoUnit("Cinematic Block");
+				trSoundPlayFN("implode explode.wav","1",-1,"","");
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk"));
+				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect("0,0");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk");
+				trSetSelectedScale(1,1,1);
+
+				dir = vector(1,0,0);
+				for(i=30; >0) {
+					addGenericProj(dValkyrieProj, pos, dir);
+					dir = rotationMatrix(dir, 0.978148, 0.207912);
+				}
+				trQuestVarSet("nickonhawkStep", 3);
+				trQuestVarSet("nickonhawkNext", trTimeMS());
+				trQuestVarSet("nickonhawkTimeout", trTimeMS());
+			}
+		}
+		case 3:
+		{
+			amt = trTimeMS() - trQuestVarGet("nickonhawkTimeout");
+			if (amt > 2000) {
+				trQuestVarSet("nickonhawkStep", 0);
+				trQuestVarSetFromRand("rand", 10000, 20000, true);
+				trQuestVarSet("nickonhawkNext", trTimeMS() + trQuestVarGet("rand"));
+			} else {
+				dist = 0.03 * amt;
+				diff = 0.03 * (trQuestVarGet("nickonhawkNext") - trQuestVarGet("nickonhawkTimeout"));
+				if (dist - diff > 3) {
+					trQuestVarSet("nickonhawkNext", trTimeMS());
+					pos = kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk"));
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						if (trUnitAlive() == false) {
+							removePlayerUnit();
+						} else {
+							targetPos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName));
+							amt = distanceBetweenVectors(pos, targetPos, false);
+							if (amt < dist && amt > diff) {
+								xSetInt(dPlayerUnits, xStunTimeout, 0);
+								xSetInt(dPlayerUnits, xSilenceTimeout, 0);
+								xSetInt(dPlayerUnits, xPoisonTimeout, 0);
+								trDamageUnit(-100.0 * trQuestVarGet("nickonhawkCount"));
+								if (xGetBool(dPlayerUnits, xIsHero)) {
+									gainFavor(xGetInt(dPlayerUnits, xPlayerOwner), 10.0 * trQuestVarGet("nickonhawkCount"));
+								}
+								trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(targetPos),0,xsVectorGetZ(targetPos),0,true);
+								trArmySelect("0,0");
+								trUnitChangeProtoUnit("Regeneration SFX");
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	switch(1*trQuestVarGet("zenophobiaStep"))

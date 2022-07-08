@@ -1400,9 +1400,6 @@ int xLaplaceLaserPos = 0;
 vector keplerPos = vector(0,0,0);
 vector keplerDir = vector(0,0,0);
 
-
-int dValkyrieProj = 0;
-
 void processPhysicsBall(int timediff = 0, float speed = 1.0, bool hitbox = false) {
 	xDatabaseNext(dPhysicsBalls);
 	vector pos = xGetVector(dPhysicsBalls, xPhysicsBallPos) + (xGetVector(dPhysicsBalls, xPhysicsBallDir) * 0.001 * speed * timediff);
