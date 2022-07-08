@@ -9064,7 +9064,7 @@ highFrequency
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ECHO BOMB
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
 
-				spyEffect(bossUnit,kbGetProtoUnitID("Tartarian Gate"),xsVectorSet(ARRAYS,bossInts,0)); // tartarian gate
+				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,4));
 
 				for(i=xStunSFX; <= xSilenceSFX) {
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
@@ -9079,7 +9079,7 @@ highFrequency
 				trQuestVarSet("cinTime", trTime() + 5);
 
 				trUnitSelectClear();
-				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,0), true);
+				trUnitSelect(""+aiPlanGetUserVariableInt(ARRAYS,bossInts,4), true);
 				trMutateSelected(kbGetProtoUnitID("Tartarian Gate"));
 				trSetSelectedScale(0,0,0);
 				trUnitOverrideAnimation(6,0,true,false,-1);
@@ -9227,7 +9227,7 @@ highFrequency
 				trSoundPlayFN("","1",-1,"The Last God:Th-The Void is already here!");
 				trQuestVarSet("cinTime", trTime() + 5);
 				trSoundPlayFN("cinematics\32_out\kronosbehinddorrlong.mp3","1",-1,"","");
-				trackPlay(10000,-1);
+				trackPlay(9000,-1);
 				
 				trUIFadeToColor(0,0,0,1000,0,false);
 				if (customContent) {
@@ -9292,6 +9292,8 @@ highFrequency
 			}
 			case 9:
 			{
+				trQuestVarSet("cinStep", 0);
+				xsEnableRule("heroes_cin");
 				trMessageSetText("Your revive count has been restored to " + (ENEMY_PLAYER - 1) + "!", -1);
 				trQuestVarSet("reviveCount", ENEMY_PLAYER - 1);
 				xsDisableSelf();
@@ -9614,7 +9616,7 @@ highFrequency
 						removePlayerUnit();
 					} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), pos) < 16.0) {
 						dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName)));
-						spawnAttackFinger(pos, dir, 1.0 + xsSqrt(percentDamaged * 0.05));
+						spawnAttackFinger(pos, dir, xsSqrt(1.0 + 0.01 * percentDamaged));
 						trQuestVarSetFromRand("voidClawsNext", 100, 5000, true);
 						trQuestVarSetFromRand("rand", 100, 5000, true);
 						trQuestVarSet("voidClawsNext", trTimeMS() + xsMin(trQuestVarGet("voidClawsNext"), trQuestVarGet("rand")));
@@ -9666,6 +9668,8 @@ highFrequency
 			processBossCooldown();
 		} else if (trQuestVarGet("bossSpell") > 30) {
 			if (trQuestVarGet("bossSpell") == 31) {
+				trMutateSelected(kbGetProtoUnitID("Victory Marker"));
+				xDetachDatabaseBlock(dEnemies, bossPointer);
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
 				trOverlayText("Nightmare Gallery", 3.0, -1, -1, -1);
@@ -9674,6 +9678,7 @@ highFrequency
 				trQuestVarSet("bossSpell", 32);
 			} else if (trQuestVarGet("bossSpell") == 32) {
 				if (trTimeMS() > bossNext) {
+					worldHeight = -2;
 					trSoundPlayFN("changeunit.wav","1",-1,"","");
 					trUIFadeToColor(0,0,0,1000,0,false);
 					trUnitSelectClear();
@@ -9721,8 +9726,7 @@ highFrequency
 						}
 					}
 					if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) <= 0) {
-						reselectMyself();
-						uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
+						uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, trCurrentPlayer()))));
 					}
 					trSetFogAndBlackmap(true, false);
 					bossNext = trTimeMS() + 1000;
@@ -9777,6 +9781,12 @@ highFrequency
 						activateEnemy(action, -1, 0);
 					}
 				} else if (trTimeMS() > bossTimeout) {
+					worldHeight = 13;
+					xClearDatabase(dPlayerCharacters);
+					trUnitSelectClear();
+					trUnitSelect(""+bossUnit, true);
+					trMutateSelected(kbGetProtoUnitID("Titan Kronos"));
+					xRestoreDatabaseBlock(dEnemies, bossPointer);
 					xRestoreCache(dPlayerUnits);
 					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
 						xDatabaseNext(dPlayerUnits);
@@ -9811,8 +9821,7 @@ highFrequency
 						}
 					}
 					if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) <= 0) {
-						reselectMyself();
-						uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
+						uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, trCurrentPlayer()))));
 					}
 					bossCooldown(10, 15);
 					trQuestVarSet("bossUltimate", 3);
@@ -9978,6 +9987,11 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+			if (trQuestVarGet("secondPhase") == 1) {
+				trQuestVarSet("bossSpell", 1);
+			} else {
+				trDamageUnitPercent(50);
+			}
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -9985,16 +9999,598 @@ highFrequency
 		trMusicStop();
 		xsDisableRule("boss_music");
 		xsDisableRule("void_music");
+		xsDisableRule("rising_up");
 		trForceNonCinematicModels(true);
 		trUIFadeToColor(0,0,0,1000,0,true);
 		trLetterBox(true);
 		
 		xsDisableRule("gameplay_always");
-		xsEnableRule("guardian_ded");
 		boss = 0;
 		trSetLighting("dusk", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
 		
 		uiLookAtUnitByName(""+bossUnit);
+	}
+}
+
+void modifyHero(string proto = "") {
+	trModifyProtounit(proto, 0, 0, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 0, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 0, 99999);
+
+	trModifyProtounit(proto, 0, 27, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 27, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 27, 999);
+
+	trModifyProtounit(proto, 0, 31, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 31, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 31, 999);
+	/* damage bonus vs myth */
+	trModifyProtounit(proto, 0, 33, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 33, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 33, 1.0);
+	trModifyProtounit(proto, 0, 44, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 44, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 44, 1.0);
+	/* damage bonus vs hero */
+	trModifyProtounit(proto, 0, 34, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 34, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 34, 0.1);
+	trModifyProtounit(proto, 0, 45, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 45, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 45, 0.1);
+}
+
+rule heroes_cin
+inactive
+highFrequency
+{
+	int next = 0;
+	if (trQuestVarGet("cinStep") == 0) {
+		trUnitSelectClear();
+		trUnitSelect(""+bossUnit, true);
+		if (trUnitPercentDamaged() >= 50) {
+			trQuestVarSet("cinStep", 1);
+			trQuestVarSet("cinTime", trTime() + 2);
+			trSetUnitIdleProcessing(false);
+			trLetterBox(true);
+			trUIFadeToColor(0, 0, 0, 1000, 0, true);
+			xsDisableRule("void_battle");
+			xsDisableRule("void_music");
+			for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+				xDatabaseNext(dPlayerUnits);
+				xUnitSelectByID(dPlayerUnits, xUnitID);
+				trMutateSelected(kbGetUnitBaseTypeID(xGetInt(dPlayerUnits, xUnitID)));
+			}
+			for(i=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				trMutateSelected(kbGetUnitBaseTypeID(xGetInt(dEnemies, xUnitID)));
+			}
+		}
+		trPlayerSetDiplomacy(ENEMY_PLAYER, 0, "Ally");
+		trTechSetStatus(0, 476, 4);
+		trTechSetStatus(0, 7, 4);
+
+		modifyHero("Hoplite");
+		
+		modifyHero("Minotaur");
+
+		modifyHero("Hero Greek Odysseus");
+
+		modifyHero("Pharaoh of Osiris");
+
+	} else if (trTime() >= trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 2:
+			{
+				trQuestVarSet("cinTime", trTime() + 1);
+				trCameraCut(vector(0,47,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+				trQuestVarSet("zenoPort", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,161,0,129,315,true);
+				trQuestVarSet("zenophobia", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,161,0,129,315,true);
+
+				trQuestVarSet("yeebPort", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,129,0,129,45,true);
+				trQuestVarSet("yeebaagooon", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,129,0,129,45,true);
+
+				trQuestVarSet("nickPort", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,129,0,161,129,true);
+				trQuestVarSet("nickonhawk", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,129,0,161,129,true);
+
+				trQuestVarSet("notPort", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,161,0,161,225,true);
+				trQuestVarSet("nottud", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Cinematic Block",1,161,0,161,225,true);
+
+				trQuestVarSet("zenophobiaID", kbGetBlockID(""+1*trQuestVarGet("zenophobia")));
+				trQuestVarSet("nickonhawkID", kbGetBlockID(""+1*trQuestVarGet("nickonhawk")));
+				trQuestVarSet("nottudID", kbGetBlockID(""+1*trQuestVarGet("nottud")));
+
+				trQuestVarSet("zenophobiaLaserGroundCarrier", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0","Militia",1,1,0,1,0,true);
+				spyEffect(1*trQuestVarGet("zenophobiaLaserGroundCarrier"),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,0));
+			}
+			case 3:
+			{
+				trMusicPlay("cinematics\35_out\music.mp3","1",0);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				uiLookAtUnitByName(""+1*trQuestVarGet("zenoPort"));
+				trUnitSelectClear();
+				trUnitSelectByQV("zenoPort");
+				trUnitChangeProtoUnit("Traitors effect");
+				trSoundPlayFN("","1",-1,"Zenophobia:It looks like we will need to step in here.","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 4:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("zenoPort");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobia");
+				trUnitChangeProtoUnit("Hoplite");
+
+				trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
+
+				trQuestVarSet("cinTime", trTime() + 4);
+			}
+			case 5:
+			{
+				trackInsert();
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("yeebPort"));
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("zenoPort"));
+				trackPlay(500, -1);
+
+				trSoundPlayFN("","1",-1,"Yeebaagooon:Indeed. The Void cannot be allowed to advance any further.","icons\special e son of osiris icon 64");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 6:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebPort");
+				trUnitChangeProtoUnit("Traitors effect");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 7:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebPort");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebaagooon");
+				trUnitChangeProtoUnit("Pharaoh of Osiris");
+
+				trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
+
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 8:
+			{
+				trackInsert();
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("nickPort"));
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("yeebPort"));
+				trackPlay(500, -1);
+
+				trSoundPlayFN("","1",-1,"Nickonhawk:Time to show these noobs how it's done.","icons\hero g odysseus icon 64");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 9:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("nickPort");
+				trUnitChangeProtoUnit("Traitors effect");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 10:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("nickPort");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk");
+				trUnitChangeProtoUnit("Hero Greek Odysseus");
+
+				trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
+
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 11:
+			{
+				trackInsert();
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("notPort"));
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("nickPort"));
+				trackPlay(500, -1);
+
+				trSoundPlayFN("","1",-1,"nottud:What the heck Zeno. I was in the middle of working on my new map!","icons\special g minotaur icon 64");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 12:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("notPort");
+				trUnitChangeProtoUnit("Traitors effect");
+				trQuestVarSet("cinTime", trTime() + 1);
+			}
+			case 13:
+			{
+				trUnitSelectClear();
+				trUnitSelectByQV("notPort");
+				trDamageUnitPercent(100);
+				trUnitChangeProtoUnit("Implode Sphere Effect");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("nottud");
+				trUnitChangeProtoUnit("Minotaur");
+
+				trSoundPlayFN("arkantosarrive.wav","1",-1,"","");
+
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 14:
+			{
+				trackInsert();
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("zenophobia"));
+				trackAddWaypoint();
+				uiLookAtUnitByName(""+1*trQuestVarGet("nottud"));
+				trackPlay(500, -1);
+				trSoundPlayFN("","1",-1,"Zenophobia:Don't worry about the small fries. We'll take care of them. Take down the big one!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 7);
+				trUIFadeToColor(0,0,0,1000,4000,true);
+			}
+			case 15:
+			{
+				trLetterBox(false);
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
+				uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, trCurrentPlayer()))));
+				trQuestVarSet("secondPhase", 1);
+				trSetUnitIdleProcessing(true);
+				xsEnableRule("rising_up");
+				xsEnableRule("heroes_always");
+				trQuestVarSet("musicTime",0);
+				xsDisableSelf();
+				trUnitSelectClear();
+				trUnitSelectByQV("yeebaagooon");
+				trUnitOverrideAnimation(33,0,true,false,-1);
+				trUnitSelectClear();
+				trUnitSelectByQV("nickonhawk");
+				trUnitSetStance("Defensive");
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobia");
+				trUnitSetStance("Defensive");
+				trUnitSelectClear();
+				trUnitSelectByQV("nottud");
+				trUnitSetStance("Defensive");
+
+				trModifyProtounit("Hero Greek Achilles", 0, 5, 99);
+				trModifyProtounit("Hero Greek Achilles", 0, 1, 9999999999999999999.0);
+				trModifyProtounit("Hero Greek Achilles", 0, 1, -9999999999999999999.0);
+				trModifyProtounit("Hero Greek Achilles", 0, 1, 1);
+				trModifyProtounit("Wadjet Spit", 0, 0, 9999999999999999999.0);
+				trModifyProtounit("Wadjet Spit", 0, 0, -9999999999999999999.0);
+				trModifyProtounit("Wadjet Spit", 0, 55, 2);
+
+				zInitProtoUnitStat("Hero Greek Achilles", 0, 1, 1);
+				trModifyProtounit("Hero Greek Achilles", 0, 55, 4);
+
+				trQuestVarSet("zenophobiaCarrier", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Militia",1,1,0,1,0,true);
+				trQuestVarSet("zenophobiaLaser", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Militia",1,1,0,1,0,false);
+				trQuestVarSet("zenophobiaLaserGroundSFX", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Militia",1,1,0,1,0,false);
+				trArmySelect("0,0");
+				trUnitChangeProtoUnit("Victory Marker");
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaCarrier");
+				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Phoenix",1,1,0,1,0,true);
+				trArmySelect("0,0");
+				trMutateSelected(kbGetProtoUnitID("Phoenix"));
+				trUnitOverrideAnimation(2,0,true,false,-1);
+				trMutateSelected(kbGetProtoUnitID("Relic"));
+				trImmediateUnitGarrison(""+1*trQuestVarGet("zenophobiaCarrier"));
+				trMutateSelected(kbGetProtoUnitID("Phoenix"));
+				trSetSelectedScale(1.5, 1.5, 1.5);
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaCarrier");
+				trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+				trUnitTeleport(145,0,145);
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundCarrier");
+				trMutateSelected(kbGetProtoUnitID("Rocket"));
+
+				trQuestVarSet("zenophobiaLaserGround", aiPlanGetUserVariableInt(ARRAYS, bossInts, 0));
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGround");
+				trUnitChangeProtoUnit("Militia");
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGround");
+				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+				trSetSelectedScale(0,0,0);
+
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundSFX");
+				trMutateSelected(kbGetProtoUnitID("Meteorite"));
+				trUnitOverrideAnimation(6, 0, true, false, -1);
+				trMutateSelected(kbGetProtoUnitID("Relic"));
+				trImmediateUnitGarrison(""+1*trQuestVarGet("zenophobiaLaserGround"));
+				trSetSelectedScale(0,0,0);
+				trMutateSelected(kbGetProtoUnitID("Victory Marker"));
+
+				trQuestVarSetFromRand("rand", 5000, 15000, true);
+
+				trQuestVarSet("zenophobiaNext", trTimeMS() + trQuestVarGet("rand"));
+
+				zInitProtoUnitStat("Rocket", 1, 1, 30);
+
+				xsEnableRule("void_battle");
+			}
+		}
+	}
+}
+
+rule rising_up
+inactive
+highFrequency
+{
+	if (trTime() > trQuestVarGet("musicTime")) {
+		if (customContent) {
+			trMusicPlay("Zenophobia\Rising Up.mp3","1",0.5);
+			trQuestVarSet("musicTime", trTime() + 325);
+		} else {
+			trMusicPlay("music\interface\if you can use a doorknob.mp3","1",0.5);
+			trQuestVarSet("musicTime", trTime() + 56);
+		}
+	}
+}
+
+rule heroes_always
+inactive
+highFrequency
+{
+	float dist = 0;
+	float diff = 0;
+	float amt = 0;
+	int target = 0;
+	vector pos = vector(0,0,0);
+	vector dir = vector(0,0,0);
+	vector targetPos = vector(0,0,0);
+
+	int id = kbUnitGetTargetUnitID(1*trQuestVarGet("zenophobiaID"));
+	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
+		trUnitSelectClear();
+		trUnitSelectByQV("zenophobia");
+		trMutateSelected(kbGetProtoUnitID("Hoplite"));
+		dist = 3600;
+		pos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobia"), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
+			if (amt < dist) {
+				target = xGetInt(dEnemies, xUnitName);
+				dist = amt;
+			}
+		}
+		trUnitDoWorkOnUnit(""+target, -1);
+	}
+	id = kbUnitGetTargetUnitID(1*trQuestVarGet("nickonhawkID"));
+	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
+		trUnitSelectClear();
+		trUnitSelectByQV("nickonhawk");
+		trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
+		dist = 3600;
+		pos = kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk"), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
+			if (amt < dist) {
+				target = xGetInt(dEnemies, xUnitName);
+				dist = amt;
+			}
+		}
+		trUnitDoWorkOnUnit(""+target, -1);
+	}
+	id = kbUnitGetTargetUnitID(1*trQuestVarGet("nottudID"));
+	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
+		trUnitSelectClear();
+		trUnitSelectByQV("nottud");
+		trMutateSelected(kbGetProtoUnitID("Minotaur"));
+		dist = 3600;
+		pos = kbGetBlockPosition(""+1*trQuestVarGet("nottud"), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
+			if (amt < dist) {
+				target = xGetInt(dEnemies, xUnitName);
+				dist = amt;
+			}
+		}
+		trUnitDoWorkOnUnit(""+target, -1);
+	}
+
+	switch(1*trQuestVarGet("zenophobiaStep"))
+	{
+		case 0:
+		{
+			if (trTimeMS() > trQuestVarGet("zenophobiaNext")) {
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobia"));
+
+				dist = 0;
+				for(i=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else {
+						amt = trCountUnitsInArea(""+xGetInt(dEnemies, xUnitName),ENEMY_PLAYER,"Argus",10.0);
+						if (amt > dist) {
+							dist = amt;
+							target = xGetInt(dEnemies, xUnitName);
+						}
+					}
+				}
+
+				dir = getUnitVector(pos, kbGetBlockPosition(""+target, true));
+
+				trVectorQuestVarSet("zenophobiaDir", dir);
+				
+				trSoundPlayFN("phoenixselect2.wav","1",-1,"","");
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaCarrier");
+				trMutateSelected(kbGetProtoUnitID("Hero Greek Achilles"));
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobia");
+				trMutateSelected(kbGetProtoUnitID("Relic"));
+				trImmediateUnitGarrison(""+1*trQuestVarGet("zenophobiaCarrier"));
+				trMutateSelected(kbGetProtoUnitID("Hoplite"));
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaCarrier");
+				trMutateSelected(kbGetProtoUnitID("Wadjet Spit"));
+				trSetUnitOrientation(dir, vector(0,1,0), true);
+				trUnitTeleport(xsVectorGetX(pos),xsVectorGetY(pos) + 10,xsVectorGetZ(pos));
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaser");
+				trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+				trSetSelectedScale(0,0,0);
+				trSetUnitOrientation(vector(0,1,0),vector(1,0,0),true);
+				trUnitTeleport(xsVectorGetX(pos),xsVectorGetY(pos) + 10,xsVectorGetZ(pos));
+
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundCarrier");
+				trDamageUnitPercent(-100);
+				trUnitTeleport(xsVectorGetX(pos),xsVectorGetY(pos),xsVectorGetZ(pos));
+				trQuestVarSet("zenophobiaNext", trTimeMS() + 1500);
+				trQuestVarSet("zenophobiaStep", 1);
+			}
+		}
+		case 1:
+		{
+			if (trTimeMS() > trQuestVarGet("zenophobiaNext")) {
+				pos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobiaLaser"));
+				dir = vectorSetAsTargetVector(pos, pos + trVectorQuestVarGet("zenophobiaDir"), 999.0);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundCarrier");
+				trUnitMoveToPoint(xsVectorGetX(dir),xsVectorGetY(dir),xsVectorGetZ(dir),-1,false);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundSFX");
+				trMutateSelected(kbGetProtoUnitID("Meteorite"));
+				trSoundPlayFN("sonofosirisbolt.wav","1",-1,"","");
+				trSoundPlayFN("nidhoggflame2.wav","1",-1,"","");
+				trQuestVarSet("zenophobiaStep", 2);
+				trQuestVarSet("zenophobiaNext", trTimeMS() + 3000);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaser");
+				trSetSelectedScale(12.0,12.0,60.0);
+				trUnitHighlight(10, false);
+
+				trVectorQuestVarSet("zenophobiaFirePos", pos);
+				trQuestVarSet("zenophobiaFireDist", 0);
+				zSetProtoUnitStat("Rocket", 1, 1, 10);
+			}
+		}
+		case 2:
+		{
+			pos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobiaLaser"));
+			targetPos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobiaLaserGround"));
+			dir = getUnitVector3d(pos, targetPos);
+			trUnitSelectClear();
+			trUnitSelectByQV("zenophobiaLaser");
+			trSetUnitOrientation(vector(0,0,0) - dir, rotationMatrix(xsVectorNormalize(xsVectorSetY(dir,0)), 0.0, 1.0), true);
+
+			// adjust speed
+			diff = xsVectorGetY(pos) - xsVectorGetY(targetPos);
+			dist = distanceBetweenVectors(pos, targetPos, false);
+			amt = xsAtan(dist / diff) + 0.02;
+			// where you're supposed to be one second from now
+			diff = xsSin(amt) / xsCos(amt) * diff;
+			zSetProtoUnitStat("Rocket", 1, 1, 60.0 * (diff - dist));
+
+			// spawn tartarian shit
+			diff = dist - trQuestVarGet("zenophobiaFireDist");
+			if (diff > 2.0) {
+				pos = trVectorQuestVarGet("zenophobiaFirePos");
+				dir = trVectorQuestVarGet("zenophobiaDir");
+				for(i=xGetDatabaseCount(dEnemies); >0) {
+					xDatabaseNext(dEnemies);
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (rayCollision(dEnemies, pos, dir, diff + 5.0, 16.0, true)) {
+						trDamageUnit(5000);
+					}
+				}
+				
+				for(i=(dist - trQuestVarGet("zenophobiaFireDist")) / 2; >0) {
+					trQuestVarSet("zenophobiaFireDist", 2.0 + trQuestVarGet("zenophobiaFireDist"));
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("0,0");
+					trSetUnitOrientation(dir,vector(0,1,0),true);
+					trUnitChangeProtoUnit("Tartarian Gate flame");
+					pos = pos + (dir * 2.0);
+				}
+				trVectorQuestVarSet("zenophobiaFirePos", pos);
+			}
+			if (trTimeMS() > trQuestVarGet("zenophobiaNext") || distanceBetweenVectors(pos, vector(145,0,145)) >= 6400.0) {
+				trQuestVarSet("zenophobiaStep", 3);
+				trQuestVarSet("zenophobiaNext", trTimeMS() + 500);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundSFX");
+				trMutateSelected(kbGetProtoUnitID("Victory Marker"));
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaserGroundCarrier");
+				trUnitTeleport(1,0,1);
+			}
+		}
+		case 3:
+		{
+			amt = 0.024 * (trQuestVarGet("zenophobiaNext") - trTimeMS());
+			if (amt < 0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaser");
+				trSetSelectedScale(0,0,0);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobia");
+				trUnitChangeProtoUnit("Hoplite");
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaCarrier");
+				trUnitTeleport(145, 0, 145);
+				trQuestVarSet("zenophobiaNext", trTimeMS() + 20000);
+				trQuestVarSet("zenophobiaStep", 0);
+			} else {
+				trUnitSelectClear();
+				trUnitSelectByQV("zenophobiaLaser");
+				trSetSelectedScale(amt, amt, 60.0);
+			}
+		}
 	}
 }

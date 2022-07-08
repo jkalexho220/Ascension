@@ -3103,6 +3103,8 @@ highFrequency
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, -9999999999999999999.0);
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
 
+		trModifyProtounit("Victory Marker", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 27, 450);
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 29, -70);
 
