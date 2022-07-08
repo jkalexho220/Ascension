@@ -3092,6 +3092,27 @@ highFrequency
 	if (trTime() > cActivationTime + 1) {
 		trStringQuestVarSet("advice", "Are you worthy?");
 
+		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
+		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
+		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
+
+		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -200);
+		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
+
+		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 9999999999999999999.0);
+		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, -9999999999999999999.0);
+		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
+
+		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 27, 450);
+		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 29, -70);
+
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
+
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);
+
 		worldHeight = 13;
 		TERRAIN_WALL = 0;
 		TERRAIN_SUB_WALL = 50;

@@ -8309,27 +8309,6 @@ highFrequency
 				}
 
 				trStringQuestVarSet("advice","You can do this! I believe in you!");
-
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
-
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -200);
-				trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
-
-				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
-
-				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 27, 450);
-				trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 29, -70);
-
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
-
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
-				trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);
 			}
 		}
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -9185,11 +9164,11 @@ highFrequency
 				for(x=0; < 145) {
 					for(z=0; < 145) {
 						height = xsPow(x - 72, 2) + xsPow(z - 72, 2);
-						if (height > 3600) {
+						if (height > 1600) {
 							trPaintTerrain(x, z, x, z, 2, 13, false);
-						} else if (height > 1000) {
+						} else if (height > 400) {
 							trQuestVarSetFromRand("rand", 0, height, true);
-							if (trQuestVarGet("rand") > 1000) {
+							if (trQuestVarGet("rand") > 400) {
 								trPaintTerrain(x, z, x, z, 5, 4, false);
 							}
 						}
@@ -9211,15 +9190,15 @@ highFrequency
 				pos = vector(20, 0, 20);
 				dir = vector(72, 0, 72) - pos;
 				p = 1;
-				for(i=0; <4) {
-					for(j=0; >4) {
+				for(i=0; < 3) {
+					for(j=0; < 4) {
 						trVectorQuestVarSet("p"+p+"arena", pos);
 						p = p + 1;
-						for(a = -6; <= 6) {
-							for(b = -6; <= 6) {
-								if(xsPow(a, 2) + xsPow(b, 2) <= 6) {
+						for(a = -8; <= 8) {
+							for(b = -8; <= 8) {
+								if(xsPow(a, 2) + xsPow(b, 2) <= 64) {
 									x = a + xsVectorGetX(pos);
-									z = a + xsVectorGetZ(pos);
+									z = b + xsVectorGetZ(pos);
 									trPaintTerrain(x, z, x, z, 5, 4, false);
 								}
 							}
@@ -9308,6 +9287,8 @@ highFrequency
 				trQuestVarSet("bossUsedUltimate", 0);
 
 				trQuestVarSet("cinTime", trTime() + 3);
+
+				trStringQuestVarSet("bossProto", "Titan Kronos");
 			}
 			case 9:
 			{
@@ -9339,6 +9320,68 @@ void paintVoidCircle(vector pos = vector(0,0,0), int radius = 0, int duration = 
 				x = a + xsVectorGetX(pos);
 				z = b + xsVectorGetZ(pos);
 				paintVoid(x, z, duration);
+			}
+		}
+	}
+}
+
+void paintNightmareCircle(vector pos = vector(0,0,0), int floor = 0) {
+	int primary = 0;
+	int secondary = 0;
+	int x = 0;
+	int z = 0;
+	switch(floor)
+	{
+		case 0:
+		{
+			primary = 5;
+			secondary = 4;
+		}
+		case 1:
+		{
+			secondary = 34;
+		}
+		case 2:
+		{
+			secondary = 58;
+		}
+		case 3:
+		{
+			secondary = 41;
+		}
+		case 4:
+		{
+			secondary = 25;
+		}
+		case 5:
+		{
+			secondary = 32;
+		}
+		case 6:
+		{
+			secondary = 70;
+		}
+		case 7:
+		{
+			primary = 3;
+			secondary = 8;
+		}
+		case 8:
+		{
+			secondary = 53;
+		}
+		case 9:
+		{
+			secondary = 84;
+		}
+	}
+
+	for(a = -8; <= 8) {
+		for(b = -8; <= 8) {
+			if (xsPow(a, 2) + xsPow(b, 2) <= 64) {
+				x = a + xsVectorGetX(pos);
+				z = b + xsVectorGetZ(pos);
+				trPaintTerrain(x, z, x, z, primary, secondary, false);
 			}
 		}
 	}
@@ -9383,7 +9426,7 @@ highFrequency
 			trQuestVarSet("bossSummonTime", trTime() + trQuestVarGet("bossSummonTime"));
 			trQuestVarSetFromRand("rand", 0, 6.283185, false);
 			dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
-			pos = vector(145, 0, 145) - (dir * 100.0);
+			pos = vector(145, 0, 145) - (dir * 70.0);
 			action = trGetNextUnitScenarioNameNumber();
 			trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 			trArmySelect(""+ENEMY_PLAYER+",0");
@@ -9625,47 +9668,168 @@ highFrequency
 			if (trQuestVarGet("bossSpell") == 31) {
 				trSoundPlayFN("cinematics\15_in\gong.wav","1",-1,"","");
 				trSoundPlayFN("godpower.wav","1",-1,"","");
-				trOverlayText("Nightmare Duel", 3.0, -1, -1, -1);
+				trOverlayText("Nightmare Gallery", 3.0, -1, -1, -1);
 				trUIFadeToColor(0,0,0,1000,0,true);
 				bossNext = trTimeMS() + 1000;
 				trQuestVarSet("bossSpell", 32);
 			} else if (trQuestVarGet("bossSpell") == 32) {
 				if (trTimeMS() > bossNext) {
+					trSoundPlayFN("changeunit.wav","1",-1,"","");
+					trUIFadeToColor(0,0,0,1000,0,false);
 					trUnitSelectClear();
 					trUnitSelectByQV("bossRevealer");
 					trUnitChangeProtoUnit("Cinematic Block");
+
+					xRestoreCache(dPlayerUnits);
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xSetBool(dPlayerUnits, xIsHero, false);
+					}
 					for(p=1; < ENEMY_PLAYER) {
-						for(x=p; < ENEMY_PLAYER) {
+						for(x=p + 1; < ENEMY_PLAYER) {
 							trPlayerModifyLOS(p, false, x);
 							trPlayerModifyLOS(x, false, p);
 						}
-						if (xGetInt(dPlayerData, xPlayerDead, p) == 0) {
-							trQuestVarSet("p"+p+"rideLightning", 0);
-							trQuestVarSet("p"+p+"lightwing", 0);
-							pos = trVectorQuestVarGet("p"+p+"arena");
-							for(a = -6; <= 6) {
-								for(b = -6; <= 6) {
-									if (xsPow(a, 2) + xsPow(b, 2) <= 6) {
-										x = a + xsVectorGetX(pos);
-										z = b + xsVectorGetZ(pos);
-										trPaintTerrain(x, z, x, z, 5, 5, false);
-									}
-								}
-							}
-							pos = gridToVector(pos);
+						if (xGetInt(dPlayerData, xPlayerDead, p) <= 0) {
+							trQuestVarSetFromRand("rand", 1, 9, true);
 							xAddDatabaseBlock(dDuelists, true);
+							xSetInt(dDuelists, xDuelistOpponent, 1*trQuestVarGet("rand"));
 							xSetInt(dDuelists, xPlayerOwner, p);
 							xSetVector(dDuelists, xDuelistPos, kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true));
+
+							xClearDatabase(getCharactersDB(p));
+							trQuestVarSet("p"+p+"rideLightning", 0);
+							trQuestVarSet("p"+p+"lightwing", 0);
+							trQuestVarSet("p"+p+"nightfall", 0);
+							if (xGetInt(dPlayerData, xPlayerClass) == SPELLSTEALER) {
+								xClearDatabase(1*trQuestVarGet("p"+p+"bladeDanceTargets"));
+							}
+							pos = trVectorQuestVarGet("p"+p+"arena");
+							paintNightmareCircle(pos, 1*trQuestVarGet("rand"));
+							pos = gridToVector(pos);
+							spawnPlayer(p, pos);
+							equipRelicsAgain(p);
 							xSetInt(dDuelists, xUnitName, xGetInt(dPlayerData, xPlayerUnit, p));
-							action = trGetNextUnitScenarioNameNumber();
-							trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos) - 8, 0, xsVectorGetZ(pos) - 8,45,true);
-							trArmySelect(""+p+",0");
-							trUnitChangeProtoUnit("Transport Ship Greek");
-							xSetInt(dDuelists, xDuelistOpponent, trGetNextUnitScenarioNameNumber());
-							
 						}
 					}
-					bossNext = trTimeMS() + 30000;
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						if (xGetBool(dPlayerUnits, xIsHero) == false) {
+							xUnitSelectByID(dPlayerUnits, xUnitID);
+							trUnitDestroy();
+							xFreeDatabaseBlock(dPlayerUnits);
+						}
+					}
+					if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) <= 0) {
+						reselectMyself();
+						uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
+					}
+					trSetFogAndBlackmap(true, false);
+					bossNext = trTimeMS() + 1000;
+					bossTimeout = trTimeMS() + 30000;
+					trQuestVarSet("bossSpell", 33);
+				}
+			} else if (trQuestVarGet("bossSpell") == 33) {
+				if (xGetDatabaseCount(dDuelists) > 0) {
+					xDatabaseNext(dDuelists);
+					p = xGetInt(dDuelists, xPlayerOwner);
+					if (xGetInt(dPlayerData, xPlayerDead, p) > 0) {
+						pos = xGetVector(dDuelists, xDuelistPos);
+						trVectorQuestVarSet("dead"+p+"pos", pos);
+						trUnitSelectClear();
+						trUnitSelectByQV("p"+p+"reviveBeam");
+						trUnitDestroy();
+						trQuestVarSet("p"+p+"reviveBeam", trGetNextUnitScenarioNameNumber());
+						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos), 0, xsVectorGetZ(pos), 0, true);
+						trArmySelect("0,0");
+						trUnitChangeProtoUnit("Healing SFX");
+
+						pos = trVectorQuestVarGet("p"+p+"arena");
+						paintNightmareCircle(pos, 0);
+						pos = gridToVector(pos);
+						for(i=xGetDatabaseCount(dEnemies); >0) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
+								removeEnemy();
+							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 145.0) {
+								trUnitDestroy();
+								xFreeDatabaseBlock(dEnemies);
+							}
+						}
+						xFreeDatabaseBlock(dDuelists);
+					}
+				}
+				if (trTimeMS() > bossNext) {
+					bossNext = bossNext + 3000;
+					trQuestVarSetFromRand("rand", 0, 6.283185, false);
+					dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
+					for(i=xGetDatabaseCount(dDuelists); >0) {
+						xDatabaseNext(dDuelists);
+						p = xGetInt(dDuelists, xPlayerOwner);
+						pos = gridToVector(trVectorQuestVarGet("p"+p+"arena")) - (dir * 12.0);
+						action = trGetNextUnitScenarioNameNumber();
+						trQuestVarSetFromRand("rand", 0, 3, true);
+						id = monsterPetProto(4 * (xGetInt(dDuelists, xDuelistOpponent) - 1) + trQuestVarGet("rand"));
+						trArmyDispatch(""+ENEMY_PLAYER+",0",kbGetProtoUnitName(id),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+						trArmySelect(""+ENEMY_PLAYER+",0");
+						trSetUnitOrientation(dir, vector(0,1,0), true);
+						activateEnemy(action, -1, 0);
+					}
+				} else if (trTimeMS() > bossTimeout) {
+					xRestoreCache(dPlayerUnits);
+					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
+						xDatabaseNext(dPlayerUnits);
+						xUnitSelectByID(dPlayerUnits, xUnitID);
+						trUnitDestroy();
+					}
+					for(i=xGetDatabaseCount(dDuelists); >0) {
+						xDatabaseNext(dDuelists);
+						p = xGetInt(dDuelists, xPlayerOwner);
+						pos = xGetVector(dDuelists, xDuelistPos);
+						xClearDatabase(getCharactersDB(p));
+						trQuestVarSet("p"+p+"rideLightning", 0);
+						trQuestVarSet("p"+p+"lightwing", 0);
+						trQuestVarSet("p"+p+"nightfall", 0);
+						if (xGetInt(dPlayerData, xPlayerClass) == SPELLSTEALER) {
+							xClearDatabase(1*trQuestVarGet("p"+p+"bladeDanceTargets"));
+						}
+						spawnPlayer(p, pos);
+						equipRelicsAgain(p);
+						paintNightmareCircle(trVectorQuestVarGet("p"+p+"arena"), 0);
+					}
+					xClearDatabase(dDuelists);
+					pos = trVectorQuestVarGet("bossRoomCenter");
+					for(i=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
+							removeEnemy();
+						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) > 1600.0) {
+							trUnitDestroy();
+							xFreeDatabaseBlock(dEnemies);
+						}
+					}
+					if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) <= 0) {
+						reselectMyself();
+						uiLookAtUnitByName(""+xGetInt(dPlayerData, xPlayerUnit, trCurrentPlayer()));
+					}
+					bossCooldown(10, 15);
+					trQuestVarSet("bossUltimate", 3);
+
+					trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+					trUIFadeToColor(0,0,0,1000,0,false);
+					trUnitSelectClear();
+					trUnitSelectByQV("bossRevealer");
+					trUnitChangeProtoUnit("Cinematic Block");
+					trSetFogAndBlackmap(false, false);
+
+					for(p=1; < ENEMY_PLAYER) {
+						for(x=p + 1; < ENEMY_PLAYER) {
+							trPlayerModifyLOS(p, false, x);
+							trPlayerModifyLOS(x, false, p);
+						}
+					}
 				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 20) {
@@ -9814,7 +9978,6 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
-			trQuestVarSet("bossSpell", 21);
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
