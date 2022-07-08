@@ -9397,6 +9397,7 @@ highFrequency
 	int x = 0;
 	int z = 0;
 	int action = 0;
+	int spell = 0;
 	int id = 0;
 	float amt = 0;
 	float angle = 0;
@@ -9423,18 +9424,21 @@ highFrequency
 	if (trUnitAlive() == true) {
 		trDamageUnit(timediff * 100); // counteract regen
 
-		if (trTime() > trQuestVarGet("bossSummonTime")) {
-			trQuestVarSetFromRand("bossSummonTime", 1, 1000.0 / (50.0 + percentDamaged), true);
-			trQuestVarSet("bossSummonTime", trTime() + trQuestVarGet("bossSummonTime"));
-			trQuestVarSetFromRand("rand", 0, 6.283185, false);
-			dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
-			pos = vector(145, 0, 145) - (dir * 70.0);
-			action = trGetNextUnitScenarioNameNumber();
-			trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-			trArmySelect(""+ENEMY_PLAYER+",0");
-			trSetUnitOrientation(dir, vector(0,1,0), true);
-			trUnitMoveToPoint(145, 0, 145, -1, true);
-			activateEnemy(action);
+		spell = trQuestVarGet("bossSpell");
+		if (spell / 10 != 3) { // no summoning during nightmares
+			if (trTime() > trQuestVarGet("bossSummonTime")) {
+				trQuestVarSetFromRand("bossSummonTime", 1, 1000.0 / (50.0 + percentDamaged), true);
+				trQuestVarSet("bossSummonTime", trTime() + trQuestVarGet("bossSummonTime"));
+				trQuestVarSetFromRand("rand", 0, 6.283185, false);
+				dir = xsVectorSet(xsCos(trQuestVarGet("rand")), 0, xsSin(trQuestVarGet("rand")));
+				pos = vector(145, 0, 145) - (dir * 70.0);
+				action = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect(""+ENEMY_PLAYER+",0");
+				trSetUnitOrientation(dir, vector(0,1,0), true);
+				trUnitMoveToPoint(145, 0, 145, -1, true);
+				activateEnemy(action);
+			}
 		}
 
 		for(i=xGetDatabaseCount(dVoidEggDust); >0) {
@@ -9598,14 +9602,16 @@ highFrequency
 				aiPlanSetUserVariableVector(voidPaintArray, 1*xsVectorGetX(pos), 1*xsVectorGetZ(pos), xsVectorSetY(start, 0));
 				xFreeDatabaseBlock(dVoidPaint);
 			} else if ((trTimeMS() > trQuestVarGet("bossSummonNext")) && (trQuestVarGet("secondPhase") == 1)) { // random argus spawn
-				pos = gridToVector(pos + vector(32, 0, 32));
-				action = trGetNextUnitScenarioNameNumber();
-				trQuestVarSetFromRand("rand", 0, 360, true);
-				trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("rand"),true);
-				activateEnemy(action);
-				trQuestVarSetFromRand("bossSummonNext", 100, 9000, true);
-				trQuestVarSetFromRand("rand", 100, 9000, true);
-				trQuestVarSet("bossSummonNext", trTimeMS() + xsMin(trQuestVarGet("bossSummonNext"), trQuestVarGet("rand")));
+				if (spell / 10 != 3) { // don't summon when we're in nightmare land
+					pos = gridToVector(pos + vector(32, 0, 32));
+					action = trGetNextUnitScenarioNameNumber();
+					trQuestVarSetFromRand("rand", 0, 360, true);
+					trArmyDispatch(""+ENEMY_PLAYER+",0","Argus",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("rand"),true);
+					activateEnemy(action);
+					trQuestVarSetFromRand("bossSummonNext", 100, 9000, true);
+					trQuestVarSetFromRand("rand", 100, 9000, true);
+					trQuestVarSet("bossSummonNext", trTimeMS() + xsMin(trQuestVarGet("bossSummonNext"), trQuestVarGet("rand")));
+				}
 			} else if (trTimeMS() > trQuestVarGet("voidClawsNext")) {
 				pos = gridToVector(pos + vector(32, 0, 32));
 				hit = false;
@@ -10028,10 +10034,10 @@ void modifyHero(string proto = "") {
 	/* damage bonus vs myth */
 	trModifyProtounit(proto, 0, 33, 9999999999999999999.0);
 	trModifyProtounit(proto, 0, 33, -9999999999999999999.0);
-	trModifyProtounit(proto, 0, 33, 1.0);
+	trModifyProtounit(proto, 0, 33, 0.1);
 	trModifyProtounit(proto, 0, 44, 9999999999999999999.0);
 	trModifyProtounit(proto, 0, 44, -9999999999999999999.0);
-	trModifyProtounit(proto, 0, 44, 1.0);
+	trModifyProtounit(proto, 0, 44, 0.5);
 	/* damage bonus vs hero */
 	trModifyProtounit(proto, 0, 34, 9999999999999999999.0);
 	trModifyProtounit(proto, 0, 34, -9999999999999999999.0);
@@ -10039,6 +10045,10 @@ void modifyHero(string proto = "") {
 	trModifyProtounit(proto, 0, 45, 9999999999999999999.0);
 	trModifyProtounit(proto, 0, 45, -9999999999999999999.0);
 	trModifyProtounit(proto, 0, 45, 0.1);
+
+	trModifyProtounit(proto, 0, 2, 9999999999999999999.0);
+	trModifyProtounit(proto, 0, 2, -9999999999999999999.0);
+	trModifyProtounit(proto, 0, 2, 15);
 }
 
 rule heroes_cin
@@ -10049,7 +10059,7 @@ highFrequency
 	if (trQuestVarGet("cinStep") == 0) {
 		trUnitSelectClear();
 		trUnitSelect(""+bossUnit, true);
-		if (trUnitPercentDamaged() >= 50) {
+		if ((trUnitPercentDamaged() >= 50) || (trQuestVarGet("reviveCount") == 0)) {
 			trQuestVarSet("cinStep", 1);
 			trQuestVarSet("cinTime", trTime() + 2);
 			trSetUnitIdleProcessing(false);
@@ -10253,8 +10263,8 @@ highFrequency
 				uiLookAtUnitByName(""+1*trQuestVarGet("nottud"));
 				trackPlay(500, -1);
 				trSoundPlayFN("","1",-1,"Zenophobia:Don't worry about the small fries. We'll take care of them. Take down the big one!","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 7);
-				trUIFadeToColor(0,0,0,1000,4000,true);
+				trQuestVarSet("cinTime", trTime() + 8);
+				trUIFadeToColor(0,0,0,1000,5000,true);
 			}
 			case 15:
 			{
@@ -10344,9 +10354,12 @@ highFrequency
 				trSetSelectedScale(0,0,0);
 				trMutateSelected(kbGetProtoUnitID("Victory Marker"));
 
-				trQuestVarSetFromRand("rand", 5000, 15000, true);
-
+				trQuestVarSetFromRand("rand", 5000, 10000, true);
 				trQuestVarSet("zenophobiaNext", trTimeMS() + trQuestVarGet("rand"));
+				trQuestVarSetFromRand("rand", 5000, 10000, true);
+				trQuestVarSet("nickNext", trQuestVarGet("zenophobiaNext") + trQuestVarGet("rand"));
+
+				trQuestVarSet("yeebLightningNext", trTimeMS());
 
 				zInitProtoUnitStat("Rocket", 1, 1, 30);
 
@@ -10371,6 +10384,32 @@ highFrequency
 	}
 }
 
+void heroAttack(string name = "") {
+	float dist = 0;
+	float amt = 0;
+	vector pos = vector(0,0,0);
+	int id = 1*trQuestVarGet(name+"ID");
+	int target = kbUnitGetTargetUnitID(id);
+	if ((kbUnitGetAnimationActionType(id) == 9) || ((target > 0) && (kbUnitGetOwner(target) != ENEMY_PLAYER))) {
+		target = bossUnit;
+		trUnitSelectClear();
+		trUnitSelectByQV(name);
+		dist = 25600;
+		pos = kbGetBlockPosition(""+1*trQuestVarGet(name), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			if (xGetInt(dEnemies, xUnitName) != bossUnit) {
+				amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) + unitDistanceToVector(xGetInt(dEnemies, xUnitName), vector(145,0,145));
+				if (amt < dist) {
+					target = xGetInt(dEnemies, xUnitName);
+					dist = amt;
+				}
+			}
+		}
+		trUnitDoWorkOnUnit(""+target, -1);
+	}
+}
+
 rule heroes_always
 inactive
 highFrequency
@@ -10383,56 +10422,42 @@ highFrequency
 	vector dir = vector(0,0,0);
 	vector targetPos = vector(0,0,0);
 
-	int id = kbUnitGetTargetUnitID(1*trQuestVarGet("zenophobiaID"));
-	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
-		trUnitSelectClear();
-		trUnitSelectByQV("zenophobia");
-		trMutateSelected(kbGetProtoUnitID("Hoplite"));
-		dist = 3600;
-		pos = kbGetBlockPosition(""+1*trQuestVarGet("zenophobia"), true);
-		for(i=xGetDatabaseCount(dEnemies); >0) {
-			xDatabaseNext(dEnemies);
-			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
-			if (amt < dist) {
-				target = xGetInt(dEnemies, xUnitName);
-				dist = amt;
-			}
-		}
-		trUnitDoWorkOnUnit(""+target, -1);
+	int id = 0;
+	if (trTime() > trQuestVarGet("heroesRefresh")) {
+		trQuestVarSet("heroesRefresh", trTime());
+		heroAttack("zenophobia");
+		heroAttack("nickonhawk");
+		heroAttack("nottud");
 	}
-	id = kbUnitGetTargetUnitID(1*trQuestVarGet("nickonhawkID"));
-	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
-		trUnitSelectClear();
-		trUnitSelectByQV("nickonhawk");
-		trMutateSelected(kbGetProtoUnitID("Hero Greek Odysseus"));
-		dist = 3600;
-		pos = kbGetBlockPosition(""+1*trQuestVarGet("nickonhawk"), true);
+
+	if (trTimeMS() > trQuestVarGet("yeebLightningNext")) {
+		trChatSetStatus(false);
+		trDelayedRuleActivation("enable_chat");
+		trQuestVarSetFromRand("rand", 100, 1200, true);
+		trQuestVarSetFromRand("rand2", 100, 1200, true);
+		trQuestVarSet("yeebLightningNext", trQuestVarGet("yeebLightningNext") + xsMin(trQuestVarGet("rand"), trQuestVarGet("rand2")));
+		pos = kbGetBlockPosition(""+1*trQuestVarGet("yeebaagooon"));
+		target = 0;
 		for(i=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
-			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
-			if (amt < dist) {
-				target = xGetInt(dEnemies, xUnitName);
-				dist = amt;
+			if (xGetInt(dEnemies, xUnitName) != bossUnit) {
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (trUnitAlive() == false) {
+					removeEnemy();
+				} else {
+					dist = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
+					target = xGetInt(dEnemies, xUnitName);
+					trQuestVarSetFromRand("rand", 0, dist, false);
+					if (trQuestVarGet("rand") < 100) {
+						break;
+					}
+				}
 			}
 		}
-		trUnitDoWorkOnUnit(""+target, -1);
-	}
-	id = kbUnitGetTargetUnitID(1*trQuestVarGet("nottudID"));
-	if ((id > 0) && (kbUnitGetOwner(id) != ENEMY_PLAYER)) {
 		trUnitSelectClear();
-		trUnitSelectByQV("nottud");
-		trMutateSelected(kbGetProtoUnitID("Minotaur"));
-		dist = 3600;
-		pos = kbGetBlockPosition(""+1*trQuestVarGet("nottud"), true);
-		for(i=xGetDatabaseCount(dEnemies); >0) {
-			xDatabaseNext(dEnemies);
-			amt = unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos);
-			if (amt < dist) {
-				target = xGetInt(dEnemies, xUnitName);
-				dist = amt;
-			}
-		}
-		trUnitDoWorkOnUnit(""+target, -1);
+		trUnitSelect(""+target, true);
+		trTechInvokeGodPower(0, "bolt", vector(0,0,0), vector(0,0,0));
+		trDamageUnit(470);
 	}
 
 	switch(1*trQuestVarGet("zenophobiaStep"))
@@ -10582,9 +10607,13 @@ highFrequency
 				trUnitSelectByQV("zenophobia");
 				trUnitChangeProtoUnit("Hoplite");
 				trUnitSelectClear();
+				trUnitSelectByQV("zenophobia");
+				trUnitMoveToPoint(145, 0, 145, -1, true);
+				trUnitSelectClear();
 				trUnitSelectByQV("zenophobiaCarrier");
 				trUnitTeleport(145, 0, 145);
-				trQuestVarSet("zenophobiaNext", trTimeMS() + 20000);
+				trQuestVarSetFromRand("rand", 10000, 20000, true);
+				trQuestVarSet("zenophobiaNext", trTimeMS() + trQuestVarGet("rand"));
 				trQuestVarSet("zenophobiaStep", 0);
 			} else {
 				trUnitSelectClear();
