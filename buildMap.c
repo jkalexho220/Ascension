@@ -3114,7 +3114,7 @@ highFrequency
 
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 9999999999999999999.0);
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, -9999999999999999999.0);
-		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
+		trModifyProtounit("Guardian", ENEMY_PLAYER, 0, 3600 * ENEMY_PLAYER);
 
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);

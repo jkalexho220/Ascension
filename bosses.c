@@ -5408,6 +5408,7 @@ highFrequency
 						trImmediateUnitGarrison(""+bossUnit);
 						trUnitChangeProtoUnit("Cinematic Block");
 					}
+					bossNext = trTimeMS() + 1000;
 				} else {
 					xDatabaseNext(dPlayerUnits);
 					pos = xGetVector(dPlayerUnits, xUnitPos);
@@ -5430,10 +5431,15 @@ highFrequency
 					trUnitSelectClear();
 					trUnitSelect(""+bossUnit, true);
 					trSetUnitOrientation(getUnitVector(bossPos, pos), vector(0,1,0), true);
+
+					bossNext = trTimeMS() + 2000;
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("Recreation");
 				}
 
 				trQuestVarSet("bossSpell", 22);
-				bossNext = trTimeMS() + 1000;
+				
 
 
 				trUnitSelectClear();
@@ -7976,10 +7982,10 @@ highFrequency
 			trUnitSelectClear();
 			trUnitSelectByQV("bossRevealer");
 			trUnitChangeProtoUnit("Revealer");
-			/*
+			/* */
 			xsEnableRule("guardian_awaken");
 			xsEnableRule("guardian_dialog");
-			*/
+			/*
 			debugIsOn = true;
 			trQuestVarSet("cinStep", 0);
 			trQuestVarSet("cinTime", trTime() + 3);
@@ -7992,6 +7998,7 @@ highFrequency
 			trUnitSelect(""+bossUnit);
 			trUnitDestroy();
 			trSetFogAndBlackmap(false, false);
+			/**/
 			// delete the above
 			trRevealEntireMap();
 			xsDisableSelf();
@@ -8906,7 +8913,7 @@ highFrequency
 							action = 8;
 						}
 						if (action > 0) {
-							amt = 0.3 * (trTimeMS() - xGetInt(dKaleidoscopes, xKaleidoscopeLast));
+							amt = 0.5 * (trTimeMS() - xGetInt(dKaleidoscopes, xKaleidoscopeLast));
 							xSetInt(dKaleidoscopes, xKaleidoscopeLast, trTimeMS());
 							action = action - 1;
 							pos = vector(145, 0, 145) + (dir * xGetPointer(dKaleidoscopes));
@@ -10002,9 +10009,6 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
-			if (trQuestVarGet("secondPhase") == 0) {
-				trDamageUnitPercent(50);
-			}
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -10012,6 +10016,7 @@ highFrequency
 		trMusicStop();
 		xsDisableRule("boss_music");
 		xsDisableRule("void_music");
+		xsDisableRule("heroes_always");
 		xsDisableRule("rising_up");
 		trForceNonCinematicModels(true);
 		trUIFadeToColor(0,0,0,1000,0,true);
@@ -10021,6 +10026,16 @@ highFrequency
 		boss = 0;
 		trSetLighting("dusk", 1.0);
 		trSoundPlayFN("win.wav","1",-1,"","");
+
+		xsEnableRule("beat_the_game");
+		trQuestVarSet("cinStep", 0);
+		trQuestVarSet("cinTime", 0);
+
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			trUnitDelete(false);
+		}
 		
 		uiLookAtUnitByName(""+bossUnit);
 	}
@@ -10794,6 +10809,69 @@ highFrequency
 				trUnitSelectClear();
 				trUnitSelectByQV("zenophobiaLaser");
 				trSetSelectedScale(amt, amt, 60.0);
+			}
+		}
+	}
+}
+
+rule beat_the_game
+inactive
+highFrequency
+{
+	if (trTime() >= trQuestVarGet("cinTime")) {
+		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
+		switch(1*trQuestVarGet("cinStep"))
+		{
+			case 1:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:Victory is ours!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 2:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:The Void is no more. I never thought I'd see the day this would happen.","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 3:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:Thank you to all my wonderful playtesters for making this map a possibility!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 4:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:You have no idea how much pain and suffering we've gone through to make the release version so smooth.","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 6);
+			}
+			case 5:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:Lost relics, corrupted profiles, oh the horror!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 6:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:So again, thank you to all my playtesters, and thank YOU for playing!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 7:
+			{
+				trSoundPlayFN("","1",-1,"Zenophobia:Until next time!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 3);
+			}
+			case 8:
+			{
+				trUIFadeToColor(0,0,0,1000,0,false);
+				trLetterBox(false);
+				trQuestVarSet("cinTime", trTime() + 2);
+			}
+			case 9:
+			{
+				xsDisableSelf();
+				trQuestVarSet("beatTheGame", 1);
+				saveAllData();
+				for(p=1; < ENEMY_PLAYER) {
+					trSetPlayerWon(p);
+				}
+				trEndGame();
 			}
 		}
 	}

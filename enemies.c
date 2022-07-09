@@ -2263,7 +2263,9 @@ void specialUnitsAlways() {
 		trUnitSelectByID(id);
 		db = databaseName(p);
 		if (trUnitAlive() == false) {
-			trUnitChangeProtoUnit("Argus");
+			if (xGetInt(dArgus, xSpecialStep) > 0) {
+				trUnitChangeProtoUnit("Argus");
+			}
 			xFreeDatabaseBlock(dArgus);
 		} else if (checkEnemyDeactivated(dArgus)) {
 			trUnitOverrideAnimation(-1,0,false,true,-1);

@@ -115,6 +115,8 @@ void saveAllData() {
 	
 	/* class unlock progress */
 	savedata = 0;
+	currentdata = trQuestVarGet("beatTheGame");
+	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("subscribed");
 	savedata = savedata * 2 + currentdata;
 	currentdata = trQuestVarGet("doggoQuestProgress");
@@ -259,6 +261,8 @@ inactive
 	trQuestVarSet("doggoQuestProgress", iModulo(6, savedata));
 	savedata = savedata / 6;
 	trQuestVarSet("subscribed", iModulo(2, savedata));
+	savedata = savedata / 2;
+	trQuestVarSet("beatTheGame", iModulo(2, savedata));
 	savedata = savedata / 2;
 	
 	if ((trCurrentPlayer() == 1) && Multiplayer) {

@@ -192,7 +192,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("If you subscribe, you will get access to cool stuff like custom boss music and icons!");
+					uiMessageBox("You will get access to cool stuff like custom boss music and icons! (Online compatible)");
 				}
 				case 4:
 				{
