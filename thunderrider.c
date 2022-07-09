@@ -1,12 +1,12 @@
-int blitzCooldown = 8;
-float blitzRange = 12;
-float blitzDamage = 80;
+const int blitzCooldown = 8;
+const float blitzRange = 12;
+const float blitzDamage = 80;
 
-int rechargeCooldown = 22;
+const int rechargeCooldown = 22;
 
-float rideLightningDamage = 100;
-float rideLightningRange = 5;
-float rideLightningCost = 5;
+const float rideLightningDamage = 100;
+const float rideLightningRange = 5;
+const float rideLightningCost = 5;
 
 int xThunderRiderPrev = 0;
 int xThunderRiderIndex = 0;

@@ -120,7 +120,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 5:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 9 favor per second.";
+					msg = "(E) Protection (Toggle): Grant all allies invulnerability. Costs 8 favor per second.";
 					if (Multiplayer) {
 						next = 0;
 					} else {
@@ -147,7 +147,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 10:
 				{
 					icon = "icons\improvement rheias gift icons 64";
-					msg = "Cost increases by 0.5 each second while active.";
+					msg = "Cost increases by 0.5 each second while active and decreases by 0.5 each second when inactive.";
 					next = 0;
 				}
 			}
@@ -196,7 +196,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 6:
 				{
 					icon = "icons\special e phoenix icon 64";
-					msg = "Cost: 4 + 0.5 per second | Radius: 5 | Damage: 240";
+					msg = "Cost: 4 + 0.5 per second (Decreases when inactive) | Radius: 5 | Damage: 240";
 					next = 0;
 				}
 				case 7:
@@ -271,7 +271,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				case 9:
 				{
 					icon = "icons\god power implode icons 64";
-					msg = "(E) Ride the Lightning: Become a fast-moving ball of lightning that bounces off walls";
+					msg = "(E) Ride the Lightning (Toggle): Become a fast-moving ball of lightning that bounces off walls";
 				}
 				case 10:
 				{
@@ -282,6 +282,11 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 				{
 					icon = "icons\god power implode icons 64";
 					msg = "Cost: 5 + 0.5 favor per second | Radius: 5 | Damage: 100 + 100 per bounce | Velocity: 2 x Speed";
+				}
+				case 12:
+				{
+					icon = "icons\god power implode icons 64";
+					msg = "Cost and bounce damage resets when the ability is deactivated.";
 					next = 0;
 				}
 			}

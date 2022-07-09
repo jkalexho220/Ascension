@@ -1,9 +1,9 @@
-int icicleCooldown = 5;
-float icicleDuration = 8;
-float icicleDamage = 80;
-float icicleRadius = 2;
-float icicleHealRange = 5;
-float icicleRange = 4;
+const int icicleCooldown = 5;
+const float icicleDuration = 8;
+const float icicleDamage = 80;
+const float icicleRadius = 2;
+const float icicleHealRange = 5;
+const float icicleRange = 4;
 
 int xIciclePos = 0;
 int xIcicleTimeout = 0;
@@ -11,9 +11,9 @@ int xIcicleLast = 0;
 int xIcicleStep = 0;
 int xIcicleRadius = 0;
 
-int titanicImpactCooldown = 24;
-float smashRange = 6;
-float smashWidth = 2;
+const int titanicImpactCooldown = 24;
+const float smashRange = 6;
+const float smashWidth = 2;
 
 int xSmashAngle = 0;
 int xSmashVelocity = 0;
@@ -21,9 +21,9 @@ int xSmashScale = 0;
 int xSmashDir = 0;
 int xSmashTimeout = 0;
 
-int blizzardCost = 80;
-float blizzardDuration = 10;
-float blizzardRadius = 10;
+const int blizzardCost = 80;
+const float blizzardDuration = 10;
+const float blizzardRadius = 10;
 
 int xBlizzardSFX = 0;
 

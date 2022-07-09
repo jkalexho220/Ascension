@@ -1,14 +1,14 @@
 
-float spellstealerPassiveRadius = 6;
+const float spellstealerPassiveRadius = 6;
 
-float bladeDanceCost = 16;
-float bladeDanceRadius = 16;
+const float bladeDanceCost = 16;
+const float bladeDanceRadius = 16;
 
-float negationCloakDuration = 3;
-int negationCloakCooldown = 12;
+const float negationCloakDuration = 3;
+const int negationCloakCooldown = 12;
 
-int spellbladesCooldown = 9;
-int spellbladesCount = 5;
+const int spellbladesCooldown = 9;
+const int spellbladesCount = 5;
 
 int xBladeDanceIndex = 0;
 int xBladeDanceStatus = 0;

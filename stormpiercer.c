@@ -1,14 +1,14 @@
-float rainOfLightningCost = 50;
-float rainOfLightningDuration = 10;
-float rainOfLightningRadius = 5;
+const float rainOfLightningCost = 50;
+const float rainOfLightningDuration = 10;
+const float rainOfLightningRadius = 5;
 
-int disengageCooldown = 10;
-float disengageRadius = 4;
-float disengageRange = 12;
+const int disengageCooldown = 10;
+const float disengageRadius = 4;
+const float disengageRange = 12;
 
-int shockArrowCooldown = 8;
-float shockArrowRange = 30;
-float shockArrowDamage = 100;
+const int shockArrowCooldown = 8;
+const float shockArrowRange = 30;
+const float shockArrowDamage = 100;
 
 int xRainStormSFX = 0;
 

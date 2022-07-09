@@ -1,15 +1,15 @@
-int thunderstrikeCooldown = 12;
-float thunderstrikeRadius = 6;
-float thunderstrikeDamage = 60;
+const int thunderstrikeCooldown = 12;
+const float thunderstrikeRadius = 6;
+const float thunderstrikeDamage = 60;
 
-int hexboltCooldown = 18;
-float hexboltDuration = 6;
-float hexboltRadius = 3;
-float hexboltDamage = 30;
+const int hexboltCooldown = 18;
+const float hexboltDuration = 6;
+const float hexboltRadius = 3;
+const float hexboltDamage = 30;
 
-float vortexCost = 80;
-float vortexRadius = 12;
-float vortexMoveTime = 800; // 1000 * vortexRadius / 15
+const float vortexCost = 80;
+const float vortexRadius = 12;
+const float vortexMoveTime = 800; // 1000 * vortexRadius / 15
 
 int xHex = 0;
 int xBounces = 0;

@@ -1,16 +1,16 @@
-float abductRange = 12;
-int abductCooldown = 15;
+const float abductRange = 12;
+const int abductCooldown = 15;
 
-float deathSentenceDamage = 6;
-float deathSentenceDuration = 6;
-float deathSentenceRadius = 8;
+const float deathSentenceDamage = 6;
+const float deathSentenceDuration = 6;
+const float deathSentenceRadius = 8;
 
-int ariseCooldown = 16;
+const int ariseCooldown = 16;
 
-float nightfallCost = 80;
-float nightfallRadius = 15;
-float nightfallDuration = 12;
-float nightfallDecay = 12;
+const float nightfallCost = 80;
+const float nightfallRadius = 15;
+const float nightfallDuration = 12;
+const float nightfallDecay = 12;
 
 int xDeathSentenceIndex = 0;
 int xDeathSentenceTimeout = 0;

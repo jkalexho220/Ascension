@@ -1,16 +1,16 @@
-float seedHeal = 30;
-float seedDuration = 15;
+const float seedHeal = 30;
+const float seedDuration = 15;
 
-int bloodbloomCooldown = 15;
+const int bloodbloomCooldown = 15;
 
-int stranglethornsCooldown = 12;
-float stranglethornsRange = 6;
-float stranglethornsRadius = 3;
-float stranglethornsDuration = 3;
-float stranglethornsDamage = 20;
+const int stranglethornsCooldown = 12;
+const float stranglethornsRange = 6;
+const float stranglethornsRadius = 3;
+const float stranglethornsDuration = 3;
+const float stranglethornsDamage = 20;
 
-float natureBountyCost = 70;
-float natureBountyDuration = 12;
+const float natureBountyCost = 70;
+const float natureBountyDuration = 12;
 
 int xSeedReadyTime = 0;
 int xSeedTimeout = 0;

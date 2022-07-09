@@ -1,18 +1,18 @@
 
-int flamingImpactCooldown = 12;
-float flamingImpactDamage = 90;
-float flamingImpactRange = 4;
+const int flamingImpactCooldown = 12;
+const float flamingImpactDamage = 90;
+const float flamingImpactRange = 4;
 
-int overheatCooldown = 18;
-float overheatDuration = 6;
-float overheatDamage = 40;
-float overheatRadius = 4;
+const int overheatCooldown = 18;
+const float overheatDuration = 6;
+const float overheatDamage = 40;
+const float overheatRadius = 4;
 
-float infernoDuration = 8;
-float infernoRange = 12;
-float infernoDamage = 120;
-float infernoHeal = 60;
-float infernoCost = 70;
+const float infernoDuration = 8;
+const float infernoRange = 12;
+const float infernoDamage = 120;
+const float infernoHeal = 60;
+const float infernoCost = 70;
 
 int xFireKnightPhoenix = 0;
 int xFireKnightCharging = 0;

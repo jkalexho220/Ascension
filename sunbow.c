@@ -1,12 +1,16 @@
-int sunlightCooldown = 18;
-float sunlightRadius = 6;
-float sunlightDuration = 6;
-float sunlightPower = 60;
+const int sunlightCooldown = 18;
+const float sunlightRadius = 6;
+const float sunlightDuration = 6;
+const float sunlightPower = 60;
 
-int smitingRaysCooldown = 12;
-float smitingRaysPower = 60;
-float smitingRaysDuration = 9;
-float smitingRaysRange = 16;
+const int smitingRaysCooldown = 12;
+const float smitingRaysPower = 60;
+const float smitingRaysDuration = 9;
+const float smitingRaysRange = 16;
+
+const float lightwingDamage = 240;
+const float lightwingDuration = 15;
+const float lightwingCost = 4;
 
 int xSunlightRadius = 0;
 int xSunlightDamage = 0;
@@ -22,10 +26,6 @@ int xSmitingHeal = 0;
 int xSmitingDB = 0;
 int xSmitingIndex = 0;
 int xSmitingSFX = 0;
-
-int lightwingDamage = 240;
-int lightwingDuration = 15;
-int lightwingCost = 4;
 
 void removeSunbow(int p = 0) {
 	if (trQuestVarGet("p"+p+"lightwing") == 1) {
@@ -56,6 +56,8 @@ void lightwingOff(int p = 0) {
 	equipRelicsAgain(p);
 	xSetInt(dPlayerData, xPlayerFirstDelay, xGetInt(dClass, xClassFirstDelay, SUNBOW));
 	xSetInt(dPlayerData, xPlayerNextDelay, xGetInt(dClass, xClassNextDelay, SUNBOW));
+
+	trQuestVarSet("p"+p+"lightwingNext", trTimeMS());
 
 	for(x=xGetDatabaseCount(sunlights); >0) {
 		xDatabaseNext(sunlights);
@@ -298,6 +300,23 @@ void sunbowAlways(int eventID = -1) {
 				lightwingOff(p);
 			}
 		}
+	} else {
+		amt = trTimeMS() - trQuestVarGet("p"+p+"lightwingNext");
+		dist = lightwingCost * xGetFloat(dPlayerData, xPlayerUltimateCost);
+		trQuestVarSet("p"+p+"lightwingNext", trTimeMS());
+		if (trQuestVarGet("p"+p+"lightwingCost") > dist) {
+			trQuestVarSet("p"+p+"lightwingCost", xsMax(dist, trQuestVarGet("p"+p+"lightwingCost") - 0.0005 * amt));
+		}
+	}
+
+	if (trCurrentPlayer() == p) {
+		amt = trQuestVarGet("p"+p+"lightwingCost");
+		target = 100*fModulo(1.0, amt);
+		if (target < 10) {
+			trSetCounterDisplay("Lightwing Cost: " + (1*amt) + ".0" + target);
+		} else {
+			trSetCounterDisplay("Lightwing Cost: " + (1*amt) + "." + target);
+		}
 	}
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
@@ -305,7 +324,6 @@ void sunbowAlways(int eventID = -1) {
 		trQuestVarSet("p"+p+"lightwing", 1 - trQuestVarGet("p"+p+"lightwing"));
 		if (trQuestVarGet("p"+p+"lightwing") == 1) {
 			trSoundPlayFN("cinematics\32_out\doorseal.mp3","1",-1,"","");
-			trQuestVarSet("p"+p+"lightwingCost", lightwingCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			xSetBool(dPlayerData, xPlayerLaunched, true);
 			for(x=xGetDatabaseCount(relics); >0) {
 				xDatabaseNext(relics);
@@ -443,6 +461,7 @@ void chooseSunbow(int eventID = -1) {
 	xSetInt(dPlayerData,xPlayerRainCooldown,2);
 	xSetFloat(dPlayerData,xPlayerRainCost, lightwingCost);
 	
+	trQuestVarSet("p"+p+"lightwingCost", lightwingCost);
 	
 	if (trQuestVarGet("p"+p+"sunlights") == 0) {
 		db = xInitDatabase("p"+p+"sunlights");

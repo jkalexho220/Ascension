@@ -7,7 +7,7 @@ const int crescentCooldown = 12;
 const float crescentCount = 3;
 const float crescentDamage = 50;
 
-const float protectionCost = 9;
+const float protectionCost = 8;
 
 int xCrescentCount = 0;
 int xCrescentTimeout = 0;
@@ -25,6 +25,13 @@ int xMoonbeamEnd = 0;
 
 void removeMoonblade(int p = 0) {
 	removePlayerSpecific(p);
+}
+
+void protectionOff(int p = 0) {
+	trQuestVarSet("p"+p+"protection", 0);
+	trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);
+	trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+	trQuestVarSet("p"+p+"protectionNext", trTimeMS());
 }
 
 void moonbladeAlways(int eventID = -1) {
@@ -149,8 +156,8 @@ void moonbladeAlways(int eventID = -1) {
 				}
 				trQuestVarSet("p"+p+"protection", 0);
 			} else {
+				trQuestVarSet("p"+p+"protectionNext", trTimeMS());
 				trQuestVarSet("protectionCount", 1 + trQuestVarGet("protectionCount"));
-				trQuestVarSet("p"+p+"protectionCost", protectionCost * xGetFloat(dPlayerData, xPlayerUltimateCost));
 				trQuestVarSet("p"+p+"protectionNext", trTimeMS());
 				trSoundPlayFN("bronzebirth.wav","1",-1,"","");
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
@@ -165,10 +172,7 @@ void moonbladeAlways(int eventID = -1) {
 				}
 			}
 		} else {
-			trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);
-			if (trCurrentPlayer() == p) {
-				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
-			}
+			protectionOff(p);
 		}
 	}
 	
@@ -239,10 +243,25 @@ void moonbladeAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"protectionCost", trQuestVarGet("p"+p+"protectionCost") + 0.0005 * amt * xGetFloat(dPlayerData, xPlayerUltimateCost));
 			gainFavor(p, 0.0 - 1);
 			if (trPlayerResourceCount(p, "favor") < 1) {
-				trQuestVarSet("p"+p+"protection", 0);
-				trQuestVarSet("protectionCount", trQuestVarGet("protectionCount") - 1);
-				trSoundPlayFN("godpowerfailed.wav","1",-1,"","");
+				protectionOff(p);
 			}
+		}
+	} else {
+		amt = trTimeMS() - trQuestVarGet("p"+p+"protectionNext");
+		dist = protectionCost * xGetFloat(dPlayerData, xPlayerUltimateCost);
+		trQuestVarSet("p"+p+"protectionNext", trTimeMS());
+		if (trQuestVarGet("p"+p+"protectionCost") > dist) {
+			trQuestVarSet("p"+p+"protectionCost", xsMax(dist, trQuestVarGet("p"+p+"protectionCost") - 0.0005 * amt));
+		}
+	}
+
+	if (trCurrentPlayer() == p) {
+		amt = trQuestVarGet("p"+p+"protectionCost");
+		target = 100*fModulo(1.0, amt);
+		if (target < 10) {
+			trSetCounterDisplay("Protection Cost: " + (1*amt) + ".0" + target);
+		} else {
+			trSetCounterDisplay("Protection Cost: " + (1*amt) + "." + target);
 		}
 	}
 	xSetPointer(dEnemies, index);
@@ -273,6 +292,8 @@ void chooseMoonblade(int eventID = -1) {
 	xSetFloat(dPlayerData,xPlayerLureCost,0);
 	xSetInt(dPlayerData,xPlayerRainCooldown,1);
 	xSetFloat(dPlayerData,xPlayerRainCost, 0);
+
+	trQuestVarSet("p"+p+"protectionCost", protectionCost);
 	
 	xCrescentCount = xInitAddInt(db, "crescentCount");
 	xCrescentTimeout = xInitAddInt(db, "crescentTimeout");

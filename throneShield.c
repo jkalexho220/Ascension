@@ -1,14 +1,14 @@
 
-int vowCooldown = 10;
+const int vowCooldown = 10;
 
-int justiceCooldown = 10;
-float justiceRadius = 8;
+const int justiceCooldown = 10;
+const float justiceRadius = 8;
 
-float shieldOfLightCost = 60;
-int shieldOfLightCooldown = 20;
-float shieldOfLightDuration = 9;
-float shieldOfLightWidth = 3;
-float shieldOfLightRadius = 20;
+const float shieldOfLightCost = 60;
+const int shieldOfLightCooldown = 20;
+const float shieldOfLightDuration = 9;
+const float shieldOfLightWidth = 3;
+const float shieldOfLightRadius = 20;
 
 int xThroneShieldSFX = 0;
 int xThroneShieldAbsorbed = 0;

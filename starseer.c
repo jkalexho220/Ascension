@@ -1,15 +1,15 @@
-float starBaseDamage = 50;
+const float starBaseDamage = 50;
 
-int realignCooldown = 5;
-float realignRadius = 15;
+const int realignCooldown = 5;
+const float realignRadius = 15;
 
-int RepelCooldown = 15;
-float RepelRange = 15;
+const int RepelCooldown = 15;
+const float RepelRange = 15;
 
-float eventHorizonCost = 60;
-float eventHorizonDuration = 10;
+const float eventHorizonCost = 60;
+const float eventHorizonDuration = 10;
 
-float starAngularVelocity = 1.570796; // 6.283185 / 4.0
+const float starAngularVelocity = 1.570796; // 6.283185 / 4.0
 
 int xStarseerStar = 0;
 int xStarseerMeteorite = 0;

@@ -1,23 +1,23 @@
 
-float empoweredDamage = 90;
-float empoweredRadius = 4;
+const float empoweredDamage = 90;
+const float empoweredRadius = 4;
 
-float starDuration = 10;
-float starRadius = 4;
-float starDamage = 10;
+const float starDuration = 10;
+const float starRadius = 4;
+const float starDamage = 10;
 
-int starfallCooldown = 8;
-float starfallRadius = 4;
-float starfallDamage = 120;
+const int starfallCooldown = 8;
+const float starfallRadius = 4;
+const float starfallDamage = 120;
 
-float solarFlareDamage = 100;
-float solarFlareRange = 40;
-float solarFlareCost = 50;
+const float solarFlareDamage = 100;
+const float solarFlareRange = 40;
+const float solarFlareCost = 50;
 
-float missileDamage = 60;
-float missileAcquireRange = 12;
-int missileCooldown = 12;
-int missileLifespan = 8000;
+const float missileDamage = 60;
+const float missileAcquireRange = 12;
+const int missileCooldown = 12;
+const int missileLifespan = 8000;
 
 int xStarfire = 0;
 

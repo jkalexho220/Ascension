@@ -13,12 +13,12 @@ int xDuplicateDecayNext = 0;
 int xNextPotion = 0;
 
 
-float potionHeal = 5;
+const float potionHeal = 5;
 
-int elixirCooldown = 12;
-float elixirHeal = 200;
+const int elixirCooldown = 12;
+const float elixirHeal = 200;
 
-float duplicateCost = 50;
+const float duplicateCost = 50;
 
 void removeAlchemist(int p = 0) {
 	removePlayerSpecific(p);

@@ -1,15 +1,15 @@
-int guardianAngelCooldown = 8;
-float guardianAngelHeal = 50;
-float guardianAngelRange = 10;
+const int guardianAngelCooldown = 8;
+const float guardianAngelHeal = 50;
+const float guardianAngelRange = 10;
 
-int unityCooldown = 20;
-float unityRadius = 10;
-float unityDuration = 8;
-float unityBonus = 0.5;
-float unityHeal = 0.5;
+const int unityCooldown = 20;
+const float unityRadius = 10;
+const float unityDuration = 8;
+const float unityBonus = 0.5;
+const float unityHeal = 0.5;
 
-float interventionCost = 100;
-int interventionCooldown = 10;
+const float interventionCost = 100;
+const int interventionCooldown = 10;
 
 int xJumping = 0;
 

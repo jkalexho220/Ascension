@@ -1,10 +1,10 @@
-int shrapnelCooldown = 10;
+const int shrapnelCooldown = 10;
 
-int echoBombCooldown = 20;
-float echoBombDuration = 6;
-float echoBombRadius = 12;
+const int echoBombCooldown = 20;
+const float echoBombDuration = 6;
+const float echoBombRadius = 12;
 
-float minigunRange = 1.5;
+const float minigunRange = 1.5;
 
 int xShotgunHitboxStartPos = 0;
 int xShotgunHitboxStartTime = 0;

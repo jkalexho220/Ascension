@@ -193,7 +193,7 @@ void checkGodPowers(int p = 0) {
 				xSetBool(dPlayerData, xPlayerWellActivated, true, p);
 				xSetInt(dPlayerData, xPlayerWellCooldownStatus, ABILITY_COOLDOWN, p);
 				xSetInt(dPlayerData, xPlayerWellReadyTime,
-					trTimeMS() + 1000 * xGetInt(dPlayerData,xPlayerWellCooldown,p) * xGetFloat(dPlayerData,xPlayerCooldownReduction,p), p);
+					trTimeMS() + xGetFloat(dPlayerData,xPlayerCooldownReduction,p) * 1000 * xGetInt(dPlayerData,xPlayerWellCooldown,p), p);
 				if (trCurrentPlayer() == p) {
 					trCounterAbort("well");
 					trCounterAddTime("well",
@@ -236,7 +236,7 @@ void checkGodPowers(int p = 0) {
 				xSetBool(dPlayerData, xPlayerRainActivated, true, p);
 				xSetInt(dPlayerData, xPlayerRainCooldownStatus, ABILITY_COOLDOWN, p);
 				xSetInt(dPlayerData, xPlayerRainReadyTime,
-					trTimeMS() + 1000 * xGetInt(dPlayerData,xPlayerRainCooldown,p) * xGetFloat(dPlayerData,xPlayerCooldownReduction,p), p);
+					trTimeMS() + xGetFloat(dPlayerData,xPlayerCooldownReduction,p) * 1000 * xGetInt(dPlayerData,xPlayerRainCooldown,p), p);
 				if (trCurrentPlayer() == p) {
 					trCounterAbort("Rain");
 					trCounterAddTime("Rain",
@@ -280,7 +280,7 @@ void checkGodPowers(int p = 0) {
 				xSetBool(dPlayerData, xPlayerLureActivated, true, p);
 				xSetInt(dPlayerData, xPlayerLureCooldownStatus, ABILITY_COOLDOWN, p);
 				xSetInt(dPlayerData, xPlayerLureReadyTime,
-					trTimeMS() + 1000 * xGetInt(dPlayerData,xPlayerLureCooldown,p) * xGetFloat(dPlayerData,xPlayerCooldownReduction,p), p);
+					trTimeMS() + xGetFloat(dPlayerData,xPlayerCooldownReduction,p) * 1000 * xGetInt(dPlayerData,xPlayerLureCooldown,p), p);
 				if (trCurrentPlayer() == p) {
 					trCounterAbort("Lure");
 					trCounterAddTime("Lure",
