@@ -10410,6 +10410,13 @@ highFrequency
 				zInitProtoUnitStat("Rocket", 1, 1, 30);
 
 				xsEnableRule("void_battle");
+
+				trQuestVarSet("reviveCount", trQuestVarGet("reviveCount") + trQuestVarGet("deadPlayerCount"));
+				for(p=1; < ENEMY_PLAYER) {
+					if (xGetInt(dPlayerData, xPlayerDead, p) > 0) {
+						revivePlayer(p);
+					}
+				}
 			}
 		}
 	}
