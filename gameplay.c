@@ -3,34 +3,6 @@ void removeCamTracks(int eventID = -1) {
 	trUnblockAllSounds();
 }
 
-void everythingOff(int p = 0) {
-	switch(xGetInt(dPlayerData, xPlayerClass, p)) 
-	{
-		case SPELLSTEALER:
-		{
-			xClearDatabase(1*trQuestVarGet("p"+p+"bladeDanceTargets"));
-		}
-		case SUNBOW:
-		{
-			if (trQuestVarGet("p"+p+"lightwing") == 1) {
-				lightwingOff(p);
-			}
-		}
-		case THUNDERRIDER:
-		{
-			if (trQuestVarGet("p"+p+"rideLightning") == 1) {
-				rideLightningOff(p);
-			}
-		}
-		case MOONBLADE:
-		{
-			if (trQuestVarGet("p"+p+"protection") == 1) {
-				protectionOff(p);
-			}
-		}
-	}
-}
-
 void fixAnimations(int p = 0) {
 	/*
 	Prevent hip-thrusting heroes from invisible relic holding
