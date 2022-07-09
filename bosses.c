@@ -9053,6 +9053,9 @@ highFrequency
 			case 1:
 			{
 				trQuestVarSet("play", 0);
+				for(p=1; < ENEMY_PLAYER) {
+					everythingOff(p);
+				}
 				trSoundPlayFN("","1",-1,"The Last God:At last, I rest. You... are worthy of the Starsword.");
 				trQuestVarSet("cinTime", trTime() + 4);
 				bossUnit = trGetNextUnitScenarioNameNumber();
@@ -9725,12 +9728,7 @@ highFrequency
 							xSetVector(dDuelists, xDuelistPos, kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true));
 
 							xClearDatabase(getCharactersDB(p));
-							trQuestVarSet("p"+p+"rideLightning", 0);
-							trQuestVarSet("p"+p+"lightwing", 0);
-							trQuestVarSet("p"+p+"nightfall", 0);
-							if (xGetInt(dPlayerData, xPlayerClass) == SPELLSTEALER) {
-								xClearDatabase(1*trQuestVarGet("p"+p+"bladeDanceTargets"));
-							}
+							everythingOff(p);
 							pos = trVectorQuestVarGet("p"+p+"arena");
 							paintNightmareCircle(pos, 1*trQuestVarGet("rand"));
 							pos = gridToVector(pos);
@@ -9804,6 +9802,9 @@ highFrequency
 					}
 				} else if (trTimeMS() > bossTimeout) {
 					worldHeight = 13;
+					for(p=1; < ENEMY_PLAYER) {
+						everythingOff(p);
+					}
 					xClearDatabase(dPlayerCharacters);
 					trUnitSelectClear();
 					trUnitSelect(""+bossUnit, true);
@@ -10121,6 +10122,9 @@ highFrequency
 		{
 			case 2:
 			{
+				for(p=1; < ENEMY_PLAYER) {
+					everythingOff(p);
+				}
 				dValkyrieProj = initGenericProj("valkyrieProj",kbGetProtoUnitID("Valkyrie"),15,30,4.5,0,0);
 				dNickLaunches = xInitDatabase("nickLaunches");
 				xInitAddInt(dNickLaunches, "name");
