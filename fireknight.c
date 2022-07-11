@@ -289,7 +289,7 @@ void fireknightAlways(int eventID = -1) {
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
 				xUnitSelectByID(db, xUnitID);
-				damagePlayerUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage), xGetInt(db, xCharIndex));
+				trDamageUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
 				
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);

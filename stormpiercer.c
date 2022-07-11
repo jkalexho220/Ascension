@@ -213,7 +213,7 @@ void stormpiercerAlways(int eventID = -1) {
 					}
 					damageEnemy(p,
 						shockArrowDamage * xGetFloat(dPlayerData, xPlayerSpellDamage) * (1.0 + 0.04 * xGetFloat(shockArrows, xShockArrowDist)));
-					if (trUnitAlive()) {
+					if (trUnitAlive() && (xGetBool(dEnemies, xLaunched) == false)) {
 						xAddDatabaseBlock(spearedUnits, true);
 						xSetInt(spearedUnits, xUnitName, xGetInt(dEnemies, xUnitName));
 						xSetInt(spearedUnits, xSpearedIndex, xGetPointer(dEnemies));

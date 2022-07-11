@@ -265,6 +265,14 @@ void monsterpedia(int stage = 0, int x = 0) {
 			trStringQuestVarSet("enemyProto5", "Titan Atlantean");
 			bossScale = 1.2;
 		}
+		case 10:
+		{
+			tPrimary = 0;
+			tSubPrimary = 53;
+			trStringQuestVarSet("enemyProto1", "Argus");
+			trStringQuestVarSet("enemyProto2", "Guardian XP");
+			trStringQuestVarSet("enemyProto3", "Titan Kronos");
+		}
 	}
 	trPaintTerrain(x, 90, x+3, 101, tPrimary, tSubPrimary, false);
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
@@ -272,23 +280,46 @@ void monsterpedia(int stage = 0, int x = 0) {
 	trUnitSelectClear();
 	trUnitSelectByQV("next", true);
 	trUnitSetAnimationPath(""+(stage-1)+",0,0,0,0,0,0");
-	for(i=1; < 6) {
-		trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
-		trArmyDispatch("1,0","Dwarf",1,2*x+3,0,181+4*i,180,true);
-		trArmySelect("1,0");
-		trUnitConvert(0);
-		trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
-		xAddDatabaseBlock(dMonsterpedia, true);
-		xSetInt(dMonsterpedia, xUnitName, 1*trQuestVarGet("next"));
-		if (i < 5) {
-			xSetInt(dMonsterpedia,xMonsterIndex, 4 * (stage - 1) + i - 1);
-		} else {
-			xSetInt(dMonsterpedia, xMonsterIndex, -1);
+	if (stage < 10) {
+		for(i=1; < 6) {
+			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,2*x+3,0,181+4*i,180,true);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
+			xAddDatabaseBlock(dMonsterpedia, true);
+			xSetInt(dMonsterpedia, xUnitName, 1*trQuestVarGet("next"));
+			if (i < 5) {
+				xSetInt(dMonsterpedia,xMonsterIndex, 4 * (stage - 1) + i - 1);
+			} else {
+				xSetInt(dMonsterpedia, xMonsterIndex, -1);
+			}
+		}
+		trUnitSelectClear();
+		trUnitSelectByQV("next");
+		trSetSelectedScale(bossScale,bossScale,bossScale);
+		if (stage == 9) {
+			xUnitSelect(dMonsterpedia, xUnitName);
+			trUnitSetAnimationPath("3,0,0,0,0,0,0");
+			trUnitOverrideAnimation(2,0,true,false,-1);
+			trUnitOverrideAnimation(2,-1,true,false,-1);
+		}
+	} else {
+		for(i=1; <= 3) {
+			trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("1,0","Dwarf",1,2*x+3,0,177+8*i,180,true);
+			trArmySelect("1,0");
+			trUnitConvert(0);
+			trUnitChangeProtoUnit(trStringQuestVarGet("enemyProto"+i));
+			xAddDatabaseBlock(dMonsterpedia, true);
+			xSetInt(dMonsterpedia, xUnitName, 1*trQuestVarGet("next"));
+			if (i == 1) {
+				xSetInt(dMonsterpedia,xMonsterIndex, 4 * (stage - 1) + i - 1);
+			} else {
+				xSetInt(dMonsterpedia, xMonsterIndex, -1);
+			}
 		}
 	}
-	trUnitSelectClear();
-	trUnitSelectByQV("next");
-	trSetSelectedScale(bossScale,bossScale,bossScale);
 }
 
 void answerQuestion(int eventID = -1) {
@@ -667,7 +698,7 @@ highFrequency
 			xInitAddInt(dMonsterpedia, "name");
 			xMonsterIndex = xInitAddInt(dMonsterpedia, "index");
 			/* 72 is the center. 15 is the width */
-			for(x=0; < xGetInt(dPlayerData, xPlayerProgress)) {
+			for(x=0; < xGetInt(dPlayerData, xPlayerProgress) + trQuestVarGet("beatTheGame")) {
 				monsterpedia(x+1, 57 + 3 * x);
 			}
 			trPaintTerrain(71,71,73,87,0,53,false);
@@ -685,16 +716,6 @@ highFrequency
 						trUnitSelectByQV("monsterpediaSpotlight");
 						trUnitTeleport(xsVectorGetX(pos),0,xsVectorGetZ(pos));
 						break;
-					}
-				}
-			}
-			if (xGetInt(dPlayerData, xPlayerProgress) >= 9) {
-				for(i=xGetDatabaseCount(dMonsterpedia); >0) {
-					xDatabaseNext(dMonsterpedia, true);
-					if (kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(dMonsterpedia, xUnitName), true)) == kbGetProtoUnitID("Titan Atlantean")) {
-						trUnitSetAnimationPath("3,0,0,0,0,0,0");
-						trUnitOverrideAnimation(2,0,true,false,-1);
-						trUnitOverrideAnimation(2,-1,true,false,-1);
 					}
 				}
 			}
@@ -1417,6 +1438,10 @@ highFrequency
 			{
 				desc("Fires a massive fireball that explodes on contact with walls, releasing smaller fireballs.");
 			}
+			case kbGetProtoUnitID("Argus"):
+			{
+				desc("Its special attack will apply stun, silence, and poison for 6 seconds to its target.");
+			}
 			case kbGetProtoUnitID("Nemean Lion"):
 			{
 				name = "The King of Beasts";
@@ -1488,6 +1513,19 @@ highFrequency
 				desc("Common Relic: " + relicName(19));
 				desc("He releases devastating fire attacks. Make sure to dodge them!");
 				desc("Tartarian Gates will also appear and spawn enemies. Destroy them with haste.");
+			}
+			case kbGetProtoUnitID("Guardian XP"):
+			{
+				name = "The Last God";
+				desc("The Last God to wield the Starsword.");
+				desc("He can summon clones of himself which can also cast devastating spells.");
+				desc("If he has enough clones, he will perform the Laser Carousel attack.");
+				desc("Hide behind units to avoid damage!");
+			}
+			case kbGetProtoUnitID("Titan Kronos"):
+			{
+				name = "The Void";
+				desc("A mysterious entity that threatens the world.");
 			}
 		}
 		uiClearSelection();

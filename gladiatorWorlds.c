@@ -6,7 +6,6 @@ int dPillars = 0;
 int dBigBang = 0;
 
 int dMouthOfChaos = 0;
-int bullshitProj = 0;
 
 int dRevealerShots = 0;
 int xRevealerShotPos = 0;

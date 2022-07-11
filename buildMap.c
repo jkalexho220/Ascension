@@ -2431,8 +2431,17 @@ highFrequency
 					paintEnemies(x0, z0, x1, z1);
 					trQuestVarSetFromRand("key", 1, 14, true);
 					for(j=trQuestVarGet("key"); >0) {
-						room = xDatabaseNext(dBasicRooms);
+						xDatabaseNext(dBasicRooms);
 					}
+					for(j=xGetDatabaseCount(dBasicRooms); >0) {
+						if (trQuestVarGet("room"+xGetInt(dBasicRooms, xRoomNumber)) != ROOM_CHEST) {
+							break;
+						} else {
+							debugLog("Room was a chest room! Moving on!");
+							xDatabaseNext(dBasicRooms);
+						}
+					}
+					room = xGetInt(dBasicRooms, xRoomNumber);
 					pos = trVectorQuestVarGet("room"+room+"bottom1");
 					x0 = xsVectorGetX(pos);
 					z0 = xsVectorGetZ(pos);
@@ -3099,6 +3108,10 @@ highFrequency
 		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 27, -200);
 		trModifyProtounit("Guardian XP", ENEMY_PLAYER, 29, -2000);
 
+		trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+		trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+		trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 36000 * ENEMY_PLAYER);
+
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 9999999999999999999.0);
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, -9999999999999999999.0);
 		trModifyProtounit("Titan Kronos", ENEMY_PLAYER, 0, 40000 * ENEMY_PLAYER);
@@ -3145,7 +3158,7 @@ highFrequency
 		trChangeTerrainHeight(57, 57, 87, 87, 13.0, false);
 
 		// southeast slope, made of black rock
-		for(a=37; < 107) {
+		for(a=43; < 98) {
 			for(b=37; < 57) {
 				if (b <= a && b <= 145 - a && 80 < a + b) {
 					x = a;

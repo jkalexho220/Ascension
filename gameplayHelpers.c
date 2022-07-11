@@ -525,25 +525,26 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
 			}
 		}
-	} else if (trTimeMS() + duration > xGetInt(db, xPoisonTimeout)) {
-		if (xGetInt(db, xPoisonStatus) == 0) {
-			if (xGetInt(db, xPoisonSFX) == 0) {
-				spyEffect(xGetInt(db, xUnitName), kbGetProtoUnitID("Poison SFX"), xsVectorSet(db,xPoisonSFX,xGetPointer(db)));
-			} else {
-				trUnitSelectClear();
-				trUnitSelect(""+xGetInt(db,xPoisonSFX), true);
-				trMutateSelected(kbGetProtoUnitID("Poison SFX"));
+	} else {
+		if (trTimeMS() + duration > xGetInt(db, xPoisonTimeout)) {
+			if (xGetInt(db, xPoisonStatus) == 0) {
+				if (xGetInt(db, xPoisonSFX) == 0) {
+					spyEffect(xGetInt(db, xUnitName), kbGetProtoUnitID("Poison SFX"), xsVectorSet(db,xPoisonSFX,xGetPointer(db)));
+				} else {
+					trUnitSelectClear();
+					trUnitSelect(""+xGetInt(db,xPoisonSFX), true);
+					trMutateSelected(kbGetProtoUnitID("Poison SFX"));
+				}
+				xSetInt(db,xPoisonStatus,1);
+				xSetInt(db,xPoisonLast,trTimeMS());
+				trQuestVarSet("poisonSound", 1);
 			}
-			xSetInt(db,xPoisonStatus,1);
-			xSetInt(db,xPoisonLast,trTimeMS());
-			trQuestVarSet("poisonSound", 1);
+			xSetInt(db, xPoisonTimeout, trTimeMS() + duration);
 		}
-		xSetInt(db, xPoisonTimeout, trTimeMS() + duration);
 		if (damage > xGetFloat(db, xPoisonDamage)) {
-			xSetFloat(db, xPoisonDamage, damage);
+			xSetFloat(db, xPoisonDamage, xsMin(1000.0, damage));
 		}
 	}
-	
 }
 
 
@@ -816,6 +817,7 @@ void stunsAndPoisons(int db = 0) {
 		float amt = trTimeMS() - xGetInt(db, xPoisonLast);
 		if (trTimeMS() > xGetInt(db, xPoisonTimeout)) {
 			xSetInt(db, xPoisonStatus, 0);
+			xSetFloat(db, xPoisonDamage, 0);
 			xUnitSelect(db, xPoisonSFX);
 			trMutateSelected(kbGetProtoUnitID("Rocket"));
 		} else if (amt > 500) {
@@ -924,7 +926,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 				}
 				/* simp benefits */
 				if (simp > 0) {
-					simp = trQuestVarGet("p"+simp+"characters");
+					simp = getCharactersDB(simp);
 					for(x=xGetDatabaseCount(simp); >0) {
 						xDatabaseNext(simp);
 						xSetInt(simp, xCharSpecialAttack, xGetInt(simp, xCharSpecialAttack) - 1);

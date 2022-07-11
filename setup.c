@@ -553,7 +553,7 @@ highFrequency
 	setupClass("Lancer Hero", FIREKNIGHT, 1155, 1500, MANASTONE, 5);
 	setupClass("Hero Greek Achilles", NIGHTRIDER, 470, 1000, SOULSTONE, 7);
 	setupClass("Priest", BLASTMAGE, 500, 800, STARSTONE);
-	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE, 8);
+	setupClass("Oracle Hero", STARSEER, 540, 1500, STARSTONE);
 	setupClass("Archer Atlantean Hero", STORMPIERCER, 400, 1000, MANASTONE);
 	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
 	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
@@ -1104,6 +1104,10 @@ int monsterPetProto(int i = 0) {
 		case 35:
 		{
 			proto = kbGetProtoUnitID("Fire Giant");
+		}
+		case 36:
+		{
+			proto = kbGetProtoUnitID("Argus");
 		}
 	}
 	return(proto);

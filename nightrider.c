@@ -218,7 +218,7 @@ void nightriderAlways(int eventID = -1) {
 					xUnitSelectByID(dEnemies, xUnitID);
 					if (trUnitAlive() == false) {
 						removeEnemy();
-					} else if (xGetBool(dEnemies, xLaunched) == false) {
+					} else if ((xGetBool(dEnemies, xLaunched) == false) || (xGetInt(dEnemies, xUnitName) == bossUnit)) {
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 						current = distanceBetweenVectors(prev, pos, false);
 						if (current < dist) {

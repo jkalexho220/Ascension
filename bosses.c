@@ -1,5 +1,7 @@
 const int BOSS_SPELL_COOLDOWN = -1;
 
+int bullshitProj = 0;
+
 void everythingOff(int p = 0) {
 	switch(xGetInt(dPlayerData, xPlayerClass, p)) 
 	{
@@ -28,9 +30,6 @@ void everythingOff(int p = 0) {
 	}
 }
 
-void yeebMusicLoop(int eventID = -1) {
-	trSoundPlayFN("Zenophobia\Death track loop.mp3","1",7047,"","");
-}
 
 void bossCooldown(int minVal = 0, int maxVal = 0) {
 	trQuestVarSet("bossSpell", BOSS_SPELL_COOLDOWN);
@@ -155,8 +154,9 @@ highFrequency
 				trLetterBox(false);
 				trQuestVarSet("yeebNext", trTime() + 3);
 				if (customContent) {
-					trEventSetHandler(7047, "yeebMusicLoop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+					xsEnableRule("death_track_loop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					xsEnableRule("boss_music");
 					trQuestVarSet("musicTime", trTime());
@@ -306,7 +306,7 @@ inactive
 				case 8:
 				{
 					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 0.1);
-					trQuestVarSet("musicTime", trTime() + 360);
+					trQuestVarSet("musicTime", trTime() + 72);
 				}
 				case 9:
 				{
@@ -2989,8 +2989,9 @@ highFrequency
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trLetterBox(false);
 				if (customContent) {
-					trEventSetHandler(7047, "yeebMusicLoop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+					xsEnableRule("death_track_loop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					xsEnableRule("boss_music");
 					trQuestVarSet("musicTime", trTime());
@@ -3924,6 +3925,7 @@ highFrequency
 	} else {
 		xsDisableSelf();
 		xsDisableRule("boss_music");
+		xsDisableRule("death_track_loop");
 		xsEnableRule("yeebaagooon_ded");
 		
 		trMusicStop();
@@ -4048,11 +4050,12 @@ highFrequency
 				xsEnableRule("yeebaagooon_battle");
 				bossCooldown(10, 12);
 				if (customContent) {
-					trEventSetHandler(7047, "yeebMusicLoop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",7047,"","");
+					xsEnableRule("death_track_loop");
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
-					xsEnableRule("boss_music");
 					trQuestVarSet("musicTime", trTime());
+					xsEnableRule("boss_music");
 				}
 				trVectorQuestVarSet("yeebDir", vector(1,0,0));
 				trQuestVarSet("yeebLightningNext", trTimeMS());
@@ -4178,6 +4181,16 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("yeebaagooon");
 		trUnitChangeProtoUnit("Cinematic Block");
+	}
+}
+
+rule death_track_loop
+inactive
+highFrequency
+{
+	if (trTimeMS() >= trQuestVarGet("musicTime")) {
+		trQuestVarSet("musicTime", trTimeMS() + 105000);
+		trSoundPlayFN("Zenophobia\Death track loop.mp3","1",-1,"","");
 	}
 }
 
@@ -5462,7 +5475,7 @@ highFrequency
 					bossNext = trTimeMS() + 2000;
 					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("0,0");
-					trUnitChangeProtoUnit("Recreation");
+					trUnitChangeProtoUnit("Qilin Heal");
 				}
 
 				trQuestVarSet("bossSpell", 22);
@@ -8360,6 +8373,7 @@ highFrequency
 	int z = 0;
 	int action = 0;
 	int id = 0;
+	int target = 0;
 	float amt = 0;
 	float angle = 0;
 	float dist = 0;
@@ -8376,7 +8390,7 @@ highFrequency
 	vector dir = vector(0,0,0);
 	
 	if (trUnitAlive() == true) {
-
+		trDamageUnitPercent(100);
 		for(i=xGetDatabaseCount(dBlossoms); >0) {
 			xDatabaseNext(dBlossoms);
 			if (xGetInt(dBlossoms, xBlossomStep) == 0) {
@@ -8459,7 +8473,15 @@ highFrequency
 						amt = 1.3;
 						xSetInt(dStarShooters, xStarShooterStep, 1);
 						xSetInt(dStarShooters, xStarShooterNext, trTimeMS() + 1500);
-						xDatabaseNext(dPlayerCharacters);
+						for(j=xGetDatabaseCount(dPlayerCharacters); >0) {
+							xDatabaseNext(dPlayerCharacters);
+							xUnitSelectByID(dPlayerCharacters, xUnitID);
+							if (trUnitAlive() == false) {
+								removePlayerCharacter();
+							} else {
+								break;
+							}
+						}
 						pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName));
 
 						dir = getUnitVector3d(xGetVector(dStarShooters, xStarShooterPos), pos);
@@ -8602,6 +8624,7 @@ highFrequency
 					case 0:
 					{
 						if (xGetInt(dEnemies, xSilenceStatus, xGetInt(dGuardianClones, xSpecialIndex)) == 0) {
+							trUnitSetStance("Passive");
 							xSetInt(dGuardianClones, xSpecialStep, 1);
 							trQuestVarSetFromRand("rand", 0, 2, true);
 							xSetInt(dGuardianClones, xSpecialStep, 1);
@@ -8610,10 +8633,19 @@ highFrequency
 							{
 								case GUARDIAN_STARSWORD:
 								{
-									xDatabaseNext(dPlayerCharacters);
+									for(j=xGetDatabaseCount(dPlayerCharacters); >0) {
+										xDatabaseNext(dPlayerCharacters);
+										xUnitSelectByID(dPlayerCharacters, xUnitID);
+										if (trUnitAlive() == false) {
+											removePlayerCharacter();
+										} else {
+											break;
+										}
+									}
 									pos = kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName), true);
 									xSetVector(dGuardianClones, xGuardianCloneDir, getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true)));
 									trSetUnitOrientation(xGetVector(dGuardianClones, xGuardianCloneDir), vector(0,1,0), true);
+									xUnitSelectByID(dGuardianClones, xUnitID);
 									trUnitOverrideAnimation(3, 0, false, false, -1);
 									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 1000);
 									trSoundPlayFN("sonofosirisbirth.wav","1",-1,"","");
@@ -8627,9 +8659,18 @@ highFrequency
 								}
 								case GUARDIAN_STARWAVE:
 								{
-									xDatabaseNext(dPlayerCharacters);
+									for(j=xGetDatabaseCount(dPlayerCharacters); >0) {
+										xDatabaseNext(dPlayerCharacters);
+										xUnitSelectByID(dPlayerCharacters, xUnitID);
+										if (trUnitAlive() == false) {
+											removePlayerCharacter();
+										} else {
+											break;
+										}
+									}
 									pos = kbGetBlockPosition(""+xGetInt(dGuardianClones, xUnitName), true);
 									xSetVector(dGuardianClones, xGuardianCloneDir, getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true)));
+									xUnitSelectByID(dGuardianClones, xUnitID);
 									trUnitOverrideAnimation(1, 0, false, false, -1);
 									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 750);
 								}
@@ -8678,6 +8719,7 @@ highFrequency
 					case 10:
 					{
 						trUnitOverrideAnimation(-1,0,false,true,-1);
+						trUnitSetStance("Aggressive");
 						xSetInt(dGuardianClones, xSpecialStep, 0);
 						trQuestVarSetFromRand("rand", 5000, 15000, true);
 						xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + trQuestVarGet("rand"));
@@ -8783,14 +8825,21 @@ highFrequency
 							}
 						}
 						if (trQuestVarGet("bossSpell") == 23) {
+							target = 0;
 							for(j=xGetDatabaseCount(dPlayerUnits); >0) {
 								xDatabaseNext(dPlayerUnits);
 								xUnitSelectByID(dPlayerUnits, xUnitID);
 								if (trUnitAlive() == false) {
 									removePlayerUnit();
-								} else if (rayCollision(dPlayerUnits, bossPos, dir, dist, 4.0)) {
-									damagePlayerUnit(amt);
+								} else if (rayCollision(dPlayerUnits, bossPos, dir, dist, 6.0)) {
+									target = xGetPointer(dPlayerUnits);
+									dist = unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), bossPos, false);
 								}
+							}
+							if (target > 0) {
+								xSetPointer(dPlayerUnits, target);
+								xUnitSelectByID(dPlayerUnits, xUnitID);
+								damagePlayerUnit(amt);
 							}
 						}
 						trUnitSelectClear();
@@ -9121,14 +9170,6 @@ highFrequency
 				trSetSelectedScale(0,0,0);
 				trUnitOverrideAnimation(6,0,true,false,-1);
 
-				voidPaintArray = aiPlanCreate("voidPaintArray", 8);
-				for(x=0; <80) {
-					aiPlanAddUserVariableVector(voidPaintArray, x, "row"+x, 80);
-					for(z=0; < 80) {
-						aiPlanSetUserVariableVector(voidPaintArray, x, z, xsVectorSet(trGetTerrainType(x + 32, z + 32),0,trGetTerrainSubType(x + 32, z + 32)));
-					}
-				}
-
 				dDuelists = xInitDatabase("duelists", ENEMY_PLAYER - 1);
 				xInitAddInt(dDuelists, "name");
 				xInitAddInt(dDuelists, "player");
@@ -9198,6 +9239,7 @@ highFrequency
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 13;
 
+				// paint black
 				for(x=0; < 145) {
 					for(z=0; < 145) {
 						height = xsPow(x - 72, 2) + xsPow(z - 72, 2);
@@ -9209,6 +9251,14 @@ highFrequency
 								trPaintTerrain(x, z, x, z, 5, 4, false);
 							}
 						}
+					}
+				}
+
+				voidPaintArray = aiPlanCreate("voidPaintArray", 8);
+				for(x=0; <80) {
+					aiPlanAddUserVariableVector(voidPaintArray, x, "row"+x, 80);
+					for(z=0; < 80) {
+						aiPlanSetUserVariableVector(voidPaintArray, x, z, xsVectorSet(trGetTerrainType(x + 32, z + 32),0,trGetTerrainSubType(x + 32, z + 32)));
 					}
 				}
 
@@ -9737,7 +9787,6 @@ highFrequency
 					trUnitSelectByQV("bossRevealer");
 					trUnitChangeProtoUnit("Cinematic Block");
 
-					xRestoreCache(dPlayerUnits);
 					for(i=xGetDatabaseCount(dPlayerUnits); >0) {
 						xDatabaseNext(dPlayerUnits);
 						xSetBool(dPlayerUnits, xIsHero, false);
@@ -9885,8 +9934,8 @@ highFrequency
 
 					for(p=1; < ENEMY_PLAYER) {
 						for(x=p + 1; < ENEMY_PLAYER) {
-							trPlayerModifyLOS(p, false, x);
-							trPlayerModifyLOS(x, false, p);
+							trPlayerModifyLOS(p, true, x);
+							trPlayerModifyLOS(x, true, p);
 						}
 					}
 				}
@@ -9926,7 +9975,15 @@ highFrequency
 			}
 		} else if (trQuestVarGet("bossSpell") > 10) {
 			if (trQuestVarGet("bossSpell") == 11) {
-				xDatabaseNext(dPlayerCharacters);
+				for(i=xGetDatabaseCount(dPlayerCharacters); >0) {
+					xDatabaseNext(dPlayerCharacters);
+					xUnitSelectByID(dPlayerCharacters, xUnitID);
+					if (trUnitAlive() == false) {
+						removePlayerCharacter();
+					} else {
+						break;
+					}
+				}
 				pos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName));
 				trVectorQuestVarSet("keeperPos", vectorSnapToGrid(pos));
 				dir = vector(-10, 0, -10);
@@ -10037,6 +10094,10 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
+
+			if (trQuestVarGet("secondPhase") == 0) {
+				trDamageUnitPercent(50);
+			}
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -10105,6 +10166,7 @@ int dValkyrieProj = 0;
 int dNickLaunches = 0;
 int xNickLaunchIndex = 0;
 
+
 rule heroes_cin
 inactive
 highFrequency
@@ -10131,17 +10193,19 @@ highFrequency
 				xUnitSelectByID(dEnemies, xUnitID);
 				trMutateSelected(kbGetUnitBaseTypeID(xGetInt(dEnemies, xUnitID)));
 			}
+			trTechSetStatus(0, 476, 4);
+			trTechSetStatus(0, 7, 4);
+
+			modifyHero("Hoplite");
+			
+			modifyHero("Minotaur");
+
+			modifyHero("Hero Greek Odysseus");
+
+			modifyHero("Pharaoh of Osiris");
+
+			xSetInt(dEnemies, xPoisonTimeout, 0, bossPointer);
 		}
-		trTechSetStatus(0, 476, 4);
-		trTechSetStatus(0, 7, 4);
-
-		modifyHero("Hoplite");
-		
-		modifyHero("Minotaur");
-
-		modifyHero("Hero Greek Odysseus");
-
-		modifyHero("Pharaoh of Osiris");
 
 	} else if (trTime() >= trQuestVarGet("cinTime")) {
 		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
@@ -10186,6 +10250,17 @@ highFrequency
 				trQuestVarSet("zenophobiaLaserGroundCarrier", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch("1,0","Militia",1,1,0,1,0,true);
 				spyEffect(1*trQuestVarGet("zenophobiaLaserGroundCarrier"),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,0));
+
+				trModifyProtounit("SPCMeteor", 0, 27, 9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 27, -9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 27, 0);
+				trModifyProtounit("SPCMeteor", 0, 28, 9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 28, -9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 28, 0);
+				trModifyProtounit("SPCMeteor", 0, 29, 9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 29, -9999999999999999999.0);
+				trModifyProtounit("SPCMeteor", 0, 29, 0);
+				trModifyProtounit("SPCMeteor", 0, 8, -10);
 			}
 			case 3:
 			{
@@ -10352,8 +10427,13 @@ highFrequency
 				trQuestVarSet("secondPhase", 1);
 				trSetUnitIdleProcessing(true);
 				xsEnableRule("rising_up");
+				if (customContent) {
+					trSoundPlayFN("Zenophobia\Rising Up start.mp3","1",-1,"","");
+					trQuestVarSet("musicTime", trTimeMS() + 150100);
+				} else {
+					trQuestVarSet("musicTime", 0);
+				}
 				xsEnableRule("heroes_always");
-				trQuestVarSet("musicTime",0);
 				xsDisableSelf();
 				trUnitSelectClear();
 				trUnitSelectByQV("yeebaagooon");
@@ -10448,6 +10528,8 @@ highFrequency
 						revivePlayer(p);
 					}
 				}
+
+				bullshitProj = trGetNextUnitScenarioNameNumber();
 			}
 		}
 	}
@@ -10457,14 +10539,14 @@ rule rising_up
 inactive
 highFrequency
 {
-	if (trTime() > trQuestVarGet("musicTime")) {
-		if (customContent) {
-			trMusicPlay("Zenophobia\Rising Up.mp3","1",0.5);
-			trQuestVarSet("musicTime", trTime() + 325);
-		} else {
-			trMusicPlay("music\interface\if you can use a doorknob.mp3","1",0.5);
-			trQuestVarSet("musicTime", trTime() + 56);
+	if (customContent) {
+		if (trTimeMS() >= trQuestVarGet("musicTime")) {
+			trQuestVarSet("musicTime", trTimeMS() + 190000);
+			trSoundPlayFN("Zenophobia\Rising Up loop.mp3","1",-1,"","");
 		}
+	} else if (trTime() > trQuestVarGet("musicTime")) {
+		trMusicPlay("music\interface\if you can use a doorknob.mp3","1",0.5);
+		trQuestVarSet("musicTime", trTime() + 56);
 	}
 }
 
@@ -10521,6 +10603,34 @@ highFrequency
 		heroAttack("zenophobia");
 		heroAttack("nickonhawk");
 		heroAttack("nottud");
+	}
+
+	for(i=bullshitProj; < trGetNextUnitScenarioNameNumber()) {
+		id = kbGetBlockID(""+i, true);
+		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("SPCMeteor")) {
+			pos = kbGetBlockPosition(""+i, true);
+			for(j=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (trUnitAlive() == false) {
+					removeEnemy();
+				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 144.0) {
+					trDamageUnit(5000.0);
+				}
+			}
+		}
+	}
+	bullshitProj = trGetNextUnitScenarioNameNumber();
+
+	if (trTime() > trQuestVarGet("nottudMeteorNext")) {
+		trChatSetStatus(false);
+		trDelayedRuleActivation("enable_chat");
+		trQuestVarSet("nottudMeteorNext", trTime());
+		trQuestVarSetFromRand("modx", -80, 80, false);
+		amt = xsSqrt(6400.0 - xsPow(trQuestVarGet("modx"), 2));
+		trQuestVarSetFromRand("modz", 0.0 - amt, amt, false);
+		pos = xsVectorSet(trQuestVarGet("modx") + 145,0,trQuestVarGet("modz") + 145);
+		trTechInvokeGodPower(0, "SPCMeteor", pos, pos);
 	}
 
 	if (trTimeMS() > trQuestVarGet("yeebLightningNext")) {
