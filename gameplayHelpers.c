@@ -319,7 +319,7 @@ void removePlayerSpecific(int p = 0) {
 			xUnitSelect(relics, xUnitName);
 			if (xGetInt(relics, xRelicType) <= NORMAL_RELICS) {
 				trUnitDestroy();
-			} else {
+			} else if (xGetInt(relics, xRelicType) != RELIC_NICKONHAWK) {
 				trUnitChangeProtoUnit("Relic");
 				xAddDatabaseBlock(dFreeRelics, true);
 				xSetInt(dFreeRelics, xUnitName, xGetInt(relics, xUnitName));

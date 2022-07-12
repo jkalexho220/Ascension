@@ -17,7 +17,7 @@ const int TOTAL_LOAD = 25;
 
 void saveAllData() {
 	xsSetContextPlayer(0);
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 2);
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
 	int p = trCurrentPlayer();
 	int relic = 0;
 	/* relic transporter guy */
