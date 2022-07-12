@@ -155,7 +155,7 @@ highFrequency
 				trQuestVarSet("yeebNext", trTime() + 3);
 				if (customContent) {
 					xsEnableRule("death_track_loop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trMusicPlay("Zenophobia\Death track begin.mp3","1",0);
 					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					xsEnableRule("boss_music");
@@ -270,19 +270,9 @@ minInterval 3
 inactive
 {
 	if (boss > 0 && trTime() >= trQuestVarGet("musicTime")) {
-		if (customContent && (boss > 1)) {
+		if (customContent && (boss > 3)) {
 			switch(1*trQuestVarGet("stage"))
 			{
-				case 2:
-				{
-					trMusicPlay("Zenophobia\Enlightenment is Found Within.mp3", "1", 1.0);
-					trQuestVarSet("musicTime", trTime() + 100);
-				}
-				case 3:
-				{
-					trMusicPlay("Zenophobia\To Overcome This Crisis.mp3", "1", 1.0);
-					trQuestVarSet("musicTime", trTime() + 119);
-				}
 				case 4:
 				{
 					trMusicPlay("Zenophobia\Onslaught.mp3", "1", 1.0);
@@ -306,7 +296,7 @@ inactive
 				case 8:
 				{
 					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 0.1);
-					trQuestVarSet("musicTime", trTime() + 72);
+					trQuestVarSet("musicTime", trTime() + 73);
 				}
 				case 9:
 				{
@@ -2990,7 +2980,7 @@ highFrequency
 				trLetterBox(false);
 				if (customContent) {
 					xsEnableRule("death_track_loop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trMusicPlay("Zenophobia\Death track begin.mp3","1",0);
 					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					xsEnableRule("boss_music");
@@ -4051,7 +4041,7 @@ highFrequency
 				bossCooldown(10, 12);
 				if (customContent) {
 					xsEnableRule("death_track_loop");
-					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
+					trMusicPlay("Zenophobia\Death track begin.mp3","1",0);
 					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					trQuestVarSet("musicTime", trTime());
@@ -4190,7 +4180,7 @@ highFrequency
 {
 	if (trTimeMS() >= trQuestVarGet("musicTime")) {
 		trQuestVarSet("musicTime", trTimeMS() + 105000);
-		trSoundPlayFN("Zenophobia\Death track loop.mp3","1",-1,"","");
+		trMusicPlay("Zenophobia\Death track loop.mp3","1",0);
 	}
 }
 
@@ -8390,7 +8380,6 @@ highFrequency
 	vector dir = vector(0,0,0);
 	
 	if (trUnitAlive() == true) {
-		trDamageUnitPercent(100);
 		for(i=xGetDatabaseCount(dBlossoms); >0) {
 			xDatabaseNext(dBlossoms);
 			if (xGetInt(dBlossoms, xBlossomStep) == 0) {
@@ -10094,10 +10083,6 @@ highFrequency
 				trQuestVarSetFromRand("bossSpell", 0, 2, true);
 				trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
 			}
-
-			if (trQuestVarGet("secondPhase") == 0) {
-				trDamageUnitPercent(50);
-			}
 		}
 	} else {
 		trUnitOverrideAnimation(-1,0,false,true,-1);
@@ -10542,7 +10527,7 @@ highFrequency
 	if (customContent) {
 		if (trTimeMS() >= trQuestVarGet("musicTime")) {
 			trQuestVarSet("musicTime", trTimeMS() + 190000);
-			trSoundPlayFN("Zenophobia\Rising Up loop.mp3","1",-1,"","");
+			trMusicPlay("Zenophobia\Rising Up loop.mp3","1",0);
 		}
 	} else if (trTime() > trQuestVarGet("musicTime")) {
 		trMusicPlay("music\interface\if you can use a doorknob.mp3","1",0.5);
@@ -10611,11 +10596,13 @@ highFrequency
 			pos = kbGetBlockPosition(""+i, true);
 			for(j=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
-				xUnitSelectByID(dEnemies, xUnitID);
-				if (trUnitAlive() == false) {
-					removeEnemy();
-				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 144.0) {
-					trDamageUnit(5000.0);
+				if (xGetInt(dEnemies, xUnitName) != bossUnit) {
+					xUnitSelectByID(dEnemies, xUnitID);
+					if (trUnitAlive() == false) {
+						removeEnemy();
+					} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 144.0) {
+						trDamageUnit(5000.0);
+					}
 				}
 			}
 		}

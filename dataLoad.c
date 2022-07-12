@@ -193,7 +193,7 @@ inactive
 	/*
 	VERSION CHANGE
 	v1. Added a new block under relics sacrificed/monsterpedia quest. Shift old block up by 1
-	*/
+	
 	if (trGetScenarioUserData(VERSION_NUMBER) == 0) {
 		savedata = trGetScenarioUserData(4);
 		currentdata = savedata / 896;
@@ -208,7 +208,13 @@ inactive
 		trSetCurrentScenarioUserData(8, trGetScenarioUserData(8) + currentdata * 2933040);
 		trSetCurrentScenarioUserData(VERSION_NUMBER, 2);
 	}
-	
+	*/
+	if (trGetScenarioUserData(VERSION_NUMBER) < 5) {
+		for(i=0; < 16) {
+			trSetCurrentScenarioUserData(i, 0);
+		}
+		trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
+	}
 
 
 	/* owned relics */

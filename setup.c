@@ -519,7 +519,9 @@ runImmediately
 	xsEnableRule("data_load_00");
 	xsDisableSelf();
 
-	if (trCurrentPlayer() == 1) {
+	if (trGetScenarioUserData(5) == 1) {
+		debugIsOn = true;
+	} else if (trCurrentPlayer() == 1) {
 		xsEnableRule("debug_is_on");
 	}
 }
