@@ -383,27 +383,14 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("The objective on each floor is to find and defeat the boss of the floor.");
+					uiMessageBox("Remember to click on objects and units in the world to receive useful information!");
 				}
 				case 4:
 				{
-					uiMessageBox("Once you've defeated a boss, the next floor will be unlocked in your future playthroughs.");
+					uiMessageBox("Good luck and have fun! The Tower of Ascension awaits!");
 				}
 				case 5:
 				{
-					uiMessageBox("You can also open this map in singleplayer to choose your class and customize your equipment.");
-				}
-				case 6:
-				{
-					uiMessageBox("Also remember to click on characters and objects in the world to receive useful information!");
-				}
-				case 7:
-				{
-					uiMessageBox("Good luck and have fun! The Tower of Ascension awaits!");
-				}
-				case 8:
-				{
-					uiMessageBox("For starters, choose one of the two flashing characters by walking up to them.");
 					trUnitSelectClear();
 					trUnitSelectByQV("choice1unit");
 					trUnitHighlight(60, true);

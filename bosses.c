@@ -7980,7 +7980,6 @@ highFrequency
 			xsDisableSelf();
 			trQuestVarSet("bossUsedUltimate", 0);
 			trQuestVarSet("bossUltimate", 0);
-			trQuestVarSet("p"+trCurrentPlayer()+"swordpiece"+SWORD_HILT, 1);
 			trQuestVarSetFromRand("bossReward", 11, 20, true);
 
 			trQuestVarSet("ownedRelics"+1*trQuestVarGet("bossReward"), 1 + trQuestVarGet("ownedRelics"+1*trQuestVarGet("bossReward")));
