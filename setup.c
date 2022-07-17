@@ -946,6 +946,7 @@ highFrequency
 			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black
 			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
+			//for(i=0; <= 8) {
 				paintTowerSegment(i+1);
 			}
 			trPaintTerrain(67,46,67,76,0,74,false); // left wall

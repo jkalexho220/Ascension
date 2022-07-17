@@ -1887,11 +1887,11 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 3:
 				{
-					uiMessageBox("If you exit the bubble, you take damage! (The bubble is the Line of Sight of the Hippocampus)");
+					uiMessageBox("If you exit the bubble, you take damage! (Marked by the green circles)");
 				}
 				case 4:
 				{
-					uiMessageBox("You only get one Hippocampus, so keep her safe!");
+					uiMessageBox("You only get one Hippocampus, so keep it safe!");
 				}
 				case 5:
 				{

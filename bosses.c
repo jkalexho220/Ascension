@@ -5083,6 +5083,9 @@ highFrequency
 	vector pos = vector(0,0,0);
 	vector prev = vector(0,0,0);
 	vector dir = vector(0,0,0);
+
+	int timediff = trTimeMS() - trQuestVarGet("dragonLast");
+	trQuestVarSet("dragonLast", trTimeMS());
 	
 	trUnitSelectClear();
 	trUnitSelect(""+bossUnit, true);
@@ -5101,12 +5104,14 @@ highFrequency
 					trQuestVarSet("dragonSpotlight", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					if (trQuestVarGet("dragonSpotlight") < trGetNextUnitScenarioNameNumber()) {
-
-						trQuestVarSet("dragonSpotlight2", trGetNextUnitScenarioNameNumber());
-						trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-						trUnitSelectClear();
-						trUnitSelectByQV("dragonSpotlight2");
-						trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+						trQuestVarSet("spotlightAngle", 0);
+						for(i=0; < 3) {
+							trQuestVarSet("dragonSpotlight"+i, trGetNextUnitScenarioNameNumber());
+							trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+							trUnitSelectClear();
+							trUnitSelectByQV("dragonSpotlight"+i);
+							trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+						}
 
 						trQuestVarSet("dragonSpotlightStep", 2);
 						trUnitSelectClear();
@@ -5130,9 +5135,11 @@ highFrequency
 				pos = kbGetBlockPosition(""+bossUnit);
 				if (distanceBetweenVectors(trVectorQuestVarGet("dragonSpotlightPos"), pos) < 9.0) {
 					trDamageUnit(10000);
-					trUnitSelectClear();
-					trUnitSelectByQV("dragonSpotlight2");
-					trUnitDestroy();
+					for(i=0; <3) {
+						trUnitSelectClear();
+						trUnitSelectByQV("dragonSpotlight"+i);
+						trUnitDestroy();
+					}
 
 					trUnitSelectClear();
 					trUnitSelectByQV("dragonSpotlight");
@@ -5148,8 +5155,17 @@ highFrequency
 					xSetFloat(dPlayerLasers, xPlayerLaserRange, 28);
 					trSoundPlayFN("petsuchosattack.wav", "1", -1, "", "");
 					trQuestVarSet("dragonSpotlightStep", 0);
+				} else {
+					trQuestVarSet("spotlightAngle", fModulo(6.283185, trQuestVarGet("spotlightAngle") + 0.003 * timediff));
+					dir = xsVectorSet(xsCos(trQuestVarGet("spotlightAngle")), 0, xsSin(trQuestVarGet("spotlightAngle"))) * 2.0;
+					for(i=0; <3) {
+						trUnitSelectClear();
+						trUnitSelectByQV("dragonSpotlight"+i);
+						trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
+						dir = rotationMatrix(dir, -0.5, 0.866025);
+					}
 				}
-			}
+			} 
 		}
 
 		xsSetContextPlayer(0);
@@ -5463,9 +5479,17 @@ highFrequency
 					trSetUnitOrientation(getUnitVector(bossPos, pos), vector(0,1,0), true);
 
 					bossNext = trTimeMS() + 2000;
+					bossAngle = 0;
+					trQuestVarSet("bossWarn1", trGetNextUnitScenarioNameNumber());
 					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect("0,0");
-					trUnitChangeProtoUnit("Qilin Heal");
+					trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+					trQuestVarSet("bossWarn2", trGetNextUnitScenarioNameNumber());
+					trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("0,0");
+					trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+
+					trSoundPlayFN("attackwarning.wav","1",-1,"","");
 				}
 
 				trQuestVarSet("bossSpell", 22);
@@ -5490,6 +5514,24 @@ highFrequency
 					trUnitOverrideAnimation(6,0,true,false,-1);
 					trQuestVarSet("bossDamageNext", trTimeMS());
 					bossTargetPos = kbGetBlockPosition(""+1*trQuestVarGet("bossBreath1"));
+					if (trQuestVarGet("secondPhase") == 1) {
+						trUnitSelectClear();
+						trUnitSelectByQV("bossWarn1");
+						trUnitDestroy();
+						trUnitSelectClear();
+						trUnitSelectByQV("bossWarn2");
+						trUnitDestroy();
+					}
+				} else if (trQuestVarGet("secondPhase") == 1) {
+					bossAngle = fModulo(6.283185, bossAngle + 0.005 * timediff);
+					dir = xsVectorSet(xsCos(bossAngle), 0, xsSin(bossAngle)) * 5.0;
+					trUnitSelectClear();
+					trUnitSelectByQV("bossWarn1");
+					trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
+					dir = vector(0,0,0) - dir;
+					trUnitSelectClear();
+					trUnitSelectByQV("bossWarn2");
+					trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
 				}
 			} else if (trQuestVarGet("bossSpell") == 23) {
 				trQuestVarSet("bossAlternate", 1 - trQuestVarGet("bossAlternate"));

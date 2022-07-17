@@ -10,6 +10,7 @@ const float rideLightningCost = 5;
 
 int xThunderRiderPrev = 0;
 int xThunderRiderIndex = 0;
+int xThunderRiderRechargeSFX = 0;
 
 int xLightningBallDir = 0;
 int xLightningBallPrev = 0;
@@ -342,6 +343,21 @@ void thunderRiderAlways(int eventID = -1) {
 			refreshRideLightningTargets(p);
 		}
 	}
+
+	if (trQuestVarGet("p"+p+"rechargeSFX") == 1) {
+		if (trQuestVarGet("spyFind") == trQuestVarGet("spyFound")) {
+			for(i=xGetDatabaseCount(db); >0) {
+				xDatabaseNext(db);
+				xUnitSelect(db, xThunderRiderRechargeSFX);
+				trUnitChangeProtoUnit("Spy Eye");
+				xUnitSelect(db, xThunderRiderRechargeSFX);
+				trMutateSelected(kbGetProtoUnitID("Flying Medic"));
+				trUnitOverrideAnimation(18,0,false,false,-1);
+				trSetSelectedScale(0,0,0);
+			}
+			trQuestVarSet("p"+p+"rechargeSFX", 0);
+		}
+	}
 	
 	if (xGetBool(dPlayerData, xPlayerRainActivated)) {
 		xSetBool(dPlayerData, xPlayerRainActivated, false);
@@ -355,11 +371,11 @@ void thunderRiderAlways(int eventID = -1) {
 				xUnitSelectByID(db, xUnitID);
 				trUnitHighlight(0.5, false);
 				healUnit(p, xGetFloat(dPlayerData, xPlayerAttack), xGetInt(db, xCharIndex));
-				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit), true);
-				trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trArmySelect(""+p+",0");
-				trUnitChangeProtoUnit("Regeneration SFX");
+				if (xGetInt(db, xThunderRiderRechargeSFX) == 0) {
+					spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(db,xThunderRiderRechargeSFX,xGetPointer(db)));
+				}
 			}
+			trQuestVarSet("p"+p+"rechargeSFX", 1);
 		}
 		gainFavor(p, 0.1 * xGetFloat(dPlayerData, xPlayerAttack));
 		trQuestVarSet("p"+p+"thunderRiderBonus", 0);
@@ -583,6 +599,7 @@ void chooseThunderRider(int eventID = -1) {
 	}
 	xThunderRiderPrev = xInitAddVector(db, "prev");
 	xThunderRiderIndex = xInitAddInt(db, "index");
+	xThunderRiderRechargeSFX = xInitAddInt(db, "rechargeSFX");
 	
 	xSetInt(dPlayerData,xPlayerWellCooldown, blitzCooldown);
 	xSetFloat(dPlayerData,xPlayerWellCost,0);
