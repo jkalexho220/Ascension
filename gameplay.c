@@ -528,6 +528,10 @@ highFrequency
 	trSetFogAndBlackmap(true, true);
 	trPlayerResetBlackMapForAllPlayers();
 	trQuestVarSet("play", 1);
+
+	if (trQuestVarGet("p"+trCurrentPlayer()+"noob") == 1) {
+		xsEnableRule("how_to_level_up");
+	}
 }
 
 rule gameplay_start_2
@@ -542,6 +546,7 @@ highFrequency
 	if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") < 5) {
 		trQuestVarSet("nickQuestProgressLocal", trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress"));
 		trQuestVarSet("nickEquippedLocal", trQuestVarGet("p"+trCurrentPlayer()+"nickEquipped"));
+		trQuestVarSet("nickWasEquipped", trQuestVarGet("nickEquippedLocal"));
 		xsEnableRule("nick_dialog");
 	}
 	vector pos = trVectorQuestVarGet("startPosition");
@@ -1235,6 +1240,25 @@ highFrequency
 			trDamageUnit(0.2 * amt);
 		}
 	}
+
+	if (xGetDatabaseCount(dHippoBubble) > 0) {
+		amt = 0.001 * (trTimeMS() - hippoBubbleLast);
+		hippoBubbleLast = trTimeMS();
+		hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsCos(amt), xsSin(amt));
+		hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
+
+		xDatabaseNext(dHippoBubble);
+		xUnitSelect(dHippoBubble, xUnitName);
+		if (trUnitAlive() == false) {
+			xFreeDatabaseBlock(dHippoBubble);
+		} else {
+			for(i=1; <= hippoBubbleCount) {
+				xUnitSelect(dHippoBubble, xUnitName + i);
+				trSetSelectedUpVector(xsVectorGetX(hippoBubbleDir),0,xsVectorGetZ(hippoBubbleDir));
+				hippoBubbleDir = rotationMatrix(hippoBubbleDir, 0.309017, 0.951057);
+			}
+		}
+	}
 	
 	xSetPointer(dPlayerUnits, index);
 	if (trTime() > trQuestVarGet("hippocampusHealNext")) {
@@ -1817,5 +1841,18 @@ highFrequency
 				xSetInt(dPlayerCharacters, xElectricNext, trTimeMS() + 1000);
 			}
 		}
+	}
+}
+
+rule how_to_level_up
+inactive
+highFrequency
+{
+	if (trChatHistoryContains("level", trCurrentPlayer())) {
+		trChatHistoryClear();
+		trChatSend(0, "<color=0.3,0.3,1><u>How to level up</u></color>");
+		trChatSend(0, "<color=1,1,1>You can level up by playing this map in singleplayer.");
+		trChatSend(0, "<color=1,1,1>Select the obelisk in the bottom right and follow the prompts.");
+		trChatSend(0, "<color=1,1,1>This map remembers your progress across playthroughs!");
 	}
 }

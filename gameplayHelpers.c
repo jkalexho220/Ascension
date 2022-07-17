@@ -319,7 +319,9 @@ void removePlayerSpecific(int p = 0) {
 			xUnitSelect(relics, xUnitName);
 			if (xGetInt(relics, xRelicType) <= NORMAL_RELICS) {
 				trUnitDestroy();
-			} else if (xGetInt(relics, xRelicType) != RELIC_NICKONHAWK) {
+			} else if (xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) {
+				trUnitChangeProtoUnit("Cinematic Block");
+			} else {
 				trUnitChangeProtoUnit("Relic");
 				xAddDatabaseBlock(dFreeRelics, true);
 				xSetInt(dFreeRelics, xUnitName, xGetInt(relics, xUnitName));
@@ -366,15 +368,16 @@ void equipRelicsAgain(int p = 0) {
 	int db = getRelicsDB(p);
 	for(x=xGetDatabaseCount(db); >0) {
 		xDatabaseNext(db);
-		if (kbGetBlockID(""+xGetInt(db, xUnitName)) == -1) {
+		xUnitSelect(db, xUnitName);
+		if ((kbGetBlockID(""+xGetInt(db, xUnitName)) == -1) || (trUnitAlive() == false)) {
 			xSetInt(db, xUnitName, trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("1,0","Dwarf",1,1,0,1,0,true);
 		}
 		trUnitSelectClear();
-		trUnitSelect(""+xGetInt(db,xRelicName),true);
+		trUnitSelect(""+xGetInt(db,xUnitName),true);
 		trUnitChangeProtoUnit("Relic");
 		trUnitSelectClear();
-		trUnitSelect(""+xGetInt(db,xRelicName),true);
+		trUnitSelect(""+xGetInt(db,xUnitName),true);
 		trImmediateUnitGarrison(""+xGetInt(dPlayerData,xPlayerUnit,p));
 		trMutateSelected(relicProto(xGetInt(db,xRelicType)));
 		if (xGetInt(db,xRelicType) < KEY_RELICS) {
@@ -806,7 +809,7 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 			for(x=xGetDatabaseCount(relics); >0) {
 				xDatabaseNext(relics);
 				xUnitSelect(relics,xRelicName);
-				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				trUnitChangeProtoUnit("Cinematic Block");
 			}
 		}
 	}
@@ -1760,9 +1763,11 @@ void spawnPlayerCircle(vector pos = vector(0,0,0)) {
 	float mSin = xsSin(angle);
 	vector dir = vector(4, 0, 4);
 	for(p=1; < ENEMY_PLAYER) {
-		spawnPlayer(p, pos + dir);
-		equipRelicsAgain(p);
-		dir = rotationMatrix(dir, mCos, mSin);
+		if (kbIsPlayerResigned(p) == false) {
+			spawnPlayer(p, pos + dir);
+			equipRelicsAgain(p);
+			dir = rotationMatrix(dir, mCos, mSin);
+		}
 	}
 }
 

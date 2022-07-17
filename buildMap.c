@@ -2859,42 +2859,47 @@ highFrequency
 	}
 }
 
+const int hippoBubbleCount = 5;
+int dHippoBubble = 0;
+int xHippoBubbleSwap = 0;
+
+int hippoBubbleLast = 0;
+vector hippoBubbleDir = vector(25, 0, 0);
+vector hippoBubbleDirMod = vector(0,0,0);
+
 rule the_deep_build_02
 inactive
 highFrequency
 {
-	int class = 0;
-	string proto = "";
+	float angle = 0;
 	vector pos = trVectorQuestVarGet("startPosition");
 	if (trQuestVarGet("play") == 1) {
 		/* no LOS for you */
+		hippoBubbleLast = trTimeMS();
+		dHippoBubble = xInitDatabase("hippoBubbleSFX", ENEMY_PLAYER - 1);
+		for(i=0; <= hippoBubbleCount) {
+			xInitAddInt(dHippoBubble, "name" + i);
+		}
+		xHippoBubbleSwap = xInitAddBool(dHippoBubble, "swap");
+		angle = 6.283185 /  hippoBubbleCount / (ENEMY_PLAYER - 1);
+		hippoBubbleDirMod = xsVectorSet(xsCos(angle), 0, xsSin(angle));
 		for(p=1; < ENEMY_PLAYER) {
-			class = xGetInt(dPlayerData, xPlayerClass, p);
-			proto = kbGetProtoUnitName(xGetInt(dClass, xClassProto, class));
-			trModifyProtounit(proto, p, 2, -999);
-			trModifyProtounit("Dog", p, 2, -999);
-			trModifyProtounit("Wolf", p, 2, -999);
-			trModifyProtounit("Minion", p, 2, -999);
-			trModifyProtounit("Audrey", p, 2, -999);
-			trModifyProtounit("Walking Berry Bush", p, 2, -999);
-			
 			trModifyProtounit("Hippocampus", p, 55, 1);
 			zSetProtoUnitStat("Hippocampus", p, 2, 25.0);
 			
-			if (trQuestVarGet("p"+p+"hippocampus") == 1) {
+			if (trQuestVarGet("p"+p+"hippocampus") == 1) { 
 				trQuestVarSet("p"+p+"medic", trGetNextUnitScenarioNameNumber());
 				spawnPlayerUnit(p, kbGetProtoUnitID("Hippocampus"), pos);
+				xAddDatabaseBlock(dHippoBubble, true);
+				xSetInt(dHippoBubble, xUnitName, 1*trQuestVarGet("p"+p+"medic"));
+				for(i=1; <= hippoBubbleCount) {
+					spyEffect(1*trQuestVarGet("p"+p+"medic"),kbGetProtoUnitID("UI Range Indicator Norse SFX"),xsVectorSet(dHippoBubble,xUnitName + i,xGetPointer(dHippoBubble)), vector(1,1,1));
+				}
 				if (trCurrentPlayer() == p) {
 					startNPCDialog(NPC_EXPLAIN_DEEP);
 				}
 			} else if (trCurrentPlayer() == p) {
 				trStringQuestVarSet("advice", "You need a Hippocampus in order to survive on this floor. Go and find one!");
-			}
-		}
-		for (i=1; < 40) {
-			proto = kbGetProtoUnitName(monsterPetProto(i));
-			for(p=1; < ENEMY_PLAYER) {
-				trModifyProtounit(proto, p, 2, -999);
 			}
 		}
 		xsEnableRule("the_deep_damage");

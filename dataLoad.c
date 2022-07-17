@@ -30,7 +30,7 @@ void saveAllData() {
 		}
 	}
 	
-	if ((trQuestVarGet("p"+p+"nickQuestProgress") < 5) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
+	if ((trQuestVarGet("nickWasEquipped") == 1) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
 		trQuestVarSet("p"+p+"nickQuestProgress", 0);
 	}
 

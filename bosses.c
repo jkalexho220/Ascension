@@ -647,7 +647,7 @@ highFrequency
 					trUnitConvert(ENEMY_PLAYER);
 				}
 				if (xSetPointer(dEnemies, bossPointer)) {
-					removeEnemy();
+					xDetachDatabaseBlock(dEnemies);
 				}
 				trQuestVarSet("bossSpell", 32);
 				trQuestVarSet("bossSpellTimeout", trTimeMS() + 12000);
@@ -689,7 +689,7 @@ highFrequency
 						trUnitSelectClear();
 						trUnitSelect(""+bossUnit, true);
 						trSetSelectedScale(bossScale,bossScale,bossScale);
-						activateEnemy(bossUnit, 0, 0);
+						xRestoreDatabaseBlock(dEnemies, bossPointer);
 						trSetLighting("default", 1);
 					}
 				}
@@ -7633,6 +7633,7 @@ highFrequency
 							} else {
 								pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
 								if (distanceBetweenVectors(pos, bossTargetPos) < 1000.0) {
+									bossTarget = xGetPointer(dPlayerUnits);
 									action = 1;
 									break;
 								}

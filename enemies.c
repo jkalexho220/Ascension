@@ -526,7 +526,7 @@ void specialUnitsAlways() {
 							}
 						}
 						if (p == ENEMY_PLAYER) {
-							if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 1) {
+							if ((trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 1) && (trQuestVarGet("p"+trCurrentPlayer()+"nickEquipped") == 1)) {
 								if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer()), pos) < 16) {
 									trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 2);
 									xsEnableRule("nick_next_dialog");
@@ -767,7 +767,7 @@ void specialUnitsAlways() {
 					}
 				}
 				if (p == ENEMY_PLAYER) {
-					if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) {
+					if ((trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 2) && (trQuestVarGet("p"+trCurrentPlayer()+"nickEquipped") == 1)) {
 						if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer()), pos) < 16) {
 							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 3);
 							xsEnableRule("nick_next_dialog");
@@ -910,7 +910,7 @@ void specialUnitsAlways() {
 					xSetInt(dFrostGiants, xSpecialNext, xGetInt(dFrostGiants, xSpecialNext) + 600);
 					if (action == 0) {
 						xSetInt(dFrostGiants, xSpecialTarget, -1);
-					} else if (trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) {
+					} else if ((trQuestVarGet("p"+trCurrentPlayer()+"nickQuestProgress") == 3) && (trQuestVarGet("p"+trCurrentPlayer()+"nickEquipped") == 1)) {
 						if (xGetInt(dFrostGiants, xSpecialTarget) == xGetInt(dPlayerData,xPlayerUnit,trCurrentPlayer())) {
 							trQuestVarSet("p"+trCurrentPlayer()+"nickQuestProgress", 4);
 							xsEnableRule("nick_next_dialog");

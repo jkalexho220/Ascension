@@ -343,7 +343,7 @@ void sunbowAlways(int eventID = -1) {
 					xSetInt(dPlayerUnits, xSilenceStatus, 0);
 					if (xGetInt(dPlayerUnits, xStunStatus, target) > 0) {
 						xFreeDatabaseBlock(dStunnedUnits, xGetInt(dPlayerUnits, xStunStatus, target));
-						xSetInt(dPlayerUnits, xStunStatus, 0);
+						xSetInt(dPlayerUnits, xStunStatus, 0, target);
 					}
 
 					if (xGetBool(dPlayerUnits, xLaunched, target)) {
