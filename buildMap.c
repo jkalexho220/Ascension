@@ -2881,7 +2881,7 @@ highFrequency
 			xInitAddInt(dHippoBubble, "name" + i);
 		}
 		xHippoBubbleSwap = xInitAddBool(dHippoBubble, "swap");
-		angle = 6.283185 /  hippoBubbleCount / (ENEMY_PLAYER - 1);
+		angle = 6.283185 / hippoBubbleCount;
 		hippoBubbleDirMod = xsVectorSet(xsCos(angle), 0, xsSin(angle));
 		for(p=1; < ENEMY_PLAYER) {
 			trModifyProtounit("Hippocampus", p, 55, 1);

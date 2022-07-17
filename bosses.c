@@ -529,7 +529,8 @@ highFrequency
 				trQuestVarSet("bossSpell", 11);
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 2, 60);
 				trQuestVarSet("bossGem", STARSTONE);
-				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				// trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				trQuestVarSet("bossGemCount", 2);
 				xsEnableRule("boss_music");
 				trMessageSetText("Use the rocks to take cover from the lion's roar!", -1);
 
@@ -940,7 +941,8 @@ highFrequency
 				xsEnableRule("boss2_battle");
 				trQuestVarSet("bossSpell", 41);
 				trQuestVarSet("bossGem", SOULSTONE);
-				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				// trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				trQuestVarSet("bossGemCount", 2);
 				xsEnableRule("boss_music");
 				trMessageSetText("Defeat the spawned enemies to damage the Wraithwood!", -1);
 				trStringQuestVarSet("advice",
@@ -1373,7 +1375,8 @@ highFrequency
 				spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,2)); // ice age sfx
 				xsEnableRule("boss3_battle");
 				trQuestVarSet("bossGem", MANASTONE);
-				trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				// trQuestVarSetFromRand("bossGemCount", 2, 3, true);
+				trQuestVarSet("bossGemCount", 2);
 				xsEnableRule("boss_music");
 
 				reselectMyself();
@@ -1798,7 +1801,8 @@ highFrequency
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
 				xsEnableRule("boss4_battle");
 				trQuestVarSet("bossGem", STARSTONE);
-				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				//trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				trQuestVarSet("bossGemCount", 3);
 				xsEnableRule("boss_music");
 
 				reselectMyself();
@@ -2206,7 +2210,8 @@ highFrequency
 				trSetSelectedScale(bossScale, bossScale, bossScale);
 				xsEnableRule("boss5_battle");
 				trQuestVarSet("bossGem", SOULSTONE);
-				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				//trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				trQuestVarSet("bossGemCount", 3);
 				xsEnableRule("boss_music");
 				
 				trQuestVarSet("bossWarn1", trGetNextUnitScenarioNameNumber());
@@ -2930,7 +2935,8 @@ highFrequency
 				trSetSelectedScale(0.7,0.5,0.5);
 				xsEnableRule("boss6_battle");
 				trQuestVarSet("bossGem", MANASTONE);
-				trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				//trQuestVarSetFromRand("bossGemCount", 3, 4, true);
+				trQuestVarSet("bossGemCount", 3);
 				xsEnableRule("boss_music");
 
 				reselectMyself();
@@ -4222,7 +4228,8 @@ highFrequency
 				trSetSelectedScale(bossScale, bossScale, bossScale);
 				xsEnableRule("boss7_battle");
 				trQuestVarSet("bossGem", SOULSTONE);
-				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				//trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				trQuestVarSet("bossGemCount", 4);
 				xsEnableRule("boss_music");
 				
 				pos = trVectorQuestVarGet("bossRoomCenter");
@@ -5014,7 +5021,8 @@ highFrequency
 				trSetSelectedScale(bossScale, bossScale, bossScale);
 				xsEnableRule("boss8_battle");
 				trQuestVarSet("bossGem", STARSTONE);
-				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				//trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				trQuestVarSet("bossGemCount", 4);
 				xsEnableRule("boss_music");
 				
 				vector pos = trVectorQuestVarGet("bossRoomCenter");
@@ -5951,7 +5959,8 @@ highFrequency
 				trSetSelectedScale(bossScale, bossScale, bossScale);
 				xsEnableRule("boss9_battle");
 				trQuestVarSet("bossGem", MANASTONE);
-				trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				//trQuestVarSetFromRand("bossGemCount", 4, 5, true);
+				trQuestVarSet("bossGemCount", 4);
 				xsEnableRule("boss_music");
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,1));
@@ -7499,6 +7508,7 @@ highFrequency
 	trUnitSelect(""+bossUnit, true);
 	for(p=1; < ENEMY_PLAYER) {
 		if (trUnitHasLOS(p)) {
+			bossID = kbGetBlockID(""+bossUnit);
 			bossCooldown(10, 12);
 			trMessageSetText("The White Tiger has appeared!", -1);
 			xsEnableRule("white_tiger_boss");
@@ -8011,11 +8021,13 @@ highFrequency
 			} else if ((trQuestVarGet("bossUsedUltimate") == 0) && trUnitPercentDamaged() >= 70) {
 				trQuestVarSet("bossSpell", 31);
 			} else if (xGetInt(dEnemies, xStunStatus, bossPointer) == 0) {
-				trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
-				trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
-				if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
-					trQuestVarSetFromRand("bossSpell", 0, 2, true);
-					trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+				if (kbUnitGetAnimationActionType(bossID) != 9) {
+					trQuestVarSetFromRand("bossSpell", 0, xsMin(3, trUnitPercentDamaged() * 0.05), true);
+					trQuestVarSet("bossSpell", trQuestVarGet("bossSpell") * 10 + 1);
+					if (trQuestVarGet("bossSpell") == 31 && trQuestVarGet("bossUltimate") > 0) {
+						trQuestVarSetFromRand("bossSpell", 0, 2, true);
+						trQuestVarSet("bossSpell", 1 + 10 * trQuestVarGet("bossSpell"));
+					}
 				}
 			}
 		} else {

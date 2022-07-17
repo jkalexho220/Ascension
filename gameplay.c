@@ -1245,17 +1245,19 @@ highFrequency
 		amt = 0.001 * (trTimeMS() - hippoBubbleLast);
 		hippoBubbleLast = trTimeMS();
 		hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsCos(amt), xsSin(amt));
-		hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
 
-		xDatabaseNext(dHippoBubble);
-		xUnitSelect(dHippoBubble, xUnitName);
-		if (trUnitAlive() == false) {
-			xFreeDatabaseBlock(dHippoBubble);
-		} else {
-			for(i=1; <= hippoBubbleCount) {
-				xUnitSelect(dHippoBubble, xUnitName + i);
-				trSetSelectedUpVector(xsVectorGetX(hippoBubbleDir),0,xsVectorGetZ(hippoBubbleDir));
-				hippoBubbleDir = rotationMatrix(hippoBubbleDir, 0.309017, 0.951057);
+		for(j=xGetDatabaseCount(dHippoBubble); >0) {
+			xDatabaseNext(dHippoBubble);
+			xUnitSelect(dHippoBubble, xUnitName);
+			if (trUnitAlive() == false) {
+				xFreeDatabaseBlock(dHippoBubble);
+			} else {
+				for(i=1; <= hippoBubbleCount) {
+					xUnitSelect(dHippoBubble, xUnitName + i);
+					trSetSelectedUpVector(xsVectorGetX(hippoBubbleDir),0,xsVectorGetZ(hippoBubbleDir));
+					//hippoBubbleDir = rotationMatrix(hippoBubbleDir, 0.309017, 0.951057);
+					hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
+				}
 			}
 		}
 	}
