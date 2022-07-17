@@ -1079,7 +1079,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 9999999999999999999.0);
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, -9999999999999999999.0);
-			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
 
 			trModifyProtounit("Tartarian Gate flame", 0, 8, -999);
 
@@ -2859,12 +2859,9 @@ highFrequency
 	}
 }
 
-const int hippoBubbleCount = 5;
+const int hippoBubbleCount = 24;
 int dHippoBubble = 0;
-int xHippoBubbleSwap = 0;
 
-int hippoBubbleLast = 0;
-vector hippoBubbleDir = vector(25, 0, 0);
 vector hippoBubbleDirMod = vector(0,0,0);
 
 rule the_deep_build_02
@@ -2875,12 +2872,10 @@ highFrequency
 	vector pos = trVectorQuestVarGet("startPosition");
 	if (trQuestVarGet("play") == 1) {
 		/* no LOS for you */
-		hippoBubbleLast = trTimeMS();
 		dHippoBubble = xInitDatabase("hippoBubbleSFX", ENEMY_PLAYER - 1);
 		for(i=0; <= hippoBubbleCount) {
 			xInitAddInt(dHippoBubble, "name" + i);
 		}
-		xHippoBubbleSwap = xInitAddBool(dHippoBubble, "swap");
 		angle = 6.283185 / hippoBubbleCount;
 		hippoBubbleDirMod = xsVectorSet(xsCos(angle), 0, xsSin(angle));
 		for(p=1; < ENEMY_PLAYER) {
@@ -2892,9 +2887,6 @@ highFrequency
 				spawnPlayerUnit(p, kbGetProtoUnitID("Hippocampus"), pos);
 				xAddDatabaseBlock(dHippoBubble, true);
 				xSetInt(dHippoBubble, xUnitName, 1*trQuestVarGet("p"+p+"medic"));
-				for(i=1; <= hippoBubbleCount) {
-					spyEffect(1*trQuestVarGet("p"+p+"medic"),kbGetProtoUnitID("UI Range Indicator Norse SFX"),xsVectorSet(dHippoBubble,xUnitName + i,xGetPointer(dHippoBubble)), vector(1,1,1));
-				}
 				if (trCurrentPlayer() == p) {
 					startNPCDialog(NPC_EXPLAIN_DEEP);
 				}
@@ -2902,8 +2894,39 @@ highFrequency
 				trStringQuestVarSet("advice", "You need a Hippocampus in order to survive on this floor. Go and find one!");
 			}
 		}
-		xsEnableRule("the_deep_damage");
+		xDatabaseNext(dHippoBubble);
+		for(i=1; <= hippoBubbleCount) {
+			spyEffect(xGetInt(dHippoBubble,xUnitName),kbGetProtoUnitID("UI Range Indicator Norse SFX"),xsVectorSet(dHippoBubble,xUnitName + i,xGetPointer(dHippoBubble)), vector(1,1,1));
+		}
+		trQuestVarSet("hippoBubbleCount", xGetDatabaseCount(dHippoBubble));
+		xsEnableRule("the_deep_build_03");
 		xsDisableSelf();
+	}
+}
+
+rule the_deep_build_03
+inactive
+highFrequency
+{
+	if (trQuestVarGet("spyfind") == trQuestVarGet("spyfound")) {
+		vector dir = vector(25,0,0);
+		debugLog("Hippo Bubble: " + xGetPointer(dHippoBubble));
+		for(i=1; <= hippoBubbleCount) {
+			xUnitSelect(dHippoBubble, xUnitName + i);
+			trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
+			//hippoBubbleDir = rotationMatrix(hippoBubbleDir, 0.309017, 0.951057);
+			dir = rotationMatrix(dir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
+		}
+		trQuestVarSet("hippoBubbleCount", trQuestVarGet("hippoBubbleCount") - 1);
+		if (trQuestVarGet("hippoBubbleCount") <= 0) {
+			xsEnableRule("the_deep_damage");
+			xsDisableSelf();
+		} else {
+			xDatabaseNext(dHippoBubble);
+			for(i=1; <= hippoBubbleCount) {
+				spyEffect(xGetInt(dHippoBubble,xUnitName),kbGetProtoUnitID("UI Range Indicator Norse SFX"),xsVectorSet(dHippoBubble,xUnitName + i,xGetPointer(dHippoBubble)), vector(1,1,1));
+			}
+		}
 	}
 }
 

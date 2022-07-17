@@ -1220,6 +1220,10 @@ inactive
 highFrequency
 {
 	int index = xGetPointer(dPlayerUnits);
+	vector dir = vector(0,0,0);
+	vector pos = vector(0,0,0);
+	vector center = vector(0,0,0);
+
 	xSetPointer(dPlayerUnits, 1*trQuestVarGet("deepPlayerPointer"));
 	xDatabaseNext(dPlayerUnits);
 	trQuestVarSet("deepPlayerPointer", xGetPointer(dPlayerUnits));
@@ -1240,29 +1244,41 @@ highFrequency
 			trDamageUnit(0.2 * amt);
 		}
 	}
+	
+	xSetPointer(dPlayerUnits, index);
 
 	if (xGetDatabaseCount(dHippoBubble) > 0) {
-		amt = 0.001 * (trTimeMS() - hippoBubbleLast);
-		hippoBubbleLast = trTimeMS();
-		hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsCos(amt), xsSin(amt));
-
-		for(j=xGetDatabaseCount(dHippoBubble); >0) {
-			xDatabaseNext(dHippoBubble);
-			xUnitSelect(dHippoBubble, xUnitName);
-			if (trUnitAlive() == false) {
-				xFreeDatabaseBlock(dHippoBubble);
-			} else {
-				for(i=1; <= hippoBubbleCount) {
-					xUnitSelect(dHippoBubble, xUnitName + i);
-					trSetSelectedUpVector(xsVectorGetX(hippoBubbleDir),0,xsVectorGetZ(hippoBubbleDir));
-					//hippoBubbleDir = rotationMatrix(hippoBubbleDir, 0.309017, 0.951057);
-					hippoBubbleDir = rotationMatrix(hippoBubbleDir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
+		index = xDatabaseNext(dHippoBubble, true);
+		xUnitSelect(dHippoBubble, xUnitName);
+		if (trUnitAlive() == false) {
+			xFreeDatabaseBlock(dHippoBubble);
+		} else {
+			dir = vector(25,0,0);
+			center = kbGetBlockPosition(""+xGetInt(dHippoBubble, xUnitName));
+			for(i=1; <= hippoBubbleCount) {
+				pos = center + dir;
+				found = false;
+				for(j=xGetDatabaseCount(dHippoBubble); >1) {
+					xDatabaseNext(dHippoBubble);
+					if (unitDistanceToVector(xGetInt(dHippoBubble, xUnitName), pos) < 550.0) {
+						found = true;
+						break;
+					}
 				}
+				xSetPointer(dHippoBubble, index);
+				xUnitSelect(dHippoBubble, xUnitName + i);
+				if (found) {
+					trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+				} else {
+					trMutateSelected(kbGetProtoUnitID("UI Range Indicator Norse SFX"));
+				}
+
+				dir = rotationMatrix(dir, xsVectorGetX(hippoBubbleDirMod), xsVectorGetZ(hippoBubbleDirMod));
 			}
 		}
 	}
-	
-	xSetPointer(dPlayerUnits, index);
+
+
 	if (trTime() > trQuestVarGet("hippocampusHealNext")) {
 		for(p=1; < ENEMY_PLAYER) {
 			trUnitSelectClear();
