@@ -349,6 +349,7 @@ void chooseClass(int p = 0, int class = 0) {
 	for(x=xGetDatabaseCount(relics); >0) {
 		xDatabaseNext(relics);
 		if ((x > xGetInt(dPlayerData,xPlayerLevel,p)+1) || xGetInt(relics, xRelicType) > NORMAL_RELICS) {
+			relicEffect(xGetInt(relics,xRelicType), p, false); // removing relic
 			int index = xAddDatabaseBlock(dFreeRelics);
 			xSetInt(dFreeRelics,xRelicName,xGetInt(relics,xRelicName),index);
 			xSetInt(dFreeRelics,xRelicType,xGetInt(relics,xRelicType),index);
@@ -356,9 +357,6 @@ void chooseClass(int p = 0, int class = 0) {
 			trUnitSelectClear();
 			trUnitSelect(""+xGetInt(dFreeRelics,xRelicName,index),true);
 			trUnitChangeProtoUnit("Relic");
-			if (xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) {
-				trQuestVarSet("p"+p+"nickEquipped", 0);
-			}
 		} else {
 			relicEffect(xGetInt(relics,xRelicType), p, true);
 		}
@@ -666,6 +664,10 @@ highFrequency
 		trModifyProtounit("Arkantos God Out", p, 8, 1);
 		zInitProtoUnitStat("Victory Marker", p, 0, 300);
 		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
+
+		trModifyProtounit("Argus", p, 1, 9999999999999999999.0);
+		trModifyProtounit("Argus", p, 1, -9999999999999999999.0);
+		trModifyProtounit("Argus", p, 1, 3.0);
 
 		trModifyProtounit("Phoenix From Egg", p, 29, 9999999999999999999.0);
 		trModifyProtounit("Phoenix From Egg", p, 29, -9999999999999999999.0);

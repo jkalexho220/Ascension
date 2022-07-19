@@ -319,7 +319,7 @@ void removePlayerSpecific(int p = 0) {
 			xUnitSelect(relics, xUnitName);
 			if (xGetInt(relics, xRelicType) <= NORMAL_RELICS) {
 				trUnitDestroy();
-			} else if (xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) {
+			} else if ((xGetInt(relics, xRelicType) == RELIC_NICKONHAWK) || (xGetInt(relics, xRelicType) == RELIC_TRANSPORTER_TICKET)) {
 				trUnitChangeProtoUnit("Cinematic Block");
 			} else {
 				trUnitChangeProtoUnit("Relic");
@@ -579,13 +579,25 @@ void damagePlayerUnit(float dmg = 0, int index = -1) {
 		int p = xGetInt(dPlayerUnits, xPlayerOwner);
 		if (PvP) {
 			trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
+		} else {
+			dmg = dmg - dmg * xGetFloat(dPlayerUnits, xMagicResist);
 		}
 		if (trQuestVarGet("protectionCount") == 0) {
-			if (PvP == false) {
-				dmg = dmg - dmg * xGetFloat(dPlayerUnits, xMagicResist);
-			}
-			if (xGetBool(dPlayerUnits, xIsHero) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+			if ((trQuestVarGet("p"+p+"negationCloak") == 1) && xGetBool(dPlayerUnits, xIsHero)) {
+				// negation cloak: spell damage heals you instead of damaging you
 				healUnit(p, dmg);
+			} else if ((xGetInt(dPlayerData, xPlayerSimp, p) > 0) && (index == xGetInt(dPlayerData, xPlayerIndex, p))) {
+				// throne shield simping
+				dmg = 0.5 * dmg;
+
+				trDamageUnit(dmg);
+				xSetFloat(dPlayerUnits, xCurrentHealth, xGetFloat(dPlayerUnits, xCurrentHealth, index) - dmg, index);
+				
+				trUnitSelectClear();
+				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(dPlayerData, xPlayerSimp, p)), true);
+				trDamageUnit(dmg);
+				
+				xUnitSelectByID(dPlayerUnits, xUnitID);
 			} else {
 				trDamageUnit(dmg);
 			}
@@ -1642,7 +1654,7 @@ void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
 }
 
 void revivePlayer(int p = 0) {
-	if (trQuestVarGet("stage") < 10 || trQuestVarGet("reviveCount") > 0) {
+	if ((trQuestVarGet("stage") != 10) || trQuestVarGet("reviveCount") > 0) {
 		trUnitSelectClear();
 		trUnitSelectByQV("p"+p+"reviveBeam");
 		trUnitChangeProtoUnit("Rocket");

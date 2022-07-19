@@ -895,8 +895,7 @@ highFrequency
 			trQuestVarSet("relicCarrier", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Villager Atlantean",1,165,0,153,225,true);
 			xsEnableRule("relic_carrier_always");
-			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) >= 7) {
-				xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
+			if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == 7) {
 				xAddDatabaseBlock(dFreeRelics, true);
 				xSetInt(dFreeRelics, xUnitName, trGetNextUnitScenarioNameNumber());
 				xSetInt(dFreeRelics, xRelicType, RELIC_TRANSPORTER_TICKET);
@@ -1072,13 +1071,13 @@ highFrequency
 		if (xGetInt(dPlayerData, xPlayerLevel) < 9) {
 			trShowChoiceDialog("Ascend " + className(class) + "? (Increases relic capacity by 1)",
 				yesPrompt, 7000+class, "No", -1);
-			trChatHistoryClear();
-			trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
-			for(x=0; <3) {
-				trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
-			}
 		} else {
 			uiMessageBox("You have reached the max level for " + className(class) + "!");
+		}
+		trChatHistoryClear();
+		trChatSend(0, "<u><color=1,1,1>Gemstones</color></u>");
+		for(x=0; <3) {
+			trChatSend(0, gemstoneName(x) + " x" + 1*trQuestVarGet("gemstone"+x));
 		}
 	}
 	

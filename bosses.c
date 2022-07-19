@@ -2690,6 +2690,9 @@ highFrequency
 						xSetInt(dSplatterUnits, xUnitName, xGetInt(dPlayerUnits, xUnitName));
 						xSetInt(dSplatterUnits, xDatabaseIndex, xGetPointer(dPlayerUnits));
 					}
+				} else {
+					trSetUnitOrientation(bossDir,vector(0,1,0),true);
+					trMutateSelected(kbGetProtoUnitID("Shade of Hades"));
 				}
 			} else if (trQuestVarGet("bossSpell") == 3) {
 				action = processGenericProj(dShadeCloud);
@@ -4898,6 +4901,36 @@ highFrequency
 			trForceNonCinematicModels(true);
 			trUIFadeToColor(0,0,0,1000,0,true);
 			trLetterBox(true);
+			if (trQuestVarGet("bossSpell") == 24) {
+				bossScale = 1.3;
+				trSetSelectedScale(bossScale,bossScale,bossScale);
+				p = bossTarget;
+				if (xRestoreDatabaseBlock(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, p)) == false) {
+					debugLog("Could not restore playerUnits block");
+				} else if (xSetPointer(dPlayerUnits, xGetInt(dPlayerData, xPlayerIndex, p)) == false) {
+					debugLog("Could not set pointer for eat target");
+				} else {
+					xSetInt(dPlayerUnits, xSilenceStatus, 0, xGetInt(dPlayerData, xPlayerIndex, p));
+					xSetBool(dPlayerData, xPlayerLaunched, false, p);
+					pos = kbGetBlockPosition(""+bossUnit, true);
+					x = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch(""+bossTarget+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trUnitSelectClear();
+					trUnitSelect(""+x, true);
+					trUnitChangeProtoUnit("Transport Ship Greek");
+					xUnitSelect(dPlayerUnits, xUnitName);
+					trUnitChangeProtoUnit("Militia");
+					xUnitSelect(dPlayerUnits, xUnitName);
+					trImmediateUnitGarrison(""+x);
+					trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, p))));
+					trUnitSelectClear();
+					trUnitSelect(""+x, true);
+					trUnitChangeProtoUnit("Meteor Impact Water");
+					xUnitSelect(dPlayerUnits, xUnitName);
+					damagePlayerUnit(trQuestVarGet("bossDamage"));
+				}
+				equipRelicsAgain(p);
+			}
 		}
 		boss = 0;
 		trSetLighting("Fimbulwinter", 1.0);
@@ -5036,6 +5069,8 @@ highFrequency
 				trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("0,0");
 				trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
+
+				trModifyProtounit("Nidhogg", 0, 2, 20);
 				
 				for(i=1; <= 4) {
 					trQuestVarSet("bossBreath"+i, trGetNextUnitScenarioNameNumber());
@@ -5305,6 +5340,14 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 				trQuestVarSet("bossSpell", 0);
+				id = kbUnitGetTargetUnitID(bossID);
+
+				if ((id <= 0) || (kbUnitGetOwner(id) == ENEMY_PLAYER)) {
+					xDatabaseNext(dPlayerUnits);
+					trUnitSelectClear();
+					trUnitSelect(""+bossUnit);
+					trUnitDoWorkOnUnit(""+xGetInt(dPlayerUnits, xUnitName));
+				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 40) {
 			if (trQuestVarGet("bossSpell") == 41) {
@@ -7317,7 +7360,7 @@ highFrequency
 				if (diff > 0) {
 					diff = 3.5 - 0.002 * diff;
 					if (diff > 0) {
-						trSetSelectedScale(0.0 - diff, diff, 2.0);
+						trSetSelectedScale(0.0 - diff * xGetFloat(dFingers,xFingerScale), 0.5 * diff * xGetFloat(dFingers,xFingerScale), 0.0 - 1.0 - xGetFloat(dFingers,xFingerScale));
 					} else {
 						trUnitDestroy();
 						xFreeDatabaseBlock(dFingers);
@@ -7333,7 +7376,7 @@ highFrequency
 		if (trQuestVarGet("rand2") < trQuestVarGet("rand")) {
 			trQuestVarSet("rand", trQuestVarGet("rand2"));
 		}
-		bossNext = bossNext + trQuestVarGet("rand") * (50 + trQuestVarGet("bossHealth")) / 100; // as boss health goes down, it gets faster
+		bossNext = bossNext + trQuestVarGet("rand") * (100.0 + trQuestVarGet("bossHealth")) / (100.0 + 10 * ENEMY_PLAYER); // as boss health goes down, it gets faster
 		trQuestVarSetFromRand("rand", 1, 3, true);
 		xDatabaseNext(dPlayerCharacters);
 		xUnitSelectByID(dPlayerCharacters, xUnitID);
@@ -9709,7 +9752,7 @@ highFrequency
 						if (diff > 0) {
 							diff = 3.5 - 0.002 * diff;
 							if (diff > 0) {
-								trSetSelectedScale(0.0 - diff, diff, 2.0);
+								trSetSelectedScale(0.0 - diff * xGetFloat(dFingers,xFingerScale), 0.5 * diff * xGetFloat(dFingers,xFingerScale), 0.0 - 1.0 - xGetFloat(dFingers,xFingerScale));
 							} else {
 								trUnitDestroy();
 								xFreeDatabaseBlock(dFingers);

@@ -2293,9 +2293,9 @@ void specialUnitsAlways() {
 						xDatabaseNext(db);
 						if (xGetInt(dArgus, xSpecialTarget) == xGetInt(db,xUnitName)) {
 							xUnitSelectByID(db,xUnitID);
-							stunUnit(db, 6.0, p);
-							poisonUnit(db, 6.0, 5.0 * trQuestVarGet("stage"), p);
-							silenceUnit(db, 6.0, p);
+							stunUnit(db, 4.0, p);
+							poisonUnit(db, 4.0, 5.0 * trQuestVarGet("stage"), p);
+							silenceUnit(db, 4.0, p);
 							action = 1;
 							break;
 						}

@@ -557,20 +557,23 @@ highFrequency
 	int db = 0;
 	for(p=1; < ENEMY_PLAYER) {
 		spawnPlayer(p, vectorSnapToGrid(pos + dir));
-		if ((xGetInt(dPlayerData, xPlayerRelicTransporterLevel) == 8) && Multiplayer && trQuestVarGet("stage") < 10) {
-			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7);
-			trQuestVarSet("p"+p+"transporterPurchased", 1);
-			spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
+		if (xGetInt(dPlayerData, xPlayerRelicTransporterLevel, p) == 8) {
+			if (Multiplayer && trQuestVarGet("stage") < 10) {
+				trQuestVarSet("p"+p+"transporterPurchased", 1);
+				spawnPlayerUnit(p, kbGetProtoUnitID("Villager Atlantean Hero"), vectorSnapToGrid(pos + dir));
+			}
+			trQuestVarSet("p"+p+"relic13", RELIC_TRANSPORTER_TICKET);
+			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, 7, p);
 		}
 		dir = rotationMatrix(dir, mCos, mSin);
 		trQuestVarSet("p"+p+"lureObject", trGetNextUnitScenarioNameNumber()-1);
 		trQuestVarSet("p"+p+"wellObject", trGetNextUnitScenarioNameNumber()-1);
 		if (trQuestVarGet("p"+p+"nickEquipped") == 1) {
 			trQuestVarSet("p"+p+"nickEquipped", 0); // Set it to 0 because relicEffect will set it back to 1
-			trQuestVarSet("p"+p+"relic12", RELIC_NICKONHAWK);
+			trQuestVarSet("p"+p+"relic14", RELIC_NICKONHAWK);
 		}
 		db = getRelicsDB(p);
-		for(x=12; >0) {
+		for(x=14; >0) {
 			if (trQuestVarGet("p"+p+"relic"+x) > 0) {
 				trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 				trArmyDispatch(""+p+",0","Dwarf",1,1,0,1,0,true);
@@ -716,7 +719,12 @@ highFrequency
 				if (trUnitGetIsContained("Unit") == false) {
 					if (xGetInt(db, xRelicType) < KEY_RELICS) {
 						relicReturned = false;
-						if (distanceBetweenVectors(pos, trVectorQuestVarGet("relicTransporterGuyPos")) < 36) {
+						if ((xGetInt(db, xRelicType) == RELIC_TRANSPORTER_TICKET) && Multiplayer) {
+							trUnitDestroy();
+							if (trCurrentPlayer() == p) {
+								uiMessageBox("Relic Transporter Ticket unequipped. Return to singleplayer if you want to equip it again.");
+							}
+						} else if (distanceBetweenVectors(pos, trVectorQuestVarGet("relicTransporterGuyPos")) < 36) {
 							relicReturned = true;
 							if (trPlayerUnitCountSpecific(p, "Villager Atlantean Hero") == 0) {
 								if (trPlayerResourceCount(p, "gold") >= 100) {
@@ -1605,6 +1613,10 @@ highFrequency
 		xsDisableSelf();
 	} else if (aiPlanGetUserVariableBool(dEnemies, xDirtyBit, 1*trQuestVarGet("hippocampusIndex")) == false) {
 		debugLog("Hippocampus ejected from the database!");
+		trUnitSelectClear();
+		trUnitSelectByQV("hippocampusUnit");
+		trUnitDestroy();
+		xsDisableSelf();
 	}
 }
 
@@ -1835,7 +1847,7 @@ highFrequency
 			if (vectorInRectangle(pos, bot, top)) {
 				gainFavor(xGetInt(dPlayerCharacters, xPlayerOwner), -1.0);
 				dist = xsMax(xsAbs(xsVectorGetX(pos) - xsVectorGetX(center)), xsAbs(xsVectorGetZ(pos) - xsVectorGetZ(center)));
-				if (dist > 4) {
+				if (dist > 2) {
 					xSetInt(dPlayerCharacters, xElectricNext, xGetInt(dPlayerCharacters, xElectricNext) + 200 + 100 * dist);
 					trTechGodPower(0, "bolt", 1);
 					trChatSetStatus(false);

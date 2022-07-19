@@ -94,7 +94,11 @@ void throneShieldAlways(int eventID = -1) {
 			if (xGetInt(dPlayerData, xPlayerSimp, target) > 0) {
 				target = 0;
 				if (trCurrentPlayer() == p) {
-					trChatSend(0, "That player already has a partner!");
+					if (xGetInt(dPlayerData, xPlayerSimp, target) == p) {
+						trChatSend(0, "You must cast closer to your ally in order to teleport to them.");
+					} else {
+						trChatSend(0, "That player already has a partner!");
+					}
 				}
 			} else if (xGetInt(dPlayerData, xPlayerClass, target) == THRONESHIELD) {
 				target = 0;
@@ -147,7 +151,8 @@ void throneShieldAlways(int eventID = -1) {
 					trQuestVarSet("p"+target+"tetherReady", 1);
 				}
 			}
-		} else if (target == 0) {
+		}
+		if (target == 0) {
 			if (trCurrentPlayer() == p) {
 				trChatSend(0, "You must target an ally!");
 				trCounterAbort("well");

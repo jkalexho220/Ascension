@@ -486,7 +486,7 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 	{
 		case RELIC_TRANSPORTER_TICKET:
 		{
-			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, xGetInt(dPlayerData, xPlayerRelicTransporterLevel, p) + m, p);
+			xSetInt(dPlayerData, xPlayerRelicTransporterLevel, xGetInt(dPlayerData, xPlayerRelicTransporterLevel) + m);
 		}
 		case RELIC_HEALTH:
 		{

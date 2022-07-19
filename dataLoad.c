@@ -19,165 +19,167 @@ void saveAllData() {
 	xsSetContextPlayer(0);
 	trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
 	int p = trCurrentPlayer();
-	int relic = 0;
-	/* relic transporter guy */
-	int db = getWarehouseDB(p);
-	for(x=xGetDatabaseCount(db); >0) {
-		xDatabaseNext(db);
-		relic = xGetInt(db,xRelicType);
-		if (relic <= NORMAL_RELICS) {
-			trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
-		}
-	}
-	
-	if ((trQuestVarGet("nickWasEquipped") == 1) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
-		trQuestVarSet("p"+p+"nickQuestProgress", 0);
-	}
-
-	if (Multiplayer) {
-		trQuestVarSet("nottudTicketsCount", trQuestVarGet("nottudTicketsCount") + trQuestVarGet("ownedRelics"+RELIC_NOTTUD_TICKET));
-	}
-	
-	xSetPointer(dPlayerData,p);
-	if (xGetInt(dPlayerData, xPlayerClass) == 17) {
-		xSetInt(dPlayerData, xPlayerClass, 0);
-	}
-	/* slot 0 */
-	savedata = 0;
-	savedata = savedata * 40 + xGetInt(dPlayerData,xPlayerMonsterIndex);
-	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerRelicTransporterLevel);
-	savedata = savedata * 31 + xGetInt(dPlayerData,xPlayerClass);
-	savedata = savedata * 13 + xGetInt(dPlayerData,xPlayerGodBoon);
-	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerLevel);
-	savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerProgress);
-	trSetCurrentScenarioUserData(0, savedata);
-	/* gold */
-	savedata = xGetInt(dPlayerData,xPlayerGold) - trQuestVarGet("p"+p+"startingGold");
-	savedata = savedata + trGetScenarioUserData(1);
-	trSetCurrentScenarioUserData(1, savedata);
-	/* current relics */
-	db = getRelicsDB(p);
-	for(x=12; > xGetDatabaseCount(db)) {
-		trQuestVarSet("p"+p+"relic"+x, 0);
-	}
-	for(x=xGetDatabaseCount(db); >0) {
-		xDatabaseNext(db);
-		if (xGetInt(db, xRelicType) <= NORMAL_RELICS) {
-			trQuestVarSet("p"+p+"relic"+x, xGetInt(db, xRelicType));
-		} else {
-			if (xGetInt(db, xRelicType) == RELIC_NICKONHAWK_TICKET) {
-				trQuestVarSet("p"+p+"nickQuestProgress", 6);
+	if (p != ENEMY_PLAYER) {
+		int relic = 0;
+		/* relic transporter guy */
+		int db = getWarehouseDB(p);
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			relic = xGetInt(db,xRelicType);
+			if (relic <= NORMAL_RELICS) {
+				trQuestVarSet("ownedRelics"+relic, 1 + trQuestVarGet("ownedRelics"+relic));
 			}
+		}
+		
+		if ((trQuestVarGet("nickWasEquipped") == 1) && (trQuestVarGet("p"+p+"nickEquipped") == 0) && Multiplayer) {
+			trQuestVarSet("p"+p+"nickQuestProgress", 0);
+		}
+
+		if (Multiplayer) {
+			trQuestVarSet("nottudTicketsCount", trQuestVarGet("nottudTicketsCount") + trQuestVarGet("ownedRelics"+RELIC_NOTTUD_TICKET));
+		}
+		
+		xSetPointer(dPlayerData,p);
+		if (xGetInt(dPlayerData, xPlayerClass) == 17) {
+			xSetInt(dPlayerData, xPlayerClass, 0);
+		}
+		/* slot 0 */
+		savedata = 0;
+		savedata = savedata * 40 + xGetInt(dPlayerData,xPlayerMonsterIndex);
+		savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerRelicTransporterLevel);
+		savedata = savedata * 31 + xGetInt(dPlayerData,xPlayerClass);
+		savedata = savedata * 13 + xGetInt(dPlayerData,xPlayerGodBoon);
+		savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerLevel);
+		savedata = savedata * 10 + xGetInt(dPlayerData,xPlayerProgress);
+		trSetCurrentScenarioUserData(0, savedata);
+		/* gold */
+		savedata = xGetInt(dPlayerData,xPlayerGold) - trQuestVarGet("p"+p+"startingGold");
+		savedata = savedata + trGetScenarioUserData(1);
+		trSetCurrentScenarioUserData(1, savedata);
+		/* current relics */
+		db = getRelicsDB(p);
+		for(x=12; > xGetDatabaseCount(db)) {
 			trQuestVarSet("p"+p+"relic"+x, 0);
 		}
-	}
-	/* equipped relics */
-	savedata = 0;
-	currentdata = 0;
-	for(x=6; > 0) {
-		savedata = savedata * 31 + (1*trQuestVarGet("p"+p+"relic"+x));
-		currentdata = currentdata * 31 + (1*trQuestVarGet("p"+p+"relic"+(x+6)));
-	}
-	trSetCurrentScenarioUserData(2, savedata);
-	trSetCurrentScenarioUserData(3, currentdata);
-	
-	/* owned relics */
-	for(y=0; < 4) {
-		savedata = 0;
-		for(x=8; >0) {
-			currentdata = 1*xsMin(12, 1*trQuestVarGet("ownedRelics"+(x+8*y)));
-			savedata = savedata * 13 + currentdata;
+		for(x=xGetDatabaseCount(db); >0) {
+			xDatabaseNext(db);
+			if (xGetInt(db, xRelicType) <= NORMAL_RELICS) {
+				trQuestVarSet("p"+p+"relic"+x, xGetInt(db, xRelicType));
+			} else {
+				if (xGetInt(db, xRelicType) == RELIC_NICKONHAWK_TICKET) {
+					trQuestVarSet("p"+p+"nickQuestProgress", 6);
+				}
+				trQuestVarSet("p"+p+"relic"+x, 0);
+			}
 		}
-		trSetCurrentScenarioUserData(12 + y, savedata);
-	}
-	
-	/* gemstones */
-	savedata = xsMin(9, trQuestVarGet("nottudTicketsCount"));
-	currentdata = xsMin(9, trQuestVarGet("dreamGogglesCount"));
-	savedata = savedata * 10 + currentdata;
-	for(x=2; >=0) {
-		currentdata = 1*xsMin(99, 1*trQuestVarGet("gemstone"+x));
-		savedata = savedata * 100 + currentdata;
-	}
-	trSetCurrentScenarioUserData(9, savedata);
-	
-	if (Multiplayer == false) {
-		/* class levels */
-		for(y=0; <2) {
+		/* equipped relics */
+		savedata = 0;
+		currentdata = 0;
+		for(x=6; > 0) {
+			savedata = savedata * 31 + (1*trQuestVarGet("p"+p+"relic"+x));
+			currentdata = currentdata * 31 + (1*trQuestVarGet("p"+p+"relic"+(x+6)));
+		}
+		trSetCurrentScenarioUserData(2, savedata);
+		trSetCurrentScenarioUserData(3, currentdata);
+		
+		/* owned relics */
+		for(y=0; < 4) {
 			savedata = 0;
 			for(x=8; >0) {
-				currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, x + 8 * y));
-				savedata = savedata * 11 + currentdata;
+				currentdata = 1*xsMin(12, 1*trQuestVarGet("ownedRelics"+(x+8*y)));
+				savedata = savedata * 13 + currentdata;
 			}
-			trSetCurrentScenarioUserData(10 + y, savedata);
+			trSetCurrentScenarioUserData(12 + y, savedata);
 		}
-	}
-	
-	/* class unlock progress */
-	savedata = 0;
-	currentdata = trQuestVarGet("beatTheGame");
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("subscribed");
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("doggoQuestProgress");
-	savedata = savedata * 6 + currentdata;
-	currentdata = trQuestVarGet("runestoneComplete");
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("monsterpediaQuestComplete");
-	savedata = savedata * 2 + currentdata;
-	currentdata = xsMin(10, trQuestVarGet("chestCount"));
-	savedata = savedata * 11 + currentdata;
-	currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
-	savedata = savedata * 10 + currentdata;
-	currentdata = xsMin(10, trQuestVarGet("questCount"));
-	savedata = savedata * 11 + currentdata;
-	currentdata = xsMin(100, trQuestVarGet("giantKills"));
-	savedata = savedata * 101 + currentdata;
-	currentdata = xsMin(5, trQuestVarGet("bossKills"));
-	savedata = savedata * 6 + currentdata;
-	currentdata = trQuestVarGet("playerHasHosted");
-	savedata = savedata * 2 + currentdata;
-	trSetCurrentScenarioUserData(8, savedata);
-	
-	/* boon unlocks */
-	savedata = 0;
-	for(x=12; >=0) {
-		currentdata = trQuestVarGet("boonUnlocked"+x);
+		
+		/* gemstones */
+		savedata = xsMin(9, trQuestVarGet("nottudTicketsCount"));
+		currentdata = xsMin(9, trQuestVarGet("dreamGogglesCount"));
+		savedata = savedata * 10 + currentdata;
+		for(x=2; >=0) {
+			currentdata = 1*xsMin(99, 1*trQuestVarGet("gemstone"+x));
+			savedata = savedata * 100 + currentdata;
+		}
+		trSetCurrentScenarioUserData(9, savedata);
+		
+		if (Multiplayer == false) {
+			/* class levels */
+			for(y=0; <2) {
+				savedata = 0;
+				for(x=8; >0) {
+					currentdata = 1*xsMin(10, xGetInt(dClass, xClassLevel, x + 8 * y));
+					savedata = savedata * 11 + currentdata;
+				}
+				trSetCurrentScenarioUserData(10 + y, savedata);
+			}
+		}
+		
+		/* class unlock progress */
+		savedata = 0;
+		currentdata = trQuestVarGet("beatTheGame");
 		savedata = savedata * 2 + currentdata;
-	}
-	trSetCurrentScenarioUserData(7, savedata);
-	
-	/* Quest data */
-	savedata = 0;
-	currentdata = xsMin(2, trQuestVarGet("p"+p+"monsterpediaQuest"));
-	savedata = savedata * 3 + currentdata;
-	currentdata = xsMin(9, trQuestVarGet("p"+p+"relicsSacrificed"));
-	savedata = savedata * 10 + currentdata;
+		currentdata = trQuestVarGet("subscribed");
+		savedata = savedata * 2 + currentdata;
+		currentdata = trQuestVarGet("doggoQuestProgress");
+		savedata = savedata * 6 + currentdata;
+		currentdata = trQuestVarGet("runestoneComplete");
+		savedata = savedata * 2 + currentdata;
+		currentdata = trQuestVarGet("monsterpediaQuestComplete");
+		savedata = savedata * 2 + currentdata;
+		currentdata = xsMin(10, trQuestVarGet("chestCount"));
+		savedata = savedata * 11 + currentdata;
+		currentdata = xsMin(9, trQuestVarGet("zenoQuiz"));
+		savedata = savedata * 10 + currentdata;
+		currentdata = xsMin(10, trQuestVarGet("questCount"));
+		savedata = savedata * 11 + currentdata;
+		currentdata = xsMin(100, trQuestVarGet("giantKills"));
+		savedata = savedata * 101 + currentdata;
+		currentdata = xsMin(5, trQuestVarGet("bossKills"));
+		savedata = savedata * 6 + currentdata;
+		currentdata = trQuestVarGet("playerHasHosted");
+		savedata = savedata * 2 + currentdata;
+		trSetCurrentScenarioUserData(8, savedata);
+		
+		/* boon unlocks */
+		savedata = 0;
+		for(x=12; >=0) {
+			currentdata = trQuestVarGet("boonUnlocked"+x);
+			savedata = savedata * 2 + currentdata;
+		}
+		trSetCurrentScenarioUserData(7, savedata);
+		
+		/* Quest data */
+		savedata = 0;
+		currentdata = xsMin(2, trQuestVarGet("p"+p+"monsterpediaQuest"));
+		savedata = savedata * 3 + currentdata;
+		currentdata = xsMin(9, trQuestVarGet("p"+p+"relicsSacrificed"));
+		savedata = savedata * 10 + currentdata;
 
-	currentdata = 0; // 3 placeholder bits
-	for(x=3; >0) {
-		currentdata = trQuestVarGet("p"+p+"swordpieceQuest"+x);
-		savedata = savedata * 2 + currentdata;
-	}
-	currentdata = xsMin(3, trQuestVarGet("p"+p+"runestoneQuest"));
-	savedata = savedata * 4 + currentdata;
+		currentdata = 0; // 3 placeholder bits
+		for(x=3; >0) {
+			currentdata = trQuestVarGet("p"+p+"swordpieceQuest"+x);
+			savedata = savedata * 2 + currentdata;
+		}
+		currentdata = xsMin(3, trQuestVarGet("p"+p+"runestoneQuest"));
+		savedata = savedata * 4 + currentdata;
 
-	for(x=3; >0) {
-		currentdata = trQuestVarGet("p"+p+"swordpiece"+x);
+		for(x=3; >0) {
+			currentdata = trQuestVarGet("p"+p+"swordpiece"+x);
+			savedata = savedata * 2 + currentdata;
+		}
+		currentdata = xsMin(trQuestVarGet("p"+p+"gladiatorWorlds"), 1);
 		savedata = savedata * 2 + currentdata;
+		currentdata = trQuestVarGet("p"+p+"hippocampus");
+		savedata = savedata * 2 + currentdata;
+		
+		currentdata = trQuestVarGet("yeebHit");
+		savedata = savedata * 2 + currentdata;
+		currentdata = trQuestVarGet("p"+p+"nickEquipped");
+		savedata = savedata * 2 + currentdata;
+		currentdata = trQuestVarGet("p"+p+"nickQuestProgress");
+		savedata = savedata * 7 + currentdata;
+		trSetCurrentScenarioUserData(4, savedata);
 	}
-	currentdata = xsMin(trQuestVarGet("p"+p+"gladiatorWorlds"), 1);
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"hippocampus");
-	savedata = savedata * 2 + currentdata;
-	
-	currentdata = trQuestVarGet("yeebHit");
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"nickEquipped");
-	savedata = savedata * 2 + currentdata;
-	currentdata = trQuestVarGet("p"+p+"nickQuestProgress");
-	savedata = savedata * 7 + currentdata;
-	trSetCurrentScenarioUserData(4, savedata);
 }
 
 void showLoadProgress() {

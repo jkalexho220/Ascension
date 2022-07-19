@@ -434,7 +434,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			pos = xsVectorSet(x * 35 + 10, 0, z * 35 + 30);
 			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 30, z * 35 + 30, 0, 73, false); // city water pool
 			trPaintTerrain(x * 35 + 10, z * 35 + 10, x * 35 + 10, z * 35 + 30, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
-			for(i=10; >1) {
+			for(i=10; >0) {
 				trPaintTerrain(xsVectorGetX(pos),xsVectorGetZ(pos),xsVectorGetX(pos) + 2 * xsVectorGetX(dir) * i, xsVectorGetZ(pos) + 2 * xsVectorGetZ(dir) * i, TERRAIN_WALL, TERRAIN_SUB_WALL, false);
 				pos = pos + (dir * i * 2);
 				dir = rotationMatrix(dir, 0, -1);
@@ -447,10 +447,10 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 			trArmySelect("0,0");
 			trUnitChangeProtoUnit("Cinematic Block");
 			trQuestVarSet("electricRoomShiny", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Dwarf",1,x * 70 + 41, 0, z * 70 + 41,0,true);
+			trArmyDispatch("0,0","Dwarf",1,x * 70 + 43, 0, z * 70 + 39,0,true);
 			trArmySelect("0,0");
 			trMutateSelected(kbGetProtoUnitID("Curse SFX"));
-			trVectorQuestVarSet("electricRoomCenter", xsVectorSet(x * 70 + 41, 0, z * 70 + 41));
+			trVectorQuestVarSet("electricRoomCenter", xsVectorSet(x * 70 + 43, 0, z * 70 + 39));
 			trVectorQuestVarSet("electricRoomBot", xsVectorSet(x * 70 + 20, 0, z * 70 + 20));
 			trVectorQuestVarSet("electricRoomTop", xsVectorSet(x * 70 + 60, 0, z * 70 + 60));
 			xsEnableRule("electric_room_find");
@@ -1079,7 +1079,7 @@ void buildRoom(int x = 0, int z = 0, int type = 0) {
 
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 9999999999999999999.0);
 			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, -9999999999999999999.0);
-			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
+			trModifyProtounit("White Tiger", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
 
 			trModifyProtounit("Tartarian Gate flame", 0, 8, -999);
 
