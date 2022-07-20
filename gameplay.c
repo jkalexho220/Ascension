@@ -1444,10 +1444,6 @@ highFrequency
 						xSetInt(dPitSpawn, xPitSpawnNext, trTimeMS() + 500);
 					}
 				}
-				case kbGetProtoUnitID("Tartarian Gate birth"):
-				{
-					trQuestVarSet("noGates", 0);
-				}
 			}
 		}
 		pitLatest = trGetNextUnitScenarioNameNumber() - 1;
@@ -1515,8 +1511,6 @@ highFrequency
 		trTechGodPower(ENEMY_PLAYER, "tartarian gate", 1);
 		trUnitSelectClear();
 		trTechInvokeGodPower(ENEMY_PLAYER, "tartarian gate", pos, vector(0,0,0));
-
-		trQuestVarSet("noGates", 1);
 	}
 }
 
