@@ -221,8 +221,13 @@ void thunderRiderAlways(int eventID = -1) {
 				pos = vectorSetAsCurrentPosition(prev,dir,dist);
 				trQuestVarSet("p"+p+"thunderRiderBonus",
 					trQuestVarGet("p"+p+"thunderRiderBonus") + dist * 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack));
-				
 				xSetInt(balls, xLightningBallLast, trTimeMS());
+
+				if (cameraLockOnSelf) {
+					if (trQuestVarGet("p"+p+"rideLightningIndex") == xGetPointer(balls)) {
+						lookAt(xsVectorGetX(pos),xsVectorGetZ(pos));
+					}
+				}
 				
 				amt = rideLightningRange * xGetFloat(dPlayerData, xPlayerSpellRange);
 				dist = dist + amt;
@@ -420,6 +425,10 @@ void thunderRiderAlways(int eventID = -1) {
 						xSetInt(balls, xLightningBallLast, trTimeMS());
 						xSetInt(balls, xLightningBallStart, trTimeMS());
 						xSetFloat(balls, xLightningBallDamage, rideLightningDamage * xGetFloat(dPlayerData, xPlayerSpellDamage));
+
+						if (xGetInt(dPlayerData, xPlayerUnit) == xGetInt(db, xUnitName)) {
+							trQuestVarSet("p"+p+"rideLightningIndex", xGetNewestPointer(balls));
+						}
 						
 						
 						trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(prev),0,xsVectorGetZ(prev),0,true);

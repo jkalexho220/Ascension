@@ -19,6 +19,7 @@ int xFireKnightCharging = 0;
 int xFireKnightOverheatNext = 0;
 
 int xFireChargeTimeout = 0;
+int xFireChargeDir = 0;
 int xFireChargeSFX = 0;
 int xFireChargeDest = 0;
 
@@ -123,6 +124,9 @@ void fireknightAlways(int eventID = -1) {
 				trSoundPlayFN("meteordustcloud.wav","1",-1,"","");
 			}
 		} else {
+			dir = xGetVector(charges, xFireChargeDir);
+			dest = dest + dir * 4.0;
+			dir = rotationMatrix(dir, 0, 1.0);
 			dist = xsPow(flamingImpactRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 			for(x=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
@@ -131,8 +135,7 @@ void fireknightAlways(int eventID = -1) {
 					removeEnemy();
 				} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist &&
 					xGetBool(dEnemies, xLaunched) == false) {
-					dir = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true) - pos + dest;
-					launchUnit(dEnemies, dir);
+					launchUnit(dEnemies, dir * dotProduct(kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true) - pos, dir) + dest);
 				}
 			}
 		}
@@ -184,7 +187,8 @@ void fireknightAlways(int eventID = -1) {
 				
 				xSetBool(dPlayerUnits, xLaunched, true, xGetInt(db, xCharIndex));
 				
-				dist = distanceBetweenVectors(pos, xGetVector(dPlayerData, xPlayerWellPos), false);
+				// Charge duration is 2, and speed is 15. Therefore it is 30 x spell duration for maximum range
+				dist = xsMin(distanceBetweenVectors(pos, xGetVector(dPlayerData, xPlayerWellPos), false), 30.0 * xGetFloat(dPlayerData, xPlayerSpellDuration));
 				for(y=0; < dist / 2) {
 					dest = pos + (dir * 2.0);
 					if (terrainIsType(vectorToGrid(dest), TERRAIN_WALL, TERRAIN_SUB_WALL)) {
@@ -203,8 +207,9 @@ void fireknightAlways(int eventID = -1) {
 				xAddDatabaseBlock(charges, true);
 				xSetInt(charges, xUnitName, next);
 				xSetInt(charges, xDatabaseIndex, xGetPointer(db));
-				xSetInt(charges, xFireChargeTimeout, trTimeMS() + 2000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
 				xSetInt(charges, xFireChargeSFX, target);
+				xSetInt(charges, xFireChargeTimeout, trTimeMS() + 1000 + 2000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
+				xSetVector(charges, xFireChargeDir, dir);
 				xSetVector(charges, xFireChargeDest, pos);
 			}
 		}
@@ -425,6 +430,7 @@ void chooseFireKnight(int eventID = -1) {
 		xInitAddInt(db, "index");
 		xFireChargeTimeout = xInitAddInt(db, "timeout");
 		xFireChargeSFX = xInitAddInt(db, "sfx");
+		xFireChargeDir = xInitAddVector(db, "dir");
 		xFireChargeDest = xInitAddVector(db, "dest");
 	}
 	

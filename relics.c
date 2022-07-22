@@ -530,9 +530,9 @@ void relicEffect(int relic = 0, int p = 0, bool equip = true) {
 			trModifyProtounit(proto, p, 24, -1);
 			trModifyProtounit(proto, p, 25, -1);
 			trModifyProtounit(proto, p, 26, -1);
-			trModifyProtounit(proto, p, 24, xGetFloat(dPlayerData,xPlayerPhysicalResist));
-			trModifyProtounit(proto, p, 25, xGetFloat(dPlayerData,xPlayerPhysicalResist));
-			trModifyProtounit(proto, p, 26, xGetFloat(dPlayerData,xPlayerPhysicalResist));
+			trModifyProtounit(proto, p, 24, xGetFloat(dPlayerData,xPlayerPhysicalResist) + 0.001);
+			trModifyProtounit(proto, p, 25, xGetFloat(dPlayerData,xPlayerPhysicalResist) + 0.001);
+			trModifyProtounit(proto, p, 26, xGetFloat(dPlayerData,xPlayerPhysicalResist) + 0.001);
 			for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 				xDatabaseNext(dPlayerUnits);
 				if ((xGetInt(dPlayerUnits,xPlayerOwner) == p) && xGetBool(dPlayerUnits,xIsHero)) {

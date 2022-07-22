@@ -144,7 +144,7 @@ string boonName(int boon = 0) {
 	{
 		case BOON_REGENERATE_HEALTH:
 		{
-			name = "Regenerate 2 percent health per second.";
+			name = "Regenerate 3 percent health per second.";
 		}
 		case BOON_MORE_GOLD:
 		{

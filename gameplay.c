@@ -141,7 +141,7 @@ void processRegen(int p = 0) {
 		amt = 0;
 		diff = trTimeMS() - xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p);
 		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_REGENERATE_HEALTH) {
-			amt = diff * 0.00002 * xGetFloat(dPlayerData, xPlayerHealth, p);
+			amt = diff * 0.00003 * xGetFloat(dPlayerData, xPlayerHealth, p);
 		}
 		xSetFloat(dPlayerData, xPlayerLifestealTotal, xGetFloat(dPlayerData, xPlayerLifestealTotal, p) + amt, p);
 		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
@@ -1079,6 +1079,12 @@ highFrequency
 	
 	processChests();
 	processWalls();
+
+	if (cameraLockOnSelf) {
+		if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) + trQuestVarGet("p"+p+"rideLightning") == 0) {
+			uiLookAtUnit(xGetInt(dPlayerUnits, xUnitID, xGetInt(dPlayerData, xPlayerIndex)));
+		}
+	}
 	
 	/* GAME OVER */
 	if (trQuestVarGet("deadPlayerCount") == trQuestVarGet("activePlayerCount") && Multiplayer &&
@@ -1419,10 +1425,9 @@ highFrequency
 			{
 				case kbGetProtoUnitID("Tartarian Gate"):
 				{
-					if (boss == 0) {
-						xAddDatabaseBlock(dPitGates, true);
-						xSetInt(dPitGates, xUnitName, i);
-					}
+					xAddDatabaseBlock(dPitGates, true);
+					xSetInt(dPitGates, xUnitName, i);
+					
 					trUnitSelectClear();
 					trUnitSelectByID(id);
 					trDamageUnitPercent(-100);
@@ -1464,14 +1469,12 @@ highFrequency
 
 		if (trTime() > trQuestVarGet("pitDamageNext")) {
 			trQuestVarSet("pitDamageNext", trTime());
-			if (boss == 0) {
-				for(i=xGetDatabaseCount(dPitGates); >0) {
-					xDatabaseNext(dPitGates);
-					xUnitSelect(dPitGates, xUnitName);
-					trDamageUnitPercent(5);
-					if (trUnitAlive() == false) {
-						xFreeDatabaseBlock(dPitGates);
-					}
+			for(i=xGetDatabaseCount(dPitGates); >0) {
+				xDatabaseNext(dPitGates);
+				xUnitSelect(dPitGates, xUnitName);
+				trDamageUnit(1);
+				if (trUnitAlive() == false) {
+					xFreeDatabaseBlock(dPitGates);
 				}
 			}
 		}

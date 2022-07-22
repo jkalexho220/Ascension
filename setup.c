@@ -40,6 +40,8 @@ bool PvP = false;
 
 bool customContent = false;
 
+bool cameraLockOnSelf = false;
+
 /*
 Chasm terrain is black
 */
@@ -63,6 +65,10 @@ Secondary terrain
 */
 int TERRAIN_SECONDARY = 0;
 int TERRAIN_SUB_SECONDARY = 1;
+
+void toggleCameraLock(int eventID = -1) {
+	cameraLockOnSelf = (cameraLockOnSelf == false);
+}
 
 string gemstoneIcon(int gem = 0) {
 	string img = "icons\improvement hands of the pharaoh icons 64";
@@ -396,6 +402,9 @@ runImmediately
 	} else {
 		ENEMY_PLAYER = 2;
 	}
+
+	trEventSetHandler(997, "toggleCameraLock");
+	map("space","game","trackInsert(); trackAddWaypoint();trackPlay(-1,997);");
 	
 	trQuestVarSet("activePlayerCount", ENEMY_PLAYER - 1);
 	
@@ -948,7 +957,7 @@ highFrequency
 			}
 			trPaintTerrain(68,46,76,76,5,4,false); // black
 			for(i=0; <= xGetInt(dPlayerData,xPlayerProgress,1)) {
-			//for(i=0; <= 8) {
+			//for(i=0; <= 9) { // FIX ME
 				paintTowerSegment(i+1);
 			}
 			trPaintTerrain(67,46,67,76,0,74,false); // left wall

@@ -1265,8 +1265,8 @@ highFrequency
 				case 4:
 				{
 					gem = SOULSTONE;
-					setupQuestion("All players must be present to start the boss battle.","True","False",2);
-					setupExplain("Only the living players need to be present. Dead players will be automatically revived.");
+					setupQuestion("The Spell Duration stat will affect the decay rate of your summoned allies.","True","False",1);
+					setupExplain("The decay rate of summoned allies is decreased by your Spell Duration.");
 					
 					setupQuestion("If a unit is afflicted with two different poisons, how is the damage calculated?",
 						"The poison damage adds up.","Only the strongest poison deals damage.",2);
@@ -1283,6 +1283,9 @@ highFrequency
 					
 					setupQuestion("Only melee characters have Special Attacks.","True","False",1);
 					setupExplain("Melee characters have Special Attacks, while ranged characters have Projectiles.");
+
+					setupQuestion("You can press Space to toggle camera-lock on your character.","True","False",1);
+					setupExplain("Press spacebar to lock the camera to your character! Press it again to unlock it.");
 
 					setupQuestion("You can press Escape to close a relic image box.","True","False",1);
 					setupExplain("I painstakingly coded this myself. It's not a default AoM feature. So use it you bastards.");

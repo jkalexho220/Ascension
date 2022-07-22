@@ -17,7 +17,7 @@ const int TOTAL_LOAD = 25;
 
 void saveAllData() {
 	xsSetContextPlayer(0);
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
+	trSetCurrentScenarioUserData(VERSION_NUMBER, 6);
 	int p = trCurrentPlayer();
 	if (p != ENEMY_PLAYER) {
 		int relic = 0;
@@ -216,6 +216,8 @@ inactive
 			trSetCurrentScenarioUserData(i, 0);
 		}
 		trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
+	} else if (trGetScenarioUserData(VERSION_NUMBER) == 5) {
+		uiMessageBox("New functionality added: Press SPACE to toggle camera-lock on your character.");
 	}
 
 

@@ -6063,7 +6063,7 @@ highFrequency
 	if (trUnitAlive() == true) {
 		if (trQuestVarGet("secondPhase") == 1) {
 			if (trTime() > trQuestVarGet("pitDeployNext")) {
-				trQuestVarSet("pitDeployNext", trTime() + 30 - trUnitPercentDamaged() / 5);
+				trQuestVarSet("pitDeployNext", trTime() + 45 - ENEMY_PLAYER - trUnitPercentDamaged() / 5);
 				// tartarian gates
 				dir = trVectorQuestVarGet("gateSpawnDir");
 				pos = trVectorQuestVarGet("bossRoomCenter") - (dir * 15.0);
@@ -6548,7 +6548,7 @@ highFrequency
 			}
 		}
 	} else {
-		trUnitOverrideAnimation(-1,0,false,true,-1);
+		trUnitChangeProtoUnit("Titan Atlantean");
 		xsDisableSelf();
 		trMusicStop();
 		xsDisableRule("boss_music");
