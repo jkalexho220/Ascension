@@ -296,7 +296,7 @@ inactive
 				case 8:
 				{
 					trMusicPlay("Zenophobia\Celestial Battle.mp3", "1", 0.1);
-					trQuestVarSet("musicTime", trTime() + 73);
+					trQuestVarSet("musicTime", trTime() + 72);
 				}
 				case 9:
 				{
@@ -4600,8 +4600,15 @@ highFrequency
 					}
 				}
 				bossTargetPos = kbGetBlockPosition(""+xGetInt(dPlayerCharacters, xUnitName), true);
-				dir = getUnitVector(bossPos, bossTargetPos);
-				dist = 0.5 * distanceBetweenVectors(bossPos, bossTargetPos, false);
+				if (manhattanDistance(bossTargetPos, bossPos) < 0.1) {
+					// avoid divide by zero error
+					dir = vector(0,0,-1);
+					dist = 0.5;
+					bossTargetPos = bossPos + dir;
+				} else {
+					dir = getUnitVector(bossPos, bossTargetPos);
+					dist = 0.5 * distanceBetweenVectors(bossPos, bossTargetPos, false);
+				}
 				amt = dist * 0.04;
 				m = 15.0 / xsPow(dist, 2);
 				for(i=0; < 50) {
@@ -5340,14 +5347,6 @@ highFrequency
 		if (trQuestVarGet("bossSpell") == BOSS_SPELL_COOLDOWN) {
 			if (trTimeMS() > trQuestVarGet("bossCooldownTime")) {
 				trQuestVarSet("bossSpell", 0);
-				id = kbUnitGetTargetUnitID(bossID);
-
-				if ((id <= 0) || (kbUnitGetOwner(id) == ENEMY_PLAYER)) {
-					xDatabaseNext(dPlayerUnits);
-					trUnitSelectClear();
-					trUnitSelect(""+bossUnit);
-					trUnitDoWorkOnUnit(""+xGetInt(dPlayerUnits, xUnitName));
-				}
 			}
 		} else if (trQuestVarGet("bossSpell") > 40) {
 			if (trQuestVarGet("bossSpell") == 41) {
@@ -5370,6 +5369,14 @@ highFrequency
 						trQuestVarSet("bCos", xsCos(6.283185 / bossCount));
 						trQuestVarSet("bSin", xsSin(6.283185 / bossCount));
 					}
+				}
+				id = kbUnitGetTargetUnitID(bossID);
+
+				if ((id <= 0) || (kbUnitGetOwner(id) == ENEMY_PLAYER)) {
+					xDatabaseNext(dPlayerUnits);
+					trUnitSelectClear();
+					trUnitSelect(""+bossUnit);
+					trUnitDoWorkOnUnit(""+xGetInt(dPlayerUnits, xUnitName));
 				}
 			} else if (trQuestVarGet("bossSpell") == 42) {
 				if (bossCount <= 0) {
@@ -5982,9 +5989,16 @@ highFrequency
 				if (lavaTiles < 0) {
 					debugLog("Unable to allocate lavaTiles plan");
 				}
-				for (x=trQuestVarGet("bossRoomSize") * 2 + 2; >=0) {
+				for (x=2 + trQuestVarGet("bossRoomSize") * 2; >=0) {
 					aiPlanAddUserVariableInt(lavaTiles,x,"row"+x,2*trQuestVarGet("bossRoomSize"));
 				}
+
+				for(i=xGetDatabaseCount(dEnemiesIncoming); >0) {
+					xDatabaseNext(dEnemiesIncoming);
+					xUnitSelect(dEnemiesIncoming, xUnitName);
+					trUnitDestroy();
+				}
+				xClearDatabase(dEnemiesIncoming);
 			}
 			case 1:
 			{
@@ -6249,23 +6263,23 @@ highFrequency
 					amt = 0.0 - (8.0 - 0.004 * action) / 64;
 					bossPos = kbGetBlockPosition(""+bossUnit, true);
 					angle = xsPow(trQuestVarGet("bossRoomSize") * 2, 2);
-					for(i = -7; <= 7) {
-						for(j = -7; <= 7) {
+					for(i = -8; <= 8) {
+						for(j = -8; <= 8) {
 							pos = vectorSnapToGrid(bossPos) + xsVectorSet(2 * i - 1, 0, 2 * j - 1);
 							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < angle) {
 								dist = distanceBetweenVectors(pos, bossPos);
 								x = xsVectorGetX(pos) / 2;
 								z = xsVectorGetZ(pos) / 2;
-								if (dist > 121.0) {
+								if (dist > 144.0) {
 									trChangeTerrainHeight(x, z, x, z, worldHeight, false);
 								} else {
 									if (terrainIsType(vectorToGrid(pos), TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY)) {
 										paintLava(pos);
 									}
-									if (dist < 9.0) {
+									if (dist < 16.0) {
 										trChangeTerrainHeight(x, z, x, z, 0.004 * action - 3.0, false);
 									} else {
-										dist = xsSqrt(dist) - 3.0;
+										dist = xsSqrt(dist) - 4.0;
 										trChangeTerrainHeight(x, z, x, z, amt * xsPow(dist - 8.0, 2) + 5.0, false);
 									}	
 								} 
@@ -6281,7 +6295,7 @@ highFrequency
 						xUnitSelectByID(dPlayerUnits, xUnitID);
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
-						} else if (xsVectorGetY(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName))) < 1.0) {
+						} else if (xsVectorGetY(kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName))) < 1.5) {
 							if (xGetBool(dPlayerUnits, xIsHero)) {
 								trUnitDelete(false);
 							} else {
@@ -6297,7 +6311,7 @@ highFrequency
 							xUnitSelectByID(dEnemies, xUnitID);
 							if (trUnitAlive() == false) {
 								removeEnemy();
-							} else if (xsVectorGetY(kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName))) < 1.0) {
+							} else if (xsVectorGetY(kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName))) < 2.0) {
 								trUnitChangeProtoUnit("Tartarian Gate flame");
 								removeEnemy();
 							}
@@ -6318,8 +6332,8 @@ highFrequency
 				if (trTimeMS() > bossTimeout) {
 					bossCooldown(8, 12);
 					trQuestVarSet("bossUltimate", 3);
-					for(i = -7; <= 7) {
-						for(j = -7; <= 7) {
+					for(i = -8; <= 8) {
+						for(j = -8; <= 8) {
 							pos = vectorSnapToGrid(bossPos) + xsVectorSet(2 * i - 1, 0, 2 * j - 1);
 							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < angle) {
 								x = xsVectorGetX(pos) / 2;
@@ -6337,23 +6351,23 @@ highFrequency
 					trSetSelectedScale(1,1,1);
 					trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 1, -2.0 * trQuestVarGet("secondPhase"));
 				} else {
-					for(i = -7; <= 7) {
-						for(j = -7; <= 7) {
+					for(i = -8; <= 8) {
+						for(j = -8; <= 8) {
 							pos = vectorSnapToGrid(bossPos) + xsVectorSet(2 * i - 1, 0, 2 * j - 1);
 							if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < angle) {
 								dist = distanceBetweenVectors(pos, bossPos);
 								x = xsVectorGetX(pos) / 2;
 								z = xsVectorGetZ(pos) / 2;
-								if (dist > 121.0) {
+								if (dist > 144.0) {
 									trChangeTerrainHeight(x, z, x, z, worldHeight, false);
 								} else {
 									if (terrainIsType(vectorToGrid(pos), TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY)) {
 										paintLava(pos);
 									}
-									if (dist < 9.0) {
+									if (dist < 16.0) {
 										trChangeTerrainHeight(x, z, x, z, -3, false);
 									} else {
-										dist = xsSqrt(dist) - 3.0;
+										dist = xsSqrt(dist) - 4.0;
 										trChangeTerrainHeight(x, z, x, z, -0.125 * xsPow(dist - 8.0, 2) + 5.0, false);
 									}	
 								} 
@@ -6563,6 +6577,18 @@ highFrequency
 			trForceNonCinematicModels(true);
 			trUIFadeToColor(0,0,0,1000,0,true);
 			trLetterBox(true);
+			if (trQuestVarGet("bossSpell") == 33) {
+				for(i = -7; <= 7) {
+					for(j = -7; <= 7) {
+						pos = vectorSnapToGrid(bossPos) + xsVectorSet(2 * i - 1, 0, 2 * j - 1);
+						if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < angle) {
+							x = xsVectorGetX(pos) / 2;
+							z = xsVectorGetZ(pos) / 2;
+							trChangeTerrainHeight(x, z, x, z, worldHeight, false);
+						}
+					}
+				}
+			}
 		}
 		boss = 0;
 		trSetLighting("hades", 1.0);
@@ -6852,7 +6878,7 @@ highFrequency
 			xUnitSelectByID(dPlayerUnits, xUnitID);
 			if (trUnitAlive() == false) {
 				removePlayerUnit();
-			} else if ((xGetBool(dPlayerUnits, xIsHero) == false) || (trQuestVarGet("p"+p+"runestoneQuest") < 2)) {
+			} else if ((xGetBool(dPlayerUnits, xIsHero) == false) || (trQuestVarGet("p"+p+"runestoneQuest") != 2)) {
 				// the hand only eats people at phase 3 of the quest
 				temp = vectorToGrid(xGetVector(dPlayerUnits, xUnitPos));
 				if (xsVectorGetX(temp) + xsVectorGetZ(temp) > 0) {

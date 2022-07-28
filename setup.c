@@ -674,6 +674,14 @@ highFrequency
 		zInitProtoUnitStat("Victory Marker", p, 0, 300);
 		zInitProtoUnitStat("Priest Projectile", p, 8, 2);
 
+		trModifyProtounit("Victory Marker", p, 24, 1);
+		trModifyProtounit("Victory Marker", p, 25, 1);
+		trModifyProtounit("Victory Marker", p, 26, 1);
+
+		trModifyProtounit("Revealer to Player", p, 24, 1);
+		trModifyProtounit("Revealer to Player", p, 25, 1);
+		trModifyProtounit("Revealer to Player", p, 26, 1);
+
 		trModifyProtounit("Argus", p, 1, 9999999999999999999.0);
 		trModifyProtounit("Argus", p, 1, -9999999999999999999.0);
 		trModifyProtounit("Argus", p, 1, 3.0);

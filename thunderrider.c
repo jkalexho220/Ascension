@@ -465,7 +465,7 @@ void thunderRiderAlways(int eventID = -1) {
 								xRestoreDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
 								xFreeDatabaseBlock(dEnemies, xGetInt(dPlayerUnits, xDoppelganger));
 								xFreeDatabaseBlock(dPlayerUnits);
-							} else if (xDetachDatabaseBlock(dPlayerUnits,xGetInt(db, xCharIndex)) == false) {
+							} else if (xDetachDatabaseBlock(dPlayerUnits) == false) {
 								debugLog("Unable to detach Thunderrider");
 							}
 						} else {

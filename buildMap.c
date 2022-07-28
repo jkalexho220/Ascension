@@ -1835,6 +1835,7 @@ highFrequency
 				trSetLighting("fimbulwinter", 0.01);
 				wallHeight = worldHeight + 3;
 				trSetCivAndCulture(0, 11, 3);
+				trSetCivAndCulture(ENEMY_PLAYER, 0, 0);
 				trQuestVarSet("bossRoomSize", 15);
 				TERRAIN_WALL = 2;
 				TERRAIN_SUB_WALL = 11;

@@ -373,12 +373,14 @@ void relicTransporterGuy(int p = 0) {
 void processFreeRelics(int count = 1) {
 	float amt = 0;
 	int db = 0;
+	int p = 0;
 	vector pos = vector(0,0,0);
 	for (x=xsMin(count, xGetDatabaseCount(dFreeRelics)); > 0) {
 		amt = 0;
 		xDatabaseNext(dFreeRelics);
 		xUnitSelect(dFreeRelics, xUnitName);
 		if (trUnitGetIsContained("Unit")) {
+			p = kbUnitGetOwner(kbGetBlockID(""+xGetInt(dFreeRelics, xUnitName)));
 			if (trUnitGetIsContained("Villager Atlantean Hero")) {
 				if (xGetInt(dFreeRelics, xRelicType) == RELIC_NICKONHAWK) {
 					if (trUnitIsOwnedBy(trCurrentPlayer())) {
@@ -386,51 +388,40 @@ void processFreeRelics(int count = 1) {
 					}
 					trUnitChangeProtoUnit("Relic");
 				} else {
-					for(p=1; < ENEMY_PLAYER) {
-						if (trUnitIsOwnedBy(p)) {
-							trSetSelectedScale(0,0,-1);
-							trMutateSelected(relicProto(xGetInt(dFreeRelics, xRelicType)));
-							if (xGetInt(dFreeRelics, xRelicType) < KEY_RELICS) {
-								trUnitSetAnimationPath("1,0,1,1,0,0,0");
-							}
-							db = getWarehouseDB(p);
-							xAddDatabaseBlock(db, true);
-							xSetInt(db, xUnitName, xGetInt(dFreeRelics, xUnitName));
-							xSetInt(db, xRelicType, xGetInt(dFreeRelics, xRelicType));
-							xFreeDatabaseBlock(dFreeRelics);
-							break;
-						}
-					}
-				}
-			} else {
-				pos = kbGetBlockPosition(""+xGetInt(dFreeRelics, xUnitName), true);
-				for(p=1; < ENEMY_PLAYER) {
-					trUnitSelectClear();
-					trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
-					if (trUnitAlive()) {
-						if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), pos) < 1.5) {
-							amt = 1;
-							break;
-						}
-					}
-				}
-				if (amt == 1) {
-					xUnitSelect(dFreeRelics, xUnitName);
 					trSetSelectedScale(0,0,-1);
 					trMutateSelected(relicProto(xGetInt(dFreeRelics, xRelicType)));
 					if (xGetInt(dFreeRelics, xRelicType) < KEY_RELICS) {
 						trUnitSetAnimationPath("1,0,1,1,0,0,0");
 					}
-					if (trCurrentPlayer() == p) {
-						trChatSend(0, relicName(xGetInt(dFreeRelics, xRelicType)) + " equipped!");
-						trSoundPlayFN("researchcomplete.wav","1",-1,"","");
-					}
-					db = getRelicsDB(p);
+					db = getWarehouseDB(p);
 					xAddDatabaseBlock(db, true);
 					xSetInt(db, xUnitName, xGetInt(dFreeRelics, xUnitName));
 					xSetInt(db, xRelicType, xGetInt(dFreeRelics, xRelicType));
-					relicEffect(xGetInt(dFreeRelics, xRelicType), p, true);
 					xFreeDatabaseBlock(dFreeRelics);
+				}
+			} else {
+				pos = kbGetBlockPosition(""+xGetInt(dFreeRelics, xUnitName), true);
+				trUnitSelectClear();
+				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
+				if (trUnitAlive()) {
+					if (unitDistanceToVector(xGetInt(dPlayerData, xPlayerUnit, p), pos) < 1.5) {
+						xUnitSelect(dFreeRelics, xUnitName);
+						trSetSelectedScale(0,0,-1);
+						trMutateSelected(relicProto(xGetInt(dFreeRelics, xRelicType)));
+						if (xGetInt(dFreeRelics, xRelicType) < KEY_RELICS) {
+							trUnitSetAnimationPath("1,0,1,1,0,0,0");
+						}
+						if (trCurrentPlayer() == p) {
+							trChatSend(0, relicName(xGetInt(dFreeRelics, xRelicType)) + " equipped!");
+							trSoundPlayFN("researchcomplete.wav","1",-1,"","");
+						}
+						db = getRelicsDB(p);
+						xAddDatabaseBlock(db, true);
+						xSetInt(db, xUnitName, xGetInt(dFreeRelics, xUnitName));
+						xSetInt(db, xRelicType, xGetInt(dFreeRelics, xRelicType));
+						relicEffect(xGetInt(dFreeRelics, xRelicType), p, true);
+						xFreeDatabaseBlock(dFreeRelics);
+					}
 				}
 			}
 		} else if (trUnitIsSelected()) {
@@ -1081,8 +1072,8 @@ highFrequency
 	processWalls();
 
 	if (cameraLockOnSelf) {
-		if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) + trQuestVarGet("p"+p+"rideLightning") == 0) {
-			uiLookAtUnit(xGetInt(dPlayerUnits, xUnitID, xGetInt(dPlayerData, xPlayerIndex)));
+		if (xGetInt(dPlayerData, xPlayerDead, trCurrentPlayer()) + trQuestVarGet("p"+trCurrentPlayer()+"rideLightning") == 0) {
+			uiLookAtUnit(xGetInt(dPlayerUnits, xUnitID, xGetInt(dPlayerData, xPlayerIndex, trCurrentPlayer())));
 		}
 	}
 	

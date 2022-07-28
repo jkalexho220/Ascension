@@ -161,6 +161,12 @@ void zSquareVar(string qv = "") {
 	trQuestVarSet(qv, xsPow(trQuestVarGet(qv), 2));
 }
 
+float manhattanDistance(vector start = vector(0,0,0), vector end = vector(0,0,0)) {
+	float xdiff = xsAbs(xsVectorGetX(start) - xsVectorGetX(end));
+	float zdiff = xsAbs(xsVectorGetZ(start) - xsVectorGetZ(end));
+	return(xdiff + zdiff);
+}
+
 float distanceBetweenVectors(vector start = vector(0,0,0), vector end = vector(0,0,0), bool squared = true) {
 	float xDiff = xsVectorGetX(end) - xsVectorGetX(start);
 	float zDiff = xsVectorGetZ(end) - xsVectorGetZ(start);
@@ -248,7 +254,11 @@ void trVectorSetFromAngle(string qv = "", float angle = 0) {
 
 float angleBetweenVectors(vector from = vector(0,0,0), vector to = vector(0,0,0)) {
 	float a = xsVectorGetX(to) - xsVectorGetX(from);
-	a = a / (xsVectorGetZ(to) - xsVectorGetZ(from));
+	if (xsVectorGetZ(to) - xsVectorGetZ(from) == 0) {
+		a = 0;
+	} else {
+		a = a / (xsVectorGetZ(to) - xsVectorGetZ(from));
+	}
 	a = xsAtan(a);
 	if (xsVectorGetZ(from) > xsVectorGetZ(to)) {
 		if (xsVectorGetX(from) > xsVectorGetX(to)) {

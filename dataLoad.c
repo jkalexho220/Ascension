@@ -12,12 +12,15 @@ data at 13, 14, 15 is unlocked relic data
 int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
+const int CURRENT_VERSION = 6;
 const int VERSION_NUMBER = 6;
 const int TOTAL_LOAD = 25;
 
 void saveAllData() {
 	xsSetContextPlayer(0);
-	trSetCurrentScenarioUserData(VERSION_NUMBER, 6);
+	if (trGetScenarioUserData(VERSION_NUMBER) < CURRENT_VERSION) {
+		trSetCurrentScenarioUserData(VERSION_NUMBER, CURRENT_VERSION);
+	}
 	int p = trCurrentPlayer();
 	if (p != ENEMY_PLAYER) {
 		int relic = 0;
@@ -218,6 +221,9 @@ inactive
 		trSetCurrentScenarioUserData(VERSION_NUMBER, 5);
 	} else if (trGetScenarioUserData(VERSION_NUMBER) == 5) {
 		uiMessageBox("New functionality added: Press SPACE to toggle camera-lock on your character.");
+	} else if (trGetScenarioUserData(VERSION_NUMBER) > CURRENT_VERSION) {
+		// if the player's version is higher than this version
+		uiMessageBox("WARNING: You are playing on an older version of this file!");
 	}
 
 

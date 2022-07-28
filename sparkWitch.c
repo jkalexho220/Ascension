@@ -148,7 +148,7 @@ void sparkWitchAlways(int eventID = -1) {
 			xFreeDatabaseBlock(pigs);
 		} else if (trTimeMS() > xGetInt(pigs, xWitchPigTimeout)) {
 			trMutateSelected(xGetInt(pigs, xWitchPigProto));
-			if (xSetPointer(dEnemies, xGetInt(pigs, xWitchPigTimeout))) {
+			if (xSetPointer(dEnemies, xGetInt(pigs, xWitchPigIndex))) {
 				xSetFloat(dEnemies, xPhysicalResist, xGetFloat(pigs, xPhysicalResist));
 				xSetFloat(dEnemies, xMagicResist, xGetFloat(pigs, xMagicResist));
 				if (xGetInt(dEnemies, xStunStatus) > 0) {
