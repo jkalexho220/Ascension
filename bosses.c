@@ -6578,8 +6578,8 @@ highFrequency
 			trUIFadeToColor(0,0,0,1000,0,true);
 			trLetterBox(true);
 			if (trQuestVarGet("bossSpell") == 33) {
-				for(i = -7; <= 7) {
-					for(j = -7; <= 7) {
+				for(i = -8; <= 8) {
+					for(j = -8; <= 8) {
 						pos = vectorSnapToGrid(bossPos) + xsVectorSet(2 * i - 1, 0, 2 * j - 1);
 						if (distanceBetweenVectors(pos, trVectorQuestVarGet("bossRoomCenter")) < angle) {
 							x = xsVectorGetX(pos) / 2;
