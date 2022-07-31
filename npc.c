@@ -4623,9 +4623,6 @@ highFrequency
 									xFreeDatabaseBlock(dWorthlessJunk);
 								}
 							} else {
-								xsDisableRule("yeeb_hit_list");
-								trQuestVarSet("yeebHit", 0);
-								trQuestVarSet("yeebBossFight", 0);
 								questComplete(MANASTONE, -1);
 							}
 						}

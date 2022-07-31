@@ -118,7 +118,7 @@ void stormpiercerAlways(int eventID = -1) {
 				trArmySelect(""+p+",0");
 				trUnitChangeProtoUnit("Dust Large");
 				target = 1 + xsMin(disengageRange * xGetFloat(dPlayerData, xPlayerSpellRange),
-					unitDistanceToVector(xGetInt(db, xUnitName), end)) / 2;
+					unitDistanceToVector(xGetInt(db, xUnitName), end, false)) / 2;
 				dir = getUnitVector(pos, end);
 				for(i=target; >0) {
 					pos = xsVectorSet(xsVectorGetX(pos) + 2.0 * xsVectorGetX(dir), 0, xsVectorGetZ(pos) + 2.0 * xsVectorGetZ(dir));
