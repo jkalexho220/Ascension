@@ -4545,11 +4545,14 @@ highFrequency
 							pos = randomNearEdgeOfRoom(room);
 							trQuestVarSet("yeebRelic", trGetNextUnitScenarioNameNumber());
 							spawnRelicSpecific(pos, RELIC_YEEBAAGOOON);
+							debugLog("Spawned yeeb relic at " + pos);
 							trQuestVarSet("questActive", 2);
 							trQuestVarSet("magicDetectorRelic", trGetNextUnitScenarioNameNumber());
-							pos = trVectorQuestVarGet("questGuyPos");
-							pos = xsVectorSet(xsVectorGetX(pos) - 2, 0, xsVectorGetZ(pos) - 2);
+							pos = trVectorQuestVarGet("questGuyPos") - vector(2,0,2);
 							spawnRelicSpecific(pos, RELIC_MAGIC_DETECTOR);
+							debugLog("Spawned magic detector at " + pos);
+							debugLog("Yeeb Relic is " + 1*trQuestVarGet("yeebRelic"));
+							debugLog("Magic Detector is " + 1*trQuestVarGet("magicDetectorRelic"));
 							xsEnableRule("yeeb_hit_list");
 						}
 						case 2:

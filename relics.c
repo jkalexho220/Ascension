@@ -968,15 +968,19 @@ int randomStageClosest(int maxval = 10) {
 void spawnRelicSpecific(vector v = vector(0,0,0), int val = 1) {
 	trQuestVarSet("next", trGetNextUnitScenarioNameNumber());
 	trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(v),0,xsVectorGetZ(v),0,true);
-	trUnitSelectClear();
-	trUnitSelectByQV("next", true);
-	if (trUnitVisToPlayer()) {
-		trSoundPlayFN("relicselect.wav","1",-1,"","");
+	if (trQuestVarGet("next") == trGetNextUnitScenarioNameNumber()) {
+		debugLog("Unable to spawn relic " + relicName(val));
+	} else {
+		trUnitSelectClear();
+		trUnitSelectByQV("next", true);
+		if (trUnitVisToPlayer()) {
+			trSoundPlayFN("relicselect.wav","1",-1,"","");
+		}
+		trUnitChangeProtoUnit("Relic");
+		xSetPointer(dFreeRelics, xAddDatabaseBlock(dFreeRelics));
+		xSetInt(dFreeRelics,xRelicName,1*trQuestVarGet("next"));
+		xSetInt(dFreeRelics,xRelicType,val);
 	}
-	trUnitChangeProtoUnit("Relic");
-	xSetPointer(dFreeRelics, xAddDatabaseBlock(dFreeRelics));
-	xSetInt(dFreeRelics,xRelicName,1*trQuestVarGet("next"));
-	xSetInt(dFreeRelics,xRelicType,val);
 }
 
 void spawnRelic(vector v = vector(0,0,0), int maxval = 10) {

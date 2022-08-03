@@ -322,8 +322,13 @@ void saviorAlways(int eventID = -1) {
 		}
 		for(x=1; < ENEMY_PLAYER) {
 			if (xGetInt(dPlayerData, xPlayerDead, x) > 0) {
-				revivePlayer(x);
-				xSetInt(dPlayerData, xPlayerDead, 0, x);
+				if ((trQuestVarGet("stage") != 10) || (trQuestVarGet("reviveCount") > 0)) {
+					revivePlayer(x);
+					xSetInt(dPlayerData, xPlayerDead, 0, x);
+					trUnitSelectClear();
+					trUnitSelectByQV("p"+x+"reviveBeam");
+					trUnitChangeProtoUnit("Vision SFX");
+				}
 			}
 		}
 		gainFavor(p, 0.0 - interventionCost * xGetFloat(dPlayerData, xPlayerUltimateCost));

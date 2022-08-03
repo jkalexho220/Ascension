@@ -256,7 +256,10 @@ minInterval 2
 		xsEnableRule("boss_cin_00");
 		
 		trUIFadeToColor(0,0,0,1000,0,true);
+
+		modeEnter("pregame");
 		trLetterBox(true);
+		modeEnter("simulation");
 		
 		if (trQuestVarGet("stage") == 7) {
 			xsDisableRule("the_deep_damage");
@@ -6222,7 +6225,7 @@ highFrequency
 						if (trUnitAlive() == false) {
 							removePlayerUnit();
 						} else if (unitDistanceToVector(xGetInt(dPlayerUnits, xUnitName), start) < 36.0) {
-							damageOpponentUnit(p, 500.0);
+							damagePlayerUnit(500.0);
 						}
 					}
 
@@ -6576,7 +6579,9 @@ highFrequency
 			xsEnableRule("boss9_start_again");
 			trForceNonCinematicModels(true);
 			trUIFadeToColor(0,0,0,1000,0,true);
+			modeEnter("pregame");
 			trLetterBox(true);
+			modeEnter("simulation");
 			if (trQuestVarGet("bossSpell") == 33) {
 				for(i = -8; <= 8) {
 					for(j = -8; <= 8) {
@@ -6665,7 +6670,8 @@ highFrequency
 		xsDisableSelf();
 		trUnitSelectClear();
 		trUnitSelect(""+bossUnit, true);
-		trMutateSelected(kbGetProtoUnitID("Titan Atlantean"));
+		trUnitChangeProtoUnit("Titan Atlantean");
+		unitTransform("Titan Gate Dead", "Rocket");
 	}
 }
 
@@ -10216,7 +10222,9 @@ highFrequency
 		xsDisableRule("rising_up");
 		trForceNonCinematicModels(true);
 		trUIFadeToColor(0,0,0,1000,0,true);
+		modeEnter("pregame");
 		trLetterBox(true);
+		modeEnter("simulation");
 		
 		xsDisableRule("gameplay_always");
 		boss = 0;
@@ -10286,7 +10294,9 @@ highFrequency
 			trQuestVarSet("cinStep", 1);
 			trQuestVarSet("cinTime", trTime() + 2);
 			trSetUnitIdleProcessing(false);
+			modeEnter("pregame");
 			trLetterBox(true);
+			modeEnter("simulation");
 			trUIFadeToColor(0, 0, 0, 1000, 0, true);
 			xsDisableRule("void_battle");
 			xsDisableRule("void_music");
