@@ -3845,7 +3845,6 @@ highFrequency
 			trSoundPlayFN("settlement.wav","1",-1,"","");
 		}
 	} else {
-		
 		if (trQuestVarGet("questActive") == 0) {
 			for(p=1; < ENEMY_PLAYER) {
 				if (unitDistanceToVector(xGetInt(dPlayerData,xPlayerUnit,p), trVectorQuestVarGet("questGuyPos")) < 16) {
@@ -4609,11 +4608,6 @@ highFrequency
 					switch(1*trQuestVarGet("questActive"))
 					{
 						case 1:
-						{
-							xsEnableRule("yeeb_hit_list");
-							trQuestVarSet("questActive", 2);
-						}
-						case 2:
 						{
 							if (xGetDatabaseCount(dWorthlessJunk) > 0) {
 								xDatabaseNext(dWorthlessJunk);

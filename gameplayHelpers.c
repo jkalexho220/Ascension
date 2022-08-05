@@ -757,6 +757,17 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		}
 		int type = kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(db,xUnitName)));
 		int p = xGetInt(db,xPlayerOwner);
+
+		if ((p < ENEMY_PLAYER) && (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p))) {
+			xSetBool(dPlayerData,xPlayerLaunched,true,p);
+			int relics = getRelicsDB(p);
+			for(x=xGetDatabaseCount(relics); >0) {
+				xDatabaseNext(relics);
+				xUnitSelect(relics,xRelicName);
+				trUnitChangeProtoUnit("Cinematic Block");
+			}
+		}
+
 		xUnitSelectByID(db,xUnitID);
 		trUnitChangeProtoUnit("Transport Ship Greek");
 		
@@ -813,17 +824,6 @@ void launchUnit(int db = 0, vector dest = vector(0,0,0)) {
 		xSetInt(dLaunchedUnits,xLaunchedTimeout, trTimeMS() + 1100 * dist / 15);
 		xSetBool(dLaunchedUnits,xLaunchedStun, hitWall);
 		xSetInt(dLaunchedUnits, xLaunchedDB, db);
-		
-		
-		if ((p < ENEMY_PLAYER) && (xGetInt(db,xUnitName) == xGetInt(dPlayerData,xPlayerUnit,p))) {
-			xSetBool(dPlayerData,xPlayerLaunched,true,p);
-			int relics = getRelicsDB(p);
-			for(x=xGetDatabaseCount(relics); >0) {
-				xDatabaseNext(relics);
-				xUnitSelect(relics,xRelicName);
-				trUnitChangeProtoUnit("Cinematic Block");
-			}
-		}
 	}
 }
 

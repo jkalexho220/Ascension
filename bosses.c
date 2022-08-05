@@ -155,7 +155,7 @@ highFrequency
 				trQuestVarSet("yeebNext", trTime() + 3);
 				if (customContent) {
 					xsEnableRule("death_track_loop");
-					trMusicPlay("Zenophobia\Death track begin.mp3","1",0);
+					trSoundPlayFN("Zenophobia\Death track begin.mp3","1",-1,"","");
 					trQuestVarSet("musicTime", trTimeMS() + 68000);
 				} else {
 					xsEnableRule("boss_music");
@@ -179,6 +179,7 @@ highFrequency
 							xDatabaseNext(relics);
 							if (xGetInt(relics, xRelicType) == RELIC_YEEBAAGOOON) {
 								found = true;
+								xUnitSelect(relics, xUnitName);
 								trUnitDestroy();
 								xFreeDatabaseBlock(relics);
 								break;
@@ -3526,6 +3527,7 @@ highFrequency
 	int z = 0;
 	int action = 0;
 	int id = 0;
+	int relics = 0;
 	float amt = 0;
 	float dist = 0;
 	float angle = 0;
@@ -3901,6 +3903,16 @@ highFrequency
 						p = trQuestVarGet("zappyTarget");
 						action = xGetInt(dPlayerData, xPlayerClass, p);
 						trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dClass, xClassProto, action)));
+						relics = getRelicsDB(p);
+						for(i=xGetDatabaseCount(relics); >0) {
+							xDatabaseNext(relics);
+							xUnitSelect(relics, xUnitName);
+							trUnitChangeProtoUnit("Relic");
+							xAddDatabaseBlock(dFreeRelics, true);
+							xSetInt(dFreeRelics, xUnitName, xGetInt(relics, xUnitName));
+							xSetInt(dFreeRelics, xRelicType, xGetInt(relics, xRelicType));
+						}
+						xClearDatabase(relics);
 						trQuestVarSetFromRand("sound", 1, 5, true);
 						trSoundPlayFN("lightningstrike"+1*trQuestVarGet("sound")+".wav","1",-1,"","");
 						gainFavor(p, -5.0);

@@ -701,13 +701,13 @@ highFrequency
 			case 14:
 			{
 				gadgetUnreal("ShowImageBox-CloseButton");
+				trQuestVarSet("pvpCount", 1);
 				trQuestVarSetFromRand("pvpReward",21,25,true);
 				trShowImageDialog(relicIcon(1*trQuestVarGet("pvpReward")),
 					"("+1*trQuestVarGet("pvpCount")+"x) " + relicName(1*trQuestVarGet("pvpReward")));
 				trQuestVarSet("pvpTime", trTime() + 5);
 				trQuestVarSet("pvpStep", 3);
 				trSoundPlayFN("market.wav","1",-1,"","");
-				trQuestVarSet("pvpCount", 1);
 			}
 			case 20:
 			{

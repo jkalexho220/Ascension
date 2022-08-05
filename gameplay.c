@@ -796,11 +796,12 @@ highFrequency
 									}
 								}
 							}
-						} else if (xGetInt(db, xRelicType) <= NORMAL_RELICS) {
+						}
+						if ((xGetInt(db, xRelicType) <= NORMAL_RELICS) && (relicReturned == false)) {
 							relicReturned = aiPlanGetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType));
+							aiPlanSetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType), true);
 						}
 						if (relicReturned == false) {
-							aiPlanSetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType), true);
 							id = kbGetBlockID(""+xGetInt(db, xUnitName));
 							if (trCurrentPlayer() == p) {
 								trSoundPlayFN("backtowork.wav","1",-1,"","");
