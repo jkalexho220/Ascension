@@ -107,6 +107,9 @@ void starseerAlways(int eventID = -1) {
 					/* this is the hitbox for this iteration */
 					cur = dir;
 					prev = xGetVector(db, xStarseerDir + x);
+					if (xsVectorGetX(prev) + xsVectorGetZ(prev) == 0) {
+						prev = vector(1,0,0);
+					}
 					angleDiff = dotProduct(cur, prev);
 				}
 				pos = dir * xGetFloat(db, xStarseerCurrentRadius);

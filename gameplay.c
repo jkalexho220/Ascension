@@ -470,7 +470,7 @@ void petDogs(int p = 0) {
 			trCounterAddTime("petDogs",30,1,"Pet Dog respawn",-1);
 		}
 	}
-	if ((xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_MONSTER_COMPANION) && Multiplayer) {
+	if (((xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_MONSTER_COMPANION) && Multiplayer) && (PvP == false)) {
 		if (xGetBool(dPlayerData, xPlayerPetMonsterReady, p)) {
 			if (trTime() > xGetInt(dPlayerData, xPlayerPetMonsterNext, p)) {
 				pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
@@ -699,6 +699,9 @@ highFrequency
 	trQuestVarSet("shopping", 0);
 	p = trQuestVarGet("relicPlayer");
 	xSetPointer(dPlayerData, p);
+	for(i=0; < 30) {
+		aiPlanSetUserVariableBool(ARRAYS, rememberRelics, i, false);
+	}
 	if (xGetBool(dPlayerData, xPlayerResigned) == false) {
 		xUnitSelect(dPlayerData, xPlayerUnit);
 		if (trUnitAlive() && (xGetBool(dPlayerData, xPlayerLaunched) == false) && xGetInt(dPlayerData, xPlayerDead) <= 0) {
@@ -793,8 +796,11 @@ highFrequency
 									}
 								}
 							}
+						} else if (xGetInt(db, xRelicType) <= NORMAL_RELICS) {
+							relicReturned = aiPlanGetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType));
 						}
 						if (relicReturned == false) {
+							aiPlanSetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType), true);
 							id = kbGetBlockID(""+xGetInt(db, xUnitName));
 							if (trCurrentPlayer() == p) {
 								trSoundPlayFN("backtowork.wav","1",-1,"","");

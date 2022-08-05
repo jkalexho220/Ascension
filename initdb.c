@@ -229,6 +229,8 @@ int xKeeperPaintPrimary = 0;
 int xKeeperPaintSecondary = 0;
 int xKeeperPaintPos = 0;
 
+int rememberRelics = 0;
+
 int getCharactersDB(int p = 0) {
 	return(aiPlanGetUserVariableInt(ARRAYS,dPlayerCharacterArray,p));
 }
@@ -248,6 +250,9 @@ highFrequency
 	xsSetContextPlayer(0);
 	xsDisableSelf();
 	int db = 0;
+
+	rememberRelics = zNewArray(mBool, 30, "remember_relics");
+
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
 	dEnemies = xInitDatabase("enemies", 30);
 	for(db=dEnemies; >= dPlayerUnits) {
