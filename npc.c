@@ -197,7 +197,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 						case 3:
 						{
 							if (trQuestVarGet("beatTheGame") == 1) {
-								uiMessageBox("Stop! No more, I beg you!");
+								uiMessageBox("Stop! No more, I beg of you!");
 							} else {
 								uiMessageBox("WHAT KIND OF JOKE BUILD IS THIS?");
 							}
@@ -292,7 +292,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 7:
 				{
-					uiMessageBox("I AM NOT BROKEN. IT IS SOCIETY THAT'S BROKEN.");
+					uiMessageBox("WHY DO WE HAVE TO DODGE SPECIAL ATTACKS? WHY CAN'T WE JUST CLICK ON THE BADDIES AND KILL THEM?");
 				}
 				case 8:
 				{
@@ -316,17 +316,17 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 13:
 				{
-					uiMessageBox("*sniffle*");
+					uiMessageBox("Hey you. I know you've helped me out a lot already, but could I ask for one last favor?");
 				}
 				case 14:
 				{
-					uiMessageBox("I-I'm going now. Not like anyone cared anyway...");
+					uiMessageBox("Please beat the shit out of this robot.");
 				}
 				case 15:
 				{
 					trUnitSelectClear();
 					trUnitSelectByQV("dreameaterx");
-					trUnitChangeProtoUnit("Hero Death");
+					trUnitChangeProtoUnit("Arkantos God Out");
 					xsEnableRule("punching_bag_always");
 					xsDisableRule("dreameaterx_always");
 					trQuestVarSet("scrapQuest", 0);

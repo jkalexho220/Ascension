@@ -484,7 +484,7 @@ highFrequency
 			xSetInt(dEnemies, xStunTimeout, xGetInt(dEnemies, xStunTimeout) - timediff * trQuestVarGet("bossStunRecoveryAmount"));
 			trQuestVarSet("bossStunRecoveryAmount", trQuestVarGet("bossStunRecoveryAmount") + 0.001 * timediff);
 		} else {
-			trQuestVarSet("bossStunRecoveryAmount", 1.0);
+			trQuestVarSet("bossStunRecoveryAmount", 1.0 + 0.1 * trQuestVarGet("stage"));
 		}
 		xSetPointer(dEnemies, pointer);
 	}

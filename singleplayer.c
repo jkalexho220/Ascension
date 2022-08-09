@@ -495,8 +495,7 @@ highFrequency
 		TERRAIN_SUB_WALL = 13;
 		
 		trSetUnitIdleProcessing(false);
-		trPlayerSetDiplomacy(1, 2, "Enemy");
-		trPlayerSetDiplomacy(2, 1, "Enemy");
+		trPlayerSetDiplomacy(1, ENEMY_PLAYER, "Enemy");
 		trArmyDispatch("1,0","Victory Marker",1,1,0,1,0,true);
 		trArmyDispatch("2,0","Victory Marker",1,1,0,1,0,true);
 		
@@ -2155,7 +2154,8 @@ highFrequency
 					trQuestVarSet("yimCurrentHealth", current);
 					if (trQuestVarGet("yimCalculateStart") == 0) {
 						trQuestVarSet("yimCalculateStart", trTimeMS());
-						trQuestVarSet("yimTotalTime", 0);
+						trQuestVarSet("yimTotalTime", 500);
+						current = 10000.0 - current;
 					} else {
 						trQuestVarSet("yimTotalTime", trQuestVarGet("yimTotalTime") + trTimeMS() - trQuestVarGet("yimCalculateStart"));
 						trQuestVarSet("yimCalculateStart", trTimeMS());
@@ -2181,6 +2181,8 @@ highFrequency
 				startNPCDialog(NPC_PUNCHING_BAG_TAUNT);
 				xClearDatabase(dEnemies);
 				trQuestVarSet("punchingBagActive", 0);
+				trChatSend(0, "<color=1,1,1><u>Damage Per Second</u></color>");
+				trChatSend(0, "<color=1,0,0>"+trQuestVarGet("yimDPS")+"</color>");
 			}
 			stunsAndPoisons(dEnemies);
 			xSetVector(dEnemies,xUnitPos,kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName)));
