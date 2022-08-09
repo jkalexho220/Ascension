@@ -152,8 +152,11 @@ void sparkWitchAlways(int eventID = -1) {
 				xSetFloat(dEnemies, xPhysicalResist, xGetFloat(pigs, xPhysicalResist));
 				xSetFloat(dEnemies, xMagicResist, xGetFloat(pigs, xMagicResist));
 				if (xGetInt(dEnemies, xStunStatus) > 0) {
+					debugLog("Converting stun protounit to " + kbGetProtoUnitName(xGetInt(pigs, xWitchPigProto)));
 					xSetInt(dStunnedUnits, xStunnedProto, xGetInt(pigs, xWitchPigProto), xGetInt(dEnemies, xStunStatus));
 				}
+			} else {
+				debugLog("Could not find witch pig index");
 			}
 			xFreeDatabaseBlock(pigs);
 		}

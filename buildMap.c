@@ -2812,6 +2812,8 @@ highFrequency
 			xsEnableRule("runestone_read");
 		}
 
+		trVectorQuestVarSet("runestonePos", kbGetBlockPosition(""+1*trQuestVarGet("runestone")));
+
 		if (trQuestVarGet("keeperQuestActive") == 0) {
 			xsDisableRule("enter_boss_room");
 		}

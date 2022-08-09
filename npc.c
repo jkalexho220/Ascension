@@ -133,6 +133,13 @@ const int NPC_GUARDIAN_SLEEPING = 493;
 const int NPC_ARE_YOU_SUBSCRIBED = 494;
 const int NPC_THANK_YOU_SUBSCRIBER = 495;
 
+const int NPC_PUNCHING_BAG_QUEST = 496;
+/*
+Reserved to 498
+*/
+const int NPC_PUNCHING_BAG_TALK = 499;
+const int NPC_PUNCHING_BAG_TAUNT = 500;
+
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
 const int SHOP_NPC = 30;
@@ -154,6 +161,179 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_PUNCHING_BAG_TAUNT:
+		{
+			dialog = 0;
+			if (trQuestVarGet("beatTheGame") == 1) {
+				uiMessageBox("I-Is it finally over?");
+			} else {
+				uiMessageBox("WITH DPS LIKE THAT, YOU WILL NEVER BEAT FLOOR " + (1+xGetInt(dPlayerData, xPlayerProgress)));
+			}
+		}
+		case NPC_PUNCHING_BAG_TALK:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					switch(1*trQuestVarGet("rand"))
+					{
+						case 1:
+						{
+							if (trQuestVarGet("beatTheGame") == 1) {
+								uiMessageBox("You already beat the game! Why are you still hurting me?!");
+							} else {
+								uiMessageBox("THIS GAME IS IMPOSSIBLE. YOU WILL NEVER WIN.");
+							}
+						}
+						case 2:
+						{
+							if (trQuestVarGet("beatTheGame") == 1) {
+								uiMessageBox("Have mercy please! I was wrong!");
+							} else {
+								uiMessageBox("DON'T WORRY. IT'S NOT YOUR FAULT ZENO WON'T NERF THE BOSSES.");
+							}
+						}
+						case 3:
+						{
+							if (trQuestVarGet("beatTheGame") == 1) {
+								uiMessageBox("Stop! No more, I beg you!");
+							} else {
+								uiMessageBox("WHAT KIND OF JOKE BUILD IS THIS?");
+							}
+						}
+					}
+				}
+				case 2:
+				{
+					trShowChoiceDialog("Target practice?", "Yes", 10006, "No", -1);
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_PUNCHING_BAG_QUEST:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Hey you! Are you interested in robots? This is the latest prototype, a Y.I.M. model.");
+				}
+				case 2:
+				{
+					uiMessageBox("It can talk and sing and crack funny jokes!");
+				}
+				case 3:
+				{
+					uiMessageBox("But unfortunately, my YIM is broken right now. It will need parts for repair.");
+				}
+				case 4:
+				{
+					uiMessageBox("Can you enter the sixth floor of the Tower and collect robot parts for me?");
+				}
+				case 5:
+				{
+					trSoundPlayFN("xnew_objective.wav", "1", -1, "", "");
+					trMessageSetText("Collect parts from 30 automatons.", -1);
+					dialog = 0;
+					trQuestVarSet("scrapQuest", 1);
+				}
+			}
+		}
+		case NPC_PUNCHING_BAG_QUEST + 1:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("If you destroy an Automaton the normal way, it will explode. I can't use those parts.");
+				}
+				case 2:
+				{
+					uiMessageBox("Make sure to silence the Automatons before you take them down!");
+				}
+				case 3:
+				{
+					uiMessageBox("Currently collected (" + 1*trQuestVarGet("scrap") + "/30)");
+					dialog = 0;
+				}
+			}
+		}
+		case NPC_PUNCHING_BAG_QUEST + 2:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Alright! It's finally functional! Now then, time to turn it on...");
+				}
+				case 2:
+				{
+					uiMessageBox("BEEP!");
+					trUnitSelectClear();
+					trUnitSelectByQV("yimababwe");
+					trUnitChangeProtoUnit("Automaton");
+				}
+				case 3:
+				{
+					uiMessageBox("DEATH TO ALL HUMANS.");
+				}
+				case 4:
+				{
+					uiMessageBox("Uh, what? Maybe I calibrated it wrong... let's see if this does anything...");
+				}
+				case 5:
+				{
+					uiMessageBox("THIS MAP IS TOO HARD. THE ENDGAME BOSSES SHOULD BE NERFED.");
+				}
+				case 6:
+				{
+					uiMessageBox("Yup. It's totally broken. Great.");
+				}
+				case 7:
+				{
+					uiMessageBox("I AM NOT BROKEN. IT IS SOCIETY THAT'S BROKEN.");
+				}
+				case 8:
+				{
+					uiMessageBox("*sigh* A malfunctioning robot is all I got out of this.");
+				}
+				case 9:
+				{
+					uiMessageBox("Well, since you helped me so much, I'll let you keep it. I have no use for it anymore.");
+				}
+				case 10:
+				{
+					uiMessageBox("I MAY HAVE BEEN FIXED, BUT IS THERE ANYONE WHO CAN FIX YOU, DREAMEATERX?");
+				}
+				case 11:
+				{
+					uiMessageBox("Hey, that's rude!");
+				}
+				case 12:
+				{
+					uiMessageBox("...");
+				}
+				case 13:
+				{
+					uiMessageBox("*sniffle*");
+				}
+				case 14:
+				{
+					uiMessageBox("I-I'm going now. Not like anyone cared anyway...");
+				}
+				case 15:
+				{
+					trUnitSelectClear();
+					trUnitSelectByQV("dreameaterx");
+					trUnitChangeProtoUnit("Hero Death");
+					xsEnableRule("punching_bag_always");
+					xsDisableRule("dreameaterx_always");
+					trQuestVarSet("scrapQuest", 0);
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_THANK_YOU_SUBSCRIBER:
 		{
 			switch(dialog)

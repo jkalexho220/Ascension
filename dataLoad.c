@@ -12,7 +12,7 @@ data at 13, 14, 15 is unlocked relic data
 int loadProgress = 0;
 int savedata = 0;
 int currentdata = 0;
-const int CURRENT_VERSION = 6;
+const int CURRENT_VERSION = 7;
 const int VERSION_NUMBER = 6;
 const int TOTAL_LOAD = 25;
 
@@ -96,7 +96,9 @@ void saveAllData() {
 		}
 		
 		/* gemstones */
-		savedata = xsMin(9, trQuestVarGet("nottudTicketsCount"));
+		savedata = 0;
+		currentdata = xsMin(9, trQuestVarGet("nottudTicketsCount"));
+		savedata = savedata * 10 + currentdata;
 		currentdata = xsMin(9, trQuestVarGet("dreamGogglesCount"));
 		savedata = savedata * 10 + currentdata;
 		for(x=2; >=0) {
@@ -144,7 +146,9 @@ void saveAllData() {
 		trSetCurrentScenarioUserData(8, savedata);
 		
 		/* boon unlocks */
-		savedata = 0;
+		savedata = xsMin(2, trQuestVarGet("scrapQuest"));
+		currentdata = xsMin(30, trQuestVarGet("scrap"));
+		savedata = savedata * 31 + currentdata;
 		for(x=12; >=0) {
 			currentdata = trQuestVarGet("boonUnlocked"+x);
 			savedata = savedata * 2 + currentdata;
@@ -294,6 +298,10 @@ inactive
 		trQuestVarSet("boonUnlocked"+x, iModulo(2, savedata));
 		savedata = savedata / 2;
 	}
+	trQuestVarSet("scrap", iModulo(31, savedata));
+	savedata = savedata / 31;
+	trQuestVarSet("scrapQuest", iModulo(3, savedata));
+	savedata = savedata / 3;
 	
 	if (Multiplayer) {
 		

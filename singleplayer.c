@@ -1,3 +1,16 @@
+void attackYimababwe(int eventID = -1) {
+	trQuestVarSet("punchingBagActive", 1);
+	trUnitSelectClear();
+	trUnitSelectByQV("yimababwe");
+	trUnitConvert(ENEMY_PLAYER);
+	activateEnemy(1*trQuestVarGet("yimababwe"));
+	xSetBool(dEnemies, xLaunched, true);
+	trQuestVarSet("yimCurrentHealth", 10000);
+	trQuestVarSet("yimCalculateStart", 0);
+	trQuestVarSet("yimCalculateTimeout", 0);
+	gainFavor(1, 200.0);
+	trLetterBox(false);
+}
 
 void spChooseBoon(int eventID = -1) {
 	xsSetContextPlayer(0);
@@ -469,6 +482,8 @@ highFrequency
 		trUIFadeToColor(0,0,0,1000,0,false);
 		trMusicPlayCurrent();
 		trPlayNextMusicTrack();
+
+		trPlayerSetDiplomacy(ENEMY_PLAYER, 1, "Neutral");
 		
 		xSetPointer(dPlayerData, 1);
 		
@@ -917,6 +932,32 @@ highFrequency
 			xsEnableRule("milkman_matty_always");
 			trQuestVarSet("milkmanMatty", trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Troll",1,161,0,131,225,true);
+		}
+
+		// yimababwe quest
+		if (trQuestVarGet("zenoQuiz") >= 6) {
+			trArmyDispatch("1,0","Revealer to Player",1,129,0,163,0,true);
+			trQuestVarSet("yimababwe", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Dwarf",1,129,0,163,225,true);
+			trUnitSelectClear();
+			trUnitSelectByQV("yimababwe");
+			trMutateSelected(kbGetProtoUnitID("Automaton"));
+			trQuestVarSet("yimID", kbGetBlockID(""+1*trQuestVarGet("yimababwe")));
+			if ((trQuestVarGet("scrap") < 30) || (trQuestVarGet("scrapQuest") == 2)) {
+				trQuestVarSet("dreameaterx", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("0,0","Trident Soldier",1,131, 0, 161,225,true);
+
+				trUnitSelectClear();
+				trUnitSelectByQV("yimababwe");
+				trMutateSelected(kbGetProtoUnitID("Automaton"));
+				trUnitOverrideAnimation(6,0,false,false,-1);
+				trUnitOverrideAnimation(6,-1,false,false,-1);
+				xsEnableRule("dreameaterx_always");
+			} else {
+				xsEnableRule("punching_bag_always");
+				trQuestVarSet("punchingBagActive", 0);
+			}
+			trEventSetHandler(10006, "attackYimababwe");
 		}
 
 		// runestone quest
@@ -1963,6 +2004,25 @@ highFrequency
 	}
 }
 
+rule dreameaterx_always
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("dreameaterx", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_PUNCHING_BAG_QUEST + trQuestVarGet("scrapQuest"));
+		reselectMyself();
+	}
+
+	trUnitSelectClear();
+	trUnitSelectByQV("yimababwe");
+	if (trUnitIsSelected()) {
+		uiMessageBox("The YIM is silent.");
+		reselectMyself();
+	}
+}
+
 rule sword_is_ready
 inactive
 highFrequency
@@ -2061,5 +2121,90 @@ highFrequency
 		trUnitSelectClear();
 		trUnitSelectByQV("boonSpotlight", true);
 		trUnitTeleport(x,0,z);
+	}
+}
+
+rule punching_bag_always
+inactive
+highFrequency
+{
+	switch(1*trQuestVarGet("punchingBagActive"))	
+	{
+		case 0:
+		{
+			trUnitSelectClear();
+			trUnitSelectByQV("yimababwe");
+			if (trUnitIsSelected()) {
+				trQuestVarSetFromRand("rand", 1, 3, true);
+				startNPCDialog(NPC_PUNCHING_BAG_TALK);
+				reselectMyself();
+				trQuestVarSet("yimID", kbGetBlockID(""+1*trQuestVarGet("yimababwe")));
+			}
+		}
+		case 1:
+		{
+			int id = trQuestVarGet("yimID");
+			xsSetContextPlayer(ENEMY_PLAYER);
+			float current = kbUnitGetCurrentHitpoints(id);
+			xsSetContextPlayer(0);
+			if (current < trQuestVarGet("yimCurrentHealth")) {
+				if (current == 0) {
+					trQuestVarSet("punchingBagActive", 2);
+					trQuestVarSet("yimCalculateTimeout", trTimeMS() + 2000);
+				} else {
+					trQuestVarSet("yimCurrentHealth", current);
+					if (trQuestVarGet("yimCalculateStart") == 0) {
+						trQuestVarSet("yimCalculateStart", trTimeMS());
+						trQuestVarSet("yimTotalTime", 0);
+					} else {
+						trQuestVarSet("yimTotalTime", trQuestVarGet("yimTotalTime") + trTimeMS() - trQuestVarGet("yimCalculateStart"));
+						trQuestVarSet("yimCalculateStart", trTimeMS());
+						current = 10000.0 - current;
+						current = current / trQuestVarGet("yimTotalTime");
+						current = current * 1000.0;
+					}
+					trQuestVarSet("yimCalculateTimeout", trTimeMS() + 5000);
+
+					
+					trSoundPlayFN("default","1",-1,"Damage Per Second:"+current,"");
+					trQuestVarSet("yimDPS", current);
+
+					trUnitSelectClear();
+					trUnitSelectByQV("yimababwe");
+					trUnitHighlight(0.1, false);
+				}
+			} else if (trTimeMS() > trQuestVarGet("yimCalculateTimeout") && trQuestVarGet("yimCalculateTimeout") > 0) {
+				trUnitSelectClear();
+				trUnitSelectByQV("yimababwe");
+				trDamageUnitPercent(-100);
+				trUnitConvert(0);
+				startNPCDialog(NPC_PUNCHING_BAG_TAUNT);
+				xClearDatabase(dEnemies);
+				trQuestVarSet("punchingBagActive", 0);
+			}
+			stunsAndPoisons(dEnemies);
+			xSetVector(dEnemies,xUnitPos,kbGetBlockPosition(""+xGetInt(dEnemies,xUnitName)));
+		}
+		case 2:
+		{
+			if (trTimeMS() > trQuestVarGet("yimCalculateTimeout")) {
+				trUnitSelectClear();
+				trUnitSelectByQV("yimababwe");
+				trDamageUnitPercent(-100);
+				trUnitChangeProtoUnit("Automaton");
+				trUnitSelectClear();
+				trUnitSelectByQV("yimababwe");
+				trDamageUnitPercent(-100);
+				trUnitConvert(0);
+				trUnitSelectClear();
+				trUnitSelectByQV("yimababwe");
+				trDamageUnitPercent(-100);
+				trUnitChangeProtoUnit("Automaton");
+				trQuestVarSet("punchingBagActive", 0);
+				trLetterBox(false);
+				trChatSend(0, "<color=1,1,1><u>Damage Per Second</u></color>");
+				trChatSend(0, "<color=1,0,0>"+trQuestVarGet("yimDPS")+"</color>");
+			}
+		}
 	}
 }

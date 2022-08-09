@@ -476,15 +476,17 @@ rule boss_stun_recovery
 inactive
 highFrequency
 {
-	if (trTime() > trQuestVarGet("bossStunRecoveryLast")) {
-		trQuestVarSet("bossStunRecoveryLast", trTime());
-		int pointer = xGetPointer(dEnemies);
-		if (xSetPointer(dEnemies, bossPointer)) {
-			if (xGetInt(dEnemies, xStunStatus) > 0) {
-				xSetInt(dEnemies, xStunTimeout, xGetInt(dEnemies, xStunTimeout) - 500 * trQuestVarGet("stage"));
-			}
-			xSetPointer(dEnemies, pointer);
+	int timediff = trTimeMS() - trQuestVarGet("bossStunRecoveryLast");
+	trQuestVarSet("bossStunRecoveryLast", trTimeMS());
+	int pointer = xGetPointer(dEnemies);
+	if (xSetPointer(dEnemies, bossPointer)) {
+		if (xGetInt(dEnemies, xStunStatus) > 0) {
+			xSetInt(dEnemies, xStunTimeout, xGetInt(dEnemies, xStunTimeout) - timediff * trQuestVarGet("bossStunRecoveryAmount"));
+			trQuestVarSet("bossStunRecoveryAmount", trQuestVarGet("bossStunRecoveryAmount") + 0.001 * timediff);
+		} else {
+			trQuestVarSet("bossStunRecoveryAmount", 1.0);
 		}
+		xSetPointer(dEnemies, pointer);
 	}
 }
 
@@ -3886,7 +3888,7 @@ highFrequency
 			} else if (trQuestVarGet("bossSpell") == 2) {
 				if (bossTimeout - trTimeMS() < bossNext) {
 					bossNext = bossNext - 100;
-					dist = bossNext / 500;
+					dist = 1.0 * bossNext / 500;
 					pos = kbGetBlockPosition(""+1*trQuestVarGet("zappyEnd"), true);
 					pos = pos + (kbGetBlockPosition(""+1*trQuestVarGet("zappyStart"),true) - pos) * dist;
 					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -3908,6 +3910,7 @@ highFrequency
 							xDatabaseNext(relics);
 							xUnitSelect(relics, xUnitName);
 							trUnitChangeProtoUnit("Relic");
+							relicEffect(xGetInt(relics, xRelicType), p, false);
 							xAddDatabaseBlock(dFreeRelics, true);
 							xSetInt(dFreeRelics, xUnitName, xGetInt(relics, xUnitName));
 							xSetInt(dFreeRelics, xRelicType, xGetInt(relics, xRelicType));
@@ -8203,6 +8206,7 @@ int dGuardianClones = 0;
 int xGuardianCloneDir = 0;
 int xGuardianCloneSpell = 0;
 int xGuardianCloneCount = 0;
+int xGuardianCloneRecovery = 0;
 
 int dGuardianStuns = 0;
 
@@ -8397,6 +8401,7 @@ highFrequency
 				xSpecialNext = xInitAddInt(dGuardianClones, "next");
 				xGuardianCloneDir = xInitAddVector(dGuardianClones, "dir");
 				xGuardianCloneCount = xInitAddInt(dGuardianClones, "count");
+				xGuardianCloneRecovery = xInitAddFloat(dGuardianClones, "recovery");
 
 				trSoundPlayFN("default","1",-1,"???:It has been a long time since I've felt this blade in my hand.","");
 				trQuestVarSet("cinTime", trTime() + 5);
@@ -8752,7 +8757,9 @@ highFrequency
 				{
 					case 0:
 					{
-						if (xGetInt(dEnemies, xSilenceStatus, xGetInt(dGuardianClones, xSpecialIndex)) == 0) {
+						action = xGetInt(dGuardianClones, xSpecialIndex);
+						if (xGetInt(dEnemies, xSilenceStatus, action) + xGetInt(dEnemies, xStunStatus, action) == 0) {
+							xSetFloat(dGuardianClones, xGuardianCloneRecovery, 0);
 							trUnitSetStance("Passive");
 							xSetInt(dGuardianClones, xSpecialStep, 1);
 							trQuestVarSetFromRand("rand", 0, 2, true);
@@ -8804,6 +8811,11 @@ highFrequency
 									xSetInt(dGuardianClones, xSpecialNext, trTimeMS() + 750);
 								}
 							}
+						} else {
+							xSetFloat(dGuardianClones, xGuardianCloneRecovery, xGetFloat(dGuardianClones, xGuardianCloneRecovery) + timediff);
+							debugLog("Recovery: " + xGetFloat(dGuardianClones, xGuardianCloneRecovery));
+							xSetInt(dEnemies, xSilenceTimeout, xGetInt(dEnemies, xSilenceTimeout, action) - 2000 * timediff * xGetFloat(dGuardianClones, xGuardianCloneRecovery), action);
+							xSetInt(dEnemies, xStunTimeout, xGetInt(dEnemies, xStunTimeout, action) - 1000 * timediff * xGetFloat(dGuardianClones, xGuardianCloneRecovery), action);
 						}
 					}
 					case 1:
@@ -9503,6 +9515,7 @@ highFrequency
 				trQuestVarSet("bossUsedUltimate", 0);
 
 				trQuestVarSet("cinTime", trTime() + 3);
+				trQuestVarSet("secondPhase", 1);
 
 				trStringQuestVarSet("bossProto", "Titan Kronos");
 

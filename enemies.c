@@ -166,6 +166,8 @@ highFrequency
 	setupProtounitBounty("Shade XP", 0, 0, 0);
 	trModifyProtounit("Shade XP", 0, 1, -1.8);
 	trModifyProtounit("Shade XP", ENEMY_PLAYER, 1, -1.8);
+
+	setupProtounitBounty("Automaton", 0.5, 0, 0);
 	
 	setupProtounitBounty("Hero Boar", 0, 0, 0);
 	setupProtounitBounty("Hero Boar 2", 0, 0, 0);
@@ -210,6 +212,11 @@ highFrequency
 	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 24, 1);
 	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 25, 1);
 	trModifyProtounit("Spider Egg", ENEMY_PLAYER, 26, 1);
+
+	trModifyProtounit("Automaton", ENEMY_PLAYER, 0, 9999999999999999999.0);
+	trModifyProtounit("Automaton", ENEMY_PLAYER, 0, -9999999999999999999.0);
+	trModifyProtounit("Automaton", ENEMY_PLAYER, 0, 10000);
+	trModifyProtounit("Automaton", ENEMY_PLAYER, 55, 2);
 	
 	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, 9999999999999999999.0);
 	trModifyProtounit("Pharaoh of Osiris XP", ENEMY_PLAYER, 0, -9999999999999999999.0);
@@ -851,6 +858,15 @@ void specialUnitsAlways() {
 				xSetInt(dAutomatonBombs,xUnitName,xGetInt(dAutomatons,xUnitName));
 				xSetInt(dAutomatonBombs,xPlayerOwner,xGetInt(dAutomatons,xPlayerOwner));
 				xSetInt(dAutomatonBombs,xTimeout,trTimeMS() + 3000);
+			} else if (xGetInt(dAutomatons, xPlayerOwner) == ENEMY_PLAYER) {
+				if (trQuestVarGet("scrapQuest") == 1) {
+					trQuestVarSet("scrap", 1 + trQuestVarGet("scrap"));
+					trChatSend(0, "<color=0.8,0.8,0.8>Collected 1 spare part</color>");
+					if (trQuestVarGet("scrap") >= 30) {
+						trQuestVarSet("scrapQuest", 2);
+						uiMessageBox("You have acquired 30 pieces of scrap metal.");
+					}
+				}
 			}
 			xFreeDatabaseBlock(dAutomatons);
 		} else if (checkEnemyDeactivated(dAutomatons)) {

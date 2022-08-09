@@ -317,19 +317,41 @@ void checkGodPowers(int p = 0) {
 
 void maintainStun() {
 	int id = 0;
-	for(x=xGetDatabaseCount(dStunnedUnits); >0) {
-		xDatabaseNext(dStunnedUnits);
-		xUnitSelect(dStunnedUnits, xUnitName);
-		if (trUnitAlive() == false) {
-			if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
-				trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
-			}
-			xFreeDatabaseBlock(dStunnedUnits);
-		} else {
-			if ((xGetInt(dStunnedUnits, xUnitName) != bossUnit) ||
-				(bossAnim == false)) {
+	if ((trQuestVarGet("stage") == 10) && (trQuestVarGet("secondPhase") == 0)) {
+		// special stun rules
+		for(x=xGetDatabaseCount(dStunnedUnits); >0) {
+			xDatabaseNext(dStunnedUnits);
+			xUnitSelect(dStunnedUnits, xUnitName);
+			if (trUnitAlive() == false) {
+				if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
+					trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
+				}
+				xFreeDatabaseBlock(dStunnedUnits);
+			} else if (xGetInt(dStunnedUnits, xPlayerOwner) == ENEMY_PLAYER) {
+				id = xGetInt(dStunnedUnits, xUnitID);
+				if (kbUnitGetAnimationActionType(id) != 16) {
+					trMutateSelected(xGetInt(dStunnedUnits, xStunnedProto));
+				}
+			} else {
 				trMutateSelected(xGetInt(dStunnedUnits, xStunnedProto));
 				trUnitOverrideAnimation(2, 0, false, false, -1, 0);
+			}
+		}
+	} else {
+		for(x=xGetDatabaseCount(dStunnedUnits); >0) {
+			xDatabaseNext(dStunnedUnits);
+			xUnitSelect(dStunnedUnits, xUnitName);
+			if (trUnitAlive() == false) {
+				if (xGetInt(dStunnedUnits, xStunnedProto) != kbGetProtoUnitID("Hero Boar")) {
+					trUnitChangeProtoUnit(kbGetProtoUnitName(xGetInt(dStunnedUnits, xStunnedProto)));
+				}
+				xFreeDatabaseBlock(dStunnedUnits);
+			} else {
+				if ((xGetInt(dStunnedUnits, xUnitName) != bossUnit) ||
+					(bossAnim == false)) {
+					trMutateSelected(xGetInt(dStunnedUnits, xStunnedProto));
+					trUnitOverrideAnimation(2, 0, false, false, -1, 0);
+				}
 			}
 		}
 	}
@@ -948,7 +970,7 @@ highFrequency
 				if (Multiplayer == false) {
 					reviving = true;
 					count = 1;
-				} else if (trQuestVarGet("stage") < 10 || trQuestVarGet("reviveCount") > 0) {
+				} else if ((trQuestVarGet("stage") != 10) || trQuestVarGet("reviveCount") > 0) {
 					for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
 						xDatabaseNext(dPlayerCharacters);
 						xUnitSelectByID(dPlayerCharacters, xUnitID);
@@ -1222,7 +1244,7 @@ highFrequency
 			xsDisableSelf();
 			trMessageSetText("The Palace of the Deep has been destroyed!",-1);
 			trUnitOverrideAnimation(6,0,false,false,-1);
-			trUnitSetAnimationPath("3,1,0,0,0,0,0");
+			trUnitSetAnimationPath("3,2,0,0,0,0,0");
 		}
 	}
 }
