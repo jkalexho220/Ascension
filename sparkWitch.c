@@ -242,6 +242,7 @@ void sparkWitchAlways(int eventID = -1) {
 									xSetInt(pigs, xWitchPigTimeout, trTimeMS() + 1000 * hexboltDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 									xSetFloat(dEnemies, xPhysicalResist, 0);
 									xSetFloat(dEnemies, xMagicResist, 0);
+									xUnitSelect(zaps, xUnitName);
 									if (xGetInt(zaps, xUnitName) == bossUnit) {
 										trMutateSelected(kbGetProtoUnitID("Hero Boar 2"));
 									} else {

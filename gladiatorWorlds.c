@@ -360,7 +360,11 @@ highFrequency
 
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 25000 * ENEMY_PLAYER);
+				trModifyProtounit("Minotaur", ENEMY_PLAYER, 0, 30000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 30000 * ENEMY_PLAYER);
 
 				xsEnableRule("boss_stun_recovery");
 

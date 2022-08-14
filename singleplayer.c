@@ -496,8 +496,12 @@ highFrequency
 		
 		trSetUnitIdleProcessing(false);
 		trPlayerSetDiplomacy(1, ENEMY_PLAYER, "Enemy");
-		trArmyDispatch("1,0","Victory Marker",1,1,0,1,0,true);
-		trArmyDispatch("2,0","Victory Marker",1,1,0,1,0,true);
+		trArmyDispatch("1,0","Victory Marker",2,1,0,1,0,true);
+		trArmyDispatch(""+ENEMY_PLAYER+",0","Victory Marker",1,1,0,1,0,true);
+
+		trUnitSelectClear();
+		trUnitSelect("0");
+		trUnitDestroy();
 		
 		int x = 0;
 		int z = 15;
