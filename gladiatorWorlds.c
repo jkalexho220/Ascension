@@ -1529,8 +1529,8 @@ highFrequency
 
 	trPaintTerrain(0,0,0,0,TERRAIN_WALL, TERRAIN_SUB_WALL, true);
 
-	for(x=55; < 90) {
-		for(z=55; < 90) {
+	for(x=55; <= 91) {
+		for(z=55; <= 91) {
 			dist = xsPow(x - 73, 2) + xsPow(z - 73, 2);
 			if (dist > 144 && dist <= 289) {
 				aiPlanSetUserVariableVector(dPitOfDoom, x - 42, z - 42, xsVectorSet(TERRAIN_SECONDARY, TERRAIN_SUB_SECONDARY, -3));

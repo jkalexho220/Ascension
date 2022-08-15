@@ -251,7 +251,7 @@ highFrequency
 	xsDisableSelf();
 	int db = 0;
 
-	rememberRelics = zNewArray(mBool, 30, "remember_relics");
+	rememberRelics = zNewArray(mBool, 31, "remember_relics");
 
 	dPlayerUnits = xInitDatabase("playerUnits", 30);
 	dEnemies = xInitDatabase("enemies", 30);
