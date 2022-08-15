@@ -2036,6 +2036,10 @@ highFrequency
 				trModifyProtounit("Titan Atlantean", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", 0, 0, -9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", 0, 0, 32000 * ENEMY_PLAYER);
+
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
 				
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				bossScale = 1.0;
@@ -3162,6 +3166,10 @@ highFrequency
 
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 27, -400);
 		trModifyProtounit("Guardian", ENEMY_PLAYER, 29, -2000);
+
+		trModifyProtounit("Hero Boar", ENEMY_PLAYER, 0, 9999999999999999999.0);
+		trModifyProtounit("Hero Boar", ENEMY_PLAYER, 0, -9999999999999999999.0);
+		trModifyProtounit("Hero Boar", ENEMY_PLAYER, 0, 3600 * ENEMY_PLAYER);
 
 		worldHeight = 13;
 		TERRAIN_WALL = 0;

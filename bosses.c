@@ -2963,9 +2963,15 @@ highFrequency
 				trUnitSelect(""+bossUnit, true);
 				trUnitChangeProtoUnit("Pharaoh of Osiris XP");
 				xSetPointer(dEnemies, bossPointer);
+				xSetInt(dEnemies, xUnitProto, kbGetProtoUnitID("Pharaoh of Osiris XP"));
 				xSetBool(dEnemies, xLaunched, true);
 				xSetFloat(dEnemies, xPhysicalResist, 0.47);
 				xSetFloat(dEnemies, xMagicResist, 0.47);
+
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 47000);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 2, 20);
 				
 				spyEffect(1*trQuestVarGet("yeebaagooon"),
 					kbGetProtoUnitID("Cinematic Block"), xsVectorSet(ARRAYS,bossInts,yeebShieldSFX));
@@ -8468,6 +8474,7 @@ highFrequency
 				activateGuardianClone(bossPointer);
 
 				xSetBool(dEnemies, xLaunched, true, bossPointer);
+				xSetInt(dEnemies, xUnitProto, kbGetProtoUnitID("Guardian XP"));
 
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
@@ -9282,6 +9289,7 @@ highFrequency
 				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 1, 5);
 				trModifyProtounit("Heka Gigantes", ENEMY_PLAYER, 55, 4);
 				activateEnemy(bossUnit);
+				xSetInt(dEnemies, xUnitProto, kbGetProtoUnitID("Titan Kronos"));
 				xSetFloat(dEnemies, xPhysicalResist, 0.7);
 				xSetFloat(dEnemies, xMagicResist, 0.7);
 				bossPointer = xGetNewestPointer(dEnemies);
@@ -9292,6 +9300,8 @@ highFrequency
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,3)); // DEATH SENTENCE
 
 				spyEffect(bossUnit,kbGetProtoUnitID("Cinematic Block"),xsVectorSet(ARRAYS,bossInts,4));
+
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
 
 				for(i=xStunSFX; <= xSilenceSFX) {
 					spyEffect(bossUnit, kbGetProtoUnitID("Cinematic Block"), xsVectorSet(dEnemies, i, bossPointer));
@@ -9520,6 +9530,8 @@ highFrequency
 				trStringQuestVarSet("bossProto", "Titan Kronos");
 
 				trModifyProtounit("Argus", ENEMY_PLAYER, 2, 20);
+
+				trQuestVarSet("deadPlayerCount", 0);
 			}
 			case 9:
 			{
@@ -9653,7 +9665,9 @@ highFrequency
 	trUnitSelect(""+bossUnit, true);
 	float percentDamaged = trUnitPercentDamaged();
 	if (trUnitAlive() == true) {
-		trDamageUnit(timediff * 100); // counteract regen
+		if (kbGetUnitBaseTypeID(bossID) == kbGetProtoUnitID("Titan Kronos")) {
+			trDamageUnit(timediff * 100); // counteract regen
+		}
 
 		spell = trQuestVarGet("bossSpell");
 		if (spell / 10 != 3) { // no summoning during nightmares

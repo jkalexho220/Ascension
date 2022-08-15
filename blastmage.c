@@ -422,28 +422,33 @@ void blastmageAlways(int eventID = -1) {
 			dist = solarFlareRange * xGetFloat(dPlayerData, xPlayerSpellRange);
 			for(y=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);
-				pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName), true));
-				dir = getUnitVector(pos, dest);
-				for(x=xGetDatabaseCount(dEnemies); >0) {
-					xDatabaseNext(dEnemies);
-					xUnitSelectByID(dEnemies, xUnitID);
-					if (trUnitAlive() == false) {
-						removeEnemy();
-					} else if (rayCollision(dEnemies, pos, dir, dist + 2.0, 4.0)) {
-						damageEnemy(p, amt);
+				xUnitSelectByID(db, xUnitID);
+				if (trUnitAlive() == false) {
+					removeBlastmage(p);
+				} else {
+					pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName), true));
+					dir = getUnitVector(pos, dest);
+					for(x=xGetDatabaseCount(dEnemies); >0) {
+						xDatabaseNext(dEnemies);
+						xUnitSelectByID(dEnemies, xUnitID);
+						if (trUnitAlive() == false) {
+							removeEnemy();
+						} else if (rayCollision(dEnemies, pos, dir, dist + 2.0, 4.0)) {
+							damageEnemy(p, amt);
+						}
 					}
+					next = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trArmySelect("1,0");
+					trUnitSetStance("Passive");
+					trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+					trSetUnitOrientation(vector(0,0,0) - dir,vector(0,1,0),true);
+					trUnitHighlight(10.0, false);
+					xAddDatabaseBlock(dPlayerLasers, true);
+					xSetInt(dPlayerLasers, xUnitName, next);
+					xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 1000);
+					xSetFloat(dPlayerLasers, xPlayerLaserRange, dist * 1.4);
 				}
-				next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trArmySelect("1,0");
-				trUnitSetStance("Passive");
-				trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
-				trSetUnitOrientation(vector(0,0,0) - dir,vector(0,1,0),true);
-				trUnitHighlight(10.0, false);
-				xAddDatabaseBlock(dPlayerLasers, true);
-				xSetInt(dPlayerLasers, xUnitName, next);
-				xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 1000);
-				xSetFloat(dPlayerLasers, xPlayerLaserRange, dist * 1.4);
 			}
 			trQuestVarSetFromRand("sound", 1, 5, true);
 			trSoundPlayFN("ui\lightning"+1*trQuestVarGet("sound")+".wav","1",-1,"","");

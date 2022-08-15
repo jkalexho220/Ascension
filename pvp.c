@@ -664,6 +664,7 @@ highFrequency
 			case 10:
 			{
 				trLetterBox(true);
+				xRestoreCache(dPlayerUnits);
 				for(x=xGetDatabaseCount(dPlayerUnits); >0) {
 					xDatabaseNext(dPlayerUnits);
 					xUnitSelectByID(dPlayerUnits, xUnitID);
