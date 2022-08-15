@@ -6030,6 +6030,7 @@ highFrequency
 				bossDir = vector(0,0,-1);
 
 				xSetBool(dEnemies, xLaunched, true, bossPointer);
+				xSetInt(dEnemies, xUnitProto, kbGetProtoUnitID("Titan Atlantean"), bossPointer);
 
 				trLetterBox(false);
 				trUIFadeToColor(0,0,0,1000,0,false);
@@ -9216,6 +9217,11 @@ highFrequency
 			xUnitSelect(dStarShooters, xStarShooterProj);
 			trUnitDestroy();
 		}
+		for(i=KALEIDOSCOPE_COUNT; >0) {
+			xDatabaseNext(dKaleidoscopes);
+			xUnitSelect(dKaleidoscopes, xUnitName);
+			trUnitDestroy();
+		}
 		uiLookAtUnitByName(""+bossUnit);
 	}
 }
@@ -9846,7 +9852,7 @@ highFrequency
 				trPaintTerrain(x, z, x, z, 1*xsVectorGetX(start), 1*xsVectorGetZ(start), false);
 				aiPlanSetUserVariableVector(voidPaintArray, 1*xsVectorGetX(pos), 1*xsVectorGetZ(pos), xsVectorSetY(start, 0));
 				xFreeDatabaseBlock(dVoidPaint);
-			} else if ((trTimeMS() > trQuestVarGet("bossSummonNext")) && (trQuestVarGet("secondPhase") == 1)) { // random argus spawn
+			} else if ((trTimeMS() > trQuestVarGet("bossSummonNext")) && (trQuestVarGet("secondPhase") == 2)) { // random argus spawn
 				if (spell / 10 != 3) { // don't summon when we're in nightmare land
 					pos = gridToVector(pos + vector(32, 0, 32));
 					action = trGetNextUnitScenarioNameNumber();
@@ -10100,7 +10106,7 @@ highFrequency
 			if (trQuestVarGet("bossSpell") == 21) {
 				trMessageSetText("Destroy the eggs before they explode!", -1);
 				bossCount = ENEMY_PLAYER / 2;
-				if (trQuestVarGet("secondPhase") == 1) {
+				if (trQuestVarGet("secondPhase") == 2) {
 					bossCount = bossCount * 2;
 				}
 				bossNext = trTimeMS();
@@ -10109,7 +10115,7 @@ highFrequency
 				if (trTimeMS() > bossNext) {
 					trSoundPlayFN("gatherpoint.wav","1",-1,"","");
 					bossNext = bossNext + 1500;
-					if (trQuestVarGet("secondPhase") == 1) {
+					if (trQuestVarGet("secondPhase") == 2) {
 						bossNext = bossNext - 500;
 					}
 					trQuestVarSetFromRand("modx", -20, 20, true);
@@ -10222,7 +10228,7 @@ highFrequency
 			if (trQuestVarGet("bossSpell") == 1) {
 				bossNext = trTimeMS();
 				bossTimeout = trTimeMS() + 9000;
-				if (trQuestVarGet("secondPhase") == 1) {
+				if (trQuestVarGet("secondPhase") == 2) {
 					bossTimeout = bossTimeout + 3000;
 				}
 				trQuestVarSet("bossSpell", 2);
@@ -10580,7 +10586,7 @@ highFrequency
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trCameraCut(vector(0,70.710701,0), vector(0.5,-0.707107,0.5), vector(0.5,0.707107,0.5), vector(0.707107,0,-0.707107));
 				uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, xGetInt(dPlayerData, xPlayerClass, trCurrentPlayer()))));
-				trQuestVarSet("secondPhase", 1);
+				trQuestVarSet("secondPhase", 2);
 				trSetUnitIdleProcessing(true);
 				xsEnableRule("rising_up");
 				if (customContent) {
