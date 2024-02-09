@@ -932,7 +932,8 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 				if (action == 6) {
 					xSetInt(db,xCharSpecialAttack,xGetInt(db,xCharSpecialAttack) - 1);
 					if (xGetInt(db, xCharSpecialAttack) <= 0) {
-						xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
+						xSetInt(db, xCharSpecialAttack, xsMax(xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p), xGetInt(dClass, xClassSpecialAttackCooldown, xGetInt(dPlayerData, xPlayerClass, p)) / 2));
+						//xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
 						status = ON_HIT_SPECIAL;
 						if (xGetFloat(dPlayerData, xPlayerFavorSpecial, p) > 0) {
 							for(i=1; < ENEMY_PLAYER) {

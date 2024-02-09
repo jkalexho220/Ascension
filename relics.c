@@ -163,7 +163,7 @@ string relicName(int relic = 0) {
 			}
 			case RELIC_SPECIAL_ATTACK:
 			{
-				msg = "Special Attack Cooldown -1";
+				msg = "Special Attack Cooldown -1 (Cannot reduce below half of original)";
 			}
 			case RELIC_COOLDOWN_REDUCTION:
 			{
