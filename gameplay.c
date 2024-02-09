@@ -365,7 +365,7 @@ void playerLasers() {
 			trUnitDestroy();
 			xFreeDatabaseBlock(dPlayerLasers);
 		} else {
-			float width = 4.0 * (xGetInt(dPlayerLasers, xPlayerLaserTimeout) - trTimeMS()) / 500;
+			float width = xGetFloat(dPlayerLasers, xPlayerLaserScale) * 4.0 * (xGetInt(dPlayerLasers, xPlayerLaserTimeout) - trTimeMS()) / 500;
 			trSetSelectedScale(width, width, xGetFloat(dPlayerLasers, xPlayerLaserRange));
 		}
 	}

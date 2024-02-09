@@ -342,7 +342,7 @@ void throneShieldAlways(int eventID = -1) {
 				} else if (xGetFloat(dPlayerUnits, xCurrentHealth, xGetInt(db, xCharIndex)) <= 1) {
 					dist = 0;
 				} else {
-					dist = dist * trQuestVarGet("p"+p+"damageReduction");
+					dist = dist * xsMin(0.9, trQuestVarGet("p"+p+"damageReduction"));
 				}
 				trDamageUnit(0.0 - dist);
 				amt = amt + dist;

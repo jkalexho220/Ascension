@@ -566,7 +566,7 @@ highFrequency
 	setupClass("Archer Atlantean Hero", STORMPIERCER, 400, 1000, MANASTONE);
 	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
 	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
-	setupClass("Javelin Cavalry Hero", COMMANDO, 1000, 2000, STARSTONE);
+	setupClass("Royal Guard Hero", COMMANDO, 600, 1000, STARSTONE, 5);
 	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
@@ -605,7 +605,7 @@ highFrequency
 	setupPlayerProto("Archer Atlantean Hero", 900, 30, 4.05, 0, 20);
 	setupPlayerProto("Pharaoh", 1000, 50, 4.0, 0, 12);
 	setupPlayerProto("Swordsman Hero", 1000, 50, 4.8, 0.3);
-	setupPlayerProto("Javelin Cavalry Hero", 1200, 45, 5.3, 0, 12);
+	setupPlayerProto("Royal Guard Hero", 1200, 50, 4.6, 0.3);
 	setupPlayerProto("Trident Soldier Hero", 1200, 30, 3.9, 0);
 	setupPlayerProto("Hero Greek Bellerophon", 1200, 60, 6.0, 0.4);
 	setupPlayerProto("Hero Greek Chiron", 1000, 50, 5.5, 0, 16);

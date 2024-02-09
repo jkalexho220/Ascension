@@ -340,7 +340,7 @@ void spellstealerAlways(int eventID = -1) {
 					xSetVector(spellblades, xSpellbladePrev, pos - (dir * 2.0));
 					xSetVector(spellblades, xSpellbladeDir, dir);
 					xSetInt(spellblades, xSpellbladeStatus, 1*trQuestVarGet("p"+p+"spellstealStatus"));
-					xSetInt(spellblades, xSpellbladePierce, xGetInt(dPlayerData, xPlayerProjectiles));
+					xSetInt(spellblades, xSpellbladePierce, 5);
 					dir = rotationMatrix(dir, 0.980785, 0.195089);
 				}
 			}

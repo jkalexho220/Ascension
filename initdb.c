@@ -203,6 +203,7 @@ int xPlayerWolfTimeout = 0;
 
 int dPlayerLasers = 0;
 int xPlayerLaserTimeout = 0;
+int xPlayerLaserScale = 0;
 int xPlayerLaserRange = 0;
 
 int dSlotRelics = 0;
@@ -475,6 +476,7 @@ highFrequency
 	xInitAddInt(dPlayerLasers, "name");
 	xPlayerLaserRange = xInitAddFloat(dPlayerLasers, "range");
 	xPlayerLaserTimeout = xInitAddInt(dPlayerLasers, "timeout");
+	xPlayerLaserScale = xInitAddFloat(dPlayerLasers, "scale", 1.0);
 	
 	dApplicants = xInitDatabase("applicants");
 	xInitAddInt(dApplicants, "name");

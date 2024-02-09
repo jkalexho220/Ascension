@@ -1523,12 +1523,12 @@ highFrequency
 				
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
+				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 0, 6000 * xsSqrt(ENEMY_PLAYER));
 				trModifyProtounit("Nemean Lion", ENEMY_PLAYER, 1, 2.4);
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 4000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 6000 * xsSqrt(ENEMY_PLAYER));
 
 				for(p=1; < ENEMY_PLAYER) {
 					if (trQuestVarGet("p"+p+"swordpieceQuest"+SWORD_HANDLE) == 1) {
@@ -1632,16 +1632,16 @@ highFrequency
 				
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
+				trModifyProtounit("King Folstag", ENEMY_PLAYER, 0, 12000 * xsSqrt(ENEMY_PLAYER));
 				trModifyProtounit("King Folstag", ENEMY_PLAYER, 1, 1.075);
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 8000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 12000 * xsSqrt(ENEMY_PLAYER));
 
 				trModifyProtounit("King Folstag", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("King Folstag", 0, 0, -9999999999999999999.0);
-				trModifyProtounit("King Folstag", 0, 0, 8000 * ENEMY_PLAYER);
+				trModifyProtounit("King Folstag", 0, 0, 12000 * xsSqrt(ENEMY_PLAYER));
 			}
 			case 4:
 			{
@@ -1688,11 +1688,11 @@ highFrequency
 				
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+				trModifyProtounit("Chimera", ENEMY_PLAYER, 0, 18000 * xsSqrt(ENEMY_PLAYER));
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 12000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 18000 * xsSqrt(ENEMY_PLAYER));
 			}
 			case 5:
 			{
@@ -1741,11 +1741,11 @@ highFrequency
 				bossScale = 1.5;
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+				trModifyProtounit("Shade of Hades", ENEMY_PLAYER, 0, 24000 * xsSqrt(ENEMY_PLAYER));
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 16000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * xsSqrt(ENEMY_PLAYER));
 
 				trModifyProtounit("Shade of Hades", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Shade of Hades", 0, 0, -9999999999999999999.0);
@@ -1805,11 +1805,11 @@ highFrequency
 				
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
+				trModifyProtounit("Helepolis", ENEMY_PLAYER, 0, 30000 * xsSqrt(ENEMY_PLAYER));
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 20000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 30000 * xsSqrt(ENEMY_PLAYER));
 
 				trModifyProtounit("Helepolis", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Helepolis", 0, 0, -9999999999999999999.0);
@@ -1878,11 +1878,11 @@ highFrequency
 				
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+				trModifyProtounit("Scylla", ENEMY_PLAYER, 0, 36000 * xsSqrt(ENEMY_PLAYER));
 				
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 24000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 36000 * xsSqrt(ENEMY_PLAYER));
 				
 				trQuestVarSet("fishHawks", zNewArray(mInt, 30, "fishHawks"));
 				trQuestVarSet("fishes", zNewArray(mInt, 30, "fishes"));
@@ -2031,15 +2031,15 @@ highFrequency
 
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				trModifyProtounit("Titan Atlantean", ENEMY_PLAYER, 0, 48000 * xsSqrt(ENEMY_PLAYER));
 
 				trModifyProtounit("Titan Atlantean", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Titan Atlantean", 0, 0, -9999999999999999999.0);
-				trModifyProtounit("Titan Atlantean", 0, 0, 32000 * ENEMY_PLAYER);
+				trModifyProtounit("Titan Atlantean", 0, 0, 48000 * xsSqrt(ENEMY_PLAYER));
 
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 9999999999999999999.0);
 				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, -9999999999999999999.0);
-				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 32000 * ENEMY_PLAYER);
+				trModifyProtounit("Hero Boar 2", ENEMY_PLAYER, 0, 48000 * xsSqrt(ENEMY_PLAYER));
 				
 				trStringQuestVarSet("bossProto", "Heka Gigantes");
 				bossScale = 1.0;
