@@ -2119,7 +2119,7 @@ int npcDiag(int npc = 0, int dialog = 0) {
 				}
 				case 2:
 				{
-					uiMessageBox("Healing is reduced to 25 percent effectiveness on this floor.");
+					uiMessageBox("Healing is reduced to 50 percent effectiveness on this floor.");
 				}
 				case 3:
 				{

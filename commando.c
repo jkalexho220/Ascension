@@ -1,4 +1,4 @@
-const int quickdrawCooldown = 16;
+const int quickdrawCooldown = 10;
 const float quickdrawRadius = 3.0;
 const int quickdrawDuration = 3000;
 
@@ -6,7 +6,7 @@ const int echoBombCooldown = 20;
 const float echoBombDuration = 6;
 const float echoBombRadius = 12;
 
-const float bulletStormRange = 9;
+const float bulletStormRange = 8;
 
 int xCommandoBulletStormSFX = 0;
 int xCommandoQuickdrawSFX = 0;
@@ -26,18 +26,14 @@ void removeCommando(int p = 0) {
 	removePlayerSpecific(p);
 }
 
-void commandoGainFavor(int p = 0, float amt = 1.0) {
-	if (trQuestVarGet("p"+p+"bulletStormActive") == 0) {
-		gainFavor(p, amt);
-	}
-}
-
-void commandoCrit(int p = 0) {
+float commandoCritMultiplier(int p = 0) {
+	float amt = 1.0;
 	trQuestVarSetFromRand("rand", 0, 1.0, false);
 	if (trQuestVarGet("rand") < xGetFloat(dPlayerData, xPlayerPhysicalResist)) {
-		damageEnemy(p, xGetFloat(dPlayerData, xPlayerAttack), false);
-		commandoGainFavor(p);
+		amt = amt * 2;
+		gainFavor(p, 1.0);
 	}
+	return(amt);
 }
 
 
@@ -59,22 +55,6 @@ void shootBullet(int p = 0, vector start = vector(0,0,0), vector end = vector(0,
 }
 
 
-void shootVendetta(int p = 0) {
-	int db = getCharactersDB(p);
-	trUnitSelectClear();
-	trUnitSelectByQV("p"+p+"vendettaUnit");
-	if (trUnitAlive()) {
-		int old = xGetPointer(dEnemies);
-		xSetPointer(dEnemies, 1*trQuestVarGet("p"+p+"vendetta"));
-		damageEnemy(p, xGetFloat(dPlayerData, xPlayerAttack), false);
-		commandoCrit(p);
-		OnHit(p, 1*trQuestVarGet("p"+p+"vendetta"));
-		xSetPointer(dEnemies, old);
-		shootBullet(p, kbGetBlockPosition(""+xGetInt(db, xUnitName), true), kbGetBlockPosition(""+1*trQuestVarGet("p"+p+"vendettaUnit"), true));
-		trQuestVarSet("bulletSound", 1);
-	}
-}
-
 void minigunOff(int p = 0) {
 	trModifyProtounit("Royal Guard Hero", p, 55, 1);
 	trQuestVarSet("p"+p+"bulletStormActive", 0);
@@ -84,6 +64,40 @@ void minigunOff(int p = 0) {
 		xUnitSelect(db, xCommandoBulletStormSFX);
 		trMutateSelected(kbGetProtoUnitID("Cinematic Block"));
 	}
+}
+
+void plantEchoBomb(int p = 0) {
+	float amt = 0;
+	int id = xGetInt(dEnemies, xUnitID);
+	int echoBombs = trQuestVarGet("p"+p+"echoBombs");
+	xSetBool(dEnemies, xEchoBomb, true);
+	xAddDatabaseBlock(echoBombs, true);
+	xSetInt(echoBombs, xEchoBombUnit, xGetInt(dEnemies, xUnitName));
+	if ((xGetInt(dEnemies, xUnitName) == bossUnit) && (trQuestVarGet("stage") >= 9)) {
+		// can't cast spy on the titan atlantean
+		xSetInt(echoBombs, xUnitName, aiPlanGetUserVariableInt(ARRAYS, bossInts, 2));
+		xUnitSelect(echoBombs, xUnitName);
+		trMutateSelected(kbGetProtoUnitID("Phoenix Egg"));
+	} else {
+		spyEffect(xGetInt(dEnemies, xUnitName), kbGetProtoUnitID("Phoenix Egg"),
+			xsVectorSet(echoBombs, xUnitName, xGetPointer(echoBombs)));
+	}
+	if (PvP) {
+		xsSetContextPlayer(xGetInt(dPlayerUnits, xPlayerOwner, xGetInt(dEnemies, xDoppelganger)));
+	} else {
+		xsSetContextPlayer(ENEMY_PLAYER);
+	}
+	amt = kbUnitGetCurrentHitpoints(id);
+	xsSetContextPlayer(0);
+	xSetFloat(echoBombs, xEchoBombStartingHealth, amt);
+	xSetFloat(echoBombs, xEchoBombCurrentHealth, amt);
+	xSetFloat(echoBombs, xEchoBombSize, 1.0);
+	xSetVector(echoBombs, xEchoBombPos, xGetVector(dEnemies, xUnitPos));
+	xSetInt(echoBombs, xEchoBombIndex, xGetPointer(dEnemies));
+	xSetInt(echoBombs, xEchoBombTimeout,
+		trTimeMS() + 1000 * echoBombDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
+	trSoundPlayFN("siegeselect.wav", "1", -1, "","");
+	trSoundPlayFN("gatherpoint.wav","1",-1,"","");
 }
 
 
@@ -128,12 +142,19 @@ void commandoAlways(int eventID = -1) {
 			hit = CheckOnHit(p,false);
 			start = kbGetBlockPosition(""+xGetInt(db, xUnitName));
 			if (hit >= ON_HIT_NORMAL) {
-				commandoCrit(p);
+				id = xGetPointer(dEnemies);
+				xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex));
+				xUnitSelectByID(dEnemies, xUnitID);
+				damageEnemy(p, (commandoCritMultiplier(p) - 1.0) * xGetFloat(dPlayerData, xPlayerAttack), false);
 				if (hit == ON_HIT_SPECIAL) {
-					trQuestVarSet("p"+p+"vendetta", xGetInt(db, xCharAttackTargetIndex));
-					trQuestVarSet("p"+p+"vendettaUnit", xGetInt(dEnemies, xUnitName, 1*trQuestVarGet("p"+p+"vendetta")));
+					xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex));
+					if (xGetBool(dEnemies, xEchoBomb) == false) {
+						plantEchoBomb(p);
+					} else {
+						xSetInt(db, xCharSpecialAttack, 1);
+					}
 				}
-				shootVendetta(p);
+				xSetPointer(dEnemies, id);
 			}
 		}
 	}
@@ -164,6 +185,7 @@ void commandoAlways(int eventID = -1) {
 			}
 			trModifyProtounit("Royal Guard Hero", p, 1, 0.0 - trQuestVarGet("p"+p+"quickdrawBoost"));
 		} else {
+			hit = xGetPointer(dEnemies);
 			xDatabaseNext(db);
 			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			dist = xsPow(quickdrawRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
@@ -175,6 +197,8 @@ void commandoAlways(int eventID = -1) {
 						if (trCurrentPlayer() == p) {
 							trUnitHighlight(20.0, false);
 						}
+						xSetPointer(dEnemies, xGetInt(quickdrawIncoming, xQuickdrawIndex));
+						silenceUnit(dEnemies, 6.0, p);
 						xAddDatabaseBlock(quickdrawTargets, true);
 						xSetInt(quickdrawTargets, xUnitName, xGetInt(quickdrawIncoming, xUnitName));
 						xSetInt(quickdrawTargets, xQuickdrawIndex, xGetInt(quickdrawIncoming, xQuickdrawIndex));
@@ -184,10 +208,11 @@ void commandoAlways(int eventID = -1) {
 					xFreeDatabaseBlock(quickdrawIncoming);
 				}
 			}
+			xSetPointer(dEnemies, hit);
 		}
 	} else if (xGetDatabaseCount(quickdrawTargets) > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"quickdrawTimeout")) {
-			commandoGainFavor(p);
+			gainFavor(p, 1.0);
 			trQuestVarSet("p"+p+"quickdrawTimeout", trQuestVarGet("p"+p+"quickdrawTimeout") + 100);
 			trQuestVarSet("bulletSound", 1);
 			xUnitSelect(quickdrawTargets, xUnitName);
@@ -195,12 +220,31 @@ void commandoAlways(int eventID = -1) {
 				if (trCurrentPlayer() == p) {
 					trUnitHighlight(0.1, true);
 				}
+				amt = commandoCritMultiplier(p);
 				target = xGetPointer(dEnemies);
 				xSetPointer(dEnemies, xGetInt(quickdrawTargets, xQuickdrawIndex));
 				OnHit(p, xGetPointer(dEnemies));
-				damageEnemy(p, xGetFloat(dPlayerData, xPlayerAttack), false);
-				commandoCrit(p);
-				shootBullet(p, kbGetBlockPosition(""+xGetInt(db, xUnitName), true), kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true));
+				damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerAttack) * xGetDatabaseCount(db), false);
+				for(i=xGetDatabaseCount(db); >0) {
+					xDatabaseNext(db);
+					xUnitSelectByID(db, xUnitID);
+					if (trUnitAlive() == false) {
+						removeCommando(p);
+					} else {
+						shootBullet(p, kbGetBlockPosition(""+xGetInt(db, xUnitName), true), kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true));
+						xSetInt(db, xCharSpecialAttack, xGetInt(db, xCharSpecialAttack) - 1);
+						if (xGetInt(db, xCharSpecialAttack) <= 0) {
+							xSetInt(db, xCharSpecialAttack, xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p));
+							if (xGetBool(dEnemies, xEchoBomb) == false) {
+								xUnitSelectByID(dEnemies, xUnitID);
+								plantEchoBomb(p);
+							} else {
+								xSetInt(db, xCharSpecialAttack, 1);
+							}
+						}
+					}
+				}
+				
 				xSetPointer(dEnemies, target);
 			}
 			xFreeDatabaseBlock(quickdrawTargets);
@@ -367,6 +411,7 @@ void commandoAlways(int eventID = -1) {
 			}
 		}
 		if (target > 0 && xSetPointer(dEnemies, target) && (xGetBool(dEnemies, xEchoBomb) == false)) {
+			/*
 			xSetBool(dEnemies, xEchoBomb, true);
 			xAddDatabaseBlock(echoBombs, true);
 			xSetInt(echoBombs, xEchoBombUnit, xGetInt(dEnemies, xUnitName));
@@ -395,6 +440,8 @@ void commandoAlways(int eventID = -1) {
 				trTimeMS() + 1000 * echoBombDuration * xGetFloat(dPlayerData, xPlayerSpellDuration));
 			trSoundPlayFN("siegeselect.wav", "1", -1, "","");
 			trSoundPlayFN("gatherpoint.wav","1",-1,"","");
+			*/
+			plantEchoBomb(p);
 		} else {
 			if (trCurrentPlayer() == p) {
 				trSoundPlayFN("cantdothat.wav","1",-1,"","");
@@ -423,11 +470,16 @@ void commandoAlways(int eventID = -1) {
 
 	if (trQuestVarGet("p"+p+"bulletStormActive") == 1) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"bulletStormNext")) {
-			hit = xGetPointer(dEnemies);
+			//trQuestVarSet("p"+p+"bulletStormShoot", 1 - trQuestVarGet("p"+p+"bulletStormShoot"));
+			
 			trQuestVarSet("p"+p+"bulletStormNext", trQuestVarGet("p"+p+"bulletStormNext") + 100);
-			gainFavor(p, 0.0 - 1.0 * xGetFloat(dPlayerData, xPlayerUltimateCost));
+			if (trQuestVarGet("p"+p+"bulletStormShoot") == 1) {
+				gainFavor(p, 0.0 - 1.0 * xGetFloat(dPlayerData, xPlayerUltimateCost));
+			}
 			dir = rotationMatrix(trVectorQuestVarGet("p"+p+"bulletStormDir"), -0.740544, -0.672008);
 			dist = xsPow(bulletStormRange * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
+
+			hit = xGetPointer(dEnemies);
 			for(i=xGetDatabaseCount(db); >0) {
 				xDatabaseNext(db);
 				xUnitSelectByID(db, xUnitID);
@@ -437,31 +489,34 @@ void commandoAlways(int eventID = -1) {
 					trSetUnitOrientation(dir, vector(0,1,0), true);
 					pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 					shootBullet(p, pos, pos + dir * bulletStormRange * xGetFloat(dPlayerData, xPlayerSpellRange));
-					xSetPointer(dEnemies, xGetInt(db, xCommandoBulletStormTargetIndex));
-					for(j=xGetDatabaseCount(dEnemies); > 0) {
-						xDatabaseNext(dEnemies);
-						xUnitSelectByID(dEnemies, xUnitID);
-						if (trUnitAlive() == false) {
-							removeEnemy();
-						} else {
-							end = kbGetBlockPosition("" + xGetInt(dEnemies, xUnitName), true);
-							if (distanceBetweenVectors(pos, end, true) < dist) {
-								OnHit(p, xGetPointer(dEnemies));
-								damageEnemy(p, xGetFloat(dPlayerData, xPlayerAttack), false);
-								commandoCrit(p);
-								trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),0,true);
-								trArmySelect("1,0");
-								trUnitChangeProtoUnit("Dust Small");
-								xSetInt(db, xCommandoBulletStormTargetIndex, xGetPointer(dEnemies));
-								break;
+					if (trQuestVarGet("p"+p+"bulletStormShoot") == 1) {
+						xSetInt(db, xCharSpecialAttack, xGetInt(db, xCharSpecialAttack) - 1);
+						xSetPointer(dEnemies, xGetInt(db, xCommandoBulletStormTargetIndex));
+						for(j=xGetDatabaseCount(dEnemies); > 0) {
+							xDatabaseNext(dEnemies);
+							xUnitSelectByID(dEnemies, xUnitID);
+							if (trUnitAlive() == false) {
+								removeEnemy();
+							} else {
+								end = kbGetBlockPosition("" + xGetInt(dEnemies, xUnitName), true);
+								if (distanceBetweenVectors(pos, end, true) < dist) {
+									OnHit(p, xGetPointer(dEnemies));
+									damageEnemy(p, commandoCritMultiplier(p) * xGetFloat(dPlayerData, xPlayerAttack), false);
+									trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),0,true);
+									trArmySelect("1,0");
+									trUnitChangeProtoUnit("Dust Small");
+									xSetInt(db, xCommandoBulletStormTargetIndex, xGetPointer(dEnemies));
+									break;
+								}
 							}
 						}
 					}
 				}
 			}
+			xSetPointer(dEnemies, hit);
 			trQuestVarSet("bulletSound", 1);
 			trVectorQuestVarSet("p"+p+"bulletStormDir", dir);
-			if (trPlayerResourceCount(p, "favor") == 0) {
+			if ((trPlayerResourceCount(p, "favor") * xGetDatabaseCount(db)) == 0) {
 				minigunOff(p);
 			}
 		}
@@ -481,7 +536,8 @@ void commandoAlways(int eventID = -1) {
 				trSoundPlayFN("storehouse.wav","1",-1,"","");
 				trQuestVarSet("p"+p+"bulletStormStart", 1);
 				trModifyProtounit("Royal Guard Hero", p, 55, 2);
-				trQuestVarSet("p"+p+"bulletStormNext", trTimeMS() + 500);
+				trQuestVarSet("p"+p+"bulletStormNext", trTimeMS() + 100);
+				trQuestVarSet("p"+p+"bulletStormShoot", 1);
 				for(x=xGetDatabaseCount(db); >0) {
 					xDatabaseNext(db);
 					xUnitSelectByID(db, xUnitID);
@@ -518,7 +574,7 @@ void chooseCommando(int eventID = -1) {
 		wellName = "(Q) Quickdraw";
 		wellIsUltimate = false;
 		map("e", "game", "uiSetSpecialPower(156) uiSpecialPowerAtPointer");
-		rainName = "(E) Bullet Storm";
+		rainName = "(E) Shooting Gallery";
 		rainIsUltimate = false;
 		map("w", "game", "uiSetSpecialPower(227) uiSpecialPowerAtPointer");
 		lureName = "(W) Echo Bomb";

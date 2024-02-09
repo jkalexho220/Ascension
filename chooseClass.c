@@ -579,7 +579,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					case 5:
 					{
 						icon = "icons\god power barrage icon";
-						msg = "Each dagger can pierce through a number of enemies, up to your Projectile count.";
+						msg = "Each dagger can pierce through 5 enemies.";
 					}
 					case 6:
 					{
@@ -644,30 +644,31 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					}
 					case 1:
 					{
-						msg = "Passive: You wield a shotgun that shoots piercing bullets in a cone.";
+						msg = "Passive: Your attacks can critically strike to deal double damage and grant 1 favor.";
 					}
 					case 2:
 					{
-						msg = "Restore 1 favor when these bullets hit an enemy.";
+						msg = "Critical strike chance is equal to your armor.";
 					}
 					case 3:
 					{
-						msg = "Damage per bullet: 0.6 x Attack | Bullets: 4 + Projectiles | Damage falls off with distance.";
+						icon = "icons\improvement electrum bullets icon 64";
+						msg = "(Q) Quickdraw: Gain a burst of movement speed. During this time, mark enemies that you touch.";
 					}
 					case 4:
 					{
 						icon = "icons\improvement electrum bullets icon 64";
-						msg = "(Q) Shrapnel Shot: Fire an explosive at your cursor.";
+						msg = "When this ability ends, you shoot a bullet at all marked enemies, attacking them.";
 					}
 					case 5:
 					{
 						icon = "icons\improvement electrum bullets icon 64";
-						msg = "If it hits a wall, it explodes and releases a cone of shrapnel, dealing physical damage.";
+						msg = "If this critically strikes an enemy, shoot them an additional time.";
 					}
 					case 6:
 					{
 						icon = "icons\improvement electrum bullets icon 64";
-						msg = "Cooldown: 10 | Damage per bullet: 0.6 x Attack | Bullets: 8 + 2 x Projectiles";
+						msg = "Cooldown: 10 | Duration: 3 | Speed Boost: 3x | Applies on-hit effects";
 					}
 					case 7:
 					{
@@ -686,18 +687,18 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					}
 					case 10:
 					{
-						icon = "icons\siege x fire siphon icons 64";
-						msg = "(E) Minigun: Switch to your minigun, which continuously fires bullets at longer range.";
+						icon = "icons\god power sand storm icon 64";
+						msg = "(E) Shooting Gallery: Shoot in all directions, attacking random nearby enemies.";
 					}
 					case 11:
 					{
-						icon = "icons\siege x fire siphon icons 64";
-						msg = "These bullets do not pierce through enemies or grant you favor.";
+						icon = "icons\god power sand storm icon 64";
+						msg = "You cannot move or gain favor while this ability is active.";
 					}
 					case 12:
 					{
-						icon = "icons\siege x fire siphon icons 64";
-						msg = "Cost: 1 per bullet | Range: 1.5x | Damage: 1 x Attack | Fire rate: 3 + Projectiles";
+						icon = "icons\god power sand storm icon 64";
+						msg = "Cost: 1 per bullet | Range: 8 | Fire Rate: 10 | Applies on-hit effects.";
 						next = 0;
 					}
 				}

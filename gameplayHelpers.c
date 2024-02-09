@@ -106,13 +106,15 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 }
 
 void gainFavor(int p = 0, float amt = 0) {
-	xSetFloat(dPlayerData,xPlayerFavor,xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt),p);
-	if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_DOUBLE_FAVOR) {
-		xSetFloat(dPlayerData,xPlayerFavor,xsMin(200, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
-	} else {
-		xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
+	if ((trQuestVarGet("p"+p+"bulletStormActive") == 0) || amt < 0.0) { // this is so sloppy lol
+		xSetFloat(dPlayerData,xPlayerFavor,xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt),p);
+		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_DOUBLE_FAVOR) {
+			xSetFloat(dPlayerData,xPlayerFavor,xsMin(200, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
+		} else {
+			xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
+		}
+		trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 	}
-	trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
 }
 
 void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0), vector scale = vector(1,1,1)) {
@@ -689,7 +691,7 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 				xSetInt(dStunnedUnits,xUnitName,xGetInt(db,xUnitName),index);
 				xSetInt(dStunnedUnits,xPlayerOwner,xGetInt(db,xPlayerOwner),index);
 				xSetInt(dStunnedUnits,xUnitID,xGetInt(db,xUnitID),index);
-				xSetInt(dStunnedUnits,xStunnedProto,kbGetUnitBaseTypeID(kbGetBlockID(""+xGetInt(db,xUnitName), true)),index);
+				xSetInt(dStunnedUnits,xStunnedProto,kbGetUnitBaseTypeID(xGetInt(db,xUnitID)),index);
 				if (xGetInt(db, xStunSFX) == 0) {
 					spyEffect(xGetInt(db,xUnitName), kbGetProtoUnitID("Shockwave stun effect"), xsVectorSet(db,xStunSFX,xGetPointer(db)));
 				} else {

@@ -566,7 +566,7 @@ highFrequency
 	setupClass("Archer Atlantean Hero", STORMPIERCER, 400, 1000, MANASTONE);
 	setupClass("Pharaoh", ALCHEMIST, 550, 1200, SOULSTONE);
 	setupClass("Swordsman Hero", SPELLSTEALER, 400, 800, MANASTONE, 6);
-	setupClass("Royal Guard Hero", COMMANDO, 600, 1000, STARSTONE, 5);
+	setupClass("Royal Guard Hero", COMMANDO, 600, 1000, STARSTONE, 12);
 	setupClass("Trident Soldier Hero", THRONESHIELD, 625, 1250, SOULSTONE, 10);
 	setupClass("Hero Greek Bellerophon", SAVIOR, 625, 1250, SOULSTONE, 3);
 	setupClass("Hero Greek Chiron", GARDENER, 900, 1500, SOULSTONE);
