@@ -17,6 +17,7 @@ int xCommandoBulletStormTargetIndex = 0;
 
 int xCommandoPadID = 0;
 int xCommandoPadPos = 0;
+int xCommandoPadSourcePos = 0;
 int xCommandoPadTimeout = 0;
 
 int xQuickdrawIndex = 0;
@@ -83,6 +84,7 @@ void placeCommandoPad(int p = 0, vector pos = vector(0,0,0)) {
 	int id = kbGetBlockID(""+next, true);
 	xAddDatabaseBlock(commandoPads, true);
 	xSetInt(commandoPads, xCommandoPadID, id);
+	xSetVector(commandoPads, xCommandoPadSourcePos, snap);
 	xSetVector(commandoPads, xCommandoPadPos, pos);
 	xSetInt(commandoPads, xCommandoPadTimeout, trTimeMS() + 20000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
 
@@ -198,6 +200,7 @@ void commandoAlways(int eventID = -1) {
 						trSoundPlayFN("swing" + 1*trQuestVarGet("sound") + ".wav");
 					}
 					xUnitSelect(db, xUnitName);
+					gainFavor(p, 2.0);
 					healUnit(p, xGetFloat(dPlayerData, xPlayerHealth) * 0.05, xGetInt(db, xCharIndex));
 
 					for(j=xGetDatabaseCount(dEnemies); >0) {
@@ -280,6 +283,23 @@ void commandoAlways(int eventID = -1) {
 				}
 			}
 			xSetPointer(dEnemies, hit);
+
+			start = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit), true);
+			amt = 0.001 * (0.0 + trTimeMS() - trQuestVarGet("p"+p+"quickdrawLast"));
+			trQuestVarSet("p"+p+"quickdrawLast", trTimeMS());
+			for(i=xGetDatabaseCount(commandoPads); >0) {
+				xDatabaseNext(commandoPads);
+				pos = xGetVector(commandoPads, xCommandoPadPos);
+				dist = distanceBetweenVectors(start, pos, false);
+				if (dist < 10.0) {
+					xSetVector(commandoPads, xCommandoPadPos, (start - pos) * xsMax(dist, xGetFloat(dPlayerData, xPlayerSpeed)) * amt + pos);
+				}
+				xUnitSelectByID(commandoPads, xCommandoPadID);
+				dir = xGetVector(commandoPads, xCommandoPadPos) - xGetVector(commandoPads, xCommandoPadSourcePos);
+				if (trCurrentPlayer() == p) {
+					trSetSelectedUpVector(xsVectorGetX(dir),0,xsVectorGetZ(dir));
+				}
+			}
 		}
 	} else if (xGetDatabaseCount(quickdrawTargets) > 0) {
 		if (trTimeMS() > trQuestVarGet("p"+p+"quickdrawTimeout")) {
@@ -338,6 +358,7 @@ void commandoAlways(int eventID = -1) {
 			trQuestVarSet("p"+p+"quickdraw", 1);
 			trQuestVarSet("p"+p+"quickdrawBoost", xGetFloat(dPlayerData, xPlayerSpeed) * 2);
 			trModifyProtounit("Royal Guard Hero", p, 1, trQuestVarGet("p"+p+"quickdrawBoost"));
+			trQuestVarSet("p"+p+"quickdrawLast", trTimeMS());
 		}
 
 		for(x=xGetDatabaseCount(dEnemies); > 0) {
@@ -566,7 +587,7 @@ void commandoAlways(int eventID = -1) {
 							} else {
 								end = kbGetBlockPosition("" + xGetInt(dEnemies, xUnitName), true);
 								if (distanceBetweenVectors(pos, end, true) < dist) {
-									damageEnemy(p, commandoCritMultiplier(p) * xGetFloat(dPlayerData, xPlayerAttack) * 0.5, false);
+									damageEnemy(p, commandoCritMultiplier(p) * xGetFloat(dPlayerData, xPlayerAttack), false);
 									OnHit(p, xGetPointer(dEnemies));
 									if (xGetInt(db, xCharSpecialAttack) <= 0) {
 										placeCommandoPad(p, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true));
@@ -575,11 +596,17 @@ void commandoAlways(int eventID = -1) {
 									trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(end),0,xsVectorGetZ(end),0,true);
 									trArmySelect("1,0");
 									trUnitChangeProtoUnit("Dust Small");
-									xSetInt(db, xCommandoBulletStormTargetIndex, xGetPointer(dEnemies));
+									if (xGetInt(db, xCommandoBulletStormTargetIndex) == xGetPointer(dEnemies)) {
+										trQuestVarSet("p"+p+"bulletStormShoot", 0);
+									} else {
+										xSetInt(db, xCommandoBulletStormTargetIndex, xGetPointer(dEnemies));
+									}
 									break;
 								}
 							}
 						}
+					} else {
+						trQuestVarSet("p"+p+"bulletStormShoot", 1);
 					}
 				}
 			}
@@ -700,6 +727,7 @@ void chooseCommando(int eventID = -1) {
 		trQuestVarSet("p"+p+"commandoPads", db);
 		xCommandoPadID = xInitAddInt(db, "name");
 		xCommandoPadPos = xInitAddVector(db, "pos");
+		xCommandoPadSourcePos = xInitAddVector(db, "sourcePos");
 		xCommandoPadTimeout = xInitAddInt(db, "timeout");
 	}
 
