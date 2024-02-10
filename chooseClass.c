@@ -653,49 +653,54 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					case 3:
 					{
 						icon = "icons\improvement electrum bullets icon 64";
-						msg = "(Q) Quickdraw: Gain a burst of movement speed. During this time, mark enemies that you touch.";
+						msg = "Special Attack: Drop a power-up next to your target. When you step on it, gain bonus attack and favor.";
 					}
 					case 4:
 					{
 						icon = "icons\improvement electrum bullets icon 64";
-						msg = "When this ability ends, you shoot a bullet at all marked enemies, attacking them.";
+						msg = "Cooldown: 6 attacks | Favor Gain: 3 | Attack Boost: 0.1x | Boost Decay: 0.05x";
 					}
 					case 5:
 					{
-						icon = "icons\improvement electrum bullets icon 64";
-						msg = "If this critically strikes an enemy, shoot them an additional time.";
+						icon = "icons\god power journey icon";
+						msg = "(Q) Quickdraw: Gain a burst of movement speed. During this time, silence and mark enemies that you touch.";
 					}
 					case 6:
 					{
-						icon = "icons\improvement electrum bullets icon 64";
-						msg = "Cooldown: 10 | Duration: 3 | Speed Boost: 3x | Applies on-hit effects";
+						icon = "icons\god power journey icon";
+						msg = "When this ability ends, you shoot a bullet at all marked enemies, attacking them.";
 					}
 					case 7:
 					{
-						icon = "icons\special e phoenix egg icon 64";
-						msg = "(W) Echo Bomb: Attach a bomb to an enemy that records all the damage it takes for several seconds";
+						icon = "god power journey icon";
+						msg = "Cooldown: 10 | Duration: 3 | Speed Boost: 3x | Applies on-hit effects";
 					}
 					case 8:
 					{
 						icon = "icons\special e phoenix egg icon 64";
-						msg = "When the bomb explodes, deal all the stored damage in a large radius.";
+						msg = "(W) Echo Bomb: Attach a bomb to an enemy that records all the damage it takes for several seconds";
 					}
 					case 9:
 					{
 						icon = "icons\special e phoenix egg icon 64";
-						msg = "Cooldown: 20 | Duration: 6 | Radius: 12 | An enemy can only have one Echo Bomb at a time";
+						msg = "When the bomb explodes, deal all the stored damage in a large radius.";
 					}
 					case 10:
 					{
-						icon = "icons\god power sand storm icon 64";
-						msg = "(E) Shooting Gallery: Shoot in all directions, attacking random nearby enemies.";
+						icon = "icons\special e phoenix egg icon 64";
+						msg = "Cooldown: 20 | Duration: 6 | Radius: 12 | An enemy can only have one Echo Bomb at a time";
 					}
 					case 11:
 					{
 						icon = "icons\god power sand storm icon 64";
-						msg = "You cannot move or gain favor while this ability is active.";
+						msg = "(E) Shooting Gallery: Shoot in all directions, attacking random nearby enemies.";
 					}
 					case 12:
+					{
+						icon = "icons\god power sand storm icon 64";
+						msg = "You cannot move or gain favor while this ability is active.";
+					}
+					case 13:
 					{
 						icon = "icons\god power sand storm icon 64";
 						msg = "Cost: 1 per bullet | Range: 8 | Fire Rate: 10 | Applies on-hit effects.";
@@ -1011,37 +1016,47 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					case 3:
 					{
 						icon = "icons\god power thunder clap icons 64";
-						msg = "(Q) Repel: Launch nearby enemies away from you.";
+						msg = "(Q) Repel/Mass Teleport: This spell has two functions depending on the location of your cursor.";
 					}
 					case 4:
 					{
 						icon = "icons\god power thunder clap icons 64";
-						msg = "Cooldown: 15 | Range: 15";
+						msg = "(Q) Repel/Mass Teleport: Cast inside your circle to launch nearby enemies away.";
 					}
 					case 5:
 					{
-						icon = "icons\god power vision icon 64";
-						msg = "(W) Realignment: Change the radius of your stars to match your cursor.";
+						icon = "icons\god power thunder clap icons 64";
+						msg = "(Q) Repel/Mass Teleport: Cast outside your circle to teleport yourself and nearby allies.";
 					}
 					case 6:
 					{
-						icon = "icons\god power vision icon 64";
-						msg = "The closer they are, the faster you move. The farther they are, the more damage they deal.";
+						icon = "icons\god power thunder clap icons 64";
+						msg = "Cooldown: 15 | Range: 15";
 					}
 					case 7:
 					{
 						icon = "icons\god power vision icon 64";
-						msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x | Damage Bonus: 2x Distance";
+						msg = "(W) Realignment: Change the radius of your stars to match your cursor.";
 					}
 					case 8:
 					{
-						icon = "icons\god power eclipse icon 64";
-						msg = "(E) Event Horizon: Your stars rotate at double speed and stun enemies.";
+						icon = "icons\god power vision icon 64";
+						msg = "The closer they are, the faster you move. The farther they are, the more damage they deal.";
 					}
 					case 9:
 					{
+						icon = "icons\god power vision icon 64";
+						msg = "Cooldown: 5 | Range: 2 - 15 | Speed: 1.5x - 0.5x | Damage Bonus: 2x Distance";
+					}
+					case 10:
+					{
 						icon = "icons\god power eclipse icon 64";
-						msg = "Cost: 60 | Duration: 10";
+						msg = "(E) Celestial Cleansing (Toggle): While active, heal allies within your circle and remove their status effects.";
+					}
+					case 11:
+					{
+						icon = "icons\god power eclipse icon 64";
+						msg = "Cost: 6 favor per second | Heal: 20 health per second";
 						next = 0;
 					}
 				}
