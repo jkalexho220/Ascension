@@ -315,7 +315,7 @@ void processChests() {
 				trSoundPlayFN("siegetowerdeath.wav","1",-1,"","");
 				trQuestVarSetFromRand("rand", 1, 10, true);
 				if (trQuestVarGet("symphonyMode") == 1) {
-					trQuestVarSet("rand", ENEMY_PLAYER);
+					trQuestVarSet("rand", ENEMY_PLAYER * 2);
 				}
 				if (trQuestVarGet("rand") == 1) {
 					xSetInt(dChests, xChestState, CHEST_STATE_COUNTDOWN);

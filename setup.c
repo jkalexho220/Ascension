@@ -454,7 +454,6 @@ runImmediately
 	trModifyProtounit("Scylla", 1, 55, 1);
 	trModifyProtounit("Scylla", ENEMY_PLAYER, 55, 1);
 
-	trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.5);
 	trModifyProtounit("Petosuchus Projectile", 0, 55, 2);
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
@@ -489,7 +488,6 @@ runImmediately
 
 		trModifyProtounit("Petosuchus Projectile", p, 55, 2);
 		
-		trModifyProtounit("Statue of Lightning", p, 1, 3.5);
 		
 		trPlayerKillAllGodPowers(p);
 		trPlayerTechTreeEnabledGodPowers(p, false);
@@ -709,6 +707,8 @@ highFrequency
 		trModifyProtounit("Troll", p, 11, 2); // troll range 16
 		
 		zInitProtoUnitStat("Ballista Shot", p, 1, 30);
+
+		trModifyProtounit("Statue of Lightning", p, 1, 3.5);
 		
 		trModifyProtounit("Servant", p, 55, 1);
 		trModifyProtounit("Kraken", p, 55, 1);

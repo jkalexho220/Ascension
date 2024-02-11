@@ -27,8 +27,12 @@ const int ROOM_TIGER = 9;
 const int ROOM_GOLD = 10;
 const int ROOM_LEVELUP = 11;
 const int ROOM_HEALING = 12;
-const int ROOM_PET_STORE = 13;
-const int ROOM_REVIVES = 14;
+const int ROOM_STAT_STORE = 13;
+const int ROOM_FAVOR = 14;
+const int ROOM_JESTER_BOSS = 15;
+const int ROOM_PLAGUE_BOSS = 16;
+const int ROOM_MOUNTAIN_BOSS = 17;
+const int ROOM_SYMPHONY_BOSS = 18;
 
 const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;

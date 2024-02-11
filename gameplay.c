@@ -138,10 +138,10 @@ void processRegen(int p = 0) {
 		xSetInt(dPlayerData, xPlayerRegenerateFavorLast,trTimeMS(),p);
 	}
 	if (trTimeMS() > xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p) + 1000) {
-		amt = 0;
-		diff = trTimeMS() - xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p);
+		diff = 0.001 * (0.0 + trTimeMS() - xGetInt(dPlayerData, xPlayerRegenerateHealthLast, p));
+		amt = diff * xGetFloat(dPlayerData, xPlayerHealthRegen, p);
 		if (xGetInt(dPlayerData, xPlayerGodBoon, p) == BOON_REGENERATE_HEALTH) {
-			amt = diff * 0.00003 * xGetFloat(dPlayerData, xPlayerHealth, p);
+			amt = amt + diff * 0.03 * xGetFloat(dPlayerData, xPlayerHealth, p);
 		}
 		xSetFloat(dPlayerData, xPlayerLifestealTotal, xGetFloat(dPlayerData, xPlayerLifestealTotal, p) + amt, p);
 		xSetInt(dPlayerData, xPlayerRegenerateHealthLast, trTimeMS(), p);
@@ -831,13 +831,13 @@ highFrequency
 									trQuestVarSet("shopping", 1);
 									if (trPlayerResourceCount(p, "gold") >= xGetInt(dNottudShop, xNottudShopPrice)) {
 										trPlayerGrantResources(p, "gold", 0 - xGetInt(dNottudShop, xNottudShopPrice));
-										spawnPlayerUnit(p, xGetInt(dNottudShop,xRelicType), xGetVector(dNottudShop, xNottudShopPos));
+										relicEffect(xGetInt(dNottudShop, xRelicType), p);
 										if (trCurrentPlayer() == p) {
-											trSoundPlayFN("mythcreate.wav","1",-1,"","");
-											trChatSend(0, "Purchased " + kbGetProtoUnitName(xGetInt(dNottudShop,xRelicType)) + "!");
+											trSoundPlayFN("favordump.wav","1",-1,"","");
+											trChatSend(0, "Purchased " + relicName(xGetInt(dNottudShop,xRelicType)) + "!");
 										}
 									} else if (trCurrentPlayer() == p) {
-										trChatSend(0, "You don't have enough gold! You need 300!");
+										trChatSend(0, "You don't have enough gold! You need " + xGetInt(dNottudShop, xNottudShopPrice) + "!");
 										trSoundPlayFN("cantdothat.wav","1",-1,"","");
 									}
 								}

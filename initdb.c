@@ -83,6 +83,7 @@ int xPlayerPoisonSpeed = 0;
 int xPlayerLifesteal = 0;
 int xPlayerLifestealTotal = 0;
 int xPlayerFavorRegen = 0;
+int xPlayerHealthRegen = 0;
 int xPlayerPhysicalResist = 0;
 int xPlayerMagicResist = 0;
 int xPlayerPetDogs = 0;
@@ -323,6 +324,7 @@ highFrequency
 	xPlayerLifesteal = xInitAddFloat(dPlayerData,"lifesteal");
 	xPlayerLifestealTotal = xInitAddFloat(dPlayerData,"lifestealTotal");
 	xPlayerFavorRegen = xInitAddFloat(dPlayerData,"favorRegen");
+	xPlayerHealthRegen = xInitAddFloat(dPlayerData,"healthRegen");
 	xPlayerPhysicalResist = xInitAddFloat(dPlayerData,"physicalResist");
 	xPlayerMagicResist = xInitAddFloat(dPlayerData,"magicResist");
 	xPlayerPetDogs = xInitAddInt(dPlayerData,"petDogs");

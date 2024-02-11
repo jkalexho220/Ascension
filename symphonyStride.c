@@ -7,7 +7,7 @@ int dActiveSpawners = 0;
 int xActiveSpawnerPos = 0;
 
 int frontierUnitsArray = 0;
-int petShopOptions = 0;
+int relicShopOptions = 0;
 
 bool notVoted = false;
 
@@ -49,23 +49,39 @@ string symphonyRoomDescription(int type = 0) {
 		}
 		case ROOM_GOLD:
 		{
-			msg = "Gold";
+			msg = "500 Gold";
 		}
 		case ROOM_LEVELUP:
 		{
-			msg = "Level Up";
+			msg = "+2 Levels";
 		}
 		case ROOM_HEALING:
 		{
-			msg = "Healing Room";
+			msg = "+10 Health Regen per second";
 		}
-		case ROOM_PET_STORE:
+		case ROOM_STAT_STORE:
 		{
-			msg = "Pet Shop";
+			msg = "Random Stat Shop";
 		}
-		case ROOM_REVIVES:
+		case ROOM_FAVOR:
 		{
-			msg = "Refresh Revives";
+			msg = "+0.5 Favor Regen per second";
+		}
+		case ROOM_SYMPHONY_BOSS:
+		{
+			msg = "Final Boss";
+		}
+		case ROOM_JESTER_BOSS:
+		{
+			proto = "Miniboss (+3 Levels)";
+		}
+		case ROOM_PLAGUE_BOSS:
+		{
+			proto = "Miniboss (+3 Levels)";
+		}
+		case ROOM_MOUNTAIN_BOSS:
+		{
+			proto = "Miniboss (+3 Levels)";
 		}
 	}
 	return(msg);
@@ -91,13 +107,29 @@ string symphonyRoomProtoUnit(int type = 0) {
 		{
 			proto = "Healing Spring Object";
 		}
-		case ROOM_PET_STORE:
+		case ROOM_STAT_STORE:
 		{
 			proto = "Villager Atlantean";
 		}
-		case ROOM_REVIVES:
+		case ROOM_FAVOR:
 		{
-			proto = "Athena";
+			proto = "Monument 2";
+		}
+		case ROOM_SYMPHONY_BOSS:
+		{
+			proto = "Monument 5";
+		}
+		case ROOM_JESTER_BOSS:
+		{
+			proto = "Theris";
+		}
+		case ROOM_PLAGUE_BOSS:
+		{
+			proto = "Jiangshi";
+		}
+		case ROOM_MOUNTAIN_BOSS:
+		{
+			proto = "Heka Gigantes";
 		}
 	}
 	return(proto);
@@ -111,6 +143,13 @@ void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 		vector center = symphonyRoomToVector(room);
 		vector pos = gridToVector(center);
 		if (terrainIsType(center, TERRAIN_WALL, TERRAIN_SUB_WALL)) {
+			if (trQuestVarGet("bossRoomFound") == 0) {
+				trQuestVarSetFromRand("rand", 1, trQuestVarGet("availableRooms"), true);
+				if (trQuestVarGet("rand") == 1) {
+					trQuestVarSet("bossRoomFound", 1);
+					trQuestVarSet("room"+room, ROOM_SYMPHONY_BOSS);
+				}
+			}
 			xAddDatabaseBlock(dFrontier, true);
 			xSetInt(dFrontier, xUnitName, zGetInt(frontierUnitsArray, room));
 			xSetInt(dFrontier, xFrontierCameFrom, cameFrom);
@@ -124,6 +163,8 @@ void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 				trSetUnitOrientation(vector(-0.707107,0,-0.707107),vector(0,1,0),true);
 			}
 			trUnitChangeProtoUnit(symphonyRoomProtoUnit(xGetInt(dFrontier, xFrontierType)));
+
+			trQuestVarSet("availableRooms", trQuestVarGet("availableRooms") - 1);
 		}
 	}
 }
@@ -312,7 +353,7 @@ highFrequency
 		trStringQuestVarSet("rockProto3", "Columns Fallen");
 
 		frontierUnitsArray = zNewArray(mInt, 25, "frontierUnits");
-		petShopOptions = zNewArray(mInt, 36, "petOptions");
+		relicShopOptions = zNewArray(mInt, NORMAL_RELICS, "relicShopOptions");
 
 		trModifyProtounit("Healing Spring Object", 0, 55, 4); // flying spring
 		trModifyProtounit("Revealer", 1, 2, 205);
@@ -324,14 +365,14 @@ highFrequency
 		vector pos = vector(0,0,0);
 		int val = 0;
 
-		for(i=0; < 36) {
-			zSetInt(petShopOptions, i, i);
+		for(i=0; < NORMAL_RELICS) {
+			zSetInt(relicShopOptions, i, i + 1);
 		}
-		for(i=0; < 36) {
-			val = zGetInt(petShopOptions, i);
-			trQuestVarSetFromRand("rand", i, 35, true);
-			zSetInt(petShopOptions, i, zGetInt(petShopOptions, 1*trQuestVarGet("rand")));
-			zSetInt(petShopOptions, 1*trQuestVarGet("rand"), val);
+		for(i=0; < NORMAL_RELICS) {
+			val = zGetInt(relicShopOptions, i);
+			trQuestVarSetFromRand("rand", i, NORMAL_RELICS - 1, true);
+			zSetInt(relicShopOptions, i, zGetInt(relicShopOptions, 1*trQuestVarGet("rand")));
+			zSetInt(relicShopOptions, 1*trQuestVarGet("rand"), val);
 		}
 
 		trSetCivAndCulture(0, 0, 0);
@@ -357,6 +398,8 @@ highFrequency
 			trTechSetStatus(ENEMY_PLAYER, 297, 4);
 		}
 
+		trQuestVarSet("availableRooms", 24);
+
 		dFrontier = xInitDatabase("frontier");
 		xInitAddInt(dFrontier, "unit");
 		xFrontierDest = xInitAddInt(dFrontier, "destination");
@@ -378,21 +421,27 @@ highFrequency
 		xNottudShopPrice = xInitAddInt(dNottudShop, "price");
 		xNottudShopPos = xInitAddVector(dNottudShop,"pos");
 
-		for(i=0; < 6) {
+		for(i=0; < 5) {
 			trQuestVarSet("room"+i, ROOM_CHEST);
 		}
-		for(i=6; < 12) {
-			trQuestVarSet("room"+i, ROOM_GOLD);
-		}
-		for(i=12; < 18) {
+		for(i=5; < 10) {
 			trQuestVarSet("room"+i, ROOM_LEVELUP);
 		}
-		for(i=18; < 22) {
+		for(i=10; < 13) {
+			trQuestVarSet("room"+i, ROOM_GOLD);
+		}
+		for(i=13; < 16) {
+			trQuestVarSet("room"+i, ROOM_FAVOR);
+		}
+		for(i=16; < 19) {
 			trQuestVarSet("room"+i, ROOM_HEALING);
 		}
-		for(i=22; < 25) {
-			trQuestVarSet("room"+i, ROOM_PET_STORE);
+		for(i=19; < 22) {
+			trQuestVarSet("room"+i, ROOM_STAT_STORE);
 		}
+		trQuestVarSet("room22", ROOM_JESTER_BOSS);
+		trQuestVarSet("room23", ROOM_PLAGUE_BOSS);
+		trQuestVarSet("room24", ROOM_MOUNTAIN_BOSS);
 
 		// shuffle
 		for(i=0; < 25) {
@@ -424,6 +473,11 @@ highFrequency
 			}
 			xSetInt(dFrontier, xFrontierType, ROOM_BASIC);
 			symphonyUnlockRoom();
+		}
+
+		for(p=1; < ENEMY_PLAYER) {
+			trPlayerGrantResources(p, "gold", -9999);
+			xSetInt(dPlayerData, xPlayerGold, 0, p);
 		}
 
 		trVectorQuestVarSet("startPosition", vector(145,0,145));
@@ -516,12 +570,13 @@ highFrequency
 		}
 
 		/* monstrous rage */
-		if (iModulo(2, 1 * trQuestVarGet("symphonyRound")) == 0) {
-			trTechSetStatus(ENEMY_PLAYER, 76, 4);
-		}
+		trTechSetStatus(ENEMY_PLAYER, 76, 4);
 
 		trQuestVarSet("killcount", 0);
 		trQuestVarSet("killgoal", 10 + trQuestVarGet("killgoal"));
+
+		//todo :delete
+		trQuestVarSet("killgoal", 0);
 
 		symphonyCreateSpawners(2 + (trQuestVarGet("symphonyRound") / 3));
 
@@ -594,6 +649,7 @@ highFrequency
 		vector pos = vector(0,0,0);
 		int proto = 0;
 		int index = 0;
+		int relic = 0;
 		int next = 0;
 		int room = trQuestVarGet("newestRoom");
 		switch(1*trQuestVarGet("newestRoomType"))
@@ -605,30 +661,39 @@ highFrequency
 			}
 			case ROOM_LEVELUP:
 			{
+				trOverlayText("Level up!", 3.0);
 				trSoundPlayFN("ageadvance.wav");
 				pos = gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom")));
 				trArmyDispatch("1,0","Dwarf",2,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 				trArmySelect("1,0");
 				trUnitChangeProtoUnit("Vision SFX");
-				symphonyLevelUp(1);
+				symphonyLevelUp(2);
 			}
 			case ROOM_GOLD:
 			{
 				trSoundPlayFN("plentybirth.wav");
 				for(p=1; < ENEMY_PLAYER) {
+					xSetInt(dPlayerData, xPlayerGold, 500 + xGetInt(dPlayerData, xPlayerGold, p), p);
 					trPlayerGrantResources(p, "gold", 500);
 				}
 			}
 			case ROOM_HEALING:
 			{
-				trUnitSelectClear();
-				trUnitSelect(""+zGetInt(frontierUnitsArray, room));
-				pos = gridToVector(symphonyRoomToVector(room));
-				trUnitChangeProtoUnit("Cinematic Block");
-				trTechGodPower(0, "healing spring", 1);
-				trTechInvokeGodPower(0, "healing spring", pos, pos);
+				trSoundPlayFN("restorationbirth.wav");
+				trMessageSetText("All players gain +10 health regen per second.", -1);
+				for(p=1; < ENEMY_PLAYER) {
+					xSetFloat(dPlayerData, xPlayerHealthRegen, xGetFloat(dPlayerData, xPlayerHealthRegen, p) + 10.0, p);
+				}
 			}
-			case ROOM_PET_STORE:
+			case ROOM_FAVOR:
+			{
+				trSoundPlayFN("oracledone.wav");
+				trMessageSetText("All players gain +0.5 favor regen per second.", -1);
+				for(p=1; < ENEMY_PLAYER) {
+					xSetFloat(dPlayerData, xPlayerFavorRegen, xGetFloat(dPlayerData, xPlayerFavorRegen, p) + 0.5, p);
+				}
+			}
+			case ROOM_STAT_STORE:
 			{
 				trUnitSelectClear();
 				trUnitSelect(""+zGetInt(frontierUnitsArray, room));
@@ -646,23 +711,30 @@ highFrequency
 				pos = gridToVector(pos) - vector(10,0,10);
 				for(i=0; <= 1) {
 					for(j=0; <= 1) {
-						index = zGetInt(petShopOptions, 1*trQuestVarGet("petShopNext"));
-						proto = monsterPetProto(index);
+						trQuestVarSetFromRand("rand", index, NORMAL_RELICS - 1, true);
+						relic = zGetInt(relicShopOptions, 1*trQuestVarGet("rand"));
+						zSetInt(relicShopOptions, 1*trQuestVarGet("rand"), zGetInt(relicShopOptions, index));
+						zSetInt(relicShopOptions, index, relic);
+
+						proto = relicProto(relic);
 						next = trGetNextUnitScenarioNameNumber();
 						
 						trArmyDispatch("0,0",kbGetProtoUnitName(proto),1,xsVectorGetX(pos) + 20 * i, 0, xsVectorGetZ(pos) + 20 * j, 225, true);
 						
-						trQuestVarSetFromRand("rand", 100 + index, 200 + index * 2, true);
+						trQuestVarSetFromRand("rand", 300, 600, true);
 						xAddDatabaseBlock(dNottudShop, true);
 						xSetInt(dNottudShop, xUnitName, next);
-						xSetInt(dNottudShop, xRelicType, proto);
+						xSetInt(dNottudShop, xRelicType, relic);
 						xSetVector(dNottudShop, xNottudShopPos, pos + xsVectorSet(20 * i, 0, 20 * j));
 						xSetInt(dNottudShop, xNottudShopPrice, trQuestVarGet("rand"));
 						
 						xAddDatabaseBlock(dStunnedUnits, true);
 						xSetInt(dStunnedUnits, xUnitName, next);
 						xSetInt(dStunnedUnits, xStunnedProto, proto);
-						trQuestVarSet("petShopNext", 1 + trQuestVarGet("petShopNext"));
+
+
+						
+						index = index + 1;
 					}
 				}
 			}
@@ -731,8 +803,8 @@ highFrequency
 		xDatabaseNext(dNottudShop);
 		xUnitSelect(dNottudShop,xUnitName);
 		if (trUnitIsSelected()) {
-			int proto = xGetInt(dNottudShop, xRelicType);
-			uiMessageBox(kbGetProtoUnitName(proto) + " (" + xGetInt(dNottudShop, xNottudShopPrice) + "g)");
+			int relic = xGetInt(dNottudShop, xRelicType);
+			trShowImageDialog(relicIcon(relic), relicName(relic) + " (" + xGetInt(dNottudShop, xNottudShopPrice) + " gold)");
 			
 			reselectMyself();
 		}
