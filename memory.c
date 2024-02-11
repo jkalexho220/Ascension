@@ -95,6 +95,14 @@ int zNewArray(int type = 0, int size = 1, string name = "") {
 	return(index);
 }
 
+void zSetInt(int arr = 0, int index = 0, int val = 0) {
+	aiPlanSetUserVariableInt(ARRAYS,arr,index,val);
+}
+
+int zGetInt(int arr = 0, int index = 0) {
+	return(aiPlanGetUserVariableInt(ARRAYS,arr,index));
+}
+
 /*
 */
 bool free(int type = -1, int index = -1) {

@@ -24,6 +24,12 @@ const int ROOM_BOSS = 7;
 const int ROOM_NOTTUD = 8;
 const int ROOM_TIGER = 9;
 
+const int ROOM_GOLD = 10;
+const int ROOM_LEVELUP = 11;
+const int ROOM_SHOP = 12;
+const int ROOM_PET_STORE = 13;
+const int ROOM_REVIVES = 14;
+
 const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;
 const int ROOM_EXCALIBUR = 100;
@@ -64,6 +70,7 @@ int xFrontierType = 0;
 
 int xFrontierDest = 0;
 int xFrontierCameFrom = 0;
+int xFrontierVotes = 0;
 
 int dVisited = 0;
 

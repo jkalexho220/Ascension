@@ -190,7 +190,12 @@ void processChests() {
 				trDamageUnitPercent(-100);
 				xSetPointer(dFreeRelics,xAddDatabaseBlock(dFreeRelics));
 				xSetInt(dFreeRelics,xRelicName,xGetInt(dRainingRelics,xUnitName));
-				xSetInt(dFreeRelics,xRelicType,randomStageClosest(20));
+				if (trQuestVarGet("symphonyMode") == 1) {
+					trQuestVarSetFromRand("rand", 1, 30, true);
+					xSetInt(dFreeRelics,xRelicType,trQuestVarGet("rand"));
+				} else {
+					xSetInt(dFreeRelics,xRelicType,randomStageClosest(20));
+				}
 				xFreeDatabaseBlock(dRainingRelics);
 			}
 		}
@@ -344,6 +349,10 @@ void processChests() {
 			{
 				if (trTimeMS() > xGetInt(dChests, xChestSFX)) {
 					if (xGetInt(dChests, xChestCount) == 0) {
+						if (xGetInt(dChests, xChestType) == CHEST_SYMPHONY) {
+							xUnitSelect(dChests, xUnitName);
+							trUnitChangeProtoUnit("Vision SFX");
+						}
 						xFreeDatabaseBlock(dChests);
 					} else {
 						trSoundPlayFN("tributereceived.wav","1",-1,"","");

@@ -233,16 +233,20 @@ string stageIcon(int stage = 0) {
 	return(img);
 }
 
-void reselectMyself() {
+void reselectMyself(bool look = false) {
 	uiClearSelection();
 	int p = trCurrentPlayer();
 	int class = xGetInt(dPlayerData, xPlayerClass, p);
-	trackInsert();
-	trackAddWaypoint();
-	trackAddWaypoint();
-	trBlockAllSounds(false);
-	uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, class)));
-	trackPlay(1,999);
+	if (look) {
+		uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, class)));
+	} else {
+		trackInsert();
+		trackAddWaypoint();
+		trackAddWaypoint();
+		trBlockAllSounds(false);
+		uiFindType(kbGetProtoUnitName(xGetInt(dClass, xClassProto, class)));
+		trackPlay(1,999);
+	}
 }
 
 

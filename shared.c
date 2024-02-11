@@ -414,3 +414,12 @@ int yFindLatest(string qv = "", string proto = "", int p = 0) {
 	}
 	return(-1);
 }
+
+void RunFunction(string function=""){
+	subModeEnter("Simulation", "Editor");
+	uiMessageBox("moo",function);
+	uiCycleCurrentActivate();
+	subModeLeave("Simulation", "Editor");
+	modeEnter("pregame");
+	modeEnter("Simulation");
+}
