@@ -13,6 +13,8 @@ highFrequency
 			xsEnableRule("pvp_build_map");
 		} else if (trQuestVarGet("stage") == 12) {
 			xsEnableRule("gladiator_worlds_build_map");
+		} else if (trQuestVarGet("stage") == 13) {
+			xsEnableRule("symphony_stride_build_map");
 		} else {
 			if (trQuestVarGet("stage") == 10) {
 				xsEnableRule("final_build_map");

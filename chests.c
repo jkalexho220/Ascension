@@ -300,6 +300,13 @@ void processChests() {
 							xSetInt(dChests,xChestState,CHEST_STATE_UNLOCKED);
 						}
 					}
+					case CHEST_SYMPHONY:
+					{
+						if (trUnitIsSelected()) {
+							reselectMyself();
+							uiMessageBox("This chest will open when this round ends.");
+						}
+					}
 				}
 			}
 			case CHEST_STATE_UNLOCKED:
@@ -309,6 +316,9 @@ void processChests() {
 				trUnitSetAnimation("SE_Great_Box_Opening",false,-1);
 				trSoundPlayFN("siegetowerdeath.wav","1",-1,"","");
 				trQuestVarSetFromRand("rand", 1, 10, true);
+				if (trQuestVarGet("symphonyMode") == 1) {
+					trQuestVarSet("rand", ENEMY_PLAYER);
+				}
 				if (trQuestVarGet("rand") == 1) {
 					xSetInt(dChests, xChestState, CHEST_STATE_COUNTDOWN);
 					trUnitHighlight(4.0, true);

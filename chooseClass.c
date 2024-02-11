@@ -579,7 +579,7 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					case 5:
 					{
 						icon = "icons\god power barrage icon";
-						msg = "Each dagger can pierce through 5 enemies.";
+						msg = "Each dagger can pierce through up to 5 enemies.";
 					}
 					case 6:
 					{

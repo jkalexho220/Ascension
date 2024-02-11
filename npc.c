@@ -139,6 +139,7 @@ Reserved to 498
 */
 const int NPC_PUNCHING_BAG_TALK = 499;
 const int NPC_PUNCHING_BAG_TAUNT = 500;
+const int NPC_EXPLAIN_SYMPHONY = 501;
 
 const int FETCH_NPC = 10;
 const int BOUNTY_NPC = 20;
@@ -161,6 +162,42 @@ int npcDiag(int npc = 0, int dialog = 0) {
 	string extra = "";
 	switch(npc)
 	{
+		case NPC_EXPLAIN_SYMPHONY:
+		{
+			switch(dialog)
+			{
+				case 1:
+				{
+					uiMessageBox("Congratulations for beating the game! There's still more content to play!");
+				}
+				case 2:
+				{
+					uiMessageBox("You've unlocked the endgame mode: Symphony of War!");
+				}
+				case 3:
+				{
+					uiMessageBox("This mode is purely for fun and does not grant you any rewards.");
+				}
+				case 4:
+				{
+					uiMessageBox("In this mode, you face against hordes of increasingly powerful enemies.");
+				}
+				case 5:
+				{
+					uiMessageBox("But also, in this mode, your characters can level up past level 10!");
+				}
+				case 6:
+				{
+					uiMessageBox("Simply host in multiplayer and a new option will be revealed.");
+				}
+				case 7:
+				{
+					// TODO: this is an image
+					uiMessageBox("Also, I'm making a real game now! Check out Symphony Stride on Steam!");
+					dialog = 0;
+				}
+			}
+		}
 		case NPC_PUNCHING_BAG_TAUNT:
 		{
 			dialog = 0;

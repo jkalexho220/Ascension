@@ -13,6 +13,7 @@ const int EDGE_PORTAL = 3;
 const int EDGE_WALL = 4;
 const int EDGE_MOUNTAIN = 5;
 
+const int ROOM_SYMPHONY = 0;
 const int ROOM_BASIC = 1;
 const int ROOM_AMBUSH = 2;
 const int ROOM_BOSS_ENTRANCE = 3;
@@ -60,6 +61,9 @@ int dMapTiles = 0;
 int dFrontier = 0;
 int xFrontierEdge = 0;
 int xFrontierType = 0;
+
+int xFrontierDest = 0;
+int xFrontierCameFrom = 0;
 
 int dVisited = 0;
 

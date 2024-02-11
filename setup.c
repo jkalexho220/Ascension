@@ -1,6 +1,7 @@
 const int CHEST_KEY = 1;
 const int CHEST_ENCOUNTER = 2;
 const int CHEST_STATUES = 3;
+const int CHEST_SYMPHONY = 4;
 
 const int MOONBLADE = 1;
 const int SUNBOW = 2;
@@ -162,6 +163,10 @@ string stageName(int stage = 0) {
 		{
 			name = "Gladiator Worlds v" + 1*trQuestVarGet("gladiatorWorldsVersion") + " by nottud";
 		}
+		case 13:
+		{
+			name = "Symphony of War";
+		}
 	}
 	return(name);
 }
@@ -217,6 +222,12 @@ string stageIcon(int stage = 0) {
 		case 12:
 		{
 			img = "icons\infantry x oracle hero icons 64";
+		}
+		case 13:
+		{
+			if (customContent) {
+				//TODO: custom icon for Symphony mode?
+			}
 		}
 	}
 	return(img);
@@ -954,7 +965,17 @@ highFrequency
 				trPaintTerrain(79,47,79,47,0,83);
 				trPaintTerrain(80,47,80,47,0,75);
 				trPaintTerrain(80,46,80,46,0,34);
+			}
 
+			if (xGetInt(dPlayerData, xPlayerProgress) == 9) {
+				next = trGetNextUnitScenarioNameNumber();
+				trArmyDispatch("0,0","Dwarf",1,151,0,95,180,true);
+				trArmySelect("0,0");
+				trMutateSelected(kbGetProtoUnitID("Hoplite"));
+				trUnitSetAnimationPath("1,0,0,0,0,0,0");
+				xSetPointer(dStageChoices,xAddDatabaseBlock(dStageChoices));
+				xSetInt(dStageChoices,xUnitName,next);
+				xSetInt(dStageChoices,xStageChoicesStage,13);
 			}
 
 			if (trQuestVarGet("p1monsterpediaQuest") == 2) {

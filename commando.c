@@ -657,6 +657,7 @@ void commandoAlways(int eventID = -1) {
 					if (trUnitAlive() == false) {
 						removeCommando(p);
 					} else if (xGetInt(db, xCommandoBulletStormSFX) == 0) {
+						trMutateSelected(kbGetProtoUnitID("Royal Guard Hero"));
 						spyEffect(xGetInt(db, xUnitName),kbGetProtoUnitID("Cinematic Block"),xsVectorSet(db,xCommandoBulletStormSFX,xGetPointer(db)));
 					}
 				}

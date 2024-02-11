@@ -11156,26 +11156,33 @@ highFrequency
 			}
 			case 5:
 			{
-				trSoundPlayFN("","1",-1,"Zenophobia:Lost relics, corrupted profiles, oh the horror!","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 5);
+				trSoundPlayFN("","1",-1,"Zenophobia:But now, it's time for some exciting news!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 4);
 			}
 			case 6:
 			{
-				trSoundPlayFN("","1",-1,"Zenophobia:So again, thank you to all my playtesters, and thank YOU for playing!","icons\infantry g hoplite icon 64");
+				trSoundPlayFN("","1",-1,"Zenophobia: You've unlocked the endgame game mode where characters can temporarily surpass level 10!","icons\infantry g hoplite icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 			}
 			case 7:
 			{
-				trSoundPlayFN("","1",-1,"Zenophobia:Until next time!","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 3);
+				trSoundPlayFN("","1",-1,"Zenophobia:To learn more, you can talk to me in your singleplayer world. Good luck and have fun!","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
 			}
 			case 8:
 			{
+				// TODO: show image here
+				trSoundPlayFN("","1",-1,"Zenophobia:Also, check out Symphony Stride on Steam. It's a new game that I'm working on. *wink*","icons\infantry g hoplite icon 64");
+				trQuestVarSet("cinTime", trTime() + 5);
+			}
+			case 9:
+			{
+				// TODO: hide image here
 				trUIFadeToColor(0,0,0,1000,0,false);
 				trLetterBox(false);
 				trQuestVarSet("cinTime", trTime() + 2);
 			}
-			case 9:
+			case 10:
 			{
 				xsDisableSelf();
 				trQuestVarSet("beatTheGame", 1);

@@ -801,6 +801,13 @@ highFrequency
 				trUnitSelectByQV("zenoUnit", true);
 				trUnitConvert(0);
 				xsEnableRule("zeno_quiz_start");
+			} else if (xGetInt(dPlayerData, xPlayerProgress) == 9) {
+				trQuestVarSet("zenoUnit", trGetNextUnitScenarioNameNumber());
+				trArmyDispatch("1,0", "Hoplite", 1, 161, 0, 131, 225, true);
+				trUnitSelectClear();
+				trUnitSelectByQV("zenoUnit", true);
+				trUnitConvert(0);
+				xsEnableRule("explain_symphony");
 			}
 			if (trQuestVarGet("p1nickQuestProgress") > 0) {
 				if (trQuestVarGet("p1nickQuestProgress") == 6) {
@@ -1971,6 +1978,18 @@ highFrequency
 	trUnitSelectByQV("talkingDog", true);
 	if (trUnitIsSelected()) {
 		startNPCDialog(NPC_DOGGO_QUEST_DOGGO + trQuestVarGet("doggoQuestProgress"));
+		reselectMyself();
+	}
+}
+
+rule explain_symphony
+inactive
+highFrequency
+{
+	trUnitSelectClear();
+	trUnitSelectByQV("zenoUnit", true);
+	if (trUnitIsSelected()) {
+		startNPCDialog(NPC_EXPLAIN_SYMPHONY);
 		reselectMyself();
 	}
 }
