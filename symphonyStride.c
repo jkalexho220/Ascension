@@ -7,6 +7,7 @@ int dActiveSpawners = 0;
 int xActiveSpawnerPos = 0;
 
 int frontierUnitsArray = 0;
+int petShopOptions = 0;
 
 bool notVoted = false;
 
@@ -14,11 +15,15 @@ void symphonyLevelUp(int count = 0) {
 	int class = 0;
 	int proto = 0;
 	for(p=1; < ENEMY_PLAYER) {
-		class = xGetInt(dPlayerData, xPlayerClass, p);
+		xSetPointer(dPlayerData, p);
+		class = xGetInt(dPlayerData, xPlayerClass);
 		proto = xGetInt(dClass, xClassProto, class);
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, count);
 		xSetInt(dPlayerData, xPlayerLevel, count + xGetInt(dPlayerData, xPlayerLevel));
-		trSetCivilizationNameOverride(p, "Level " + xGetInt(dPlayerData, xPlayerLevel, p));
+		trSetCivilizationNameOverride(p, "Level " + xGetInt(dPlayerData, xPlayerLevel));
+		if (p == 1) {
+			debugLog("Level is " + xGetInt(dPlayerData, xPlayerLevel));
+		}
 	}
 }
 
@@ -53,9 +58,9 @@ string symphonyRoomDescription(int type = 0) {
 		{
 			msg = "Level Up";
 		}
-		case ROOM_SHOP:
+		case ROOM_HEALING:
 		{
-			msg = "Relic Shop";
+			msg = "Healing Room";
 		}
 		case ROOM_PET_STORE:
 		{
@@ -85,13 +90,13 @@ string symphonyRoomProtoUnit(int type = 0) {
 		{
 			proto = "Outpost";
 		}
-		case ROOM_SHOP:
+		case ROOM_HEALING:
 		{
-			proto = "Villager Atlantean";
+			proto = "Healing Spring Object";
 		}
 		case ROOM_PET_STORE:
 		{
-			proto = "Chimera";
+			proto = "Villager Atlantean";
 		}
 		case ROOM_REVIVES:
 		{
@@ -118,6 +123,9 @@ void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 			trPaintTerrain(xsVectorGetX(center)-2,xsVectorGetZ(center)-2,xsVectorGetX(center)+2,xsVectorGetZ(center)+2,0,73,false);
 
 			xUnitSelect(dFrontier, xUnitName);
+			if (trQuestVarGet("room"+room) > ROOM_HEALING) {
+				trSetUnitOrientation(vector(-0.707107,0,-0.707107),vector(0,1,0),true);
+			}
 			trUnitChangeProtoUnit(symphonyRoomProtoUnit(xGetInt(dFrontier, xFrontierType)));
 		}
 	}
@@ -182,20 +190,18 @@ void symphonyBuildRoom(int x = 0, int z = 0, int type = 0) {
 		case ROOM_CHEST:
 		{
 			xAddDatabaseBlock(dChests, true);
-			xSetInt(dChests,xUnitName,trGetNextUnitScenarioNameNumber());
+			xSetInt(dChests,xUnitName,zGetInt(frontierUnitsArray, room));
 			xSetInt(dChests,xChestType, CHEST_SYMPHONY);
 			xSetInt(dChests,xChestRoom,room);
-			pos = gridToVector(center);
-			trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0, xsVectorGetZ(pos), 135, true);
-			trArmySelect("1,0");
-			trUnitConvert(0);
-			trUnitChangeProtoUnit("Great Box");
 		}
 		case ROOM_BASIC:
 		{
 			xAddDatabaseBlock(dSpawnerRooms, true);
 			xSetInt(dSpawnerRooms, xUnitName, zGetInt(frontierUnitsArray, room));
 			xSetVector(dSpawnerRooms, xSpawnerRoomPos, gridToVector(symphonyRoomToVector(room)));
+			trUnitSelectClear();
+			trUnitSelect(""+zGetInt(frontierUnitsArray,room));
+			trUnitChangeProtoUnit("Cinematic Block");
 		}
 	}
 
@@ -231,9 +237,6 @@ void symphonyUnlockRoom(int index = -1) {
 	int cameFrom = xGetInt(dFrontier, xFrontierCameFrom);
 	int type = xGetInt(dFrontier, xFrontierType);
 	vector pos = symphonyRoomIndexToCoordinates(room);
-
-	xUnitSelect(dFrontier, xUnitName);
-	trUnitChangeProtoUnit("Cinematic Block");
 
 	xFreeDatabaseBlock(dFrontier);
 
@@ -310,6 +313,9 @@ highFrequency
 		trStringQuestVarSet("rockProto3", "Columns Fallen");
 
 		frontierUnitsArray = zNewArray(mInt, 25, "frontierUnits");
+		petShopOptions = zNewArray(mInt, 36, "petOptions");
+
+		trModifyProtounit("Healing Spring Object", 0, 55, 4); // flying spring
 
 		trModifyProtounit("Revealer", 1, 2, 205);
 		trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
@@ -319,6 +325,16 @@ highFrequency
 		vector center = vector(0,0,0);
 		vector pos = vector(0,0,0);
 		int val = 0;
+
+		for(i=0; < 36) {
+			zSetInt(petShopOptions, i, i);
+		}
+		for(i=0; < 36) {
+			val = zGetInt(petShopOptions, i);
+			trQuestVarSetFromRand("rand", i, 35, true);
+			zSetInt(petShopOptions, i, zGetInt(petShopOptions, 1*trQuestVarGet("rand")));
+			zSetInt(petShopOptions, 1*trQuestVarGet("rand"), val);
+		}
 
 		worldHeight = 0;
 		wallHeight = 5;
@@ -355,6 +371,12 @@ highFrequency
 		xInitAddInt(dActiveSpawners, "unit");
 		xActiveSpawnerPos = xInitAddVector(dActiveSpawners, "pos");
 
+		dNottudShop = xInitDatabase("nottudShop");
+		xInitAddInt(dNottudShop,"name");
+		xInitAddInt(dNottudShop,"type");
+		xNottudShopPrice = xInitAddInt(dNottudShop, "price");
+		xNottudShopPos = xInitAddVector(dNottudShop,"pos");
+
 		for(i=0; < 6) {
 			trQuestVarSet("room"+i, ROOM_CHEST);
 		}
@@ -365,7 +387,7 @@ highFrequency
 			trQuestVarSet("room"+i, ROOM_LEVELUP);
 		}
 		for(i=18; < 22) {
-			trQuestVarSet("room"+i, ROOM_SHOP);
+			trQuestVarSet("room"+i, ROOM_HEALING);
 		}
 		for(i=22; < 25) {
 			trQuestVarSet("room"+i, ROOM_PET_STORE);
@@ -380,16 +402,19 @@ highFrequency
 
 			pos = gridToVector(symphonyRoomToVector(i));
 			zSetInt(frontierUnitsArray, i, trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),225,true);
+			trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),135,true);
 			trArmySelect("0,0");
 			trUnitChangeProtoUnit("Cinematic Block");
 		}
 
 		symphonyBuildRoom(2, 2, ROOM_CHEST);
+		trUnitSelectClear();
+		trUnitSelect(""+zGetInt(frontierUnitsArray,12));
+		trUnitChangeProtoUnit("Great Box");
 
 		trQuestVarSet("newestRoom", symphonyCoordinatesToRoomIndex(2,2));
 		trQuestVarSet("newestRoomType", ROOM_CHEST);
-		trQuestVarSet("symphonyRound", 1);
+		trQuestVarSet("symphonyRound", 0);
 		
 		for(i=0; < 2) {
 			trQuestVarSetFromRand("rand",1,3,true);
@@ -438,7 +463,7 @@ highFrequency
 			}
 			case 3:
 			{
-				trSoundPlayFN("default","1",-1,"Zenophobia:Face 10 challenges of increasing difficulty to win! Your characters will level up after each challenge!","icons\infantry g hoplite icon 64");
+				trSoundPlayFN("default","1",-1,"Zenophobia:Face challenges of increasing difficulty to power up your characters and challenge the final boss!","icons\infantry g hoplite icon 64");
 				trQuestVarSet("cinTime", trTime() + 6);
 			}
 			case 4:
@@ -447,7 +472,6 @@ highFrequency
 				trQuestVarSet("cinTime", trTime() + 5);
 				trSoundPlayFN("ageadvance.wav");
 				trOverlayText("Level up!", 3.0);
-				symphonyLevelUp(2);
 			}
 			case 5:
 			{
@@ -463,9 +487,9 @@ highFrequency
 				trMusicPlayCurrent();
 				trPlayNextMusicTrack();
 
-				symphonyCreateSpawners(2);
+				symphonyLevelUp(2);
 
-				xsEnableRule("symphony_stride_spawn");
+				xsEnableRule("symphony_stride_new_round");
 				
 				//trStringQuestVarSet("advice", "What do you mean you can't beat this? This is easy mode!");
 			}
@@ -473,7 +497,38 @@ highFrequency
 	}
 }
 
-rule symphony_stride_spawn
+rule symphony_stride_new_round
+inactive
+highFrequency
+{
+	if (trTime() > cActivationTime + 1) {
+		xsEnableRule("symphony_stride_combat");
+		trSoundPlayFN("fanfare.wav");
+		trQuestVarSet("symphonyRound", 1 + trQuestVarGet("symphonyRound"));
+		trOverlayText("Round " + 1*trQuestVarGet("symphonyRound"), 3.0);
+		symphonyResetSpawners();
+		symphonyChooseNewProtos();
+
+		for(i=10; >0) {
+			/* bacchanalia */
+			trTechSetStatus(ENEMY_PLAYER, 78, 4);
+		}
+
+		/* monstrous rage */
+		if (iModulo(3, 1 * trQuestVarGet("symphonyRound")) == 0) {
+			trTechSetStatus(ENEMY_PLAYER, 76, 4);
+		}
+
+		trQuestVarSet("killcount", 0);
+		trQuestVarSet("killgoal", 1 + trQuestVarGet("killgoal"));
+
+		symphonyCreateSpawners(2 + (trQuestVarGet("symphonyRound") / 3));
+
+		xsDisableSelf();
+	}
+}
+
+rule symphony_stride_combat
 inactive
 highFrequency
 {
@@ -524,23 +579,91 @@ highFrequency
 
 		trSoundPlayFN("fanfare.wav");
 		trOverlayText("Round Over!", 3.0);
-		xsEnableRule("symphony_round_end");
+		xsEnableRule("symphony_round_end_rewards");
 		
 		xsDisableSelf();
 	}
 }
 
-rule symphony_round_end
+rule symphony_round_end_rewards
 inactive
 highFrequency
 {
 	if (trTime() > cActivationTime + 1) {
+		vector pos = vector(0,0,0);
+		int proto = 0;
+		int index = 0;
+		int next = 0;
+		int room = trQuestVarGet("newestRoom");
 		switch(1*trQuestVarGet("newestRoomType"))
 		{
 			case ROOM_CHEST:
 			{
 				xDatabaseNext(dChests);
 				xSetInt(dChests, xChestState, CHEST_STATE_UNLOCKED);
+			}
+			case ROOM_LEVELUP:
+			{
+				trSoundPlayFN("ageadvance.wav");
+				pos = gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom")));
+				trArmyDispatch("1,0","Dwarf",2,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+				trArmySelect("1,0");
+				trUnitChangeProtoUnit("Vision SFX");
+				symphonyLevelUp(1);
+			}
+			case ROOM_GOLD:
+			{
+				trSoundPlayFN("plentybirth.wav");
+				for(p=1; < ENEMY_PLAYER) {
+					trPlayerGrantResources(p, "gold", 500);
+				}
+			}
+			case ROOM_HEALING:
+			{
+				trUnitSelectClear();
+				trUnitSelect(""+zGetInt(frontierUnitsArray, room));
+				pos = gridToVector(symphonyRoomToVector(room));
+				trUnitChangeProtoUnit("Cinematic Block");
+				trTechGodPower(0, "healing spring", 1);
+				trTechInvokeGodPower(0, "healing spring", pos, pos);
+			}
+			case ROOM_PET_STORE:
+			{
+				trUnitSelectClear();
+				trUnitSelect(""+zGetInt(frontierUnitsArray, room));
+				trUnitChangeProtoUnit("Cinematic Block");
+				trSoundPlayFN("market.wav");
+				pos = symphonyRoomToVector(room);
+				trPaintTerrain(xsVectorGetX(pos) - 10, xsVectorGetZ(pos) - 10,
+					xsVectorGetX(pos) + 10, xsVectorGetZ(pos) + 10,
+					TERRAIN_PRIMARY, TERRAIN_SUB_PRIMARY, false);
+				trChangeTerrainHeight(xsVectorGetX(pos) - 10, xsVectorGetZ(pos) - 10,
+					xsVectorGetX(pos) + 11, xsVectorGetZ(pos) + 11,
+					worldHeight,true);
+				paintSecondary(xsVectorGetX(pos) - 10, xsVectorGetZ(pos) - 10,
+					xsVectorGetX(pos) + 10, xsVectorGetZ(pos) + 10);
+				pos = gridToVector(pos) - vector(10,0,10);
+				for(i=0; <= 1) {
+					for(j=0; <= 1) {
+						index = zGetInt(petShopOptions, 1*trQuestVarGet("petShopNext"));
+						proto = monsterPetProto(index);
+						next = trGetNextUnitScenarioNameNumber();
+						
+						trArmyDispatch("0,0",kbGetProtoUnitName(proto),1,xsVectorGetX(pos) + 20 * i, 0, xsVectorGetZ(pos) + 20 * j, 225, true);
+						
+						trQuestVarSetFromRand("rand", 100 + index, 200 + index * 2, true);
+						xAddDatabaseBlock(dNottudShop, true);
+						xSetInt(dNottudShop, xUnitName, next);
+						xSetInt(dNottudShop, xRelicType, proto);
+						xSetVector(dNottudShop, xNottudShopPos, pos + xsVectorSet(20 * i, 0, 20 * j));
+						xSetInt(dNottudShop, xNottudShopPrice, trQuestVarGet("rand"));
+						
+						xAddDatabaseBlock(dStunnedUnits, true);
+						xSetInt(dStunnedUnits, xUnitName, next);
+						xSetInt(dStunnedUnits, xStunnedProto, proto);
+						trQuestVarSet("petShopNext", 1 + trQuestVarGet("petShopNext"));
+					}
+				}
 			}
 		}
 		xsEnableRule("symphony_start_voting");
@@ -560,7 +683,12 @@ highFrequency
 			trLetterBox(true);
 		} else {
 			trMessageSetText("You may vote for your next destination now.", -1);
+			reselectMyself(true);
 		}
+
+		trUnitSelectClear();
+		trUnitSelect(""+zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
+		trUnitChangeProtoUnit("Cinematic Block");
 		
 		notVoted = true;
 		for(p=1; < ENEMY_PLAYER) {
@@ -587,6 +715,24 @@ highFrequency
 			trShowChoiceDialog(description, "Vote for this room", EVENT_SYMPHONY_VOTE, "Cancel", -1);
 		} else {
 			uiMessageBox(description);
+		}
+	}
+
+	trUnitSelectClear();
+	trUnitSelect(""+zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
+	if (trUnitIsSelected()) {
+		reselectMyself();
+		uiMessageBox("This reward is unlocked at the end of this round.");
+	}
+
+	if (xGetDatabaseCount(dNottudShop) > 0) {
+		xDatabaseNext(dNottudShop);
+		xUnitSelect(dNottudShop,xUnitName);
+		if (trUnitIsSelected()) {
+			int proto = xGetInt(dNottudShop, xRelicType);
+			uiMessageBox(kbGetProtoUnitName(proto) + " (" + xGetInt(dNottudShop, xNottudShopPrice) + "g)");
+			
+			reselectMyself();
 		}
 	}
 }
@@ -696,26 +842,20 @@ highFrequency
 					trUnitDestroy();
 				}
 				trSoundPlayFN("wall.wav");
-				xAddDatabaseBlock(dSpawnerRooms, true);
-				xSetInt(dSpawnerRooms, xUnitName, zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
-				xSetVector(dSpawnerRooms, xSpawnerRoomPos, gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom"))));
+
+				if (trQuestVarGet("newestRoomType") < ROOM_HEALING) {
+					xAddDatabaseBlock(dSpawnerRooms, true);
+					xSetInt(dSpawnerRooms, xUnitName, zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
+					xSetVector(dSpawnerRooms, xSpawnerRoomPos, gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom"))));
+				}
 
 				xSetPointer(dFrontier, 1*trQuestVarGet("newRoom"));
 
-				trQuestVarSet("newestRoom", trQuestVarGet("newRoom"));
+				trQuestVarSet("newestRoom", xGetInt(dFrontier, xFrontierDest));
 				trQuestVarSet("newestRoomType", xGetInt(dFrontier, xFrontierType));
 
 				symphonyUnlockRoom();
 
-				for(i=10; >0) {
-					/* bacchanalia */
-					trTechSetStatus(ENEMY_PLAYER, 78, 4);
-				}
-
-				/* monstrous rage */
-				if (iModulo(3, 1 * trQuestVarGet("symphonyRound")) == 0) {
-					trTechSetStatus(ENEMY_PLAYER, 76, 4);
-				}
 
 
 				trUIFadeToColor(0,0,0,1000,100,false);
@@ -727,10 +867,7 @@ highFrequency
 				trLetterBox(false);
 				reselectMyself(true);
 
-				symphonyResetSpawners();
-				symphonyChooseNewProtos();
-
-				trQuestVarSet("symphonyRound", 1 + trQuestVarGet("symphonyRound"));
+				xsEnableRule("symphony_stride_new_round");
 			}
 		}
 	}

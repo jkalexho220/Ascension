@@ -305,13 +305,6 @@ void processChests() {
 							xSetInt(dChests,xChestState,CHEST_STATE_UNLOCKED);
 						}
 					}
-					case CHEST_SYMPHONY:
-					{
-						if (trUnitIsSelected()) {
-							reselectMyself();
-							uiMessageBox("This chest will open when this round ends.");
-						}
-					}
 				}
 			}
 			case CHEST_STATE_UNLOCKED:
@@ -349,10 +342,6 @@ void processChests() {
 			{
 				if (trTimeMS() > xGetInt(dChests, xChestSFX)) {
 					if (xGetInt(dChests, xChestCount) == 0) {
-						if (xGetInt(dChests, xChestType) == CHEST_SYMPHONY) {
-							xUnitSelect(dChests, xUnitName);
-							trUnitChangeProtoUnit("Vision SFX");
-						}
 						xFreeDatabaseBlock(dChests);
 					} else {
 						trSoundPlayFN("tributereceived.wav","1",-1,"","");

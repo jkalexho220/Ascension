@@ -818,6 +818,30 @@ highFrequency
 									}
 								}
 							}
+						} else if (1*trQuestVarGet("symphonyMode") == 1) {
+							for(i=xGetDatabaseCount(dNottudShop); >0) {
+								xDatabaseNext(dNottudShop);
+								if (distanceBetweenVectors(pos, xGetVector(dNottudShop, xNottudShopPos)) < 25) {
+									break;
+								}
+							}
+							if (i > 0) {
+								relicReturned = true;
+								if (trQuestVarGet("shopping") == 0) {
+									trQuestVarSet("shopping", 1);
+									if (trPlayerResourceCount(p, "gold") >= xGetInt(dNottudShop, xNottudShopPrice)) {
+										trPlayerGrantResources(p, "gold", 0 - xGetInt(dNottudShop, xNottudShopPrice));
+										spawnPlayerUnit(p, xGetInt(dNottudShop,xRelicType), xGetVector(dNottudShop, xNottudShopPos));
+										if (trCurrentPlayer() == p) {
+											trSoundPlayFN("mythcreate.wav","1",-1,"","");
+											trChatSend(0, "Purchased " + kbGetProtoUnitName(xGetInt(dNottudShop,xRelicType)) + "!");
+										}
+									} else if (trCurrentPlayer() == p) {
+										trChatSend(0, "You don't have enough gold! You need 300!");
+										trSoundPlayFN("cantdothat.wav","1",-1,"","");
+									}
+								}
+							}
 						}
 						if ((xGetInt(db, xRelicType) <= NORMAL_RELICS) && (relicReturned == false)) {
 							relicReturned = aiPlanGetUserVariableBool(ARRAYS, rememberRelics, xGetInt(db, xRelicType));

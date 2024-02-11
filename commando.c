@@ -135,6 +135,34 @@ void plantEchoBomb(int p = 0) {
 }
 */
 
+void commandoSmite(int p = 0) {
+	int db = getCharactersDB(p);
+	if (xGetFloat(db, xCharSmiteDamage) > 0) {
+		vector pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName)));
+		vector dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName, xGetInt(db, xCharAttackTargetIndex))));
+		float dist = xsMax(16.0, xGetFloat(dPlayerData, xPlayerRange, p) + 4.0);
+		int next = trGetNextUnitScenarioNameNumber();
+		trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+		trArmySelect("1,0");
+		trMutateSelected(kbGetProtoUnitID("Petosuchus Projectile"));
+		trUnitHighlight(2.0, false);
+		trSetUnitOrientation(vector(0,0,0) - dir, vector(0,1,0), true);
+		xAddDatabaseBlock(dPlayerLasers, true);
+		xSetInt(dPlayerLasers, xUnitName, next);
+		xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 500);
+		xSetFloat(dPlayerLasers, xPlayerLaserRange, dist * 1.4);
+		for(x=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			if (trUnitAlive()) {
+				if (rayCollision(dEnemies, pos, dir, dist, 3.0)) {
+					damageEnemy(p, xGetFloat(db, xCharSmiteDamage));
+				}
+			}
+		}
+	}
+}
+
 void commandoAlways(int eventID = -1) {
 	xsSetContextPlayer(0);
 	int p = eventID - 12 * COMMANDO;
@@ -213,16 +241,7 @@ void commandoAlways(int eventID = -1) {
 					xUnitSelect(db, xUnitName);
 					gainFavor(p, 3.0);
 
-					for(j=xGetDatabaseCount(dEnemies); >0) {
-						xDatabaseNext(dEnemies);
-						xUnitSelectByID(dEnemies, xUnitID);
-						if (trUnitAlive() == false) {
-							removeEnemy();
-						} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), xGetVector(commandoPads, xCommandoPadPos)) < dist) {
-							trQuestVarSet("p"+p+"commandoBoost", 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack) + trQuestVarGet("p"+p+"commandoBoost"));
-							break;
-						}
-					}
+					trQuestVarSet("p"+p+"commandoBoost", 0.1 * xGetFloat(dPlayerData, xPlayerBaseAttack) + trQuestVarGet("p"+p+"commandoBoost"));
 					xFreeDatabaseBlock(commandoPads);
 					break;
 				}
@@ -344,6 +363,7 @@ void commandoAlways(int eventID = -1) {
 							xSetInt(db, xCharSpecialAttack, xsMax(xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p), xGetInt(dClass, xClassSpecialAttackCooldown, xGetInt(dPlayerData, xPlayerClass)) / 2));
 							placeCommandoPad(p, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true));
 						}
+						commandoSmite(p);
 					}
 				}
 				
@@ -605,6 +625,7 @@ void commandoAlways(int eventID = -1) {
 								if (distanceBetweenVectors(pos, end, true) < dist) {
 									damageEnemy(p, commandoCritMultiplier(p) * xGetFloat(dPlayerData, xPlayerAttack), false);
 									OnHit(p, xGetPointer(dEnemies));
+									commandoSmite(p);
 									if (xGetInt(db, xCharSpecialAttack) <= 0) {
 										placeCommandoPad(p, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true));
 										xSetInt(db, xCharSpecialAttack, xsMax(xGetInt(dPlayerData,xPlayerSpecialAttackCooldown,p), xGetInt(dClass, xClassSpecialAttackCooldown, xGetInt(dPlayerData, xPlayerClass)) / 2));

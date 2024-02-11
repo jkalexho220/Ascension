@@ -3969,6 +3969,8 @@ int dWorthlessJunk = 0;
 int dNottudShop = 0;
 int xNottudShopPos = 0;
 
+int xNottudShopPrice = 0;
+
 int dNpcTalk = 0;
 int xNpcDialog = 0;
 
