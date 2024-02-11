@@ -32,6 +32,11 @@ int xEchoBombTimeout = 0;
 int xEchoBombUnit = 0;
 
 void removeCommando(int p = 0) {
+	int db = getCharactersDB(p);
+	xUnitSelect(db, xCommandoBulletStormSFX);
+	trUnitDestroy();
+	xUnitSelect(db, xCommandoQuickdrawSFX);
+	trUnitDestroy();
 	removePlayerSpecific(p);
 }
 

@@ -20,10 +20,7 @@ void symphonyLevelUp(int count = 0) {
 		proto = xGetInt(dClass, xClassProto, class);
 		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, count);
 		xSetInt(dPlayerData, xPlayerLevel, count + xGetInt(dPlayerData, xPlayerLevel));
-		trSetCivilizationNameOverride(p, "Level " + xGetInt(dPlayerData, xPlayerLevel));
-		if (p == 1) {
-			debugLog("Level is " + xGetInt(dPlayerData, xPlayerLevel));
-		}
+		trSetCivilizationNameOverride(p, "Level " + (xGetInt(dPlayerData, xPlayerLevel) + 1));
 	}
 }
 
@@ -120,7 +117,7 @@ void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 			xSetInt(dFrontier, xFrontierDest, room);
 			xSetInt(dFrontier, xFrontierType, trQuestVarGet("room"+room));
 
-			trPaintTerrain(xsVectorGetX(center)-2,xsVectorGetZ(center)-2,xsVectorGetX(center)+2,xsVectorGetZ(center)+2,0,73,false);
+			trPaintTerrain(xsVectorGetX(center)-3,xsVectorGetZ(center)-3,xsVectorGetX(center)+3,xsVectorGetZ(center)+3,0,73,false);
 
 			xUnitSelect(dFrontier, xUnitName);
 			if (trQuestVarGet("room"+room) > ROOM_HEALING) {
@@ -297,6 +294,8 @@ highFrequency
 		trQuestVarSet("symphonyMode", 1);
 		xsEnableRule("symphony_stride_cin_intro");
 
+		trOverlayTextColour(200,200,0);
+
 		trEventSetHandler(EVENT_SYMPHONY_VOTE, "symphonyCastVote");
 
 		trQuestVarSet("treeDensity", 0.05);
@@ -316,7 +315,6 @@ highFrequency
 		petShopOptions = zNewArray(mInt, 36, "petOptions");
 
 		trModifyProtounit("Healing Spring Object", 0, 55, 4); // flying spring
-
 		trModifyProtounit("Revealer", 1, 2, 205);
 		trArmyDispatch("1,0","Dwarf",1,145,0,145,0,true);
 		trArmySelect("1,0");
@@ -335,6 +333,9 @@ highFrequency
 			zSetInt(petShopOptions, i, zGetInt(petShopOptions, 1*trQuestVarGet("rand")));
 			zSetInt(petShopOptions, 1*trQuestVarGet("rand"), val);
 		}
+
+		trSetCivAndCulture(0, 0, 0);
+		trSetCivAndCulture(ENEMY_PLAYER, 0, 0);
 
 		worldHeight = 0;
 		wallHeight = 5;
@@ -436,8 +437,8 @@ highFrequency
 
 		xsEnableRule("symphony_stride_cin_intro");
 		// TODO: delete this
-		trQuestVarSet("cinStep", 4);
-		trQuestVarSet("cinTime", trTime() + 2);
+		//trQuestVarSet("cinStep", 4);
+		//trQuestVarSet("cinTime", trTime() + 2);
 		xsDisableSelf();
 	}
 }
@@ -482,7 +483,7 @@ highFrequency
 				//xsEnableRule("gladiator_worlds_portals");
 
 				trQuestVarSet("killcount", 0);
-				trQuestVarSet("killgoal", 1);
+				trQuestVarSet("killgoal", 10 + ENEMY_PLAYER);
 
 				trMusicPlayCurrent();
 				trPlayNextMusicTrack();
@@ -515,12 +516,12 @@ highFrequency
 		}
 
 		/* monstrous rage */
-		if (iModulo(3, 1 * trQuestVarGet("symphonyRound")) == 0) {
+		if (iModulo(2, 1 * trQuestVarGet("symphonyRound")) == 0) {
 			trTechSetStatus(ENEMY_PLAYER, 76, 4);
 		}
 
 		trQuestVarSet("killcount", 0);
-		trQuestVarSet("killgoal", 1 + trQuestVarGet("killgoal"));
+		trQuestVarSet("killgoal", 10 + trQuestVarGet("killgoal"));
 
 		symphonyCreateSpawners(2 + (trQuestVarGet("symphonyRound") / 3));
 
@@ -539,7 +540,7 @@ highFrequency
 		int next = 0;
 		trQuestVarSetFromRand("rand", 5, 10);
 		trQuestVarSetFromRand("proto", 1, 5, true);
-		trQuestVarSet("rand", 1); // TODO: delete
+		// trQuestVarSet("rand", 1); // TODO: delete
 
 		trQuestVarSet("killcount", trQuestVarGet("killcount") + trQuestVarGet("rand"));
 		for(i=trQuestVarGet("rand"); >0) {
@@ -694,6 +695,7 @@ highFrequency
 		for(p=1; < ENEMY_PLAYER) {
 			trTechGodPower(p, "vision", 1);
 		}
+		trQuestVarSet("voteCount", ENEMY_PLAYER - 1);
 		trQuestVarSet("votingUnitTracker", trGetNextUnitScenarioNameNumber());
 		trQuestVarSet("votingCountdown", 0);
 		xsEnableRule("symphony_stride_voting");
@@ -743,7 +745,9 @@ highFrequency
 {
 	int id = 0;
 	int p = 0;
+	int next = 0;
 	int closest = 0;
+	int destUnit = 0;
 	float closestDistance = 0;
 	float currentDistance = 0;
 	vector center = vector(0,0,0);
@@ -753,11 +757,11 @@ highFrequency
 		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Vision Revealer")) {
 			center = kbGetBlockPosition(""+n, true);
 			p = kbUnitGetOwner(id);
-			trQuestVarSet("p"+p+"votingFlag", n);
 			trUnitSelectClear();
 			trUnitSelect("" + n, true);
-			trUnitChangeProtoUnit("Folstag Flag Bearer");
+			//trUnitChangeProtoUnit("Folstag Flag Bearer"); //TODO: make it deploy there instead
 			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has voted!");
+			trQuestVarSet("voteCount", trQuestVarGet("voteCount") - 1);
 
 			closestDistance = 100000;
 			for(i=xGetDatabaseCount(dFrontier); >0) {
@@ -774,9 +778,27 @@ highFrequency
 			pos = gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest)));
 			xSetInt(dFrontier, xFrontierVotes, 1 + xGetInt(dFrontier, xFrontierVotes));
 
+			destUnit = zGetInt(frontierUnitsArray, xGetInt(dFrontier, xFrontierDest));
+			trUnitSelectClear();
+			trUnitSelect(""+destUnit);
+			trUnitChangeProtoUnit("Transport Ship Greek");
+
+			trQuestVarSet("p"+p+"senator", trGetNextUnitScenarioNameNumber());
+			trArmyDispatch("0,0","Folstag Flag Bearer", 1, 1, 0, 1, 0, true);
+			trArmySelect("0,0");
+			trImmediateUnitGarrison("" + destUnit);
+
+			trUnitSelectClear();
+			trUnitSelect(""+destUnit);
+			trUnitChangeProtoUnit(symphonyRoomProtoUnit(xGetInt(dFrontier, xFrontierType)));
+
+			trUnitSelectClear();
+			trUnitSelectByQV("p"+p+"senator");
+			trUnitConvert(p);
+
 			trMinimapFlare(p, 10.0, pos, true);
 
-			if (xGetInt(dFrontier, xFrontierVotes) >= (ENEMY_PLAYER / 2)) {
+			if ((xGetInt(dFrontier, xFrontierVotes) >= (ENEMY_PLAYER / 2)) || (trQuestVarGet("voteCount") == 0)) {
 				xsEnableRule("symphony_stride_voting_done");
 				trQuestVarSet("cinStep", 0);
 				trQuestVarSet("cinTime", trTime() + 1);
@@ -838,7 +860,7 @@ highFrequency
 			{
 				for(p=1; < ENEMY_PLAYER) {
 					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"votingFlag");
+					trUnitSelectByQV("p"+p+"senator");
 					trUnitDestroy();
 				}
 				trSoundPlayFN("wall.wav");

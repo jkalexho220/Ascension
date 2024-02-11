@@ -592,7 +592,7 @@ void specialUnitsAlways() {
 						if (trUnitAlive() == false) {
 							removeOpponentUnit(p);
 						} else if (unitDistanceToVector(xGetInt(db,xUnitName), end) < 4) {
-							damageOpponentUnit(p, 100 + 100 * trQuestVarGet("stage"));
+							damageOpponentUnit(p, 100 + 100 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")));
 							if (xGetBool(db, xIsHero) && trCurrentPlayer() == xGetInt(db, xPlayerOwner)) {
 								trCameraShake(0.7, 0.7);
 							}
@@ -770,7 +770,7 @@ void specialUnitsAlways() {
 					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (unitDistanceToVector(xGetInt(db,xUnitName), pos) < 16) {
-						poisonUnit(db, 10.0, 5.0 * trQuestVarGet("stage"), p);
+						poisonUnit(db, 10.0, 5.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")), p);
 					}
 				}
 				if (p == ENEMY_PLAYER) {
@@ -1247,7 +1247,7 @@ void specialUnitsAlways() {
 						}
 						case STATUS_POISON:
 						{
-							poisonUnit(db, 10, 5.0 * trQuestVarGet("stage"), p);
+							poisonUnit(db, 10, 5.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")), p);
 						}
 					}
 				}
@@ -1360,7 +1360,7 @@ void specialUnitsAlways() {
 						xDatabaseNext(db);
 						if (xGetInt(dScorpionMen, xSpecialTarget) == xGetInt(db,xUnitName)) {
 							xUnitSelectByID(db,xUnitID);
-							poisonUnit(db, 10, 5.0 * trQuestVarGet("stage"), p);
+							poisonUnit(db, 10, 5.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")), p);
 							action = 1;
 							break;
 						}
@@ -1824,7 +1824,7 @@ void specialUnitsAlways() {
 					if (trUnitAlive() == false) {
 						removeOpponentUnit(p);
 					} else if (rayCollision(db, start, dir, dist + 1.0, 2.0)) {
-						damageOpponentUnit(p, 20.0 * trQuestVarGet("stage"));
+						damageOpponentUnit(p, 20.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")));
 						hit = true;
 					}
 				}
@@ -1900,7 +1900,7 @@ void specialUnitsAlways() {
 					if (trUnitAlive() == false) {
 						removeOpponentUnit();
 					} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
-						damageOpponentUnit(p, 50.0 * trQuestVarGet("stage"));
+						damageOpponentUnit(p, 50.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")));
 					}
 				}
 
@@ -2071,7 +2071,7 @@ void specialUnitsAlways() {
 				if (trUnitAlive() == false) {
 					removeOpponentUnit();
 				} else if (unitDistanceToVector(xGetInt(db, xUnitName), start) < 36.0) {
-					damageOpponentUnit(p, 50.0 * trQuestVarGet("stage"));
+					damageOpponentUnit(p, 50.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")));
 				}
 			}
 			xFreeDatabaseBlock(dTartarianEggs);
@@ -2310,7 +2310,7 @@ void specialUnitsAlways() {
 						if (xGetInt(dArgus, xSpecialTarget) == xGetInt(db,xUnitName)) {
 							xUnitSelectByID(db,xUnitID);
 							stunUnit(db, 4.0, p);
-							poisonUnit(db, 4.0, 5.0 * trQuestVarGet("stage"), p);
+							poisonUnit(db, 4.0, 5.0 * (trQuestVarGet("stage") + trQuestVarGet("symphonyRound")), p);
 							silenceUnit(db, 4.0, p);
 							action = 1;
 							break;

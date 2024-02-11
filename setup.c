@@ -454,6 +454,7 @@ runImmediately
 	trModifyProtounit("Scylla", 1, 55, 1);
 	trModifyProtounit("Scylla", ENEMY_PLAYER, 55, 1);
 
+	trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.5);
 	trModifyProtounit("Petosuchus Projectile", 0, 55, 2);
 	for(p=1; < ENEMY_PLAYER) {
 		trPlayerSetDiplomacy(p, 0, "neutral");
@@ -971,7 +972,7 @@ highFrequency
 				trPaintTerrain(80,46,80,46,0,34);
 			}
 
-			if (xGetInt(dPlayerData, xPlayerProgress) == 9) {
+			if (xGetInt(dPlayerData, xPlayerProgress, 1) == 9) {
 				next = trGetNextUnitScenarioNameNumber();
 				trArmyDispatch("0,0","Dwarf",1,151,0,95,180,true);
 				trArmySelect("0,0");

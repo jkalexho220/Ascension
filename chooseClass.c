@@ -692,17 +692,17 @@ int displayNextTooltip(int class = 0, int tooltip = 0) {
 					}
 					case 11:
 					{
-						icon = "icons\god power sand storm icon 64";
+						icon = "icons\god power shifting sand icon 64";
 						msg = "(E) Shooting Gallery: Shoot in all directions, attacking random nearby enemies.";
 					}
 					case 12:
 					{
-						icon = "icons\god power sand storm icon 64";
+						icon = "icons\god power shifting sand icon 64";
 						msg = "You cannot move or gain favor while this ability is active.";
 					}
 					case 13:
 					{
-						icon = "icons\god power sand storm icon 64";
+						icon = "icons\god power shifting sand icon 64";
 						msg = "Cost: 1 per bullet | Range: 8 | Fire Rate: 10 | Applies on-hit effects.";
 						next = 0;
 					}

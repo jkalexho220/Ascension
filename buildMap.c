@@ -1942,8 +1942,6 @@ highFrequency
 				trStringQuestVarSet("enemyProto5", "Statue of Lightning");
 				trStringQuestVarSet("enemyProto6", "Lampades");
 				
-				trModifyProtounit("Statue of Lightning", ENEMY_PLAYER, 1, 3.0);
-				
 				trModifyProtounit("Nidhogg", 0, 0, 9999999999999999999.0);
 				trModifyProtounit("Nidhogg", 0, 0, -9999999999999999999.0);
 				trModifyProtounit("Nidhogg", 0, 0, 100000);
