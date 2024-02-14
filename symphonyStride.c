@@ -525,7 +525,7 @@ highFrequency
 		trQuestVarSet("killgoal", 10 + trQuestVarGet("killgoal"));
 
 		//todo :delete
-		trQuestVarSet("killgoal", 0);
+		trQuestVarSet("killgoal", 1);
 
 		symphonyCreateSpawners(2 + (trQuestVarGet("symphonyRound") / 3));
 
@@ -615,7 +615,7 @@ highFrequency
 				trQuestVarSet("symphonyUpgradeNumber", 1 + trQuestVarGet("symphonyUpgradeNumber"));
 				trQuestVarSet("symphonyUpgradeStart", 3 + trQuestVarGet("symphonyUpgradeStart"));
 				xsEnableRule("symphony_upgrade");
-				// TODO: symphony upgrade time
+				
 				notVoted = true;
 				int p = 0;
 				for(p=1; < ENEMY_PLAYER) {

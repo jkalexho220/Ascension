@@ -448,7 +448,7 @@ void gainFavor(int p = 0, float amt = 0) {
 			xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
 		}
 		trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
-		if (amt < 0.0 && playerHasSymphony(p, SYMPHONY_FAVOR_CLONE)) {
+		if ((amt < 0.0) && playerHasSymphony(p, SYMPHONY_FAVOR_CLONE)) {
 			trQuestVarSet("p"+p+"favorCloneCharge", trQuestVarGet("p"+p+"favorCloneCharge") - amt);
 			if (trQuestVarGet("p"+p+"favorCloneCharge") > 50.0) {
 				trQuestVarSet("p"+p+"favorCloneCharge", trQuestVarGet("p"+p+"favorCloneCharge") - 50.0);
@@ -620,10 +620,10 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 			xUnitSelectByID(db,xUnitID);
 		}
 	}
-	if ((db == dPlayerUnits) && (playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS))) {
+	if ((db == dPlayerUnits) && playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS)) {
 		int old = xGetPointer(dEnemies);
 		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
-		for(i=xGetDatabaseCount(dEnemies); >0) {
+		for(k=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
 			xUnitSelectByID(dEnemies, xUnitID);
 			if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
@@ -735,7 +735,7 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 	if(playerHasSymphony(p, SYMPHONY_HEAL_DEAL)) {
 		old = xGetPointer(dEnemies);
 		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
-		for(i=xGetDatabaseCount(dEnemies); >0) {
+		for(k=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
 			xUnitSelectByID(dEnemies, xUnitID);
 			if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
@@ -808,10 +808,10 @@ void removePlayerUnit() {
 			pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
 			int old = xGetPointer(dEnemies);
 			int p = xGetInt(dPlayerUnits, xPlayerOwner);
-			for(i=xGetDatabaseCount(dEnemies); >0) {
+			for(k=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
-				xUnitSelectByID(dEnemies, xUnitID);
 				if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+					xUnitSelectByID(dEnemies, xUnitID);
 					damageEnemy(p, 300.0);
 				}
 			}
@@ -1096,7 +1096,8 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 			}
 			xSetInt(db,xStunTimeout,trTimeMS() + duration);
 			if (playerHasSymphony(p, SYMPHONY_STUN_HEAL)) {
-				xSetFloat(dPlayerData, xPlayerLifestealTotal, 0.1 * xGetFloat(dPlayerData, xPlayerHealth, p) + xGetFloat(dPlayerData, xPlayerLifestealTotal, p), p);
+				xSetFloat(dPlayerData, xPlayerLifestealTotal, 
+					0.1 * xGetFloat(dPlayerData, xPlayerHealth, p) + xGetFloat(dPlayerData, xPlayerLifestealTotal, p), p);
 			}
 		}
 		if (targetPlayers && (playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS))) {
