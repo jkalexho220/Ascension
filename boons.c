@@ -18,6 +18,23 @@ const int BOON_ATTACK_PROLONGS_STUN = 10; // kronos
 const int BOON_TWO_RELICS = 11; // oranos
 const int BOON_HEAL_FAVOR = 12; // gaia
 
+const int SYMPHONY_DOUBLE_SPECIAL = 0;
+const int SYMPHONY_FAVOR_CLONE = 1;
+const int SYMPHONY_LASER_ATTACKS = 2;
+const int SYMPHONY_STUN_HEAL = 3;
+const int SYMPHONY_HEAL_DEAL = 4;
+const int SYMPHONY_MORE_PHYSICAL = 5;
+const int SYMPHONY_MORE_MAGICAL = 6;
+const int SYMPHONY_STATUS_DAMAGE = 7;
+const int SYMPHONY_SHARE_STATUS = 8;
+const int SYMPHONY_REGENERATE_FAVOR = 9;
+const int SYMPHONY_GAIN_LEVELS = 10;
+const int SYMPHONY_GAIN_ATTACK = 11;
+const int SYMPHONY_GAIN_POWER = 12;
+const int SYMPHONY_EXPLODING_MINIONS = 13;
+const int SYMPHONY_MAGIC_SHRED = 14;
+const int SYMPHONY_POISON_STACKS = 15;
+
 int statueCiv(int boon = 0) {
 	return(boon - 1);
 }
@@ -192,4 +209,85 @@ string boonName(int boon = 0) {
 		}
 	}
 	return(name);
+}
+
+string symphonyName(int boon = 0) {
+	string name = "(This Symphony has not been implemented yet)";
+	switch(boon)
+	{
+		case SYMPHONY_DOUBLE_SPECIAL:
+		{
+			name = "Your special attack triggers twice.";
+		}
+		case SYMPHONY_FAVOR_CLONE:
+		{
+			name = "Each time you spend 50 favor, summon a decaying copy of yourself.";
+		}
+		case SYMPHONY_LASER_ATTACKS:
+		{
+			name = "Your attacks fire lasers that deal 100 magic damage in a line.";
+		}
+		case SYMPHONY_STUN_HEAL:
+		{
+			name = "Each time you stun an enemy, restore 10 percent of your health.";
+		}
+		case SYMPHONY_HEAL_DEAL:
+		{
+			name = "Whenever you heal, deal the same amount of damage to enemies within 5 meters.";
+		}
+		case SYMPHONY_MORE_PHYSICAL:
+		{
+			name = "Increase health, attack, and armor by 20 percent of current value.";
+		}
+		case SYMPHONY_MORE_MAGICAL:
+		{
+			name = "Increase spell power, duration, and range by 20 percent of current value.";
+		}
+		case SYMPHONY_STATUS_DAMAGE:
+		{
+			name = "Whenever you apply a status effect, the target loses 1 percent health.";
+		}
+		case SYMPHONY_SHARE_STATUS:
+		{
+			name = "Whenever you are inflicted by a status effect, inflict it on nearby enemies.";
+		}
+		case SYMPHONY_REGENERATE_FAVOR:
+		{
+			name = "Regenerate 1 favor per second.";
+		}
+		case SYMPHONY_GAIN_LEVELS:
+		{
+			name = "Gain 3 levels.";
+		}
+		case SYMPHONY_GAIN_ATTACK:
+		{
+			name = "+50 Attack";
+		}
+		case SYMPHONY_GAIN_POWER:
+		{
+			name = "+1.0 Spell Power";
+		}
+		case SYMPHONY_EXPLODING_MINIONS:
+		{
+			name = "When your summoned allies die, they explode and deal 300 damage.";
+		}
+		case SYMPHONY_MAGIC_SHRED:
+		{
+			name = "When you deal magic damage to an enemy, reduce their magic resist by 1.";
+		}
+		case SYMPHONY_POISON_STACKS:
+		{
+			name = "When you attack a poisoned enemy, increase the poison damage by 10.";
+		}
+	}
+	return(name);
+}
+
+bool playerHasSymphony(int p = 0, int symphony = 0) {
+	for(i=trQuestVarGet("symphonyUpgradeNumber"); > 0) {
+		if (1*trQuestVarGet("p"+p+"upgrade"+i) == symphony) {
+			return(true);
+		}
+	}
+	return(false);
 }

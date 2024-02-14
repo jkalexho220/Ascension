@@ -82,25 +82,32 @@ void minigunOff(int p = 0) {
 
 void placeCommandoPad(int p = 0, vector pos = vector(0,0,0)) {
 	int commandoPads = trQuestVarGet("p"+p+"commandoPads");
-	int next = trGetNextUnitScenarioNameNumber();
-	trQuestVarSetFromRand("rand", 0, 6.283185, false);
-	pos = pos + xsVectorSet(xsCos(trQuestVarGet("rand")),0,xsSin(trQuestVarGet("rand")));
-	vector snap = vectorSnapToGrid(pos);
-	trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(snap),0,xsVectorGetZ(snap),0,true);
-	int id = kbGetBlockID(""+next, true);
-	xAddDatabaseBlock(commandoPads, true);
-	xSetInt(commandoPads, xCommandoPadID, id);
-	xSetVector(commandoPads, xCommandoPadSourcePos, snap);
-	xSetVector(commandoPads, xCommandoPadPos, pos);
-	xSetInt(commandoPads, xCommandoPadTimeout, trTimeMS() + 20000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
+	int next = 0;
+	int count = 1;
+	if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+		count = 2;
+	}
+	for(i=count; >0) {
+		next = trGetNextUnitScenarioNameNumber();
+		trQuestVarSetFromRand("rand", 0, 6.283185, false);
+		pos = pos + xsVectorSet(xsCos(trQuestVarGet("rand")),0,xsSin(trQuestVarGet("rand")));
+		vector snap = vectorSnapToGrid(pos);
+		trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(snap),0,xsVectorGetZ(snap),0,true);
+		int id = kbGetBlockID(""+next, true);
+		xAddDatabaseBlock(commandoPads, true);
+		xSetInt(commandoPads, xCommandoPadID, id);
+		xSetVector(commandoPads, xCommandoPadSourcePos, snap);
+		xSetVector(commandoPads, xCommandoPadPos, pos);
+		xSetInt(commandoPads, xCommandoPadTimeout, trTimeMS() + 20000 * xGetFloat(dPlayerData, xPlayerSpellDuration));
 
-	xUnitSelectByID(commandoPads, xCommandoPadID);
-	trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
-	xUnitSelectByID(commandoPads, xCommandoPadID);
-	if (trCurrentPlayer() == p) {
-		trSetSelectedUpVector(xsVectorGetX(pos) - xsVectorGetX(snap),0,xsVectorGetZ(pos) - xsVectorGetZ(snap));
-	} else {
-		trSetSelectedUpVector(0,-10,0);
+		xUnitSelectByID(commandoPads, xCommandoPadID);
+		trUnitChangeProtoUnit("UI Range Indicator Norse SFX");
+		xUnitSelectByID(commandoPads, xCommandoPadID);
+		if (trCurrentPlayer() == p) {
+			trSetSelectedUpVector(xsVectorGetX(pos) - xsVectorGetX(snap),0,xsVectorGetZ(pos) - xsVectorGetZ(snap));
+		} else {
+			trSetSelectedUpVector(0,-10,0);
+		}
 	}
 }
 
@@ -142,9 +149,9 @@ void plantEchoBomb(int p = 0) {
 
 void commandoSmite(int p = 0) {
 	int db = getCharactersDB(p);
-	if (xGetFloat(db, xCharSmiteDamage) > 0) {
+	if (xGetFloat(db, xCharSmiteDamage) + trQuestVarGet("p"+p+"laserAttacks") > 0) {
 		vector pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName)));
-		vector dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName, xGetInt(db, xCharAttackTargetIndex))));
+		vector dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName)));
 		float dist = xsMax(16.0, xGetFloat(dPlayerData, xPlayerRange, p) + 4.0);
 		int next = trGetNextUnitScenarioNameNumber();
 		trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -161,7 +168,7 @@ void commandoSmite(int p = 0) {
 			xUnitSelectByID(dEnemies, xUnitID);
 			if (trUnitAlive()) {
 				if (rayCollision(dEnemies, pos, dir, dist, 3.0)) {
-					damageEnemy(p, xGetFloat(db, xCharSmiteDamage));
+					damageEnemy(p, xGetFloat(db, xCharSmiteDamage) + trQuestVarGet("p"+p+"laserAttacks"));
 				}
 			}
 		}

@@ -37,6 +37,7 @@ void throneShieldAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int count = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
 	float amt = 0;
@@ -399,16 +400,22 @@ void throneShieldAlways(int eventID = -1) {
 						xUnitSelectByID(db, xUnitID);
 						trSetSelectedScale(1,1,1);
 					} else if (hit == ON_HIT_SPECIAL) {
-						gainFavor(p, 3);
-						stunUnit(dEnemies, 3.0, p);
-						amt = 0.1 * xGetFloat(dPlayerData, xPlayerHealth);
-						for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
-							xDatabaseNext(dPlayerCharacters);
-							xUnitSelectByID(dPlayerCharacters, xUnitID);
-							if (trUnitAlive() == false) {
-								removePlayerCharacter();
-							} else {
-								healUnit(p, amt);
+						count = 1;
+						if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+							count = 2;
+						}
+						for(i=count; >0) {
+							gainFavor(p, 3);
+							stunUnit(dEnemies, 3.0, p);
+							amt = 0.1 * xGetFloat(dPlayerData, xPlayerHealth);
+							for(x=xGetDatabaseCount(dPlayerCharacters); >0) {
+								xDatabaseNext(dPlayerCharacters);
+								xUnitSelectByID(dPlayerCharacters, xUnitID);
+								if (trUnitAlive() == false) {
+									removePlayerCharacter();
+								} else {
+									healUnit(p, amt);
+								}
 							}
 						}
 					}

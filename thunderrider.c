@@ -165,6 +165,7 @@ void thunderRiderAlways(int eventID = -1) {
 	int shocks = trQuestVarGet("p"+p+"thunderShocks");
 	int shockTargets = trQuestVarGet("p"+p+"thunderShockTargets");
 	int next = 0;
+	int count = 0;
 	float amt = 0;
 	float dist = 0;
 	
@@ -500,10 +501,16 @@ void thunderRiderAlways(int eventID = -1) {
 					xClearDatabase(shocks);
 					target = trGetUnitScenarioNameNumber(xGetInt(db, xCharAttackTarget));
 					pos = kbGetBlockPosition(""+target, true);
-					xAddDatabaseBlock(shocks, true);
-					xSetFloat(shocks, xShockDamage, xGetFloat(dPlayerData, xPlayerAttack));
-					xSetInt(shocks, xShockNext, trTimeMS() + 100);
-					xSetVector(shocks, xShockPos, pos);
+					count = 1;
+					if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+						count = 2;
+					}
+					for(i=count; >0) {
+						xAddDatabaseBlock(shocks, true);
+						xSetFloat(shocks, xShockDamage, xGetFloat(dPlayerData, xPlayerAttack));
+						xSetInt(shocks, xShockNext, trTimeMS() + 100);
+						xSetVector(shocks, xShockPos, pos);
+					}
 					
 					trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
 					trArmySelect(""+p+",0");

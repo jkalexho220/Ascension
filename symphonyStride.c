@@ -1,4 +1,8 @@
 const int EVENT_SYMPHONY_VOTE = 10010;
+const int EVENT_SYMPHONY_CHOOSE = 10011;
+const int EVENT_SYMPHONY_NEXT = 10012;
+
+bool cameraWasLocked = false;
 
 int dSpawnerRooms = 0;
 int xSpawnerRoomPos = 0;
@@ -11,17 +15,32 @@ int relicShopOptions = 0;
 
 bool notVoted = false;
 
-void symphonyLevelUp(int count = 0) {
+
+
+void symphonyLevelUpIndividual(int count = 0, int p = 0) {
 	int class = 0;
 	int proto = 0;
+	xSetPointer(dPlayerData, p);
+	class = xGetInt(dPlayerData, xPlayerClass);
+	proto = xGetInt(dClass, xClassProto, class);
+	trModifyProtounit(kbGetProtoUnitName(proto), p, 5, count);
+	xSetInt(dPlayerData, xPlayerLevel, count + xGetInt(dPlayerData, xPlayerLevel));
+	trSetCivilizationNameOverride(p, "Level " + (xGetInt(dPlayerData, xPlayerLevel) + 1));
+}
+
+void symphonyLevelUp(int count = 0) {
 	for(p=1; < ENEMY_PLAYER) {
-		xSetPointer(dPlayerData, p);
-		class = xGetInt(dPlayerData, xPlayerClass);
-		proto = xGetInt(dClass, xClassProto, class);
-		trModifyProtounit(kbGetProtoUnitName(proto), p, 5, count);
-		xSetInt(dPlayerData, xPlayerLevel, count + xGetInt(dPlayerData, xPlayerLevel));
-		trSetCivilizationNameOverride(p, "Level " + (xGetInt(dPlayerData, xPlayerLevel) + 1));
+		symphonyLevelUpIndividual(count, p);
 	}
+}
+
+void symphonyChooseUpgrade(int eventID = -1) {
+	cameraWasLocked = cameraLockOnSelf;
+	cameraLockOnSelf = false;
+	int choice = eventID - EVENT_SYMPHONY_CHOOSE;
+	vector pos = xsVectorSet(30 + choice * 80, 0, 73);
+	lookAt(xsVectorGetX(pos),xsVectorGetZ(pos));
+	RunFunction("uiSetSpecialPower(220) uiSpecialPowerAtPointer");
 }
 
 vector symphonyRoomIndexToCoordinates(int room = 0) {
@@ -39,101 +58,6 @@ vector symphonyRoomToVector(int room = 0) {
 	return(symphonyRoomIndexToCoordinates(room) * 27 + xsVectorSet(5 + 14, 0, 5 + 14));
 }
 
-string symphonyRoomDescription(int type = 0) {
-	string msg = "How in the fuck did you get here???";
-	switch(type)
-	{
-		case ROOM_CHEST:
-		{
-			msg = "Relics";
-		}
-		case ROOM_GOLD:
-		{
-			msg = "500 Gold";
-		}
-		case ROOM_LEVELUP:
-		{
-			msg = "+2 Levels";
-		}
-		case ROOM_HEALING:
-		{
-			msg = "+10 Health Regen per second";
-		}
-		case ROOM_STAT_STORE:
-		{
-			msg = "Random Stat Shop";
-		}
-		case ROOM_FAVOR:
-		{
-			msg = "+0.5 Favor Regen per second";
-		}
-		case ROOM_SYMPHONY_BOSS:
-		{
-			msg = "Final Boss";
-		}
-		case ROOM_JESTER_BOSS:
-		{
-			proto = "Miniboss (+3 Levels)";
-		}
-		case ROOM_PLAGUE_BOSS:
-		{
-			proto = "Miniboss (+3 Levels)";
-		}
-		case ROOM_MOUNTAIN_BOSS:
-		{
-			proto = "Miniboss (+3 Levels)";
-		}
-	}
-	return(msg);
-}
-
-string symphonyRoomProtoUnit(int type = 0) {
-	string proto = "Outpost";
-	switch(type)
-	{
-		case ROOM_CHEST:
-		{
-			proto = "Great Box";
-		}
-		case ROOM_GOLD:
-		{
-			proto = "Gold Mine";
-		}
-		case ROOM_LEVELUP:
-		{
-			proto = "Outpost";
-		}
-		case ROOM_HEALING:
-		{
-			proto = "Healing Spring Object";
-		}
-		case ROOM_STAT_STORE:
-		{
-			proto = "Villager Atlantean";
-		}
-		case ROOM_FAVOR:
-		{
-			proto = "Monument 2";
-		}
-		case ROOM_SYMPHONY_BOSS:
-		{
-			proto = "Monument 5";
-		}
-		case ROOM_JESTER_BOSS:
-		{
-			proto = "Theris";
-		}
-		case ROOM_PLAGUE_BOSS:
-		{
-			proto = "Jiangshi";
-		}
-		case ROOM_MOUNTAIN_BOSS:
-		{
-			proto = "Heka Gigantes";
-		}
-	}
-	return(proto);
-}
 
 void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 	if (x > 4 || z > 4 || x < 0 || z < 0) {
@@ -154,15 +78,9 @@ void symphonyAddFrontier(int x = 0, int z = 0, int cameFrom = 0) {
 			xSetInt(dFrontier, xUnitName, zGetInt(frontierUnitsArray, room));
 			xSetInt(dFrontier, xFrontierCameFrom, cameFrom);
 			xSetInt(dFrontier, xFrontierDest, room);
-			xSetInt(dFrontier, xFrontierType, trQuestVarGet("room"+room));
+			xSetInt(dFrontier, xFrontierType, ROOM_CHEST);
 
-			trPaintTerrain(xsVectorGetX(center)-3,xsVectorGetZ(center)-3,xsVectorGetX(center)+3,xsVectorGetZ(center)+3,0,73,false);
-
-			xUnitSelect(dFrontier, xUnitName);
-			if (trQuestVarGet("room"+room) > ROOM_HEALING) {
-				trSetUnitOrientation(vector(-0.707107,0,-0.707107),vector(0,1,0),true);
-			}
-			trUnitChangeProtoUnit(symphonyRoomProtoUnit(xGetInt(dFrontier, xFrontierType)));
+			trPaintTerrain(xsVectorGetX(center)-1,xsVectorGetZ(center)-1,xsVectorGetX(center)+1,xsVectorGetZ(center)+1,TERRAIN_WALL,TERRAIN_SUB_WALL + 1,false);
 
 			trQuestVarSet("availableRooms", trQuestVarGet("availableRooms") - 1);
 		}
@@ -223,6 +141,8 @@ void symphonyBuildRoom(int x = 0, int z = 0, int type = 0) {
 	trPaintTerrain(0,0,5,5,0,73,true);
 	trPaintTerrain(0,0,5,5,TERRAIN_WALL,TERRAIN_SUB_WALL,false);
 
+	trUnitSelectClear();
+	trUnitSelect("" + zGetInt(frontierUnitsArray, room));
 	switch(type)
 	{
 		case ROOM_CHEST:
@@ -231,6 +151,13 @@ void symphonyBuildRoom(int x = 0, int z = 0, int type = 0) {
 			xSetInt(dChests,xUnitName,zGetInt(frontierUnitsArray, room));
 			xSetInt(dChests,xChestType, CHEST_SYMPHONY);
 			xSetInt(dChests,xChestRoom,room);
+
+			
+			trUnitChangeProtoUnit("Great Box");
+		}
+		case ROOM_SYMPHONY_UPGRADE:
+		{
+			trUnitChangeProtoUnit("Outpost");
 		}
 		case ROOM_BASIC:
 		{
@@ -338,6 +265,8 @@ highFrequency
 		trOverlayTextColour(200,200,0);
 
 		trEventSetHandler(EVENT_SYMPHONY_VOTE, "symphonyCastVote");
+		trEventSetHandler(EVENT_SYMPHONY_CHOOSE, "symphonyChooseUpgrade");
+		trEventSetHandler(EVENT_SYMPHONY_CHOOSE + 1, "symphonyChooseUpgrade");
 
 		trQuestVarSet("treeDensity", 0.05);
 		trStringQuestVarSet("treeProto1", "Ruins");
@@ -421,6 +350,7 @@ highFrequency
 		xNottudShopPrice = xInitAddInt(dNottudShop, "price");
 		xNottudShopPos = xInitAddVector(dNottudShop,"pos");
 
+		/*
 		for(i=0; < 5) {
 			trQuestVarSet("room"+i, ROOM_CHEST);
 		}
@@ -442,6 +372,8 @@ highFrequency
 		trQuestVarSet("room22", ROOM_JESTER_BOSS);
 		trQuestVarSet("room23", ROOM_PLAGUE_BOSS);
 		trQuestVarSet("room24", ROOM_MOUNTAIN_BOSS);
+		*/
+
 
 		// shuffle
 		for(i=0; < 25) {
@@ -450,6 +382,7 @@ highFrequency
 			trQuestVarSet("room"+i, trQuestVarGet("room"+1*trQuestVarGet("rand")));
 			trQuestVarSet("room"+1*trQuestVarGet("rand"), val);
 
+			trQuestVarSet("room"+i, ROOM_CHEST);
 			pos = gridToVector(symphonyRoomToVector(i));
 			zSetInt(frontierUnitsArray, i, trGetNextUnitScenarioNameNumber());
 			trArmyDispatch("0,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),135,true);
@@ -478,6 +411,22 @@ highFrequency
 		for(p=1; < ENEMY_PLAYER) {
 			trPlayerGrantResources(p, "gold", -9999);
 			xSetInt(dPlayerData, xPlayerGold, 0, p);
+			trQuestVarSet("p"+p+"upgradeOptions", zNewArray(mInt, 16));
+			trQuestVarSet("p"+p+"upgrade1", -1);
+			trQuestVarSet("p"+p+"upgrade2", -1);
+			trQuestVarSet("p"+p+"upgrade3", -1);
+
+			// populate
+			for(i=0; < 16) {
+				zSetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), i, i);
+			}
+			// shuffle
+			for(i=0; < 16) {
+				trQuestVarSetFromRand("rand", i, 15, true);
+				val = zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), i);
+				zSetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), i, zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1*trQuestVarGet("rand")));
+				zSetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1*trQuestVarGet("rand"), val);
+			}
 		}
 
 		trVectorQuestVarSet("startPosition", vector(145,0,145));
@@ -523,7 +472,7 @@ highFrequency
 			}
 			case 4:
 			{
-				trSoundPlayFN("default","1",-1,"Zenophobia:Good luck and have fun! To start, I'll grant you 2 level ups immediately.","icons\infantry g hoplite icon 64");
+				trSoundPlayFN("default","1",-1,"Zenophobia:Good luck and have fun! To start, I'll grant you 1 level up immediately.","icons\infantry g hoplite icon 64");
 				trQuestVarSet("cinTime", trTime() + 5);
 				trSoundPlayFN("ageadvance.wav");
 				trOverlayText("Level up!", 3.0);
@@ -542,7 +491,7 @@ highFrequency
 				trMusicPlayCurrent();
 				trPlayNextMusicTrack();
 
-				symphonyLevelUp(2);
+				symphonyLevelUp(1);
 
 				xsEnableRule("symphony_stride_new_round");
 				
@@ -595,7 +544,7 @@ highFrequency
 		int next = 0;
 		trQuestVarSetFromRand("rand", 5, 10);
 		trQuestVarSetFromRand("proto", 1, 5, true);
-		// trQuestVarSet("rand", 1); // TODO: delete
+		trQuestVarSet("rand", 1); // TODO: delete
 
 		trQuestVarSet("killcount", trQuestVarGet("killcount") + trQuestVarGet("rand"));
 		for(i=trQuestVarGet("rand"); >0) {
@@ -604,7 +553,7 @@ highFrequency
 			trArmyDispatch(""+ENEMY_PLAYER+",0",trStringQuestVarGet("enemyProto"+1*trQuestVarGet("proto")),1,xsVectorGetX(pos),0,xsVectorGetZ(pos),trQuestVarGet("heading"),true);
 			if (next < trGetNextUnitScenarioNameNumber()) {
 				trQuestVarSetFromRand("relicdrop", 0, 1, false);
-				if (trQuestVarGet("relicdrop") < 0.02) {
+				if (trQuestVarGet("relicdrop") < 0.03) {
 					trQuestVarSetFromRand("randrelic", 1, 30);
 				} else {
 					trQuestVarSet("randrelic", 0);
@@ -631,10 +580,15 @@ highFrequency
 		lookAt(xsVectorGetX(pos),xsVectorGetZ(pos));
 		trackAddWaypoint();
 		trackPlay(1000, -1);
-		
+
+		if (iModulo(3, 1*trQuestVarGet("symphonyRound")) == 2) {
+			trMessageSetText("Round end. Choose a Symphony.", -1);
+		} else {
+			trMessageSetText("Round end. Level up!", -1);
+			symphonyLevelUp(1);
+		}
 
 		trSoundPlayFN("fanfare.wav");
-		trOverlayText("Round Over!", 3.0);
 		xsEnableRule("symphony_round_end_rewards");
 		
 		xsDisableSelf();
@@ -652,12 +606,40 @@ highFrequency
 		int relic = 0;
 		int next = 0;
 		int room = trQuestVarGet("newestRoom");
+		trQuestVarSet("cinStep", 0);
 		switch(1*trQuestVarGet("newestRoomType"))
 		{
+			case ROOM_SYMPHONY_UPGRADE:
+			{
+				trSoundPlayFN("sentinelbirth.wav");
+				trQuestVarSet("symphonyUpgradeNumber", 1 + trQuestVarGet("symphonyUpgradeNumber"));
+				trQuestVarSet("symphonyUpgradeStart", 3 + trQuestVarGet("symphonyUpgradeStart"));
+				xsEnableRule("symphony_upgrade");
+				// TODO: symphony upgrade time
+				notVoted = true;
+				int p = 0;
+				for(p=1; < ENEMY_PLAYER) {
+					trTechGodPower(p, "vision", 1);
+				}
+
+				p = trCurrentPlayer();
+
+				trShowChoiceDialog("Choose a Symphony", symphonyName(zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1 * trQuestVarGet("symphonyUpgradeStart"))), EVENT_SYMPHONY_CHOOSE,
+					symphonyName(zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1 + trQuestVarGet("symphonyUpgradeStart"))), EVENT_SYMPHONY_NEXT);
+
+				trQuestVarSet("voteCount", ENEMY_PLAYER - 1);
+				trQuestVarSet("votingUnitTracker", trGetNextUnitScenarioNameNumber());
+				trQuestVarSet("votingCountdown", 0);
+
+				trCounterAddTime("symphonyCountdown", 60, 1, "Next round begins", -1);
+				trQuestVarSet("cinTime", trTime() + 60);
+			}
 			case ROOM_CHEST:
 			{
 				xDatabaseNext(dChests);
 				xSetInt(dChests, xChestState, CHEST_STATE_UNLOCKED);
+				trQuestVarSet("cinTime", trTime() + 30);
+				trCounterAddTime("symphonyCountdown", 30, 1, "Next round begins", -1);
 			}
 			case ROOM_LEVELUP:
 			{
@@ -739,39 +721,100 @@ highFrequency
 				}
 			}
 		}
-		xsEnableRule("symphony_start_voting");
 		xsDisableSelf();
+		xsEnableRule("symphony_stride_round_done");
 	}
 }
 
-rule symphony_start_voting
+rule symphony_upgrade
 inactive
 highFrequency
 {
-	if (trTime() > cActivationTime + 2) {
-		if (trQuestVarGet("symphonyRound") == 1) {
-			xsEnableRule("symphony_stride_cin_vote");
-			trQuestVarSet("cinStep",0);
-			trQuestVarSet("cinTime", trTime() + 1);
-			trLetterBox(true);
-		} else {
-			trMessageSetText("You may vote for your next destination now.", -1);
-			reselectMyself(true);
-		}
-
-		trUnitSelectClear();
-		trUnitSelect(""+zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
-		trUnitChangeProtoUnit("Cinematic Block");
-		
-		notVoted = true;
-		for(p=1; < ENEMY_PLAYER) {
-			trTechGodPower(p, "vision", 1);
-		}
-		trQuestVarSet("voteCount", ENEMY_PLAYER - 1);
-		trQuestVarSet("votingUnitTracker", trGetNextUnitScenarioNameNumber());
-		trQuestVarSet("votingCountdown", 0);
-		xsEnableRule("symphony_stride_voting");
+	if (trQuestVarGet("voteCount") == 0) {
 		xsDisableSelf();
+	} else {
+		int id = 0;
+		int p = 0;
+		vector pos = vector(0,0,0);
+		for(n=trQuestVarGet("votingUnitTracker"); < trGetNextUnitScenarioNameNumber()) {
+			id = kbGetBlockID(""+n, true);
+			if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Vision Revealer")) {
+				p = kbUnitGetOwner(id);
+				trQuestVarSet("voteCount", trQuestVarGet("voteCount") - 1);
+
+				if (xsVectorGetX(kbGetBlockPosition(""+n, true)) < 70) {
+					trQuestVarSet("p"+p+"upgrade"+1*trQuestVarGet("symphonyUpgradeNumber"), zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1 * trQuestVarGet("symphonyUpgradeStart")));
+				} else {
+					trQuestVarSet("p"+p+"upgrade"+1*trQuestVarGet("symphonyUpgradeNumber"), zGetInt(1*trQuestVarGet("p"+p+"upgradeOptions"), 1 + trQuestVarGet("symphonyUpgradeStart")));
+				}
+
+				trQuestVarSetFromRand("rand", 1, 5, true);
+				trSoundPlayFN("ui\thunder"+1*trQuestVarGet("rand")+".wav");
+
+				if (trCurrentPlayer() == p) {
+					if (cameraWasLocked) {
+						cameraLockOnSelf = true;
+					}
+					reselectMyself(true);
+					trMessageSetText("Chosen: " + symphonyName(1*trQuestVarGet("p"+p+"upgrade"+1*trQuestVarGet("symphonyUpgradeNumber"))), -1);
+				}
+
+				switch(1*trQuestVarGet("p"+p+"upgrade"+1*trQuestVarGet("symphonyUpgradeNumber")))
+				{
+					case SYMPHONY_LASER_ATTACKS:
+					{
+						trQuestVarSet("p"+p+"laserAttacks", 100);
+					}
+					case SYMPHONY_MORE_PHYSICAL:
+					{
+						xSetPointer(dPlayerData, p);
+						xSetFloat(dPlayerData, xPlayerBaseAttackTrue, xGetFloat(dPlayerData, xPlayerBaseAttackTrue) * 1.2);
+						xSetFloat(dPlayerData, xPlayerHealth, xGetFloat(dPlayerData, xPlayerHealth) * 1.2);
+						relicEffect(RELIC_ARMOR, p, true);
+					}
+					case SYMPHONY_MORE_MAGICAL:
+					{
+						xSetPointer(dPlayerData, p);
+						xSetFloat(dPlayerData, xPlayerSpellDamage, xGetFloat(dPlayerData, xPlayerSpellDamage) * 1.2);
+						xSetFloat(dPlayerData, xPlayerSpellRange, xGetFloat(dPlayerData, xPlayerSpellRange) * 1.2);
+						xSetFloat(dPlayerData, xPlayerSpellDuration, xGetFloat(dPlayerData, xPlayerSpellDuration) * 1.2);
+						relicEffect(RELIC_SPELL_POWER, p, true);
+						relicEffect(RELIC_SPELL_POWER, p, false);
+					}
+					case SYMPHONY_REGENERATE_FAVOR:
+					{
+						xSetPointer(dPlayerData, p);
+						xSetFloat(dPlayerData, xPlayerFavorRegen, 1.0 + xGetFloat(dPlayerData, xPlayerFavorRegen));
+					}
+					case SYMPHONY_GAIN_LEVELS:
+					{
+						symphonyLevelUpIndividual(3, p);
+					}
+					case SYMPHONY_GAIN_ATTACK:
+					{
+						xSetPointer(dPlayerData, p);
+						xSetFloat(dPlayerData, xPlayerBaseAttackTrue, xGetFloat(dPlayerData, xPlayerBaseAttackTrue) + 5);
+						relicEffect(RELIC_ATTACK_DAMAGE, p, true);
+						relicEffect(RELIC_ATTACK_DAMAGE, p, true);
+						relicEffect(RELIC_ATTACK_DAMAGE, p, true);
+					}
+					case SYMPHONY_GAIN_POWER:
+					{
+						xSetPointer(dPlayerData, p);
+						xSetFloat(dPlayerData, xPlayerSpellDamage, xGetFloat(dPlayerData, xPlayerSpellDamage) + 0.1);
+						relicEffect(RELIC_SPELL_POWER, p, true);
+						relicEffect(RELIC_SPELL_POWER, p, true);
+						relicEffect(RELIC_SPELL_POWER, p, true);
+					}
+				}
+
+				if (trQuestVarGet("voteCount") == 0) {
+					trQuestVarSet("cinTime", trTime() + 20);
+					trCounterAbort("symphonyCountdown");
+					trCounterAddTime("symphonyCountdown", 20, 1, "Next round begins", -1);
+				}
+			}
+		}
 	}
 }
 
@@ -779,24 +822,22 @@ rule symphony_stride_always
 inactive
 highFrequency
 {
-	xDatabaseNext(dFrontier);
-	xUnitSelect(dFrontier, xUnitName);
-	if (trUnitIsSelected()) {
-		reselectMyself();
-		string description = symphonyRoomDescription(xGetInt(dFrontier, xFrontierType));
-		if (notVoted) {
-			trVectorQuestVarSet("lookingAt", gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest))));
-			trShowChoiceDialog(description, "Vote for this room", EVENT_SYMPHONY_VOTE, "Cancel", -1);
-		} else {
-			uiMessageBox(description);
-		}
-	}
 
 	trUnitSelectClear();
 	trUnitSelect(""+zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
 	if (trUnitIsSelected()) {
 		reselectMyself();
-		uiMessageBox("This reward is unlocked at the end of this round.");
+		switch(1*trQuestVarGet("newestRoomType"))
+		{
+		case ROOM_CHEST:
+			{
+				uiMessageBox("This chest is unlocked at the end of this round.");
+			}
+		case ROOM_SYMPHONY_UPGRADE:
+			{
+				uiMessageBox("Choose a Symphony at the end of this round.");
+			}
+		}
 	}
 
 	if (xGetDatabaseCount(dNottudShop) > 0) {
@@ -811,91 +852,7 @@ highFrequency
 	}
 }
 
-rule symphony_stride_voting
-inactive
-highFrequency
-{
-	int id = 0;
-	int p = 0;
-	int next = 0;
-	int closest = 0;
-	int destUnit = 0;
-	float closestDistance = 0;
-	float currentDistance = 0;
-	vector center = vector(0,0,0);
-	vector pos = vector(0,0,0);
-	for(n = trQuestVarGet("votingUnitTracker"); < trGetNextUnitScenarioNameNumber()) {
-		id = kbGetBlockID(""+n, true);
-		if (kbGetUnitBaseTypeID(id) == kbGetProtoUnitID("Vision Revealer")) {
-			center = kbGetBlockPosition(""+n, true);
-			p = kbUnitGetOwner(id);
-			trUnitSelectClear();
-			trUnitSelect("" + n, true);
-			//trUnitChangeProtoUnit("Folstag Flag Bearer"); //TODO: make it deploy there instead
-			trChatSend(0, "<color={Playercolor("+p+")}>{Playername("+p+")}</color> has voted!");
-			trQuestVarSet("voteCount", trQuestVarGet("voteCount") - 1);
-
-			closestDistance = 100000;
-			for(i=xGetDatabaseCount(dFrontier); >0) {
-				xDatabaseNext(dFrontier);
-				pos = gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest)));
-				currentDistance = distanceBetweenVectors(pos, center);
-				if (currentDistance < closestDistance) {
-					closest = xGetPointer(dFrontier);
-					closestDistance = currentDistance;
-				}
-			}
-
-			xSetPointer(dFrontier, closest);
-			pos = gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest)));
-			xSetInt(dFrontier, xFrontierVotes, 1 + xGetInt(dFrontier, xFrontierVotes));
-
-			destUnit = zGetInt(frontierUnitsArray, xGetInt(dFrontier, xFrontierDest));
-			trUnitSelectClear();
-			trUnitSelect(""+destUnit);
-			trUnitChangeProtoUnit("Transport Ship Greek");
-
-			trQuestVarSet("p"+p+"senator", trGetNextUnitScenarioNameNumber());
-			trArmyDispatch("0,0","Folstag Flag Bearer", 1, 1, 0, 1, 0, true);
-			trArmySelect("0,0");
-			trImmediateUnitGarrison("" + destUnit);
-
-			trUnitSelectClear();
-			trUnitSelect(""+destUnit);
-			trUnitChangeProtoUnit(symphonyRoomProtoUnit(xGetInt(dFrontier, xFrontierType)));
-
-			trUnitSelectClear();
-			trUnitSelectByQV("p"+p+"senator");
-			trUnitConvert(p);
-
-			trMinimapFlare(p, 10.0, pos, true);
-
-			if ((xGetInt(dFrontier, xFrontierVotes) >= (ENEMY_PLAYER / 2)) || (trQuestVarGet("voteCount") == 0)) {
-				xsEnableRule("symphony_stride_voting_done");
-				trQuestVarSet("cinStep", 0);
-				trQuestVarSet("cinTime", trTime() + 1);
-				trCounterAbort("votingCounter");
-				xsDisableSelf();
-				break;
-			} else if (trQuestVarGet("votingCountdown") == 0) {
-				trQuestVarSet("votingCountdown", 1);
-				trQuestVarSet("votingTimeout", trTime() + 60);
-				trCounterAddTime("votingCounter", 60, 0, "Voting Ends", -1);
-			}
-		}
-	}
-
-	if ((trQuestVarGet("votingCountdown") == 1) && (trTime() > trQuestVarGet("votingTimeout"))) {
-		xsEnableRule("symphony_stride_voting_done");
-		trQuestVarSet("cinStep", 0);
-		trQuestVarSet("cinTime", trTime() + 1);
-		xsDisableSelf();
-	}
-
-	trQuestVarSet("votingUnitTracker", trGetNextUnitScenarioNameNumber());
-}
-
-rule symphony_stride_voting_done
+rule symphony_stride_round_done
 inactive
 highFrequency
 {
@@ -905,44 +862,36 @@ highFrequency
 		{
 			case 1:
 			{
-				trLetterBox(true);
-				//trMusicPlay("xpack\xcinematics\10_a\music.mp3", "1", 0);
-				trSoundPlayFN("default","1",-1,"The votes have been decided.");
-				trQuestVarSet("cinTime", trTime() + 3);
+				trCounterAbort("symphonyCountdown");
+				xsDisableRule("symphony_upgrade");
+				trMessageSetText("A new room has opened!", -1);
+				trQuestVarSet("cinTime", trTime() + 1);
+				trQuestVarSetFromRand("rand",0,xGetDatabaseCount(dFrontier), true);
+				for(i=trQuestVarGet("rand"); >0) {
+					xDatabaseNext(dFrontier);
+				}
 				trQuestVarSet("newRoom", xGetPointer(dFrontier));
-				for(i=xGetDatabaseCount(dFrontier); >0) {
-					xDatabaseNext(dFrontier);
-					if (xGetInt(dFrontier, xFrontierVotes) > xGetInt(dFrontier, xFrontierVotes, 1*trQuestVarGet("newRoom"))) {
-						trQuestVarSet("newRoom", xGetPointer(dFrontier));
-					}
+
+				if (iModulo(3, 1*trQuestVarGet("symphonyRound")) == 1) {
+					xSetInt(dFrontier, xFrontierType, ROOM_SYMPHONY_UPGRADE);
 				}
 
-				xSetPointer(dFrontier, 1*trQuestVarGet("newRoom"));
 				vector pos = gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest)));
+				trackInsert();
+				trackAddWaypoint();
 				lookAt(xsVectorGetX(pos),xsVectorGetZ(pos));
-
-				trUIFadeToColor(0,0,0,1000,1900,true);
-
-				for(i=xGetDatabaseCount(dFrontier); >0) {
-					xDatabaseNext(dFrontier);
-					xSetInt(dFrontier, xFrontierVotes, 0);
-				}
+				trackAddWaypoint();
+				trackPlay(1000, -1);
 			}
 			case 2:
 			{
-				for(p=1; < ENEMY_PLAYER) {
-					trUnitSelectClear();
-					trUnitSelectByQV("p"+p+"senator");
-					trUnitDestroy();
-				}
 				trSoundPlayFN("wall.wav");
 
-				if (trQuestVarGet("newestRoomType") < ROOM_HEALING) {
-					xAddDatabaseBlock(dSpawnerRooms, true);
-					xSetInt(dSpawnerRooms, xUnitName, zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
-					xSetVector(dSpawnerRooms, xSpawnerRoomPos, gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom"))));
-				}
-
+				// add the old room to the enemy spawners
+				xAddDatabaseBlock(dSpawnerRooms, true);
+				xSetInt(dSpawnerRooms, xUnitName, zGetInt(frontierUnitsArray, 1*trQuestVarGet("newestRoom")));
+				xSetVector(dSpawnerRooms, xSpawnerRoomPos, gridToVector(symphonyRoomToVector(1*trQuestVarGet("newestRoom"))));
+				
 				xSetPointer(dFrontier, 1*trQuestVarGet("newRoom"));
 
 				trQuestVarSet("newestRoom", xGetInt(dFrontier, xFrontierDest));
@@ -950,9 +899,7 @@ highFrequency
 
 				symphonyUnlockRoom();
 
-
-
-				trUIFadeToColor(0,0,0,1000,100,false);
+				trUIFadeToColor(200,200,200,1000,1,false);
 				trQuestVarSet("cinTime", trTime() + 1);
 			}
 			case 3:
@@ -962,54 +909,6 @@ highFrequency
 				reselectMyself(true);
 
 				xsEnableRule("symphony_stride_new_round");
-			}
-		}
-	}
-}
-
-
-rule symphony_stride_cin_vote
-inactive
-highFrequency
-{
-	vector pos = vector(0,0,0);
-	if (trTime() > trQuestVarGet("cinTime")) {
-		trQuestVarSet("cinStep", 1 + trQuestVarGet("cinStep"));
-		switch(1*trQuestVarGet("cinStep"))
-		{
-			case 1:
-			{
-				trMusicPlay("xpack\xcinematics\10_a\music.mp3", "1", 0);
-				trSoundPlayFN("default","1",-1,"Zenophobia:Round end! Now it's time to rest and vote on your next destination!","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 5);
-			}
-			case 2:
-			{
-				xDatabaseNext(dFrontier);
-				xUnitSelect(dFrontier, xUnitName);
-				trUnitHighlight(5.0, true);
-				pos = gridToVector(symphonyRoomToVector(xGetInt(dFrontier, xFrontierDest)));
-				trackInsert();
-				trackAddWaypoint();
-				lookAt(xsVectorGetX(pos),xsVectorGetZ(pos));
-				trackAddWaypoint();
-				trackPlay(1000,-1);
-				trSoundPlayFN("default","1",-1,"Zenophobia:You may have noticed these blue squares earlier. Select one to see what it is.","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 5);
-			}
-			case 3:
-			{
-				trSoundPlayFN("default","1",-1,"Zenophobia:If you want to unlock this room next, you can vote for it.","icons\infantry g hoplite icon 64");
-				trQuestVarSet("cinTime", trTime() + 4);
-			}
-			case 4:
-			{
-				xsDisableSelf();
-				trLetterBox(false);
-				trMessageSetText("You may vote for your next destination now.", -1);
-
-				trMusicPlayCurrent();
-				trPlayNextMusicTrack();
 			}
 		}
 	}

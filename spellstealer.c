@@ -38,6 +38,7 @@ void spellstealerAlways(int eventID = -1) {
 	int stunned = 0;
 	int poisoned = 0;
 	int silenced = 0;
+	int count = 0;
 	float amt = 0;
 	float dist = 0;
 	float current = 0;
@@ -62,6 +63,10 @@ void spellstealerAlways(int eventID = -1) {
 					damageEnemy(p, amt * xGetFloat(dPlayerData, xPlayerAttack), false);
 					xSetInt(dPlayerData, xPlayerClass, SPELLSTEALER);
 					if (hit == ON_HIT_SPECIAL) {
+						count = 1;
+						if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+							count = 2;
+						}
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 						dist = xsPow(spellstealerPassiveRadius * xGetFloat(dPlayerData, xPlayerSpellRange), 2);
 						trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
@@ -73,7 +78,9 @@ void spellstealerAlways(int eventID = -1) {
 							if (trUnitAlive() == false) {
 								removeEnemy();
 							} else if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < dist) {
-								poisonUnit(dEnemies, 12.0, 12.0, p);
+								for(i=count; >0) {
+									poisonUnit(dEnemies, 12.0, 12.0, p);
+								}
 							}
 						}
 					}

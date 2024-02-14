@@ -43,6 +43,7 @@ void moonbladeAlways(int eventID = -1) {
 	xSetPointer(dPlayerData, p);
 	int id = 0;
 	int hit = 0;
+	int count = 0;
 	int target = 0;
 	int index = xGetPointer(dEnemies);
 	float dist = 0;
@@ -86,10 +87,16 @@ void moonbladeAlways(int eventID = -1) {
 					if (trCurrentPlayer() == p) {
 						trSoundPlayFN("mythcreate.wav","1",-1,"","");
 					}
+					count = 1;
+					if (playerHasSymphony(SYMPHONY_DOUBLE_SPECIAL)) {
+						count = 2;
+					}
 					pos = kbGetBlockPosition(""+xGetInt(db, xUnitName));
-					xAddDatabaseBlock(dPlayerWolves, true);
-					xSetInt(dPlayerWolves, xUnitName, trGetNextUnitScenarioNameNumber());
-					spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), pos, calculateDecay(p, 5.0));
+					for(i=count; >0) {
+						xAddDatabaseBlock(dPlayerWolves, true);
+						xSetInt(dPlayerWolves, xUnitName, trGetNextUnitScenarioNameNumber());
+						spawnPlayerUnit(p, kbGetProtoUnitID("Wolf"), pos, calculateDecay(p, 5.0));
+					}
 				}
 			}
 			if ((xGetInt(db, xCrescentCount) > 0) &&

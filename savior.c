@@ -25,6 +25,7 @@ void saviorAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int count = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
 	float amt = 0;
@@ -256,6 +257,10 @@ void saviorAlways(int eventID = -1) {
 				target = 1;
 				if (hit == ON_HIT_SPECIAL) {
 					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
+						count = 1;
+						if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+							count = 2;
+						}
 						start = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 						pos = kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName), true);
 						dir = getUnitVector(start, pos);
@@ -271,7 +276,7 @@ void saviorAlways(int eventID = -1) {
 						xSetInt(dPlayerLasers, xUnitName, 1*trQuestVarGet("next"));
 						xSetInt(dPlayerLasers, xPlayerLaserTimeout, trTimeMS() + 500);
 						xSetFloat(dPlayerLasers, xPlayerLaserRange, dist * 1.3);
-						amt = xGetFloat(dPlayerData, xPlayerAttack);
+						amt = xGetFloat(dPlayerData, xPlayerAttack) * count;
 						for(x=xGetDatabaseCount(dEnemies); >1) {
 							xDatabaseNext(dEnemies);
 							xUnitSelectByID(dEnemies, xUnitID);

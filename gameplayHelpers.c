@@ -59,6 +59,110 @@ vector bossPrev = vector(0,0,0);
 int nextproj = 0;
 bool pvpDetached = false;
 
+
+int dSphinxes = 0;
+int dDryads = 0;
+int dMedusas = 0;
+int dMountainGiants = 0;
+int dFrostGiants = 0;
+int dValkyries = 0;
+int dBallistas = 0;
+int dFireSiphons = 0;
+int dBattleBoars = 0;
+int dAutomatons = 0;
+int dScarabs = 0;
+int dSatyrs = 0;
+int dAvengers = 0;
+int dScorpionMen = 0;
+int dMummies = 0;
+int dNereids = 0;
+int dHydras = 0;
+int dKrakens = 0;
+int dLampades = 0;
+int dEinherjars = 0;
+int dLightningStatues = 0;
+int dManticores = 0;
+int dFireGiants = 0;
+int dArgus = 0;
+int dFireLance = 0;
+
+int dFireLancePellets = 0;
+int xFireLancePelletPrev = 0;
+int xFireLancePelletDir = 0;
+int xFireLancePelletLast = 0;
+int xFireLancePelletTimeout = 0;
+
+int dAutomatonBombs = 0;
+
+int xSpecialIndex = 0;
+int xSpecialStep = 0;
+int xSpecialNext = 0;
+int xSpecialTarget = 0;
+
+int dDelayLasers = 0;
+int xLaserDir = 0;
+int xLaserPhase = 0;
+int xLaserNext = 0;
+int xLaserDist = 0;
+
+int dBallistaShots = 0;
+int xBallistaShot1 = 0;
+int xBallistaShot2 = 0;
+
+int dYeebLightning = 0;
+int xTimeout = 0;
+
+int dYeebLightningEnd = 0;
+
+int dBarrages = 0;
+int xBarragePos = 0;
+int xBarrageDir = 0;
+int xBarrageCount = 0;
+
+int dMedusaBalls = 0;
+int xMedusaBallTarget = 0;
+int xMedusaBallBounces = 0;
+
+int dMummyBalls = 0;
+int xProjType = 0;
+
+int dAvengerProj = 0;
+int xAvengerProjDist = 0;
+int xAvengerProjUnit = 0;
+int xAvengerProjIndex = 0;
+
+int xMummyStart = 0;
+int xMummyDir = 0;
+
+int dFireGiantProj = 0;
+int xFireGiantProjOwner = 0;
+int dFireGiantBalls = 0;
+
+int dTrolls = 0;
+
+int dTrollHarpoons = 0;
+int xTrollHarpoonLast = 0;
+int xTrollHarpoonLine = 0;
+int xTrollHarpoonStart = 0;
+
+int dTrollLines = 0;
+int xTrollLineTarget = 0;
+int xTrollLineTargetDB = 0;
+int xTrollLineTargetIndex = 0;
+int xTrollLineStart = 0;
+
+int dYeebLightningBalls = 0;
+
+int dTartarianSpawns = 0;
+
+int dTartarianEggs = 0;
+int xTartarianEggTimeout = 0;
+
+int dAmbushRooms = 0;
+int xAmbushRoomType = 0;
+int xAmbushRoomPos = 0;
+
+
 rule initialize_spy_database
 active
 highFrequency
@@ -72,6 +176,24 @@ highFrequency
 	spyDest = zNewArray(mVector,64,"spyDest");
 	spyScale = zNewArray(mVector,64,"spyScale");
 	spyActive = zNewArray(mBool,64,"spyActive");
+}
+
+void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0), vector scale = vector(1,1,1)) {
+	if (peekModularCounterNext("spyFind") != trQuestVarGet("spyFound")) {
+		trUnitSelectClear();
+		trUnitSelect(""+unit, true);
+		if (trUnitAlive()) {
+			int x = modularCounterNext("spyFind");
+			aiPlanSetUserVariableInt(ARRAYS,spyProto,x,proto);
+			aiPlanSetUserVariableInt(ARRAYS,spyUnit,x,unit);
+			aiPlanSetUserVariableBool(ARRAYS,spyActive,x,true);
+			aiPlanSetUserVariableVector(ARRAYS,spyDest,x,dest);
+			aiPlanSetUserVariableVector(ARRAYS,spyScale,x,scale);
+			trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
+		}
+	} else {
+		debugLog("Spy buffer overflow");
+	}
 }
 
 void advanceCooldowns(int p = 0, float seconds = 0) {
@@ -105,6 +227,218 @@ void advanceCooldowns(int p = 0, float seconds = 0) {
 	xSetPointer(dPlayerData, prev);
 }
 
+void addSpecialToDatabase(int db = 0,int name = 0, int from = 0, int p = 0) {
+	xSetPointer(db, xAddDatabaseBlock(db));
+	xSetInt(db, xUnitName,name);
+	xSetInt(db, xPlayerOwner,p);
+	xSetInt(db, xUnitID, xGetInt(from,xUnitID));
+	xSetInt(db, xSpecialIndex, xGetNewestPointer(from));
+}
+
+void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
+	int index = 0;
+	switch(proto)
+	{
+		case kbGetProtoUnitID("Sphinx"):
+		{
+			addSpecialToDatabase(dSphinxes,name,db,p);
+		}
+		case kbGetProtoUnitID("Dryad"):
+		{
+			addSpecialToDatabase(dDryads,name,db,p);
+		}
+		case kbGetProtoUnitID("Wadjet"):
+		{
+			addSpecialToDatabase(dDryads,name,db,p);
+		}
+		case kbGetProtoUnitID("Medusa"):
+		{
+			addSpecialToDatabase(dMedusas,name,db,p);
+		}
+		case kbGetProtoUnitID("Mountain Giant"):
+		{
+			addSpecialToDatabase(dMountainGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Frost Giant"):
+		{
+			addSpecialToDatabase(dFrostGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Troll"):
+		{
+			addSpecialToDatabase(dTrolls,name,db,p);
+		}
+		case kbGetProtoUnitID("Argus"):
+		{
+			addSpecialToDatabase(dArgus,name,db,p);
+		}
+		case kbGetProtoUnitID("Valkyrie"):
+		{
+			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+			addSpecialToDatabase(dValkyries,name,db,p);
+			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
+				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
+		}
+		case kbGetProtoUnitID("Ballista"):
+		{
+			addSpecialToDatabase(dBallistas,name,db,p);
+		}
+		case kbGetProtoUnitID("Colossus"):
+		{
+			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+			addSpecialToDatabase(dValkyries,name,db,p);
+			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
+				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
+		}
+		case kbGetProtoUnitID("Fire Siphon"):
+		{
+			addSpecialToDatabase(dFireSiphons,name,db,p);
+		}
+		case kbGetProtoUnitID("Battle Boar"):
+		{
+			addSpecialToDatabase(dBattleBoars,name,db,p);
+		}
+		case kbGetProtoUnitID("Automaton SPC"):
+		{
+			addSpecialToDatabase(dAutomatons,name,db,p);
+		}
+		case kbGetProtoUnitID("Behemoth"):
+		{
+			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
+		}
+		case kbGetProtoUnitID("Scarab"):
+		{
+			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
+			addSpecialToDatabase(dScarabs,name,db,p);
+		}
+		case kbGetProtoUnitID("Satyr"):
+		{
+			addSpecialToDatabase(dSatyrs,name,db,p);
+		}
+		case kbGetProtoUnitID("Avenger"):
+		{
+			addSpecialToDatabase(dAvengers,name,db,p);
+		}
+		case kbGetProtoUnitID("Scorpion Man"):
+		{
+			addSpecialToDatabase(dScorpionMen,name,db,p);
+		}
+		case kbGetProtoUnitID("Mummy"):
+		{
+			addSpecialToDatabase(dMummies,name,db,p);
+		}
+		case kbGetProtoUnitID("Nereid"):
+		{
+			addSpecialToDatabase(dNereids,name,db,p);
+		}
+		case kbGetProtoUnitID("Hydra"):
+		{
+			addSpecialToDatabase(dHydras,name,db,p);
+			xSetInt(dHydras,xSpecialStep,trTime());
+		}
+		case kbGetProtoUnitID("Kraken"):
+		{
+			addSpecialToDatabase(dKrakens,name,db,p);
+		}
+		case kbGetProtoUnitID("Lampades"):
+		{
+			addSpecialToDatabase(dLampades,name,db,p);
+		}
+		case kbGetProtoUnitID("Einheriar"):
+		{
+			addSpecialToDatabase(dEinherjars,name,db,p);
+		}
+		case kbGetProtoUnitID("Statue of Lightning"):
+		{
+			addSpecialToDatabase(dLightningStatues,name,db,p);
+		}
+		case kbGetProtoUnitID("Fire Giant"):
+		{
+			addSpecialToDatabase(dFireGiants,name,db,p);
+		}
+		case kbGetProtoUnitID("Manticore"):
+		{
+			addSpecialToDatabase(dManticores,name,db,p);
+		}
+		case kbGetProtoUnitID("Tartarian Gate Spawn"):
+		{
+			addSpecialToDatabase(dTartarianSpawns,name,db,p);
+		}
+		case kbGetProtoUnitID("Hippocampus"):
+		{
+			if (p == ENEMY_PLAYER) {
+				xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
+				xSetFloat(db,xPhysicalResist,1,xGetNewestPointer(db));
+			}
+		}
+		case kbGetProtoUnitID("Fire Lance"):
+		{
+			addSpecialToDatabase(dFireLance,name,db,p);
+		}
+	}
+}
+
+int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) {
+	int id = kbGetBlockID(""+name,true);
+	int index = xAddDatabaseBlock(dPlayerUnits);
+	xSetPointer(dPlayerUnits,index);
+	xSetInt(dPlayerUnits,xUnitName,name);
+	xSetInt(dPlayerUnits,xPlayerOwner,p);
+	xSetInt(dPlayerUnits,xUnitID,id);
+	xSetFloat(dPlayerUnits,xDecay,decay);
+	xSetInt(dPlayerUnits,xDecayNext,trTimeMS()+1000);
+	xSetInt(dPlayerUnits, xUnitProto, proto);
+	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
+	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
+	if (PvP) {
+		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies, true));
+		xSetInt(dEnemies,xDoppelganger,index);
+		xSetInt(dEnemies,xPlayerOwner,p);
+		xSetInt(dEnemies,xUnitName,name);
+		xSetInt(dEnemies,xUnitID,id);
+		xSetInt(dEnemies, xUnitProto, proto);
+		xSetFloat(dEnemies,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
+		xSetFloat(dEnemies,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
+		if (pvpDetached) {
+			xDetachDatabaseBlock(dEnemies);
+		}
+	}
+	activateSpecialUnit(name, dPlayerUnits, proto, p);
+	return(index);
+}
+
+int spawnPlayerUnit(int p = 0, int proto = 0, vector vdb = vector(0,0,0), float decay = 0) {
+	int next = trGetNextUnitScenarioNameNumber();
+	string pName = kbGetProtoUnitName(proto);
+	trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(vdb),0,xsVectorGetZ(vdb),0,true);
+	trArmySelect(""+p+",0");
+	trUnitChangeProtoUnit(pName);
+	return(activatePlayerUnit(next, p, proto, decay));
+}
+
+int spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0), float decay = 0.0) {
+	int prev = xGetPointer(dPlayerData);
+	xSetPointer(dPlayerData,p);
+	int class = xGetInt(dPlayerData,xPlayerClass);
+	int next = trGetNextUnitScenarioNameNumber();
+	int db = getCharactersDB(p);
+	int index = spawnPlayerUnit(p, xGetInt(dClass,xClassProto,class), vdb, decay);
+	int id = kbGetBlockID(""+next,true);
+	xSetPointer(db, xAddDatabaseBlock(db));
+	xSetInt(db, xUnitName, next);
+	xSetInt(db,xUnitID,id);
+	xSetInt(db, xCharIndex, index);
+	xSetBool(dPlayerUnits,xIsHero,true);
+	xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
+	xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
+	xSetPointer(dPlayerCharacters, xAddDatabaseBlock(dPlayerCharacters));
+	xSetInt(dPlayerCharacters,xUnitName,next);
+	xSetInt(dPlayerCharacters,xPlayerOwner,p);
+	xSetInt(dPlayerCharacters,xUnitID,id);
+	xSetInt(dPlayerCharacters, xCharIndex, index);
+	xSetPointer(dPlayerData, prev);
+	return(index);
+}
+
 void gainFavor(int p = 0, float amt = 0) {
 	if ((trQuestVarGet("p"+p+"bulletStormActive") == 0) || amt < 0.0) { // this is so sloppy lol
 		xSetFloat(dPlayerData,xPlayerFavor,xsMax(0, xGetFloat(dPlayerData,xPlayerFavor,p) + amt),p);
@@ -114,26 +448,17 @@ void gainFavor(int p = 0, float amt = 0) {
 			xSetFloat(dPlayerData,xPlayerFavor,xsMin(100, xGetFloat(dPlayerData,xPlayerFavor,p)),p);
 		}
 		trPlayerGrantResources(p,"favor", xGetFloat(dPlayerData,xPlayerFavor,p) - trPlayerResourceCount(p, "favor"));
+		if (amt < 0.0 && playerHasSymphony(p, SYMPHONY_FAVOR_CLONE)) {
+			trQuestVarSet("p"+p+"favorCloneCharge", trQuestVarGet("p"+p+"favorCloneCharge") - amt);
+			if (trQuestVarGet("p"+p+"favorCloneCharge") > 50.0) {
+				trQuestVarSet("p"+p+"favorCloneCharge", trQuestVarGet("p"+p+"favorCloneCharge") - 50.0);
+				spawnPlayerClone(p, kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true), 5);
+			}
+		}
 	}
 }
 
-void spyEffect(int unit = 0, int proto = 0, vector dest = vector(0,0,0), vector scale = vector(1,1,1)) {
-	if (peekModularCounterNext("spyFind") != trQuestVarGet("spyFound")) {
-		trUnitSelectClear();
-		trUnitSelect(""+unit, true);
-		if (trUnitAlive()) {
-			int x = modularCounterNext("spyFind");
-			aiPlanSetUserVariableInt(ARRAYS,spyProto,x,proto);
-			aiPlanSetUserVariableInt(ARRAYS,spyUnit,x,unit);
-			aiPlanSetUserVariableBool(ARRAYS,spyActive,x,true);
-			aiPlanSetUserVariableVector(ARRAYS,spyDest,x,dest);
-			aiPlanSetUserVariableVector(ARRAYS,spyScale,x,scale);
-			trTechInvokeGodPower(0, "spy", vector(0,0,0), vector(0,0,0));
-		}
-	} else {
-		debugLog("Spy buffer overflow");
-	}
-}
+
 
 float distanceTraveled(int last = 0, float speed = 0) {
 	float dist = trTimeMS() - last;
@@ -175,12 +500,86 @@ void silencePlayer(int p = 0) {
 	}
 }
 
+void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
+	bool targetPlayers = (db == dPlayerUnits);
+	if (db == dEnemies) {
+		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
+			advanceCooldowns(p, 1);
+		}
+		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p) * xsPow(0.5, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
+		damage = damage * xGetFloat(dPlayerData,xPlayerSpellDamage,p) * xsPow(2, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
+		if (PvP) {
+			int old = xGetPointer(dPlayerUnits);
+			int index = xGetInt(dEnemies, xDoppelganger);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
+			xSetPointer(dPlayerUnits, index);
+			poisonUnit(dPlayerUnits, duration, damage, 0);
+			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
+			xSetPointer(dPlayerUnits, old);
+			return;
+		}
+	} else {
+		p = xGetInt(db, xPlayerOwner);
+		duration = duration * xGetFloat(dPlayerData,xPlayerPoisonResistance, p);
+	}
+	duration = duration * 1000;
+	if (targetPlayers && xGetBool(db, xIsHero) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
+		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
+			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
+			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
+			gainFavor(p, 5);
+			if (trCurrentPlayer() == p) {
+				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
+			}
+		}
+	} else {
+		if (trTimeMS() + duration > xGetInt(db, xPoisonTimeout)) {
+			if (playerHasSymphony(p, SYMPHONY_STATUS_DAMAGE)) {
+				trDamageUnitPercent(1.0 - xGetFloat(db, xMagicResist));
+			}
+			if (xGetInt(db, xPoisonStatus) == 0) {
+				if (xGetInt(db, xPoisonSFX) == 0) {
+					spyEffect(xGetInt(db, xUnitName), kbGetProtoUnitID("Poison SFX"), xsVectorSet(db,xPoisonSFX,xGetPointer(db)));
+				} else {
+					trUnitSelectClear();
+					trUnitSelect(""+xGetInt(db,xPoisonSFX), true);
+					trMutateSelected(kbGetProtoUnitID("Poison SFX"));
+				}
+				xSetInt(db,xPoisonStatus,1);
+				xSetInt(db,xPoisonLast,trTimeMS());
+				trQuestVarSet("poisonSound", 1);
+			}
+			xSetInt(db, xPoisonTimeout, trTimeMS() + duration);
+		}
+		if (damage > xGetFloat(db, xPoisonDamage)) {
+			xSetFloat(db, xPoisonDamage, xsMin(1000.0, damage));
+		}
+
+		if (targetPlayers && playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS)) {
+			int old = xGetPointer(dEnemies);
+			vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
+			for(i=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+					poisonUnit(dEnemies, duration, damage, p);
+				}
+			}
+			xSetPointer(dEnemies, old);
+		}
+	}
+}
+
 void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p);
-		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
-			if ((xGetInt(dPlayerData,xPlayerClass,p) != MOONBLADE && xGetInt(dPlayerData,xPlayerClass,p) != FROSTHAMMER) || (xGetInt(db, xSilenceStatus) == 0)) {
+		
+		if ((xGetInt(dPlayerData,xPlayerClass,p) != MOONBLADE && xGetInt(dPlayerData,xPlayerClass,p) != FROSTHAMMER) || (xGetInt(db, xSilenceStatus) == 0)) {
+			if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
 				advanceCooldowns(p, 1);
+			}
+			if (playerHasSymphony(p, SYMPHONY_STATUS_DAMAGE)) {
+				trDamageUnitPercent(1.0 - xGetFloat(db, xMagicResist));
 			}
 		}
 		if (PvP) {
@@ -221,6 +620,95 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 			xUnitSelectByID(db,xUnitID);
 		}
 	}
+	if ((db == dPlayerUnits) && (playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS))) {
+		int old = xGetPointer(dEnemies);
+		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+				silenceUnit(dEnemies, duration, p);
+			}
+		}
+		xSetPointer(dEnemies, old);
+	}
+}
+
+
+/*
+protection blocks all damage.
+*/
+void damagePlayerUnit(float dmg = 0, int index = -1) {
+	int old = xGetPointer(dPlayerUnits);
+	if (index < 0) {
+		index = old;
+	}
+	if (xSetPointer(dPlayerUnits, index)) {
+		int p = xGetInt(dPlayerUnits, xPlayerOwner);
+		if (PvP) {
+			trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
+		} else {
+			dmg = dmg - dmg * xGetFloat(dPlayerUnits, xMagicResist);
+		}
+		if (trQuestVarGet("protectionCount") == 0) {
+			if ((trQuestVarGet("p"+p+"negationCloak") == 1) && xGetBool(dPlayerUnits, xIsHero)) {
+				// negation cloak: spell damage heals you instead of damaging you
+				trDamageUnit(0.0 - dmg);
+			} else if ((xGetInt(dPlayerData, xPlayerSimp, p) > 0) && (index == xGetInt(dPlayerData, xPlayerIndex, p))) {
+				// throne shield simping
+				dmg = 0.5 * dmg;
+
+				trDamageUnit(dmg);
+				xSetFloat(dPlayerUnits, xCurrentHealth, xGetFloat(dPlayerUnits, xCurrentHealth, index) - dmg, index);
+				
+				trUnitSelectClear();
+				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(dPlayerData, xPlayerSimp, p)), true);
+				trDamageUnit(dmg);
+				
+				xUnitSelectByID(dPlayerUnits, xUnitID);
+			} else {
+				trDamageUnit(dmg);
+			}
+		}
+		xSetPointer(dPlayerUnits, old);
+	}
+}
+
+/*
+Enemies have elemental resistance and weakness
+*/
+float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
+	if (spell) {
+		dmg = dmg - dmg * (xGetFloat(dEnemies, xMagicResist) * (1.0 - pierce) - xGetFloat(dPlayerData,xPlayerMagicPen,p));
+		if (playerHasSymphony(p, SYMPHONY_MAGIC_SHRED)) {
+			xSetFloat(dEnemies, xMagicResist, xGetFloat(dEnemies, xMagicResist) - 0.01);
+		}
+	} else {
+		dmg = dmg - dmg * xGetFloat(dEnemies, xPhysicalResist) * (1.0 - pierce);
+	}
+	if (xGetInt(dEnemies, xPoisonStatus) == 1) {
+		dmg = dmg * (1.0 + xGetFloat(dPlayerData,xPlayerPoisonKiller,p));
+	}
+	if (xGetInt(dPlayerData, xPlayerClass, p) == SPELLSTEALER) {
+		dmg = dmg * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) + xsMin(1, xGetInt(dEnemies, xStunStatus)));
+	}
+	float lifesteal = xGetFloat(dPlayerData,xPlayerLifesteal,p) * dmg;
+	if (spell) {
+		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_SPELL_POISON) {
+			poisonUnit(dEnemies, 12.0, 12.0, p);
+		}
+		lifesteal = 0.5 * lifesteal;
+	}
+	xSetFloat(dPlayerData,xPlayerLifestealTotal,xGetFloat(dPlayerData,xPlayerLifestealTotal,p) + lifesteal,p);
+	if (PvP) {
+		int index = xGetInt(dEnemies, xDoppelganger);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, true);
+		damagePlayerUnit(dmg, index);
+		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, false);
+	} else {
+		trDamageUnit(dmg);
+	}
+	return(dmg);
 }
 
 void healUnit(int p = 0, float amt = 0, int index = -1) {
@@ -243,6 +731,18 @@ void healUnit(int p = 0, float amt = 0, int index = -1) {
 			xSetInt(dPlayerData, xPlayerHealFavorCharges, xGetInt(dPlayerData, xPlayerHealFavorCharges, p) - 1, p);
 			gainFavor(p, 1.0);
 		}
+	}
+	if(playerHasSymphony(p, SYMPHONY_HEAL_DEAL)) {
+		old = xGetPointer(dEnemies);
+		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, p), true);
+		for(i=xGetDatabaseCount(dEnemies); >0) {
+			xDatabaseNext(dEnemies);
+			xUnitSelectByID(dEnemies, xUnitID);
+			if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+				damageEnemy(p, amt, true);
+			}
+		}
+		xSetPointer(dEnemies, old);
 	}
 }
 
@@ -301,6 +801,21 @@ void removePlayerUnit() {
 			} else {
 				debugLog("Unable to restore doppelganger from playerUnits.");
 			}
+		}
+		if (playerHasSymphony(xGetInt(dPlayerUnits, xPlayerOwner), SYMPHONY_EXPLODING_MINIONS)) {
+			xUnitSelectByID(dPlayerUnits, xUnitID);
+			trUnitChangeProtoUnit("Meteorite");
+			pos = kbGetBlockPosition(""+xGetInt(dPlayerUnits, xUnitName), true);
+			int old = xGetPointer(dEnemies);
+			int p = xGetInt(dPlayerUnits, xPlayerOwner);
+			for(i=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+					damageEnemy(p, 300.0);
+				}
+			}
+			xSetPointer(dEnemies, old);
 		}
 		xFreeDatabaseBlock(dPlayerUnits);
 	}
@@ -498,59 +1013,6 @@ vector vectorSetAsTargetVector(vector from = vector(0,0,0), vector to = vector(0
 	return(target);
 }
 
-void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
-	bool targetPlayers = (db == dPlayerUnits);
-	if (db == dEnemies) {
-		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
-			advanceCooldowns(p, 1);
-		}
-		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p) * xsPow(0.5, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
-		damage = damage * xGetFloat(dPlayerData,xPlayerSpellDamage,p) * xsPow(2, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
-		if (PvP) {
-			int old = xGetPointer(dPlayerUnits);
-			int index = xGetInt(dEnemies, xDoppelganger);
-			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
-			xSetPointer(dPlayerUnits, index);
-			poisonUnit(dPlayerUnits, duration, damage, 0);
-			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,false);
-			xSetPointer(dPlayerUnits, old);
-			return;
-		}
-	} else {
-		p = xGetInt(db, xPlayerOwner);
-		duration = duration * xGetFloat(dPlayerData,xPlayerPoisonResistance, p);
-	}
-	duration = duration * 1000;
-	if (targetPlayers && xGetBool(db, xIsHero) && (trQuestVarGet("p"+p+"negationCloak") == 1)) {
-		if (getBit(STATUS_POISON, 1*trQuestVarGet("p"+p+"spellstealStatus")) == false) {
-			trQuestVarSet("p"+p+"spellstealStatus", trQuestVarGet("p"+p+"spellstealStatus") + xsPow(2, STATUS_POISON));
-			trSoundPlayFN("shadeofhadesgrunt2.wav","1",-1,"","");
-			gainFavor(p, 5);
-			if (trCurrentPlayer() == p) {
-				trChatSend(0, "<color=1,1,1>Poison absorbed! Your next spell will inflict Poison!</color>");
-			}
-		}
-	} else {
-		if (trTimeMS() + duration > xGetInt(db, xPoisonTimeout)) {
-			if (xGetInt(db, xPoisonStatus) == 0) {
-				if (xGetInt(db, xPoisonSFX) == 0) {
-					spyEffect(xGetInt(db, xUnitName), kbGetProtoUnitID("Poison SFX"), xsVectorSet(db,xPoisonSFX,xGetPointer(db)));
-				} else {
-					trUnitSelectClear();
-					trUnitSelect(""+xGetInt(db,xPoisonSFX), true);
-					trMutateSelected(kbGetProtoUnitID("Poison SFX"));
-				}
-				xSetInt(db,xPoisonStatus,1);
-				xSetInt(db,xPoisonLast,trTimeMS());
-				trQuestVarSet("poisonSound", 1);
-			}
-			xSetInt(db, xPoisonTimeout, trTimeMS() + duration);
-		}
-		if (damage > xGetFloat(db, xPoisonDamage)) {
-			xSetFloat(db, xPoisonDamage, xsMin(1000.0, damage));
-		}
-	}
-}
 
 
 void growFrostGiantsIncoming(vector pos = vector(0,0,0)) {
@@ -569,80 +1031,6 @@ void growFrostGiantsIncoming(vector pos = vector(0,0,0)) {
 	}
 }
 
-/*
-protection blocks all damage.
-*/
-void damagePlayerUnit(float dmg = 0, int index = -1) {
-	int old = xGetPointer(dPlayerUnits);
-	if (index < 0) {
-		index = old;
-	}
-	if (xSetPointer(dPlayerUnits, index)) {
-		int p = xGetInt(dPlayerUnits, xPlayerOwner);
-		if (PvP) {
-			trQuestVarSet("protectionCount", trQuestVarGet("p"+p+"protection"));
-		} else {
-			dmg = dmg - dmg * xGetFloat(dPlayerUnits, xMagicResist);
-		}
-		if (trQuestVarGet("protectionCount") == 0) {
-			if ((trQuestVarGet("p"+p+"negationCloak") == 1) && xGetBool(dPlayerUnits, xIsHero)) {
-				// negation cloak: spell damage heals you instead of damaging you
-				healUnit(p, dmg);
-			} else if ((xGetInt(dPlayerData, xPlayerSimp, p) > 0) && (index == xGetInt(dPlayerData, xPlayerIndex, p))) {
-				// throne shield simping
-				dmg = 0.5 * dmg;
-
-				trDamageUnit(dmg);
-				xSetFloat(dPlayerUnits, xCurrentHealth, xGetFloat(dPlayerUnits, xCurrentHealth, index) - dmg, index);
-				
-				trUnitSelectClear();
-				trUnitSelect(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(dPlayerData, xPlayerSimp, p)), true);
-				trDamageUnit(dmg);
-				
-				xUnitSelectByID(dPlayerUnits, xUnitID);
-			} else {
-				trDamageUnit(dmg);
-			}
-		}
-		xSetPointer(dPlayerUnits, old);
-	}
-}
-
-
-/*
-Enemies have elemental resistance and weakness
-*/
-float damageEnemy(int p = 0, float dmg = 0, bool spell = true, float pierce = 0) {
-	if (spell) {
-		dmg = dmg - dmg * (xGetFloat(dEnemies, xMagicResist) * (1.0 - pierce) - xGetFloat(dPlayerData,xPlayerMagicPen,p));
-	} else {
-		dmg = dmg - dmg * xGetFloat(dEnemies, xPhysicalResist) * (1.0 - pierce);
-	}
-	if (xGetInt(dEnemies, xPoisonStatus) == 1) {
-		dmg = dmg * (1.0 + xGetFloat(dPlayerData,xPlayerPoisonKiller,p));
-	}
-	if (xGetInt(dPlayerData, xPlayerClass, p) == SPELLSTEALER) {
-		dmg = dmg * xsPow(2, xGetInt(dEnemies, xPoisonStatus) + xGetInt(dEnemies, xSilenceStatus) + xsMin(1, xGetInt(dEnemies, xStunStatus)));
-	}
-	float lifesteal = xGetFloat(dPlayerData,xPlayerLifesteal,p) * dmg;
-	if (spell) {
-		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_SPELL_POISON) {
-			poisonUnit(dEnemies, 12.0, 12.0, p);
-		}
-		lifesteal = 0.5 * lifesteal;
-	}
-	xSetFloat(dPlayerData,xPlayerLifestealTotal,xGetFloat(dPlayerData,xPlayerLifestealTotal,p) + lifesteal,p);
-	if (PvP) {
-		int index = xGetInt(dEnemies, xDoppelganger);
-		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, true);
-		damagePlayerUnit(dmg, index);
-		aiPlanSetUserVariableBool(dPlayerUnits, xDirtyBit, index, false);
-	} else {
-		trDamageUnit(dmg);
-	}
-	return(dmg);
-}
-
 
 void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
@@ -650,6 +1038,9 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 	if (db == dEnemies) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
 			advanceCooldowns(p, 1);
+		}
+		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
+			trDamageUnitPercent(1.0 - xGetFloat(db, xMagicResist));
 		}
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p);
 		xUnitSelectByID(db,xUnitID);
@@ -704,6 +1095,21 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 				trQuestVarSet("stunSound", 1);
 			}
 			xSetInt(db,xStunTimeout,trTimeMS() + duration);
+			if (playerHasSymphony(p, SYMPHONY_STUN_HEAL)) {
+				xSetFloat(dPlayerData, xPlayerLifestealTotal, 0.1 * xGetFloat(dPlayerData, xPlayerHealth, p) + xGetFloat(dPlayerData, xPlayerLifestealTotal, p), p);
+			}
+		}
+		if (targetPlayers && (playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS))) {
+			int old = xGetPointer(dEnemies);
+			vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
+			for(i=xGetDatabaseCount(dEnemies); >0) {
+				xDatabaseNext(dEnemies);
+				xUnitSelectByID(dEnemies, xUnitID);
+				if (unitDistanceToVector(xGetInt(dEnemies, xUnitName), pos) < 25.0) {
+					stunUnit(dEnemies, duration, p);
+				}
+			}
+			xSetPointer(dEnemies, old);
 		}
 	}
 	
@@ -880,6 +1286,11 @@ void OnHit(int p = 0, int index = 0, bool magic = false) {
 			}
 		}
 	}
+	if (playerHasSymphony(p, SYMPHONY_POISON_STACKS)) {
+		if (xGetInt(dEnemies, xPoisonStatus, index) > 0) {
+			xSetFloat(dEnemies, xPoisonDamage, xGetFloat(dEnemies, xPoisonDamage, index) + 10.0, index);
+		}
+	}
 	if (xGetFloat(dPlayerData,xPlayerCleave) > 0) {
 		int prev = xGetPointer(dEnemies);
 		if (index != prev) {
@@ -976,7 +1387,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 					OnHit(p, xGetInt(db,xCharAttackTargetIndex));
 				}
 
-				if (xGetFloat(db, xCharSmiteDamage) > 0) {
+				if (xGetFloat(db, xCharSmiteDamage) + trQuestVarGet("p"+p+"laserAttacks") > 0) {
 					vector pos = vectorSnapToGrid(kbGetBlockPosition(""+xGetInt(db, xUnitName)));
 					vector dir = getUnitVector(pos, kbGetBlockPosition(""+xGetInt(dEnemies, xUnitName, xGetInt(db, xCharAttackTargetIndex))));
 					float dist = xsMax(16.0, xGetFloat(dPlayerData, xPlayerRange, p) + 4.0);
@@ -995,7 +1406,7 @@ int CheckOnHit(int p = 0, bool onhit = true) {
 						xUnitSelectByID(dEnemies, xUnitID);
 						if (trUnitAlive()) {
 							if (rayCollision(dEnemies, pos, dir, dist, 3.0)) {
-								damageEnemy(p, xGetFloat(db, xCharSmiteDamage));
+								damageEnemy(p, xGetFloat(db, xCharSmiteDamage) + trQuestVarGet("p"+p+"laserAttacks"));
 							}
 						}
 					}
@@ -1149,108 +1560,6 @@ int initGenericProj(string name = "", int proto = 0, int anim = 0, float speed =
 	return(db);
 }
 
-int dSphinxes = 0;
-int dDryads = 0;
-int dMedusas = 0;
-int dMountainGiants = 0;
-int dFrostGiants = 0;
-int dValkyries = 0;
-int dBallistas = 0;
-int dFireSiphons = 0;
-int dBattleBoars = 0;
-int dAutomatons = 0;
-int dScarabs = 0;
-int dSatyrs = 0;
-int dAvengers = 0;
-int dScorpionMen = 0;
-int dMummies = 0;
-int dNereids = 0;
-int dHydras = 0;
-int dKrakens = 0;
-int dLampades = 0;
-int dEinherjars = 0;
-int dLightningStatues = 0;
-int dManticores = 0;
-int dFireGiants = 0;
-int dArgus = 0;
-int dFireLance = 0;
-
-int dFireLancePellets = 0;
-int xFireLancePelletPrev = 0;
-int xFireLancePelletDir = 0;
-int xFireLancePelletLast = 0;
-int xFireLancePelletTimeout = 0;
-
-int dAutomatonBombs = 0;
-
-int xSpecialIndex = 0;
-int xSpecialStep = 0;
-int xSpecialNext = 0;
-int xSpecialTarget = 0;
-
-int dDelayLasers = 0;
-int xLaserDir = 0;
-int xLaserPhase = 0;
-int xLaserNext = 0;
-int xLaserDist = 0;
-
-int dBallistaShots = 0;
-int xBallistaShot1 = 0;
-int xBallistaShot2 = 0;
-
-int dYeebLightning = 0;
-int xTimeout = 0;
-
-int dYeebLightningEnd = 0;
-
-int dBarrages = 0;
-int xBarragePos = 0;
-int xBarrageDir = 0;
-int xBarrageCount = 0;
-
-int dMedusaBalls = 0;
-int xMedusaBallTarget = 0;
-int xMedusaBallBounces = 0;
-
-int dMummyBalls = 0;
-int xProjType = 0;
-
-int dAvengerProj = 0;
-int xAvengerProjDist = 0;
-int xAvengerProjUnit = 0;
-int xAvengerProjIndex = 0;
-
-int xMummyStart = 0;
-int xMummyDir = 0;
-
-int dFireGiantProj = 0;
-int xFireGiantProjOwner = 0;
-int dFireGiantBalls = 0;
-
-int dTrolls = 0;
-
-int dTrollHarpoons = 0;
-int xTrollHarpoonLast = 0;
-int xTrollHarpoonLine = 0;
-int xTrollHarpoonStart = 0;
-
-int dTrollLines = 0;
-int xTrollLineTarget = 0;
-int xTrollLineTargetDB = 0;
-int xTrollLineTargetIndex = 0;
-int xTrollLineStart = 0;
-
-int dYeebLightningBalls = 0;
-
-int dTartarianSpawns = 0;
-
-int dTartarianEggs = 0;
-int xTartarianEggTimeout = 0;
-
-int dAmbushRooms = 0;
-int xAmbushRoomType = 0;
-int xAmbushRoomPos = 0;
-
 int initSpecialDatabase(string name = "", bool step = true) {
 	int db = xInitDatabase(name);
 	xInitAddInt(db, "name");
@@ -1264,13 +1573,7 @@ int initSpecialDatabase(string name = "", bool step = true) {
 	return(db);
 }
 
-void addSpecialToDatabase(int db = 0,int name = 0, int from = 0, int p = 0) {
-	xSetPointer(db, xAddDatabaseBlock(db));
-	xSetInt(db, xUnitName,name);
-	xSetInt(db, xPlayerOwner,p);
-	xSetInt(db, xUnitID, xGetInt(from,xUnitID));
-	xSetInt(db, xSpecialIndex, xGetNewestPointer(from));
-}
+
 
 rule initialize_special_database
 active
@@ -1439,210 +1742,6 @@ highFrequency
 	
 }
 
-
-void activateSpecialUnit(int name = 1, int db = 0, int proto = 0, int p = 0) {
-	int index = 0;
-	switch(proto)
-	{
-		case kbGetProtoUnitID("Sphinx"):
-		{
-			addSpecialToDatabase(dSphinxes,name,db,p);
-		}
-		case kbGetProtoUnitID("Dryad"):
-		{
-			addSpecialToDatabase(dDryads,name,db,p);
-		}
-		case kbGetProtoUnitID("Wadjet"):
-		{
-			addSpecialToDatabase(dDryads,name,db,p);
-		}
-		case kbGetProtoUnitID("Medusa"):
-		{
-			addSpecialToDatabase(dMedusas,name,db,p);
-		}
-		case kbGetProtoUnitID("Mountain Giant"):
-		{
-			addSpecialToDatabase(dMountainGiants,name,db,p);
-		}
-		case kbGetProtoUnitID("Frost Giant"):
-		{
-			addSpecialToDatabase(dFrostGiants,name,db,p);
-		}
-		case kbGetProtoUnitID("Troll"):
-		{
-			addSpecialToDatabase(dTrolls,name,db,p);
-		}
-		case kbGetProtoUnitID("Argus"):
-		{
-			addSpecialToDatabase(dArgus,name,db,p);
-		}
-		case kbGetProtoUnitID("Valkyrie"):
-		{
-			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
-			addSpecialToDatabase(dValkyries,name,db,p);
-			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
-				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
-		}
-		case kbGetProtoUnitID("Ballista"):
-		{
-			addSpecialToDatabase(dBallistas,name,db,p);
-		}
-		case kbGetProtoUnitID("Colossus"):
-		{
-			xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
-			addSpecialToDatabase(dValkyries,name,db,p);
-			spyEffect(name,kbGetProtoUnitID("Vortex Finish Linked"),
-				xsVectorSet(dValkyries,xSpecialNext,xGetNewestPointer(dValkyries)));
-		}
-		case kbGetProtoUnitID("Fire Siphon"):
-		{
-			addSpecialToDatabase(dFireSiphons,name,db,p);
-		}
-		case kbGetProtoUnitID("Battle Boar"):
-		{
-			addSpecialToDatabase(dBattleBoars,name,db,p);
-		}
-		case kbGetProtoUnitID("Automaton SPC"):
-		{
-			addSpecialToDatabase(dAutomatons,name,db,p);
-		}
-		case kbGetProtoUnitID("Behemoth"):
-		{
-			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
-		}
-		case kbGetProtoUnitID("Scarab"):
-		{
-			xSetFloat(db,xMagicResist,-1,xGetNewestPointer(db));
-			addSpecialToDatabase(dScarabs,name,db,p);
-		}
-		case kbGetProtoUnitID("Satyr"):
-		{
-			addSpecialToDatabase(dSatyrs,name,db,p);
-		}
-		case kbGetProtoUnitID("Avenger"):
-		{
-			addSpecialToDatabase(dAvengers,name,db,p);
-		}
-		case kbGetProtoUnitID("Scorpion Man"):
-		{
-			addSpecialToDatabase(dScorpionMen,name,db,p);
-		}
-		case kbGetProtoUnitID("Mummy"):
-		{
-			addSpecialToDatabase(dMummies,name,db,p);
-		}
-		case kbGetProtoUnitID("Nereid"):
-		{
-			addSpecialToDatabase(dNereids,name,db,p);
-		}
-		case kbGetProtoUnitID("Hydra"):
-		{
-			addSpecialToDatabase(dHydras,name,db,p);
-			xSetInt(dHydras,xSpecialStep,trTime());
-		}
-		case kbGetProtoUnitID("Kraken"):
-		{
-			addSpecialToDatabase(dKrakens,name,db,p);
-		}
-		case kbGetProtoUnitID("Lampades"):
-		{
-			addSpecialToDatabase(dLampades,name,db,p);
-		}
-		case kbGetProtoUnitID("Einheriar"):
-		{
-			addSpecialToDatabase(dEinherjars,name,db,p);
-		}
-		case kbGetProtoUnitID("Statue of Lightning"):
-		{
-			addSpecialToDatabase(dLightningStatues,name,db,p);
-		}
-		case kbGetProtoUnitID("Fire Giant"):
-		{
-			addSpecialToDatabase(dFireGiants,name,db,p);
-		}
-		case kbGetProtoUnitID("Manticore"):
-		{
-			addSpecialToDatabase(dManticores,name,db,p);
-		}
-		case kbGetProtoUnitID("Tartarian Gate Spawn"):
-		{
-			addSpecialToDatabase(dTartarianSpawns,name,db,p);
-		}
-		case kbGetProtoUnitID("Hippocampus"):
-		{
-			if (p == ENEMY_PLAYER) {
-				xSetFloat(db,xMagicResist,1,xGetNewestPointer(db));
-				xSetFloat(db,xPhysicalResist,1,xGetNewestPointer(db));
-			}
-		}
-		case kbGetProtoUnitID("Fire Lance"):
-		{
-			addSpecialToDatabase(dFireLance,name,db,p);
-		}
-	}
-}
-
-int activatePlayerUnit(int name = 0, int p = 0, int proto = 0, float decay = 0) {
-	int id = kbGetBlockID(""+name,true);
-	int index = xAddDatabaseBlock(dPlayerUnits);
-	xSetPointer(dPlayerUnits,index);
-	xSetInt(dPlayerUnits,xUnitName,name);
-	xSetInt(dPlayerUnits,xPlayerOwner,p);
-	xSetInt(dPlayerUnits,xUnitID,id);
-	xSetFloat(dPlayerUnits,xDecay,decay);
-	xSetInt(dPlayerUnits,xDecayNext,trTimeMS()+1000);
-	xSetInt(dPlayerUnits, xUnitProto, proto);
-	xSetFloat(dPlayerUnits,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
-	xSetFloat(dPlayerUnits,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
-	if (PvP) {
-		xSetInt(dPlayerUnits,xDoppelganger, xAddDatabaseBlock(dEnemies, true));
-		xSetInt(dEnemies,xDoppelganger,index);
-		xSetInt(dEnemies,xPlayerOwner,p);
-		xSetInt(dEnemies,xUnitName,name);
-		xSetInt(dEnemies,xUnitID,id);
-		xSetInt(dEnemies, xUnitProto, proto);
-		xSetFloat(dEnemies,xPhysicalResist,trQuestVarGet("proto"+proto+"armor"));
-		xSetFloat(dEnemies,xMagicResist,trQuestVarGet("proto"+proto+"armor"));
-		if (pvpDetached) {
-			xDetachDatabaseBlock(dEnemies);
-		}
-	}
-	activateSpecialUnit(name, dPlayerUnits, proto, p);
-	return(index);
-}
-
-int spawnPlayerUnit(int p = 0, int proto = 0, vector vdb = vector(0,0,0), float decay = 0) {
-	int next = trGetNextUnitScenarioNameNumber();
-	string pName = kbGetProtoUnitName(proto);
-	trArmyDispatch(""+p+",0","Dwarf",1,xsVectorGetX(vdb),0,xsVectorGetZ(vdb),0,true);
-	trArmySelect(""+p+",0");
-	trUnitChangeProtoUnit(pName);
-	return(activatePlayerUnit(next, p, proto, decay));
-}
-
-int spawnPlayerClone(int p = 0, vector vdb = vector(0,0,0)) {
-	int prev = xGetPointer(dPlayerData);
-	xSetPointer(dPlayerData,p);
-	int class = xGetInt(dPlayerData,xPlayerClass);
-	int next = trGetNextUnitScenarioNameNumber();
-	int db = getCharactersDB(p);
-	int index = spawnPlayerUnit(p, xGetInt(dClass,xClassProto,class), vdb);
-	int id = kbGetBlockID(""+next,true);
-	xSetPointer(db, xAddDatabaseBlock(db));
-	xSetInt(db, xUnitName, next);
-	xSetInt(db,xUnitID,id);
-	xSetInt(db, xCharIndex, index);
-	xSetBool(dPlayerUnits,xIsHero,true);
-	xSetFloat(dPlayerUnits,xPhysicalResist,xGetFloat(dPlayerData,xPlayerPhysicalResist));
-	xSetFloat(dPlayerUnits,xMagicResist,xGetFloat(dPlayerData,xPlayerMagicResist));
-	xSetPointer(dPlayerCharacters, xAddDatabaseBlock(dPlayerCharacters));
-	xSetInt(dPlayerCharacters,xUnitName,next);
-	xSetInt(dPlayerCharacters,xPlayerOwner,p);
-	xSetInt(dPlayerCharacters,xUnitID,id);
-	xSetInt(dPlayerCharacters, xCharIndex, index);
-	xSetPointer(dPlayerData, prev);
-	return(index);
-}
 
 void spawnPlayer(int p = 0, vector vdb = vector(0,0,0)) {
 	xSetInt(dPlayerData,xPlayerUnit,trGetNextUnitScenarioNameNumber(),p);

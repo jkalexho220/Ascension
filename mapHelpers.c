@@ -33,6 +33,7 @@ const int ROOM_JESTER_BOSS = 15;
 const int ROOM_PLAGUE_BOSS = 16;
 const int ROOM_MOUNTAIN_BOSS = 17;
 const int ROOM_SYMPHONY_BOSS = 18;
+const int ROOM_SYMPHONY_UPGRADE = 19;
 
 const int ROOM_VILLAGE = 10;
 const int ROOM_TEMPLE = 50;

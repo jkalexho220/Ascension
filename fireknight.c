@@ -41,6 +41,7 @@ void fireknightAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int count = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
 	int infernos = trQuestVarGet("p"+p+"inferno");
@@ -293,16 +294,23 @@ void fireknightAlways(int eventID = -1) {
 			pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
-				xUnitSelectByID(db, xUnitID);
-				trDamageUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
-				
-				next = trGetNextUnitScenarioNameNumber();
-				trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
-				trUnitSelectClear();
-				trUnitSelect(""+next, true);
-				trDamageUnitPercent(100);
-				trUnitChangeProtoUnit("Meteorite");
-				amt = 50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage);
+				count = 1;
+				if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+					count = 2;
+				}
+				for(i=count; >0) {
+					xUnitSelectByID(db, xUnitID);
+					trDamageUnit(50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage));
+					
+					next = trGetNextUnitScenarioNameNumber();
+					trArmyDispatch("1,0","Dwarf",1,xsVectorGetX(pos),0,xsVectorGetZ(pos),0,true);
+					trUnitSelectClear();
+					trUnitSelect(""+next, true);
+					trDamageUnitPercent(100);
+					trUnitChangeProtoUnit("Meteorite");
+					amt = amt + 50.0 * xGetFloat(dPlayerData, xPlayerSpellDamage);
+				}
+
 				trSoundPlayFN("fireball fall 2.wav","1",-1,"","");
 			}
 			xsSetContextPlayer(p);

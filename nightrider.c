@@ -84,6 +84,7 @@ void nightriderAlways(int eventID = -1) {
 	int id = 0;
 	int hit = 0;
 	int target = 0;
+	int count = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
 	int sentences = trQuestVarGet("p"+p+"sentences");
@@ -122,12 +123,18 @@ void nightriderAlways(int eventID = -1) {
 				}
 				if (hit == ON_HIT_SPECIAL) {
 					if (xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex))) {
-						if (xGetBool(dEnemies, xDeathSentence) == false) {
-							castDeathSentence(p);
-						} else { // summon a minion instead
-							pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
-							trQuestVarSetFromRand("heading", 1, 360, true);
-							spawnMinion(p, pos, trQuestVarGet("heading"));
+						count = 1;
+						if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+							count = 2;
+						}
+						for(i=count; >0) {
+							if (xGetBool(dEnemies, xDeathSentence) == false) {
+								castDeathSentence(p);
+							} else { // summon a minion instead
+								pos = kbGetBlockPosition(""+xGetInt(db, xUnitName), true);
+								trQuestVarSetFromRand("heading", 1, 360, true);
+								spawnMinion(p, pos, trQuestVarGet("heading"));
+							}
 						}
 					}
 				}

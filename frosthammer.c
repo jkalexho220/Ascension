@@ -48,6 +48,7 @@ void frosthammerAlways(int eventID = -1) {
 	int hit = 0;
 	int target = 0;
 	int next = 0;
+	int count = 0;
 	int index = xGetPointer(dEnemies);
 	int db = getCharactersDB(p);
 	int icicles = trQuestVarGet("p"+p+"icicles");
@@ -361,9 +362,15 @@ void frosthammerAlways(int eventID = -1) {
 			trSetSelectedScale(scale, scale, scale);
 			hit = CheckOnHit(p);
 			if (hit == ON_HIT_SPECIAL) {
-				xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex));
-				stunUnit(dEnemies, 3.0, p);
-				frostHammerGrow(p);
+				count = 1;
+				if (playerHasSymphony(p, SYMPHONY_DOUBLE_SPECIAL)) {
+					count = 2;
+				}
+				for(i=count; >0) {
+					xSetPointer(dEnemies, xGetInt(db, xCharAttackTargetIndex));
+					stunUnit(dEnemies, 3.0, p);
+					frostHammerGrow(p);
+				}
 			}
 		}
 	}
