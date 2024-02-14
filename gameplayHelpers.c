@@ -501,6 +501,7 @@ void silencePlayer(int p = 0) {
 }
 
 void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
+	int old = 0;
 	bool targetPlayers = (db == dPlayerUnits);
 	if (db == dEnemies) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
@@ -509,7 +510,7 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p) * xsPow(0.5, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
 		damage = damage * xGetFloat(dPlayerData,xPlayerSpellDamage,p) * xsPow(2, xGetInt(dPlayerData,xPlayerPoisonSpeed,p));
 		if (PvP) {
-			int old = xGetPointer(dPlayerUnits);
+			old = xGetPointer(dPlayerUnits);
 			int index = xGetInt(dEnemies, xDoppelganger);
 			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
 			xSetPointer(dPlayerUnits, index);
@@ -556,7 +557,7 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 		}
 
 		if (targetPlayers && playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS)) {
-			int old = xGetPointer(dEnemies);
+			old = xGetPointer(dEnemies);
 			vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
 			for(i=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
@@ -571,6 +572,7 @@ void poisonUnit(int db = 0, float duration = 0, float damage = 0, int p = 0) {
 }
 
 void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
+	int old = 0;
 	if (db == dEnemies) {
 		duration = duration * xGetFloat(dPlayerData,xPlayerSpellDuration,p);
 		
@@ -583,7 +585,7 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 			}
 		}
 		if (PvP) {
-			int old = xGetPointer(dPlayerUnits);
+			old = xGetPointer(dPlayerUnits);
 			int index = xGetInt(dEnemies, xDoppelganger);
 			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
 			xSetPointer(dPlayerUnits, index);
@@ -621,7 +623,7 @@ void silenceUnit(int db = 0, float duration = 9.0, int p = 0) {
 		}
 	}
 	if ((db == dPlayerUnits) && playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS)) {
-		int old = xGetPointer(dEnemies);
+		old = xGetPointer(dEnemies);
 		vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
 		for(k=xGetDatabaseCount(dEnemies); >0) {
 			xDatabaseNext(dEnemies);
@@ -1034,6 +1036,7 @@ void growFrostGiantsIncoming(vector pos = vector(0,0,0)) {
 
 void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 	int index = 0;
+	int old = 0;
 	bool targetPlayers = (db == dPlayerUnits);
 	if (db == dEnemies) {
 		if (xGetInt(dPlayerData,xPlayerGodBoon,p) == BOON_STATUS_COOLDOWNS) {
@@ -1048,7 +1051,7 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 			damageEnemy(p, xGetFloat(dPlayerData,xPlayerHealth,p) * xGetFloat(dPlayerData,xPlayerStunDamage,p), true);
 		}
 		if (PvP) {
-			int old = xGetPointer(dPlayerUnits);
+			old = xGetPointer(dPlayerUnits);
 			index = xGetInt(dEnemies, xDoppelganger);
 			aiPlanSetUserVariableBool(dPlayerUnits,xDirtyBit,index,true);
 			xSetPointer(dPlayerUnits, index);
@@ -1101,7 +1104,7 @@ void stunUnit(int db = 0, float duration = 0, int p = 0, bool sound = true) {
 			}
 		}
 		if (targetPlayers && (playerHasSymphony(xGetInt(db, xPlayerOwner), SYMPHONY_SHARE_STATUS))) {
-			int old = xGetPointer(dEnemies);
+			old = xGetPointer(dEnemies);
 			vector pos = kbGetBlockPosition(""+xGetInt(dPlayerData, xPlayerUnit, xGetInt(db, xPlayerOwner)), true);
 			for(i=xGetDatabaseCount(dEnemies); >0) {
 				xDatabaseNext(dEnemies);
