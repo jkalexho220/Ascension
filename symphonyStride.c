@@ -525,7 +525,7 @@ highFrequency
 		trQuestVarSet("killgoal", 10 + trQuestVarGet("killgoal"));
 
 		//todo :delete
-		trQuestVarSet("killgoal", 1);
+		//trQuestVarSet("killgoal", 1);
 
 		symphonyCreateSpawners(2 + (trQuestVarGet("symphonyRound") / 3));
 
@@ -544,7 +544,7 @@ highFrequency
 		int next = 0;
 		trQuestVarSetFromRand("rand", 5, 10);
 		trQuestVarSetFromRand("proto", 1, 5, true);
-		trQuestVarSet("rand", 1); // TODO: delete
+		//trQuestVarSet("rand", 1); // TODO: delete
 
 		trQuestVarSet("killcount", trQuestVarGet("killcount") + trQuestVarGet("rand"));
 		for(i=trQuestVarGet("rand"); >0) {
@@ -771,6 +771,10 @@ highFrequency
 						xSetFloat(dPlayerData, xPlayerBaseAttackTrue, xGetFloat(dPlayerData, xPlayerBaseAttackTrue) * 1.2);
 						xSetFloat(dPlayerData, xPlayerHealth, xGetFloat(dPlayerData, xPlayerHealth) * 1.2);
 						relicEffect(RELIC_ARMOR, p, true);
+						relicEffect(RELIC_ATTACK_DAMAGE, p, true);
+						relicEffect(RELIC_ATTACK_DAMAGE, p, false);
+						relicEffect(RELIC_HEALTH, p, true);
+						relicEffect(RELIC_HEALTH, p, false);
 					}
 					case SYMPHONY_MORE_MAGICAL:
 					{
@@ -780,6 +784,10 @@ highFrequency
 						xSetFloat(dPlayerData, xPlayerSpellDuration, xGetFloat(dPlayerData, xPlayerSpellDuration) * 1.2);
 						relicEffect(RELIC_SPELL_POWER, p, true);
 						relicEffect(RELIC_SPELL_POWER, p, false);
+						relicEffect(RELIC_SPELL_DURATION, p, true);
+						relicEffect(RELIC_SPELL_DURATION, p, false);
+						relicEffect(RELIC_SPELL_RANGE, p, true);
+						relicEffect(RELIC_SPELL_RANGE, p, false);
 					}
 					case SYMPHONY_REGENERATE_FAVOR:
 					{
